@@ -16,6 +16,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 
 TOPICS = [
+    ("le ciel bleu et l'arc-en-ciel", "le-ciel-bleu-et-l-arc-en-ciel.html"),
+    ("l'arc-en-ciel", "le-ciel-bleu-et-l-arc-en-ciel.html"),
+    ("la physique du sport", "la-physique-du-sport.html"),
+    ("le climat et l'effet de serre", "le-climat-et-l-effet-de-serre.html"),
+    ("l'effet de serre", "le-climat-et-l-effet-de-serre.html"),
     ("les acides et les bases", "les-acides-et-les-bases.html"),
     ("le pH", "les-acides-et-les-bases.html"),
     ("la gravitation", "la-gravitation.html"),
@@ -131,6 +136,8 @@ a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-dec
 # Une page d'accueil par matière : chaque tutoriel renvoie vers la sienne,
 # et « précédent / suivant » reste dans la même matière.
 LANDINGS = [("index.html", "Tous les tutoriels"), ("physique.html", "Tous les tutoriels de physique")]
+# Pages de révision qui ne sont pas des cartes mais appartiennent à une matière.
+HOME_OF = {"physique.html": ("glossaire-physique.html", "revisions-brevet-physique.html")}
 
 
 def landing_order():
@@ -177,6 +184,8 @@ def process(path, order):
 
     home, label, seq = order[0][0], order[0][1], []
     for landing, lab, cards in order:
+        if path.name in HOME_OF.get(landing, ()):
+            home, label = landing, lab
         if any(h == path.name for h, _ in cards):
             home, label, seq = landing, lab, cards
     names = [h for h, _ in seq]

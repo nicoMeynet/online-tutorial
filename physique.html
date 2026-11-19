@@ -31,6 +31,7 @@
   --c-mvt: #15803d;       --c-mvt-s: #dcf3e3;
   --c-energie: #c2410c;   --c-energie-s: #fde6d8;
   --c-signaux: #4338ca;   --c-signaux-s: #e4e4fd;
+  --c-pcurio: #be185d;    --c-pcurio-s: #fbe1ee;
   --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
   --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
   --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
@@ -51,6 +52,7 @@
     --c-mvt: #86efac;       --c-mvt-s: #143a22;
     --c-energie: #fdba74;   --c-energie-s: #46261a;
     --c-signaux: #a5b4fc;   --c-signaux-s: #23244a;
+    --c-pcurio: #f9a8d4;    --c-pcurio-s: #43192e;
     color-scheme: dark;
   }
 }
@@ -82,7 +84,8 @@ header { display: flex; flex-direction: column; gap: 10px; }
 .search input { flex: 1; min-width: 0; font: inherit; padding: 10px 14px; border: 2px solid var(--ink); border-radius: 10px; background: var(--card); color: var(--ink); }
 .search input:focus-visible { outline: 3px solid var(--red); outline-offset: 2px; }
 .count { font-family: var(--f-mono); font-size: .9rem; color: var(--soft); white-space: nowrap; }
-.chips { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: thin; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+@media (max-width: 700px) { .tools { position: static; } .chips { gap: 6px; } .chips a { font-size: .85rem; padding: 4px 10px; } }
 .chips a { flex: none; text-decoration: none; font-family: var(--f-display); font-weight: 700; font-size: .95rem; padding: 6px 12px; border-radius: 999px; border: 2px solid currentColor; background: var(--card); }
 .chips a:focus-visible { outline: 3px solid var(--red); outline-offset: 2px; }
 
@@ -105,10 +108,12 @@ a.card span.d { color: var(--soft); font-size: .95rem; }
 
 footer { margin-top: 12px; padding-top: 14px; border-top: 2px solid var(--ink); color: var(--soft); font-size: .9rem; }
 @media (prefers-reduced-motion: reduce) { a.card { transition: none; } }
-.extras { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 12px; margin: 22px 0 0; }
+.extras { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 12px; margin: 22px 0 0; }
 .extras a { display: flex; gap: 12px; align-items: center; text-decoration: none; color: var(--ink); background: var(--card); border: 2px solid var(--ink); border-radius: 12px; padding: 12px 14px; box-shadow: 3px 3px 0 var(--ink); min-width: 0; }
 .extras a:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
 .extras .ico { font-size: 1.6rem; line-height: 1; }
+.extras a.star { background: var(--ink); color: var(--paper); }
+.extras a.star span.d { color: var(--paper); opacity: .85; }
 .extras strong { display: block; font-family: var(--f-display); font-weight: 800; }
 .extras span.d { font-size: .9rem; color: var(--soft); }
 #progress { margin: 18px 0 0; padding: 12px 14px; border: 2px dashed var(--line); border-radius: 12px; display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; }
@@ -143,14 +148,17 @@ a.card .prog.full { background: #ffd34d; color: #1d2233; border-color: #b7791f; 
   </header>
 
   <nav class="extras" aria-label="Pour réviser">
-    <a href="fiches.html#physique"><span class="ico" aria-hidden="true">🖨</span><span><strong>Fiches à imprimer</strong><span class="d">L'essentiel de chaque tutoriel, maths et physique.</span></span></a>
-    <a href="index.html"><span class="ico" aria-hidden="true">📐</span><span><strong>Les tutoriels de maths</strong><span class="d">Vitesse, vecteurs, puissances, proportionnalité : les outils du physicien.</span></span></a>
+    <a href="parcours.html#physique" class="star"><span class="ico" aria-hidden="true">🧭</span><span><strong>Mon parcours</strong><span class="d">Ta formation personnalisée : quoi faire ensuite, selon ce que tu as réussi.</span></span></a>
+    <a href="revisions-brevet-physique.html"><span class="ico" aria-hidden="true">🎯</span><span><strong>Quiz brevet de physique</strong><span class="d">Des questions de tous les thèmes, avec ton score.</span></span></a>
+    <a href="fiches.html#physique"><span class="ico" aria-hidden="true">🖨</span><span><strong>Fiches à imprimer</strong><span class="d">L'essentiel de chaque tutoriel de physique, à relire.</span></span></a>
+    <a href="glossaire-physique.html"><span class="ico" aria-hidden="true">📖</span><span><strong>Glossaire de physique</strong><span class="d">Tous les mots de physique-chimie expliqués simplement.</span></span></a>
   </nav>
 
   <div id="progress" hidden aria-live="polite">
     <strong>Ta progression</strong>
     <span><b data-seen>0</b> tutoriels ouverts · <b data-mastered>0</b> quiz réussis (6/8 ou plus)</span>
     <span class="bar" aria-hidden="true"><i></i></span>
+    <a href="parcours.html#physique" style="font-weight:700">Voir mon parcours →</a>
     <button type="button" id="progressReset">Effacer</button>
     <span class="soft" style="flex-basis:100%;font-size:.85rem">Enregistrée seulement sur cet appareil, dans ce navigateur.</span>
   </div>
@@ -159,13 +167,14 @@ a.card .prog.full { background: #ffd34d; color: #1d2233; border-color: #b7791f; 
     <div class="search">
       <label for="q" class="soft" style="position:absolute;left:-9999px">Chercher un tutoriel</label>
       <input id="q" type="search" placeholder="Chercher : atome, lumière, circuit…" autocomplete="off">
-      <span class="count" id="count">18 tutoriels</span>
+      <span class="count" id="count">21 tutoriels</span>
     </div>
     <nav class="chips" aria-label="Aller à une catégorie">
       <a href="#matiere" style="color:var(--c-matiere)">La matière et ses transformations</a>
       <a href="#mouvement" style="color:var(--c-mvt)">Mouvement et interactions</a>
       <a href="#energie" style="color:var(--c-energie)">L'énergie et l'électricité</a>
       <a href="#signaux" style="color:var(--c-signaux)">Signaux : lumière, son et communication</a>
+      <a href="#curiosites-physique" style="color:var(--c-pcurio)">Physique et curiosités</a>
     </nav>
   </div>
 
@@ -211,6 +220,15 @@ a.card .prog.full { background: #ffd34d; color: #1d2233; border-color: #b7791f; 
     </div>
   </section>
 
+  <section class="cat" id="curiosites-physique" style="--c:var(--c-pcurio);--cs:var(--c-pcurio-s)">
+    <div class="cat-head"><h2 style="color:var(--c-pcurio)">Physique et curiosités</h2><span class="n">3 tutoriels</span><p>La physique cachée dans le ciel, le sport et le climat.</p></div>
+    <div class="cards">
+      <a class="card" href="le-ciel-bleu-et-l-arc-en-ciel.html"><span class="top"><span class="sym">🌈</span><span class="lvl">curiosité</span></span><strong>Le ciel bleu et l'arc-en-ciel</strong><span class="d">Pourquoi le ciel est bleu et le coucher de soleil rouge, et comment naît un arc-en-ciel.</span></a>
+      <a class="card" href="la-physique-du-sport.html"><span class="top"><span class="sym">🏅</span><span class="lvl">curiosité</span></span><strong>La physique du sport</strong><span class="d">Sprint, lancer, saut à la perche, parachute et effet de balle : la physique des records.</span></a>
+      <a class="card" href="le-climat-et-l-effet-de-serre.html"><span class="top"><span class="sym">🌡</span><span class="lvl">curiosité</span></span><strong>Le climat et l'effet de serre</strong><span class="d">Le bilan d'énergie de la Terre, le CO₂, le réchauffement et les solutions.</span></a>
+    </div>
+  </section>
+
   <p class="empty" id="empty" hidden>Aucun tutoriel ne correspond à ta recherche. Essaie un autre mot, comme « triangle », « nombre » ou « calcul ».</p>
 
   <footer>© 2026 Nicolas Meynet</footer>
@@ -222,6 +240,9 @@ a.card .prog.full { background: #ffd34d; color: #1d2233; border-color: #b7791f; 
   var sections = [].slice.call(document.querySelectorAll("section.cat"));
   function norm(s) { return s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, ""); }
   var keys = {
+    "le-ciel-bleu-et-l-arc-en-ciel.html": "ciel bleu arc en ciel coucher soleil diffusion lumiere couleur goutte",
+    "la-physique-du-sport.html": "sport sprint lancer saut perche parachute frottement vitesse limite",
+    "le-climat-et-l-effet-de-serre.html": "climat effet de serre co2 rechauffement temperature carbone energie",
     "les-acides-et-les-bases.html": "acide base ph indicateur chou rouge ion corrosif neutre",
     "la-gravitation.html": "gravitation attraction newton orbite lune satellite pesanteur",
     "l-energie-cinetique-et-la-securite-routiere.html": "energie cinetique vitesse freinage distance arret securite routiere voiture",

@@ -82,14 +82,20 @@ Accueil de la physique : [physique.html](physique.html).
 | [Tension, intensité et loi d'Ohm](la-loi-d-ohm.html) | Ampèremètre et voltmètre, un multimètre virtuel, les lois des circuits série et dérivation, U = R × I avec une expérience virtuelle, un quiz. |
 | [La puissance et l'énergie électrique](la-puissance-et-l-energie-electrique.html) | Les étiquettes des appareils, P = U × I, la multiprise et le disjoncteur, E = P × t, la veille, DEL contre ampoule, un quiz. |
 | [Les signaux et la communication](les-signaux-et-la-communication.html) | Émetteur, canal, récepteur, analogique et numérique, le Morse et le binaire, la fibre optique, les ondes radio, le débit, un quiz. |
+| [Le ciel bleu et l'arc-en-ciel](le-ciel-bleu-et-l-arc-en-ciel.html) | La diffusion de la lumière, le ciel bleu et le coucher de soleil rouge, les nuages blancs, l'arc-en-ciel dans une goutte, le second arc, un quiz. |
+| [La physique du sport](la-physique-du-sport.html) | Le sprint, les lancers et le meilleur angle, le saut à la perche, les frottements, le parachute et la vitesse limite, l'effet Magnus, un quiz. |
+| [Le climat et l'effet de serre](le-climat-et-l-effet-de-serre.html) | Météo et climat, le bilan d'énergie de la Terre, l'effet de serre, le CO₂, le réchauffement, l'albédo, l'empreinte carbone et les solutions, un quiz. |
 
 ## Pour réviser
 
 | Page | Contenu |
 |---|---|
+| [Mon parcours](parcours.html) | Une formation personnalisée : 8 parcours (maths et physique), la prochaine étape conseillée selon ce qui est réussi, les prérequis à revoir et des conseils. Générée par `python tools/parcours.py`. |
 | [Quiz brevet mélangé](revisions-brevet.html) | 60 types de questions tirées au hasard dans tous les thèmes du collège, mode entraînement ou examen, score par thème et tutoriels à revoir. |
 | [Fiches à imprimer](fiches.html) | L'essentiel de chaque tutoriel (sa partie « À retenir »), une catégorie par feuille. Générée par `python tools/fiches.py`. |
 | [Glossaire](glossaire.html) | Plus de 360 mots de maths expliqués simplement, avec un exemple et un lien vers le bon tutoriel. Lien direct vers un mot : `glossaire.html#hypotenuse`. |
+| [Quiz brevet de physique](revisions-brevet-physique.html) | Des questions de physique-chimie tirées au hasard dans les 4 thèmes, mode entraînement ou examen, score par thème. |
+| [Glossaire de physique](glossaire-physique.html) | Les mots de la physique-chimie expliqués simplement, avec leur unité, un exemple et un lien vers le bon tutoriel. |
 
 La **progression** (tutoriels ouverts, meilleur score à chaque quiz) est enregistrée par [progress.js](progress.js) dans le navigateur de l'élève, sans compte ni serveur. Elle s'affiche sur l'accueil.
 
@@ -98,4 +104,4 @@ La **progression** (tutoriels ouverts, meilleur score à chaque quiz) est enregi
 1. Ajouter un fichier `nom-du-tutoriel.html` à la racine.
 2. Ajouter une ligne dans le tableau ci-dessus.
 3. Ajouter une carte dans `index.html` (maths) ou `physique.html` (physique-chimie), dans la bonne catégorie.
-4. Lancer `python tools/fiches.py`, puis `python tools/liens.py` : il ajoute le logo (icône d'onglet et d'écran d'accueil), le retour à l'accueil, les liens « précédent / suivant » (dans l'ordre de `index.html`) et transforme les mentions « le tutoriel sur … » en liens. On peut le relancer sans risque.
+4. Ajouter le tutoriel dans un parcours de `tools/parcours.py` (et ses prérequis), puis lancer `python tools/parcours.py`, `python tools/fiches.py` et `python tools/liens.py` : il ajoute le logo (icône d'onglet et d'écran d'accueil), le retour à l'accueil, les liens « précédent / suivant » (dans l'ordre de `index.html`) et transforme les mentions « le tutoriel sur … » en liens. On peut le relancer sans risque.

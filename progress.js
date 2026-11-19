@@ -67,8 +67,10 @@
       }
       c.appendChild(b);
     });
-    var bre = d['revisions-brevet.html'], link = document.querySelector('.extras a[href="revisions-brevet.html"] .d');
-    if (link) link.textContent = bre && bre.total ? 'Ton meilleur score : ' + bre.best + ' / ' + bre.total + '. Retente ta chance !' : 'Des questions de tous les thèmes, avec ton score.';
+    ['revisions-brevet.html', 'revisions-brevet-physique.html'].forEach(function (f) {
+      var bre = d[f], link = document.querySelector('.extras a[href="' + f + '"] .d');
+      if (link) link.textContent = bre && bre.total ? 'Ton meilleur score : ' + bre.best + ' / ' + bre.total + '. Retente ta chance !' : 'Des questions de tous les thèmes, avec ton score.';
+    });
     var box = document.getElementById('progress');
     if (!box) return;
     if (!seen) { box.hidden = true; return; }
