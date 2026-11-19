@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Les ensembles de nombres</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, marge rouge. Les ensembles s'emboîtent comme des poupées russes : chaque ensemble a sa couleur, du vert (ℕ) au rose (ℝ). */
+:root {
+  --paper: #f7f7f5;
+  --grid: #e5e5df;
+  --card: #ffffff;
+  --ink: #23231f;
+  --ink-soft: #5c5c52;
+  --n: #15803d; --n-soft: #dcf1e2;
+  --z: #1c64c8; --z-soft: #dbe8fa;
+  --d: #b45309; --d-soft: #fbe7cf;
+  --q: #7c3aed; --q-soft: #ece4fd;
+  --r: #be123c; --r-soft: #fbe1e8;
+  --c: #475569; --c-soft: #e2e8f0;
+  --red: #cf3a52;
+  --hl: #fff0a3;
+  --line: #dadad2;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+  --f-set: "Cambria Math", "STIX Two Math", "Latin Modern Math", "Segoe UI Symbol", serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #121210; --grid: #1d1d19; --card: #191915; --ink: #eeeee6; --ink-soft: #b0b0a3;
+    --n: #6fd39f; --n-soft: #173a29; --z: #7fb0ff; --z-soft: #1a2a45; --d: #f5a35c; --d-soft: #46301a;
+    --q: #b69cff; --q-soft: #2c2350; --r: #ff7d9b; --r-soft: #43192a; --c: #a5b4c8; --c-soft: #262d38;
+    --red: #ff7d92; --hl: #4b4318; --line: #303029;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #121210; --grid: #1d1d19; --card: #191915; --ink: #eeeee6; --ink-soft: #b0b0a3;
+  --n: #6fd39f; --n-soft: #173a29; --z: #7fb0ff; --z-soft: #1a2a45; --d: #f5a35c; --d-soft: #46301a;
+  --q: #b69cff; --q-soft: #2c2350; --r: #ff7d9b; --r-soft: #43192a; --c: #a5b4c8; --c-soft: #262d38;
+  --red: #ff7d92; --hl: #4b4318; --line: #303029;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+.set { font-family: var(--f-set); font-weight: 700; font-size: 1.15em; }
+.cN { color: var(--n); } .cZ { color: var(--z); } .cD { color: var(--d); } .cQ { color: var(--q); } .cR { color: var(--r); } .cC { color: var(--c); }
+section { display: flex; flex-direction: column; gap: 18px; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+.chain { font-family: var(--f-set); font-weight: 700; font-size: clamp(2.2rem, 10vw, 3.6rem); display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; }
+.chain .sub { color: var(--ink-soft); font-family: var(--f-body); font-weight: 400; font-size: .5em; }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+.note { border-left: 4px solid var(--q); background: var(--q-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--r); background: var(--r-soft); }
+.note.slate { border-left-color: var(--c); background: var(--c-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { fill: var(--ink); }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 6px 12px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button.ex { font-family: var(--f-mono); font-weight: 600; font-size: .92rem; }
+button.setb { font-family: var(--f-set); font-size: 1.3rem; min-width: 52px; }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+button:disabled { opacity: .5; cursor: default; transform: none; }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+input[type="text"] { font: inherit; font-family: var(--f-mono); font-size: 1.15rem; padding: 10px 12px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; }
+
+.dolls svg { width: 100%; height: auto; display: block; }
+.dolls .chip { cursor: pointer; }
+.dolls .chip:focus { outline: none; }
+.dolls .chip:focus-visible rect { stroke-width: 4; }
+
+/* Cartes des ensembles */
+.sets { display: flex; flex-direction: column; gap: 12px; }
+.setcard { display: grid; grid-template-columns: 64px 1fr; gap: 14px; align-items: start; border-radius: 10px; padding: 14px 16px; border: 2px solid currentColor; }
+.setcard .sym { font-family: var(--f-set); font-weight: 700; font-size: 2.6rem; line-height: 1; text-align: center; }
+.setcard .txt { color: var(--ink); min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.setcard .txt strong { font-family: var(--f-display); font-size: 1.15rem; }
+.setcard .ex { font-family: var(--f-mono); font-size: .92rem; color: var(--ink-soft); }
+.sN { color: var(--n); background: var(--n-soft); } .sZ { color: var(--z); background: var(--z-soft); } .sD { color: var(--d); background: var(--d-soft); }
+.sQ { color: var(--q); background: var(--q-soft); } .sR { color: var(--r); background: var(--r-soft); } .sC { color: var(--c); background: var(--c-soft); }
+
+/* Classeur */
+.verdict { display: flex; flex-direction: column; gap: 10px; }
+.vnum { font-family: var(--f-mono); font-size: 1.6rem; font-weight: 700; overflow-wrap: anywhere; }
+.member { display: flex; flex-wrap: wrap; gap: 8px; }
+.member span { font-family: var(--f-set); font-weight: 700; font-size: 1.2rem; padding: 4px 12px; border-radius: 999px; border: 2px solid currentColor; display: inline-flex; gap: 6px; align-items: center; }
+.member span.no { opacity: .35; text-decoration: line-through; }
+.member span b { font-family: var(--f-body); font-size: .9rem; }
+.why { color: var(--ink); }
+.err { color: var(--red); font-weight: 700; }
+.rep { text-decoration: overline; text-decoration-thickness: 2px; color: var(--q); font-weight: 700; }
+.dec { font-family: var(--f-mono); font-size: 1.1rem; overflow-wrap: anywhere; line-height: 1.8; }
+
+table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+th, td { padding: 7px 8px; border-bottom: 1px dashed var(--line); text-align: center; font-family: var(--f-mono); }
+thead th { border-bottom: 2px solid var(--ink); font-family: var(--f-display); }
+.scroll { overflow-x: auto; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.quiz .qrow { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; }
+.quiz .q { font-family: var(--f-mono); font-size: 1.3rem; font-weight: 700; min-width: 90px; }
+.quiz .fb { font-size: .95rem; }
+.quiz .fb.ok { color: var(--n); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; display: block; }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 130px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+</head>
+<body>
+<main class="page">
+
+  <header class="hero">
+    <span class="eyebrow">Tutoriel de maths · niveau collège</span>
+    <h1>Les ensembles de nombres</h1>
+    <p class="lead">Entiers, relatifs, décimaux, fractions, irrationnels… Tous les nombres rangés dans des familles qui s'emboîtent comme des poupées russes.</p>
+    <div class="chain" aria-label="N inclus dans Z inclus dans D inclus dans Q inclus dans R">
+      <span class="cN">ℕ</span><span class="sub">⊂</span><span class="cZ">ℤ</span><span class="sub">⊂</span><span class="cD">𝔻</span><span class="sub">⊂</span><span class="cQ">ℚ</span><span class="sub">⊂</span><span class="cR">ℝ</span>
+    </div>
+    <p class="soft">Le signe ⊂ se lit « est inclus dans » : tous les nombres de ℕ sont aussi dans ℤ, tous ceux de ℤ sont dans 𝔻, et ainsi de suite.</p>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · Les poupées russes</span>
+    <h2>Cinq familles emboîtées</h2>
+    <p>Chaque ensemble contient le précédent, plus de nouveaux nombres. Clique sur un nombre pour voir toutes les familles auxquelles il appartient.</p>
+    <div class="box dolls">
+      <svg id="dolls" viewBox="0 0 640 470" role="img" aria-label="Les ensembles de nombres emboîtés, avec des exemples dans chacun"></svg>
+      <div class="verdict" id="dollOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · Chaque famille</span>
+    <h2>Qui est qui ?</h2>
+    <div class="sets">
+      <div class="setcard sN"><span class="sym">ℕ</span><span class="txt"><strong>Les entiers naturels</strong><span>Les nombres pour compter : 0, 1, 2, 3… Ils ne s'arrêtent jamais. Pas de signe moins, pas de virgule.</span><span class="ex">0 ; 7 ; 42 ; 1 000 000</span></span></div>
+      <div class="setcard sZ"><span class="sym">ℤ</span><span class="txt"><strong>Les entiers relatifs</strong><span>Les entiers naturels, plus leurs opposés négatifs. Le Z vient de l'allemand <em>Zahlen</em>, « nombres ».</span><span class="ex">−12 ; −1 ; 0 ; 5</span></span></div>
+      <div class="setcard sD"><span class="sym">𝔻</span><span class="txt"><strong>Les nombres décimaux</strong><span>Ceux qui s'écrivent avec un nombre <strong>fini</strong> de chiffres après la virgule. Cette notation 𝔻 est surtout utilisée en France.</span><span class="ex">2,5 ; −0,75 ; 3/4 = 0,75 ; 7/20 = 0,35</span></span></div>
+      <div class="setcard sQ"><span class="sym">ℚ</span><span class="txt"><strong>Les nombres rationnels</strong><span>Tous ceux qui s'écrivent comme une <strong>fraction</strong> de deux entiers. Leurs décimales s'arrêtent, ou se répètent en boucle. Le Q vient de « quotient ».</span><span class="ex">1/3 = 0,333… ; −2/7 ; 22/7</span></span></div>
+      <div class="setcard sR"><span class="sym">ℝ</span><span class="txt"><strong>Les nombres réels</strong><span>Tous les nombres de la droite graduée. Ils comprennent les rationnels, et aussi les <strong>irrationnels</strong> : ceux qu'on ne peut pas écrire en fraction.</span><span class="ex">√2 ; π ; e ; −√5</span></span></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Les irrationnels</span>
+      <span>Un nombre <strong>irrationnel</strong> est un réel qui n'est pas rationnel. Ses décimales ne s'arrêtent jamais et ne forment jamais un motif qui se répète. π et e en sont (voir leurs tutoriels), et aussi la plupart des racines carrées, comme √2 ou √3.</span>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Le classeur</span>
+    <h2>À quelle famille appartient ton nombre ?</h2>
+    <p>Écris un nombre (ou choisis un exemple). La page trouve toutes ses familles et explique pourquoi.</p>
+    <div class="box">
+      <div class="btns" id="presets" role="group" aria-label="Exemples de nombres"></div>
+      <label for="numIn" style="font-weight:700">Ton nombre :</label>
+      <input id="numIn" type="text" autocomplete="off" spellcheck="false" value="12/4">
+      <p class="soft" style="font-size:.9rem">Tu peux écrire un entier (−7), un décimal (2,5), une fraction (5/12), une racine (√8 ou √(9/4)), π, e, ou même i.</p>
+      <div class="verdict" id="clsOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · Le secret des décimales</span>
+    <h2>Fraction ou pas : il suffit de regarder la virgule</h2>
+    <p>Divise un entier par un autre, chiffre après chiffre. Soit la division s'arrête (c'est un décimal), soit les mêmes chiffres reviennent en boucle (c'est un rationnel non décimal). Le bloc qui se répète s'appelle la <strong>période</strong> ; on le marque d'une barre au-dessus.</p>
+    <div class="box">
+      <div class="btns" id="decPresets" role="group" aria-label="Exemples de fractions"></div>
+      <label for="decIn" style="font-weight:700">Une fraction :</label>
+      <input id="decIn" type="text" autocomplete="off" spellcheck="false" value="1/7">
+      <div class="verdict" id="decOut" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">L'astuce des dénominateurs</span>
+      <span>Une fraction simplifiée est un nombre décimal seulement si son dénominateur ne contient que des facteurs <strong>2</strong> et <strong>5</strong> (comme 4, 8, 20, 25, 40…). Avec un 3, un 7 ou un 11 en bas, les décimales tournent en boucle pour toujours.</span>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Le premier irrationnel</span>
+    <h2>√2, le nombre qui ne s'arrête pas</h2>
+    <p>√2 est le nombre qui, multiplié par lui-même, donne 2. C'est la diagonale d'un carré de côté 1 (voir le tutoriel sur Pythagore). Essaie de le trouver avec des décimales : on s'approche de 2, sans jamais tomber pile dessus.</p>
+    <div class="box">
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Essai</th><th>Essai × essai</th><th>Écart avec 2</th></tr></thead>
+          <tbody id="sqrtRows"></tbody>
+        </table>
+      </div>
+      <p class="soft">Les mathématiciens grecs ont démontré qu'aucune fraction ne donne exactement 2 quand on la multiplie par elle-même. √2 est donc irrationnel.</p>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · Et les nombres « irréels » ?</span>
+    <h2>Les nombres imaginaires</h2>
+    <p>En maths, on ne dit pas « irréel ». Mais il existe bien des nombres qui ne sont pas réels : les <strong>nombres imaginaires</strong>.</p>
+    <div class="setcard sC"><span class="sym">ℂ</span><span class="txt"><strong>Les nombres complexes</strong><span>Chez les réels, un carré n'est jamais négatif : 3 × 3 = 9 et (−3) × (−3) = 9. Il n'existe donc aucun réel dont le carré vaut −1. Des mathématiciens ont osé l'inventer quand même et l'ont appelé <strong>i</strong>, avec <span class="mono">i × i = −1</span>.</span><span class="ex">i ; 2i ; 3 + 2i</span></span></div>
+    <p>Ces nombres ne sont pas sur la droite graduée : ils forment tout un plan. Ils servent en électricité, en physique, dans le traitement du son… On les étudie au lycée. Ainsi la chaîne continue : <span class="set cR">ℝ</span> ⊂ <span class="set cC">ℂ</span>.</p>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Quiz</span>
+    <h2>Range chaque nombre dans sa plus petite famille</h2>
+    <p>Pour chaque nombre, choisis le <strong>plus petit</strong> ensemble qui le contient. Par exemple, 7 est dans les cinq, mais sa plus petite famille est <span class="set cN">ℕ</span>.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Nouveaux nombres</button>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Un peu d'histoire</span>
+    <h2>Les nombres sont arrivés les uns après les autres</h2>
+    <ol class="timeline">
+      <li><span class="when">il y a 20 000 ans</span><div class="what"><strong>Compter</strong><span>Sur l'os d'Ishango, trouvé en Afrique, des encoches servaient sans doute à compter. Ce sont les ancêtres de ℕ.</span></div></li>
+      <li><span class="when">vers −500</span><div class="what"><strong>Le scandale de √2</strong><span>Les élèves de Pythagore découvrent que la diagonale d'un carré ne s'écrit pas en fraction. Ils croyaient que tout était fraction !</span></div></li>
+      <li><span class="when">628</span><div class="what"><strong>Le zéro et les négatifs</strong><span>En Inde, Brahmagupta traite zéro comme un vrai nombre et donne les règles des nombres négatifs.</span></div></li>
+      <li><span class="when">1585</span><div class="what"><strong>Les décimaux</strong><span>Le Flamand Simon Stevin publie un petit livre pour apprendre à tout le monde à calculer avec les nombres à virgule.</span></div></li>
+      <li><span class="when">1637 – 1777</span><div class="what"><strong>Les imaginaires</strong><span>Descartes les appelle « imaginaires » (un peu pour s'en moquer), puis Euler choisit la lettre i.</span></div></li>
+      <li><span class="when">fin des années 1800</span><div class="what"><strong>ℕ, ℤ, ℚ, ℝ</strong><span>Des mathématiciens comme Dedekind, Cantor et Peano définissent précisément les ensembles et leur donnent leurs noms.</span></div></li>
+    </ol>
+    <div class="note slate">
+      <span class="note-title">Des infinis plus grands que d'autres</span>
+      <span>Il y a une infinité de nombres rationnels, et une infinité de réels. Pourtant, Georg Cantor a démontré en 1874 qu'il y a « plus » de réels que de rationnels : un infini plus grand qu'un autre infini !</span>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · À toi de jouer</span>
+    <h2>Six questions</h2>
+    <div class="exos">
+      <details>
+        <summary>Vrai ou faux (1)<span class="q">« Tous les nombres entiers sont des nombres décimaux. »</span></summary>
+        <div><span><strong>Vrai.</strong> 5 s'écrit 5,0 : il a zéro chiffre après la virgule, ce qui est bien un nombre fini. ℤ est inclus dans 𝔻.</span></div>
+      </details>
+      <details>
+        <summary>Vrai ou faux (2)<span class="q">« 1/3 est un nombre décimal. »</span></summary>
+        <div><span><strong>Faux.</strong> 1/3 = 0,333… Les 3 ne s'arrêtent jamais. C'est un rationnel, mais pas un décimal.</span></div>
+      </details>
+      <details>
+        <summary>Le piège de 12/4<span class="q">Dans quelle plus petite famille est 12/4 ?</span></summary>
+        <div><span>12/4 = 3. C'est un <strong>entier naturel</strong> : sa plus petite famille est ℕ, même s'il est écrit comme une fraction.</span></div>
+      </details>
+      <details>
+        <summary>Les racines<span class="q">√16 et √17 sont-ils rationnels ?</span></summary>
+        <div><span>√16 = 4, car 4 × 4 = 16 : c'est un entier, donc rationnel.</span><span>√17 n'est égal à aucune fraction : c'est un <strong>irrationnel</strong>. La racine d'un entier est soit un entier, soit irrationnelle.</span></div>
+      </details>
+      <details>
+        <summary>22/7 et π<span class="q">Une calculatrice donne π ≈ 3,1416 et 22/7 ≈ 3,1429. Pourquoi 22/7 ne peut-il pas être égal à π ?</span></summary>
+        <div><span>22/7 est une fraction, donc un rationnel : ses décimales se répètent (3,142857142857…). π est irrationnel : ses décimales ne se répètent jamais. Ils ne peuvent donc pas être égaux.</span></div>
+      </details>
+      <details>
+        <summary>Range-les<span class="q">Classe dans sa plus petite famille : −4 ; 0,2 ; 5/6 ; √9 ; π ; −√7.</span></summary>
+        <div><span>−4 : ℤ · 0,2 : 𝔻 · 5/6 : ℚ · √9 = 3 : ℕ · π : ℝ · −√7 : ℝ (irrationnel).</span></div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• <span class="set cN">ℕ</span> entiers naturels ⊂ <span class="set cZ">ℤ</span> entiers relatifs ⊂ <span class="set cD">𝔻</span> décimaux ⊂ <span class="set cQ">ℚ</span> rationnels ⊂ <span class="set cR">ℝ</span> réels.</span>
+      <span>• <strong>Décimal</strong> : un nombre fini de chiffres après la virgule. <strong>Rationnel</strong> : une fraction d'entiers, avec des décimales qui s'arrêtent ou se répètent.</span>
+      <span>• <strong>Irrationnel</strong> : un réel qui n'est pas une fraction, comme √2, π ou e.</span>
+      <span>• Les <strong>imaginaires</strong> (avec i × i = −1) ne sont pas réels : ils forment <span class="set cC">ℂ</span>, au lycée.</span>
+    </div>
+  </section>
+
+  <footer>Fiche de révision · Les ensembles de nombres</footer>
+</main>
+
+<script>
+(function () {
+  var NS = 'http://www.w3.org/2000/svg';
+  var ORDER = ['N', 'Z', 'D', 'Q', 'R'];
+  var SYM = { N: 'ℕ', Z: 'ℤ', D: '𝔻', Q: 'ℚ', R: 'ℝ', C: 'ℂ' };
+  var NAME = { N: 'entiers naturels', Z: 'entiers relatifs', D: 'nombres décimaux', Q: 'nombres rationnels', R: 'nombres réels', C: 'nombres complexes' };
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+  function gcd(a, b) { a = Math.abs(a); b = Math.abs(b); while (b) { var t = b; b = a % b; a = t; } return a || 1; }
+  function fnum(x) { return x.toLocaleString('fr-FR', { maximumFractionDigits: 10 }).replace('-', '−'); }
+  function isSquare(n) { var r = Math.round(Math.sqrt(n)); return r * r === n ? r : -1; }
+
+  /* ---------- Développement décimal par division ---------- */
+  function expand(n, d, maxDigits) {
+    maxDigits = maxDigits || 80;
+    var neg = n < 0, a = Math.abs(n), ip = Math.floor(a / d), r = a % d, digits = [], seen = {}, start = -1;
+    while (r !== 0 && digits.length < maxDigits) {
+      if (seen[r] !== undefined) { start = seen[r]; break; }
+      seen[r] = digits.length; r *= 10; digits.push(Math.floor(r / d)); r %= d;
+    }
+    return { neg: neg, ip: ip, digits: digits, start: start, truncated: r !== 0 && start < 0 };
+  }
+  function expHTML(e) {
+    var s = (e.neg ? '−' : '') + e.ip.toLocaleString('fr-FR');
+    if (!e.digits.length) return s;
+    s += ',';
+    if (e.start < 0) return s + e.digits.join('') + (e.truncated ? '…' : '');
+    return s + e.digits.slice(0, e.start).join('') + '<span class="rep">' + e.digits.slice(e.start).join('') + '</span>…';
+  }
+
+  /* ---------- Lecture d'un nombre ---------- */
+  function toFrac(x) {
+    if (!/^-?\d+(\.\d+)?$/.test(x)) return null;
+    var dec = (x.split('.')[1] || '').length, m = Math.pow(10, dec);
+    return [Math.round(parseFloat(x) * m), m];
+  }
+  function reduce(n, d) { if (d < 0) { n = -n; d = -d; } var g = gcd(n, d); return [n / g, d / g]; }
+  function onlyTwoFive(d) { while (d % 2 === 0) d /= 2; while (d % 5 === 0) d /= 5; return d === 1; }
+  function fracInfo(n, d, shown, extra) {
+    var f = reduce(n, d), e = expand(f[0], f[1]), val = (f[1] === 1 ? fnum(f[0]) : f[0].toLocaleString('fr-FR').replace('-', '−') + '/' + f[1]);
+    extra = extra || '';
+    if (f[1] === 1) {
+      if (f[0] >= 0) return { k: 'N', shown: shown, why: extra + 'C\'est un entier positif ou nul : un nombre pour compter. Il appartient aux cinq ensembles.' };
+      return { k: 'Z', shown: shown, why: extra + 'C\'est un entier négatif : il n\'est pas dans ℕ (pas de négatifs pour compter), mais il est dans ℤ et dans tous ceux qui l\'entourent.' };
+    }
+    if (onlyTwoFive(f[1])) return { k: 'D', shown: shown, why: extra + 'Il s\'écrit avec un nombre fini de chiffres après la virgule : ' + expHTML(e) + '. C\'est un décimal, mais pas un entier.', frac: f };
+    return { k: 'Q', shown: shown, why: extra + 'C\'est une fraction d\'entiers (' + val + '), mais ses décimales ne s\'arrêtent jamais : ' + expHTML(e) + ' Le bloc souligné d\'une barre se répète en boucle. C\'est un rationnel, mais pas un décimal.', frac: f };
+  }
+  function classify(raw) {
+    var shown = raw.trim();
+    var s = shown.replace(/\s/g, '').replace(/[−–]/g, '-').replace(/,/g, '.').replace(/pi/gi, 'π').replace(/sqrt/gi, '√').replace(/racine/gi, '√');
+    if (!s) throw new Error('Écris un nombre.');
+    if (/\.\.\.|…/.test(s)) return { k: 'info', shown: shown, why: 'Avec des points de suspension, tout dépend de ce qui suit. Si un bloc de chiffres se répète en boucle (comme 0,333…), c\'est un rationnel. Si rien ne se répète jamais (comme 3,14159… pour π), c\'est un irrationnel.' };
+    if (/i/.test(s) && /^[-+]?(\d+(\.\d+)?)?([+-](\d+(\.\d+)?)?)?i$|^[-+]?\d+(\.\d+)?[+-](\d+(\.\d+)?)?i$/.test(s)) return { k: 'C', shown: shown, why: 'Il contient i, le nombre imaginaire tel que i × i = −1. Ce n\'est pas un nombre réel : il n\'est sur aucune droite graduée. Il appartient à ℂ, les nombres complexes (au lycée).' };
+    if (/π/.test(s)) {
+      if (/^-?(\d+(\.\d+)?)?π(\/\d+(\.\d+)?)?$/.test(s)) { if (/^-?0(\.0+)?π/.test(s)) return fracInfo(0, 1, shown, 'Zéro fois π, ça fait 0. '); return { k: 'R', shown: shown, why: 'π est irrationnel : ses décimales ne s\'arrêtent jamais et ne se répètent jamais. Multiplié ou divisé par un nombre (non nul), il reste irrationnel. Il est réel, mais pas rationnel.' }; }
+      throw new Error('Écris π seul, ou comme 2π ou π/2.');
+    }
+    if (/^-?(\d+(\.\d+)?)?e$/.test(s)) return { k: 'R', shown: shown, why: 'Le nombre e ≈ 2,718 est irrationnel (voir le tutoriel sur e). Il est réel, mais pas rationnel.' };
+    var m = s.match(/^(-?)(\d+(?:\.\d+)?)?√\(?(-?\d+(?:\.\d+)?)(?:\/(\d+(?:\.\d+)?))?\)?$/);
+    if (m) {
+      var sign = m[1] === '-' ? -1 : 1, coef = m[2] ? toFrac(m[2]) : [1, 1];
+      var p = toFrac(m[3]), q = m[4] ? toFrac(m[4]) : [1, 1];
+      var rad = reduce(p[0] * q[1], p[1] * q[0]);
+      if (rad[0] < 0) return { k: 'C', shown: shown, why: 'C\'est la racine d\'un nombre négatif. Aucun réel multiplié par lui-même ne donne un négatif. C\'est un nombre imaginaire, dans ℂ (au lycée).' };
+      if (coef[0] === 0 || rad[0] === 0) return fracInfo(0, 1, shown, 'Ça vaut 0. ');
+      var rn = isSquare(rad[0]), rd = isSquare(rad[1]);
+      if (rn >= 0 && rd >= 0) {
+        var n2 = sign * coef[0] * rn, d2 = coef[1] * rd;
+        return fracInfo(n2, d2, shown, 'La racine tombe juste : ' + (rad[1] === 1 ? '√' + rad[0] + ' = ' + rn + ', car ' + rn + ' × ' + rn + ' = ' + rad[0] : '√(' + rad[0] + '/' + rad[1] + ') = ' + rn + '/' + rd) + '. ');
+      }
+      return { k: 'R', shown: shown, why: 'La racine ne tombe pas juste : ' + (rad[1] === 1 ? rad[0] : rad[0] + '/' + rad[1]) + ' n\'est pas un carré parfait. C\'est un nombre irrationnel, comme √2 : réel, mais impossible à écrire en fraction.' };
+    }
+    var fm = s.match(/^(-?\d+(?:\.\d+)?)(?:\/(-?\d+(?:\.\d+)?))?$/);
+    if (fm) {
+      var a = toFrac(fm[1]), b = fm[2] ? toFrac(fm[2]) : [1, 1];
+      var n = a[0] * b[1], d = a[1] * b[0];
+      if (d === 0) throw new Error('On ne peut pas diviser par 0 !');
+      var r = reduce(n, d), extra = '';
+      if (fm[2] && r[1] === 1) extra = 'Attention : ' + esc(shown) + ' = ' + fnum(r[0]) + '. ';
+      else if (fm[2] && (r[0] !== a[0] || r[1] !== b[0])) extra = 'En simplifiant : ' + esc(shown) + ' = ' + r[0].toLocaleString('fr-FR').replace('-', '−') + '/' + r[1] + '. ';
+      return fracInfo(n, d, shown, extra);
+    }
+    throw new Error('Je ne reconnais pas ce nombre. Essaie par exemple −7, 2,5, 5/12, √8, π ou i.');
+  }
+  window.__classify = classify;
+
+  function memberHTML(k) {
+    var idx = ORDER.indexOf(k), html = '<div class="member">';
+    ORDER.forEach(function (s, i) {
+      var yes = k === 'C' ? false : (k === 'info' ? false : i >= idx);
+      html += '<span class="c' + s + (yes ? '' : ' no') + '">' + SYM[s] + ' <b>' + (yes ? 'oui' : 'non') + '</b></span>';
+    });
+    if (k === 'C') html += '<span class="cC">ℂ <b>oui</b></span>';
+    return html + '</div>';
+  }
+  function verdictHTML(r) {
+    if (r.k === 'info') return '<div class="vnum">' + esc(r.shown) + '</div><p class="why">' + r.why + '</p>';
+    var head = r.k === 'C' ? 'Pas réel : ' : 'Plus petite famille : ';
+    return '<div class="vnum">' + esc(r.shown) + '</div>' + memberHTML(r.k) +
+      '<p><strong>' + head + '<span class="set c' + r.k + '">' + SYM[r.k] + '</span> (' + NAME[r.k] + (r.k === 'R' ? ', irrationnel' : '') + ')</strong></p><p class="why">' + r.why + '</p>';
+  }
+
+  /* ---------- Poupées russes ---------- */
+  var dolls = document.getElementById('dolls');
+  function mk(name, attrs, text, parent) { var e = document.createElementNS(NS, name); for (var a in attrs) e.setAttribute(a, attrs[a]); if (text != null) e.textContent = text; (parent || dolls).appendChild(e); return e; }
+  var chipsBy = { R: ['√2', 'π'], Q: ['1/3', '−2/7'], D: ['2,5', '−0,75'], Z: ['−5', '−12'], N: ['0', '7', '42'] };
+  var labels = { R: 'réels', Q: 'rationnels', D: 'décimaux', Z: 'relatifs', N: 'naturels' };
+  var rings = {}, chipEls = [], selected = null;
+  var outer = ['R', 'Q', 'D', 'Z', 'N'];
+  outer.forEach(function (s, i) {
+    var x = 8 + 14 * i, y = 8 + 76 * i, w = 624 - 28 * i, h = 454 - 90 * i;
+    rings[s] = mk('rect', { x: x, y: y, width: w, height: h, rx: 18, fill: 'var(--' + s.toLowerCase() + '-soft)', stroke: 'var(--' + s.toLowerCase() + ')', 'stroke-width': 2.5 });
+    mk('text', { x: x + 16, y: y + 48, 'font-size': 34, style: 'font-family:var(--f-set);font-weight:700;fill:var(--' + s.toLowerCase() + ')' }, SYM[s]);
+    mk('text', { x: x + 54, y: y + 46, 'font-size': 22, style: 'font-family:var(--f-display);font-weight:700;fill:var(--' + s.toLowerCase() + ')' }, labels[s]);
+    var cx = x + 210;
+    chipsBy[s].forEach(function (t) {
+      var w2 = t.length * 15 + 28;
+      var g = mk('g', { class: 'chip', tabindex: '0', role: 'button', 'aria-label': 'Le nombre ' + t });
+      var r = mk('rect', { x: cx, y: y + 14, width: w2, height: 44, rx: 22, fill: 'var(--card)', stroke: 'var(--' + s.toLowerCase() + ')', 'stroke-width': 2.5 }, null, g);
+      mk('text', { x: cx + w2 / 2, y: y + 44, 'text-anchor': 'middle', 'font-size': 22, style: 'font-family:var(--f-mono);font-weight:700' }, t, g);
+      chipEls.push({ g: g, r: r, t: t });
+      function pick() { selectChip(t); }
+      g.addEventListener('click', pick);
+      g.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); } });
+      cx += w2 + 12;
+    });
+  });
+  function selectChip(t) {
+    selected = t;
+    var r = classify(t), idx = ORDER.indexOf(r.k);
+    ORDER.forEach(function (s, i) { var inSet = i >= idx; rings[s].setAttribute('stroke-width', inSet ? 5 : 2); rings[s].setAttribute('opacity', inSet ? 1 : .45); });
+    chipEls.forEach(function (c) { c.r.setAttribute('fill', c.t === t ? 'var(--hl)' : 'var(--card)'); });
+    document.getElementById('dollOut').innerHTML = verdictHTML(r);
+  }
+  selectChip('2,5');
+
+  /* ---------- Classeur ---------- */
+  var numIn = document.getElementById('numIn');
+  function cls() {
+    var out = document.getElementById('clsOut');
+    try { out.innerHTML = verdictHTML(classify(numIn.value)); } catch (e) { out.innerHTML = '<p class="err">' + e.message + '</p>'; }
+  }
+  ['12/4', '−8', '7/20', '5/12', '√8', '√(9/4)', '−√16', 'π', '0,333…', 'i'].forEach(function (ex, i) {
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'ex'; b.id = 'pre' + i; b.textContent = ex;
+    b.addEventListener('click', function () { numIn.value = ex; cls(); });
+    document.getElementById('presets').appendChild(b);
+  });
+  numIn.addEventListener('input', cls); cls();
+
+  /* ---------- Décimales ---------- */
+  var decIn = document.getElementById('decIn');
+  function dec() {
+    var out = document.getElementById('decOut');
+    var s = decIn.value.replace(/\s/g, '').replace(/[−–]/g, '-'), m = s.match(/^(-?\d+)\/(-?\d+)$/);
+    if (!m) { out.innerHTML = '<p class="err">Écris une fraction d\'entiers, comme 5/12.</p>'; return; }
+    var n = parseInt(m[1], 10), d = parseInt(m[2], 10);
+    if (d === 0) { out.innerHTML = '<p class="err">On ne peut pas diviser par 0 !</p>'; return; }
+    if (Math.abs(d) > 100000) { out.innerHTML = '<p class="err">Choisis un dénominateur plus petit que 100 000.</p>'; return; }
+    var f = reduce(n, d), e = expand(f[0], f[1], 120), txt;
+    if (!e.digits.length) txt = 'La division tombe juste : c\'est un entier.';
+    else if (e.start < 0 && !e.truncated) txt = 'La division s\'arrête après ' + e.digits.length + ' chiffre' + (e.digits.length > 1 ? 's' : '') + ' : c\'est un <strong class="cD">nombre décimal</strong>.';
+    else if (e.start >= 0) { var per = e.digits.length - e.start; txt = 'Un bloc de ' + per + ' chiffre' + (per > 1 ? 's' : '') + ' se répète en boucle : c\'est un <strong class="cQ">rationnel non décimal</strong>.'; }
+    else txt = 'La période est trop longue pour être affichée en entier (plus de 120 chiffres) : c\'est quand même un rationnel, ses chiffres finiront par se répéter.';
+    var simp = (f[0] !== n || f[1] !== d) ? '<p class="soft">Simplifiée : ' + f[0].toLocaleString('fr-FR').replace('-', '−') + '/' + f[1] + '. Dénominateur ' + f[1] + (onlyTwoFive(f[1]) ? ' : seulement des 2 et des 5.' : ' : il contient autre chose que 2 et 5.') + '</p>' : '<p class="soft">Dénominateur ' + f[1] + (onlyTwoFive(f[1]) ? ' : seulement des facteurs 2 et 5.' : ' : il contient autre chose que 2 et 5.') + '</p>';
+    out.innerHTML = '<div class="dec">' + esc(decIn.value) + ' = ' + expHTML(e) + '</div><p>' + txt + '</p>' + simp;
+  }
+  ['1/7', '1/3', '3/8', '5/12', '22/7', '1/97', '7/25'].forEach(function (ex, i) {
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'ex'; b.id = 'dp' + i; b.textContent = ex;
+    b.addEventListener('click', function () { decIn.value = ex; dec(); });
+    document.getElementById('decPresets').appendChild(b);
+  });
+  decIn.addEventListener('input', dec); dec();
+
+  /* ---------- √2 ---------- */
+  var rows = '';
+  for (var k = 1; k <= 6; k++) {
+    var m10 = Math.pow(10, k), a = Math.floor(Math.SQRT2 * m10) / m10, sq = a * a;
+    rows += '<tr><td>' + a.toLocaleString('fr-FR', { minimumFractionDigits: k }) + '</td><td>' + sq.toLocaleString('fr-FR', { maximumFractionDigits: 2 * k }) + '</td><td>' + (2 - sq).toLocaleString('fr-FR', { maximumFractionDigits: 2 * k }) + '</td></tr>';
+  }
+  document.getElementById('sqrtRows').innerHTML = rows;
+
+  /* ---------- Quiz ---------- */
+  var pool = ['5', '−8', '0', '3,7', '−0,25', '2/3', '−1/6', '√2', 'π', '12/4', '√25', '−10/5', '7/20', '√3', '0,5', '1/9', '−√16', '22/7', '√(1/4)', '−6', '1/8', '√50', '100', '4/3'];
+  var quiz = document.getElementById('quiz'), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ''; done = [];
+    var items = pool.slice().sort(function () { return Math.random() - .5; }).slice(0, 8);
+    items.forEach(function (t, k) {
+      var li = document.createElement('li'), r = classify(t);
+      li.innerHTML = '<div class="qrow"><span class="q">' + esc(t) + '</span><span class="btns">' + ORDER.map(function (s) { return '<button type="button" class="setb c' + s + '" id="q' + k + s + '" aria-label="' + NAME[s] + '">' + SYM[s] + '</button>'; }).join('') + '</span></div><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+      quiz.appendChild(li);
+      ORDER.forEach(function (s) {
+        document.getElementById('q' + k + s).addEventListener('click', function () {
+          var fb = document.getElementById('qf' + k);
+          if (s === r.k) { done[k] = true; fb.className = 'fb ok'; fb.innerHTML = 'Bravo ! Sa plus petite famille est ' + SYM[s] + ' (' + NAME[s] + ').'; }
+          else {
+            done[k] = false; fb.className = 'fb no';
+            var bigger = ORDER.indexOf(s) > ORDER.indexOf(r.k);
+            fb.innerHTML = (bigger ? 'Il est bien dans ' + SYM[s] + ', mais il y a plus petit : ' : 'Non, il n\'est pas dans ' + SYM[s] + '. Sa plus petite famille est ') + SYM[r.k] + '.<span>' + r.why.replace(/<[^>]+>/g, '') + '</span>';
+          }
+          document.getElementById('score').textContent = done.filter(Boolean).length + ' / 8';
+        });
+      });
+    });
+    document.getElementById('score').textContent = '0 / 8';
+  }
+  document.getElementById('newQuiz').addEventListener('click', newQuiz);
+  newQuiz();
+})();
+</script>
+</body>
+</html>
