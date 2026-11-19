@@ -1,0 +1,793 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>La trigonométrie</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, encre cyan foncé, marge rouge. Trois couleurs fixes pour les côtés : adjacent bleu, opposé rose, hypoténuse orange. */
+:root {
+  --paper: #f6f9fa;
+  --grid: #dfeaee;
+  --card: #ffffff;
+  --ink: #12262e;
+  --ink-soft: #4f6670;
+  --acc: #155e75;
+  --acc-soft: #d5eef3;
+  --adj: #1c64c8;
+  --adj-soft: #dbe8fa;
+  --opp: #be185d;
+  --opp-soft: #fbe0ec;
+  --hyp: #c2410c;
+  --hyp-soft: #fde5d6;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #fff0a3;
+  --line: #d4e1e6;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0d1518; --grid: #16232a; --card: #121d22; --ink: #e6f3f6; --ink-soft: #9fb7bf;
+    --acc: #67e8f9; --acc-soft: #0f3440; --adj: #7fb0ff; --adj-soft: #1a2a45; --opp: #f78fc0; --opp-soft: #3d1a2c;
+    --hyp: #fb9a63; --hyp-soft: #40241a; --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27;
+    --hl: #4b4318; --line: #253840;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0d1518; --grid: #16232a; --card: #121d22; --ink: #e6f3f6; --ink-soft: #9fb7bf;
+  --acc: #67e8f9; --acc-soft: #0f3440; --adj: #7fb0ff; --adj-soft: #1a2a45; --opp: #f78fc0; --opp-soft: #3d1a2c;
+  --hyp: #fb9a63; --hyp-soft: #40241a; --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27;
+  --hl: #4b4318; --line: #253840;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+.big-formula { font-family: var(--f-display); font-weight: 800; font-size: clamp(1.8rem, 8vw, 3rem); color: var(--acc); letter-spacing: .04em; text-align: center; }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+.fig svg { display: block; width: 100%; height: auto; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; }
+
+/* Couleurs des côtés */
+.c-adj { color: var(--adj); font-weight: 700; }
+.c-opp { color: var(--opp); font-weight: 700; }
+.c-hyp { color: var(--hyp); font-weight: 700; }
+.c-acc { color: var(--acc); font-weight: 700; }
+/* Le petit chapeau de l'angle */
+.ang { position: relative; display: inline-block; }
+.ang::before { content: ""; position: absolute; left: 50%; top: .08em; width: .36em; height: .36em; border-left: 1.6px solid currentColor; border-top: 1.6px solid currentColor; transform: translateX(-50%) scaleY(.55) rotate(45deg); }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 6px 12px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+button[hidden] { display: none; }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.btn-label { font-weight: 700; }
+input[type="text"] { font: inherit; font-family: var(--f-mono); font-size: 1.05rem; padding: 8px 10px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; }
+input[type="range"] { width: 100%; accent-color: var(--acc); }
+.param { display: flex; flex-direction: column; gap: 2px; }
+.param label { font-weight: 700; }
+.inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px 14px; align-items: end; }
+.inputs label { font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 599px) { .grid2, .inputs { grid-template-columns: 1fr; } }
+
+.results { display: flex; flex-direction: column; gap: 8px; font-variant-numeric: tabular-nums; min-width: 0; }
+.res { border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 12px; display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; align-items: baseline; }
+.res-name { font-family: var(--f-display); font-weight: 700; }
+.res-val { font-family: var(--f-mono); font-weight: 600; color: var(--acc); font-size: 1.05rem; white-space: nowrap; }
+.res-calc { grid-column: 1 / -1; font-family: var(--f-mono); font-size: .85rem; color: var(--ink-soft); overflow-wrap: anywhere; }
+.steps { font-family: var(--f-mono); font-size: .98rem; display: flex; flex-direction: column; gap: 4px; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; padding: 12px 14px; overflow-wrap: anywhere; }
+.steps b { color: var(--acc); }
+.steps .why { font-family: var(--f-body); color: var(--ink-soft); }
+.verdict { border-radius: 8px; padding: 12px 14px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+.verdict.yes { background: var(--ok-soft); color: var(--ok); }
+.verdict.no { background: var(--red-soft); color: var(--red); }
+.verdict span { font-weight: 400; color: var(--ink); }
+.err { color: var(--red); font-weight: 700; }
+
+/* Les trois rapports */
+.ratio { font-family: var(--f-mono); font-size: 1.05rem; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.frac { display: inline-flex; flex-direction: column; text-align: center; line-height: 1.3; }
+.frac > span:first-child { border-bottom: 2px solid var(--ink); padding-bottom: 2px; }
+.frac > span:last-child { padding-top: 2px; }
+.mnemo { display: flex; justify-content: center; gap: clamp(12px, 5vw, 36px); flex-wrap: wrap; }
+.key { font-family: var(--f-mono); font-weight: 600; border: 1.5px solid var(--ink); border-bottom-width: 3px; border-radius: 6px; padding: 0 6px; background: var(--card); white-space: nowrap; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; color: var(--acc); }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 110px auto; gap: 10px; align-items: center; }
+.quiz input[type="text"] { font-size: 1rem; padding: 6px 8px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span.how { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc); }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 120px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+</head>
+<body>
+<main class="page">
+
+  <header class="hero">
+    <span class="eyebrow">Tutoriel de maths · niveau 3<sup>e</sup></span>
+    <h1>La trigonométrie</h1>
+    <p class="lead">Dans un triangle rectangle, un angle et un côté suffisent pour trouver les autres côtés. Deux côtés suffisent pour trouver les angles. Plus besoin de tout mesurer : on calcule.</p>
+    <div class="box">
+      <div class="fig"><svg id="heroFig" viewBox="0 0 640 360" role="img" aria-label="Un triangle rectangle ABC, rectangle en A, avec un angle de 35 degrés en B, son côté adjacent en bleu, son côté opposé en rose et son hypoténuse en orange"></svg></div>
+      <div class="big-formula" aria-label="cosinus, sinus, tangente">cos · sin · tan</div>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · Le vocabulaire</span>
+    <h2>Les trois côtés, vus depuis un angle</h2>
+    <p>La trigonométrie du collège ne marche que dans un <strong>triangle rectangle</strong>. On choisit d'abord un des deux angles aigus : c'est <strong>l'angle étudié</strong>. Ensuite, on donne un nom à chaque côté.</p>
+    <div class="cards">
+      <div class="box"><span class="c-hyp">L'hypoténuse</span><span class="soft">Le côté en face de l'angle droit. C'est toujours le plus long. Il ne change jamais de nom.</span></div>
+      <div class="box"><span class="c-adj">Le côté adjacent</span><span class="soft">Le côté de l'angle droit qui <strong>touche</strong> l'angle étudié. « Adjacent » veut dire « juste à côté ».</span></div>
+      <div class="box"><span class="c-opp">Le côté opposé</span><span class="soft">Le côté <strong>en face</strong> de l'angle étudié. Il ne le touche pas.</span></div>
+    </div>
+    <div class="box">
+      <h3>Essaie : change l'angle étudié</h3>
+      <div class="btns" role="group" aria-label="Angle étudié">
+        <span class="btn-label">Angle étudié :</span>
+        <button id="v1B" type="button" aria-pressed="true">Angle <span class="ang">B</span></button>
+        <button id="v1C" type="button" aria-pressed="false">Angle <span class="ang">C</span></button>
+      </div>
+      <div class="fig"><svg id="fig1" viewBox="0 0 640 360" role="img" aria-label="Triangle ABC rectangle en A. Les côtés sont colorés selon l'angle étudié."></svg></div>
+      <p id="leg1" aria-live="polite"></p>
+      <p class="soft">Regarde bien : l'hypoténuse reste la même, mais <strong>adjacent</strong> et <strong>opposé</strong> échangent leur place quand on change d'angle.</p>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · Les trois rapports</span>
+    <h2>Cosinus, sinus et tangente</h2>
+    <p>Avec les trois côtés, on fabrique trois fractions. Elles ont chacune un nom. Pour l'angle <span class="ang">B</span> du triangle ABC rectangle en A :</p>
+    <div class="cards">
+      <div class="box"><span class="tag">CAH</span><strong>Le cosinus</strong>
+        <span class="ratio">cos <span class="ang">B</span> = <span class="frac"><span class="c-adj">adjacent</span><span class="c-hyp">hypoténuse</span></span></span>
+        <span class="mono soft">cos <span class="ang">B</span> = AB / BC</span></div>
+      <div class="box"><span class="tag">SOH</span><strong>Le sinus</strong>
+        <span class="ratio">sin <span class="ang">B</span> = <span class="frac"><span class="c-opp">opposé</span><span class="c-hyp">hypoténuse</span></span></span>
+        <span class="mono soft">sin <span class="ang">B</span> = AC / BC</span></div>
+      <div class="box"><span class="tag">TOA</span><strong>La tangente</strong>
+        <span class="ratio">tan <span class="ang">B</span> = <span class="frac"><span class="c-opp">opposé</span><span class="c-adj">adjacent</span></span></span>
+        <span class="mono soft">tan <span class="ang">B</span> = AC / AB</span></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Le moyen de s'en souvenir</span>
+      <div class="big-formula mnemo" aria-label="SOH CAH TOA">
+        <span>S<span class="c-opp">O</span><span class="c-hyp">H</span></span>
+        <span>C<span class="c-adj">A</span><span class="c-hyp">H</span></span>
+        <span>T<span class="c-opp">O</span><span class="c-adj">A</span></span>
+      </div>
+      <span><strong>S</strong>inus = <strong>O</strong>pposé / <strong>H</strong>ypoténuse. <strong>C</strong>osinus = <strong>A</strong>djacent / <strong>H</strong>ypoténuse. <strong>T</strong>angente = <strong>O</strong>pposé / <strong>A</strong>djacent.</span>
+      <span>En France, beaucoup d'élèves le disent dans l'autre ordre : « CAH-SOH-TOA », qui se prononce comme « casse-toi ». Difficile à oublier !</span>
+    </div>
+
+    <div class="box">
+      <h3>Essaie : bouge l'angle, puis la taille</h3>
+      <div class="btns" role="group" aria-label="Ce qui reste fixe">
+        <span class="btn-label">On garde fixe :</span>
+        <button id="m2hyp" type="button" aria-pressed="true">l'hypoténuse</button>
+        <button id="m2adj" type="button" aria-pressed="false">le côté adjacent</button>
+      </div>
+      <div class="grid2">
+        <div class="param">
+          <label for="ang2">Angle <span class="ang">B</span> : <span class="mono" id="ang2Out">35</span>°</label>
+          <input id="ang2" type="range" min="5" max="85" step="1" value="35">
+        </div>
+        <div class="param">
+          <label for="sc2">Taille du triangle : × <span class="mono" id="sc2Out">1</span></label>
+          <input id="sc2" type="range" min="0.6" max="1.5" step="0.1" value="1">
+        </div>
+      </div>
+      <div class="fig"><svg id="fig2" viewBox="0 0 640 360" role="img" aria-label="Triangle rectangle dont on règle l'angle et la taille"></svg></div>
+      <div class="grid2">
+        <div class="results" id="len2" aria-live="polite"></div>
+        <div class="results" id="rat2" aria-live="polite"></div>
+      </div>
+      <p class="soft" id="calc2"></p>
+    </div>
+    <div class="note">
+      <span class="note-title">Pourquoi la taille ne change rien ?</span>
+      <span>Deux triangles rectangles qui ont le même angle <span class="ang">B</span> sont des agrandissements l'un de l'autre. Tous les côtés sont multipliés par le même nombre, donc les fractions restent les mêmes. Le cosinus, le sinus et la tangente dépendent <span class="hl">seulement de l'angle</span>.</span>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Calculer une longueur</span>
+    <h2>Un angle et un côté, et on trouve le reste</h2>
+    <p>La méthode tient en trois questions. Quel côté je connais ? Quel côté je cherche ? Quel rapport utilise ces deux côtés ? Avec SOH CAH TOA, on trouve le bon rapport, puis on écrit l'égalité et on la résout.</p>
+    <div class="box">
+      <h3>Calculatrice : triangle ABC rectangle en A</h3>
+      <div class="inputs">
+        <label for="ang3">Angle <span class="ang">B</span> (en °)<input id="ang3" type="text" inputmode="decimal" autocomplete="off" value="35"></label>
+        <label for="len3">Longueur connue (en cm)<input id="len3" type="text" inputmode="decimal" autocomplete="off" value="8"></label>
+      </div>
+      <div class="btns" role="group" aria-label="Le côté que je connais">
+        <span class="btn-label">Je connais :</span>
+        <button id="k3hyp" type="button" aria-pressed="true">l'hypoténuse BC</button>
+        <button id="k3adj" type="button" aria-pressed="false">l'adjacent AB</button>
+        <button id="k3opp" type="button" aria-pressed="false">l'opposé AC</button>
+      </div>
+      <div class="btns" role="group" aria-label="Le côté que je cherche">
+        <span class="btn-label">Je cherche :</span>
+        <button id="w3hyp" type="button" aria-pressed="false" hidden>l'hypoténuse BC</button>
+        <button id="w3adj" type="button" aria-pressed="true">l'adjacent AB</button>
+        <button id="w3opp" type="button" aria-pressed="false">l'opposé AC</button>
+      </div>
+      <div class="steps" id="steps3" aria-live="polite"></div>
+      <div class="fig"><svg id="fig3" viewBox="0 0 640 360" role="img" aria-label="Le triangle dessiné avec les longueurs du calcul"></svg></div>
+      <p class="soft">Tu peux écrire des nombres à virgule, comme 7,5.</p>
+    </div>
+    <div class="note">
+      <span class="note-title">Multiplier ou diviser ?</span>
+      <span>Si le côté cherché est <strong>en haut</strong> de la fraction, on multiplie : <span class="mono">cos 35° = AB / 8</span> donne <span class="mono">AB = 8 × cos 35°</span>. S'il est <strong>en bas</strong>, on divise : <span class="mono">cos 35° = 8 / BC</span> donne <span class="mono">BC = 8 ÷ cos 35°</span>. C'est un produit en croix.</span>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · Calculer un angle</span>
+    <h2>Deux côtés, et on trouve l'angle</h2>
+    <p>Cette fois, on connaît deux côtés. On calcule la fraction, puis on demande à la calculatrice : « quel angle a ce cosinus ? » C'est la fonction <strong>inverse</strong>, notée <span class="mono">cos⁻¹</span> (on dit aussi « arccos »). Pareil pour <span class="mono">sin⁻¹</span> et <span class="mono">tan⁻¹</span>.</p>
+    <div class="box">
+      <h3>Calculatrice : trouver l'angle <span class="ang">B</span></h3>
+      <div class="btns" role="group" aria-label="Les deux côtés connus">
+        <span class="btn-label">Je connais :</span>
+        <button id="p4ah" type="button" aria-pressed="true">adjacent et hypoténuse</button>
+        <button id="p4oh" type="button" aria-pressed="false">opposé et hypoténuse</button>
+        <button id="p4oa" type="button" aria-pressed="false">opposé et adjacent</button>
+      </div>
+      <div class="inputs">
+        <label for="i4a"><span id="l4a">Adjacent AB (cm)</span><input id="i4a" type="text" inputmode="decimal" autocomplete="off" value="4"></label>
+        <label for="i4b"><span id="l4b">Hypoténuse BC (cm)</span><input id="i4b" type="text" inputmode="decimal" autocomplete="off" value="5"></label>
+      </div>
+      <div class="steps" id="steps4" aria-live="polite"></div>
+      <div class="fig"><svg id="fig4" viewBox="0 0 640 360" role="img" aria-label="Le triangle dessiné avec les deux côtés connus et l'angle trouvé"></svg></div>
+    </div>
+    <div class="cards">
+      <div class="box">
+        <strong>Les touches de la calculatrice</strong>
+        <span class="soft">Appuie sur <span class="key">2nde</span> ou <span class="key">SHIFT</span>, puis sur <span class="key">cos</span>. L'écran affiche <span class="mono">cos⁻¹</span>, ou <span class="mono">Acs</span>, ou <span class="mono">arccos</span> selon le modèle. Tape ensuite la fraction : <span class="mono">cos⁻¹(4 ÷ 5)</span> donne environ 36,87.</span>
+      </div>
+      <div class="box">
+        <strong>Attention : cos⁻¹ n'est pas 1 / cos</strong>
+        <span class="soft">Le petit « −1 » ne veut pas dire « inverse de la fraction ». <span class="mono">cos⁻¹</span> fait le chemin dans l'autre sens : on lui donne un cosinus, il rend l'angle.</span>
+      </div>
+    </div>
+    <div class="note red">
+      <span class="note-title">Le mode degrés (DEG)</span>
+      <span>La calculatrice peut compter les angles en degrés, en radians ou en grades. Au collège, il faut le mode <strong>degrés</strong> : l'écran affiche un petit <span class="mono">D</span> ou <span class="mono">DEG</span>. Si tu vois <span class="mono">R</span>, <span class="mono">RAD</span>, <span class="mono">G</span> ou <span class="mono">GRAD</span>, change de mode dans le menu.</span>
+      <span>Le test rapide : tape <span class="mono">cos 60</span>. En degrés, tu dois lire <strong>0,5</strong>. Si tu lis environ −0,952, ta calculatrice est en radians.</span>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Dans la vraie vie</span>
+    <h2>Mesurer sans grimper</h2>
+    <p>Pour connaître la hauteur d'un arbre, on ne grimpe pas dessus. On se place à une distance connue, on mesure l'angle entre l'horizontale et le sommet (l'<strong>angle d'élévation</strong>), et la tangente fait le reste. Il ne faut pas oublier la hauteur de tes yeux !</p>
+    <div class="box">
+      <h3>La hauteur d'un arbre</h3>
+      <div class="inputs">
+        <div class="param">
+          <label for="d5">Distance au pied : <span class="mono" id="d5Out">20</span> m</label>
+          <input id="d5" type="range" min="5" max="50" step="1" value="20">
+        </div>
+        <div class="param">
+          <label for="a5">Angle d'élévation : <span class="mono" id="a5Out">35</span>°</label>
+          <input id="a5" type="range" min="5" max="70" step="1" value="35">
+        </div>
+        <div class="param">
+          <label for="e5">Hauteur des yeux : <span class="mono" id="e5Out">1,6</span> m</label>
+          <input id="e5" type="range" min="1" max="2" step="0.05" value="1.6">
+        </div>
+      </div>
+      <div class="fig"><svg id="fig5" viewBox="0 0 640 360" role="img" aria-label="Une personne regarde le sommet d'un arbre. La distance au pied, la ligne de visée et la hauteur forment un triangle rectangle."></svg></div>
+      <div class="steps" id="steps5" aria-live="polite"></div>
+      <p class="soft">Pour mesurer l'angle, on peut utiliser un rapporteur avec un fil et un petit poids (un clinomètre fait maison), ou une application de téléphone.</p>
+    </div>
+    <div class="cards">
+      <div class="box">
+        <strong>La pente d'une route</strong>
+        <span class="soft">Un panneau « 10 % » veut dire : on monte de 10 m quand on avance de 100 m à l'horizontale. Donc tan α = 10 / 100 = 0,1 et α = tan⁻¹(0,1) ≈ 5,7°. Ça a l'air petit, mais à vélo, ça se sent !</span>
+        <div class="param">
+          <label for="s5">Pente : <span class="mono" id="s5Out">10</span> %</label>
+          <input id="s5" type="range" min="0" max="100" step="1" value="10">
+        </div>
+        <span class="mono c-acc" id="slope5" aria-live="polite"></span>
+        <span class="soft">Une pente de 100 % ne veut pas dire « verticale » : on monte de 100 m pour 100 m, c'est 45°.</span>
+      </div>
+      <div class="box">
+        <strong>L'échelle contre un mur</strong>
+        <span class="soft">Pour être en sécurité, on conseille souvent un angle d'environ <strong>75°</strong> avec le sol. Pour une échelle de 4 m (c'est l'hypoténuse) :</span>
+        <span class="mono">pied du mur : 4 × cos 75° ≈ 1,04 m</span>
+        <span class="mono">hauteur atteinte : 4 × sin 75° ≈ 3,86 m</span>
+        <span class="soft">On entend aussi la règle « 1 pour 4 » : le pied à 1 m du mur pour 4 m de hauteur. Elle donne tan α = 4, soit α ≈ 76°. Presque pareil !</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · Les pièges</span>
+    <h2>Les erreurs à éviter</h2>
+    <div class="cards">
+      <div class="box"><strong>Seulement dans un triangle rectangle</strong><span class="soft">Avant d'écrire cos, sin ou tan, vérifie qu'il y a un angle droit. Sans angle droit, il n'y a pas d'hypoténuse, et ces formules sont fausses.</span></div>
+      <div class="box"><strong>L'adjacent dépend de l'angle</strong><span class="soft">Le même côté peut être adjacent pour un angle et opposé pour l'autre. Repère toujours l'angle étudié avant de nommer les côtés.</span></div>
+      <div class="box"><strong>La calculatrice en degrés</strong><span class="soft">En mode radians, tous les résultats sont faux, et rien ne te prévient. Fais le test : cos 60 doit donner 0,5.</span></div>
+      <div class="box"><strong>L'hypoténuse est la plus longue</strong><span class="soft">Si tu trouves une hypoténuse plus courte qu'un autre côté, il y a une erreur. C'est un bon moyen de vérifier ton résultat.</span></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Pourquoi cos et sin sont toujours entre 0 et 1</span>
+      <span>Le cosinus et le sinus ont l'hypoténuse <strong>en bas</strong> de la fraction. Comme l'hypoténuse est le plus long côté, le haut est toujours plus petit que le bas. La fraction est donc plus petite que 1. Pour un angle aigu, elle est aussi plus grande que 0.</span>
+      <span>Si ta calculatrice affiche un cosinus de 1,2, ou si tu calcules cos⁻¹(1,2), elle répond « erreur » : un tel angle n'existe pas. La tangente, elle, peut dépasser 1 : tan 60° ≈ 1,73.</span>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Donne les longueurs au dixième près (par exemple 6,6) et les angles au degré près (par exemple 37). Ta calculatrice doit être en degrés !</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Nouvelles questions</button>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Un peu d'histoire</span>
+    <h2>Des étoiles aux triangles</h2>
+    <p>La trigonométrie est née pour regarder le ciel. Les astronomes voulaient calculer des distances qu'on ne peut pas mesurer avec une règle. Les dates anciennes sont souvent approximatives.</p>
+    <ol class="timeline">
+      <li><span class="when">vers −240</span><div class="what"><strong>Ératosthène mesure la Terre</strong><span>D'après les récits, à midi le jour le plus long, le Soleil éclairait le fond des puits à Syène, en Égypte. Au même moment à Alexandrie, un bâton faisait une ombre avec un angle d'environ 7°, à peu près 1/50 de tour. Il en a déduit que le tour de la Terre valait environ 50 fois la distance entre les deux villes. Un résultat étonnamment proche de la réalité.</span></div></li>
+      <li><span class="when">IIe siècle av. J.-C.</span><div class="what"><strong>Hipparque et les tables de cordes</strong><span>On le présente souvent comme le père de la trigonométrie. Il aurait construit des tables donnant, pour chaque angle, la longueur de la « corde » dans un cercle. Il s'en servait en astronomie, pour suivre la Lune et le Soleil. Ses tables sont perdues.</span></div></li>
+      <li><span class="when">vers 150</span><div class="what"><strong>Ptolémée</strong><span>À Alexandrie, il écrit l'<em>Almageste</em>, avec une table de cordes très précise, de demi-degré en demi-degré. Ce livre a servi aux astronomes pendant plus de mille ans.</span></div></li>
+      <li><span class="when">vers 500</span><div class="what"><strong>Aryabhata et les savants indiens</strong><span>Ils utilisent la <strong>demi-corde</strong> plutôt que la corde entière. C'est exactement notre sinus. En sanskrit, ils l'appellent <em>jya</em> ou <em>jiva</em>, « la corde de l'arc ».</span></div></li>
+      <li><span class="when">IXe–XIIe siècle</span><div class="what"><strong>Le drôle de voyage du mot « sinus »</strong><span>Les savants arabes reprennent le mot sous la forme <em>jiba</em>. L'arabe s'écrit souvent sans les voyelles, et le mot a ensuite été lu <em>jaib</em>, qui veut dire « pli » ou « poche ». Un traducteur latin l'a traduit par <em>sinus</em>, qui veut aussi dire « pli, courbe ». Le sinus est donc né d'une erreur de lecture ! Les savants arabes ont aussi beaucoup travaillé sur la tangente, avec les ombres des bâtons.</span></div></li>
+      <li><span class="when">vers 1595</span><div class="what"><strong>Le mot « trigonométrie »</strong><span>Il apparaîtrait dans le titre d'un livre de l'Allemand Bartholomäus Pitiscus. Il vient du grec <em>trigonon</em>, « triangle », et <em>metron</em>, « mesure ».</span></div></li>
+    </ol>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · À toi de jouer</span>
+    <h2>Six exercices</h2>
+    <div class="exos">
+      <details>
+        <summary>Le vocabulaire<span class="q">Le triangle DEF est rectangle en E. Pour l'angle <span class="ang">F</span>, quels sont l'hypoténuse, le côté adjacent et le côté opposé ?</span></summary>
+        <div><span>L'hypoténuse est en face de l'angle droit : <strong>DF</strong>. Le côté adjacent touche <span class="ang">F</span> et l'angle droit : <strong>EF</strong>. Le côté opposé est en face de <span class="ang">F</span> : <strong>DE</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Avec le cosinus<span class="q">ABC est rectangle en A, BC = 12 cm et <span class="ang">B</span> = 50°. Calcule AB au dixième près.</span></summary>
+        <div><span>On connaît l'hypoténuse BC, on cherche l'adjacent AB : c'est le cosinus (CAH).</span><span class="mono">cos 50° = AB / 12, donc AB = 12 × cos 50° ≈ 7,71</span><span>Donc <strong>AB ≈ 7,7 cm</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Avec la tangente<span class="q">ABC est rectangle en A, AB = 6 cm et <span class="ang">B</span> = 28°. Calcule AC au dixième près.</span></summary>
+        <div><span>On connaît l'adjacent AB, on cherche l'opposé AC : c'est la tangente (TOA).</span><span class="mono">tan 28° = AC / 6, donc AC = 6 × tan 28° ≈ 3,19</span><span>Donc <strong>AC ≈ 3,2 cm</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Diviser au lieu de multiplier<span class="q">ABC est rectangle en A, AC = 5 cm et <span class="ang">B</span> = 40°. Calcule BC au dixième près.</span></summary>
+        <div><span>On connaît l'opposé AC, on cherche l'hypoténuse BC : c'est le sinus (SOH).</span><span class="mono">sin 40° = 5 / BC, donc BC = 5 ÷ sin 40° ≈ 7,78</span><span>Donc <strong>BC ≈ 7,8 cm</strong>. C'est bien plus long que AC : l'hypoténuse est le plus long côté.</span></div>
+      </details>
+      <details>
+        <summary>Trouver un angle<span class="q">ABC est rectangle en A, AB = 7 cm et BC = 10 cm. Calcule <span class="ang">B</span> au degré près.</span></summary>
+        <div><span>AB est adjacent à <span class="ang">B</span>, BC est l'hypoténuse : c'est le cosinus.</span><span class="mono">cos <span class="ang">B</span> = 7 / 10 = 0,7, donc <span class="ang">B</span> = cos⁻¹(0,7) ≈ 45,57°</span><span>Donc <strong><span class="ang">B</span> ≈ 46°</strong>.</span></div>
+      </details>
+      <details>
+        <summary>L'échelle est-elle sûre ?<span class="q">Une échelle de 5 m a son pied à 1,5 m du mur. Quel angle fait-elle avec le sol ? Est-ce proche des 75° conseillés ?</span></summary>
+        <div><span>Le mur et le sol font un angle droit. L'échelle est l'hypoténuse (5 m), la distance au mur est le côté adjacent à l'angle avec le sol (1,5 m).</span><span class="mono">cos α = 1,5 / 5 = 0,3, donc α = cos⁻¹(0,3) ≈ 72,5°</span><span>Environ <strong>73°</strong> : un peu moins que 75°, l'échelle est un peu trop penchée. Pour 75°, il faudrait le pied à 5 × cos 75° ≈ 1,29 m du mur.</span></div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• La trigonométrie s'utilise seulement dans un <strong>triangle rectangle</strong>, pour un de ses angles aigus.</span>
+      <span>• Pour l'angle étudié : l'<span class="c-hyp">hypoténuse</span> est en face de l'angle droit, le côté <span class="c-adj">adjacent</span> touche l'angle, le côté <span class="c-opp">opposé</span> est en face.</span>
+      <span>• <strong>SOH CAH TOA</strong> : sin = opposé / hypoténuse, cos = adjacent / hypoténuse, tan = opposé / adjacent.</span>
+      <span>• Pour une longueur : on choisit le rapport, on écrit l'égalité, puis on multiplie ou on divise.</span>
+      <span>• Pour un angle : on calcule la fraction, puis on utilise <span class="mono">cos⁻¹</span>, <span class="mono">sin⁻¹</span> ou <span class="mono">tan⁻¹</span>, calculatrice en mode <strong>degrés</strong>.</span>
+      <span>• Pour un angle aigu, cos et sin sont toujours entre 0 et 1.</span>
+      <span class="soft">Pour calculer un côté à partir des deux autres, sans angle, voir aussi le tutoriel sur Pythagore.</span>
+    </div>
+  </section>
+
+  <footer>Fiche de révision · La trigonométrie</footer>
+</main>
+
+<script>
+(function () {
+  var NS = "http://www.w3.org/2000/svg";
+  function fmt(x, d) { var r = Math.round(x * 1e6) / 1e6; if (Object.is(r, -0)) r = 0; return r.toLocaleString("fr-FR", { maximumFractionDigits: d == null ? 3 : d }).replace("-", "−"); }
+  function num(s) { var t = String(s).replace(/\s/g, "").replace(/[−–]/g, "-").replace(",", "."); if (t === "") return NaN; var x = Number(t); return isFinite(x) ? x : NaN; }
+  function mk(svg, name, attrs, text) { var e = document.createElementNS(NS, name); for (var a in attrs) e.setAttribute(a, attrs[a]); if (text != null) e.textContent = text; svg.appendChild(e); return e; }
+  function clear(svg) { while (svg.firstChild) svg.removeChild(svg.firstChild); }
+  function eq(x, d) { var p = Math.pow(10, d); return Math.abs(x * p - Math.round(x * p)) < 1e-6 ? "= " : "≈ "; }
+  function ang(L) { return "<span class=\"ang\">" + L + "</span>"; }
+  function $(id) { return document.getElementById(id); }
+  function press(ids, on) { ids.forEach(function (id) { $(id).setAttribute("aria-pressed", id === on ? "true" : "false"); }); }
+
+  /* ---------- Fonctions pures ---------- */
+  var RAD = Math.PI / 180;
+  function toRad(d) { return d * RAD; }
+  function toDeg(r) { return r / RAD; }
+  function ratios(deg) { var t = toRad(deg); return { cos: Math.cos(t), sin: Math.sin(t), tan: Math.tan(t) }; }
+  /* Pour chaque rapport : [côté du haut, côté du bas] */
+  var RATIO = { cos: ["adj", "hyp"], sin: ["opp", "hyp"], tan: ["opp", "adj"] };
+  var FN_FR = { cos: "le cosinus", sin: "le sinus", tan: "la tangente" };
+  var MNEMO = { cos: "CAH", sin: "SOH", tan: "TOA" };
+  var INV = { cos: "cos⁻¹", sin: "sin⁻¹", tan: "tan⁻¹" };
+  var ROLE_FR = { hyp: "l'hypoténuse", adj: "le côté adjacent", opp: "le côté opposé" };
+  function fnFor(a, b) {
+    for (var f in RATIO) { var p = RATIO[f]; if ((p[0] === a && p[1] === b) || (p[0] === b && p[1] === a)) return f; }
+    return null;
+  }
+  /* Un angle (en degrés) et un côté connu : calcule le côté cherché. */
+  function solveSide(deg, known, kv, want) {
+    if (!(deg > 0 && deg < 90) || !(kv > 0)) return null;
+    var fn = fnFor(known, want); if (!fn) return null;
+    var f = ratios(deg)[fn], mul = RATIO[fn][0] === want;
+    return { fn: fn, mul: mul, value: mul ? kv * f : kv / f };
+  }
+  /* Deux côtés connus : calcule l'angle (en degrés). */
+  function solveAngle(t1, v1, t2, v2) {
+    var fn = fnFor(t1, t2); if (!fn || !(v1 > 0) || !(v2 > 0)) return null;
+    var vals = {}; vals[t1] = v1; vals[t2] = v2;
+    var r = vals[RATIO[fn][0]] / vals[RATIO[fn][1]];
+    if (fn !== "tan" && r >= 1) return { fn: fn, r: r, error: true };
+    var a = fn === "cos" ? Math.acos(r) : fn === "sin" ? Math.asin(r) : Math.atan(r);
+    return { fn: fn, r: r, deg: toDeg(a) };
+  }
+  function treeHeight(d, deg, eye) { return eye + d * Math.tan(toRad(deg)); }
+  function slopeToDeg(p) { return toDeg(Math.atan(p / 100)); }
+  function seg(a, b) { return [a, b].sort().join(""); }
+  /* Triangle "ABC" rectangle en A (première lettre), angle étudié v (deuxième ou troisième lettre). */
+  function sideNames(tri, v) {
+    var R = tri.charAt(0), P = tri.charAt(1), Q = tri.charAt(2), o = v === P ? Q : P;
+    return { hyp: seg(P, Q), adj: seg(R, v), opp: seg(R, o) };
+  }
+  function checkAnswer(x, exact, kind) { return Math.abs(x - exact) <= (kind === "angle" ? 0.6 : 0.06) + 1e-9; }
+  window.__trigo = { toRad: toRad, toDeg: toDeg, ratios: ratios, fnFor: fnFor, solveSide: solveSide, solveAngle: solveAngle, treeHeight: treeHeight, slopeToDeg: slopeToDeg, sideNames: sideNames, checkAnswer: checkAnswer, num: num, fmt: fmt };
+
+  /* ---------- Dessin du triangle ABC rectangle en A ---------- */
+  var COL = { adj: "var(--adj)", opp: "var(--opp)", hyp: "var(--hyp)" };
+  var HALO = "paint-order:stroke;stroke:var(--paper);stroke-width:5px;stroke-linejoin:round;";
+  function label(svg, x, y, anchor, lines, color, up) {
+    var y0 = up ? y - 20 * (lines.length - 1) : y;
+    lines.forEach(function (t, i) { mk(svg, "text", { x: x, y: y0 + 20 * i, "text-anchor": anchor, "font-size": 17, style: HALO + "font-weight:600;fill:" + color }, t); });
+  }
+  /* ab = longueur AB (horizontale), ac = longueur AC (verticale). */
+  function drawTri(svg, ab, ac, o) {
+    o = o || {}; clear(svg);
+    var W = 640, L = 150, R = 50, T = 40, aw = W - L - R, ah = 250;
+    var fa = o.fit ? o.fit[0] : ab, fc = o.fit ? o.fit[1] : ac;
+    var k = Math.min(aw / fa, ah / fc);
+    var x0 = L + (aw - k * fa) / 2, yb = T + (ah - k * fc) / 2 + k * fc;
+    var A = [x0, yb], B = [x0 + k * ab, yb], C = [x0, yb - k * ac];
+    var v = o.vertex || "B";
+    var role = { AB: v === "B" ? "adj" : "opp", AC: v === "B" ? "opp" : "adj" };
+    var def = { hyp: ["hypoténuse"], adj: ["adjacent"], opp: ["opposé"] }, lab = o.labels || {};
+    function lines(r) { return lab[r] || def[r]; }
+    mk(svg, "polygon", { points: [A, B, C].map(function (p) { return p.join(","); }).join(" "), fill: "var(--acc-soft)", "fill-opacity": .6 });
+    /* angle étudié */
+    var V = v === "B" ? B : C, P2 = v === "B" ? C : B;
+    var a1 = Math.atan2(A[1] - V[1], A[0] - V[0]), a2 = Math.atan2(P2[1] - V[1], P2[0] - V[0]), d = a2 - a1;
+    while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI;
+    var r = Math.max(16, Math.min(48, 0.4 * (v === "B" ? k * ab : k * ac))), pts = [];
+    for (var i = 0; i <= 24; i++) { var t = a1 + d * i / 24; pts.push((V[0] + r * Math.cos(t)) + "," + (V[1] + r * Math.sin(t))); }
+    mk(svg, "polygon", { points: V.join(",") + " " + pts.join(" "), fill: "var(--acc)", "fill-opacity": .22 });
+    mk(svg, "polyline", { points: pts.join(" "), fill: "none", stroke: "var(--acc)", "stroke-width": 3 });
+    /* côtés */
+    function side(P, Q, rr) { mk(svg, "line", { x1: P[0], y1: P[1], x2: Q[0], y2: Q[1], stroke: COL[rr], "stroke-width": 5, "stroke-linecap": "round" }); }
+    side(A, B, role.AB); side(A, C, role.AC); side(B, C, "hyp");
+    var s = Math.max(5, Math.min(16, 0.3 * k * Math.min(ab, ac)));
+    mk(svg, "path", { d: "M" + x0 + " " + (yb - s) + " h" + s + " v" + s, fill: "none", stroke: "var(--ink)", "stroke-width": 2 });
+    if (o.angleText) {
+      var m = Math.abs(d) < 0.6 ? a1 + d + (d > 0 ? 0.4 : -0.4) : a1 + d / 2;
+      var tx = V[0] + (r + 26) * Math.cos(m), ty = V[1] + (r + 26) * Math.sin(m) + 6, tanc = "middle";
+      /* triangle très étroit : l'étiquette passe à l'extérieur */
+      if ((v === "B" ? k * ab : k * ac) < 90) { tx = V[0] + 14; ty = V[1] - 14; tanc = "start"; }
+      mk(svg, "text", { x: tx, y: ty, "text-anchor": tanc, "font-size": 18, style: HALO + "font-weight:600;fill:var(--acc)" }, o.angleText);
+    }
+    /* sommets */
+    mk(svg, "text", { x: x0 - 10, y: yb + 20, "text-anchor": "end", "font-size": 19, style: HALO + "font-weight:600" }, "A");
+    mk(svg, "text", { x: B[0] + 10, y: yb + 20, "text-anchor": "start", "font-size": 19, style: HALO + "font-weight:600" }, "B");
+    mk(svg, "text", { x: x0 - 10, y: C[1] - 4, "text-anchor": "end", "font-size": 19, style: HALO + "font-weight:600" }, "C");
+    /* noms des côtés */
+    label(svg, (x0 + B[0]) / 2, yb + 38, "middle", lines(role.AB), COL[role.AB]);
+    var lac = lines(role.AC);
+    label(svg, x0 - 34, (yb + C[1]) / 2 + 6 - 10 * (lac.length - 1), "end", lac, COL[role.AC]);
+    /* normale à BC, tournée vers l'extérieur du triangle */
+    var M = [(B[0] + C[0]) / 2, (B[1] + C[1]) / 2], ux = C[0] - B[0], uy = C[1] - B[1], nl = Math.sqrt(ux * ux + uy * uy) || 1;
+    var nx = -uy / nl, ny = ux / nl;
+    if (nx * (M[0] - A[0]) + ny * (M[1] - A[1]) < 0) { nx = -nx; ny = -ny; }
+    label(svg, M[0] + nx * 18, M[1] + ny * 18 + (ny > -0.3 ? 6 : 0), "start", lines("hyp"), COL.hyp, ny < -0.3);
+  }
+
+  /* ---------- Héros ---------- */
+  (function () { var R0 = ratios(35); drawTri($("heroFig"), 7 * R0.cos, 7 * R0.sin, { vertex: "B", angleText: "35°" }); })();
+
+  /* ---------- Étape 1 : vocabulaire ---------- */
+  var v1 = "B";
+  function upd1() {
+    drawTri($("fig1"), 8, 5, { vertex: v1 });
+    press(["v1B", "v1C"], "v1" + v1);
+    var nm = sideNames("ABC", v1);
+    $("leg1").innerHTML = "Pour l'angle " + ang(v1) + " : l'hypoténuse est <span class=\"c-hyp\">" + nm.hyp + "</span>, le côté adjacent est <span class=\"c-adj\">" + nm.adj + "</span> et le côté opposé est <span class=\"c-opp\">" + nm.opp + "</span>.";
+  }
+  $("v1B").addEventListener("click", function () { v1 = "B"; upd1(); });
+  $("v1C").addEventListener("click", function () { v1 = "C"; upd1(); });
+  upd1();
+
+  /* ---------- Étape 2 : les trois rapports ---------- */
+  var mode2 = "hyp";
+  function sides2(deg, s) {
+    var R0 = ratios(deg), base = 6 * s;
+    if (mode2 === "hyp") return { hyp: base, adj: base * R0.cos, opp: base * R0.sin };
+    return { adj: base, opp: base * R0.tan, hyp: base / R0.cos };
+  }
+  function upd2() {
+    var deg = parseFloat($("ang2").value), s = parseFloat($("sc2").value), S = sides2(deg, s), F = sides2(deg, 1.5), R0 = ratios(deg);
+    $("ang2Out").textContent = fmt(deg);
+    $("sc2Out").textContent = fmt(s, 1);
+    press(["m2hyp", "m2adj"], "m2" + mode2);
+    function cm(x) { return fmt(x, 2) + " cm"; }
+    drawTri($("fig2"), S.adj, S.opp, { vertex: "B", fit: [F.adj, F.opp], angleText: fmt(deg) + "°", labels: { hyp: [cm(S.hyp)], adj: [cm(S.adj)], opp: [cm(S.opp)] } });
+    $("len2").innerHTML =
+      "<div class=\"res\"><span class=\"res-name c-hyp\">Hypoténuse BC</span><span class=\"res-val\">" + cm(S.hyp) + "</span></div>" +
+      "<div class=\"res\"><span class=\"res-name c-adj\">Adjacent AB</span><span class=\"res-val\">" + cm(S.adj) + "</span></div>" +
+      "<div class=\"res\"><span class=\"res-name c-opp\">Opposé AC</span><span class=\"res-val\">" + cm(S.opp) + "</span></div>";
+    function row(fn, n, dd, nn, dn) {
+      var q = n / dd;
+      return "<div class=\"res\"><span class=\"res-name\">" + fn + " " + ang("B") + "</span><span class=\"res-val\">" + eq(q, 3) + fmt(q, 3) + "</span><span class=\"res-calc\">" + nn + " ÷ " + dn + " = " + fmt(n, 2) + " ÷ " + fmt(dd, 2) + "</span></div>";
+    }
+    $("rat2").innerHTML = row("cos", S.adj, S.hyp, "adjacent", "hypoténuse") + row("sin", S.opp, S.hyp, "opposé", "hypoténuse") + row("tan", S.opp, S.adj, "opposé", "adjacent");
+    $("calc2").textContent = "La calculatrice donne directement : cos " + fmt(deg) + "° ≈ " + fmt(R0.cos, 3) + " ; sin " + fmt(deg) + "° ≈ " + fmt(R0.sin, 3) + " ; tan " + fmt(deg) + "° ≈ " + fmt(R0.tan, 3) + ". Change la taille : les longueurs bougent, les trois rapports restent les mêmes.";
+  }
+  $("ang2").addEventListener("input", upd2);
+  $("sc2").addEventListener("input", upd2);
+  $("m2hyp").addEventListener("click", function () { mode2 = "hyp"; upd2(); });
+  $("m2adj").addEventListener("click", function () { mode2 = "adj"; upd2(); });
+  upd2();
+
+  /* ---------- Étape 3 : calculer une longueur ---------- */
+  var NM = sideNames("ABC", "B"), TYPES = ["hyp", "adj", "opp"], known3 = "hyp", want3 = "adj";
+  function allSides(deg, type, v) {
+    var R0 = ratios(deg), h = type === "hyp" ? v : type === "adj" ? v / R0.cos : v / R0.sin;
+    return { hyp: h, adj: h * R0.cos, opp: h * R0.sin };
+  }
+  function upd3() {
+    if (want3 === known3) want3 = TYPES.filter(function (t) { return t !== known3; })[0];
+    press(["k3hyp", "k3adj", "k3opp"], "k3" + known3);
+    TYPES.forEach(function (t) { var b = $("w3" + t); b.hidden = t === known3; b.setAttribute("aria-pressed", t === want3 ? "true" : "false"); });
+    var deg = num($("ang3").value), kv = num($("len3").value), out = $("steps3"), svg = $("fig3");
+    if (isNaN(deg) || deg <= 0 || deg >= 90) { out.innerHTML = "<span class=\"err\">L'angle doit être entre 0° et 90° (un angle aigu).</span>"; clear(svg); return; }
+    if (isNaN(kv) || kv <= 0) { out.innerHTML = "<span class=\"err\">Écris une longueur positive.</span>"; clear(svg); return; }
+    var res = solveSide(deg, known3, kv, want3), fn = res.fn, top = RATIO[fn][0], bot = RATIO[fn][1];
+    function nameOrVal(t) { return t === known3 ? fmt(kv) : NM[t]; }
+    var a = fmt(deg) + "°";
+    out.innerHTML =
+      "<span class=\"why\">Tu connais " + ROLE_FR[known3] + " " + NM[known3] + " et tu cherches " + ROLE_FR[want3] + " " + NM[want3] + ". Le rapport qui relie ces deux côtés est " + FN_FR[fn] + " (" + MNEMO[fn] + ").</span>" +
+      "<span>" + fn + " " + ang("B") + " = " + NM[top] + " / " + NM[bot] + "</span>" +
+      "<span>" + fn + " " + a + " = " + nameOrVal(top) + " / " + nameOrVal(bot) + "</span>" +
+      "<span>donc " + NM[want3] + " = " + fmt(kv) + (res.mul ? " × " : " ÷ ") + fn + " " + a + "</span>" +
+      "<span><b>" + NM[want3] + " " + eq(res.value, 2) + fmt(res.value, 2) + " cm</b></span>";
+    var S = allSides(deg, known3, kv), labs = {};
+    TYPES.forEach(function (t) {
+      if (t === known3) labs[t] = [NM[t] + " = " + fmt(kv, 2)];
+      else if (t === want3) labs[t] = [NM[t] + " = ?", eq(res.value, 2) + fmt(res.value, 2)];
+      else labs[t] = [NM[t]];
+    });
+    drawTri(svg, S.adj, S.opp, { vertex: "B", angleText: a, labels: labs });
+  }
+  TYPES.forEach(function (t) {
+    $("k3" + t).addEventListener("click", function () { known3 = t; upd3(); });
+    $("w3" + t).addEventListener("click", function () { want3 = t; upd3(); });
+  });
+  $("ang3").addEventListener("input", upd3);
+  $("len3").addEventListener("input", upd3);
+  upd3();
+
+  /* ---------- Étape 4 : calculer un angle ---------- */
+  var PAIRS = { ah: ["adj", "hyp", 4, 5], oh: ["opp", "hyp", 3, 5], oa: ["opp", "adj", 3, 4] }, pair4 = "ah";
+  var ROLE_CAP = { hyp: "Hypoténuse", adj: "Adjacent", opp: "Opposé" };
+  function setPair(p) {
+    pair4 = p; var P = PAIRS[p];
+    $("l4a").textContent = ROLE_CAP[P[0]] + " " + NM[P[0]] + " (cm)";
+    $("l4b").textContent = ROLE_CAP[P[1]] + " " + NM[P[1]] + " (cm)";
+    $("i4a").value = fmt(P[2]); $("i4b").value = fmt(P[3]);
+    press(["p4ah", "p4oh", "p4oa"], "p4" + p);
+    upd4();
+  }
+  function upd4() {
+    var P = PAIRS[pair4], x = num($("i4a").value), y = num($("i4b").value), out = $("steps4"), svg = $("fig4");
+    if (isNaN(x) || isNaN(y) || x <= 0 || y <= 0) { out.innerHTML = "<span class=\"err\">Écris deux longueurs positives.</span>"; clear(svg); return; }
+    var res = solveAngle(P[0], x, P[1], y);
+    if (res.error) { out.innerHTML = "<span class=\"err\">Impossible : l'hypoténuse doit être le plus long côté. Ici, " + res.fn + " " + ang("B") + " vaudrait " + fmt(res.r, 3) + ", plus que 1.</span>"; clear(svg); return; }
+    out.innerHTML =
+      "<span class=\"why\">Tu connais " + ROLE_FR[P[0]] + " et " + ROLE_FR[P[1]] + " : c'est " + FN_FR[res.fn] + " (" + MNEMO[res.fn] + ").</span>" +
+      "<span>" + res.fn + " " + ang("B") + " = " + NM[P[0]] + " / " + NM[P[1]] + " = " + fmt(x) + " / " + fmt(y) + " " + eq(res.r, 3) + fmt(res.r, 3) + "</span>" +
+      "<span>donc " + ang("B") + " = " + INV[res.fn] + "(" + fmt(x) + " ÷ " + fmt(y) + ")</span>" +
+      "<span><b>" + ang("B") + " " + eq(res.deg, 2) + fmt(res.deg, 2) + "°</b>, soit environ " + fmt(Math.round(res.deg)) + "° au degré près</span>";
+    var vals = {}; vals[P[0]] = x; vals[P[1]] = y;
+    var adj = vals.adj != null ? vals.adj : Math.sqrt(vals.hyp * vals.hyp - vals.opp * vals.opp);
+    var opp = vals.opp != null ? vals.opp : Math.sqrt(vals.hyp * vals.hyp - vals.adj * vals.adj);
+    var labs = {};
+    TYPES.forEach(function (t) { labs[t] = vals[t] != null ? [NM[t] + " = " + fmt(vals[t], 2)] : [NM[t]]; });
+    drawTri(svg, adj, opp, { vertex: "B", angleText: "≈ " + fmt(Math.round(res.deg)) + "°", labels: labs });
+  }
+  ["ah", "oh", "oa"].forEach(function (p) { $("p4" + p).addEventListener("click", function () { setPair(p); }); });
+  $("i4a").addEventListener("input", upd4);
+  $("i4b").addEventListener("input", upd4);
+  setPair("ah");
+
+  /* ---------- Étape 5 : l'arbre ---------- */
+  function drawTree(svg, d, deg, eye) {
+    clear(svg);
+    var top = d * Math.tan(toRad(deg)), H = eye + top, gy = 318, xP = 110;
+    var k = Math.min(380 / d, 270 / H), xT = xP + d * k, ye = gy - eye * k, yt = gy - H * k, w = Math.max(10, Math.min(50, 0.18 * H * k));
+    mk(svg, "line", { x1: 20, y1: gy, x2: 620, y2: gy, stroke: "var(--ink-soft)", "stroke-width": 2.5 });
+    /* arbre */
+    mk(svg, "line", { x1: xT, y1: gy, x2: xT, y2: gy - 0.3 * H * k, stroke: "var(--ink-soft)", "stroke-width": 6 });
+    mk(svg, "polygon", { points: xT + "," + yt + " " + (xT - w) + "," + (gy - 0.25 * H * k) + " " + (xT + w) + "," + (gy - 0.25 * H * k), fill: "var(--ok-soft)", stroke: "var(--ok)", "stroke-width": 2, "stroke-linejoin": "round" });
+    /* personne */
+    var ph = eye * k, hr = Math.max(2, 0.11 * ph);
+    mk(svg, "circle", { cx: xP, cy: ye, r: hr, fill: "none", stroke: "var(--ink)", "stroke-width": 2 });
+    mk(svg, "line", { x1: xP, y1: ye + hr, x2: xP, y2: gy - 0.45 * ph, stroke: "var(--ink)", "stroke-width": 2 });
+    mk(svg, "polyline", { points: (xP - 0.12 * ph) + "," + gy + " " + xP + "," + (gy - 0.45 * ph) + " " + (xP + 0.12 * ph) + "," + gy, fill: "none", stroke: "var(--ink)", "stroke-width": 2 });
+    /* triangle rectangle */
+    mk(svg, "line", { x1: xP, y1: ye, x2: xT, y2: ye, stroke: "var(--adj)", "stroke-width": 3.5, "stroke-dasharray": "8 6" });
+    mk(svg, "line", { x1: xT, y1: ye, x2: xT, y2: yt, stroke: "var(--opp)", "stroke-width": 4 });
+    mk(svg, "line", { x1: xP, y1: ye, x2: xT, y2: yt, stroke: "var(--hyp)", "stroke-width": 3, "stroke-dasharray": "3 5" });
+    var s = Math.min(12, (ye - yt) * 0.4);
+    mk(svg, "path", { d: "M" + (xT - s) + " " + ye + " v" + (-s) + " h" + s, fill: "none", stroke: "var(--ink)", "stroke-width": 1.8 });
+    var r = 46, pts = [];
+    for (var i = 0; i <= 20; i++) { var t = -toRad(deg) * i / 20; pts.push((xP + r * Math.cos(t)) + "," + (ye + r * Math.sin(t))); }
+    mk(svg, "polyline", { points: pts.join(" "), fill: "none", stroke: "var(--acc)", "stroke-width": 3 });
+    var m = -toRad(deg) / 2;
+    mk(svg, "text", { x: xP + (r + 12) * Math.cos(m), y: ye + (r + 12) * Math.sin(m) + 6, "font-size": 18, style: HALO + "font-weight:600;fill:var(--acc)" }, fmt(deg) + "°");
+    /* étiquettes */
+    mk(svg, "text", { x: (xP + xT) / 2, y: gy + 28, "text-anchor": "middle", "font-size": 17, style: HALO + "font-weight:600;fill:var(--adj)" }, fmt(d) + " m");
+    mk(svg, "text", { x: xT + w + 8, y: (ye + yt) / 2 + 6, "font-size": 17, style: HALO + "font-weight:600;fill:var(--opp)" }, "≈ " + fmt(top, 1) + " m");
+    mk(svg, "text", { x: xP - 14, y: (gy + ye) / 2 + 6, "text-anchor": "end", "font-size": 17, style: HALO + "font-weight:600" }, fmt(eye, 2) + " m");
+  }
+  function upd5() {
+    var d = parseFloat($("d5").value), deg = parseFloat($("a5").value), eye = parseFloat($("e5").value);
+    var top = d * Math.tan(toRad(deg)), H = treeHeight(d, deg, eye);
+    $("d5Out").textContent = fmt(d); $("a5Out").textContent = fmt(deg); $("e5Out").textContent = fmt(eye, 2);
+    drawTree($("fig5"), d, deg, eye);
+    $("steps5").innerHTML =
+      "<span>tan " + fmt(deg) + "° = <span class=\"c-opp\">hauteur au-dessus des yeux</span> / <span class=\"c-adj\">distance</span></span>" +
+      "<span>hauteur au-dessus des yeux = " + fmt(d) + " × tan " + fmt(deg) + "° " + eq(top, 2) + fmt(top, 2) + " m</span>" +
+      "<span><b>hauteur de l'arbre ≈ " + fmt(top, 2) + " + " + fmt(eye, 2) + " " + eq(H, 2) + fmt(H, 2) + " m</b></span>";
+  }
+  ["d5", "a5", "e5"].forEach(function (id) { $(id).addEventListener("input", upd5); });
+  upd5();
+  function updSlope() {
+    var p = parseFloat($("s5").value), a = slopeToDeg(p);
+    $("s5Out").textContent = fmt(p);
+    $("slope5").textContent = "tan α = " + fmt(p) + " ÷ 100 = " + fmt(p / 100, 2) + ", donc α " + eq(a, 1) + fmt(a, 1) + "°";
+  }
+  $("s5").addEventListener("input", updSlope);
+  updSlope();
+
+  /* ---------- Quiz ---------- */
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  function rnd(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+  var TRIS = ["ABC", "EFG", "RST", "MNP", "IJK"];
+  function makeQ() {
+    var tri = pick(TRIS), v = tri.charAt(rnd(1, 2)), nm = sideNames(tri, v), intro = "Le triangle " + tri + " est rectangle en " + tri.charAt(0) + ". ";
+    if (rnd(0, 2) < 2) {
+      var deg = rnd(20, 70), kn = pick(TYPES), w = pick(TYPES.filter(function (t) { return t !== kn; })), kv = rnd(3, 15), s = solveSide(deg, kn, kv, w);
+      return {
+        kind: "len", a: s.value, show: fmt(s.value, 1) + " cm",
+        q: intro + nm[kn] + " = " + kv + " cm et " + ang(v) + " = " + deg + "°. Calcule " + nm[w] + " au dixième près (en cm).",
+        how: "On connaît " + ROLE_FR[kn] + ", on cherche " + ROLE_FR[w] + " : " + FN_FR[s.fn] + ". " + s.fn + " " + ang(v) + " = " + nm[RATIO[s.fn][0]] + " / " + nm[RATIO[s.fn][1]] + ", donc " + nm[w] + " = " + kv + (s.mul ? " × " : " ÷ ") + s.fn + " " + deg + "° ≈ " + fmt(s.value, 2) + " cm"
+      };
+    }
+    var p = pick([["adj", "hyp"], ["opp", "hyp"], ["opp", "adj"]]), x, y;
+    if (p[1] === "hyp") { x = rnd(2, 9); y = x + rnd(1, 6); } else { x = rnd(2, 12); y = rnd(2, 12); }
+    var r = solveAngle(p[0], x, p[1], y);
+    return {
+      kind: "angle", a: r.deg, show: fmt(Math.round(r.deg)) + "°",
+      q: intro + nm[p[0]] + " = " + x + " cm et " + nm[p[1]] + " = " + y + " cm. Calcule l'angle " + ang(v) + " au degré près (en °).",
+      how: nm[p[0]] + " est " + ROLE_FR[p[0]] + " et " + nm[p[1]] + " est " + ROLE_FR[p[1]] + " : " + FN_FR[r.fn] + ". " + r.fn + " " + ang(v) + " = " + x + " / " + y + " " + eq(r.r, 3) + fmt(r.r, 3) + ", donc " + ang(v) + " = " + INV[r.fn] + "(" + x + " ÷ " + y + ") ≈ " + fmt(r.deg, 1) + "°"
+    };
+  }
+  var quiz = $("quiz"), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ""; done = [];
+    for (var k = 0; k < 8; k++) {
+      var Q = makeQ(), li = document.createElement("li");
+      li.innerHTML = "<span>" + Q.q + "</span><input type=\"text\" id=\"qa" + k + "\" inputmode=\"decimal\" autocomplete=\"off\" aria-label=\"Ta réponse à la question " + (k + 1) + "\"><button type=\"button\" id=\"qb" + k + "\">Vérifier</button><span class=\"fb\" id=\"qf" + k + "\" aria-live=\"polite\"></span>";
+      quiz.appendChild(li);
+      (function (k, Q) {
+        function check() {
+          var fb = $("qf" + k), x = num($("qa" + k).value);
+          if (isNaN(x)) { fb.className = "fb"; fb.textContent = "Écris un nombre."; return; }
+          if (checkAnswer(x, Q.a, Q.kind)) { fb.className = "fb ok"; fb.innerHTML = "Bravo, c'est juste !<span class=\"how\">" + Q.how + "</span>"; done[k] = true; }
+          else { done[k] = false; fb.className = "fb no"; fb.innerHTML = "Pas tout à fait : la réponse est environ " + Q.show + ".<span class=\"how\">" + Q.how + "</span>"; }
+          $("score").textContent = done.filter(Boolean).length + " / 8";
+        }
+        $("qb" + k).addEventListener("click", check);
+        $("qa" + k).addEventListener("keydown", function (e) { if (e.key === "Enter") check(); });
+      })(k, Q);
+    }
+    $("score").textContent = "0 / 8";
+  }
+  $("newQuiz").addEventListener("click", newQuiz);
+  newQuiz();
+})();
+</script>
+</body>
+</html>

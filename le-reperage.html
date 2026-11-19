@@ -1,0 +1,897 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Le repérage</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, encre sarcelle (comme une carte marine), latitude et longitude en bleu, marge rouge. Le repère du plan et la carte du monde sont au centre. */
+:root {
+  --paper: #f5faf9;
+  --grid: #dcebe8;
+  --card: #ffffff;
+  --ink: #12302d;
+  --ink-soft: #4f6b67;
+  --acc: #0f766e;
+  --acc-soft: #d3efea;
+  --two: #1c64c8;
+  --two-soft: #dbe8fa;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #fff0a3;
+  --line: #cde0dc;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0b1716; --grid: #142422; --card: #10201e; --ink: #e5f4f1; --ink-soft: #9fbdb8;
+    --acc: #5eead4; --acc-soft: #123a35; --two: #7fb0ff; --two-soft: #1a2a45;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #24403c;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0b1716; --grid: #142422; --card: #10201e; --ink: #e5f4f1; --ink-soft: #9fbdb8;
+  --acc: #5eead4; --acc-soft: #123a35; --two: #7fb0ff; --two-soft: #1a2a45;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #24403c;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note.two { border-left-color: var(--two); background: var(--two-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+svg text.tick { paint-order: stroke; stroke: var(--paper); stroke-width: 5px; stroke-linejoin: round; }
+svg text.t-acc { fill: var(--acc); font-weight: 600; }
+svg text.t-two { fill: var(--two); font-weight: 600; }
+svg text.t-ok { fill: var(--ok); font-weight: 600; }
+svg text.t-red { fill: var(--red); font-weight: 600; }
+svg text.t-soft { fill: var(--ink-soft); }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 6px 12px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+button:disabled { opacity: .45; cursor: default; transform: none; box-shadow: 3px 3px 0 var(--ink); }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.btns.cities button { font-size: .95rem; }
+input[type="text"], select { font: inherit; font-family: var(--f-mono); font-size: 1.05rem; padding: 8px 10px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; }
+input[type="range"] { width: 100%; accent-color: var(--acc); }
+.param { display: flex; flex-direction: column; gap: 2px; }
+.param label { font-weight: 700; }
+.params { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 20px; }
+.params.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (max-width: 600px) { .params, .params.three { grid-template-columns: 1fr; } }
+.inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px 14px; align-items: end; }
+.inputs label { font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+.err { color: var(--red); font-weight: 700; }
+.scroll { overflow-x: auto; }
+
+.graph svg { width: 100%; height: auto; display: block; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; }
+.graph.tap svg { cursor: crosshair; touch-action: manipulation; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: .95rem; }
+.legend span::before { content: ""; display: inline-block; width: 18px; height: 4px; border-radius: 2px; margin-right: 6px; vertical-align: middle; background: var(--acc); }
+.legend .l-two::before { background: var(--two); }
+.legend .l-ok::before { background: var(--ok); }
+.legend .l-red::before { background: var(--red); }
+
+.verdict { border-radius: 8px; padding: 12px 14px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; background: var(--acc-soft); color: var(--acc); }
+.verdict.yes { background: var(--ok-soft); color: var(--ok); }
+.verdict.no { background: var(--red-soft); color: var(--red); }
+.verdict.two { background: var(--two-soft); color: var(--two); }
+.verdict span { font-weight: 400; color: var(--ink); }
+
+.results { display: flex; flex-direction: column; gap: 8px; font-variant-numeric: tabular-nums; }
+.res { border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 12px; display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; align-items: baseline; }
+.res-name { font-family: var(--f-display); font-weight: 700; }
+.res-val { font-family: var(--f-mono); font-weight: 600; color: var(--acc); font-size: 1.05rem; white-space: nowrap; }
+.res-val.two { color: var(--two); }
+.res-calc { grid-column: 1 / -1; font-family: var(--f-mono); font-size: .85rem; color: var(--ink-soft); overflow-wrap: anywhere; }
+.steps { display: flex; flex-direction: column; gap: 6px; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; padding: 12px 14px; font-family: var(--f-mono); font-size: .98rem; overflow-wrap: anywhere; }
+.steps b { color: var(--acc); }
+.steps h3 { font-size: 1.05rem; }
+.steps .why { font-family: var(--f-body); font-size: .9rem; color: var(--ink-soft); }
+.steps .err { color: var(--red); font-family: var(--f-body); font-weight: 700; }
+.twosteps { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 600px) { .twosteps { grid-template-columns: 1fr; } }
+
+.announce { font-family: var(--f-display); font-weight: 800; font-size: clamp(1.3rem, 4vw, 1.7rem); color: var(--acc); }
+.status { font-family: var(--f-mono); font-weight: 600; color: var(--ink-soft); }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
+.tag.ok { color: var(--ok); }
+.tag.no { color: var(--red); }
+.tag.two { color: var(--two); }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
+.quiz .ans { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center; }
+.quiz .ans label { display: inline-flex; align-items: center; gap: 6px; font-family: var(--f-mono); font-weight: 600; }
+.quiz input[type="text"] { font-size: 1rem; padding: 6px 8px; width: 6.5em; }
+.quiz .ans button.choice { font-size: .95rem; }
+.quiz .fb { font-size: .95rem; }
+.quiz .fb:empty { display: none; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc); }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 120px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+</head>
+<body>
+<main class="page">
+
+  <header class="hero">
+    <span class="eyebrow">Tutoriel de maths · niveau 5<sup>e</sup>–3<sup>e</sup></span>
+    <h1>Le repérage</h1>
+    <p class="lead">Pour retrouver un point, il faut son adresse exacte. Sur une feuille, deux nombres suffisent. Dans une pièce, il en faut trois. Sur la Terre, on utilise la latitude et la longitude.</p>
+    <div class="box">
+      <div class="cards">
+        <div class="box"><span class="tag ok">Sur une droite</span><strong>1 nombre</strong><span class="soft">L'abscisse : par exemple −3.</span></div>
+        <div class="box"><span class="tag ok">Dans le plan</span><strong>2 nombres</strong><span class="soft">L'abscisse et l'ordonnée : (3 ; −2).</span></div>
+        <div class="box"><span class="tag ok">Dans l'espace</span><strong>3 nombres</strong><span class="soft">On ajoute l'altitude : (4 ; 2 ; 1).</span></div>
+        <div class="box"><span class="tag two">Sur la Terre</span><strong>2 angles</strong><span class="soft">Latitude et longitude : (48,9° N ; 2,4° E).</span></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · Sur une droite</span>
+    <h2>Un seul nombre : l'abscisse</h2>
+    <p>Sur une droite graduée, on choisit une <strong>origine</strong> O (le zéro) et une unité. Chaque point a alors un nombre : son <strong>abscisse</strong>. À droite de O, l'abscisse est positive. À gauche, elle est <span class="hl">négative</span> (voir le tutoriel sur les nombres relatifs).</p>
+    <div class="box">
+      <div class="graph tap"><svg id="lineSvg" viewBox="0 0 640 150" role="img" aria-label="Droite graduée de −5 à 5 avec les points A, B et M"></svg></div>
+      <div class="param">
+        <label for="lineM">Abscisse du point M : <span class="mono" id="lineMOut">2,5</span></label>
+        <input id="lineM" type="range" min="-5" max="5" step="0.5" value="2.5">
+      </div>
+      <p class="soft">Tu peux aussi toucher la droite pour déplacer M.</p>
+      <div class="verdict" id="lineOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · Le repère du plan</span>
+    <h2>Deux nombres : (x ; y)</h2>
+    <p>Sur une feuille, on trace deux droites graduées qui se coupent en <strong>O</strong>, l'<strong>origine</strong>. La droite horizontale est l'<strong>axe des abscisses</strong>. La droite verticale est l'<strong>axe des ordonnées</strong>.</p>
+    <p>Un point a deux <strong>coordonnées</strong>, écrites entre parenthèses : (x ; y). D'abord l'<strong>abscisse</strong> x (on se déplace à l'horizontale), puis l'<strong>ordonnée</strong> y (on monte ou on descend). Pour t'en souvenir : <span class="hl">on avance avant de monter</span>, comme dans un immeuble où on prend le couloir avant l'escalier.</p>
+    <div class="box">
+      <div class="graph tap"><svg id="planSvg" viewBox="0 0 640 640" role="img" aria-label="Repère du plan de −6 à 6 avec les quatre zones colorées"></svg></div>
+      <p class="soft">Touche un nœud du quadrillage, ou écris des coordonnées.</p>
+      <div class="inputs">
+        <label for="px">x (abscisse)<input id="px" type="text" inputmode="decimal" autocomplete="off" value="3"></label>
+        <label for="py">y (ordonnée)<input id="py" type="text" inputmode="decimal" autocomplete="off" value="-2"></label>
+      </div>
+      <div class="verdict" id="planOut" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Les quatre zones du plan</span>
+      <span>Les axes coupent le plan en quatre zones. Les signes des coordonnées disent dans quelle zone est le point : (+ ; +) en haut à droite, (− ; +) en haut à gauche, (− ; −) en bas à gauche, (+ ; −) en bas à droite. Un point qui a un 0 est sur un axe.</span>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Jeu</span>
+    <h2>La chasse au trésor</h2>
+    <p>Le trésor est caché à un point précis. Lis ses coordonnées et touche le bon nœud du quadrillage. Huit manches : à toi de jouer !</p>
+    <div class="box">
+      <div class="btns" style="justify-content:space-between">
+        <span class="announce" id="huntAsk" aria-live="polite"></span>
+        <span class="status" id="huntStatus"></span>
+      </div>
+      <div class="graph tap"><svg id="huntSvg" viewBox="0 0 640 640" role="img" aria-label="Quadrillage de la chasse au trésor"></svg></div>
+      <div class="legend"><span class="l-ok">le trésor</span><span class="l-red">ton point</span></div>
+      <div class="verdict" id="huntOut" aria-live="polite"></div>
+      <div class="btns"><button id="huntNext" type="button" disabled>Point suivant</button></div>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · Distance et milieu</span>
+    <h2>Calculer avec les coordonnées</h2>
+    <p>Avec les coordonnées de deux points A et B, on peut calculer sans règle le <strong>milieu</strong> M du segment [AB] et la <strong>longueur</strong> AB.</p>
+    <div class="cards">
+      <div class="box"><span class="tag ok">Le milieu</span><span class="mono">M ( (x<sub>A</sub> + x<sub>B</sub>) ÷ 2 ; (y<sub>A</sub> + y<sub>B</sub>) ÷ 2 )</span><span class="soft">On fait la moyenne des abscisses, puis la moyenne des ordonnées.</span></div>
+      <div class="box"><span class="tag ok">La distance</span><span class="mono">AB = √( (x<sub>B</sub> − x<sub>A</sub>)² + (y<sub>B</sub> − y<sub>A</sub>)² )</span><span class="soft">C'est le théorème de Pythagore dans un triangle rectangle caché (voir le tutoriel sur Pythagore).</span></div>
+    </div>
+    <div class="box">
+      <div class="inputs">
+        <label for="xa">x<sub>A</sub><input id="xa" type="text" inputmode="decimal" autocomplete="off" value="-3"></label>
+        <label for="ya">y<sub>A</sub><input id="ya" type="text" inputmode="decimal" autocomplete="off" value="-2"></label>
+        <label for="xb">x<sub>B</sub><input id="xb" type="text" inputmode="decimal" autocomplete="off" value="3"></label>
+        <label for="yb">y<sub>B</sub><input id="yb" type="text" inputmode="decimal" autocomplete="off" value="6"></label>
+      </div>
+      <div class="btns" role="group" aria-label="Point placé en touchant le quadrillage">
+        <span>Toucher le quadrillage place :</span>
+        <button id="tapA" type="button" aria-pressed="true">le point A</button>
+        <button id="tapB" type="button" aria-pressed="false">le point B</button>
+      </div>
+      <div class="graph tap"><svg id="distSvg" viewBox="0 0 640 640" role="img" aria-label="Points A et B, leur milieu M et le triangle rectangle qui donne la distance AB"></svg></div>
+      <div class="legend"><span class="l-two">x<sub>B</sub> − x<sub>A</sub> (horizontal)</span><span class="l-red">y<sub>B</sub> − y<sub>A</sub> (vertical)</span><span class="l-ok">le milieu M</span></div>
+      <div class="twosteps" id="distOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Dans l'espace</span>
+    <h2>Trois nombres : (x ; y ; z)</h2>
+    <p>Une mouche vole dans une chambre en forme de <strong>pavé droit</strong>. Pour dire où elle est, deux nombres ne suffisent pas : il faut aussi sa hauteur. On ajoute un troisième axe, vertical, et une troisième coordonnée : l'<strong>altitude</strong> z. Les coordonnées s'écrivent (x ; y ; z), toujours dans cet ordre.</p>
+    <div class="box">
+      <div class="graph"><svg id="boxSvg" viewBox="0 0 640 420" role="img" aria-label="Pavé droit en perspective cavalière avec un point et ses trois coordonnées"></svg></div>
+      <div class="params three">
+        <div class="param"><label for="bx">Abscisse x : <span class="mono" id="bxOut">4</span></label><input id="bx" type="range" min="0" max="6" step="0.5" value="4"></div>
+        <div class="param"><label for="by">Ordonnée y : <span class="mono" id="byOut">2</span></label><input id="by" type="range" min="0" max="4" step="0.5" value="2"></div>
+        <div class="param"><label for="bz">Altitude z : <span class="mono" id="bzOut">1</span></label><input id="bz" type="range" min="0" max="3" step="0.5" value="1"></div>
+      </div>
+      <div class="verdict" id="boxOut" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Le chemin de la mouche</span>
+      <span>Depuis le coin O, on avance de x le long du premier mur, puis de y vers le fond, puis on monte de z. Un point posé sur le sol a une altitude égale à 0.</span>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · Sur la Terre</span>
+    <h2>Latitude et longitude</h2>
+    <p>La Terre est presque une boule. Pour repérer un lieu, on utilise deux <strong>angles</strong>, en degrés.</p>
+    <div class="cards">
+      <div class="box"><span class="tag two">Latitude</span><strong>Nord ou Sud</strong><span class="soft">De 0° sur l'<strong>Équateur</strong> à 90° aux pôles. On la lit sur les <strong>parallèles</strong>, les cercles horizontaux. Elle dit si on est loin de l'Équateur, au nord (N) ou au sud (S).</span></div>
+      <div class="box"><span class="tag two">Longitude</span><strong>Est ou Ouest</strong><span class="soft">De 0° sur le <strong>méridien de Greenwich</strong> (près de Londres) à 180°. On la lit sur les <strong>méridiens</strong>, qui vont d'un pôle à l'autre. Elle dit si on est à l'est (E) ou à l'ouest (O) de Greenwich.</span></div>
+    </div>
+    <div class="box">
+      <div class="graph tap"><svg id="mapSvg" viewBox="0 0 716 384" role="img" aria-label="Carte du monde en quadrillage de latitudes et longitudes, avec l'Équateur, le méridien de Greenwich et quelques villes"></svg></div>
+      <div class="params">
+        <div class="param"><label for="lat">Latitude : <span class="mono" id="latOut"></span></label><input id="lat" type="range" min="-90" max="90" step="0.1" value="48.9"></div>
+        <div class="param"><label for="lon">Longitude : <span class="mono" id="lonOut"></span></label><input id="lon" type="range" min="-180" max="180" step="0.1" value="2.4"></div>
+      </div>
+      <div class="btns cities" id="cityBtns" role="group" aria-label="Choisir une ville"></div>
+      <div class="verdict two" id="mapOut" aria-live="polite"></div>
+    </div>
+    <div class="box">
+      <h3>La distance entre deux villes</h3>
+      <div class="inputs">
+        <label for="cityA">Départ<select id="cityA"></select></label>
+        <label for="cityB">Arrivée<select id="cityB"></select></label>
+      </div>
+      <div class="results" id="gcOut" aria-live="polite"></div>
+      <p class="soft">Le chemin le plus court sur une boule suit un <strong>grand cercle</strong> : un cercle qui a le même centre que la Terre. Les avions suivent à peu près ces routes. Sur une carte plate, ce chemin paraît souvent courbé (en vert sur la carte). La page calcule la distance avec un rayon de la Terre de 6 371 km : c'est une valeur moyenne, le résultat est donc approché.</p>
+    </div>
+    <div class="note two">
+      <span class="note-title">Le savais-tu ?</span>
+      <span>• Un tour de Terre fait environ 40 000 km pour 360°. Donc <strong>1° de latitude ≈ 111 km</strong>. Paris, à 48,9° N, est à environ 48,9 × 111 ≈ 5 400 km de l'Équateur.</span>
+      <span>• Un degré de longitude est plus court quand on s'approche des pôles, car les parallèles y sont plus petits. À Paris, il mesure environ 73 km.</span>
+      <span>• Un <strong>GPS</strong>, comme celui de ton téléphone, donne ta position avec une latitude et une longitude (et parfois l'altitude).</span>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Les pièges</span>
+    <h2>Les erreurs classiques</h2>
+    <div class="cards">
+      <div class="box"><strong>x avant y</strong><span class="soft">(2 ; 5) et (5 ; 2) sont deux points différents. On écrit toujours l'abscisse en premier. Astuce : « a » d'abscisse vient avant « o » d'ordonnée dans l'alphabet, comme x avant y.</span></div>
+      <div class="box"><strong>Les nombres négatifs</strong><span class="soft">Une abscisse négative fait aller à gauche. Une ordonnée négative fait descendre. Le point (−3 ; −1) est en bas à gauche.</span></div>
+      <div class="box"><strong>Le nom des axes</strong><span class="soft">L'axe des abscisses est <strong>horizontal</strong>. L'axe des ordonnées est <strong>vertical</strong>. Un point sur l'axe des abscisses a une ordonnée égale à 0 : par exemple (4 ; 0).</span></div>
+      <div class="box"><strong>Nord/Sud ou Est/Ouest ?</strong><span class="soft">La latitude va avec Nord ou Sud. La longitude va avec Est ou Ouest. « 48,9° E » n'est pas une latitude : la lettre doit correspondre au bon angle.</span></div>
+      <div class="box"><strong>La longitude et l'Équateur</strong><span class="soft">La distance à l'Équateur, c'est la <strong>latitude</strong>. La longitude dit seulement si on est à l'est ou à l'ouest de Greenwich.</span></div>
+      <div class="box"><strong>L'ordre sur les cartes</strong><span class="soft">En géographie, on écrit en général la latitude en premier. Or la latitude se lit à la verticale. C'est l'inverse de (x ; y) en maths : regarde bien les lettres N, S, E, O.</span></div>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Pour les nombres décimaux, utilise une virgule ou un point. Pour les villes, regarde la liste de l'étape 6.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Nouvelles questions</button>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Un peu d'histoire</span>
+    <h2>De la mouche au GPS</h2>
+    <ol class="timeline">
+      <li><span class="when">vers −240</span><div class="what"><strong>Ératosthène mesure la Terre</strong><span>À Alexandrie, en Égypte, il compare l'ombre du Soleil dans deux villes éloignées. Il en déduit le tour de la Terre. On pense que son résultat était proche des 40 000 km réels, mais on ne sait pas exactement quelle longueur avait son unité, le stade.</span></div></li>
+      <li><span class="when">1637</span><div class="what"><strong>René Descartes</strong><span>Dans <em>La Géométrie</em>, il relie les nombres et les figures : un point devient un couple de nombres. C'est pour cela qu'on parle de repère « cartésien ». On raconte qu'il en a eu l'idée en regardant une mouche marcher au plafond, en se demandant comment décrire sa position. C'est sans doute une légende. Pierre de Fermat a eu des idées proches à la même époque.</span></div></li>
+      <li><span class="when">1884</span><div class="what"><strong>Le méridien de Greenwich</strong><span>À une conférence internationale à Washington, des pays choisissent le méridien qui passe par l'observatoire de Greenwich, près de Londres, comme longitude 0°. La France a continué un temps à utiliser le méridien de Paris.</span></div></li>
+      <li><span class="when">fin du XX<sup>e</sup> siècle</span><div class="what"><strong>Le GPS</strong><span>Une trentaine de satellites tournent autour de la Terre et envoient des signaux. Un récepteur compare ces signaux et calcule sa latitude, sa longitude et son altitude, souvent à quelques mètres près.</span></div></li>
+    </ol>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · À toi de jouer</span>
+    <h2>Six exercices</h2>
+    <div class="exos">
+      <details>
+        <summary>Dans quelle zone ?<span class="q">Sans dessiner, dis où se trouvent les points A(−4 ; −1), B(5 ; −3) et C(0 ; 2).</span></summary>
+        <div><span>A : abscisse négative et ordonnée négative, donc <strong>en bas à gauche</strong>. B : (+ ; −), donc <strong>en bas à droite</strong>. C a une abscisse égale à 0 : il est <strong>sur l'axe des ordonnées</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Le milieu<span class="q">A(−2 ; 5) et B(4 ; −1). Calcule les coordonnées du milieu M de [AB].</span></summary>
+        <div><span>x<sub>M</sub> = (−2 + 4) ÷ 2 = 2 ÷ 2 = 1. y<sub>M</sub> = (5 + (−1)) ÷ 2 = 4 ÷ 2 = 2. Donc <strong>M(1 ; 2)</strong>.</span></div>
+      </details>
+      <details>
+        <summary>La distance<span class="q">A(1 ; 2) et B(4 ; 6). Calcule la longueur AB.</span></summary>
+        <div><span>x<sub>B</sub> − x<sub>A</sub> = 4 − 1 = 3 et y<sub>B</sub> − y<sub>A</sub> = 6 − 2 = 4. AB² = 3² + 4² = 9 + 16 = 25, donc <strong>AB = 5</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Le point manquant<span class="q">M(4 ; 1) est le milieu de [AB], avec A(1 ; 3). Trouve B.</span></summary>
+        <div><span>Pour aller de A à M, on fait +3 en x et −2 en y. On refait le même trajet depuis M : 4 + 3 = 7 et 1 − 2 = −1. Donc <strong>B(7 ; −1)</strong>. Vérification : (1 + 7) ÷ 2 = 4 et (3 + (−1)) ÷ 2 = 1.</span></div>
+      </details>
+      <details>
+        <summary>La lampe<span class="q">Dans une chambre, on prend un coin du sol comme origine. Une lampe est à 2 m le long du premier mur, 1,5 m vers le fond et 2,4 m de hauteur. Quelles sont ses coordonnées ?</span></summary>
+        <div><span>Dans l'ordre (x ; y ; z) : <strong>(2 ; 1,5 ; 2,4)</strong>. La hauteur est la troisième coordonnée, l'altitude.</span></div>
+      </details>
+      <details>
+        <summary>Du pôle à l'Équateur<span class="q">Le pôle Nord a pour latitude 90° N. Environ combien de kilomètres le séparent de l'Équateur ?</span></summary>
+        <div><span>1° de latitude ≈ 111 km, donc 90 × 111 = 9 990, soit <strong>environ 10 000 km</strong>. À l'origine, le mètre a été défini pour que cette distance fasse 10 000 km.</span></div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• Sur une droite graduée, un point est repéré par un nombre : son <strong>abscisse</strong>.</span>
+      <span>• Dans un repère du plan, un point a deux coordonnées <strong>(x ; y)</strong> : l'abscisse (horizontale) <strong>d'abord</strong>, puis l'ordonnée (verticale).</span>
+      <span>• Milieu de [AB] : <strong>((x<sub>A</sub> + x<sub>B</sub>) ÷ 2 ; (y<sub>A</sub> + y<sub>B</sub>) ÷ 2)</strong>. Distance : <strong>AB = √((x<sub>B</sub> − x<sub>A</sub>)² + (y<sub>B</sub> − y<sub>A</sub>)²)</strong>.</span>
+      <span>• Dans l'espace, on ajoute l'<strong>altitude</strong> : (x ; y ; z).</span>
+      <span>• Sur la Terre : la <strong>latitude</strong> (de 0° à 90°, Nord ou Sud, depuis l'Équateur) et la <strong>longitude</strong> (de 0° à 180°, Est ou Ouest, depuis Greenwich).</span>
+    </div>
+  </section>
+
+  <footer>Fiche de révision · Le repérage</footer>
+</main>
+
+<script>
+(function () {
+  "use strict";
+  var NS = "http://www.w3.org/2000/svg";
+  function fmt(x, d) { var r = Math.round(x * 1e6) / 1e6; if (Object.is(r, -0)) r = 0; return r.toLocaleString("fr-FR", { maximumFractionDigits: d == null ? 3 : d }).replace("-", "−"); }
+  function num(s) { var t = String(s).replace(/\s/g, "").replace(/[−–]/g, "-").replace(",", "."); if (t === "") return NaN; var x = Number(t); return isFinite(x) ? x : NaN; }
+  function mk(svg, name, attrs, text) { var e = document.createElementNS(NS, name); for (var a in attrs) e.setAttribute(a, attrs[a]); if (text != null) e.textContent = text; svg.appendChild(e); return e; }
+  function clear(svg) { while (svg.firstChild) svg.removeChild(svg.firstChild); }
+  function P(x) { return x < 0 ? "(" + fmt(x) + ")" : fmt(x); }
+  function co(x, y) { return "(" + fmt(x) + " ; " + fmt(y) + ")"; }
+  function rnd(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+  function nz(a, b) { var v = 0; while (v === 0) v = rnd(a, b); return v; }
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  /* Position d'un clic ou d'un toucher dans les unités du viewBox */
+  function toSvg(svg, e) {
+    var r = svg.getBoundingClientRect(), vb = svg.viewBox.baseVal;
+    return { x: vb.x + (e.clientX - r.left) * vb.width / r.width, y: vb.y + (e.clientY - r.top) * vb.height / r.height };
+  }
+
+  /* ---------- Fonctions pures ---------- */
+  function distance(xA, yA, xB, yB) { var dx = xB - xA, dy = yB - yA; return Math.sqrt(dx * dx + dy * dy); }
+  function midpoint(xA, yA, xB, yB) { return [(xA + xB) / 2, (yA + yB) / 2]; }
+  function quadrant(x, y) { if (x === 0 || y === 0) return 0; if (x > 0) return y > 0 ? 1 : 4; return y > 0 ? 2 : 3; }
+  function greatCircle(lat1, lon1, lat2, lon2) {
+    var R = 6371, r = Math.PI / 180, dLat = (lat2 - lat1) * r, dLon = (lon2 - lon1) * r;
+    var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * r) * Math.cos(lat2 * r) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    return 2 * R * Math.asin(Math.min(1, Math.sqrt(a)));
+  }
+  window.__reperage = { distance: distance, midpoint: midpoint, quadrant: quadrant, greatCircle: greatCircle };
+
+  var ZONES = ["", "en haut à droite", "en haut à gauche", "en bas à gauche", "en bas à droite"];
+  var SIGNS = ["", "(+ ; +)", "(− ; +)", "(− ; −)", "(+ ; −)"];
+  function moveText(x, y) {
+    var h = x > 0 ? "on va de " + fmt(x) + " vers la droite" : x < 0 ? "on va de " + fmt(-x) + " vers la gauche" : "on ne bouge pas à l'horizontale";
+    var v = y > 0 ? "on monte de " + fmt(y) : y < 0 ? "on descend de " + fmt(-y) : "on ne monte pas et on ne descend pas";
+    return "Depuis O, " + h + ", puis " + v + ".";
+  }
+  function zoneText(x, y) {
+    if (x === 0 && y === 0) return "C'est l'origine O.";
+    if (y === 0) return "Il est sur l'axe des abscisses : son ordonnée vaut 0.";
+    if (x === 0) return "Il est sur l'axe des ordonnées : son abscisse vaut 0.";
+    var q = quadrant(x, y);
+    return "Il est dans la zone " + ZONES[q] + ", signes " + SIGNS[q] + ".";
+  }
+
+  /* ---------- Repère du plan (−6 à 6) ---------- */
+  var U = 46, C0 = 320, M = 6;
+  function X(v) { return C0 + U * v; }
+  function Y(v) { return C0 - U * v; }
+  function gridPoint(svg, e) {
+    var p = toSvg(svg, e);
+    var x = Math.round((p.x - C0) / U), y = Math.round((C0 - p.y) / U);
+    return [Math.max(-M, Math.min(M, x)), Math.max(-M, Math.min(M, y))];
+  }
+  function drawPlane(svg, o) {
+    clear(svg);
+    o = o || {};
+    var lo = X(-M), hi = X(M), v;
+    if (o.quadrants) {
+      var q = [[X(0), Y(M), "var(--acc-soft)"], [lo, Y(M), "var(--two-soft)"], [lo, Y(0), "var(--hl)"], [X(0), Y(0), "var(--red-soft)"]];
+      q.forEach(function (r) { mk(svg, "rect", { x: r[0], y: r[1], width: U * M, height: U * M, fill: r[2], opacity: 0.8 }); });
+      [[4, 5.4, 1], [-4, 5.4, 2], [-4, -5.6, 3], [4, -5.6, 4]].forEach(function (s) {
+        mk(svg, "text", { x: X(s[0]), y: Y(s[1]), "text-anchor": "middle", "font-size": 20, "font-weight": 600, "class": "tick" }, SIGNS[s[2]]);
+      });
+    }
+    for (v = -M; v <= M; v++) {
+      mk(svg, "line", { x1: X(v), y1: Y(M), x2: X(v), y2: Y(-M), stroke: "var(--line)", "stroke-width": 1 });
+      mk(svg, "line", { x1: lo, y1: Y(v), x2: hi, y2: Y(v), stroke: "var(--line)", "stroke-width": 1 });
+    }
+    mk(svg, "line", { x1: lo - 14, y1: Y(0), x2: hi + 18, y2: Y(0), stroke: "var(--ink)", "stroke-width": 2 });
+    mk(svg, "line", { x1: X(0), y1: Y(-M) + 14, x2: X(0), y2: Y(M) - 18, stroke: "var(--ink)", "stroke-width": 2 });
+    mk(svg, "polygon", { points: (hi + 28) + "," + Y(0) + " " + (hi + 16) + "," + (Y(0) - 6) + " " + (hi + 16) + "," + (Y(0) + 6), fill: "var(--ink)" });
+    mk(svg, "polygon", { points: X(0) + "," + (Y(M) - 28) + " " + (X(0) - 6) + "," + (Y(M) - 16) + " " + (X(0) + 6) + "," + (Y(M) - 16), fill: "var(--ink)" });
+    for (v = -M; v <= M; v++) {
+      if (v === 0) continue;
+      mk(svg, "text", { x: X(v), y: Y(0) + 22, "text-anchor": "middle", "font-size": 17, "class": "tick" }, fmt(v));
+      mk(svg, "text", { x: X(0) - 8, y: Y(v) + 6, "text-anchor": "end", "font-size": 17, "class": "tick" }, fmt(v));
+    }
+    mk(svg, "text", { x: X(0) - 8, y: Y(0) + 22, "text-anchor": "end", "font-size": 18, "font-weight": 600, "class": "tick" }, "O");
+    mk(svg, "text", { x: hi + 24, y: Y(0) - 12, "text-anchor": "end", "font-size": 18, "font-weight": 600, "class": "tick" }, o.names ? "x (abscisses)" : "x");
+    mk(svg, "text", { x: X(0) + 12, y: Y(M) - 10, "text-anchor": "start", "font-size": 18, "font-weight": 600, "class": "tick" }, o.names ? "y (ordonnées)" : "y");
+  }
+  function guides(svg, x, y, color) {
+    if (x !== 0) mk(svg, "line", { x1: X(x), y1: Y(y), x2: X(x), y2: Y(0), stroke: color, "stroke-width": 2.5, "stroke-dasharray": "7 5" });
+    if (y !== 0) mk(svg, "line", { x1: X(x), y1: Y(y), x2: X(0), y2: Y(y), stroke: color, "stroke-width": 2.5, "stroke-dasharray": "7 5" });
+    if (x !== 0) mk(svg, "circle", { cx: X(x), cy: Y(0), r: 4.5, fill: color });
+    if (y !== 0) mk(svg, "circle", { cx: X(0), cy: Y(y), r: 4.5, fill: color });
+  }
+  function dot(svg, x, y, color, cls, label, r) {
+    mk(svg, "circle", { cx: X(x), cy: Y(y), r: r || 8, fill: color, stroke: "var(--card)", "stroke-width": 2.5 });
+    if (label) {
+      var right = x < 2.5, up = y < 4.5;
+      mk(svg, "text", { x: X(x) + (right ? 13 : -13), y: Y(y) + (up ? -13 : 28), "text-anchor": right ? "start" : "end", "font-size": 19, "class": "tick " + cls }, label);
+    }
+  }
+
+  /* ---------- Étape 1 : droite graduée ---------- */
+  var lineSvg = document.getElementById("lineSvg"), lineM = document.getElementById("lineM");
+  var LU = 56, LO = 320, LY = 80;
+  function LX(v) { return LO + LU * v; }
+  function drawLine() {
+    var m = parseFloat(lineM.value), v;
+    clear(lineSvg);
+    mk(lineSvg, "line", { x1: 14, y1: LY, x2: 618, y2: LY, stroke: "var(--ink)", "stroke-width": 2 });
+    mk(lineSvg, "polygon", { points: "630," + LY + " 618," + (LY - 6) + " 618," + (LY + 6), fill: "var(--ink)" });
+    for (v = -5; v <= 5; v += 0.5) {
+      var big = v === Math.round(v);
+      mk(lineSvg, "line", { x1: LX(v), y1: LY - (big ? 9 : 5), x2: LX(v), y2: LY + (big ? 9 : 5), stroke: "var(--ink)", "stroke-width": big ? 2 : 1 });
+      if (big) mk(lineSvg, "text", { x: LX(v), y: LY + 32, "text-anchor": "middle", "font-size": 17, "class": "tick" }, fmt(v));
+    }
+    mk(lineSvg, "text", { x: LX(0), y: LY - 18, "text-anchor": "middle", "font-size": 18, "font-weight": 600, "class": "tick" }, "O");
+    [["A", -3, "var(--two)", "t-two"], ["B", 1.5, "var(--two)", "t-two"]].forEach(function (p) {
+      mk(lineSvg, "circle", { cx: LX(p[1]), cy: LY, r: 7, fill: p[2], stroke: "var(--card)", "stroke-width": 2 });
+      mk(lineSvg, "text", { x: LX(p[1]), y: LY - 18, "text-anchor": "middle", "font-size": 19, "class": "tick " + p[3] }, p[0]);
+    });
+    mk(lineSvg, "line", { x1: LX(0), y1: LY + 46, x2: LX(m), y2: LY + 46, stroke: "var(--acc)", "stroke-width": 3 });
+    mk(lineSvg, "circle", { cx: LX(m), cy: LY, r: 9, fill: "var(--acc)", stroke: "var(--card)", "stroke-width": 2.5 });
+    mk(lineSvg, "text", { x: LX(m), y: LY - 40, "text-anchor": "middle", "font-size": 19, "class": "tick t-acc" }, "M(" + fmt(m) + ")");
+    document.getElementById("lineMOut").textContent = fmt(m);
+    var where = m > 0 ? "à " + fmt(m) + " unité" + (m >= 2 ? "s" : "") + " à droite de O" : m < 0 ? "à " + fmt(-m) + " unité" + (m <= -2 ? "s" : "") + " à gauche de O" : "sur l'origine O";
+    var am = Math.abs(m + 3);
+    document.getElementById("lineOut").innerHTML = "M a pour abscisse " + fmt(m) + " : il est " + where + "." +
+      "<span>A a pour abscisse −3 et B a pour abscisse 1,5.</span>" +
+      "<span>Distance AM : la plus grande abscisse moins la plus petite, " + (m >= -3 ? fmt(m) + " − (−3)" : "−3 − " + P(m)) + " = " + fmt(am) + ".</span>";
+  }
+  lineM.addEventListener("input", drawLine);
+  lineSvg.addEventListener("click", function (e) {
+    var p = toSvg(lineSvg, e), v = Math.round((p.x - LO) / LU * 2) / 2;
+    lineM.value = Math.max(-5, Math.min(5, v)); drawLine();
+  });
+  drawLine();
+
+  /* ---------- Étape 2 : repère interactif ---------- */
+  var planSvg = document.getElementById("planSvg"), px = document.getElementById("px"), py = document.getElementById("py");
+  function drawPlan() {
+    var x = num(px.value), y = num(py.value), out = document.getElementById("planOut");
+    drawPlane(planSvg, { quadrants: true, names: true });
+    if (isNaN(x) || isNaN(y)) { out.className = "verdict no"; out.innerHTML = "Écris deux nombres.<span>Par exemple 3 et −2.</span>"; return; }
+    if (Math.abs(x) > M || Math.abs(y) > M) { out.className = "verdict no"; out.innerHTML = "Ce point sort du dessin.<span>Choisis des coordonnées entre −6 et 6.</span>"; return; }
+    guides(planSvg, x, y, "var(--acc)");
+    dot(planSvg, x, y, "var(--acc)", "t-acc", "P" + co(x, y));
+    out.className = "verdict";
+    out.innerHTML = "P" + co(x, y) + " : abscisse " + fmt(x) + ", ordonnée " + fmt(y) + "." +
+      "<span>" + moveText(x, y) + "</span><span>" + zoneText(x, y) + "</span>";
+  }
+  px.addEventListener("input", drawPlan); py.addEventListener("input", drawPlan);
+  planSvg.addEventListener("click", function (e) { var p = gridPoint(planSvg, e); px.value = fmt(p[0]); py.value = fmt(p[1]); drawPlan(); });
+  drawPlan();
+
+  /* ---------- Étape 3 : chasse au trésor ---------- */
+  var huntSvg = document.getElementById("huntSvg"), huntNext = document.getElementById("huntNext");
+  var hunt = { round: 0, score: 0, t: null, answered: false };
+  function huntStatus() { document.getElementById("huntStatus").textContent = "Manche " + (hunt.round + 1) + " / 8 · Score : " + hunt.score; }
+  function huntNew() {
+    var x = nz(-6, 6), y = nz(-6, 6);
+    while (y === x) y = nz(-6, 6);
+    hunt.t = [x, y]; hunt.answered = false;
+    drawPlane(huntSvg, {});
+    document.getElementById("huntAsk").textContent = "Place le point " + co(x, y);
+    var out = document.getElementById("huntOut"); out.className = "verdict"; out.innerHTML = "Touche le quadrillage.<span>Rappel : d'abord x (horizontal), puis y (vertical).</span>";
+    huntNext.disabled = true; huntNext.textContent = "Point suivant";
+    huntStatus();
+  }
+  huntSvg.addEventListener("click", function (e) {
+    if (hunt.answered) return;
+    var p = gridPoint(huntSvg, e), t = hunt.t, out = document.getElementById("huntOut");
+    hunt.answered = true;
+    var ok = p[0] === t[0] && p[1] === t[1];
+    drawPlane(huntSvg, {});
+    guides(huntSvg, t[0], t[1], "var(--ok)");
+    if (!ok) dot(huntSvg, p[0], p[1], "var(--red)", "t-red", co(p[0], p[1]), 7);
+    dot(huntSvg, t[0], t[1], "var(--ok)", "t-ok", "Trésor " + co(t[0], t[1]), 9);
+    if (ok) {
+      hunt.score++;
+      out.className = "verdict yes"; out.innerHTML = "Bravo, tu as trouvé le trésor !<span>" + moveText(t[0], t[1]) + "</span>";
+    } else {
+      out.className = "verdict no";
+      var why;
+      if (p[0] === t[1] && p[1] === t[0]) why = "Tu as inversé x et y ! Tu as placé " + co(p[0], p[1]) + ". D'abord l'abscisse " + fmt(t[0]) + " (horizontal), puis l'ordonnée " + fmt(t[1]) + " (vertical).";
+      else if (Math.abs(p[0]) === Math.abs(t[0]) && Math.abs(p[1]) === Math.abs(t[1])) why = "Tu as placé " + co(p[0], p[1]) + " : attention aux signes. Négatif veut dire à gauche pour x, en bas pour y.";
+      else why = "Tu as placé " + co(p[0], p[1]) + ". Le trésor est en vert.";
+      out.innerHTML = "Raté !<span>" + why + "</span><span>" + moveText(t[0], t[1]) + "</span>";
+    }
+    huntNext.disabled = false;
+    if (hunt.round === 7) {
+      huntNext.textContent = "Rejouer";
+      document.getElementById("huntStatus").textContent = "Fini · Score : " + hunt.score + " / 8";
+      out.innerHTML += "<span><strong>Partie terminée : " + hunt.score + " / 8.</strong> " + (hunt.score === 8 ? "Un sans-faute, bravo !" : hunt.score >= 6 ? "Très bien !" : "Rejoue pour t'améliorer.") + "</span>";
+    } else huntStatus();
+  });
+  huntNext.addEventListener("click", function () {
+    if (hunt.round === 7 && hunt.answered) { hunt.round = 0; hunt.score = 0; } else hunt.round++;
+    huntNew();
+  });
+  huntNew();
+
+  /* ---------- Étape 4 : distance et milieu ---------- */
+  var dIn = ["xa", "ya", "xb", "yb"].map(function (id) { return document.getElementById(id); });
+  var distSvg = document.getElementById("distSvg"), tapA = document.getElementById("tapA"), tapB = document.getElementById("tapB"), tapWhich = 0;
+  function setTap(i) { tapWhich = i; tapA.setAttribute("aria-pressed", i === 0 ? "true" : "false"); tapB.setAttribute("aria-pressed", i === 1 ? "true" : "false"); }
+  tapA.addEventListener("click", function () { setTap(0); });
+  tapB.addEventListener("click", function () { setTap(1); });
+  function drawDist() {
+    var v = dIn.map(function (e) { return num(e.value); }), out = document.getElementById("distOut");
+    drawPlane(distSvg, {});
+    if (v.some(isNaN)) { out.innerHTML = "<div class=\"steps\"><span class=\"err\">Écris les quatre coordonnées.</span></div>"; return; }
+    if (v.some(function (a) { return Math.abs(a) > M; })) { out.innerHTML = "<div class=\"steps\"><span class=\"err\">Choisis des coordonnées entre −6 et 6 pour voir le dessin.</span></div>"; return; }
+    var xA = v[0], yA = v[1], xB = v[2], yB = v[3], dx = xB - xA, dy = yB - yA, m = midpoint(xA, yA, xB, yB), d = distance(xA, yA, xB, yB), d2 = dx * dx + dy * dy;
+    // Triangle rectangle : sommet C(xB ; yA)
+    if (dx !== 0) {
+      mk(distSvg, "line", { x1: X(xA), y1: Y(yA), x2: X(xB), y2: Y(yA), stroke: "var(--two)", "stroke-width": 4 });
+      mk(distSvg, "text", { x: X((xA + xB) / 2), y: Y(yA) + (dy > 0 ? 26 : -12), "text-anchor": "middle", "font-size": 19, "class": "tick t-two" }, fmt(Math.abs(dx)));
+    }
+    if (dy !== 0) {
+      mk(distSvg, "line", { x1: X(xB), y1: Y(yA), x2: X(xB), y2: Y(yB), stroke: "var(--red)", "stroke-width": 4 });
+      mk(distSvg, "text", { x: X(xB) + (dx >= 0 ? 12 : -12), y: Y((yA + yB) / 2) + 6, "text-anchor": dx >= 0 ? "start" : "end", "font-size": 19, "class": "tick t-red" }, fmt(Math.abs(dy)));
+    }
+    if (dx !== 0 && dy !== 0) {
+      var sx = dx > 0 ? -1 : 1, sy = dy > 0 ? -1 : 1, s = 14;
+      mk(distSvg, "path", { d: "M " + (X(xB) + sx * s) + " " + Y(yA) + " V " + (Y(yA) + sy * s) + " H " + X(xB), fill: "none", stroke: "var(--ink)", "stroke-width": 1.5 });
+    }
+    if (d > 0) mk(distSvg, "line", { x1: X(xA), y1: Y(yA), x2: X(xB), y2: Y(yB), stroke: "var(--ink)", "stroke-width": 3.5 });
+    dot(distSvg, xA, yA, "var(--acc)", "t-acc", "A", 8);
+    dot(distSvg, xB, yB, "var(--acc)", "t-acc", "B", 8);
+    if (d > 0) dot(distSvg, m[0], m[1], "var(--ok)", "t-ok", "M", 7);
+    var root = Math.sqrt(d2), exactRoot = Math.abs(root * 1000 - Math.round(root * 1000)) < 1e-6;
+    out.innerHTML =
+      "<div class=\"steps\"><h3>Le milieu M</h3>" +
+        "<span>x<sub>M</sub> = (" + fmt(xA) + " + " + P(xB) + ") ÷ 2 = " + fmt(xA + xB) + " ÷ 2 = " + fmt(m[0]) + "</span>" +
+        "<span>y<sub>M</sub> = (" + fmt(yA) + " + " + P(yB) + ") ÷ 2 = " + fmt(yA + yB) + " ÷ 2 = " + fmt(m[1]) + "</span>" +
+        "<span><b>M" + co(m[0], m[1]) + "</b></span>" +
+        "<span class=\"why\">On fait la moyenne des abscisses, puis celle des ordonnées.</span></div>" +
+      "<div class=\"steps\"><h3>La distance AB</h3>" +
+        "<span>x<sub>B</sub> − x<sub>A</sub> = " + fmt(xB) + " − " + P(xA) + " = " + fmt(dx) + "</span>" +
+        "<span>y<sub>B</sub> − y<sub>A</sub> = " + fmt(yB) + " − " + P(yA) + " = " + fmt(dy) + "</span>" +
+        "<span>AB² = " + P(dx) + "² + " + P(dy) + "² = " + fmt(dx * dx) + " + " + fmt(dy * dy) + " = " + fmt(d2) + "</span>" +
+        "<span><b>AB = √" + fmt(d2) + (exactRoot ? " = " : " ≈ ") + fmt(d, 2) + "</b></span>" +
+        "<span class=\"why\">" + (dx !== 0 && dy !== 0 ? "Les côtés de l'angle droit mesurent " + fmt(Math.abs(dx)) + " et " + fmt(Math.abs(dy)) + ". On applique le théorème de Pythagore : AB est l'hypoténuse." : d === 0 ? "A et B sont au même endroit : la distance est 0." : "A et B sont sur une même ligne du quadrillage : pas besoin de triangle.") + "</span></div>";
+  }
+  dIn.forEach(function (e) { e.addEventListener("input", drawDist); });
+  distSvg.addEventListener("click", function (e) {
+    var p = gridPoint(distSvg, e), k = tapWhich * 2;
+    dIn[k].value = fmt(p[0]); dIn[k + 1].value = fmt(p[1]);
+    setTap(1 - tapWhich); drawDist();
+  });
+  drawDist();
+
+  /* ---------- Étape 5 : le pavé droit ---------- */
+  var boxSvg = document.getElementById("boxSvg"), bIn = ["bx", "by", "bz"].map(function (id) { return document.getElementById(id); });
+  var BS = 62, BK = 0.5 * Math.SQRT1_2, BOX = 90, BOY = 360, LX3 = 6, LY3 = 4, LZ3 = 3;
+  function pr(x, y, z) { return [BOX + BS * x + BS * BK * y, BOY - BS * z - BS * BK * y]; }
+  function seg(a, b, at) { var p = pr(a[0], a[1], a[2]), q = pr(b[0], b[1], b[2]); at.x1 = p[0]; at.y1 = p[1]; at.x2 = q[0]; at.y2 = q[1]; return mk(boxSvg, "line", at); }
+  function drawBox() {
+    var x = parseFloat(bIn[0].value), y = parseFloat(bIn[1].value), z = parseFloat(bIn[2].value);
+    clear(boxSvg);
+    // Sol et arêtes
+    var floor = [pr(0, 0, 0), pr(LX3, 0, 0), pr(LX3, LY3, 0), pr(0, LY3, 0)].map(function (p) { return p.join(","); }).join(" ");
+    mk(boxSvg, "polygon", { points: floor, fill: "var(--acc-soft)", opacity: 0.7 });
+    var V = [], i, j;
+    for (i = 0; i < 8; i++) V.push([i & 1 ? LX3 : 0, i & 2 ? LY3 : 0, i & 4 ? LZ3 : 0]);
+    var hidden = 2; // sommet (0 ; 4 ; 0), caché derrière le pavé
+    for (i = 0; i < 8; i++) for (j = i + 1; j < 8; j++) {
+      var diff = i ^ j;
+      if (diff !== 1 && diff !== 2 && diff !== 4) continue;
+      var h = i === hidden || j === hidden;
+      seg(V[i], V[j], { stroke: "var(--ink)", "stroke-width": h ? 1.5 : 2, "stroke-dasharray": h ? "6 5" : "none", opacity: h ? 0.6 : 1 });
+    }
+    // Axes
+    seg([LX3, 0, 0], [7.2, 0, 0], { stroke: "var(--ink)", "stroke-width": 2 });
+    seg([0, LY3, 0], [0, 5.3, 0], { stroke: "var(--ink)", "stroke-width": 2, opacity: 0.6 });
+    seg([0, 0, LZ3], [0, 0, 4.1], { stroke: "var(--ink)", "stroke-width": 2 });
+    var ax = pr(7.2, 0, 0), ay = pr(0, 5.3, 0), az = pr(0, 0, 4.1), o = pr(0, 0, 0);
+    mk(boxSvg, "text", { x: ax[0] + 6, y: ax[1] + 6, "font-size": 19, "font-weight": 600 }, "x");
+    mk(boxSvg, "text", { x: ay[0] + 6, y: ay[1], "font-size": 19, "font-weight": 600 }, "y");
+    mk(boxSvg, "text", { x: az[0] - 6, y: az[1] - 6, "text-anchor": "end", "font-size": 19, "font-weight": 600 }, "z");
+    mk(boxSvg, "text", { x: o[0] - 10, y: o[1] + 22, "text-anchor": "end", "font-size": 19, "font-weight": 600 }, "O");
+    // Graduations sur les axes
+    for (i = 1; i <= LX3; i++) { var g = pr(i, 0, 0); mk(boxSvg, "text", { x: g[0], y: g[1] + 24, "text-anchor": "middle", "font-size": 16, "class": "t-soft" }, fmt(i)); }
+    for (i = 1; i <= LZ3; i++) { var gz = pr(0, 0, i); mk(boxSvg, "text", { x: gz[0] - 10, y: gz[1] + 6, "text-anchor": "end", "font-size": 16, "class": "t-soft" }, fmt(i)); }
+    // Chemin O → (x ; 0 ; 0) → (x ; y ; 0) → (x ; y ; z)
+    var A = [x, 0, 0], B = [x, y, 0], Pt = [x, y, z];
+    if (x > 0) seg([0, 0, 0], A, { stroke: "var(--acc)", "stroke-width": 5, "stroke-linecap": "round" });
+    if (y > 0) seg(A, B, { stroke: "var(--two)", "stroke-width": 5, "stroke-linecap": "round" });
+    if (z > 0) seg(B, Pt, { stroke: "var(--ok)", "stroke-width": 5, "stroke-linecap": "round" });
+    var pa = pr(x, 0, 0), pb = pr(x, y, 0), pp = pr(x, y, z);
+    if (x > 0) mk(boxSvg, "text", { x: (o[0] + pa[0]) / 2, y: o[1] - 10, "text-anchor": "middle", "font-size": 18, "class": "tick t-acc" }, "x = " + fmt(x));
+    if (y > 0) mk(boxSvg, "text", { x: (pa[0] + pb[0]) / 2 + 12, y: (pa[1] + pb[1]) / 2 + 12, "text-anchor": "start", "font-size": 18, "class": "tick t-two" }, "y = " + fmt(y));
+    if (z > 0) mk(boxSvg, "text", { x: pb[0] + 10, y: (pb[1] + pp[1]) / 2 + 6, "text-anchor": "start", "font-size": 18, "class": "tick t-ok" }, "z = " + fmt(z));
+    mk(boxSvg, "circle", { cx: pb[0], cy: pb[1], r: 4, fill: "var(--ink-soft)" });
+    mk(boxSvg, "circle", { cx: pp[0], cy: pp[1], r: 9, fill: "var(--red)", stroke: "var(--card)", "stroke-width": 2.5 });
+    var lft = pp[0] > 440;
+    mk(boxSvg, "text", { x: pp[0] + (lft ? -12 : 12), y: pp[1] - 14, "text-anchor": lft ? "end" : "start", "font-size": 19, "class": "tick t-red" },"M(" + fmt(x) + " ; " + fmt(y) + " ; " + fmt(z) + ")");
+    ["bxOut", "byOut", "bzOut"].forEach(function (id, k) { document.getElementById(id).textContent = fmt([x, y, z][k]); });
+    document.getElementById("boxOut").innerHTML = "La mouche M est au point (" + fmt(x) + " ; " + fmt(y) + " ; " + fmt(z) + ")." +
+      "<span>" + fmt(x) + " m le long du premier mur, " + fmt(y) + " m vers le fond, " + fmt(z) + " m de hauteur" + (z === 0 ? " : elle est posée sur le sol." : ".") + "</span>";
+  }
+  bIn.forEach(function (e) { e.addEventListener("input", drawBox); });
+  drawBox();
+
+  /* ---------- Étape 6 : la Terre ---------- */
+  var CITIES = [
+    ["Paris", 48.9, 2.4], ["Genève", 46.2, 6.1], ["New York", 40.7, -74.0], ["Tokyo", 35.7, 139.7],
+    ["Sydney", -33.9, 151.2], ["Rio de Janeiro", -22.9, -43.2], ["Le Cap", -33.9, 18.4], ["Dakar", 14.7, -17.4]
+  ];
+  var mapSvg = document.getElementById("mapSvg"), latIn = document.getElementById("lat"), lonIn = document.getElementById("lon");
+  var cA = document.getElementById("cityA"), cB = document.getElementById("cityB");
+  var ML = 66, MT = 12, MW = 640, MH = 320;
+  function MX(lon) { return ML + (lon + 180) * MW / 360; }
+  function MY(lat) { return MT + (90 - lat) * MH / 180; }
+  function d1(v, one) { return one ? Math.abs(v).toLocaleString("fr-FR", { minimumFractionDigits: 1, maximumFractionDigits: 1 }) : fmt(Math.abs(v), 1); }
+  function latTxt(v, one) { return v === 0 ? "0°" : d1(v, one) + "° " + (v > 0 ? "N" : "S"); }
+  function lonTxt(v, one) { return v === 0 ? "0°" : d1(v, one) + "° " + (v > 0 ? "E" : "O"); }
+  function cityTxt(c) { return c[0] + " (" + latTxt(c[1], true) + " ; " + lonTxt(c[2], true) + ")"; }
+  CITIES.forEach(function (c, i) {
+    var b = document.createElement("button"); b.type = "button"; b.id = "city" + i; b.textContent = c[0];
+    b.addEventListener("click", function () { latIn.value = c[1]; lonIn.value = c[2]; drawMap(); });
+    document.getElementById("cityBtns").appendChild(b);
+    [cA, cB].forEach(function (s) { var op = document.createElement("option"); op.value = i; op.textContent = c[0]; s.appendChild(op); });
+  });
+  cA.value = "0"; cB.value = "3";
+  function gcPath(a, b) {
+    var r = Math.PI / 180;
+    function vec(lat, lon) { return [Math.cos(lat * r) * Math.cos(lon * r), Math.cos(lat * r) * Math.sin(lon * r), Math.sin(lat * r)]; }
+    var u = vec(a[1], a[2]), w = vec(b[1], b[2]);
+    var dot3 = Math.max(-1, Math.min(1, u[0] * w[0] + u[1] * w[1] + u[2] * w[2])), om = Math.acos(dot3);
+    if (om < 1e-6) return "";
+    var d = "", prev = null, n = 80;
+    for (var i = 0; i <= n; i++) {
+      var t = i / n, k1 = Math.sin((1 - t) * om) / Math.sin(om), k2 = Math.sin(t * om) / Math.sin(om);
+      var p = [k1 * u[0] + k2 * w[0], k1 * u[1] + k2 * w[1], k1 * u[2] + k2 * w[2]];
+      var lat = Math.asin(Math.max(-1, Math.min(1, p[2]))) / r, lon = Math.atan2(p[1], p[0]) / r;
+      d += (prev === null || Math.abs(lon - prev) > 180 ? "M " : "L ") + MX(lon).toFixed(1) + " " + MY(lat).toFixed(1) + " ";
+      prev = lon;
+    }
+    return d;
+  }
+  function drawMap() {
+    var lat = parseFloat(latIn.value), lon = parseFloat(lonIn.value), v;
+    var ca = CITIES[+cA.value], cb = CITIES[+cB.value];
+    clear(mapSvg);
+    mk(mapSvg, "rect", { x: ML, y: MT, width: MW, height: MH, fill: "var(--two-soft)" });
+    for (v = -60; v <= 60; v += 30) {
+      if (v !== 0) mk(mapSvg, "line", { x1: ML, y1: MY(v), x2: ML + MW, y2: MY(v), stroke: "var(--line)", "stroke-width": 1.2 });
+      mk(mapSvg, "text", { x: ML - 6, y: MY(v) + 6, "text-anchor": "end", "font-size": 17, "class": "tick" }, latTxt(v));
+    }
+    for (v = -150; v <= 150; v += 30) {
+      if (v !== 0) mk(mapSvg, "line", { x1: MX(v), y1: MT, x2: MX(v), y2: MT + MH, stroke: "var(--line)", "stroke-width": 1.2 });
+      if (v % 60 === 0) mk(mapSvg, "text", { x: MX(v), y: MT + MH + 24, "text-anchor": "middle", "font-size": 17, "class": "tick" }, lonTxt(v));
+    }
+    mk(mapSvg, "rect", { x: ML, y: MT, width: MW, height: MH, fill: "none", stroke: "var(--ink)", "stroke-width": 1.5 });
+    mk(mapSvg, "line", { x1: ML, y1: MY(0), x2: ML + MW, y2: MY(0), stroke: "var(--two)", "stroke-width": 2.5 });
+    mk(mapSvg, "line", { x1: MX(0), y1: MT, x2: MX(0), y2: MT + MH, stroke: "var(--two)", "stroke-width": 2.5, "stroke-dasharray": "8 5" });
+    mk(mapSvg, "text", { x: ML + 8, y: MY(0) - 8, "font-size": 17, "class": "tick t-two" }, "Équateur");
+    mk(mapSvg, "text", { x: MX(0) + 6, y: MT + 20, "font-size": 17, "class": "tick t-two" }, "Greenwich");
+    mk(mapSvg, "text", { x: ML + MW - 8, y: MT + 20, "text-anchor": "end", "font-size": 17, "class": "tick t-soft" }, "pôle Nord ↑");
+    mk(mapSvg, "text", { x: ML + MW - 8, y: MT + MH - 8, "text-anchor": "end", "font-size": 17, "class": "tick t-soft" }, "pôle Sud ↓");
+    // Route du grand cercle
+    var gp = gcPath(ca, cb);
+    if (gp) mk(mapSvg, "path", { d: gp, fill: "none", stroke: "var(--ok)", "stroke-width": 3, "stroke-dasharray": "2 6", "stroke-linecap": "round" });
+    CITIES.forEach(function (c) {
+      var sel = c === ca || c === cb;
+      mk(mapSvg, "circle", { cx: MX(c[2]), cy: MY(c[1]), r: sel ? 6 : 4.5, fill: sel ? "var(--ok)" : "var(--ink-soft)", stroke: "var(--card)", "stroke-width": 1.5 });
+    });
+    [ca, cb].forEach(function (c, k) {
+      if (k === 1 && cb === ca) return;
+      var right = c[2] < 100;
+      mk(mapSvg, "text", { x: MX(c[2]) + (right ? 9 : -9), y: MY(c[1]) + (k === 0 ? -9 : 22), "text-anchor": right ? "start" : "end", "font-size": 17, "class": "tick t-ok" }, c[0]);
+    });
+    // Point choisi avec les curseurs
+    mk(mapSvg, "line", { x1: ML, y1: MY(lat), x2: ML + MW, y2: MY(lat), stroke: "var(--acc)", "stroke-width": 1.5, "stroke-dasharray": "5 5" });
+    mk(mapSvg, "line", { x1: MX(lon), y1: MT, x2: MX(lon), y2: MT + MH, stroke: "var(--acc)", "stroke-width": 1.5, "stroke-dasharray": "5 5" });
+    mk(mapSvg, "circle", { cx: MX(lon), cy: MY(lat), r: 8, fill: "var(--acc)", stroke: "var(--card)", "stroke-width": 2.5 });
+    var right2 = lon < 60, up2 = lat < 60;
+    mk(mapSvg, "text", { x: MX(lon) + (right2 ? 12 : -12), y: MY(lat) + (up2 ? -12 : 26), "text-anchor": right2 ? "start" : "end", "font-size": 18, "class": "tick t-acc" }, latTxt(lat, true) + " ; " + lonTxt(lon, true));
+
+    document.getElementById("latOut").textContent = latTxt(lat, true);
+    document.getElementById("lonOut").textContent = lonTxt(lon, true);
+    var found = null;
+    CITIES.forEach(function (c, i) {
+      var on = Math.abs(c[1] - lat) < 0.05 && Math.abs(c[2] - lon) < 0.05;
+      if (on) found = c;
+      document.getElementById("city" + i).setAttribute("aria-pressed", on ? "true" : "false");
+    });
+    var la = lat === 0 ? "Sur l'Équateur." : "Latitude " + latTxt(lat, true) + " : au " + (lat > 0 ? "nord" : "sud") + " de l'Équateur, à environ " + fmt(Math.round(Math.abs(lat) * 111 / 10) * 10, 0) + " km de lui (" + fmt(Math.abs(lat), 1) + " × 111).";
+    var lo = lon === 0 ? "Sur le méridien de Greenwich." : "Longitude " + lonTxt(lon, true) + " : à l'" + (lon > 0 ? "est" : "ouest") + " du méridien de Greenwich" + (Math.abs(lon) === 180 ? ", de l'autre côté de la Terre." : ".");
+    document.getElementById("mapOut").innerHTML = (found ? "C'est " + found[0] + " !" : "Le point (" + latTxt(lat, true) + " ; " + lonTxt(lon, true) + ")") + "<span>" + la + "</span><span>" + lo + "</span>";
+
+    var d = greatCircle(ca[1], ca[2], cb[1], cb[2]);
+    document.getElementById("gcOut").innerHTML = ca === cb ?
+      "<div class=\"res\"><span class=\"res-name\">Même ville</span><span class=\"res-val two\">0 km</span><span class=\"res-calc\">Choisis deux villes différentes.</span></div>" :
+      "<div class=\"res\"><span class=\"res-name\">" + ca[0] + " → " + cb[0] + "</span><span class=\"res-val two\">≈ " + fmt(Math.round(d / 10) * 10, 0) + " km</span>" +
+      "<span class=\"res-calc\">" + cityTxt(ca) + " et " + cityTxt(cb) + ". Distance la plus courte en suivant la surface de la Terre, arrondie à 10 km.</span></div>";
+  }
+  latIn.addEventListener("input", drawMap); lonIn.addEventListener("input", drawMap);
+  cA.addEventListener("change", drawMap); cB.addEventListener("change", drawMap);
+  mapSvg.addEventListener("click", function (e) {
+    var p = toSvg(mapSvg, e);
+    var lon = Math.round((p.x - ML) * 360 / MW - 180), lat = Math.round(90 - (p.y - MT) * 180 / MH);
+    lonIn.value = Math.max(-180, Math.min(180, lon)); latIn.value = Math.max(-90, Math.min(90, lat)); drawMap();
+  });
+  drawMap();
+
+  /* ---------- Quiz ---------- */
+  var TRIPLES = [[3, 4, 5], [6, 8, 10], [5, 12, 13], [8, 6, 10], [4, 3, 5], [12, 5, 13], [9, 12, 15]];
+  function makeQ(t) {
+    if (t === 0) {
+      var x = nz(-6, 6), y = nz(-6, 6); while (y === x) y = nz(-6, 6);
+      return { kind: "pair", q: "Depuis l'origine O, le point P est à " + Math.abs(x) + " unité" + (Math.abs(x) > 1 ? "s" : "") + (x > 0 ? " à droite" : " à gauche") + " et " + Math.abs(y) + " unité" + (Math.abs(y) > 1 ? "s" : "") + (y > 0 ? " au-dessus" : " au-dessous") + ". Quelles sont ses coordonnées ?", a: [x, y],
+        how: "Horizontal d'abord : x = " + fmt(x) + ". Puis vertical : y = " + fmt(y) + ". Donc P" + co(x, y) + "." };
+    }
+    if (t === 1) {
+      var xm = rnd(-5, 5), ym = rnd(-5, 5), hx = nz(-5, 5), hy = nz(-5, 5), xA = xm - hx, xB = xm + hx, yA = ym - hy, yB = ym + hy;
+      return { kind: "pair", q: "A" + co(xA, yA) + " et B" + co(xB, yB) + ". Quelles sont les coordonnées du milieu M de [AB] ?", a: [xm, ym],
+        how: "x = (" + fmt(xA) + " + " + P(xB) + ") ÷ 2 = " + fmt(xA + xB) + " ÷ 2 = " + fmt(xm) + " ; y = (" + fmt(yA) + " + " + P(yB) + ") ÷ 2 = " + fmt(yA + yB) + " ÷ 2 = " + fmt(ym) + ". Donc M" + co(xm, ym) + "." };
+    }
+    if (t === 2) {
+      var tr = pick(TRIPLES), sx = pick([-1, 1]), sy = pick([-1, 1]), ax = rnd(-5, 5), ay = rnd(-5, 5), bx = ax + sx * tr[0], by = ay + sy * tr[1];
+      return { kind: "num", q: "A" + co(ax, ay) + " et B" + co(bx, by) + ". Calcule la longueur AB.", a: tr[2],
+        how: "xB − xA = " + fmt(bx) + " − " + P(ax) + " = " + fmt(bx - ax) + " ; yB − yA = " + fmt(by) + " − " + P(ay) + " = " + fmt(by - ay) + " ; AB² = " + P(bx - ax) + "² + " + P(by - ay) + "² = " + (tr[0] * tr[0]) + " + " + (tr[1] * tr[1]) + " = " + (tr[2] * tr[2]) + " ; AB = √" + (tr[2] * tr[2]) + " = " + tr[2] + "." };
+    }
+    if (t === 3) {
+      var qx = nz(-9, 9), qy = nz(-9, 9), qq = quadrant(qx, qy);
+      return { kind: "choice", q: "Dans quelle zone du repère se trouve le point " + co(qx, qy) + " ?", choices: ZONES.slice(1), a: qq - 1,
+        how: "x = " + fmt(qx) + " est " + (qx > 0 ? "positif : à droite" : "négatif : à gauche") + ". y = " + fmt(qy) + " est " + (qy > 0 ? "positif : en haut" : "négatif : en bas") + ". Signes " + SIGNS[qq] + "." };
+    }
+    var c = pick(CITIES);
+    if (t === 4) return { kind: "choice", q: "La latitude de " + c[0] + " est-elle Nord ou Sud ?", choices: ["Nord", "Sud"], a: c[1] > 0 ? 0 : 1,
+      how: cityTxt(c) + " : la latitude est " + latTxt(c[1], true) + ", donc au " + (c[1] > 0 ? "nord" : "sud") + " de l'Équateur." };
+    return { kind: "choice", q: "La longitude de " + c[0] + " est-elle Est ou Ouest ?", choices: ["Est", "Ouest"], a: c[2] > 0 ? 0 : 1,
+      how: cityTxt(c) + " : la longitude est " + lonTxt(c[2], true) + ", donc à l'" + (c[2] > 0 ? "est" : "ouest") + " de Greenwich." };
+  }
+  var quiz = document.getElementById("quiz"), done = [];
+  function updScore() { document.getElementById("score").textContent = done.filter(Boolean).length + " / 8"; }
+  function newQuiz() {
+    quiz.innerHTML = ""; done = [];
+    var types = [0, 1, 2, 2, 3, 1, 4, 5];
+    for (var s = types.length - 1; s > 0; s--) { var r = Math.floor(Math.random() * (s + 1)), tmp = types[s]; types[s] = types[r]; types[r] = tmp; }
+    for (var k = 0; k < 8; k++) {
+      var Q = makeQ(types[k]), li = document.createElement("li"), ans;
+      if (Q.kind === "pair") ans = "<label>x =<input type=\"text\" id=\"qx" + k + "\" inputmode=\"decimal\" autocomplete=\"off\" aria-label=\"Abscisse, question " + (k + 1) + "\"></label><label>y =<input type=\"text\" id=\"qy" + k + "\" inputmode=\"decimal\" autocomplete=\"off\" aria-label=\"Ordonnée, question " + (k + 1) + "\"></label><button type=\"button\" id=\"qb" + k + "\">Vérifier</button>";
+      else if (Q.kind === "num") ans = "<input type=\"text\" id=\"qx" + k + "\" inputmode=\"decimal\" autocomplete=\"off\" aria-label=\"Ta réponse à la question " + (k + 1) + "\"><button type=\"button\" id=\"qb" + k + "\">Vérifier</button>";
+      else ans = Q.choices.map(function (c, i) { return "<button type=\"button\" class=\"choice\" id=\"qc" + k + "_" + i + "\" aria-pressed=\"false\">" + c + "</button>"; }).join("");
+      li.innerHTML = "<span>" + Q.q + "</span><div class=\"ans\">" + ans + "</div><span class=\"fb\" id=\"qf" + k + "\" aria-live=\"polite\"></span>";
+      quiz.appendChild(li);
+      (function (k, Q) {
+        var fb = document.getElementById("qf" + k);
+        function verdict(ok, extra) {
+          done[k] = ok;
+          if (ok) { fb.className = "fb ok"; fb.innerHTML = "Bravo, c'est juste !<span>" + Q.how + "</span>"; }
+          else { fb.className = "fb no"; fb.innerHTML = "Pas tout à fait" + (extra || "") + ".<span>" + Q.how + "</span>"; }
+          updScore();
+        }
+        if (Q.kind === "choice") {
+          Q.choices.forEach(function (c, i) {
+            document.getElementById("qc" + k + "_" + i).addEventListener("click", function () {
+              Q.choices.forEach(function (c2, j) { document.getElementById("qc" + k + "_" + j).setAttribute("aria-pressed", j === i ? "true" : "false"); });
+              verdict(i === Q.a, " : la réponse est « " + Q.choices[Q.a] + " »");
+            });
+          });
+          return;
+        }
+        function check() {
+          if (Q.kind === "num") {
+            var v = num(document.getElementById("qx" + k).value);
+            if (isNaN(v)) { fb.className = "fb"; fb.textContent = "Écris un nombre."; return; }
+            verdict(Math.abs(v - Q.a) < 0.006, " : la réponse est " + fmt(Q.a));
+            return;
+          }
+          var x = num(document.getElementById("qx" + k).value), y = num(document.getElementById("qy" + k).value);
+          if (isNaN(x) || isNaN(y)) { fb.className = "fb"; fb.textContent = "Écris deux nombres : x puis y."; return; }
+          var ok = Math.abs(x - Q.a[0]) < 0.006 && Math.abs(y - Q.a[1]) < 0.006;
+          var swapped = !ok && Math.abs(x - Q.a[1]) < 0.006 && Math.abs(y - Q.a[0]) < 0.006;
+          verdict(ok, swapped ? " : tu as inversé x et y. La réponse est " + co(Q.a[0], Q.a[1]) : " : la réponse est " + co(Q.a[0], Q.a[1]));
+        }
+        document.getElementById("qb" + k).addEventListener("click", check);
+        ["qx", "qy"].forEach(function (p) { var e = document.getElementById(p + k); if (e) e.addEventListener("keydown", function (ev) { if (ev.key === "Enter") check(); }); });
+      })(k, Q);
+    }
+    updScore();
+  }
+  document.getElementById("newQuiz").addEventListener("click", newQuiz);
+  newQuiz();
+})();
+</script>
+</body>
+</html>

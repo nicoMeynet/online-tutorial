@@ -26,6 +26,12 @@ Chaque tutoriel est une seule page HTML, sans installation. Il suffit de l'ouvri
 | [Les statistiques](les-statistiques.html) | Effectifs et fréquences, moyenne, médiane, étendue, moyenne pondérée, valeurs extrêmes, graphiques et graphiques trompeurs, un quiz. |
 | [Les probabilités](les-probabilites.html) | Vocabulaire, l'urne, la loi des grands nombres simulée, deux épreuves (arbre, somme de deux dés), les pièges, le Loto, un quiz. |
 | [Les angles et les triangles](les-angles-et-triangles.html) | Le rapporteur virtuel, la somme des angles d'un triangle, les triangles particuliers, l'inégalité triangulaire, les parallèles, les polygones, un quiz. |
+| [La trigonométrie](la-trigonometrie.html) | Adjacent, opposé, hypoténuse, cos/sin/tan (SOH CAH TOA), calculer une longueur ou un angle, la hauteur d'un arbre, les pentes, un quiz. |
+| [Les racines carrées](les-racines-carrees.html) | Le carré et sa racine, les carrés parfaits, encadrer (méthode de Héron), les règles et la simplification, la spirale de Théodore, un quiz. |
+| [Les nombres premiers](les-nombres-premiers.html) | Multiples et diviseurs, critères de divisibilité, le crible d'Ératosthène, la décomposition, PGCD et PPCM, Goldbach, un quiz. |
+| [La vitesse](la-vitesse.html) | v = d ÷ t avec une course animée, le triangle magique, les durées, km/h et m/s, le graphique distance-temps, la vitesse moyenne, un quiz. |
+| [Les transformations](les-transformations.html) | Symétrie axiale et centrale, translation, rotation, homothétie, ce qui se conserve, rosaces et frises, un jeu et un quiz. |
+| [Le repérage](le-reperage.html) | Abscisse, coordonnées, chasse au trésor, distance et milieu, l'espace, latitude et longitude, distances entre villes, un quiz. |
 
 ## Ajouter un tutoriel
 

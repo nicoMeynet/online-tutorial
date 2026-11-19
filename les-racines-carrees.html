@@ -1,0 +1,678 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Les racines carrées</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, encre violette, marge rouge. Les carrés et leurs côtés sont au centre. */
+:root {
+  --paper: #f8f7fc;
+  --grid: #e7e3f2;
+  --card: #ffffff;
+  --ink: #1f1b2e;
+  --ink-soft: #5d5873;
+  --acc: #6d28d9;
+  --acc-soft: #ede5fb;
+  --two: #15803d;
+  --two-soft: #dcf1e5;
+  --ok: #15803d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #fff0a3;
+  --line: #ddd7ea;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #121019; --grid: #1e1a28; --card: #191623; --ink: #eeeaf7; --ink-soft: #b0a9c6;
+    --acc: #c4b5fd; --acc-soft: #2e2450; --two: #6fd39f; --two-soft: #173a29;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #332c45;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #121019; --grid: #1e1a28; --card: #191623; --ink: #eeeaf7; --ink-soft: #b0a9c6;
+  --acc: #c4b5fd; --acc-soft: #2e2450; --two: #6fd39f; --two-soft: #173a29;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #332c45;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+.big { font-family: var(--f-mono); font-size: clamp(1.2rem, 4.5vw, 1.6rem); font-weight: 600; overflow-wrap: anywhere; }
+.big b { color: var(--acc); }
+.big .g { color: var(--two); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note.green { border-left-color: var(--two); background: var(--two-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 6px 12px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+button:disabled { opacity: .5; cursor: default; transform: none; }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+input[type="text"] { font: inherit; font-family: var(--f-mono); font-size: 1.05rem; padding: 8px 10px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; }
+input[type="range"] { width: 100%; accent-color: var(--acc); }
+.param { display: flex; flex-direction: column; gap: 2px; }
+.param label { font-weight: 700; }
+.inputs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 14px; align-items: end; }
+.inputs label { font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 600px) { .inputs { grid-template-columns: 1fr; } }
+
+.figure svg { width: 100%; height: auto; display: block; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; }
+.scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+th, td { padding: 7px 8px; border-bottom: 1px dashed var(--line); text-align: center; font-family: var(--f-mono); }
+thead th { border-bottom: 2px solid var(--ink); font-family: var(--f-display); white-space: nowrap; }
+
+.results { display: flex; flex-direction: column; gap: 8px; font-variant-numeric: tabular-nums; }
+.res { border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 12px; display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; align-items: baseline; }
+.res-name { font-family: var(--f-display); font-weight: 700; }
+.res-val { font-family: var(--f-mono); font-weight: 600; color: var(--acc); font-size: 1.05rem; white-space: nowrap; }
+.res-val.g { color: var(--two); }
+.res-calc { grid-column: 1 / -1; font-family: var(--f-mono); font-size: .88rem; color: var(--ink-soft); overflow-wrap: anywhere; }
+.steps { display: flex; flex-direction: column; gap: 6px; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; padding: 12px 14px; font-family: var(--f-mono); font-size: 1rem; overflow-wrap: anywhere; }
+.steps b { color: var(--acc); font-size: 1.1rem; }
+.steps .g { color: var(--two); font-weight: 700; }
+.steps .why { font-family: var(--f-body); font-size: .9rem; color: var(--ink-soft); margin-bottom: 4px; }
+.steps .rank { font-family: var(--f-display); font-weight: 700; margin-top: 6px; }
+.steps .rank:first-child { margin-top: 0; }
+.verdict { border-radius: 8px; padding: 12px 14px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+.verdict.yes { background: var(--ok-soft); color: var(--ok); }
+.verdict.no { background: var(--red-soft); color: var(--red); }
+.verdict span { font-weight: 400; color: var(--ink); }
+.err { color: var(--red); font-weight: 700; font-family: var(--f-body); }
+
+/* Carrés parfaits et racines */
+.sqgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 8px; }
+.sqgrid div { border: 1.5px solid var(--ink); border-radius: 8px; padding: 8px 10px; background: var(--card); font-family: var(--f-mono); display: flex; flex-direction: column; align-items: center; font-variant-numeric: tabular-nums; }
+.sqgrid div b { color: var(--acc); font-size: 1.15rem; }
+.sqgrid div span { font-size: .85rem; color: var(--ink-soft); }
+.chips { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+.chips span { border-radius: 8px; padding: 6px 10px; font-family: var(--f-mono); font-size: .95rem; border: 1.5px solid currentColor; text-align: center; font-variant-numeric: tabular-nums; }
+.chips .int { color: var(--two); background: var(--two-soft); font-weight: 700; }
+.chips .irr { color: var(--acc); background: var(--acc-soft); }
+.dec { font-family: var(--f-mono); font-size: 1.1rem; overflow-wrap: anywhere; line-height: 1.8; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.rule { font-family: var(--f-mono); font-size: 1.15rem; font-weight: 600; color: var(--acc); overflow-wrap: anywhere; }
+.ex { font-family: var(--f-mono); font-size: .92rem; color: var(--ink-soft); overflow-wrap: anywhere; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
+.tag.ok { color: var(--ok); }
+.tag.no { color: var(--red); }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 110px auto; gap: 10px; align-items: center; }
+.quiz input[type="text"] { font-size: 1rem; padding: 6px 8px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc); }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 120px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+</head>
+<body>
+<main class="page">
+
+  <header class="hero">
+    <span class="eyebrow">Tutoriel de maths · niveau 4<sup>e</sup>–3<sup>e</sup></span>
+    <h1>Les racines carrées</h1>
+    <p class="lead">La racine carrée d'un nombre, c'est le nombre qui, multiplié par lui-même, donne ce nombre. C'est aussi le côté d'un carré dont on connaît l'aire.</p>
+    <div class="box">
+      <span class="big"><b>√49</b> = <span class="g">7</span> car 7 × 7 = 49</span>
+      <span class="big"><b>√2</b> ≈ <span class="g">1,414</span> car 1,414 × 1,414 ≈ 2</span>
+      <span class="soft">Le signe √ se lit « racine carrée de ». On dit souvent juste « racine de ».</span>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · Le carré et sa racine</span>
+    <h2>Du carré à son côté</h2>
+    <p>Si <span class="mono">a</span> est un nombre positif, <strong>√a</strong> est le nombre <strong>positif</strong> dont le carré vaut <span class="mono">a</span>. Autrement dit : <span class="hl">√a × √a = a</span>.</p>
+    <p>En géométrie, c'est simple : un carré d'aire <span class="mono">a</span> a un côté de longueur <span class="mono">√a</span>. Un carré d'aire 36 cm² a un côté de 6 cm, car 6 × 6 = 36.</p>
+    <div class="box">
+      <div class="param">
+        <label for="area">Aire du carré : <span class="mono" id="areaOut">36</span></label>
+        <input id="area" type="range" min="0" max="100" step="1" value="36">
+      </div>
+      <div class="figure"><svg id="sqSvg" viewBox="0 0 640 380" role="img" aria-label="Un carré dont l'aire est choisie avec le curseur"></svg></div>
+      <div class="results" id="sqRes" aria-live="polite"></div>
+      <p class="soft">Essaie 49, puis 50. Avec 49, le côté tombe juste : on peut dessiner un quadrillage de 7 sur 7. Avec 50, le côté ne tombe plus juste.</p>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · Les carrés parfaits</span>
+    <h2>Les racines à connaître par cœur</h2>
+    <p>Un <strong>carré parfait</strong> est le carré d'un nombre entier : 1, 4, 9, 16, 25… Sa racine est un entier. Apprends ce tableau : il sert tout le temps.</p>
+    <div class="sqgrid" id="sqGrid"></div>
+    <div class="cards">
+      <div class="box"><strong>√0 = 0</strong><span class="soft">Car 0 × 0 = 0. Un carré d'aire 0 n'a pas de côté.</span></div>
+      <div class="box"><strong>√1 = 1</strong><span class="soft">Car 1 × 1 = 1. C'est le seul nombre, avec 0, égal à sa racine.</span></div>
+    </div>
+    <div class="note red">
+      <span class="note-title">Et la racine d'un nombre négatif ?</span>
+      <span>√(−9) n'existe pas chez les nombres réels. Un carré n'est jamais négatif : 3 × 3 = 9 et (−3) × (−3) = 9 aussi. Aucun réel multiplié par lui-même ne donne −9.</span>
+      <span>Des mathématiciens ont quand même inventé des nombres dont le carré est négatif : les <strong>nombres imaginaires</strong> (voir le tutoriel sur les ensembles de nombres). On les étudie au lycée.</span>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Encadrer et approcher</span>
+    <h2>La chasse à la racine</h2>
+    <p>Entre quels entiers se trouve √50 ? On cherche les carrés parfaits autour de 50 : 7² = 49 et 8² = 64. Comme <span class="mono">49 &lt; 50 &lt; 64</span>, on a <span class="hl mono">7 &lt; √50 &lt; 8</span>.</p>
+    <p>On peut continuer avec les dixièmes, puis les centièmes. À chaque étape, on gagne une décimale.</p>
+    <div class="box">
+      <h3>Encadre √a, étape par étape</h3>
+      <div class="inputs">
+        <label for="encA">Le nombre a<input id="encA" type="text" inputmode="decimal" autocomplete="off" value="50"></label>
+        <div class="btns">
+          <button id="encNext" type="button">Étape suivante</button>
+          <button id="encAll" type="button">Tout montrer</button>
+        </div>
+      </div>
+      <div class="steps" id="encOut" aria-live="polite"></div>
+    </div>
+    <div class="box">
+      <h3>La méthode de Héron</h3>
+      <p>Une méthode très ancienne et très rapide. On part d'un essai <span class="mono">x</span>. Si <span class="mono">x</span> est trop petit, <span class="mono">a ÷ x</span> est trop grand (et l'inverse). Alors on prend la moyenne des deux :</p>
+      <p class="rule">nouvel x = (x + a ÷ x) ÷ 2</p>
+      <div class="inputs">
+        <label for="heA">Le nombre a<input id="heA" type="text" inputmode="decimal" autocomplete="off" value="2"></label>
+        <label for="heX">Premier essai x<input id="heX" type="text" inputmode="decimal" autocomplete="off" value="1"></label>
+      </div>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Tour</th><th>x</th><th>x × x</th><th>Écart avec a</th></tr></thead>
+          <tbody id="heRows"></tbody>
+        </table>
+      </div>
+      <p class="soft" id="heOut" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · Les règles</span>
+    <h2>Ce qu'on a le droit de faire</h2>
+    <p>Pour des nombres <span class="mono">a</span> et <span class="mono">b</span> positifs, voici les règles de calcul.</p>
+    <div class="cards">
+      <div class="box"><span class="tag ok">Produit</span><span class="rule">√(a × b) = √a × √b</span><span class="ex">√(4 × 9) = √36 = 6<br>√4 × √9 = 2 × 3 = 6</span></div>
+      <div class="box"><span class="tag ok">Quotient</span><span class="rule">√(a ÷ b) = √a ÷ √b</span><span class="ex">(avec b ≠ 0)<br>√(100 ÷ 4) = √25 = 5<br>√100 ÷ √4 = 10 ÷ 2 = 5</span></div>
+      <div class="box"><span class="tag ok">Carré d'une racine</span><span class="rule">(√a)² = a</span><span class="ex">(√7)² = √7 × √7 = 7</span></div>
+      <div class="box"><span class="tag ok">Racine d'un carré</span><span class="rule">√(a²) = a</span><span class="ex">√(5²) = √25 = 5<br>Attention : a doit être positif.</span></div>
+    </div>
+    <div class="note red">
+      <span class="note-title">Interdit avec l'addition</span>
+      <span class="mono">√(9 + 16) = √25 = 5</span>
+      <span class="mono">√9 + √16 = 3 + 4 = 7</span>
+      <span>5 ≠ 7 : on ne peut <strong>jamais</strong> couper une racine en deux sur une addition ou une soustraction.</span>
+    </div>
+    <div class="box">
+      <h3>Le simplificateur</h3>
+      <p>Simplifier √50, c'est l'écrire avec le plus petit nombre possible sous la racine. On cherche le <strong>plus grand carré parfait</strong> qui divise 50 : c'est 25. Donc √50 = √(25 × 2) = √25 × √2 = <strong>5√2</strong>.</p>
+      <div class="param">
+        <label for="simpN">Un nombre entier entre 1 et 10 000</label>
+        <input id="simpN" type="text" inputmode="numeric" autocomplete="off" value="50">
+      </div>
+      <div class="steps" id="simpOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Racines et Pythagore</span>
+    <h2>Les racines dans les triangles</h2>
+    <p>Dans un triangle rectangle, Pythagore dit : hypoténuse² = côté² + côté². Pour trouver l'hypoténuse, il faut donc une racine carrée (voir le tutoriel sur Pythagore).</p>
+    <div class="box">
+      <div class="figure"><svg viewBox="0 0 640 280" role="img" aria-label="Un carré de côté 1 et sa diagonale, qui mesure racine de 2">
+        <rect x="60" y="40" width="200" height="200" fill="var(--acc-soft)" stroke="var(--ink)" stroke-width="2.5"/>
+        <line x1="60" y1="240" x2="260" y2="40" stroke="var(--acc)" stroke-width="5"/>
+        <polyline points="60,220 80,220 80,240" fill="none" stroke="var(--ink)" stroke-width="2"/>
+        <text x="160" y="268" text-anchor="middle" font-size="20">1</text>
+        <text x="282" y="148" font-size="20">1</text>
+        <text x="128" y="128" font-size="20" font-weight="600" style="fill:var(--acc)">√2</text>
+        <text x="330" y="110" font-size="20">d² = 1² + 1²</text>
+        <text x="330" y="146" font-size="20">d² = 2</text>
+        <text x="330" y="182" font-size="20" font-weight="600" style="fill:var(--acc)">d = √2 ≈ 1,414</text>
+      </svg></div>
+      <p class="soft">La diagonale d'un carré de côté 1 mesure exactement √2.</p>
+    </div>
+    <div class="box">
+      <h3>La spirale de Théodore</h3>
+      <p>On recommence : sur l'hypoténuse √2, on colle un côté de longueur 1 à angle droit. La nouvelle hypoténuse mesure √3, car (√2)² + 1² = 2 + 1 = 3. Et ainsi de suite !</p>
+      <div class="param">
+        <label for="thN">Jusqu'à √n, avec n = <span class="mono" id="thNOut">5</span></label>
+        <input id="thN" type="range" min="1" max="17" step="1" value="5">
+      </div>
+      <div class="figure"><svg id="thSvg" viewBox="0 0 640 600" role="img" aria-label="La spirale de Théodore, faite de triangles rectangles"></svg></div>
+      <p class="mono" id="thOut" aria-live="polite" style="color:var(--acc);font-weight:600"></p>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · Racines irrationnelles</span>
+    <h2>Les racines qui ne tombent pas juste</h2>
+    <p>Pour un entier <span class="mono">n</span>, il n'y a que deux cas. Si <span class="mono">n</span> est un carré parfait, √n est un <strong>entier</strong>. Sinon, √n est un nombre <strong>irrationnel</strong> : ses décimales ne s'arrêtent jamais et ne forment jamais un motif qui se répète. On ne peut pas l'écrire en fraction.</p>
+    <div class="chips" id="irrGrid"></div>
+    <div class="box">
+      <span class="note-title">√2 avec 40 décimales</span>
+      <span class="dec">1,4142135623730950488016887242096980785696…</span>
+      <span class="soft">On en connaît aujourd'hui des milliards de décimales, et aucune répétition n'apparaît. Les mathématiciens ont démontré que cela ne s'arrêtera jamais (voir le tutoriel sur les ensembles de nombres).</span>
+    </div>
+    <div class="note">
+      <span class="note-title">Valeur exacte ou valeur approchée ?</span>
+      <span>√2 est une valeur <strong>exacte</strong>. 1,414 est une valeur <strong>approchée</strong>. En maths, on garde souvent √2 dans les calculs et on arrondit seulement à la fin.</span>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Les pièges</span>
+    <h2>Quatre erreurs classiques</h2>
+    <div class="cards">
+      <div class="box"><span class="tag no">Faux</span><strong>√(a + b) = √a + √b</strong><span class="soft">√(9 + 16) = √25 = 5, alors que √9 + √16 = 7. La racine ne se coupe pas sur une somme.</span></div>
+      <div class="box"><span class="tag no">N'existe pas</span><strong>√(−4)</strong><span class="soft">Aucun réel au carré ne donne −4. Attention : −√4 existe bien, et vaut −2.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>√9 = 3 ou −3</strong><span class="soft">L'équation x² = 9 a deux solutions : 3 et −3. Mais √9 désigne seulement la solution positive : √9 = 3.</span></div>
+      <div class="box"><span class="tag no">Surprise</span><strong>Une racine plus petite ?</strong><span class="soft">√0,01 = 0,1 car 0,1 × 0,1 = 0,01. Et 0,1 est plus grand que 0,01 ! Entre 0 et 1, la racine est plus grande que le nombre.</span></div>
+    </div>
+    <div class="note red">
+      <span class="note-title">Le réflexe</span>
+      <span>Pour vérifier une racine, multiplie le résultat par lui-même. Tu dois retrouver le nombre de départ. Et le résultat doit être positif.</span>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Réponds par un nombre. En cas d'erreur, la méthode s'affiche.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Nouvelles questions</button>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Un peu d'histoire</span>
+    <h2>Quatre mille ans de racines</h2>
+    <ol class="timeline">
+      <li><span class="when">vers −1800</span><div class="what"><strong>La tablette YBC 7289</strong><span>Sur cette petite tablette d'argile babylonienne, on voit un carré et sa diagonale. Le nombre écrit en base 60 (1 ; 24 ; 51 ; 10) vaut environ 1,41421296. C'est √2 juste à six décimales ! La date exacte reste incertaine.</span></div></li>
+      <li><span class="when">vers −400</span><div class="what"><strong>Théodore de Cyrène</strong><span>D'après Platon, il aurait montré que √3, √5, … jusqu'à √17 ne sont pas des fractions. La spirale qui porte son nom est une façon moderne d'imaginer son travail : on ne sait pas s'il l'a vraiment dessinée.</span></div></li>
+      <li><span class="when">I<sup>er</sup> siècle</span><div class="what"><strong>Héron d'Alexandrie</strong><span>Il décrit la méthode de la moyenne pour approcher une racine. Elle était sans doute déjà connue bien avant lui, peut-être des Babyloniens.</span></div></li>
+      <li><span class="when">1525</span><div class="what"><strong>Christoph Rudolff</strong><span>Ce mathématicien allemand utilise le signe √ dans un livre d'algèbre. Ce signe viendrait peut-être d'une lettre r déformée, pour <em>radix</em>, « racine » en latin.</span></div></li>
+    </ol>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · À toi de jouer</span>
+    <h2>Six exercices</h2>
+    <div class="exos">
+      <details>
+        <summary>Calcul direct<span class="q">Calcule √81, √144 et √0,25.</span></summary>
+        <div><span>√81 = <strong>9</strong> car 9 × 9 = 81.</span><span>√144 = <strong>12</strong> car 12 × 12 = 144.</span><span>√0,25 = <strong>0,5</strong> car 0,5 × 0,5 = 0,25.</span></div>
+      </details>
+      <details>
+        <summary>Encadrement<span class="q">Entre quels entiers consécutifs se trouve √30 ?</span></summary>
+        <div><span>5² = 25 et 6² = 36. Comme 25 &lt; 30 &lt; 36, on a <strong>5 &lt; √30 &lt; 6</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Simplification<span class="q">Écris √72 sous la forme a√b, avec b le plus petit possible.</span></summary>
+        <div><span>Le plus grand carré qui divise 72 est 36. Donc √72 = √(36 × 2) = √36 × √2 = <strong>6√2</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Le jardin carré<span class="q">Un jardin carré a une aire de 20 m². Quelle est la longueur de son côté ?</span></summary>
+        <div><span>Le côté mesure √20 m. Valeur exacte : √20 = √(4 × 5) = <strong>2√5 m</strong>. Valeur approchée : <strong>4,47 m</strong> environ.</span></div>
+      </details>
+      <details>
+        <summary>Produit de racines<span class="q">Calcule √3 × √12 sans calculatrice.</span></summary>
+        <div><span>√3 × √12 = √(3 × 12) = √36 = <strong>6</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Pythagore<span class="q">Un triangle rectangle a deux côtés de l'angle droit de 2 cm et 3 cm. Combien mesure l'hypoténuse ?</span></summary>
+        <div><span>hypoténuse² = 2² + 3² = 4 + 9 = 13. Donc hypoténuse = <strong>√13 cm</strong>, soit environ <strong>3,61 cm</strong>.</span><span>Attention : ce n'est pas 2 + 3 = 5 cm, car √(4 + 9) ≠ √4 + √9.</span></div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• Pour a ≥ 0, <strong>√a</strong> est le nombre <strong>positif</strong> dont le carré vaut a. C'est le côté d'un carré d'aire a.</span>
+      <span>• Les <strong>carrés parfaits</strong> (1, 4, 9, 16, 25, 36, 49, 64, 81, 100…) ont une racine entière. Les autres entiers ont une racine <strong>irrationnelle</strong>.</span>
+      <span>• On encadre une racine avec les carrés voisins : 49 &lt; 50 &lt; 64, donc 7 &lt; √50 &lt; 8.</span>
+      <span>• <strong>√(a × b) = √a × √b</strong> et <strong>√(a ÷ b) = √a ÷ √b</strong>. Jamais avec + ou −.</span>
+      <span>• Simplifier : on sort le plus grand carré parfait. √50 = √(25 × 2) = 5√2.</span>
+      <span>• √ d'un nombre négatif n'existe pas chez les réels.</span>
+    </div>
+  </section>
+
+  <footer>Fiche de révision · Les racines carrées</footer>
+</main>
+
+<script>
+(function () {
+  var NS = "http://www.w3.org/2000/svg";
+  function fmt(x, d) { var r = Math.round(x * 1e6) / 1e6; if (Object.is(r, -0)) r = 0; return r.toLocaleString("fr-FR", { maximumFractionDigits: d == null ? 3 : d }).replace("-", "−"); }
+  function fmtN(x, d) { if (Object.is(x, -0)) x = 0; return x.toLocaleString("fr-FR", { maximumFractionDigits: d }).replace("-", "−"); }
+  function fmtF(x, d) { return x.toLocaleString("fr-FR", { minimumFractionDigits: d, maximumFractionDigits: d }).replace("-", "−"); }
+  function num(s) { var t = String(s).replace(/\s/g, "").replace(/[−–]/g, "-").replace(",", "."); if (t === "") return NaN; var x = Number(t); return isFinite(x) ? x : NaN; }
+  function mk(svg, name, attrs, text) { var e = document.createElementNS(NS, name); for (var a in attrs) e.setAttribute(a, attrs[a]); if (text != null) e.textContent = text; svg.appendChild(e); return e; }
+  function clear(el) { while (el.firstChild) el.removeChild(el.firstChild); }
+
+  /* ---------- Fonctions pures ---------- */
+  // Partie entière de la racine d'un nombre positif (entier ou décimal)
+  function isqrt(n) {
+    if (!(n >= 0)) return NaN;
+    var k = Math.floor(Math.sqrt(n));
+    while (k * k > n) k--;
+    while ((k + 1) * (k + 1) <= n) k++;
+    return k;
+  }
+  function isPerfectSquare(n) { if (!Number.isInteger(n) || n < 0) return false; var k = isqrt(n); return k * k === n; }
+  // Encadrement de √a au rang 10^−d, pour d = 0, 1, …, maxD
+  function encadre(a, maxD) {
+    if (!(a >= 0)) return [];
+    if (maxD == null) maxD = 3;
+    var out = [];
+    for (var d = 0; d <= maxD; d++) {
+      var p = Math.pow(10, d), A = Math.round(a * p * p * 1e6) / 1e6, k = isqrt(A);
+      var exact = k * k === A;
+      out.push({ d: d, k: k, lo: k / p, hi: (k + 1) / p, loSq: k * k / (p * p), hiSq: (k + 1) * (k + 1) / (p * p), exact: exact });
+      if (exact) break;
+    }
+    return out;
+  }
+  // Méthode de Héron : liste des essais successifs x0, x1, …, xn
+  function heron(a, x0, n) {
+    if (!(a > 0) || !(x0 > 0)) return [];
+    if (n == null) n = 5;
+    var xs = [x0], x = x0;
+    for (var i = 0; i < n; i++) { x = (x + a / x) / 2; xs.push(x); }
+    return xs;
+  }
+  // √n = k√b avec k² le plus grand carré qui divise n
+  function simplify(n) {
+    if (!Number.isInteger(n) || n < 1) return null;
+    for (var k = isqrt(n); k >= 1; k--) { if (n % (k * k) === 0) return { k: k, b: n / (k * k), square: k * k }; }
+    return null;
+  }
+  // Sommets de la spirale de Théodore : P1 = (1 ; 0), puis |Pk| = √k
+  function theodorus(n) {
+    var pts = [[1, 0]];
+    for (var k = 1; k < n; k++) {
+      var p = pts[k - 1], r = Math.sqrt(p[0] * p[0] + p[1] * p[1]);
+      pts.push([p[0] - p[1] / r, p[1] + p[0] / r]);
+    }
+    return pts;
+  }
+  window.__racines = { isqrt: isqrt, isPerfectSquare: isPerfectSquare, encadre: encadre, heron: heron, simplify: simplify, theodorus: theodorus, num: num, fmt: fmt };
+
+  /* ---------- Étape 1 : le carré ---------- */
+  var area = document.getElementById("area");
+  function drawSquare() {
+    var A = parseInt(area.value, 10), s = Math.sqrt(A), perfect = isPerfectSquare(A), U = 30;
+    var svg = document.getElementById("sqSvg"), side = s * U, x0 = 320 - side / 2, y0 = 330 - side;
+    document.getElementById("areaOut").textContent = A;
+    clear(svg);
+    if (A > 0) {
+      mk(svg, "rect", { x: x0, y: y0, width: side, height: side, fill: perfect ? "var(--two-soft)" : "var(--acc-soft)", stroke: perfect ? "var(--two)" : "var(--acc)", "stroke-width": 3 });
+      if (perfect) {
+        for (var i = 1; i < s; i++) {
+          mk(svg, "line", { x1: x0 + i * U, y1: y0, x2: x0 + i * U, y2: y0 + side, stroke: "var(--two)", "stroke-width": 1, opacity: .55 });
+          mk(svg, "line", { x1: x0, y1: y0 + i * U, x2: x0 + side, y2: y0 + i * U, stroke: "var(--two)", "stroke-width": 1, opacity: .55 });
+        }
+      }
+      if (side >= 90) mk(svg, "text", { x: 320, y: y0 + side / 2 + 7, "text-anchor": "middle", "font-size": 20, "font-weight": 600 }, "Aire " + A);
+      mk(svg, "text", { x: 320, y: 362, "text-anchor": "middle", "font-size": 20 }, "côté " + (perfect ? "= " + s : "≈ " + fmt(s, 2)));
+    } else {
+      mk(svg, "circle", { cx: 320, cy: 330, r: 5, fill: "var(--ink)" });
+      mk(svg, "text", { x: 320, y: 362, "text-anchor": "middle", "font-size": 20 }, "Aire 0 : côté 0");
+    }
+    var html;
+    if (perfect) {
+      html = '<div class="res"><span class="res-name">Côté = √' + A + '</span><span class="res-val g">= ' + s + '</span><span class="res-calc">' + s + ' × ' + s + ' = ' + A + ' : ' + A + ' est un carré parfait.</span></div>';
+    } else {
+      var r3 = Math.round(s * 1000) / 1000, k = isqrt(A);
+      html = '<div class="res"><span class="res-name">Côté = √' + A + '</span><span class="res-val">≈ ' + fmtF(r3, 3) + '</span><span class="res-calc">' + fmtF(r3, 3) + ' × ' + fmtF(r3, 3) + ' = ' + fmtN(r3 * r3, 6) + ' (presque ' + A + ', jamais pile)</span></div>' +
+        '<div class="res"><span class="res-name">Entre deux entiers</span><span class="res-val">' + k + ' &lt; √' + A + ' &lt; ' + (k + 1) + '</span><span class="res-calc">car ' + k + '² = ' + (k * k) + ' &lt; ' + A + ' &lt; ' + ((k + 1) * (k + 1)) + ' = ' + (k + 1) + '²</span></div>';
+    }
+    document.getElementById("sqRes").innerHTML = html;
+  }
+  area.addEventListener("input", drawSquare); drawSquare();
+
+  /* ---------- Étape 2 : carrés parfaits ---------- */
+  var sq = [];
+  for (var i = 1; i <= 15; i++) sq.push(i);
+  sq.push(20, 25);
+  document.getElementById("sqGrid").innerHTML = sq.map(function (n) {
+    return '<div><b>' + n + '² = ' + fmtN(n * n, 0) + '</b><span>√' + fmtN(n * n, 0) + ' = ' + n + '</span></div>';
+  }).join("");
+
+  /* ---------- Étape 3 : chasse à la racine ---------- */
+  var RANK = ["Aux unités", "Au dixième", "Au centième", "Au millième"];
+  var encA = document.getElementById("encA"), encShown = 1, encSteps = [];
+  function encRender() {
+    var a = num(encA.value), out = document.getElementById("encOut"), nb = document.getElementById("encNext"), ab = document.getElementById("encAll");
+    if (isNaN(a)) { out.innerHTML = '<span class="err">Écris un nombre.</span>'; nb.disabled = ab.disabled = true; return; }
+    if (a < 0) { out.innerHTML = '<span class="err">√' + fmtN(a, 6) + ' n\'existe pas chez les réels : un carré n\'est jamais négatif.</span>'; nb.disabled = ab.disabled = true; return; }
+    if (a > 1e6) { out.innerHTML = '<span class="err">Choisis un nombre jusqu\'à 1 000 000.</span>'; nb.disabled = ab.disabled = true; return; }
+    encSteps = encadre(a, 3);
+    if (encShown > encSteps.length) encShown = encSteps.length;
+    var as = fmtN(a, 6), html = "";
+    for (var j = 0; j < encShown; j++) {
+      var st = encSteps[j], d = st.d, lo = fmtF(st.lo, d), hi = fmtF(st.hi, d), loS = fmtN(st.loSq, 2 * d), hiS = fmtN(st.hiSq, 2 * d);
+      html += '<span class="rank">' + RANK[d] + '</span>';
+      if (d > 0) html += '<span class="why">On teste ' + fmtF(encSteps[j - 1].lo, d) + ', puis on ajoute ' + fmtF(1 / Math.pow(10, d), d) + ' à chaque fois, jusqu\'à dépasser ' + as + '.</span>';
+      if (st.exact) {
+        html += '<span>' + lo + '² = ' + loS + '</span><span class="g">Pile ! √' + as + ' = ' + fmtN(st.lo, d) + ' exactement.</span>';
+      } else {
+        html += '<span>' + lo + '² = ' + loS + ' &lt; ' + as + ' &lt; ' + hiS + ' = ' + hi + '²</span><span>donc <b>' + lo + ' &lt; √' + as + ' &lt; ' + hi + '</b></span>';
+      }
+    }
+    if (encShown === encSteps.length && !encSteps[encSteps.length - 1].exact) html += '<span class="why">Et ça continue… La calculatrice donne √' + as + ' ≈ ' + fmtN(Math.sqrt(a), 6) + '.</span>';
+    out.innerHTML = html;
+    nb.disabled = ab.disabled = encShown >= encSteps.length;
+  }
+  encA.addEventListener("input", function () { encShown = 1; encRender(); });
+  document.getElementById("encNext").addEventListener("click", function () { encShown++; encRender(); });
+  document.getElementById("encAll").addEventListener("click", function () { encShown = 4; encRender(); });
+  encRender();
+
+  /* ---------- Étape 3 : Héron ---------- */
+  var heA = document.getElementById("heA"), heX = document.getElementById("heX");
+  function heronRender() {
+    var a = num(heA.value), x0 = num(heX.value), rows = document.getElementById("heRows"), out = document.getElementById("heOut");
+    if (isNaN(a) || isNaN(x0) || a <= 0 || x0 <= 0 || a > 1e6 || x0 > 1e6) { rows.innerHTML = ""; out.innerHTML = '<span class="err">Écris deux nombres strictement positifs (jusqu\'à 1 000 000).</span>'; return; }
+    var xs = heron(a, x0, 5);
+    rows.innerHTML = xs.map(function (x, i) {
+      var e = Math.abs(x * x - a);
+      return '<tr><td>' + i + '</td><td>' + fmtN(x, 10) + '</td><td>' + fmtN(x * x, 10) + '</td><td>' + (e < 1e-10 ? "presque 0" : fmtN(e, 10)) + '</td></tr>';
+    }).join("");
+    out.textContent = "La calculatrice donne √" + fmtN(a, 6) + " ≈ " + fmtN(Math.sqrt(a), 10) + ". Dès que l'essai est proche, le nombre de bonnes décimales double environ à chaque tour !";
+  }
+  heA.addEventListener("input", heronRender); heX.addEventListener("input", heronRender); heronRender();
+
+  /* ---------- Étape 4 : simplificateur ---------- */
+  var simpN = document.getElementById("simpN");
+  function simpRender() {
+    var n = num(simpN.value), out = document.getElementById("simpOut");
+    if (isNaN(n) || !Number.isInteger(n) || n < 1 || n > 10000) { out.innerHTML = '<span class="err">Écris un nombre entier entre 1 et 10 000.</span>'; return; }
+    var r = simplify(n), divs = [];
+    for (var k = 2; k * k <= n; k++) if (n % (k * k) === 0) divs.push(fmtN(k * k, 0));
+    var ns = fmtN(n, 0), html = '<span class="why">On cherche les carrés parfaits (plus grands que 1) qui divisent ' + ns + '.</span>';
+    if (!divs.length) {
+      html += '<span>Aucun carré parfait ne divise ' + ns + '.</span><span><b>√' + ns + ' ne se simplifie pas</b></span><span class="why">√' + ns + ' ≈ ' + fmt(Math.sqrt(n), 3) + '</span>';
+    } else if (r.b === 1) {
+      html += '<span>Carrés qui divisent ' + ns + ' : ' + divs.join(" ; ") + '</span><span>' + ns + ' = ' + r.k + ' × ' + r.k + ' est lui-même un carré parfait.</span><span class="g">√' + ns + ' = ' + r.k + '</span>';
+    } else {
+      html += '<span>Carrés qui divisent ' + ns + ' : ' + divs.join(" ; ") + '</span>' +
+        '<span class="why">On prend le plus grand : ' + fmtN(r.square, 0) + ' = ' + r.k + '².</span>' +
+        '<span>' + ns + ' = ' + fmtN(r.square, 0) + ' × ' + r.b + '</span>' +
+        '<span>√' + ns + ' = √' + fmtN(r.square, 0) + ' × √' + r.b + '</span>' +
+        '<span><b>√' + ns + ' = ' + r.k + '√' + r.b + '</b></span>' +
+        '<span class="why">Vérification : ' + r.k + '² × ' + r.b + ' = ' + fmtN(r.square, 0) + ' × ' + r.b + ' = ' + ns + '. Et √' + ns + ' ≈ ' + fmt(Math.sqrt(n), 3) + '.</span>';
+    }
+    out.innerHTML = html;
+  }
+  simpN.addEventListener("input", simpRender); simpRender();
+
+  /* ---------- Étape 5 : spirale de Théodore ---------- */
+  var thN = document.getElementById("thN");
+  function thRender() {
+    var n = parseInt(thN.value, 10), svg = document.getElementById("thSvg"), S = 66, CX = 320, CY = 300;
+    function X(p) { return CX + p[0] * S; } function Y(p) { return CY - p[1] * S; }
+    document.getElementById("thNOut").textContent = n;
+    clear(svg);
+    var pts = theodorus(n), O = [0, 0];
+    for (var k = 0; k < n - 1; k++) {
+      var p = pts[k], q = pts[k + 1];
+      mk(svg, "polygon", { points: X(O) + "," + Y(O) + " " + X(p) + "," + Y(p) + " " + X(q) + "," + Y(q), fill: k % 2 ? "var(--two-soft)" : "var(--acc-soft)", stroke: "var(--ink)", "stroke-width": 1.5, "stroke-linejoin": "round" });
+    }
+    var last = pts[n - 1];
+    mk(svg, "line", { x1: X(O), y1: Y(O), x2: X(last), y2: Y(last), stroke: "var(--acc)", "stroke-width": 5, "stroke-linecap": "round" });
+    mk(svg, "circle", { cx: CX, cy: CY, r: 5, fill: "var(--ink)" });
+    pts.forEach(function (p, i) {
+      var r = Math.sqrt(i + 1), f = 1 + 0.34 / r, lx = CX + p[0] * f * S, ly = CY - p[1] * f * S + 6;
+      mk(svg, "text", { x: lx, y: ly, "text-anchor": "middle", "font-size": 18, "font-weight": i === n - 1 ? 700 : 400, style: i === n - 1 ? "fill:var(--acc)" : "" }, "√" + (i + 1));
+    });
+    var val = Math.sqrt(n), out = document.getElementById("thOut");
+    if (n === 1) out.textContent = "Un seul segment, de longueur 1 = √1.";
+    else out.textContent = "Hypoténuse en violet : √" + n + " " + (isPerfectSquare(n) ? "= " + val : "≈ " + fmt(val, 3)) + ", car (√" + (n - 1) + ")² + 1² = " + (n - 1) + " + 1 = " + n + ".";
+  }
+  thN.addEventListener("input", thRender); thRender();
+
+  /* ---------- Étape 6 : entiers ou irrationnels ---------- */
+  var chips = "";
+  for (var m = 1; m <= 30; m++) {
+    chips += isPerfectSquare(m) ? '<span class="int">√' + m + ' = ' + isqrt(m) + '</span>' : '<span class="irr">√' + m + ' ≈ ' + fmtF(Math.round(Math.sqrt(m) * 1000) / 1000, 3) + '…</span>';
+  }
+  document.getElementById("irrGrid").innerHTML = chips;
+
+  /* ---------- Quiz ---------- */
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  function rnd(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+  function makeQ() {
+    var t = rnd(0, 3);
+    if (t === 0) {
+      var k = pick([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20, 25]), K = k * k;
+      return { q: "√" + fmtN(K, 0) + " = ?", a: k, how: k + " × " + k + " = " + fmtN(K, 0) + ", donc √" + fmtN(K, 0) + " = " + k + "." };
+    }
+    if (t === 1) {
+      var n = rnd(2, 150); while (isPerfectSquare(n)) n = rnd(2, 150);
+      var f = isqrt(n);
+      return { q: "√" + n + " est entre deux entiers consécutifs. Écris le plus petit des deux.", a: f, how: f + "² = " + (f * f) + " &lt; " + n + " &lt; " + ((f + 1) * (f + 1)) + " = " + (f + 1) + "², donc " + f + " &lt; √" + n + " &lt; " + (f + 1) + "." };
+    }
+    if (t === 2) {
+      var b = pick([2, 3, 5, 6, 7, 10]), c = rnd(2, 9), N = c * c * b;
+      return { q: "On écrit √" + N + " = a√" + b + ". Que vaut a ?", a: c, how: N + " = " + (c * c) + " × " + b + ", donc √" + N + " = √" + (c * c) + " × √" + b + " = " + c + "√" + b + "." };
+    }
+    var s = rnd(0, 3);
+    if (s === 0) {
+      var m = pick([2, 3, 5, 6, 7, 10, 11, 13, 15, 17, 19, 23]);
+      return { q: "(√" + m + ")² = ?", a: m, how: "Par définition, √" + m + " × √" + m + " = " + m + "." };
+    }
+    if (s === 1) {
+      var pr = pick([[2, 8], [3, 12], [2, 18], [5, 20], [3, 27], [2, 32], [2, 50], [6, 24], [7, 28], [5, 45]]), P = pr[0] * pr[1];
+      return { q: "√" + pr[0] + " × √" + pr[1] + " = ?", a: isqrt(P), how: "√" + pr[0] + " × √" + pr[1] + " = √(" + pr[0] + " × " + pr[1] + ") = √" + P + " = " + isqrt(P) + "." };
+    }
+    if (s === 2) {
+      var mm = pick([2, 3, 5]), kk = rnd(2, 6), T = kk * kk * mm;
+      return { q: "√" + T + " ÷ √" + mm + " = ?", a: kk, how: "√" + T + " ÷ √" + mm + " = √(" + T + " ÷ " + mm + ") = √" + (kk * kk) + " = " + kk + "." };
+    }
+    var tr = pick([[9, 16, 5], [36, 64, 10], [25, 144, 13], [81, 144, 15], [64, 225, 17]]);
+    return { q: "√(" + tr[0] + " + " + tr[1] + ") = ?", a: tr[2], how: "On calcule d'abord sous la racine : " + tr[0] + " + " + tr[1] + " = " + (tr[0] + tr[1]) + ", et √" + (tr[0] + tr[1]) + " = " + tr[2] + ". Piège : √" + tr[0] + " + √" + tr[1] + " = " + (isqrt(tr[0]) + isqrt(tr[1])) + " donne un autre nombre." };
+  }
+  var quiz = document.getElementById("quiz"), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ""; done = [];
+    var seen = {};
+    for (var k = 0; k < 8; k++) {
+      var Q = makeQ(), guard = 0;
+      while (seen[Q.q] && guard++ < 50) Q = makeQ();
+      seen[Q.q] = true;
+      var li = document.createElement("li");
+      li.innerHTML = '<span>' + Q.q + '</span><input type="text" id="qa' + k + '" inputmode="decimal" autocomplete="off" aria-label="Ta réponse à la question ' + (k + 1) + '"><button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+      quiz.appendChild(li);
+      (function (k, Q) {
+        function check() {
+          var fb = document.getElementById("qf" + k), x = num(document.getElementById("qa" + k).value);
+          if (isNaN(x)) { fb.className = "fb"; fb.textContent = "Écris un nombre."; return; }
+          if (Math.abs(x - Q.a) < 1e-9) { done[k] = true; fb.className = "fb ok"; fb.innerHTML = "Bravo, c'est juste !<span>" + Q.how + "</span>"; }
+          else { done[k] = false; fb.className = "fb no"; fb.innerHTML = "Pas tout à fait : la réponse est " + fmtN(Q.a, 3) + ".<span>" + Q.how + "</span>"; }
+          document.getElementById("score").textContent = done.filter(Boolean).length + " / 8";
+        }
+        document.getElementById("qb" + k).addEventListener("click", check);
+        document.getElementById("qa" + k).addEventListener("keydown", function (e) { if (e.key === "Enter") check(); });
+      })(k, Q);
+    }
+    document.getElementById("score").textContent = "0 / 8";
+  }
+  document.getElementById("newQuiz").addEventListener("click", newQuiz);
+  newQuiz();
+})();
+</script>
+</body>
+</html>

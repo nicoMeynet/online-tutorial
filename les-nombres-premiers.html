@@ -1,0 +1,885 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Les nombres premiers</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, encre vert sapin, marge rouge. Les nombres premiers sont en vert, les multiples barrés du crible ont chacun leur couleur. */
+:root {
+  --paper: #f6f9f6;
+  --grid: #e1ebe3;
+  --card: #ffffff;
+  --ink: #14261b;
+  --ink-soft: #4f6556;
+  --acc: #15803d;
+  --acc-soft: #dcf3e3;
+  --two: #b45309;
+  --two-soft: #fbe7cf;
+  --blue: #1c64c8;
+  --blue-soft: #dbe8fa;
+  --violet: #7c3aed;
+  --violet-soft: #ede4fd;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #fff0a3;
+  --line: #d3e2d7;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0d1510; --grid: #17221a; --card: #121c15; --ink: #e8f3eb; --ink-soft: #a3b9aa;
+    --acc: #6fd39f; --acc-soft: #173a29; --two: #f5a35c; --two-soft: #46301a;
+    --blue: #7fb0ff; --blue-soft: #1a2a45; --violet: #c4a5ff; --violet-soft: #2e2146;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #26362b;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0d1510; --grid: #17221a; --card: #121c15; --ink: #e8f3eb; --ink-soft: #a3b9aa;
+  --acc: #6fd39f; --acc-soft: #173a29; --two: #f5a35c; --two-soft: #46301a;
+  --blue: #7fb0ff; --blue-soft: #1a2a45; --violet: #c4a5ff; --violet-soft: #2e2146;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #26362b;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+a { color: var(--acc); font-weight: 700; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+.hero-eq { font-family: var(--f-mono); font-size: clamp(1.05rem, 3.6vw, 1.35rem); font-weight: 600; display: flex; flex-direction: column; gap: 4px; }
+.hero-eq b { color: var(--acc); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note.amber { border-left-color: var(--two); background: var(--two-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 6px 12px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button.main, button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+button:disabled { opacity: .45; cursor: default; transform: none; box-shadow: 3px 3px 0 var(--ink); }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+input[type="text"] { font: inherit; font-family: var(--f-mono); font-size: 1.05rem; padding: 8px 10px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; }
+.param { display: flex; flex-direction: column; gap: 4px; }
+.param label { font-weight: 700; }
+.inputs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 14px; align-items: end; }
+.inputs label { font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+.err { color: var(--red); font-weight: 700; }
+.scroll { overflow-x: auto; }
+
+/* Vocabulaire */
+.vocab { display: flex; flex-direction: column; gap: 8px; font-size: 1.05rem; }
+.vocab .mono { font-weight: 600; color: var(--acc); }
+
+/* Diviseurs et rectangles */
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-family: var(--f-mono); font-weight: 600; padding: 2px 10px; border: 1.5px solid var(--line); border-radius: 999px; background: var(--paper); font-variant-numeric: tabular-nums; }
+.chip.ok { border-color: var(--acc); color: var(--acc); background: var(--acc-soft); }
+.chip.no { color: var(--ink-soft); }
+.chip.hit { border-color: var(--red); color: var(--red); background: var(--red-soft); }
+.chips.tall { max-height: 230px; overflow-y: auto; padding: 4px; border: 1.5px dashed var(--line); border-radius: 8px; }
+.rects { display: flex; flex-wrap: wrap; gap: 16px 20px; align-items: flex-end; }
+.rect { margin: 0; display: flex; flex-direction: column; gap: 4px; align-items: center; max-width: 100%; }
+.rect svg { display: block; overflow: visible; }
+.rect figcaption { font-family: var(--f-mono); font-weight: 600; font-size: .95rem; }
+
+.steps { display: flex; flex-direction: column; gap: 10px; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; padding: 12px 14px; overflow-x: auto; }
+.steps .line { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-family: var(--f-mono); font-size: 1.05rem; }
+.steps .line b { color: var(--acc); }
+.steps .why { font-size: .95rem; color: var(--ink-soft); font-family: var(--f-body); }
+.steps .err { color: var(--red); font-family: var(--f-body); font-weight: 700; }
+.verdict { border-radius: 8px; padding: 12px 14px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+.verdict.yes { background: var(--ok-soft); color: var(--ok); }
+.verdict.no { background: var(--red-soft); color: var(--red); }
+.verdict span { font-weight: 400; color: var(--ink); }
+
+/* Critères */
+.results { display: flex; flex-direction: column; gap: 8px; font-variant-numeric: tabular-nums; }
+.res { border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 12px; display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; align-items: center; }
+.res-name { font-family: var(--f-display); font-weight: 700; }
+.res .why { grid-column: 1 / -1; font-size: .95rem; color: var(--ink-soft); overflow-wrap: anywhere; }
+.res .why .mono { color: var(--ink); }
+.res.yes { border-color: var(--acc); }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
+.tag.ok { color: var(--ok); }
+.tag.no { color: var(--red); }
+.rules { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
+.rule { border: 1.5px solid var(--line); border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; background: var(--card); }
+.rule strong { font-family: var(--f-display); color: var(--acc); font-size: 1.1rem; }
+.rule .ex { font-family: var(--f-mono); font-size: .92rem; color: var(--ink-soft); }
+
+/* Crible */
+.sieve { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 3px; }
+.sieve div { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border: 1.5px solid var(--line); border-radius: 6px; background: var(--card); font-family: var(--f-mono); font-size: clamp(.72rem, 2.6vw, 1rem); font-variant-numeric: tabular-nums; transition: background .25s; min-width: 0; }
+.sieve .one { color: var(--ink-soft); opacity: .55; }
+.sieve .x2, .sieve .x3, .sieve .x5, .sieve .x7 { color: var(--ink-soft); text-decoration: line-through; text-decoration-thickness: 2px; }
+.sieve .x2 { background: var(--two-soft); border-color: var(--two); text-decoration-color: var(--two); }
+.sieve .x3 { background: var(--blue-soft); border-color: var(--blue); text-decoration-color: var(--blue); }
+.sieve .x5 { background: var(--violet-soft); border-color: var(--violet); text-decoration-color: var(--violet); }
+.sieve .x7 { background: var(--red-soft); border-color: var(--red); text-decoration-color: var(--red); }
+.sieve .pr { background: var(--acc); border-color: var(--acc); color: var(--card); font-weight: 700; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: .92rem; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 16px; height: 16px; border-radius: 4px; border: 1.5px solid; display: inline-block; }
+.counts { font-family: var(--f-mono); font-weight: 600; display: flex; flex-wrap: wrap; gap: 6px 20px; }
+.counts b { color: var(--acc); font-size: 1.2rem; }
+
+/* Décomposition */
+.tree svg { width: 100%; height: auto; display: block; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; }
+.ladder { border-collapse: collapse; font-family: var(--f-mono); font-size: 1.15rem; font-variant-numeric: tabular-nums; margin: 0 auto; }
+.ladder td { padding: 4px 14px; }
+.ladder td:first-child { text-align: right; border-right: 2px solid var(--ink); }
+.ladder td:last-child { color: var(--acc); font-weight: 600; }
+.big { font-family: var(--f-mono); font-weight: 600; font-size: clamp(1.15rem, 4vw, 1.5rem); overflow-wrap: anywhere; }
+.big b { color: var(--acc); }
+
+/* PGCD */
+.methods { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
+.method { border: 1.5px solid var(--line); border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; background: var(--paper); min-width: 0; }
+.method strong { font-family: var(--f-display); }
+.method .m { font-family: var(--f-mono); font-size: .95rem; overflow-wrap: anywhere; }
+.method .m b { color: var(--acc); }
+.fr { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; line-height: 1.1; margin: 0 2px; font-family: var(--f-mono); font-weight: 600; }
+.fr > span:first-child { border-bottom: 2px solid currentColor; padding: 0 4px 1px; }
+.fr > span:last-child { padding: 1px 4px 0; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 110px auto; gap: 10px; align-items: center; }
+.quiz input[type="text"] { font-size: 1rem; padding: 6px 8px; }
+.quiz .yn { grid-column: span 2; display: flex; gap: 8px; justify-content: flex-end; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } .quiz .yn { justify-content: flex-start; } }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc); }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 120px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+@media (max-width: 600px) { .inputs { grid-template-columns: 1fr; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+</head>
+<body>
+<main class="page">
+
+  <header class="hero">
+    <span class="eyebrow">Tutoriel de maths · niveau 5<sup>e</sup>–3<sup>e</sup></span>
+    <h1>Les nombres premiers</h1>
+    <p class="lead">Avec de petites briques, on construit n'importe quoi. Les nombres premiers sont les briques de base des nombres entiers : en les multipliant, on fabrique tous les autres.</p>
+    <div class="box">
+      <div class="hero-eq">
+        <span>12 = <b>2</b> × <b>2</b> × <b>3</b></span>
+        <span>100 = <b>2</b> × <b>2</b> × <b>5</b> × <b>5</b></span>
+        <span>2 024 = <b>2</b> × <b>2</b> × <b>2</b> × <b>11</b> × <b>23</b></span>
+      </div>
+      <span class="soft">Les nombres en vert sont premiers : on ne peut plus les casser en morceaux plus petits.</span>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · Multiples et diviseurs</span>
+    <h2>Qui divise qui ?</h2>
+    <p>On a 36 = 4 × 9. On peut dire la même chose de trois façons :</p>
+    <div class="box vocab">
+      <span>• 36 est un <strong>multiple</strong> de 4 <span class="soft">(36 est dans la table de 4)</span></span>
+      <span>• 4 est un <strong>diviseur</strong> de 36 <span class="soft">(4 « rentre » un nombre entier de fois dans 36)</span></span>
+      <span>• 36 est <strong>divisible</strong> par 4 <span class="soft">(36 ÷ 4 tombe juste : 9, sans reste)</span></span>
+    </div>
+    <p>Pour savoir si une division tombe juste, on fait la <strong>division euclidienne</strong>. On écrit <span class="mono">a = b × q + r</span>, avec un reste <span class="mono">r</span> plus petit que <span class="mono">b</span>. Le nombre <span class="mono">q</span> est le <strong>quotient</strong>. Si le reste vaut <span class="hl">0</span>, alors <span class="mono">b</span> est un diviseur de <span class="mono">a</span>.</p>
+    <div class="box">
+      <h3>La division euclidienne</h3>
+      <div class="inputs">
+        <label for="edA">Dividende a<input id="edA" type="text" inputmode="numeric" autocomplete="off" value="38"></label>
+        <label for="edB">Diviseur b<input id="edB" type="text" inputmode="numeric" autocomplete="off" value="5"></label>
+      </div>
+      <div class="steps" id="edOut" aria-live="polite"></div>
+    </div>
+    <div class="box">
+      <h3>Tous les diviseurs d'un nombre</h3>
+      <p class="soft">Les diviseurs vont par paires : 36 = 1 × 36 = 2 × 18 = 3 × 12… Chaque paire, c'est une façon de ranger les carreaux en rectangle.</p>
+      <div class="param">
+        <label for="divIn">Un nombre entre 1 et 10 000 :</label>
+        <input id="divIn" type="text" inputmode="numeric" autocomplete="off" value="36">
+      </div>
+      <div class="btns" id="divPresets" role="group" aria-label="Exemples de nombres"></div>
+      <div id="divOut" aria-live="polite" style="display:flex;flex-direction:column;gap:12px"></div>
+      <div class="rects" id="divRects"></div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · Les critères de divisibilité</span>
+    <h2>Savoir sans calculer</h2>
+    <p>Pour les petits diviseurs, il existe des astuces. On regarde seulement quelques chiffres du nombre, même s'il est très grand.</p>
+    <div class="rules">
+      <div class="rule"><strong>Par 2</strong><span>Le chiffre des unités est pair : 0, 2, 4, 6 ou 8.</span><span class="ex">538 → 8 est pair : oui</span></div>
+      <div class="rule"><strong>Par 5</strong><span>Le chiffre des unités est 0 ou 5.</span><span class="ex">735 → finit par 5 : oui</span></div>
+      <div class="rule"><strong>Par 10</strong><span>Le chiffre des unités est 0.</span><span class="ex">4 120 → finit par 0 : oui</span></div>
+      <div class="rule"><strong>Par 3</strong><span>La somme des chiffres est dans la table de 3.</span><span class="ex">471 → 4 + 7 + 1 = 12 : oui</span></div>
+      <div class="rule"><strong>Par 9</strong><span>La somme des chiffres est dans la table de 9.</span><span class="ex">828 → 8 + 2 + 8 = 18 : oui</span></div>
+      <div class="rule"><strong>Par 4</strong><span>Le nombre formé par les deux derniers chiffres est dans la table de 4.</span><span class="ex">1 316 → 16 = 4 × 4 : oui</span></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Pourquoi ça marche ?</span>
+      <span>10, 100, 1 000… sont tous divisibles par 2 et par 5. Donc seul le chiffre des unités compte. Pour 4, c'est pareil avec 100 = 4 × 25 : seuls les deux derniers chiffres comptent.</span>
+      <span>Pour 3 et 9 : 10 = 9 + 1, 100 = 99 + 1, 1 000 = 999 + 1. Donc 471 = 4 × 99 + 7 × 9 + (4 + 7 + 1). Les morceaux 99 et 9 sont dans la table de 9 : il reste la somme des chiffres.</span>
+    </div>
+    <div class="box">
+      <h3>Le testeur de critères</h3>
+      <div class="param">
+        <label for="critIn">Écris un nombre entier (jusqu'à 15 chiffres) :</label>
+        <input id="critIn" type="text" inputmode="numeric" autocomplete="off" value="7 452">
+      </div>
+      <div class="results" id="critOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Les nombres premiers</span>
+    <h2>Exactement deux diviseurs</h2>
+    <p>Un nombre est <strong>premier</strong> s'il a <span class="hl">exactement deux diviseurs</span> : 1 et lui-même. Par exemple 7 (diviseurs : 1 et 7) ou 13 (1 et 13). Le nombre 15 n'est pas premier : 15 = 3 × 5.</p>
+    <div class="cards">
+      <div class="box"><span class="tag no">Pas premier</span><strong>Le nombre 1</strong><span class="soft">Il n'a qu'un seul diviseur : lui-même. Il lui en manque un.</span></div>
+      <div class="box"><span class="tag ok">Premier</span><strong>Le nombre 2</strong><span class="soft">Diviseurs : 1 et 2. C'est le seul nombre premier pair. Les autres nombres pairs sont divisibles par 2.</span></div>
+    </div>
+    <div class="box">
+      <h3>Le crible d'Ératosthène</h3>
+      <p class="soft">Un crible, c'est une passoire. On garde 2, puis on barre tous ses multiples. Le premier nombre non barré, 3, est premier : on barre ses multiples. Et ainsi de suite avec 5 et 7. Ce qui reste dans la passoire, ce sont les nombres premiers.</p>
+      <div class="btns">
+        <button type="button" id="sieveNext" class="main">Étape suivante</button>
+        <button type="button" id="sieveAll">Tout faire</button>
+        <button type="button" id="sieveReset">Recommencer</button>
+      </div>
+      <div class="legend" aria-hidden="true">
+        <span><i style="background:var(--two-soft);border-color:var(--two)"></i>multiple de 2</span>
+        <span><i style="background:var(--blue-soft);border-color:var(--blue)"></i>de 3</span>
+        <span><i style="background:var(--violet-soft);border-color:var(--violet)"></i>de 5</span>
+        <span><i style="background:var(--red-soft);border-color:var(--red)"></i>de 7</span>
+        <span><i style="background:var(--acc);border-color:var(--acc)"></i>premier</span>
+      </div>
+      <div class="sieve" id="sieve" role="img" aria-label="Grille des nombres de 1 à 100"></div>
+      <div class="counts"><span>Premiers trouvés : <b id="sieveP">0</b></span><span>Barrés : <b id="sieveX">0</b></span></div>
+      <div class="steps" id="sieveMsg" aria-live="polite"></div>
+    </div>
+    <div class="box">
+      <h3>Le détecteur de nombres premiers</h3>
+      <p class="soft">Pour savoir si n est premier, on essaie de le diviser par 2, 3, 5, 7, 11… On peut s'arrêter à √n. En effet, si n = a × b, un des deux nombres a ou b est plus petit que √n (ou égal).</p>
+      <div class="param">
+        <label for="primeIn">Un nombre entre 1 et 1 000 000 :</label>
+        <input id="primeIn" type="text" inputmode="numeric" autocomplete="off" value="91">
+      </div>
+      <div id="primeOut" aria-live="polite" style="display:flex;flex-direction:column;gap:12px"></div>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · La décomposition en facteurs premiers</span>
+    <h2>Casser un nombre en briques</h2>
+    <p>Tout nombre entier à partir de 2 s'écrit comme un <strong>produit de nombres premiers</strong>. Et il n'y a qu'<span class="hl">une seule façon</span> de le faire, si on ne tient pas compte de l'ordre. On regroupe les facteurs égaux avec des puissances : 2 × 2 × 2 = 2³.</p>
+    <p>La méthode : on divise par le plus petit nombre premier possible, puis on recommence avec le quotient, jusqu'à obtenir 1.</p>
+    <div class="box">
+      <h3>L'arbre et l'échelle</h3>
+      <div class="param">
+        <label for="facIn">Un nombre entre 2 et 100 000 :</label>
+        <input id="facIn" type="text" inputmode="numeric" autocomplete="off" value="360">
+      </div>
+      <div class="btns" id="facPresets" role="group" aria-label="Exemples de nombres"></div>
+      <div class="btns" role="group" aria-label="Type de dessin">
+        <button type="button" id="modeTree" aria-pressed="true">Arbre</button>
+        <button type="button" id="modeLadder" aria-pressed="false">Échelle de divisions</button>
+      </div>
+      <div class="tree" id="treeWrap"><svg id="tree" viewBox="0 0 640 200" role="img" aria-label="Arbre de décomposition en facteurs premiers"></svg></div>
+      <div class="scroll" id="ladderWrap" hidden><table class="ladder" id="ladder" aria-label="Divisions successives"></table></div>
+      <div id="facOut" aria-live="polite" style="display:flex;flex-direction:column;gap:8px"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Bonus : compter les diviseurs</span>
+      <span>360 = 2³ × 3² × 5. Un diviseur de 360 prend 0 à 3 fois le 2, 0 à 2 fois le 3, 0 ou 1 fois le 5. Cela fait (3 + 1) × (2 + 1) × (1 + 1) = 24 diviseurs. On ajoute 1 à chaque exposant, puis on multiplie.</span>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Le PGCD et les fractions</span>
+    <h2>Le plus grand diviseur commun</h2>
+    <p>Le <strong>PGCD</strong> de deux nombres, c'est le Plus Grand Commun Diviseur. Les diviseurs de 84 et ceux de 60 ont en commun 1, 2, 3, 4, 6 et 12. Le plus grand est 12 : PGCD(84 ; 60) = 12.</p>
+    <p>Deux méthodes rapides : garder les <strong>facteurs premiers communs</strong>, ou utiliser l'<strong>algorithme d'Euclide</strong>. Euclide remplace le grand nombre par le reste de la division, et recommence. Le dernier reste non nul est le PGCD.</p>
+    <div class="box">
+      <h3>Calculatrice de PGCD</h3>
+      <div class="inputs">
+        <label for="gA">Premier nombre<input id="gA" type="text" inputmode="numeric" autocomplete="off" value="84"></label>
+        <label for="gB">Deuxième nombre<input id="gB" type="text" inputmode="numeric" autocomplete="off" value="60"></label>
+      </div>
+      <div class="methods" id="gcdOut" aria-live="polite"></div>
+      <div class="steps" id="gcdSteps"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">À quoi ça sert : simplifier une fraction</span>
+      <span>Si on divise le numérateur et le dénominateur par leur PGCD, on obtient directement une fraction <strong>irréductible</strong> : <span class="fr"><span>60</span><span>84</span></span> = <span class="fr"><span>60 ÷ 12</span><span>84 ÷ 12</span></span> = <span class="fr"><span>5</span><span>7</span></span>. Pour revoir les fractions, va voir le <a href="les-fractions.html">tutoriel sur les fractions</a>.</span>
+    </div>
+    <div class="cards">
+      <div class="box">
+        <span class="tag ok">PGCD</span>
+        <strong>Les paquets identiques</strong>
+        <span class="soft">Tu as 84 dragées et 60 chocolats. Tu veux faire des paquets tous pareils, sans rien laisser. Combien de paquets au maximum ?</span>
+        <span>Le nombre de paquets doit diviser 84 et 60. Le plus grand possible : PGCD(84 ; 60) = <strong>12 paquets</strong>, avec 84 ÷ 12 = 7 dragées et 60 ÷ 12 = 5 chocolats dans chacun.</span>
+      </div>
+      <div class="box">
+        <span class="tag ok">PPCM</span>
+        <strong>Les deux bus</strong>
+        <span class="soft">Le bus A passe toutes les 12 minutes, le bus B toutes les 18 minutes. Ils partent ensemble à 8 h. Quand repartent-ils ensemble ?</span>
+        <span>Multiples de 12 : 12, 24, <strong>36</strong>… Multiples de 18 : 18, <strong>36</strong>… Le Plus Petit Commun Multiple est 36 : à <strong>8 h 36</strong>. Astuce : PPCM = 12 × 18 ÷ PGCD = 216 ÷ 6 = 36.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · Records et mystères</span>
+    <h2>Des nombres premiers à l'infini</h2>
+    <p>Il y a <strong>une infinité</strong> de nombres premiers. L'idée d'Euclide : prends une liste de nombres premiers, multiplie-les tous, puis ajoute 1. Le nouveau nombre, divisé par n'importe quel nombre de ta liste, donne un reste de 1. Donc ses facteurs premiers sont <span class="hl">nouveaux</span> : ta liste n'était jamais complète.</p>
+    <div class="box">
+      <h3>Essaie l'idée d'Euclide</h3>
+      <div class="btns" id="euBtns" role="group" aria-label="Nombre de premiers dans la liste"></div>
+      <div class="steps" id="euOut" aria-live="polite"></div>
+    </div>
+    <div class="note amber">
+      <span class="note-title">Le record</span>
+      <span>Le plus grand nombre premier connu (en 2024) est 2<sup>136 279 841</sup> − 1. Il a <strong>plus de 41 millions de chiffres</strong> ! Écrit en entier, il remplirait des milliers de pages. C'est un nombre de Mersenne, de la forme 2<sup>n</sup> − 1. Il a été trouvé en 2024 grâce à des milliers d'ordinateurs.</span>
+    </div>
+    <h3 style="font-size:1.4rem;margin-top:8px">La conjecture de Goldbach</h3>
+    <p>En 1742, Christian Goldbach remarque que tout nombre pair plus grand que 2 semble être la <strong>somme de deux nombres premiers</strong> : 4 = 2 + 2, 10 = 3 + 7 = 5 + 5, 100 = 3 + 97… Les ordinateurs l'ont vérifié pour des milliards de milliards de nombres. Mais personne n'a encore réussi à le <strong>démontrer</strong> pour tous. C'est une conjecture : on pense que c'est vrai, sans preuve.</p>
+    <div class="box">
+      <h3>Le chercheur de Goldbach</h3>
+      <div class="param">
+        <label for="gbIn">Un nombre pair entre 4 et 10 000 :</label>
+        <input id="gbIn" type="text" inputmode="numeric" autocomplete="off" value="100">
+      </div>
+      <div id="gbOut" aria-live="polite" style="display:flex;flex-direction:column;gap:10px"></div>
+    </div>
+    <h3 style="font-size:1.4rem;margin-top:8px">Les nombres premiers protègent Internet</h3>
+    <div class="cards">
+      <div class="box"><strong>Facile dans un sens</strong><span class="soft">Multiplier deux nombres premiers, même énormes, est très rapide pour un ordinateur. 89 × 97 = 8 633 : facile.</span></div>
+      <div class="box"><strong>Très dur dans l'autre</strong><span class="soft">Retrouver les deux nombres à partir du produit est très long. Avec des nombres de plusieurs centaines de chiffres, les ordinateurs actuels mettraient des milliers d'années.</span></div>
+      <div class="box"><strong>Le cadenas RSA</strong><span class="soft">Quand tu paies sur Internet, ton message est verrouillé avec le produit. Seul celui qui connaît les deux nombres premiers peut l'ouvrir. Cette méthode s'appelle RSA.</span></div>
+    </div>
+    <details>
+      <summary>Défi : casse un petit cadenas<span class="q">Le produit est 2 021. Trouve les deux nombres premiers.</span></summary>
+      <div><span>On essaie 2, 3, 5, 7, 11… jusqu'à √2 021 ≈ 45. On trouve 2 021 = <strong>43 × 47</strong>. Pour un ordinateur, avec 600 chiffres, ce serait impossible en un temps raisonnable.</span></div>
+    </details>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Les pièges</span>
+    <h2>Attention aux faux amis</h2>
+    <div class="cards">
+      <div class="box"><strong>1 n'est pas premier</strong><span class="soft">Il faut exactement deux diviseurs. 1 n'en a qu'un. Sinon, on pourrait écrire 6 = 2 × 3 = 1 × 2 × 3 = 1 × 1 × 2 × 3… et la décomposition ne serait plus unique.</span></div>
+      <div class="box"><strong>2 est premier</strong><span class="soft">Il est pair, et pourtant il est premier : ses seuls diviseurs sont 1 et 2. C'est le seul nombre pair premier.</span></div>
+      <div class="box"><strong>51 et 91 ont l'air premiers</strong><span class="soft">Ils sont impairs et ne finissent pas par 5. Pourtant 51 = 3 × 17 (5 + 1 = 6, dans la table de 3) et 91 = 7 × 13.</span></div>
+      <div class="box"><strong>Par 2 et par 4 ne veut pas dire par 8</strong><span class="soft">12 est divisible par 2 et par 4, et pas par 8. On ne multiplie pas 2 × 4. Par contre, divisible par 2 et par 3 donne bien divisible par 6, car 2 et 3 n'ont pas de facteur commun.</span></div>
+    </div>
+    <div class="note red">
+      <span class="note-title">Pas de raccourci</span>
+      <span>« Impair » ne veut pas dire « premier ». 9, 15, 21, 25, 27, 33… sont impairs et pas premiers. Pour être sûr, il faut tester les divisions jusqu'à √n.</span>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Réponds avec les boutons Oui ou Non, ou écris un nombre entier.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Nouvelles questions</button>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Un peu d'histoire</span>
+    <h2>2 300 ans de chasse aux nombres premiers</h2>
+    <ol class="timeline">
+      <li><span class="when">vers −300</span><div class="what"><strong>Euclide</strong><span>Dans son livre « Les Éléments », ce savant grec d'Alexandrie démontre qu'il existe une infinité de nombres premiers. Le même livre décrit l'algorithme du PGCD qui porte son nom.</span></div></li>
+      <li><span class="when">vers −240</span><div class="what"><strong>Ératosthène</strong><span>Ce savant grec, qui a aussi mesuré la taille de la Terre, invente le crible qui porte son nom. Du moins, c'est ce que racontent des textes écrits bien plus tard.</span></div></li>
+      <li><span class="when">XVII<sup>e</sup> siècle</span><div class="what"><strong>Pierre de Fermat et Marin Mersenne</strong><span>Ces deux Français s'écrivent des lettres pleines de questions sur les nombres premiers. Mersenne étudie les nombres 2<sup>n</sup> − 1, qui portent aujourd'hui son nom.</span></div></li>
+      <li><span class="when">1742</span><div class="what"><strong>Christian Goldbach</strong><span>Dans une lettre au grand mathématicien Leonhard Euler, il propose sa conjecture sur les nombres pairs. Elle n'est toujours pas démontrée.</span></div></li>
+      <li><span class="when">1977</span><div class="what"><strong>La méthode RSA</strong><span>Trois chercheurs américains (Rivest, Shamir et Adleman) utilisent les grands nombres premiers pour chiffrer les messages.</span></div></li>
+      <li><span class="when">depuis 1996</span><div class="what"><strong>Le projet GIMPS</strong><span>Des volontaires du monde entier prêtent leur ordinateur pour chercher de grands nombres premiers de Mersenne. Presque tous les records récents viennent de ce projet, dont celui de 2024.</span></div></li>
+    </ol>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · À toi de jouer</span>
+    <h2>Six exercices</h2>
+    <div class="exos">
+      <details>
+        <summary>Les diviseurs<span class="q">Écris la liste de tous les diviseurs de 48.</span></summary>
+        <div><span>On cherche les paires : 1 × 48, 2 × 24, 3 × 16, 4 × 12, 6 × 8. Les diviseurs sont <strong>1, 2, 3, 4, 6, 8, 12, 16, 24 et 48</strong> : il y en a 10.</span></div>
+      </details>
+      <details>
+        <summary>Les critères<span class="q">Sans calculatrice : 4 725 est-il divisible par 2 ? par 3 ? par 5 ? par 9 ?</span></summary>
+        <div><span>Il finit par 5 : il est <strong>divisible par 5</strong>, et <strong>pas par 2</strong>. La somme des chiffres vaut 4 + 7 + 2 + 5 = 18, dans la table de 3 et de 9 : <strong>oui par 3 et par 9</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Premier ou pas ?<span class="q">Le nombre 143 est-il premier ?</span></summary>
+        <div><span>√143 ≈ 11,96, donc on teste 2, 3, 5, 7 et 11. Ni 2, ni 3 (1 + 4 + 3 = 8), ni 5, ni 7. Mais 143 = <strong>11 × 13</strong> : il n'est <strong>pas premier</strong>.</span></div>
+      </details>
+      <details>
+        <summary>La décomposition<span class="q">Décompose 1 260 en produit de facteurs premiers.</span></summary>
+        <div><span>1 260 ÷ 2 = 630 ; 630 ÷ 2 = 315 ; 315 ÷ 3 = 105 ; 105 ÷ 3 = 35 ; 35 ÷ 5 = 7 ; 7 ÷ 7 = 1.</span><span>Donc 1 260 = <strong>2² × 3² × 5 × 7</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Le PGCD et la fraction<span class="q">Calcule PGCD(126 ; 84) avec l'algorithme d'Euclide, puis simplifie 84/126.</span></summary>
+        <div><span>126 = 84 × 1 + 42, puis 84 = 42 × 2 + 0. Le dernier reste non nul est 42 : PGCD = <strong>42</strong>.</span><span>84/126 = (84 ÷ 42)/(126 ÷ 42) = <strong>2/3</strong>, qui est irréductible.</span></div>
+      </details>
+      <details>
+        <summary>Les bouquets<span class="q">Une fleuriste a 150 roses et 105 tulipes. Elle veut faire le plus de bouquets identiques possible, sans reste. Combien de bouquets, et que contient chacun ?</span></summary>
+        <div><span>150 = 2 × 3 × 5² et 105 = 3 × 5 × 7. Facteurs communs : 3 × 5 = 15.</span><span><strong>15 bouquets</strong>, chacun avec 150 ÷ 15 = 10 roses et 105 ÷ 15 = 7 tulipes.</span></div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• « b est un <strong>diviseur</strong> de a », « a est un <strong>multiple</strong> de b » et « a est <strong>divisible</strong> par b » veulent dire la même chose : le reste de la division euclidienne a = b × q + r est 0.</span>
+      <span>• Critères : par <strong>2</strong>, <strong>5</strong>, <strong>10</strong> on regarde le dernier chiffre ; par <strong>4</strong> les deux derniers ; par <strong>3</strong> et <strong>9</strong> la somme des chiffres.</span>
+      <span>• Un nombre <strong>premier</strong> a exactement deux diviseurs : 1 et lui-même. 1 n'est pas premier, 2 est le seul premier pair. Pour tester n, on essaie les premiers jusqu'à <strong>√n</strong>.</span>
+      <span>• Tout entier à partir de 2 se <strong>décompose</strong> d'une seule façon en produit de facteurs premiers : 360 = 2³ × 3² × 5.</span>
+      <span>• <strong>PGCD</strong> : facteurs premiers communs ou algorithme d'Euclide. Diviser par le PGCD rend une fraction <strong>irréductible</strong>. Le <strong>PPCM</strong> = a × b ÷ PGCD.</span>
+      <span>• Il y a une <strong>infinité</strong> de nombres premiers (Euclide), et ils protègent nos paiements sur Internet.</span>
+    </div>
+  </section>
+
+  <footer>Fiche de révision · Les nombres premiers</footer>
+</main>
+
+<script>
+(function () {
+  var NS = "http://www.w3.org/2000/svg";
+  var SUP = ["⁰", "¹", "²", "³", "⁴", "⁵", "⁶", "⁷", "⁸", "⁹"];
+  function $(id) { return document.getElementById(id); }
+  function fmt(x) { return Number(x).toLocaleString("fr-FR"); }
+  function dec(x, d) { return Number(x).toLocaleString("fr-FR", { maximumFractionDigits: d }); }
+  function int(s) { var t = String(s).replace(/[\s  .]/g, ""); if (!/^\d+$/.test(t)) return NaN; return Number(t); }
+  function mk(svg, name, attrs, text) { var e = document.createElementNS(NS, name); for (var a in attrs) e.setAttribute(a, attrs[a]); if (text != null) e.textContent = text; svg.appendChild(e); return e; }
+  function sup(e) { return e === 1 ? "" : String(e).split("").map(function (d) { return SUP[+d]; }).join(""); }
+
+  /* ---------- Fonctions pures ---------- */
+  function divisors(n) { var small = [], big = []; for (var d = 1; d * d <= n; d++) if (n % d === 0) { small.push(d); if (d * d !== n) big.unshift(n / d); } return small.concat(big); }
+  function divisorPairs(n) { var p = []; for (var d = 1; d * d <= n; d++) if (n % d === 0) p.push([d, n / d]); return p; }
+  function euclidDiv(a, b) { var q = Math.floor(a / b); return { q: q, r: a - b * q }; }
+  function criteria(n) {
+    var s = String(n).replace(/\D/g, "").replace(/^0+(?=\d)/, ""), digits = s.split("").map(Number);
+    var last = digits[digits.length - 1], twoS = s.slice(-2), two = Number(twoS), ds = digits.reduce(function (a, b) { return a + b; }, 0);
+    var sumTxt = digits.length > 1 ? digits.join(" + ") + " = " + ds : String(ds);
+    function inTable(x, k) { return x % k === 0 ? x + " = " + k + " × " + (x / k) + ", c'est dans la table de " + k + "." : x + " n'est pas dans la table de " + k + "."; }
+    return [
+      { d: 2, ok: last % 2 === 0, why: "Chiffre des unités : " + last + (last % 2 === 0 ? ", il est pair." : ", il est impair.") },
+      { d: 3, ok: ds % 3 === 0, why: "Somme des chiffres : " + sumTxt + ". " + inTable(ds, 3) },
+      { d: 4, ok: two % 4 === 0, why: (s.length > 1 ? "Les deux derniers chiffres forment " + twoS : "Le nombre est " + twoS) + ". " + inTable(two, 4) },
+      { d: 5, ok: last === 0 || last === 5, why: "Chiffre des unités : " + last + (last === 0 || last === 5 ? ", c'est 0 ou 5." : ", ce n'est ni 0 ni 5.") },
+      { d: 9, ok: ds % 9 === 0, why: "Somme des chiffres : " + sumTxt + ". " + inTable(ds, 9) },
+      { d: 10, ok: last === 0, why: "Chiffre des unités : " + last + (last === 0 ? ", c'est 0." : ", ce n'est pas 0.") }
+    ];
+  }
+  function sieve(N) { var c = new Uint8Array(N + 1), out = []; for (var i = 2; i <= N; i++) { if (!c[i]) { out.push(i); for (var j = i * i; j <= N; j += i) c[j] = 1; } } return out; }
+  var P1000 = sieve(1000);
+  function isPrime(n) { if (!Number.isInteger(n) || n < 2) return false; if (n < 4) return true; if (n % 2 === 0) return false; for (var d = 3; d * d <= n; d += 2) if (n % d === 0) return false; return true; }
+  function primeCheck(n) {
+    if (n < 2) return { prime: false, tried: [], divisor: null, limit: 0 };
+    var lim = Math.floor(Math.sqrt(n)), tried = [];
+    for (var i = 0; i < P1000.length && P1000[i] <= lim; i++) { var p = P1000[i]; tried.push(p); if (n % p === 0) return { prime: false, tried: tried, divisor: p, limit: lim }; }
+    return { prime: true, tried: tried, divisor: null, limit: lim };
+  }
+  function smallestFactor(n) { if (n % 2 === 0) return 2; for (var d = 3; d * d <= n; d += 2) if (n % d === 0) return d; return n; }
+  function factorize(n) { var f = []; while (n > 1) { var p = smallestFactor(n), e = 0; while (n % p === 0) { n /= p; e++; } f.push([p, e]); } return f; }
+  function factorStr(n) { if (n < 2) return String(n); return factorize(n).map(function (pe) { return fmt(pe[0]) + sup(pe[1]); }).join(" × "); }
+  function exponentOf(n, p) { var e = 0; if (p < 2) return 0; while (n > 0 && n % p === 0) { n /= p; e++; } return e; }
+  function countDivisors(n) { return factorize(n).reduce(function (a, pe) { return a * (pe[1] + 1); }, 1); }
+  function primeChain(n) { var out = []; while (n > 1) { var p = smallestFactor(n); out.push([n, p]); n /= p; } return out; }
+  function gcd(a, b) { while (b) { var t = b; b = a % b; a = t; } return a; }
+  function lcm(a, b) { return a / gcd(a, b) * b; }
+  function euclidSteps(a, b) { if (a < b) { var t = a; a = b; b = t; } var rows = []; while (b > 0) { var q = Math.floor(a / b), r = a % b; rows.push({ a: a, b: b, q: q, r: r }); a = b; b = r; } return rows; }
+  function goldbach(n) { var out = []; if (n < 4 || n % 2) return out; for (var p = 2; p <= n / 2; p++) if (isPrime(p) && isPrime(n - p)) out.push([p, n - p]); return out; }
+  function euclidNumber(k) { var ps = P1000.slice(0, k), prod = ps.reduce(function (a, b) { return a * b; }, 1); return { primes: ps, product: prod, n: prod + 1, factors: factorize(prod + 1) }; }
+
+  window.__arith = { divisors: divisors, divisorPairs: divisorPairs, euclidDiv: euclidDiv, criteria: criteria, sieve: sieve, isPrime: isPrime, primeCheck: primeCheck, factorize: factorize, factorStr: factorStr, exponentOf: exponentOf, countDivisors: countDivisors, primeChain: primeChain, gcd: gcd, lcm: lcm, euclidSteps: euclidSteps, goldbach: goldbach, euclidNumber: euclidNumber };
+
+  /* ---------- Étape 1 : division euclidienne ---------- */
+  var edA = $("edA"), edB = $("edB");
+  function showEd() {
+    var a = int(edA.value), b = int(edB.value), out = $("edOut");
+    if (isNaN(a) || isNaN(b) || a > 1e9 || b > 1e9) { out.innerHTML = "<span class='err'>Écris deux nombres entiers positifs (jusqu'à un milliard).</span>"; return; }
+    if (b === 0) { out.innerHTML = "<span class='err'>On ne peut pas diviser par 0.</span>"; return; }
+    var r = euclidDiv(a, b);
+    out.innerHTML = "<div class='line'>" + fmt(a) + " = " + fmt(b) + " × <b>" + fmt(r.q) + "</b> + <b>" + fmt(r.r) + "</b></div>" +
+      "<span class='why'>Quotient : " + fmt(r.q) + ". Reste : " + fmt(r.r) + " (plus petit que " + fmt(b) + ").</span>" +
+      (r.r === 0
+        ? "<span class='why'><strong style='color:var(--ok)'>Le reste est 0 :</strong> " + fmt(b) + " est un diviseur de " + fmt(a) + ", et " + fmt(a) + " est un multiple de " + fmt(b) + ".</span>"
+        : "<span class='why'><strong style='color:var(--red)'>Le reste n'est pas 0 :</strong> " + fmt(b) + " n'est pas un diviseur de " + fmt(a) + ".</span>");
+  }
+  edA.addEventListener("input", showEd); edB.addEventListener("input", showEd); showEd();
+
+  /* ---------- Étape 1 : diviseurs ---------- */
+  var divIn = $("divIn");
+  [12, 24, 36, 17, 60, 100, 1000].forEach(function (v) {
+    var b = document.createElement("button"); b.type = "button"; b.id = "dp" + v; b.textContent = fmt(v);
+    b.addEventListener("click", function () { divIn.value = fmt(v); showDiv(); });
+    $("divPresets").appendChild(b);
+  });
+  function showDiv() {
+    var n = int(divIn.value), out = $("divOut"), rects = $("divRects");
+    rects.innerHTML = "";
+    if (isNaN(n) || n < 1 || n > 10000) { out.innerHTML = "<p class='err'>Écris un nombre entier entre 1 et 10 000.</p>"; return; }
+    var d = divisors(n), pairs = divisorPairs(n), msg;
+    if (n === 1) msg = "1 n'a qu'un seul diviseur : lui-même.";
+    else if (d.length === 2) msg = "Seulement deux diviseurs, 1 et " + fmt(n) + ". Un seul rectangle possible : une longue ligne. " + fmt(n) + " est un <strong>nombre premier</strong> !";
+    else {
+      var sq = pairs[pairs.length - 1];
+      msg = fmt(n) + " a " + d.length + " diviseurs, donc " + pairs.length + " rectangles différents.";
+      if (sq[0] === sq[1]) msg += " L'un d'eux est un carré (" + sq[0] + " × " + sq[1] + ") : c'est pour ça que le nombre de diviseurs est impair.";
+    }
+    out.innerHTML = "<div class='chips'>" + d.map(function (x) { return "<span class='chip ok'>" + fmt(x) + "</span>"; }).join("") + "</div>" +
+      "<p>" + msg + "</p>" +
+      "<p class='soft mono'>" + pairs.map(function (p) { return fmt(p[0]) + " × " + fmt(p[1]); }).join("  ·  ") + "</p>" +
+      "<p class='soft'>" + (n <= 144 ? "Chaque rectangle contient exactement " + fmt(n) + " carreaux." : "Chaque rectangle a la même aire : " + fmt(n) + " carreaux (trop petits pour être dessinés).") + "</p>";
+    pairs.forEach(function (pr) {
+      var a = pr[0], b = pr[1], A = 8100, W = Math.sqrt(A * b / a), H = Math.sqrt(A * a / b);
+      if (W > 260) { W = 260; H = Math.max(3, 260 * a / b); }
+      var fig = document.createElement("figure"); fig.className = "rect";
+      var svg = document.createElementNS(NS, "svg");
+      svg.setAttribute("viewBox", "0 0 " + b + " " + a); svg.setAttribute("preserveAspectRatio", "none");
+      svg.setAttribute("width", W.toFixed(1)); svg.setAttribute("height", H.toFixed(1)); svg.setAttribute("aria-hidden", "true");
+      mk(svg, "rect", { x: 0, y: 0, width: b, height: a, fill: "var(--acc-soft)" });
+      if (n <= 144 && W / b >= 4) {
+        for (var i = 1; i < b; i++) mk(svg, "line", { x1: i, y1: 0, x2: i, y2: a, stroke: "var(--acc)", "stroke-width": 1, "vector-effect": "non-scaling-stroke" });
+        for (var j = 1; j < a; j++) mk(svg, "line", { x1: 0, y1: j, x2: b, y2: j, stroke: "var(--acc)", "stroke-width": 1, "vector-effect": "non-scaling-stroke" });
+      }
+      mk(svg, "rect", { x: 0, y: 0, width: b, height: a, fill: "none", stroke: "var(--ink)", "stroke-width": 2, "vector-effect": "non-scaling-stroke" });
+      fig.appendChild(svg);
+      var cap = document.createElement("figcaption"); cap.textContent = fmt(a) + " × " + fmt(b);
+      fig.appendChild(cap); rects.appendChild(fig);
+    });
+  }
+  divIn.addEventListener("input", showDiv); showDiv();
+
+  /* ---------- Étape 2 : critères ---------- */
+  var critIn = $("critIn");
+  function showCrit() {
+    var out = $("critOut"), t = String(critIn.value).replace(/[\s  .]/g, "");
+    if (!/^\d{1,15}$/.test(t) || Number(t) < 1) { out.innerHTML = "<p class='err'>Écris un nombre entier positif, avec 15 chiffres au plus.</p>"; return; }
+    var n = Number(t), list = criteria(t);
+    out.innerHTML = list.map(function (c) {
+      var r = n % c.d, q = (n - r) / c.d;
+      var check = r === 0 ? fmt(n) + " = " + c.d + " × " + fmt(q) : fmt(n) + " = " + c.d + " × " + fmt(q) + " + " + r;
+      return "<div class='res" + (c.ok ? " yes" : "") + "'><span class='res-name'>Divisible par " + c.d + " ?</span><span class='tag " + (c.ok ? "ok'>Oui" : "no'>Non") + "</span>" +
+        "<span class='why'>" + c.why + "<br>Vérification : <span class='mono'>" + check + "</span></span></div>";
+    }).join("");
+  }
+  critIn.addEventListener("input", showCrit); showCrit();
+
+  /* ---------- Étape 3 : crible ---------- */
+  var SP = [2, 3, 5, 7], sStep = 0, crossed = [], isPr = [], sieveBox = $("sieve");
+  for (var c = 1; c <= 100; c++) { var cell = document.createElement("div"); cell.id = "cr" + c; cell.textContent = c; sieveBox.appendChild(cell); }
+  function sieveDraw() {
+    var nP = 0, nX = 0;
+    for (var k = 1; k <= 100; k++) {
+      var e = $("cr" + k), cls = "";
+      if (k === 1) cls = "one"; else if (isPr[k]) { cls = "pr"; nP++; } else if (crossed[k]) { cls = "x" + crossed[k]; nX++; }
+      e.className = cls;
+    }
+    $("sieveP").textContent = nP; $("sieveX").textContent = nX;
+    $("sieveNext").disabled = sStep > SP.length; $("sieveAll").disabled = sStep > SP.length;
+  }
+  function sieveReset() {
+    sStep = 0; crossed = []; isPr = [];
+    sieveDraw();
+    $("sieveMsg").innerHTML = "<span class='why'>On commence par mettre 1 de côté : il n'est pas premier. Clique sur « Étape suivante ».</span>";
+  }
+  function sieveNext() {
+    if (sStep < SP.length) {
+      var p = SP[sStep], newly = [];
+      isPr[p] = true;
+      for (var m = 2 * p; m <= 100; m += p) if (!crossed[m]) { crossed[m] = p; newly.push(m); }
+      sStep++;
+      var shown = newly.slice(0, 6).join(", ") + (newly.length > 6 ? ", …" : "");
+      $("sieveMsg").innerHTML = "<div class='line'>" + p + " est premier : on barre ses multiples.</div>" +
+        "<span class='why'>Nouveaux nombres barrés : " + shown + " (" + newly.length + " de plus).</span>" +
+        (p > 2 ? "<span class='why'>Remarque : le premier nombre barré pour la première fois est " + p + " × " + p + " = " + (p * p) + ". Les multiples plus petits étaient déjà barrés.</span>" : "");
+    } else if (sStep === SP.length) {
+      for (var k = 2; k <= 100; k++) if (!crossed[k]) isPr[k] = true;
+      sStep++;
+      $("sieveMsg").innerHTML = "<div class='line'>Terminé : <b>25 nombres premiers</b> jusqu'à 100.</div>" +
+        "<span class='why'>Pourquoi s'arrêter après 7 ? Le premier suivant est 11, et 11 × 11 = 121 dépasse 100. Tous ses multiples plus petits sont déjà barrés. Les nombres restants sont donc tous premiers.</span>";
+    }
+    sieveDraw();
+  }
+  $("sieveNext").addEventListener("click", sieveNext);
+  $("sieveAll").addEventListener("click", function () { while (sStep <= SP.length) sieveNext(); });
+  $("sieveReset").addEventListener("click", sieveReset);
+  sieveReset();
+
+  /* ---------- Étape 3 : détecteur ---------- */
+  var primeIn = $("primeIn");
+  function showPrime() {
+    var n = int(primeIn.value), out = $("primeOut");
+    if (isNaN(n) || n < 1 || n > 1000000) { out.innerHTML = "<p class='err'>Écris un nombre entier entre 1 et 1 000 000.</p>"; return; }
+    if (n === 1) { out.innerHTML = "<div class='verdict no'>1 n'est pas premier.<span>Il n'a qu'un seul diviseur : lui-même.</span></div>"; return; }
+    var c = primeCheck(n), root = Math.sqrt(n), rootTxt = Number.isInteger(root) ? "√" + fmt(n) + " = " + fmt(root) : "√" + fmt(n) + " ≈ " + dec(root, 2);
+    var head = "<p>" + rootTxt + " : il suffit d'essayer les nombres premiers jusqu'à " + fmt(c.limit) + ".</p>";
+    if (c.tried.length === 0) head = "<p>" + rootTxt + ", plus petit que 2 : aucune division à essayer.</p>";
+    var chips = c.tried.length ? "<div class='chips" + (c.tried.length > 40 ? " tall" : "") + "'>" + c.tried.map(function (p) { return p === c.divisor ? "<span class='chip hit'>" + fmt(p) + " ✓</span>" : "<span class='chip no'>" + fmt(p) + " ✗</span>"; }).join("") + "</div>" : "";
+    var v = c.prime
+      ? "<div class='verdict yes'>" + fmt(n) + " est premier !<span>" + (c.tried.length ? "Aucun des " + c.tried.length + " nombres essayés ne divise " + fmt(n) + "." : "Ses seuls diviseurs sont 1 et " + n + ".") + "</span></div>"
+      : "<div class='verdict no'>" + fmt(n) + " n'est pas premier.<span class='mono'>" + fmt(n) + " = " + fmt(c.divisor) + " × " + fmt(n / c.divisor) + "</span><span>On a trouvé un diviseur au " + c.tried.length + (c.tried.length === 1 ? "er" : "e") + " essai, on peut s'arrêter.</span></div>";
+    out.innerHTML = head + chips + v;
+  }
+  primeIn.addEventListener("input", showPrime); showPrime();
+
+  /* ---------- Étape 4 : décomposition ---------- */
+  var facIn = $("facIn"), mode = "tree";
+  [360, 84, 1024, 2024, 9240, 65536, 97].forEach(function (v) {
+    var b = document.createElement("button"); b.type = "button"; b.id = "fp" + v; b.textContent = fmt(v);
+    b.addEventListener("click", function () { facIn.value = fmt(v); showFac(); });
+    $("facPresets").appendChild(b);
+  });
+  function setMode(m) {
+    mode = m;
+    $("modeTree").setAttribute("aria-pressed", m === "tree" ? "true" : "false");
+    $("modeLadder").setAttribute("aria-pressed", m === "ladder" ? "true" : "false");
+    $("treeWrap").hidden = m !== "tree"; $("ladderWrap").hidden = m !== "ladder";
+  }
+  $("modeTree").addEventListener("click", function () { setMode("tree"); });
+  $("modeLadder").addEventListener("click", function () { setMode("ladder"); });
+  function node(svg, x, y, v, prime) {
+    var label = fmt(v), w = label.length * 11.5 + 20;
+    mk(svg, "rect", { x: x - w / 2, y: y - 18, width: w, height: 36, rx: prime ? 18 : 6, fill: prime ? "var(--acc-soft)" : "var(--card)", stroke: prime ? "var(--acc)" : "var(--ink)", "stroke-width": 2 });
+    var t = mk(svg, "text", { x: x, y: y + 6, "text-anchor": "middle", "font-size": 18, "font-weight": prime ? 700 : 400 }, label);
+    if (prime) t.setAttribute("style", "fill:var(--acc)");
+  }
+  function drawTree(svg, chain) {
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    var k = chain.length, dx = Math.min(80, 560 / k), dy = 62, top = 40;
+    var W = Math.max(360, k * dx + 120), X0 = k === 1 ? W / 2 : (W - k * dx) / 2 + dx, H = top + (k - 1) * dy + 40;
+    svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+    for (var i = 0; i < k - 1; i++) {
+      var x = X0 + i * dx, y = top + i * dy;
+      mk(svg, "line", { x1: x, y1: y, x2: x - dx, y2: y + dy, stroke: "var(--ink-soft)", "stroke-width": 2 });
+      mk(svg, "line", { x1: x, y1: y, x2: x + dx, y2: y + dy, stroke: "var(--ink-soft)", "stroke-width": 2 });
+    }
+    for (var j = 0; j < k; j++) {
+      var cx = X0 + j * dx, cy = top + j * dy;
+      node(svg, cx, cy, chain[j][0], j === k - 1);
+      if (j < k - 1) node(svg, cx - dx, cy + dy, chain[j][1], true);
+    }
+  }
+  function showFac() {
+    var n = int(facIn.value), out = $("facOut"), svg = $("tree"), lad = $("ladder");
+    if (isNaN(n) || n < 2 || n > 100000) { out.innerHTML = "<p class='err'>Écris un nombre entier entre 2 et 100 000.</p>"; while (svg.firstChild) svg.removeChild(svg.firstChild); lad.innerHTML = ""; return; }
+    var chain = primeChain(n), f = factorize(n);
+    drawTree(svg, chain);
+    lad.innerHTML = chain.map(function (r) { return "<tr><td>" + fmt(r[0]) + "</td><td>" + fmt(r[1]) + "</td></tr>"; }).join("") + "<tr><td>1</td><td></td></tr>";
+    var longF = chain.map(function (r) { return fmt(r[1]); }).join(" × ");
+    if (chain.length === 1) {
+      out.innerHTML = "<p class='big'>" + fmt(n) + " = <b>" + fmt(n) + "</b></p><p>" + fmt(n) + " est premier : on ne peut pas le casser. Sa décomposition, c'est lui-même.</p>";
+      return;
+    }
+    var count = f.map(function (pe) { return "(" + pe[1] + " + 1)"; }).join(" × ");
+    out.innerHTML = "<p class='mono soft' style='overflow-wrap:anywhere'>" + fmt(n) + " = " + longF + "</p>" +
+      "<p class='big'>" + fmt(n) + " = <b>" + factorStr(n) + "</b></p>" +
+      "<p class='soft'>Nombre de diviseurs : " + count + " = " + countDivisors(n) + ".</p>";
+  }
+  facIn.addEventListener("input", showFac); setMode("tree"); showFac();
+
+  /* ---------- Étape 5 : PGCD ---------- */
+  var gA = $("gA"), gB = $("gB");
+  function frac(a, b) { return "<span class='fr'><span>" + a + "</span><span>" + b + "</span></span>"; }
+  function showGcd() {
+    var a = int(gA.value), b = int(gB.value), out = $("gcdOut"), st = $("gcdSteps");
+    if (isNaN(a) || isNaN(b) || a < 1 || b < 1 || a > 1000000 || b > 1000000) { out.innerHTML = "<p class='err'>Écris deux nombres entiers entre 1 et 1 000 000.</p>"; st.innerHTML = ""; return; }
+    var g = gcd(a, b), fa = factorize(a), fb = factorize(b), common = [];
+    fa.forEach(function (pe) { var e = Math.min(pe[1], exponentOf(b, pe[0])); if (e > 0) common.push(fmt(pe[0]) + sup(e)); });
+    var m1 = "<div class='method'><strong>Avec les facteurs premiers</strong>" +
+      "<span class='m'>" + fmt(a) + " = " + (a > 1 ? factorStr(a) : "1") + "</span><span class='m'>" + fmt(b) + " = " + (b > 1 ? factorStr(b) : "1") + "</span>" +
+      (common.length ? "<span class='m'>En commun : " + common.join(" × ") + " = <b>" + fmt(g) + "</b></span>" : "<span class='m'>Aucun facteur en commun : PGCD = <b>1</b></span>") + "</div>";
+    var m2 = "<div class='method'><strong>Pour la fraction</strong><span class='m'>" + frac(fmt(a), fmt(b)) + " = " + frac(fmt(a) + " ÷ " + fmt(g), fmt(b) + " ÷ " + fmt(g)) + " = " + frac("<b>" + fmt(a / g) + "</b>", "<b>" + fmt(b / g) + "</b>") + "</span>" +
+      "<span class='m'>" + (g === 1 ? "PGCD = 1 : la fraction est déjà irréductible." : "Fraction irréductible.") + "</span></div>";
+    var m3 = "<div class='method'><strong>Paquets et PPCM</strong><span class='m'>" + fmt(a) + " et " + fmt(b) + " objets : au plus <b>" + fmt(g) + "</b> paquet" + (g > 1 ? "s" : "") + " de " + fmt(a / g) + " et " + fmt(b / g) + ".</span>" +
+      "<span class='m'>PPCM = " + fmt(a) + " × " + fmt(b) + " ÷ " + fmt(g) + " = <b>" + fmt(lcm(a, b)) + "</b></span></div>";
+    out.innerHTML = m1 + m2 + m3;
+    var rows = euclidSteps(a, b), lastR = rows.length > 1 ? rows[rows.length - 2].r : rows[0].b;
+    st.innerHTML = "<span class='why'><strong>Algorithme d'Euclide</strong> : on divise le grand par le petit, puis le petit par le reste…</span>" +
+      rows.map(function (r) { return "<div class='line'>" + fmt(r.a) + " = " + fmt(r.b) + " × " + fmt(r.q) + " + " + (r.r === lastR && r.r > 0 ? "<b>" + fmt(r.r) + "</b>" : fmt(r.r)) + "</div>"; }).join("") +
+      "<span class='why'>" + (rows.length === 1 ? "Le reste est 0 tout de suite : " + fmt(rows[0].b) + " divise " + fmt(rows[0].a) + ", donc PGCD = " + fmt(g) + "." : "Le dernier reste non nul est " + fmt(g) + " : c'est le PGCD.") + "</span>";
+  }
+  gA.addEventListener("input", showGcd); gB.addEventListener("input", showGcd); showGcd();
+
+  /* ---------- Étape 6 : Euclide et l'infini ---------- */
+  function showEu(k) {
+    var e = euclidNumber(k), prime = e.factors.length === 1 && e.factors[0][1] === 1;
+    for (var i = 1; i <= 7; i++) $("eu" + i).setAttribute("aria-pressed", i === k ? "true" : "false");
+    var fl = e.factors.map(function (pe) { return fmt(pe[0]); }), newP = fl.length > 1 ? fl.slice(0, -1).join(", ") + " et " + fl[fl.length - 1] : fl.join("");
+    $("euOut").innerHTML = "<span class='why'>Ma liste : " + e.primes.join(", ") + "</span>" +
+      "<div class='line'>" + e.primes.join(" × ") + " + 1 = " + fmt(e.product) + " + 1 = <b>" + fmt(e.n) + "</b></div>" +
+      (prime
+        ? "<span class='why'>" + fmt(e.n) + " est premier, et il n'est pas dans la liste : on a trouvé un nombre premier de plus.</span>"
+        : "<div class='line'>" + fmt(e.n) + " = " + factorStr(e.n) + "</div><span class='why'>Ici " + fmt(e.n) + " n'est pas premier. Ses facteurs premiers (" + newP + ") sont nouveaux : ils ne sont pas dans la liste.</span>") +
+      "<span class='why'>Divisé par " + e.primes.join(", par ") + ", " + fmt(e.n) + " donne toujours un reste de 1.</span>";
+  }
+  for (var u = 1; u <= 7; u++) (function (k) {
+    var b = document.createElement("button"); b.type = "button"; b.id = "eu" + k; b.textContent = k + (k === 1 ? " premier" : " premiers");
+    b.addEventListener("click", function () { showEu(k); });
+    $("euBtns").appendChild(b);
+  })(u);
+  showEu(3);
+
+  /* ---------- Étape 6 : Goldbach ---------- */
+  var gbIn = $("gbIn");
+  function showGb() {
+    var n = int(gbIn.value), out = $("gbOut");
+    if (isNaN(n) || n < 4 || n > 10000) { out.innerHTML = "<p class='err'>Écris un nombre pair entre 4 et 10 000.</p>"; return; }
+    if (n % 2) { out.innerHTML = "<p class='err'>" + fmt(n) + " est impair. La conjecture parle des nombres pairs.</p>"; return; }
+    var g = goldbach(n);
+    out.innerHTML = "<p>" + fmt(n) + " s'écrit de <strong>" + g.length + "</strong> façon" + (g.length > 1 ? "s" : "") + " comme somme de deux nombres premiers :</p>" +
+      "<div class='chips" + (g.length > 30 ? " tall" : "") + "'>" + g.map(function (p) { return "<span class='chip ok'>" + fmt(p[0]) + " + " + fmt(p[1]) + "</span>"; }).join("") + "</div>" +
+      (n > 50 ? "<p class='soft'>Plus le nombre est grand, plus il y a de façons. C'est pour ça que tout le monde pense que la conjecture est vraie.</p>" : "");
+  }
+  gbIn.addEventListener("input", showGb); showGb();
+
+  /* ---------- Quiz ---------- */
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  function rnd(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+  var PRIMES_Q = [11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167, 173, 179, 181, 191, 193, 197, 199];
+  var FAKES_Q = [21, 27, 33, 39, 49, 51, 57, 63, 69, 77, 81, 87, 91, 93, 111, 117, 119, 121, 133, 143, 161, 169, 187, 203, 209, 221];
+  function makeQ(t) {
+    if (t === "prime") {
+      var yes = Math.random() < 0.5, n = yes ? pick(PRIMES_Q) : pick(FAKES_Q), c = primeCheck(n);
+      return { yn: true, q: "Le nombre " + n + " est-il premier ?", a: yes,
+        how: yes ? "On essaie " + c.tried.join(", ") + " (jusqu'à √" + n + " ≈ " + dec(Math.sqrt(n), 1) + ") : aucun ne divise " + n + ". Il est premier." : n + " = " + c.divisor + " × " + (n / c.divisor) + ", donc il n'est pas premier." };
+    }
+    if (t === "div") {
+      var m = pick([12, 18, 20, 24, 28, 30, 32, 36, 40, 42, 45, 48, 50, 60, 64, 72, 80, 84, 90, 96, 100]), d = divisors(m);
+      return { q: "Combien le nombre " + m + " a-t-il de diviseurs ?", a: d.length, how: "Les diviseurs de " + m + " : " + d.join(", ") + "." };
+    }
+    if (t === "pgcd") {
+      var g = rnd(2, 12), x, y;
+      do { x = rnd(1, 9); y = rnd(1, 9); } while (x === y || gcd(x, y) !== 1);
+      var a = g * x, b = g * y;
+      return { q: "Quel est le PGCD de " + a + " et " + b + " ?", a: g, how: euclidSteps(a, b).map(function (r) { return r.a + " = " + r.b + " × " + r.q + " + " + r.r; }).join(" ; ") + ". Le dernier reste non nul est " + g + "." };
+    }
+    if (t === "exp") {
+      var e2, e3, e5, e7, v;
+      do { e2 = rnd(1, 5); e3 = rnd(0, 3); e5 = rnd(0, 2); e7 = rnd(0, 1); v = Math.pow(2, e2) * Math.pow(3, e3) * Math.pow(5, e5) * Math.pow(7, e7); }
+      while (v > 5000 || v < 24 || (e3 > 0) + (e5 > 0) + (e7 > 0) < 1);
+      var opts = [[2, e2], [3, e3], [5, e5], [7, e7]].filter(function (pe) { return pe[1] > 0; }), ch = pick(opts);
+      return { q: "Dans la décomposition de " + fmt(v) + " en facteurs premiers, quel est l'exposant de " + ch[0] + " ?", a: ch[1], how: fmt(v) + " = " + factorStr(v) + "." };
+    }
+    var A = rnd(40, 500), B = rnd(3, 13), r = euclidDiv(A, B);
+    return { q: "Quel est le reste de la division euclidienne de " + A + " par " + B + " ?", a: r.r, how: A + " = " + B + " × " + r.q + " + " + r.r + ", et " + r.r + " est plus petit que " + B + "." };
+  }
+  var quiz = $("quiz"), done = [];
+  function score() { $("score").textContent = done.filter(Boolean).length + " / 8"; }
+  function newQuiz() {
+    quiz.innerHTML = ""; done = [];
+    var types = ["prime", "prime", "div", "pgcd", "exp", "rem", "pgcd", "exp"];
+    for (var s = types.length - 1; s > 0; s--) { var j = Math.floor(Math.random() * (s + 1)), tmp = types[s]; types[s] = types[j]; types[j] = tmp; }
+    for (var k = 0; k < 8; k++) {
+      var Q = makeQ(types[k]), li = document.createElement("li");
+      if (Q.yn) li.innerHTML = "<span>" + Q.q + "</span><div class='yn'><button type='button' id='qy" + k + "' aria-pressed='false'>Oui</button><button type='button' id='qn" + k + "' aria-pressed='false'>Non</button></div><span class='fb' id='qf" + k + "' aria-live='polite'></span>";
+      else li.innerHTML = "<span>" + Q.q + "</span><input type='text' id='qa" + k + "' inputmode='numeric' autocomplete='off' aria-label='Ta réponse à la question " + (k + 1) + "'><button type='button' id='qb" + k + "'>Vérifier</button><span class='fb' id='qf" + k + "' aria-live='polite'></span>";
+      quiz.appendChild(li);
+      (function (k, Q) {
+        function judge(ok) {
+          var fb = $("qf" + k);
+          done[k] = ok;
+          if (ok) { fb.className = "fb ok"; fb.innerHTML = "Bravo, c'est juste !<span>" + Q.how + "</span>"; }
+          else { fb.className = "fb no"; fb.innerHTML = "Pas tout à fait : la réponse est " + (Q.yn ? (Q.a ? "oui" : "non") : fmt(Q.a)) + ".<span>" + Q.how + "</span>"; }
+          score();
+        }
+        if (Q.yn) {
+          ["qy", "qn"].forEach(function (pre) {
+            $(pre + k).addEventListener("click", function () {
+              $("qy" + k).setAttribute("aria-pressed", pre === "qy" ? "true" : "false");
+              $("qn" + k).setAttribute("aria-pressed", pre === "qn" ? "true" : "false");
+              judge((pre === "qy") === Q.a);
+            });
+          });
+        } else {
+          var check = function () {
+            var x = int($("qa" + k).value), fb = $("qf" + k);
+            if (isNaN(x)) { fb.className = "fb"; fb.textContent = "Écris un nombre entier."; return; }
+            judge(x === Q.a);
+          };
+          $("qb" + k).addEventListener("click", check);
+          $("qa" + k).addEventListener("keydown", function (e) { if (e.key === "Enter") check(); });
+        }
+      })(k, Q);
+    }
+    score();
+  }
+  $("newQuiz").addEventListener("click", newQuiz);
+  newQuiz();
+})();
+</script>
+</body>
+</html>

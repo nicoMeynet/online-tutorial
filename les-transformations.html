@@ -1,0 +1,925 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Les transformations</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, encre bleue, marge rouge. La figure de départ est grise, son image est orange, les outils (axe, centre, flèche) sont bleus. */
+:root {
+  --paper: #f7f9fc;
+  --grid: #e3e9f3;
+  --card: #ffffff;
+  --ink: #172036;
+  --ink-soft: #56607a;
+  --acc: #2563eb;
+  --acc-soft: #dce7fd;
+  --img: #c2410c;
+  --img-soft: #fde4d4;
+  --fig-soft: #e4e7ee;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --hl: #fff0a3;
+  --line: #d8dfeb;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0e1320; --grid: #182033; --card: #141b2b; --ink: #e9eef8; --ink-soft: #a7b1c6;
+    --acc: #93c5fd; --acc-soft: #1b2a47; --img: #fb923c; --img-soft: #3d2212; --fig-soft: #262e40;
+    --red: #ff7d92; --red-soft: #3a1c27; --ok: #6fd39f; --ok-soft: #173a29; --hl: #4b4318; --line: #2a3550;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0e1320; --grid: #182033; --card: #141b2b; --ink: #e9eef8; --ink-soft: #a7b1c6;
+  --acc: #93c5fd; --acc-soft: #1b2a47; --img: #fb923c; --img-soft: #3d2212; --fig-soft: #262e40;
+  --red: #ff7d92; --red-soft: #3a1c27; --ok: #6fd39f; --ok-soft: #173a29; --hl: #4b4318; --line: #2a3550;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero-top { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+.hero-top svg { width: 180px; height: auto; flex: none; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 6px 12px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+button:disabled { opacity: .5; cursor: default; transform: none; box-shadow: 3px 3px 0 var(--ink); }
+button.good, button.good:disabled { background: var(--ok-soft); color: var(--ok); border-color: var(--ok); opacity: 1; }
+button.bad, button.bad:disabled { background: var(--red-soft); color: var(--red); border-color: var(--red); opacity: 1; }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+input[type="text"] { font: inherit; font-family: var(--f-mono); font-size: 1.05rem; padding: 8px 10px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; }
+input[type="range"] { width: 100%; accent-color: var(--acc); }
+.param { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.param label { font-weight: 700; }
+.sliders { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 18px; }
+.sliders.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (max-width: 600px) { .sliders, .sliders.three { grid-template-columns: 1fr; } }
+
+/* Le plan quadrillé */
+.plane { width: 100%; max-width: 560px; margin: 0 auto; }
+.plane svg, .wide svg { width: 100%; height: auto; display: block; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; }
+.wide { width: 100%; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: .95rem; color: var(--ink-soft); }
+.legend i { display: inline-block; width: 14px; height: 14px; border-radius: 3px; vertical-align: -2px; margin-right: 6px; border: 2px solid; }
+.legend .f { background: var(--fig-soft); border-color: var(--ink-soft); }
+.legend .g { background: var(--img-soft); border-color: var(--img); }
+.legend .e { background: var(--acc); border-color: var(--acc); }
+
+.steps { font-family: var(--f-mono); font-size: .98rem; display: flex; flex-direction: column; gap: 4px; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; padding: 12px 14px; overflow-wrap: anywhere; }
+.steps b { color: var(--acc); }
+.verdict { border-radius: 8px; padding: 12px 14px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+.verdict.yes { background: var(--ok-soft); color: var(--ok); }
+.verdict.no { background: var(--red-soft); color: var(--red); }
+.verdict.keep { background: var(--acc-soft); color: var(--acc); }
+.verdict.flip { background: var(--img-soft); color: var(--img); }
+.verdict span { font-weight: 400; color: var(--ink); }
+
+.results { display: flex; flex-direction: column; gap: 8px; font-variant-numeric: tabular-nums; }
+.res { border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 12px; display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; align-items: baseline; }
+.res-name { font-family: var(--f-display); font-weight: 700; }
+.res-val { font-family: var(--f-mono); font-weight: 600; color: var(--img); font-size: 1.05rem; white-space: nowrap; }
+.res-calc { grid-column: 1 / -1; font-family: var(--f-mono); font-size: .85rem; color: var(--ink-soft); overflow-wrap: anywhere; }
+
+table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+th, td { padding: 8px 8px; border-bottom: 1px dashed var(--line); text-align: center; font-size: .95rem; }
+th:first-child, td:first-child { text-align: left; }
+thead th { border-bottom: 2px solid var(--ink); font-family: var(--f-display); font-size: 1rem; }
+tbody th { font-family: var(--f-display); }
+td.y { color: var(--ok); font-weight: 700; }
+td.n { color: var(--red); font-weight: 700; font-family: var(--f-mono); }
+.scroll { overflow-x: auto; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
+.tag.ok { color: var(--ok); }
+.tag.no { color: var(--red); }
+
+.gstat { font-family: var(--f-display); font-weight: 800; font-size: 1.1rem; }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc); }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: center; }
+.quiz input[type="text"] { font-size: 1rem; padding: 6px 8px; }
+.quiz .one { width: 110px; }
+.xy { display: flex; gap: 8px; align-items: center; }
+.xy label { display: flex; align-items: center; gap: 4px; font-family: var(--f-mono); font-weight: 600; }
+.xy input[type="text"] { width: 4.4em; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 120px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+@media (prefers-reduced-motion: reduce) { button:hover, button:active { transform: none; } }
+</style>
+
+</head>
+<body>
+<main class="page">
+
+  <header class="hero">
+    <div class="hero-top">
+      <svg viewBox="0 0 200 160" aria-hidden="true">
+        <line x1="100" y1="20" x2="100" y2="150" stroke="var(--acc)" stroke-width="3" stroke-dasharray="7 5"></line>
+        <polygon points="20,130 38,130 38,112 56,112 56,94 38,94 38,76 74,76 74,58 20,58" fill="var(--fig-soft)" stroke="var(--ink-soft)" stroke-width="3" stroke-linejoin="round"></polygon>
+        <polygon points="180,130 162,130 162,112 144,112 144,94 162,94 162,76 126,76 126,58 180,58" fill="var(--img-soft)" stroke="var(--img)" stroke-width="3" stroke-linejoin="round"></polygon>
+      </svg>
+      <div style="display:flex;flex-direction:column;gap:10px;min-width:0;flex:1 1 280px">
+        <span class="eyebrow">Tutoriel de maths · niveau 6<sup>e</sup>–3<sup>e</sup></span>
+        <h1>Les transformations</h1>
+        <p class="lead">Faire glisser une figure, la tourner, la retourner ou l'agrandir. Ces mouvements fabriquent les frises, les pavages et beaucoup de logos.</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · La symétrie axiale (6<sup>e</sup>)</span>
+    <h2>Le miroir</h2>
+    <p>Plie ta feuille le long d'une droite : la figure se dépose de l'autre côté. C'est la <strong>symétrie axiale</strong>. La droite s'appelle l'<strong>axe</strong>. Chaque point A a une <strong>image</strong> A′, à la même distance de l'axe, juste en face.</p>
+    <p>Dans tout le tutoriel, on utilise le même F, en gris. Son image est en orange. Le F n'a aucune symétrie : on voit tout de suite s'il a été <span class="hl">retourné</span>.</p>
+    <div class="box">
+      <div class="btns" role="group" aria-label="Choisir l'axe">
+        <button type="button" id="ax1v" data-a="90">Axe vertical</button>
+        <button type="button" id="ax1h" data-a="0">Axe horizontal</button>
+        <button type="button" id="ax1o" data-a="45">Oblique ↗</button>
+        <button type="button" id="ax1b" data-a="135">Oblique ↖</button>
+      </div>
+      <div class="param">
+        <label for="ax1">Inclinaison de l'axe : <span class="mono" id="ax1Out">90°</span></label>
+        <input id="ax1" type="range" min="0" max="165" step="15" value="90">
+      </div>
+      <div class="plane"><svg id="sv1" viewBox="0 0 640 640" role="img" aria-label="Le F gris, son symétrique orange et l'axe bleu sur un quadrillage"></svg></div>
+      <div class="btns">
+        <button type="button" id="play1">▶ Voir le pliage</button>
+        <span class="legend"><span><i class="f"></i>figure</span><span><i class="g"></i>image</span><span><i class="e"></i>axe</span></span>
+      </div>
+      <div class="results" id="out1" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Construire le symétrique d'un point</span>
+      <span>Trace la perpendiculaire à l'axe qui passe par A. Reporte la distance de A à l'axe de l'autre côté. L'axe coupe [AA′] en son milieu et à angle droit : c'est la <strong>médiatrice</strong> de [AA′].</span>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · La symétrie centrale (5<sup>e</sup>)</span>
+    <h2>Le demi-tour</h2>
+    <p>Plante une punaise en un point O et fais tourner la feuille d'un <strong>demi-tour</strong>. La figure arrive de l'autre côté de O. C'est la <strong>symétrie centrale</strong> de centre O.</p>
+    <p>Le point O est <span class="hl">le milieu</span> de chaque segment [AA′]. Avec les coordonnées : x′ = 2 × x<sub>O</sub> − x et y′ = 2 × y<sub>O</sub> − y.</p>
+    <div class="box">
+      <div class="sliders">
+        <div class="param"><label for="ox2">Abscisse de O : <span class="mono" id="ox2Out">−1</span></label><input id="ox2" type="range" min="-3" max="3" step="1" value="-1"></div>
+        <div class="param"><label for="oy2">Ordonnée de O : <span class="mono" id="oy2Out">0</span></label><input id="oy2" type="range" min="-3" max="3" step="1" value="0"></div>
+      </div>
+      <div class="plane"><svg id="sv2" viewBox="0 0 640 640" role="img" aria-label="Le F gris, son symétrique orange par rapport au point O"></svg></div>
+      <div class="btns">
+        <button type="button" id="play2">▶ Voir le demi-tour</button>
+        <span class="legend"><span><i class="f"></i>figure</span><span><i class="g"></i>image</span><span><i class="e"></i>centre O</span></span>
+      </div>
+      <div class="results" id="out2" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · La translation (4<sup>e</sup>)</span>
+    <h2>Le glissement</h2>
+    <p>Fais glisser la figure sur la table, sans la tourner. Tous les points bougent <strong>de la même façon</strong> : même direction, même sens, même longueur. C'est une <strong>translation</strong>. La flèche qui décrit le glissement s'appelle un <strong>vecteur</strong>.</p>
+    <div class="box">
+      <div class="sliders">
+        <div class="param"><label for="dx3">Vers la droite : <span class="mono" id="dx3Out">4</span></label><input id="dx3" type="range" min="-6" max="6" step="1" value="4"></div>
+        <div class="param"><label for="dy3">Vers le haut : <span class="mono" id="dy3Out">−3</span></label><input id="dy3" type="range" min="-6" max="6" step="1" value="-3"></div>
+      </div>
+      <div class="plane"><svg id="sv3" viewBox="0 0 640 640" role="img" aria-label="Le F gris, son image orange par une translation, et les flèches bleues"></svg></div>
+      <div class="btns">
+        <button type="button" id="play3">▶ Faire glisser</button>
+        <span class="legend"><span><i class="f"></i>figure</span><span><i class="g"></i>image</span><span><i class="e"></i>flèches</span></span>
+      </div>
+      <div class="results" id="out3" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · La rotation (3<sup>e</sup>)</span>
+    <h2>Tourner autour d'un point</h2>
+    <p>Une <strong>rotation</strong> fait tourner la figure autour d'un centre O, d'un certain <strong>angle</strong>. Un angle positif tourne dans le <strong>sens inverse des aiguilles d'une montre</strong>. Un angle négatif tourne dans le sens des aiguilles.</p>
+    <p>Chaque point reste à la même distance de O : il se déplace sur un cercle de centre O.</p>
+    <div class="box">
+      <div class="sliders three">
+        <div class="param"><label for="ox4">Abscisse de O : <span class="mono" id="ox4Out">0</span></label><input id="ox4" type="range" min="-3" max="3" step="1" value="0"></div>
+        <div class="param"><label for="oy4">Ordonnée de O : <span class="mono" id="oy4Out">0</span></label><input id="oy4" type="range" min="-3" max="3" step="1" value="0"></div>
+        <div class="param"><label for="an4">Angle : <span class="mono" id="an4Out">90°</span></label><input id="an4" type="range" min="-180" max="180" step="15" value="90"></div>
+      </div>
+      <div class="plane"><svg id="sv4" viewBox="0 0 640 640" role="img" aria-label="Le F gris, son image orange par une rotation de centre O, avec un arc qui montre l'angle"></svg></div>
+      <div class="btns">
+        <button type="button" id="play4">▶ Faire tourner</button>
+        <span class="legend"><span><i class="f"></i>figure</span><span><i class="g"></i>image</span><span><i class="e"></i>centre et angle</span></span>
+      </div>
+      <div class="results" id="out4" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · L'homothétie (3<sup>e</sup>)</span>
+    <h2>Agrandir ou réduire</h2>
+    <p>Une <strong>homothétie</strong> de centre O et de rapport k agrandit ou réduit la figure, comme un zoom. Le point A′ est sur la droite (OA), et OA′ = |k| × OA.</p>
+    <p>Si k &gt; 1, la figure <strong>grandit</strong>. Si 0 &lt; k &lt; 1, elle <strong>rétrécit</strong>. Si k est <strong>négatif</strong>, l'image passe de l'autre côté de O, tête en bas.</p>
+    <div class="box">
+      <div class="sliders three">
+        <div class="param"><label for="ox5">Abscisse de O : <span class="mono" id="ox5Out">−1</span></label><input id="ox5" type="range" min="-3" max="3" step="1" value="-1"></div>
+        <div class="param"><label for="oy5">Ordonnée de O : <span class="mono" id="oy5Out">0</span></label><input id="oy5" type="range" min="-3" max="3" step="1" value="0"></div>
+        <div class="param"><label for="k5">Rapport k : <span class="mono" id="k5Out">2</span></label><input id="k5" type="range" min="-3" max="3" step="0.5" value="2"></div>
+      </div>
+      <div class="plane"><svg id="sv5" viewBox="0 0 640 640" role="img" aria-label="Le F gris, son image orange par une homothétie de centre O"></svg></div>
+      <div class="btns">
+        <button type="button" id="play5">▶ Voir le zoom</button>
+        <span class="legend"><span><i class="f"></i>figure</span><span><i class="g"></i>image</span><span><i class="e"></i>centre O</span></span>
+      </div>
+      <div class="results" id="out5" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Longueurs × |k|, aires × k²</span>
+      <span>Si k = 2, chaque côté double. Mais un carré de côté 1 devient un carré de côté 2 : son aire passe de 1 à 4. L'aire est multipliée par 2 × 2 = 4, c'est-à-dire k². Dans une homothétie, (AB) et (A′B′) sont parallèles : c'est la figure du théorème de Thalès (voir le tutoriel sur Thalès).</span>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · Ce qui ne change pas</span>
+    <h2>Le tableau des cinq transformations</h2>
+    <p>Chaque transformation bouge la figure. Mais certaines choses restent pareilles. Voici le bilan.</p>
+    <div class="box">
+      <div class="scroll">
+        <table aria-label="Ce que conserve chaque transformation">
+          <thead><tr><th>Transformation</th><th>Longueurs</th><th>Angles</th><th>Aires</th><th>Sens du F</th></tr></thead>
+          <tbody>
+            <tr><th>Symétrie axiale</th><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td><td class="n">retourné</td></tr>
+            <tr><th>Symétrie centrale</th><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td></tr>
+            <tr><th>Translation</th><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td></tr>
+            <tr><th>Rotation</th><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td></tr>
+            <tr><th>Homothétie</th><td class="n">× |k|</td><td class="y">✓</td><td class="n">× k²</td><td class="y">✓</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="cards">
+      <div class="box"><span class="tag ok">Même taille</span><strong>Les isométries</strong><span class="soft">Les symétries, la translation et la rotation gardent les longueurs. « Iso » veut dire « même » et « métrie » veut dire « mesure ». La figure et son image sont superposables.</span></div>
+      <div class="box"><span class="tag ok">Même forme</span><strong>L'homothétie</strong><span class="soft">Elle change la taille, mais garde les angles et la forme. C'est un agrandissement ou une réduction, comme une photo zoomée.</span></div>
+      <div class="box"><span class="tag no">Retourné</span><strong>Le sens</strong><span class="soft">Seule la symétrie axiale retourne le F, comme un miroir. Pour la superposer, il faut retourner la feuille. Les autres se font en glissant ou en tournant.</span></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Ce que les cinq conservent</span>
+      <span>Toutes gardent les <strong>angles</strong>, l'<strong>alignement</strong> (des points alignés restent alignés), le <strong>parallélisme</strong> et les <strong>milieux</strong>.</span>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Frises, rosaces et pavages</span>
+    <h2>Répéter un motif</h2>
+    <p>Prends un motif et répète-le avec une transformation. Avec des rotations autour d'un même centre, tu obtiens une <strong>rosace</strong>. Avec des translations, tu obtiens une <strong>frise</strong>. Si tu remplis tout le plan sans trou ni chevauchement, c'est un <strong>pavage</strong>.</p>
+    <div class="box">
+      <h3>La rosace</h3>
+      <div class="param">
+        <label for="n7">Nombre de motifs : <span class="mono" id="n7Out">6</span></label>
+        <input id="n7" type="range" min="2" max="12" step="1" value="6">
+      </div>
+      <div class="plane"><svg id="sv7" viewBox="0 0 640 640" role="img" aria-label="Rosace : le F répété par rotation autour d'un centre"></svg></div>
+      <p class="mono" id="out7" style="color:var(--acc);font-weight:600" aria-live="polite"></p>
+    </div>
+    <div class="box">
+      <h3>La frise</h3>
+      <div class="btns" role="group" aria-label="Choisir le type de frise">
+        <button type="button" id="fr0">Translation</button>
+        <button type="button" id="fr1">+ miroir</button>
+        <button type="button" id="fr2">+ demi-tour</button>
+      </div>
+      <div class="wide"><svg id="sv7b" viewBox="0 0 640 190" role="img" aria-label="Frise : le F répété par translation"></svg></div>
+      <p class="soft" id="out7b" aria-live="polite"></p>
+    </div>
+    <div class="cards">
+      <div class="box"><strong>L'Alhambra</strong><span class="soft">Ce palais de Grenade, en Espagne, est couvert de mosaïques. Les mêmes motifs se répètent par translations, rotations et symétries, sur des murs entiers.</span></div>
+      <div class="box"><strong>Escher</strong><span class="soft">L'artiste néerlandais M. C. Escher a dessiné des pavages avec des lézards, des poissons et des oiseaux. Chaque animal s'emboîte parfaitement dans ses voisins.</span></div>
+      <div class="box"><strong>Autour de toi</strong><span class="soft">Le carrelage de la salle de bain, le papier peint, les jantes de voiture, les logos : cherche les transformations cachées !</span></div>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Reconnaître la transformation</span>
+    <h2>Quel mouvement a fait le F ?</h2>
+    <p>Le F gris est la figure, le F orange est son image. Quelle transformation passe de l'un à l'autre ? Regarde la taille, puis le sens du F. Cinq manches.</p>
+    <div class="box">
+      <div class="btns"><span class="gstat" id="gStat" aria-live="polite"></span></div>
+      <div class="plane"><svg id="svG" viewBox="0 0 640 640" role="img" aria-label="Une figure et son image : devine la transformation"></svg></div>
+      <div class="btns" id="gChoices" role="group" aria-label="Choisir la transformation">
+        <button type="button" id="gcaxe" data-t="axe">Symétrie axiale</button>
+        <button type="button" id="gccentre" data-t="centre">Symétrie centrale</button>
+        <button type="button" id="gctranslation" data-t="translation">Translation</button>
+        <button type="button" id="gcrotation" data-t="rotation">Rotation</button>
+        <button type="button" id="gchomothetie" data-t="homothetie">Homothétie</button>
+      </div>
+      <div class="verdict" id="gFb" aria-live="polite"><span>Choisis une réponse.</span></div>
+      <div class="btns"><button type="button" id="gNext">Manche suivante</button></div>
+    </div>
+    <div class="note">
+      <span class="note-title">La méthode</span>
+      <span>1. La taille change ? C'est une homothétie. 2. Le F est retourné ? C'est une symétrie axiale. 3. Le F est à l'envers, tête en bas ? Demi-tour : symétrie centrale. 4. Il est couché sur le côté ? Rotation. 5. Il a le même sens ? Translation.</span>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Calcule les coordonnées de l'image, ou le nombre demandé. Écris les nombres négatifs avec un signe moins, et les décimaux avec une virgule.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Nouvelles questions</button>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · Un peu d'histoire</span>
+    <h2>Des motifs aux mathématiques</h2>
+    <ol class="timeline">
+      <li><span class="when">Antiquité</span><div class="what"><strong>Les frises</strong><span>Les poteries grecques, les temples égyptiens et les tapis anciens sont décorés de frises et de motifs symétriques. Les artisans utilisaient les transformations bien avant qu'on leur donne un nom.</span></div></li>
+      <li><span class="when">XIV<sup>e</sup> siècle</span><div class="what"><strong>L'Alhambra, à Grenade</strong><span>Les artisans de ce palais couvrent les murs de pavages très riches. On dit parfois que presque tous les types de pavages possibles y figurent. Les spécialistes en discutent encore.</span></div></li>
+      <li><span class="when">1872</span><div class="what"><strong>Felix Klein</strong><span>Ce mathématicien allemand a une idée simple et forte : une géométrie se décrit par ses transformations et par ce qu'elles ne changent pas. C'est exactement le tableau de l'étape 6.</span></div></li>
+      <li><span class="when">XX<sup>e</sup> siècle</span><div class="what"><strong>M. C. Escher</strong><span>Cet artiste néerlandais visite l'Alhambra, vers 1922 puis en 1936 d'après ses biographes. Il en tire des pavages d'animaux qui s'emboîtent, devenus très célèbres.</span></div></li>
+    </ol>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · À toi de jouer</span>
+    <h2>Six exercices</h2>
+    <div class="exos">
+      <details>
+        <summary>Le miroir vertical<span class="q">Quelle est l'image de A(3 ; 2) par la symétrie d'axe l'axe des ordonnées ?</span></summary>
+        <div><span>L'axe est vertical : x change de signe et y ne bouge pas. A′ = <strong>(−3 ; 2)</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Le demi-tour<span class="q">O(1 ; 1) et M(4 ; 3). Quelle est l'image de M par la symétrie de centre O ?</span></summary>
+        <div><span>O est le milieu de [MM′]. x′ = 2 × 1 − 4 = −2 et y′ = 2 × 1 − 3 = −1. M′ = <strong>(−2 ; −1)</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Le glissement<span class="q">Une translation envoie A(1 ; 2) sur B(4 ; 0). Quelle est l'image de C(−2 ; 5) ?</span></summary>
+        <div><span>De A à B : +3 en x et −2 en y. On fait pareil pour C : (−2 + 3 ; 5 − 2) = <strong>(1 ; 3)</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Le quart de tour<span class="q">Quelle est l'image de P(3 ; 1) par la rotation de centre l'origine, d'angle 90° dans le sens inverse des aiguilles d'une montre ?</span></summary>
+        <div><span>Pour ce quart de tour, (x ; y) devient (−y ; x). Donc P′ = <strong>(−1 ; 3)</strong>. Dessine-le : P était à droite, P′ est en haut.</span></div>
+      </details>
+      <details>
+        <summary>Le zoom<span class="q">Un triangle a un périmètre de 12 cm et une aire de 6 cm². On applique une homothétie de rapport −2. Que deviennent le périmètre et l'aire ?</span></summary>
+        <div><span>Les longueurs sont multipliées par |−2| = 2 : périmètre <strong>24 cm</strong>. L'aire est multipliée par (−2)² = 4 : aire <strong>24 cm²</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Les lettres b, d, p, q<span class="q">Quelle transformation change b en d ? b en p ? b en q ?</span></summary>
+        <div><span>b → d : symétrie d'axe vertical (miroir). b → p : symétrie d'axe horizontal. b → q : demi-tour, donc <strong>symétrie centrale</strong>. Essaie avec ta feuille !</span></div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• <strong>Symétrie axiale</strong> : un miroir. L'axe est la médiatrice de [AA′]. Elle retourne la figure.</span>
+      <span>• <strong>Symétrie centrale</strong> : un demi-tour autour de O. O est le milieu de [AA′].</span>
+      <span>• <strong>Translation</strong> : un glissement. Tous les points suivent la même flèche (le vecteur).</span>
+      <span>• <strong>Rotation</strong> : on tourne autour de O d'un angle donné. OA′ = OA.</span>
+      <span>• <strong>Homothétie</strong> de rapport k : OA′ = |k| × OA. Les longueurs sont multipliées par |k|, les aires par k².</span>
+      <span>• Toutes gardent les angles. Les quatre premières gardent aussi les longueurs et les aires.</span>
+    </div>
+  </section>
+
+  <footer>Fiche de révision · Les transformations</footer>
+</main>
+
+<script>
+(function () {
+  var NS = "http://www.w3.org/2000/svg";
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function $(id) { return document.getElementById(id); }
+  function cl(x) { var r = Math.round(x * 1e9) / 1e9; return r === 0 ? 0 : r; }
+  function fmt(x, d) { var r = Math.round(x * 1e6) / 1e6; if (Object.is(r, -0)) r = 0; return r.toLocaleString("fr-FR", { maximumFractionDigits: d == null ? 2 : d }).replace("-", "−"); }
+  function num(s) { var t = String(s).replace(/\s/g, "").replace(/[−–]/g, "-").replace(",", "."); if (t === "") return NaN; var x = Number(t); return isFinite(x) ? x : NaN; }
+  function mk(svg, name, attrs, text) { var e = document.createElementNS(NS, name); for (var a in attrs) e.setAttribute(a, attrs[a]); if (text != null) e.textContent = text; svg.appendChild(e); return e; }
+  function near(x) { return Math.abs(x - Math.round(x)) < 1e-6; }
+  function par(x) { return x < 0 ? "(" + fmt(x) + ")" : fmt(x); }
+  function nm(name, p) { var ex = near(p[0] * 10) && near(p[1] * 10); return name + (ex ? "" : " ≈ ") + "(" + fmt(p[0], 1) + " ; " + fmt(p[1], 1) + ")"; }
+  function dist(a, b) { return Math.hypot(b[0] - a[0], b[1] - a[1]); }
+  function mid(a, b) { return [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2]; }
+  function rnd(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+
+  /* ---------- Fonctions pures : image d'un point ---------- */
+  function symAxe(p, q, deg) {
+    var a = deg * Math.PI / 180, ux = Math.cos(a), uy = Math.sin(a);
+    var d = (p[0] - q[0]) * ux + (p[1] - q[1]) * uy;
+    return [cl(2 * (q[0] + d * ux) - p[0]), cl(2 * (q[1] + d * uy) - p[1])];
+  }
+  function symCentre(p, o) { return [cl(2 * o[0] - p[0]), cl(2 * o[1] - p[1])]; }
+  function translation(p, v) { return [cl(p[0] + v[0]), cl(p[1] + v[1])]; }
+  function rotation(p, o, deg) {
+    var a = deg * Math.PI / 180, c = Math.cos(a), s = Math.sin(a), dx = p[0] - o[0], dy = p[1] - o[1];
+    return [cl(o[0] + dx * c - dy * s), cl(o[1] + dx * s + dy * c)];
+  }
+  function homothetie(p, o, k) { return [cl(o[0] + k * (p[0] - o[0])), cl(o[1] + k * (p[1] - o[1]))]; }
+  function aire(P) { var s = 0; for (var i = 0; i < P.length; i++) { var a = P[i], b = P[(i + 1) % P.length]; s += a[0] * b[1] - b[0] * a[1]; } return cl(s / 2); }
+  function retourne(P, Q) { return aire(P) * aire(Q) < 0; }
+  function lerpP(P, Q, t) { return P.map(function (p, i) { return [p[0] + (Q[i][0] - p[0]) * t, p[1] + (Q[i][1] - p[1]) * t]; }); }
+  function centroid(P) { var x = 0, y = 0; P.forEach(function (p) { x += p[0]; y += p[1]; }); return [x / P.length, y / P.length]; }
+
+  var FIG = [[1, 1], [2, 1], [2, 2], [3, 2], [3, 3], [2, 3], [2, 4], [4, 4], [4, 5], [1, 5]];
+  var KEYS = [{ n: "A", i: 8 }, { n: "B", i: 0 }, { n: "C", i: 3 }];
+  window.__transfo = { symAxe: symAxe, symCentre: symCentre, translation: translation, rotation: rotation, homothetie: homothetie, aire: aire, retourne: retourne, FIG: FIG };
+
+  /* ---------- Dessin du plan ---------- */
+  function view(svg, pts, minR) {
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    var m = minR || 8;
+    pts.forEach(function (p) { m = Math.max(m, Math.ceil(Math.abs(p[0]) + 0.6), Math.ceil(Math.abs(p[1]) + 0.6)); });
+    if (m % 2) m++;
+    var R = Math.min(m, 20), W = 640, M = 24, u = (W - 2 * M) / (2 * R), c = W / 2;
+    var v = { svg: svg, u: u, R: R, X: function (x) { return c + x * u; }, Y: function (y) { return c - y * u; } };
+    for (var i = -R; i <= R; i++) {
+      mk(svg, "line", { x1: v.X(i), y1: M, x2: v.X(i), y2: W - M, stroke: "var(--line)", "stroke-width": 1 });
+      mk(svg, "line", { x1: M, y1: v.Y(i), x2: W - M, y2: v.Y(i), stroke: "var(--line)", "stroke-width": 1 });
+    }
+    mk(svg, "line", { x1: M, y1: c, x2: W - M, y2: c, stroke: "var(--ink-soft)", "stroke-width": 1.8 });
+    mk(svg, "line", { x1: c, y1: M, x2: c, y2: W - M, stroke: "var(--ink-soft)", "stroke-width": 1.8 });
+    var step = R <= 8 ? 2 : R <= 16 ? 4 : 5, st = "fill:var(--ink-soft)";
+    for (i = -R + 1; i < R; i++) {
+      if (i === 0 || i % step !== 0) continue;
+      mk(svg, "text", { x: v.X(i), y: c + 20, "text-anchor": "middle", "font-size": 16, style: st }, fmt(i));
+      mk(svg, "text", { x: c - 6, y: v.Y(i) + 6, "text-anchor": "end", "font-size": 16, style: st }, fmt(i));
+    }
+    mk(svg, "text", { x: c - 6, y: c + 20, "text-anchor": "end", "font-size": 16, style: st }, "0");
+    return v;
+  }
+  function S(v, p) { return [v.X(p[0]), v.Y(p[1])]; }
+  function poly(v, P, kind) {
+    var a = { points: P.map(function (p) { return v.X(p[0]) + "," + v.Y(p[1]); }).join(" "), "stroke-width": 3, "stroke-linejoin": "round" };
+    if (kind === "fig") { a.fill = "var(--fig-soft)"; a.stroke = "var(--ink-soft)"; }
+    else if (kind === "img") { a.fill = "var(--img-soft)"; a.stroke = "var(--img)"; a["fill-opacity"] = 0.85; }
+    else { a.fill = "none"; a.stroke = "var(--img)"; a["stroke-dasharray"] = "8 5"; }
+    return mk(v.svg, "polygon", a);
+  }
+  function seg(v, a, b, color, dash, w) {
+    var A = S(v, a), B = S(v, b), at = { x1: A[0], y1: A[1], x2: B[0], y2: B[1], stroke: color, "stroke-width": w || 2 };
+    if (dash) at["stroke-dasharray"] = dash;
+    mk(v.svg, "line", at);
+  }
+  function dot(v, p, color, r) { var s = S(v, p); mk(v.svg, "circle", { cx: s[0], cy: s[1], r: r || 5, fill: color, stroke: "var(--paper)", "stroke-width": 1.5 }); }
+  function lab(v, p, txt, color, away, off) {
+    var s = S(v, p), f = S(v, away), dx = s[0] - f[0], dy = s[1] - f[1], L = Math.hypot(dx, dy);
+    if (L < 1) { dx = -1; dy = -1; L = Math.SQRT2; }
+    var o = off || 20;
+    mk(v.svg, "text", { x: s[0] + dx / L * o, y: s[1] + dy / L * o + 6, "text-anchor": "middle", "font-size": 18, style: "font-weight:700;fill:" + color + ";paint-order:stroke;stroke:var(--paper);stroke-width:5px;stroke-linejoin:round" }, txt);
+  }
+  function head(svg, A, B, color, h) {
+    var dx = B[0] - A[0], dy = B[1] - A[1], L = Math.hypot(dx, dy) || 1, ux = dx / L, uy = dy / L, bx = B[0] - ux * h, by = B[1] - uy * h;
+    mk(svg, "polygon", { points: B[0] + "," + B[1] + " " + (bx - uy * h / 2) + "," + (by + ux * h / 2) + " " + (bx + uy * h / 2) + "," + (by - ux * h / 2), fill: color });
+  }
+  function arrow(v, a, b, color, w) {
+    var A = S(v, a), B = S(v, b), L = Math.hypot(B[0] - A[0], B[1] - A[1]); if (L < 4) return;
+    var h = Math.min(15, L * 0.5), ux = (B[0] - A[0]) / L, uy = (B[1] - A[1]) / L;
+    mk(v.svg, "line", { x1: A[0], y1: A[1], x2: B[0] - ux * h, y2: B[1] - uy * h, stroke: color, "stroke-width": w || 3 });
+    head(v.svg, A, B, color, h);
+  }
+  function fullLine(v, q, deg, color) {
+    var a = deg * Math.PI / 180, ux = Math.cos(a), uy = Math.sin(a);
+    seg(v, [q[0] - 60 * ux, q[1] - 60 * uy], [q[0] + 60 * ux, q[1] + 60 * uy], color, null, 3);
+  }
+  function tick(v, a, b) {
+    var A = S(v, a), B = S(v, b), dx = B[0] - A[0], dy = B[1] - A[1], L = Math.hypot(dx, dy); if (L < 16) return;
+    dx /= L; dy /= L; var mx = (A[0] + B[0]) / 2, my = (A[1] + B[1]) / 2;
+    mk(v.svg, "line", { x1: mx - dy * 7, y1: my + dx * 7, x2: mx + dy * 7, y2: my - dx * 7, stroke: "var(--acc)", "stroke-width": 2.5 });
+  }
+  function rightAngle(v, F, P, deg) {
+    var f = S(v, F), p = S(v, P), nx = p[0] - f[0], ny = p[1] - f[1], L = Math.hypot(nx, ny); if (L < 16) return;
+    nx /= L; ny /= L; var a = deg * Math.PI / 180, ux = Math.cos(a), uy = -Math.sin(a), s = 13;
+    mk(v.svg, "path", { d: "M" + (f[0] + ux * s) + " " + (f[1] + uy * s) + " L" + (f[0] + ux * s + nx * s) + " " + (f[1] + uy * s + ny * s) + " L" + (f[0] + nx * s) + " " + (f[1] + ny * s), fill: "none", stroke: "var(--acc)", "stroke-width": 2 });
+  }
+  function arcRot(v, O, P, ang) {
+    if (Math.abs(ang) < 1e-9 || dist(O, P) < 1e-9) return;
+    var pts = [], N = 48;
+    for (var i = 0; i <= N; i++) pts.push(S(v, rotation(P, O, ang * i / N)));
+    mk(v.svg, "polyline", { points: pts.map(function (p) { return p[0] + "," + p[1]; }).join(" "), fill: "none", stroke: "var(--acc)", "stroke-width": 2.5 });
+    head(v.svg, pts[N - 3], pts[N], "var(--acc)", 14);
+    var m = S(v, rotation(P, O, ang / 2)), o = S(v, O), dx = m[0] - o[0], dy = m[1] - o[1], L = Math.hypot(dx, dy) || 1;
+    mk(v.svg, "text", { x: m[0] + dx / L * 26, y: m[1] + dy / L * 26 + 6, "text-anchor": "middle", "font-size": 18, style: "font-weight:700;fill:var(--acc);paint-order:stroke;stroke:var(--paper);stroke-width:5px" }, fmt(ang) + "°");
+  }
+  function keys(v, P, Q) {
+    var cP = centroid(P), cQ = Q ? centroid(Q) : null;
+    KEYS.forEach(function (k) {
+      dot(v, P[k.i], "var(--ink-soft)");
+      lab(v, P[k.i], k.n, "var(--ink)", cP);
+      if (Q) { dot(v, Q[k.i], "var(--img)"); lab(v, Q[k.i], k.n + "′", "var(--img)", cQ); }
+    });
+  }
+  function centreO(v, O, cP) { dot(v, O, "var(--acc)", 6); lab(v, O, "O", "var(--acc)", cP, 22); }
+  function res(name, val, calc) { return "<div class='res'><span class='res-name'>" + name + "</span><span class='res-val'>" + val + "</span>" + (calc ? "<span class='res-calc'>" + calc + "</span>" : "") + "</div>"; }
+
+  /* ---------- Animation (respecte prefers-reduced-motion) ---------- */
+  var anim = {};
+  function play(key, render, ms) {
+    anim[key] = (anim[key] || 0) + 1;
+    if (reduce) { render(null); return; }
+    var id = anim[key], t0 = null;
+    function step(ts) {
+      if (anim[key] !== id) return;
+      if (t0 === null) t0 = ts;
+      var t = Math.min(1, (ts - t0) / ms), e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+      if (t < 1) { render(e); requestAnimationFrame(step); } else render(null);
+    }
+    requestAnimationFrame(step);
+  }
+  function live(key, inputs, render) {
+    inputs.forEach(function (el) { el.addEventListener("input", function () { anim[key] = (anim[key] || 0) + 1; render(null); }); });
+  }
+
+  /* ---------- 1. Symétrie axiale ---------- */
+  var ax1 = $("ax1"), ax1Btns = ["ax1v", "ax1h", "ax1o", "ax1b"];
+  function r1(t) {
+    var th = +ax1.value, O = [0, 0], img = FIG.map(function (p) { return symAxe(p, O, th); });
+    $("ax1Out").textContent = th + "°";
+    ax1Btns.forEach(function (id) { $(id).setAttribute("aria-pressed", +$(id).getAttribute("data-a") === th ? "true" : "false"); });
+    var v = view($("sv1"), FIG.concat(img));
+    poly(v, FIG, "fig");
+    if (t == null) {
+      poly(v, img, "img");
+      KEYS.forEach(function (k, j) {
+        var P = FIG[k.i], Q = img[k.i], F = mid(P, Q);
+        if (dist(P, Q) < 0.01) return;
+        seg(v, P, Q, "var(--acc)", "6 5", 2); tick(v, P, F); tick(v, F, Q);
+        if (j === 0) rightAngle(v, F, P, th);
+      });
+    } else poly(v, lerpP(FIG, img, t), "ghost");
+    fullLine(v, O, th, "var(--acc)");
+    keys(v, FIG, t == null ? img : null);
+    if (t != null) return;
+    var how = th === 90 ? "Axe vertical : x change de signe, y ne bouge pas." : th === 0 ? "Axe horizontal : y change de signe, x ne bouge pas." : th === 45 ? "Axe y = x : x et y s'échangent." : th === 135 ? "Axe y = −x : x et y s'échangent et changent de signe." : "";
+    $("out1").innerHTML = KEYS.map(function (k, j) { return res(nm(k.n, FIG[k.i]), nm(k.n + "′", img[k.i]), j === 0 ? how : ""); }).join("") +
+      "<div class='verdict flip'>Le F est retourné.<span>Comme dans un miroir, il se lit à l'envers. Pour poser le F gris sur le F orange, il faudrait retourner la feuille.</span></div>";
+  }
+  ax1Btns.forEach(function (id) { $(id).addEventListener("click", function () { ax1.value = $(id).getAttribute("data-a"); anim.s1 = (anim.s1 || 0) + 1; r1(null); }); });
+  live("s1", [ax1], r1);
+  $("play1").addEventListener("click", function () { play("s1", r1, 1400); });
+  r1(null);
+
+  /* ---------- 2. Symétrie centrale ---------- */
+  var ox2 = $("ox2"), oy2 = $("oy2");
+  function r2(t) {
+    var O = [+ox2.value, +oy2.value], img = FIG.map(function (p) { return symCentre(p, O); });
+    $("ox2Out").textContent = fmt(O[0]); $("oy2Out").textContent = fmt(O[1]);
+    var v = view($("sv2"), FIG.concat(img, [O]));
+    poly(v, FIG, "fig");
+    if (t == null) {
+      poly(v, img, "img");
+      KEYS.forEach(function (k, j) { seg(v, FIG[k.i], img[k.i], "var(--acc)", "6 5", 2); if (j === 0) { tick(v, FIG[k.i], O); tick(v, O, img[k.i]); } });
+    } else poly(v, FIG.map(function (p) { return rotation(p, O, 180 * t); }), "ghost");
+    keys(v, FIG, t == null ? img : null);
+    centreO(v, O, centroid(FIG));
+    if (t != null) return;
+    var A = FIG[8], A2 = img[8];
+    $("out2").innerHTML = KEYS.map(function (k, j) {
+      return res(nm(k.n, FIG[k.i]), nm(k.n + "′", img[k.i]), j === 0 ? "x′ = 2 × " + par(O[0]) + " − " + par(A[0]) + " = " + fmt(A2[0]) + " ; y′ = 2 × " + par(O[1]) + " − " + par(A[1]) + " = " + fmt(A2[1]) : "");
+    }).join("") +
+      "<div class='verdict keep'>Le F a fait un demi-tour.<span>Il est tête en bas, mais pas retourné : tourne ta feuille d'un demi-tour et tu le lis à l'endroit. O est le milieu de [AA′], de [BB′] et de [CC′].</span></div>";
+  }
+  live("s2", [ox2, oy2], r2);
+  $("play2").addEventListener("click", function () { play("s2", r2, 1600); });
+  r2(null);
+
+  /* ---------- 3. Translation ---------- */
+  var dx3 = $("dx3"), dy3 = $("dy3");
+  function dirText(dx, dy) {
+    var p = [];
+    if (dx) p.push(Math.abs(dx) + (Math.abs(dx) > 1 ? " carreaux" : " carreau") + (dx > 0 ? " vers la droite" : " vers la gauche"));
+    if (dy) p.push(Math.abs(dy) + (Math.abs(dy) > 1 ? " carreaux" : " carreau") + (dy > 0 ? " vers le haut" : " vers le bas"));
+    return p.length ? p.join(" et ") : "sans bouger";
+  }
+  function r3(t) {
+    var V = [+dx3.value, +dy3.value], img = FIG.map(function (p) { return translation(p, V); });
+    $("dx3Out").textContent = fmt(V[0]); $("dy3Out").textContent = fmt(V[1]);
+    var v = view($("sv3"), FIG.concat(img));
+    poly(v, FIG, "fig");
+    if (t == null) poly(v, img, "img"); else poly(v, lerpP(FIG, img, t), "ghost");
+    if (t == null) KEYS.forEach(function (k) { arrow(v, FIG[k.i], img[k.i], "var(--acc)", 3); });
+    keys(v, FIG, t == null ? img : null);
+    if (t != null) return;
+    var A = FIG[8];
+    $("out3").innerHTML = KEYS.map(function (k, j) {
+      return res(nm(k.n, FIG[k.i]), nm(k.n + "′", img[k.i]), j === 0 ? "x′ = " + fmt(A[0]) + " + " + par(V[0]) + " = " + fmt(A[0] + V[0]) + " ; y′ = " + fmt(A[1]) + " + " + par(V[1]) + " = " + fmt(A[1] + V[1]) : "");
+    }).join("") +
+      "<div class='verdict keep'>Le F a glissé " + dirText(V[0], V[1]) + ".<span>Il garde son sens et sa taille. Les trois flèches AA′, BB′ et CC′ sont pareilles : même direction, même sens, même longueur.</span></div>";
+  }
+  live("s3", [dx3, dy3], r3);
+  $("play3").addEventListener("click", function () { play("s3", r3, 1300); });
+  r3(null);
+
+  /* ---------- 4. Rotation ---------- */
+  var ox4 = $("ox4"), oy4 = $("oy4"), an4 = $("an4");
+  function r4(t) {
+    var O = [+ox4.value, +oy4.value], ang = +an4.value, img = FIG.map(function (p) { return rotation(p, O, ang); });
+    $("ox4Out").textContent = fmt(O[0]); $("oy4Out").textContent = fmt(O[1]); $("an4Out").textContent = fmt(ang) + "°";
+    var v = view($("sv4"), FIG.concat(img, [O]));
+    poly(v, FIG, "fig");
+    var A = FIG[8], A2 = img[8];
+    if (t == null) {
+      poly(v, img, "img");
+      seg(v, O, A, "var(--acc)", "6 5", 2); seg(v, O, A2, "var(--acc)", "6 5", 2);
+      arcRot(v, O, A, ang);
+    } else poly(v, FIG.map(function (p) { return rotation(p, O, ang * t); }), "ghost");
+    keys(v, FIG, t == null ? img : null);
+    centreO(v, O, centroid(FIG));
+    if (t != null) return;
+    var sens = ang > 0 ? "dans le sens inverse des aiguilles d'une montre" : ang < 0 ? "dans le sens des aiguilles d'une montre" : "pas du tout";
+    var extra = Math.abs(ang) === 180 ? " Une rotation de 180°, c'est un demi-tour : la symétrie centrale de l'étape 2 !" : ang === 0 ? " Avec un angle de 0°, rien ne bouge." : "";
+    $("out4").innerHTML = KEYS.map(function (k, j) {
+      return res(nm(k.n, FIG[k.i]), nm(k.n + "′", img[k.i]), j === 0 ? "OA = OA′ ≈ " + fmt(dist(O, A)) + " carreaux : A tourne sur un cercle de centre O" : "");
+    }).join("") +
+      "<div class='verdict keep'>Le F a tourné de " + fmt(Math.abs(ang)) + "° " + sens + ".<span>Il n'est pas retourné et sa taille ne change pas." + extra + "</span></div>";
+  }
+  live("s4", [ox4, oy4, an4], r4);
+  $("play4").addEventListener("click", function () { play("s4", r4, 1600); });
+  r4(null);
+
+  /* ---------- 5. Homothétie ---------- */
+  var ox5 = $("ox5"), oy5 = $("oy5"), k5 = $("k5"), prevK = 2;
+  k5.addEventListener("input", function () {
+    var k = +k5.value;
+    if (k === 0) { k = prevK > 0 ? -0.5 : 0.5; k5.value = k; }
+    prevK = k;
+  });
+  function r5(t) {
+    var O = [+ox5.value, +oy5.value], k = +k5.value;
+    if (k === 0) k = 0.5;
+    var img = FIG.map(function (p) { return homothetie(p, O, k); });
+    $("ox5Out").textContent = fmt(O[0]); $("oy5Out").textContent = fmt(O[1]); $("k5Out").textContent = fmt(k);
+    var v = view($("sv5"), FIG.concat(img, [O]));
+    if (t == null) KEYS.forEach(function (k2) { seg(v, O, FIG[k2.i], "var(--acc)", "6 5", 1.6); seg(v, O, img[k2.i], "var(--acc)", "6 5", 1.6); });
+    poly(v, FIG, "fig");
+    if (t == null) poly(v, img, "img"); else poly(v, lerpP(FIG, img, t), "ghost");
+    keys(v, FIG, t == null ? img : null);
+    centreO(v, O, centroid(FIG));
+    if (t != null) return;
+    var ak = Math.abs(k), a0 = Math.abs(aire(FIG)), A = FIG[8], dA = dist(O, A);
+    var kind = k === 1 ? "Rien ne bouge (k = 1)." : k === -1 ? "Même taille, de l'autre côté de O : c'est la symétrie centrale !" :
+      (k < 0 ? "De l'autre côté de O, tête en bas, et " : "") + (ak > 1 ? (k < 0 ? "agrandi" : "Agrandissement") : (k < 0 ? "réduit" : "Réduction")) + " (|k| = " + fmt(ak) + (ak > 1 ? " > 1)." : " < 1).");
+    $("out5").innerHTML = res(nm("A", A), nm("A′", img[8]), "OA ≈ " + fmt(dA) + " et OA′ = |k| × OA ≈ " + fmt(ak) + " × " + fmt(dA) + " ≈ " + fmt(ak * dA)) +
+      "<div class='steps'><span>Longueurs : × |k| = × <b>" + fmt(ak) + "</b> (le pied du F mesure 4, son image " + fmt(4 * ak) + ")</span>" +
+      "<span>Aire : × k² = × " + par(k) + "² = × <b>" + fmt(k * k) + "</b></span>" +
+      "<span>Le F gris couvre " + fmt(a0) + " carreaux, son image " + fmt(a0 * k * k) + " carreaux.</span></div>" +
+      "<div class='verdict keep'>" + kind + "<span>Les angles ne changent pas : l'image a la même forme que le F.</span></div>";
+  }
+  live("s5", [ox5, oy5, k5], r5);
+  $("play5").addEventListener("click", function () { play("s5", r5, 1400); });
+  r5(null);
+
+  /* ---------- 7. Rosace ---------- */
+  var n7 = $("n7");
+  var MOTIF = FIG.map(function (p) { return [(p[0] - 1.5) * 0.8, (p[1] - 1) * 0.8 + 1.4]; });
+  function r7() {
+    var n = +n7.value, svg = $("sv7"), u = 56, c = 320;
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    var v = { svg: svg, X: function (x) { return c + x * u; }, Y: function (y) { return c - y * u; } };
+    mk(svg, "circle", { cx: c, cy: c, r: 5.1 * u, fill: "none", stroke: "var(--line)", "stroke-width": 2, "stroke-dasharray": "6 6" });
+    for (var i = n - 1; i >= 0; i--) {
+      var a = i * 360 / n, P = MOTIF.map(function (p) { return rotation(p, [0, 0], a); });
+      if (i > 0) seg(v, [0, 0], rotation([0.4, 1.4], [0, 0], a), "var(--line)", null, 1.5);
+      poly(v, P, i === 0 ? "fig" : "img");
+    }
+    dot(v, [0, 0], "var(--acc)", 6);
+    if (n > 1) arcRot(v, [0, 0], [0, 0.9], 360 / n);
+    $("n7Out").textContent = n;
+    $("out7").textContent = "Angle entre deux motifs : 360° ÷ " + n + " " + (near(360 / n) ? "= " : "≈ ") + fmt(360 / n, 1) + "°";
+  }
+  n7.addEventListener("input", r7); r7();
+
+  /* ---------- 7. Frise ---------- */
+  var frMode = 0, FC = [2.5, 3];
+  var FRT = ["Chaque F est l'image du précédent par la même translation. La flèche bleue montre le motif qui se répète.",
+    "Un F sur deux est retourné par une symétrie d'axe vertical. Le bloc « F + son reflet » se répète par translation.",
+    "Un F sur deux a fait un demi-tour (symétrie centrale). Le bloc de deux F se répète par translation."];
+  function r7b() {
+    var svg = $("sv7b"), u = 29, stepX = 3.6;
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    var v = { svg: svg, X: function (x) { return 20 + (x - 1) * u; }, Y: function (y) { return 165 - (y - 1) * u; } };
+    for (var i = 0; i < 6; i++) {
+      var P = FIG;
+      if (i % 2 === 1 && frMode === 1) P = FIG.map(function (p) { return symAxe(p, FC, 90); });
+      if (i % 2 === 1 && frMode === 2) P = FIG.map(function (p) { return symCentre(p, FC); });
+      P = P.map(function (p) { return translation(p, [i * stepX, 0]); });
+      poly(v, P, i === 0 ? "fig" : "img");
+    }
+    var per = frMode === 0 ? stepX : 2 * stepX;
+    arrow(v, [1, 5.9], [1 + per, 5.9], "var(--acc)", 3);
+    ["fr0", "fr1", "fr2"].forEach(function (id, j) { $(id).setAttribute("aria-pressed", j === frMode ? "true" : "false"); });
+    $("out7b").textContent = FRT[frMode];
+  }
+  ["fr0", "fr1", "fr2"].forEach(function (id, j) { $(id).addEventListener("click", function () { frMode = j; r7b(); }); });
+  r7b();
+
+  /* ---------- 8. Le jeu ---------- */
+  var GT = ["axe", "centre", "translation", "rotation", "homothetie"];
+  var g = { round: 0, score: 0, order: [], cur: null, done: false };
+  function gMake(type) {
+    var off = [rnd(-4, 0), rnd(-4, 0)], base = FIG.map(function (p) { return [p[0] + off[0], p[1] + off[1]]; }), c = { type: type, base: base };
+    if (type === "axe") { c.th = pick([0, 90, 45, 135]); c.q = [rnd(-1, 1), rnd(-1, 1)]; c.f = function (p) { return symAxe(p, c.q, c.th); }; }
+    else if (type === "centre") { c.O = [rnd(-1, 1), rnd(-1, 1)]; c.f = function (p) { return symCentre(p, c.O); }; }
+    else if (type === "translation") { do { c.V = [rnd(-6, 6), rnd(-6, 6)]; } while (Math.abs(c.V[0]) + Math.abs(c.V[1]) < 5); c.f = function (p) { return translation(p, c.V); }; }
+    else if (type === "rotation") { c.ang = pick([90, -90]); c.O = [rnd(-2, 2), rnd(-2, 2)]; c.f = function (p) { return rotation(p, c.O, c.ang); }; }
+    else { c.k = pick([2, 0.5, -2, -0.5]); c.O = [rnd(-2, 2), rnd(-2, 2)]; c.f = function (p) { return homothetie(p, c.O, c.k); }; }
+    c.img = base.map(c.f);
+    return c;
+  }
+  function gDraw(show) {
+    var c = g.cur, extra = c.O ? [c.O] : [], v = view($("svG"), c.base.concat(c.img, extra));
+    if (show && c.type === "homothetie") { seg(v, c.O, c.base[8], "var(--acc)", "6 5", 1.6); seg(v, c.O, c.img[8], "var(--acc)", "6 5", 1.6); }
+    poly(v, c.base, "fig"); poly(v, c.img, "img");
+    if (show) {
+      if (c.type === "axe") fullLine(v, c.q, c.th, "var(--acc)");
+      if (c.type === "centre") seg(v, c.base[8], c.img[8], "var(--acc)", "6 5", 2);
+      if (c.type === "translation") [8, 0].forEach(function (i) { arrow(v, c.base[i], c.img[i], "var(--acc)", 3); });
+      if (c.type === "rotation") { seg(v, c.O, c.base[8], "var(--acc)", "6 5", 2); seg(v, c.O, c.img[8], "var(--acc)", "6 5", 2); arcRot(v, c.O, c.base[8], c.ang); }
+    }
+    dot(v, c.base[8], "var(--ink-soft)"); lab(v, c.base[8], "A", "var(--ink)", centroid(c.base));
+    dot(v, c.img[8], "var(--img)"); lab(v, c.img[8], "A′", "var(--img)", centroid(c.img));
+    if (show && c.O) centreO(v, c.O, centroid(c.base));
+  }
+  function gStat() { $("gStat").textContent = "Manche " + Math.min(g.round + 1, 5) + " / 5 · Score : " + g.score; }
+  function gRound() {
+    g.cur = gMake(g.order[g.round]); g.done = false;
+    GT.forEach(function (t) { var b = $("gc" + t); b.disabled = false; b.className = ""; });
+    $("gFb").className = "verdict"; $("gFb").innerHTML = "<span>Choisis une réponse.</span>";
+    $("gNext").disabled = true; $("gNext").textContent = g.round === 4 ? "Voir le score" : "Manche suivante";
+    gStat(); gDraw(false);
+  }
+  function gNew() { g.round = 0; g.score = 0; g.order = shuffle(GT.slice()); gRound(); }
+  function gWhy(c) {
+    if (c.type === "axe") return "C'est une symétrie axiale : le F est retourné, comme dans un miroir. Voici l'axe en bleu.";
+    if (c.type === "centre") return "C'est une symétrie centrale : le F a fait un demi-tour autour de O. O est le milieu de [AA′].";
+    if (c.type === "translation") return "C'est une translation : le F a glissé " + dirText(c.V[0], c.V[1]) + ", sans tourner.";
+    if (c.type === "rotation") return "C'est une rotation de centre O, d'un quart de tour " + (c.ang > 0 ? "dans le sens inverse des aiguilles d'une montre." : "dans le sens des aiguilles d'une montre.");
+    return "C'est une homothétie de centre O et de rapport " + fmt(c.k) + " : la taille a changé" + (c.k < 0 ? ", et l'image est passée de l'autre côté de O." : ".");
+  }
+  function gAnswer(t) {
+    if (g.done) return;
+    g.done = true;
+    var ok = t === g.cur.type;
+    if (ok) g.score++;
+    GT.forEach(function (x) { var b = $("gc" + x); b.disabled = true; if (x === g.cur.type) b.className = "good"; else if (x === t) b.className = "bad"; });
+    $("gFb").className = "verdict " + (ok ? "yes" : "no");
+    $("gFb").innerHTML = (ok ? "Bravo, c'est juste !" : "Pas tout à fait.") + "<span>" + gWhy(g.cur) + "</span>";
+    $("gNext").disabled = false; gStat(); gDraw(true);
+  }
+  GT.forEach(function (t) { $("gc" + t).addEventListener("click", function () { gAnswer(t); }); });
+  $("gNext").addEventListener("click", function () {
+    if (g.round === 5) { gNew(); return; }
+    g.round++;
+    if (g.round < 5) { gRound(); return; }
+    $("gStat").textContent = "Score final : " + g.score + " / 5";
+    $("gFb").className = "verdict " + (g.score >= 4 ? "yes" : "no");
+    $("gFb").innerHTML = (g.score === 5 ? "Parfait, tu reconnais les cinq transformations !" : g.score >= 3 ? "Bien joué !" : "Continue, ça va venir !") + "<span>Relis la méthode ci-dessous, puis rejoue.</span>";
+    $("gNext").textContent = "Rejouer";
+  });
+  gNew();
+
+  /* ---------- 9. Quiz ---------- */
+  var LET = ["A", "B", "M", "N", "P", "E", "K"];
+  function rp() { var x, y; do { x = rnd(-6, 6); y = rnd(-6, 6); } while (x === 0 || y === 0); return [x, y]; }
+  function makeQ(t) {
+    var L = pick(LET), p = rp(), P = L + "(" + fmt(p[0]) + " ; " + fmt(p[1]) + ")", a, b, k;
+    if (t === 0) {
+      if (Math.random() < 0.5) return { q: "Quelle est l'image de " + P + " par la symétrie d'axe l'axe des ordonnées ?", a: [-p[0], p[1]], L: L, how: "L'axe est vertical : x change de signe, y ne bouge pas." };
+      return { q: "Quelle est l'image de " + P + " par la symétrie d'axe l'axe des abscisses ?", a: [p[0], -p[1]], L: L, how: "L'axe est horizontal : y change de signe, x ne bouge pas." };
+    }
+    if (t === 1) {
+      do { a = rnd(-3, 3); } while (a === 0 || a === p[0]);
+      if (Math.random() < 0.5) return { q: "Quelle est l'image de " + P + " par la symétrie d'axe la droite verticale x = " + fmt(a) + " ?", a: [2 * a - p[0], p[1]], L: L, how: "M et M′ sont à la même distance de l'axe : x′ = 2 × " + par(a) + " − " + par(p[0]) + " = " + fmt(2 * a - p[0]) + ", y ne bouge pas." };
+      return { q: "Quelle est l'image de " + P + " par la symétrie d'axe la droite horizontale y = " + fmt(a) + " ?", a: [p[0], 2 * a - p[1]], L: L, how: "x ne bouge pas, et y′ = 2 × " + par(a) + " − " + par(p[1]) + " = " + fmt(2 * a - p[1]) + "." };
+    }
+    if (t === 2) {
+      a = rnd(-3, 3); b = rnd(-3, 3);
+      return { q: "Quelle est l'image de " + P + " par la symétrie de centre O(" + fmt(a) + " ; " + fmt(b) + ") ?", a: [2 * a - p[0], 2 * b - p[1]], L: L, how: "O est le milieu de [" + L + L + "′] : x′ = 2 × " + par(a) + " − " + par(p[0]) + " = " + fmt(2 * a - p[0]) + " et y′ = 2 × " + par(b) + " − " + par(p[1]) + " = " + fmt(2 * b - p[1]) + "." };
+    }
+    if (t === 3) {
+      do { a = rnd(-5, 5); b = rnd(-5, 5); } while (a === 0 || b === 0);
+      return { q: "Une translation déplace chaque point de " + dirText(a, b) + ". Quelle est l'image de " + P + " ?", a: [p[0] + a, p[1] + b], L: L, how: "x′ = " + fmt(p[0]) + " + " + par(a) + " = " + fmt(p[0] + a) + " et y′ = " + fmt(p[1]) + " + " + par(b) + " = " + fmt(p[1] + b) + "." };
+    }
+    if (t === 4) {
+      if (Math.random() < 0.5) return { q: "Quelle est l'image de " + P + " par la rotation de centre l'origine, d'angle 90° dans le sens inverse des aiguilles d'une montre ?", a: [-p[1], p[0]], L: L, how: "Pour ce quart de tour, (x ; y) devient (−y ; x) : (" + fmt(-p[1]) + " ; " + fmt(p[0]) + ")." };
+      return { q: "Quelle est l'image de " + P + " par la rotation de centre l'origine, d'angle 90° dans le sens des aiguilles d'une montre ?", a: [p[1], -p[0]], L: L, how: "Pour ce quart de tour, (x ; y) devient (y ; −x) : (" + fmt(p[1]) + " ; " + fmt(-p[0]) + ")." };
+    }
+    if (t === 5) {
+      k = pick([2, 3, -2, -3, 0.5]);
+      if (k === 0.5) { do { p = [2 * rnd(-4, 4), 2 * rnd(-4, 4)]; } while (p[0] === 0 || p[1] === 0); P = L + "(" + fmt(p[0]) + " ; " + fmt(p[1]) + ")"; }
+      else { do { p = [rnd(-3, 3), rnd(-3, 3)]; } while (p[0] === 0 || p[1] === 0); P = L + "(" + fmt(p[0]) + " ; " + fmt(p[1]) + ")"; }
+      return { q: "Quelle est l'image de " + P + " par l'homothétie de centre l'origine et de rapport " + fmt(k) + " ?", a: [k * p[0], k * p[1]], L: L, how: "Centre à l'origine : on multiplie les deux coordonnées par k. x′ = " + fmt(k) + " × " + par(p[0]) + " = " + fmt(k * p[0]) + " et y′ = " + fmt(k) + " × " + par(p[1]) + " = " + fmt(k * p[1]) + "." };
+    }
+    if (t === 6) {
+      k = pick([2, 3, -2, -3, 0.5, 1.5, 4]);
+      return { q: "Une homothétie de rapport " + fmt(k) + " transforme une figure. Par quel nombre est multipliée l'aire ?", a: k * k, how: "L'aire est multipliée par k² = " + par(k) + "² = " + fmt(k * k) + "." };
+    }
+    k = pick([2, 3, -2, -3, 0.5, -0.5]); var len = pick([2, 4, 5, 6, 8, 10]);
+    return { q: "Par une homothétie de rapport " + fmt(k) + ", un segment de " + len + " cm a pour image un segment de combien de cm ?", a: Math.abs(k) * len, how: "Les longueurs sont multipliées par |k| = " + fmt(Math.abs(k)) + (k < 0 ? ", même si k est négatif : " : " : ") + fmt(Math.abs(k)) + " × " + len + " = " + fmt(Math.abs(k) * len) + " cm." };
+  }
+  var quiz = $("quiz"), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ""; done = [];
+    var order = shuffle([0, 1, 2, 3, 4, 5, 6, 7]);
+    for (var n = 0; n < 8; n++) {
+      var Q = makeQ(order[n]), li = document.createElement("li"), xy = Array.isArray(Q.a);
+      var inp = xy ? "<div class='xy'><label>x<input type='text' id='qx" + n + "' inputmode='decimal' autocomplete='off' aria-label='Abscisse, question " + (n + 1) + "'></label><label>y<input type='text' id='qy" + n + "' inputmode='decimal' autocomplete='off' aria-label='Ordonnée, question " + (n + 1) + "'></label></div>"
+        : "<input type='text' class='one' id='qx" + n + "' inputmode='decimal' autocomplete='off' aria-label='Ta réponse à la question " + (n + 1) + "'>";
+      li.innerHTML = "<span>" + Q.q + "</span>" + inp + "<button type='button' id='qb" + n + "'>Vérifier</button><span class='fb' id='qf" + n + "' aria-live='polite'></span>";
+      quiz.appendChild(li);
+      (function (n, Q, xy) {
+        function check() {
+          var fb = $("qf" + n), x = num($("qx" + n).value), y = xy ? num($("qy" + n).value) : 0, ok;
+          if (isNaN(x) || isNaN(y)) { fb.className = "fb"; fb.textContent = xy ? "Écris deux nombres : x et y." : "Écris un nombre."; return; }
+          ok = xy ? Math.abs(x - Q.a[0]) < 0.006 && Math.abs(y - Q.a[1]) < 0.006 : Math.abs(x - Q.a) < 0.006;
+          if (ok) { fb.className = "fb ok"; fb.innerHTML = "Bravo, c'est juste !<span>" + Q.how + "</span>"; done[n] = true; }
+          else { done[n] = false; fb.className = "fb no"; fb.innerHTML = "Pas tout à fait : la réponse est " + (xy ? Q.L + "′(" + fmt(Q.a[0]) + " ; " + fmt(Q.a[1]) + ")" : fmt(Q.a)) + ".<span>" + Q.how + "</span>"; }
+          $("score").textContent = done.filter(Boolean).length + " / 8";
+        }
+        $("qb" + n).addEventListener("click", check);
+        ["qx", "qy"].forEach(function (pre) { var el = $(pre + n); if (el) el.addEventListener("keydown", function (e) { if (e.key === "Enter") check(); }); });
+      })(n, Q, xy);
+    }
+    $("score").textContent = "0 / 8";
+  }
+  $("newQuiz").addEventListener("click", newQuiz);
+  newQuiz();
+})();
+</script>
+</body>
+</html>

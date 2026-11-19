@@ -1,0 +1,841 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>La vitesse</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, encre ardoise (comme le bitume), accent orange vif (comme un panneau de chantier), marge rouge. */
+:root {
+  --paper: #f9f8f5;
+  --grid: #e7e4de;
+  --card: #ffffff;
+  --ink: #1f2430;
+  --ink-soft: #5b6273;
+  --acc: #ea580c;
+  --acc-soft: #ffedd5;
+  --two: #1c64c8;
+  --two-soft: #dbe8fa;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #fff0a3;
+  --line: #dcd8d0;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #13151b; --grid: #1f222b; --card: #1a1d25; --ink: #eef0f4; --ink-soft: #a9b0bd;
+    --acc: #fdba74; --acc-soft: #45260f; --two: #7fb0ff; --two-soft: #1a2a45;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #313643;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #13151b; --grid: #1f222b; --card: #1a1d25; --ink: #eef0f4; --ink-soft: #a9b0bd;
+  --acc: #fdba74; --acc-soft: #45260f; --two: #7fb0ff; --two-soft: #1a2a45;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #313643;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note.two { border-left-color: var(--two); background: var(--two-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 6px 12px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+input[type="text"] { font: inherit; font-family: var(--f-mono); font-size: 1.05rem; padding: 8px 10px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; }
+input[type="range"] { width: 100%; accent-color: var(--acc); }
+select { font: inherit; font-family: var(--f-mono); font-size: 1rem; padding: 8px 6px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); flex: 0 0 auto; }
+.param { display: flex; flex-direction: column; gap: 2px; }
+.param label { font-weight: 700; }
+
+/* Tableau */
+.ptable { border-collapse: separate; border-spacing: 0; width: 100%; font-variant-numeric: tabular-nums; }
+.ptable th, .ptable td { border: 1.5px solid var(--ink); padding: 8px 10px; text-align: center; font-family: var(--f-mono); font-size: 1.05rem; white-space: nowrap; }
+.ptable th { font-family: var(--f-display); text-align: left; background: var(--paper); }
+.ptable tr:first-child td { background: var(--card); }
+.ptable tr:last-child td { background: var(--acc-soft); font-weight: 600; }
+.scroll { overflow-x: auto; }
+.coef { display: flex; align-items: center; gap: 10px; font-family: var(--f-mono); font-weight: 700; color: var(--acc); }
+.coef::before { content: "↓"; font-size: 1.4rem; }
+.formula { font-family: var(--f-mono); font-size: clamp(1.3rem, 4.5vw, 1.8rem); font-weight: 600; text-align: center; color: var(--acc); overflow-wrap: anywhere; }
+
+.graph svg, .track svg { width: 100%; height: auto; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; display: block; }
+.verdict { border-radius: 8px; padding: 12px 14px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+.verdict.yes { background: var(--ok-soft); color: var(--ok); }
+.verdict.no { background: var(--red-soft); color: var(--red); }
+.verdict span { font-weight: 400; color: var(--ink); }
+
+.inputs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 14px; align-items: end; }
+.inputs label { font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 600px) { .inputs { grid-template-columns: 1fr; } }
+.methods { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
+.method { border: 1.5px solid var(--line); border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; background: var(--paper); }
+.method strong { font-family: var(--f-display); }
+.method .m { font-family: var(--f-mono); font-size: .95rem; overflow-wrap: anywhere; }
+.method .m b { color: var(--acc); }
+.err { color: var(--red); font-weight: 700; }
+
+.steps { font-family: var(--f-mono); font-size: .98rem; display: flex; flex-direction: column; gap: 4px; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; padding: 12px 14px; overflow-wrap: anywhere; }
+.steps b { color: var(--acc); }
+.steps .err { color: var(--red); font-family: var(--f-body); font-weight: 700; }
+.steps .why { font-family: var(--f-body); color: var(--ink-soft); font-size: .92rem; }
+
+.results { display: flex; flex-direction: column; gap: 8px; font-variant-numeric: tabular-nums; }
+.res { border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 12px; display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; align-items: baseline; }
+.res-name { font-family: var(--f-display); font-weight: 700; }
+.res-val { font-family: var(--f-mono); font-weight: 600; color: var(--acc); font-size: 1.05rem; white-space: nowrap; }
+.res-calc { grid-column: 1 / -1; font-family: var(--f-mono); font-size: .85rem; color: var(--ink-soft); overflow-wrap: anywhere; }
+.res.total { border-color: var(--acc); background: var(--acc-soft); }
+
+/* Triangle magique */
+.tri-wrap { display: grid; grid-template-columns: minmax(0, 260px) 1fr; gap: 20px; align-items: center; }
+.tri-wrap svg { width: 100%; height: auto; display: block; }
+.tri-wrap ul { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 6px; }
+@media (max-width: 600px) { .tri-wrap { grid-template-columns: 1fr; } .tri-wrap svg { max-width: 260px; margin: 0 auto; } }
+
+/* Calculatrice */
+.calc { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 16px; }
+.field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.field > label { font-weight: 700; }
+.field small { color: var(--ink-soft); font-size: .85rem; }
+.pair { display: flex; gap: 8px; min-width: 0; }
+.pair input { flex: 1 1 auto; }
+@media (max-width: 600px) { .calc { grid-template-columns: 1fr; } }
+
+/* Vitesses célèbres */
+.speeds { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.speeds li { display: flex; flex-direction: column; gap: 4px; }
+.sp-top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 12px; }
+.sp-name { font-weight: 700; }
+.sp-val { font-family: var(--f-mono); font-size: .9rem; color: var(--ink-soft); }
+.bar-track { height: 14px; background: var(--paper); border: 1.5px solid var(--line); border-radius: 999px; overflow: hidden; }
+.bar-fill { height: 100%; min-width: 3px; background: var(--acc); border-radius: 999px; transition: width .7s ease; }
+
+/* Trajet en 3 morceaux */
+.segs { display: flex; flex-direction: column; gap: 10px; }
+.seg { display: grid; grid-template-columns: 120px minmax(0, 1fr) minmax(0, 1fr); gap: 8px 12px; align-items: end; }
+.seg label { font-weight: 700; display: flex; flex-direction: column; gap: 4px; font-size: .95rem; }
+.seg-name { font-family: var(--f-display); font-weight: 800; align-self: center; display: flex; align-items: center; gap: 8px; }
+.dot { width: 14px; height: 14px; border-radius: 50%; display: inline-block; flex: 0 0 auto; }
+@media (max-width: 600px) { .seg { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .seg-name { grid-column: 1 / -1; } }
+
+/* Aller-retour */
+.split { display: flex; height: 38px; border: 2px solid var(--ink); border-radius: 8px; overflow: hidden; }
+.split span { display: flex; align-items: center; justify-content: center; font-family: var(--f-mono); font-size: .85rem; font-weight: 600; color: var(--card); white-space: nowrap; overflow: hidden; transition: width .5s ease; }
+.split .a { background: var(--acc); }
+.split .b { background: var(--two); }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.cards .m { font-family: var(--f-mono); font-size: .95rem; color: var(--acc); font-weight: 600; overflow-wrap: anywhere; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
+.tag.ok { color: var(--ok); }
+.tag.no { color: var(--red); }
+.tag.acc { color: var(--acc); }
+.tag.two { color: var(--two); }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 110px auto; gap: 10px; align-items: center; }
+.quiz input[type="text"] { font-size: 1rem; padding: 6px 8px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc); }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 120px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } button:hover, button:active { transform: none; } }
+</style>
+
+</head>
+<body>
+<main class="page">
+
+  <header class="hero">
+    <span class="eyebrow">Tutoriel de maths · niveau 4<sup>e</sup>–3<sup>e</sup></span>
+    <h1>La vitesse</h1>
+    <p class="lead">La vitesse dit combien de chemin on parcourt en un temps donné. C'est une grandeur un peu spéciale : elle en combine deux, une distance et une durée. On l'appelle une « grandeur quotient ».</p>
+    <div class="box">
+      <div class="scroll">
+        <table class="ptable" aria-label="Exemple : distance parcourue à 60 km/h">
+          <tr><th>Durée</th><td>30 min</td><td>1 h</td><td>1 h 30 min</td><td>2 h</td><td>3 h</td></tr>
+          <tr><th>Distance (km)</th><td>30</td><td>60</td><td>90</td><td>120</td><td>180</td></tr>
+        </table>
+      </div>
+      <span class="coef">À 60 km/h, on parcourt 60 km à chaque heure</span>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · L'idée</span>
+    <h2>C'est quoi, une vitesse ?</h2>
+    <p>La vitesse, c'est la <strong>distance</strong> parcourue divisée par la <strong>durée</strong> du trajet :</p>
+    <div class="box"><p class="formula">v = d ÷ t</p><p class="soft" style="text-align:center;margin:0 auto">v : vitesse · d : distance · t : durée (t comme « temps »)</p></div>
+    <p>Si tu fais 120 km en 2 h, ta vitesse est 120 ÷ 2 = <span class="hl">60 km/h</span>. On lit « 60 kilomètres par heure » : 60 km à chaque heure. On utilise aussi les <strong>m/s</strong> (mètres par seconde), surtout en sport et en physique.</p>
+    <div class="cards">
+      <div class="box"><span class="tag acc">Vitesse moyenne</span><strong>Sur tout le trajet</strong><span class="soft">Un train fait 400 km en 2 h : 200 km/h en moyenne. Pourtant, il a accéléré, ralenti, et roulé parfois plus vite.</span></div>
+      <div class="box"><span class="tag two">Vitesse instantanée</span><strong>À un instant précis</strong><span class="soft">C'est le nombre que montre le compteur de la voiture. Il change tout le temps.</span></div>
+    </div>
+    <p>Quand la vitesse ne change pas (on dit qu'elle est <strong>constante</strong>), la distance est <strong>proportionnelle</strong> à la durée : deux fois plus de temps, deux fois plus de chemin. La vitesse est le coefficient de proportionnalité. Le tutoriel sur la proportionnalité explique cette idée en détail.</p>
+    <div class="box">
+      <h3>La course : un piéton, un vélo, une voiture</h3>
+      <div class="track"><svg id="race" viewBox="0 0 640 270" role="img" aria-label="Course entre un piéton à 5 km/h, un vélo à 20 km/h et une voiture à 90 km/h"></svg></div>
+      <div class="param">
+        <label for="raceT">Temps écoulé : <span class="mono" id="raceTOut">0 s</span></label>
+        <input id="raceT" type="range" min="0" max="360" step="1" value="0">
+      </div>
+      <div class="btns">
+        <button id="racePlay" type="button">▶ Lancer la course</button>
+        <button id="raceReset" type="button">Recommencer</button>
+      </div>
+      <div class="results" id="raceOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · Trois formules en une</span>
+    <h2>Le triangle magique</h2>
+    <p>Avec v = d ÷ t, on peut retrouver les deux autres formules. Dans le triangle, cache la lettre que tu cherches : il reste la formule.</p>
+    <div class="box">
+      <div class="tri-wrap">
+        <svg id="tri" viewBox="0 0 320 240" role="img" aria-label="Triangle avec d en haut, v et t en bas">
+          <polygon points="160,14 306,226 14,226" fill="var(--acc-soft)" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round"></polygon>
+          <line x1="76" y1="136" x2="244" y2="136" stroke="var(--ink)" stroke-width="3"></line>
+          <line x1="160" y1="136" x2="160" y2="226" stroke="var(--ink)" stroke-width="3"></line>
+          <text id="triD" x="160" y="114" text-anchor="middle" font-size="46" font-weight="600">d</text>
+          <text id="triV" x="106" y="202" text-anchor="middle" font-size="46" font-weight="600">v</text>
+          <text id="triT" x="214" y="202" text-anchor="middle" font-size="46" font-weight="600">t</text>
+        </svg>
+        <ul>
+          <li>On cache <strong>d</strong> : v et t sont côte à côte, on multiplie. <span class="mono">d = v × t</span></li>
+          <li>On cache <strong>t</strong> : d est au-dessus de v, on divise. <span class="mono">t = d ÷ v</span></li>
+          <li>On cache <strong>v</strong> : d est au-dessus de t, on divise. <span class="mono">v = d ÷ t</span></li>
+        </ul>
+      </div>
+    </div>
+    <div class="box">
+      <h3>Calculatrice de vitesse</h3>
+      <div class="btns" role="group" aria-label="Ce que tu cherches">
+        <button id="findD" type="button" aria-pressed="true">Je cherche d</button>
+        <button id="findT" type="button" aria-pressed="false">Je cherche t</button>
+        <button id="findV" type="button" aria-pressed="false">Je cherche v</button>
+      </div>
+      <p class="formula" id="calcFormula">d = v × t</p>
+      <div class="calc">
+        <div class="field" id="fD">
+          <label for="inD">Distance d</label>
+          <div class="pair"><input id="inD" type="text" inputmode="decimal" autocomplete="off" value="150"><select id="uD" aria-label="Unité de la distance"><option value="km">km</option><option value="m">m</option></select></div>
+        </div>
+        <div class="field" id="fT">
+          <label for="inT">Durée t</label>
+          <div class="pair"><input id="inT" type="text" autocomplete="off" value="1h30"><select id="uT" aria-label="Unité de la durée si tu écris juste un nombre"><option value="h">h</option><option value="min">min</option><option value="s">s</option></select></div>
+          <small>Tu peux écrire 1h30, 1:30, 90 min ou 1,5 (avec l'unité choisie).</small>
+        </div>
+        <div class="field" id="fV">
+          <label for="inV">Vitesse v</label>
+          <div class="pair"><input id="inV" type="text" inputmode="decimal" autocomplete="off" value="80"><select id="uV" aria-label="Unité de la vitesse"><option value="km/h">km/h</option><option value="m/s">m/s</option></select></div>
+        </div>
+      </div>
+      <div class="steps" id="calcSteps" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Le piège n°1</span>
+    <h2>Les durées ne comptent pas par 10</h2>
+    <p>Une heure, c'est <strong>60 minutes</strong>, pas 100. Alors <span class="hl">1,5 h = 1 h 30 min</span> : la moitié d'une heure, c'est 30 minutes. Ce n'est pas 1 h 50 min !</p>
+    <div class="methods">
+      <div class="method"><strong>Heures décimales → minutes</strong><span class="m">On multiplie par 60.</span><span class="m">0,25 h = 0,25 × 60 = <b>15 min</b></span></div>
+      <div class="method"><strong>Minutes → heures</strong><span class="m">On divise par 60.</span><span class="m">45 min = 45 ÷ 60 = <b>0,75 h</b></span></div>
+      <div class="method"><strong>Plus de 60 minutes</strong><span class="m">100 min = 60 min + 40 min</span><span class="m">= <b>1 h 40 min</b></span></div>
+    </div>
+    <div class="box">
+      <h3>Convertisseur de durées</h3>
+      <div class="btns" id="durEx" role="group" aria-label="Exemples de durées"></div>
+      <div class="param">
+        <label for="durIn">Écris une durée</label>
+        <input id="durIn" type="text" autocomplete="off" value="1,5 h">
+      </div>
+      <div class="results" id="durOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · Deux unités</span>
+    <h2>km/h et m/s</h2>
+    <p>1 km = 1 000 m et 1 h = 3 600 s. Donc 1 km/h, c'est 1 000 m en 3 600 s, soit 1 000 ÷ 3 600 ≈ 0,28 m/s. Dans l'autre sens, <span class="hl">1 m/s = 3,6 km/h</span>.</p>
+    <div class="methods">
+      <div class="method"><strong>km/h → m/s</strong><span class="m">On divise par 3,6.</span><span class="m">72 km/h = 72 ÷ 3,6 = <b>20 m/s</b></span></div>
+      <div class="method"><strong>m/s → km/h</strong><span class="m">On multiplie par 3,6.</span><span class="m">10 m/s = 10 × 3,6 = <b>36 km/h</b></span></div>
+    </div>
+    <div class="box">
+      <h3>Convertisseur</h3>
+      <div class="inputs" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+        <label for="cvK">En km/h<input id="cvK" type="text" inputmode="decimal" autocomplete="off" value="36"></label>
+        <label for="cvM">En m/s<input id="cvM" type="text" inputmode="decimal" autocomplete="off" value="10"></label>
+      </div>
+      <div class="steps" id="cvOut" aria-live="polite"></div>
+    </div>
+    <div class="box">
+      <h3>Des vitesses célèbres</h3>
+      <div class="btns" role="group" aria-label="Type d'échelle">
+        <button id="scLog" type="button" aria-pressed="true">Échelle « × 10 »</button>
+        <button id="scLin" type="button" aria-pressed="false">Échelle normale</button>
+      </div>
+      <ul class="speeds" id="speeds"></ul>
+      <p class="soft" id="scNote"></p>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Le graphique distance-temps</span>
+    <h2>Dessiner un trajet</h2>
+    <p>On met le temps en abscisse et la distance en ordonnée. À vitesse constante, on obtient une <strong>droite qui passe par l'origine</strong> (c'est la proportionnalité). <span class="hl">Plus la ligne est pentue, plus on va vite.</span> Un morceau horizontal veut dire que la distance ne change plus : on est arrêté.</p>
+    <div class="box">
+      <h3>Ton trajet en trois morceaux</h3>
+      <div class="segs" id="segs"></div>
+      <div class="graph"><svg id="tripG" viewBox="0 0 640 360" role="img" aria-label="Graphique distance-temps du trajet"></svg></div>
+      <div class="results" id="tripOut" aria-live="polite"></div>
+    </div>
+    <div class="note two">
+      <span class="note-title">La ligne en pointillés</span>
+      <span>Elle relie le départ et l'arrivée. C'est le trajet d'une personne qui roulerait tout le temps à la vitesse moyenne : elle part et arrive en même temps que toi.</span>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · Un piège célèbre</span>
+    <h2>La vitesse moyenne n'est pas la moyenne des vitesses</h2>
+    <p>Tu fais 120 km à l'aller à 60 km/h, et les mêmes 120 km au retour à 40 km/h. Ta vitesse moyenne n'est pas 50 km/h. Calcule les durées pour le voir.</p>
+    <div class="box">
+      <div class="inputs">
+        <label for="arV1">Aller (km/h)<input id="arV1" type="text" inputmode="decimal" autocomplete="off" value="60"></label>
+        <label for="arV2">Retour (km/h)<input id="arV2" type="text" inputmode="decimal" autocomplete="off" value="40"></label>
+        <label for="arD">Distance d'un trajet (km)<input id="arD" type="text" inputmode="decimal" autocomplete="off" value="120"></label>
+      </div>
+      <div class="split" id="arSplit" aria-hidden="true"><span class="a" id="arA"></span><span class="b" id="arB"></span></div>
+      <div class="steps" id="arSteps" aria-live="polite"></div>
+      <div class="verdict" id="arVerdict"></div>
+    </div>
+    <p class="soft">Change la distance : la vitesse moyenne ne bouge pas. Elle dépend seulement des deux vitesses.</p>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · La même idée ailleurs</span>
+    <h2>D'autres grandeurs quotients</h2>
+    <p>Une grandeur quotient, c'est une grandeur divisée par une autre. On la reconnaît à son unité avec un « / » : km/h, mais aussi L/min, g/cm³, €/kg…</p>
+    <div class="cards">
+      <div class="box"><span class="tag two">L/min</span><strong>Le débit</strong><span class="soft">Un robinet remplit un seau de 10 L en 2 min.</span><span class="m">10 ÷ 2 = 5 L/min</span></div>
+      <div class="box"><span class="tag two">L/100 km</span><strong>La consommation</strong><span class="soft">Une voiture utilise 30 L d'essence pour 500 km.</span><span class="m">30 ÷ 500 × 100 = 6 L/100 km</span></div>
+      <div class="box"><span class="tag two">g/cm³</span><strong>La masse volumique</strong><span class="soft">Un objet de 54 g a un volume de 20 cm³. (C'est à peu près celle de l'aluminium. L'eau, elle, fait environ 1 g/cm³.)</span><span class="m">54 ÷ 20 = 2,7 g/cm³</span></div>
+      <div class="box"><span class="tag two">€/kg</span><strong>Le prix au kilo</strong><span class="soft">Une barquette de 750 g de cerises coûte 6 €.</span><span class="m">6 ÷ 0,75 = 8 €/kg</span></div>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Les pièges</span>
+    <h2>Les erreurs à éviter</h2>
+    <div class="cards">
+      <div class="box"><strong>Des unités qui vont ensemble</strong><span class="soft">Une vitesse en km/h va avec des km et des heures. 30 km en 20 min : on ne fait pas 30 ÷ 20. On écrit d'abord 20 min = 1/3 h, puis 30 ÷ 1/3 = 90 km/h.</span></div>
+      <div class="box"><strong>1 h 30 n'est pas 1,30 h</strong><span class="soft">1 h 30 min = 1,5 h. Et 1,30 h = 1 h + 0,3 × 60 min = 1 h 18 min.</span></div>
+      <div class="box"><strong>Convertir avant de diviser</strong><span class="soft">100 m en 12 s donne 100 ÷ 12 ≈ 8,33 m/s. Pour l'avoir en km/h, on convertit ensuite : 8,33 × 3,6 ≈ 30 km/h.</span></div>
+      <div class="box"><strong>Le freinage</strong><span class="soft">La distance de freinage n'est pas proportionnelle à la vitesse : elle grandit plus vite. À vitesse double, il faut environ quatre fois plus de distance pour s'arrêter. Le tutoriel sur les fonctions montre ce genre de courbe.</span></div>
+    </div>
+    <div class="note red">
+      <span class="note-title">Le réflexe</span>
+      <span>Avant de calculer, écris les unités à côté de chaque nombre. Si elles ne vont pas ensemble, convertis d'abord.</span>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Réponds avec un nombre, dans l'unité demandée. Les durées sont demandées en minutes.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Nouvelles questions</button>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · Un peu d'histoire</span>
+    <h2>Mesurer le mouvement</h2>
+    <ol class="timeline">
+      <li><span class="when">début du XVII<sup>e</sup> s.</span><div class="what"><strong>Galilée</strong><span>Il fait rouler des billes sur des plans inclinés et mesure les durées, par exemple avec de l'eau qui s'écoule. Il montre que la vitesse d'un objet qui tombe ou qui roule augmente au fil du temps.</span></div></li>
+      <li><span class="when">fin du XVIII<sup>e</sup> s.</span><div class="what"><strong>Le mètre</strong><span>Pendant la Révolution française, on crée le système métrique : le mètre, puis le kilomètre, deviennent des unités communes.</span></div></li>
+      <li><span class="when">XIX<sup>e</sup> s.</span><div class="what"><strong>Les trains</strong><span>Avec les chemins de fer, on voyage bien plus vite qu'à cheval. On prend l'habitude de comparer les vitesses en kilomètres à l'heure, et les horaires de train obligent à mesurer le temps avec précision.</span></div></li>
+      <li><span class="when">1947</span><div class="what"><strong>Le mur du son</strong><span>Le pilote américain Chuck Yeager vole plus vite que le son à bord de l'avion-fusée Bell X-1. C'est le premier vol officiellement reconnu au-delà de cette vitesse.</span></div></li>
+      <li><span class="when">1983</span><div class="what"><strong>La lumière sert de règle</strong><span>La vitesse de la lumière est fixée à exactement 299 792 458 m/s. Depuis, le mètre est défini à partir d'elle.</span></div></li>
+    </ol>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · À toi de jouer</span>
+    <h2>Six problèmes</h2>
+    <div class="exos">
+      <details>
+        <summary>La balade à vélo<span class="q">Un cycliste roule pendant 2 h 30 min à 18 km/h. Quelle distance parcourt-il ?</span></summary>
+        <div><span>2 h 30 min = 2,5 h. Donc d = v × t = 18 × 2,5 = <strong>45 km</strong>.</span></div>
+      </details>
+      <details>
+        <summary>L'autoroute<span class="q">Une voiture fait 150 km à 100 km/h. Combien de temps dure le trajet ?</span></summary>
+        <div><span>t = d ÷ v = 150 ÷ 100 = 1,5 h. Et 0,5 h = 30 min, donc <strong>1 h 30 min</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Le train<span class="q">Un train parcourt 210 km en 1 h 45 min. Quelle est sa vitesse moyenne ?</span></summary>
+        <div><span>45 min = 45 ÷ 60 = 0,75 h, donc t = 1,75 h. v = 210 ÷ 1,75 = <strong>120 km/h</strong>.</span></div>
+      </details>
+      <details>
+        <summary>La conversion<span class="q">Une voiture roule à 72 km/h. Combien de mètres fait-elle en une seconde ?</span></summary>
+        <div><span>72 ÷ 3,6 = <strong>20 m/s</strong> : 20 mètres à chaque seconde.</span></div>
+      </details>
+      <details>
+        <summary>La course à pied<span class="q">Léa court 10 km en 50 min. Quelle est sa vitesse moyenne en km/h ?</span></summary>
+        <div><span>En 10 min, elle fait 10 ÷ 5 = 2 km. En 60 min, elle fait 6 × 2 = <strong>12 km/h</strong>. (Ou : 50 min = 50/60 h, et 10 ÷ 50/60 = 12.)</span></div>
+      </details>
+      <details>
+        <summary>L'aller-retour<span class="q">Tom va chez sa grand-mère à 30 km/h et revient à 20 km/h. Le trajet fait 60 km. Quelle est sa vitesse moyenne ?</span></summary>
+        <div><span>Aller : 60 ÷ 30 = 2 h. Retour : 60 ÷ 20 = 3 h. En tout : 120 km en 5 h, soit 120 ÷ 5 = <strong>24 km/h</strong> (et pas 25 km/h).</span></div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• La vitesse est une <strong>grandeur quotient</strong> : <strong>v = d ÷ t</strong>. Avec le triangle : <strong>d = v × t</strong> et <strong>t = d ÷ v</strong>.</span>
+      <span>• À vitesse constante, la distance est <strong>proportionnelle</strong> à la durée. Le graphique est une droite qui passe par l'origine.</span>
+      <span>• Une heure = <strong>60 minutes</strong> : 1,5 h = 1 h 30 min. Minutes → heures : <strong>÷ 60</strong>.</span>
+      <span>• <strong>1 m/s = 3,6 km/h</strong>. km/h → m/s : ÷ 3,6. m/s → km/h : × 3,6.</span>
+      <span>• Vitesse moyenne = distance totale ÷ durée totale. Ce n'est pas la moyenne des vitesses.</span>
+    </div>
+  </section>
+
+  <footer>Fiche de révision · La vitesse</footer>
+</main>
+
+<script>
+(function () {
+  "use strict";
+  var NS = "http://www.w3.org/2000/svg";
+  function fmt(x, d) { var r = Math.round(x * 1e6) / 1e6; if (Object.is(r, -0)) r = 0; return r.toLocaleString("fr-FR", { maximumFractionDigits: d == null ? 3 : d }).replace("-", "−"); }
+  function num(s) { var t = String(s).replace(/\s/g, "").replace(/[−–]/g, "-").replace(",", "."); if (t === "") return NaN; var x = Number(t); return isFinite(x) ? x : NaN; }
+  function mk(svg, name, attrs, text) { var e = document.createElementNS(NS, name); for (var a in attrs) e.setAttribute(a, attrs[a]); if (text != null) e.textContent = text; svg.appendChild(e); return e; }
+  function clear(el) { while (el.firstChild) el.removeChild(el.firstChild); }
+  function exact(x) { return Math.abs(x * 1000 - Math.round(x * 1000)) < 1e-6; }
+  function eqs(x) { return exact(x) ? "= " : "≈ "; }
+  function $(id) { return document.getElementById(id); }
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------- Fonctions pures ---------- */
+  var RANK = { h: 0, min: 1, s: 2 };
+  // Renvoie une durée en heures, ou NaN. def = unité d'un nombre seul ("h", "min" ou "s").
+  function parseDuration(s, def) {
+    var raw = String(s == null ? "" : s);
+    if (/\d\s+\d/.test(raw)) return NaN;
+    var t = raw.toLowerCase().replace(/\s+/g, "").replace(/,/g, ".");
+    if (t === "") return NaN;
+    var c = t.match(/^(\d+):(\d{1,2})(?::(\d{1,2}))?$/);
+    if (c) { if (+c[2] >= 60 || (c[3] && +c[3] >= 60)) return NaN; return +c[1] + c[2] / 60 + (c[3] ? c[3] / 3600 : 0); }
+    var re = /(\d+(?:\.\d+)?|\.\d+)(heures?|h|minutes?|min|mn|m|secondes?|sec|s)?/g, pos = 0, total = 0, last = null, count = 0, k;
+    while ((k = re.exec(t)) !== null) {
+      if (k.index !== pos) return NaN;
+      pos = re.lastIndex;
+      var v = parseFloat(k[1]), u = k[2] || "", unit = null;
+      if (u.charAt(0) === "h") unit = "h"; else if (u.charAt(0) === "m") unit = "min"; else if (u.charAt(0) === "s") unit = "s";
+      else unit = last === "h" ? "min" : last === "min" ? "s" : (last === null ? (def || "h") : null);
+      if (!unit) return NaN;
+      if (last !== null && RANK[unit] <= RANK[last]) return NaN;
+      total += unit === "h" ? v : unit === "min" ? v / 60 : v / 3600;
+      last = unit; count++;
+    }
+    if (pos !== t.length || count === 0) return NaN;
+    return total;
+  }
+  // Écrit une durée (en heures) sous la forme « 1 h 30 min 15 s ».
+  function formatHMS(h) {
+    if (typeof h !== "number" || !isFinite(h) || h < 0) return "";
+    var sec = h * 3600;
+    if (sec < 60 && Math.abs(sec - Math.round(sec)) > 1e-6) return fmt(sec, 2) + " s";
+    var S = Math.round(sec), H = Math.floor(S / 3600), M = Math.floor((S % 3600) / 60), R = S % 60, p = [];
+    if (H) p.push(fmt(H, 0) + " h");
+    if (M) p.push(M + " min");
+    if (R) p.push(R + " s");
+    return p.length ? p.join(" ") : "0 s";
+  }
+  function hToMin(h) { return h * 60; }
+  function minToH(m) { return m / 60; }
+  function kmhToMs(v) { return v / 3.6; }
+  function msToKmh(v) { return v * 3.6; }
+  function vitesse(d, t) { return t > 0 ? d / t : NaN; }
+  function distance(v, t) { return v * t; }
+  function duree(d, v) { return v > 0 ? d / v : NaN; }
+  // segs : [{ t: durée en h, v: vitesse en km/h }]
+  function trajet(segs) { var d = 0, t = 0; segs.forEach(function (s) { d += s.v * s.t; t += s.t; }); return { d: d, t: t, v: t > 0 ? d / t : NaN }; }
+  function allerRetour(v1, v2, d) { var t1 = d / v1, t2 = d / v2; return { t1: t1, t2: t2, t: t1 + t2, v: 2 * d / (t1 + t2), moyenneDesVitesses: (v1 + v2) / 2 }; }
+
+  window.__vitesse = { parseDuration: parseDuration, formatHMS: formatHMS, hToMin: hToMin, minToH: minToH, kmhToMs: kmhToMs, msToKmh: msToKmh, vitesse: vitesse, distance: distance, duree: duree, trajet: trajet, allerRetour: allerRetour };
+
+  /* ---------- Étape 1 : la course ---------- */
+  var racers = [
+    { name: "Piéton", v: 5, col: "var(--ok)" },
+    { name: "Vélo", v: 20, col: "var(--two)" },
+    { name: "Voiture", v: 90, col: "var(--acc)" }
+  ];
+  var race = $("race"), RL = 24, RR = 616, RKM = 9, RMAX = 360;
+  function RX(d) { return RL + Math.min(d, RKM) / RKM * (RR - RL); }
+  for (var km = 0; km <= RKM; km++) {
+    mk(race, "line", { x1: RX(km), y1: 40, x2: RX(km), y2: 262, stroke: "var(--line)", "stroke-width": km % 3 === 0 ? 2 : 1 });
+    if (km % 3 === 0) mk(race, "text", { x: RX(km), y: 28, "text-anchor": km === 0 ? "start" : km === RKM ? "end" : "middle", "font-size": 16 }, km + " km");
+  }
+  racers.forEach(function (r, i) {
+    var y = 92 + i * 76;
+    mk(race, "text", { x: RL, y: y - 22, "font-size": 16, "font-weight": 600 }, r.name + " · " + r.v + " km/h");
+    r.txt = mk(race, "text", { x: RR, y: y - 22, "font-size": 16, "font-weight": 600, "text-anchor": "end", style: "fill:" + r.col }, "0 km");
+    mk(race, "line", { x1: RL, y1: y, x2: RR, y2: y, stroke: "var(--line)", "stroke-width": 8, "stroke-linecap": "round" });
+    r.trail = mk(race, "line", { x1: RL, y1: y, x2: RL, y2: y, stroke: r.col, "stroke-width": 8, "stroke-linecap": "round", opacity: 0.5 });
+    r.dot = mk(race, "circle", { cx: RL, cy: y, r: 12, fill: r.col, stroke: "var(--card)", "stroke-width": 3 });
+  });
+  var raceT = $("raceT"), racePlay = $("racePlay"), playing = false, raf = null, t0 = null, s0 = 0;
+  function drawRace(sec) {
+    var h = sec / 3600;
+    $("raceTOut").textContent = formatHMS(h);
+    var rows = racers.map(function (r) {
+      var d = distance(r.v, h), x = RX(d);
+      r.dot.setAttribute("cx", x); r.trail.setAttribute("x2", x); r.txt.textContent = fmt(d, 2) + " km";
+      return '<div class="res"><span class="res-name">' + r.name + '</span><span class="res-val">' + fmt(d, 2) + " km</span>" +
+        '<span class="res-calc">d = v × t = ' + r.v + " × " + fmt(h, 4) + " " + eqs(d) + fmt(d, 3) + " km</span></div>";
+    });
+    var note = sec > 0 ? '<p class="soft">t = ' + formatHMS(h) + " " + eqs(h) + fmt(h, 4) + " h. La voiture va 18 fois plus vite que le piéton : elle a fait 18 fois plus de chemin.</p>" : '<p class="soft">Lance la course ou bouge le curseur.</p>';
+    $("raceOut").innerHTML = rows.join("") + note;
+  }
+  function stopRace() { playing = false; if (raf) cancelAnimationFrame(raf); raf = null; racePlay.textContent = "▶ Lancer la course"; }
+  function stepRace(ts) {
+    if (t0 === null) t0 = ts;
+    var s = s0 + (ts - t0) / 1000 * 60;
+    if (s >= RMAX) { s = RMAX; raceT.value = s; drawRace(s); stopRace(); return; }
+    raceT.value = s; drawRace(s);
+    raf = requestAnimationFrame(stepRace);
+  }
+  racePlay.addEventListener("click", function () {
+    if (playing) { stopRace(); return; }
+    if (reduce) { raceT.value = RMAX; drawRace(RMAX); return; }
+    s0 = +raceT.value; if (s0 >= RMAX) s0 = 0;
+    t0 = null; playing = true; racePlay.textContent = "⏸ Pause";
+    raf = requestAnimationFrame(stepRace);
+  });
+  $("raceReset").addEventListener("click", function () { stopRace(); raceT.value = 0; drawRace(0); });
+  raceT.addEventListener("input", function () { stopRace(); drawRace(+raceT.value); });
+  drawRace(0);
+
+  /* ---------- Étape 2 : calculatrice ---------- */
+  var calcMode = "d", modes = { d: "findD", t: "findT", v: "findV" }, formulas = { d: "d = v × t", t: "t = d ÷ v", v: "v = d ÷ t" };
+  var inD = $("inD"), inT = $("inT"), inV = $("inV"), uD = $("uD"), uT = $("uT"), uV = $("uV");
+  function setMode(m) {
+    calcMode = m;
+    for (var k in modes) $(modes[k]).setAttribute("aria-pressed", k === m ? "true" : "false");
+    $("fD").hidden = m === "d"; $("fT").hidden = m === "t"; $("fV").hidden = m === "v";
+    $("calcFormula").textContent = formulas[m];
+    $("triD").style.fill = m === "d" ? "var(--acc)" : "var(--ink)";
+    $("triV").style.fill = m === "v" ? "var(--acc)" : "var(--ink)";
+    $("triT").style.fill = m === "t" ? "var(--acc)" : "var(--ink)";
+    calc();
+  }
+  function line(s) { return "<span>" + s + "</span>"; }
+  function calc() {
+    var out = $("calcSteps"), m = calcMode, st = [], d, t, v;
+    function bad(msg) { out.innerHTML = '<span class="err">' + msg + "</span>"; }
+    if (m !== "d") { d = num(inD.value); if (isNaN(d) || d < 0) return bad("Écris une distance positive, par exemple 150."); }
+    if (m !== "t") { t = parseDuration(inT.value, uT.value); if (isNaN(t) || t <= 0) return bad("Écris une durée, par exemple 1h30, 1:30, 90 min ou 1,5."); }
+    if (m !== "v") { v = num(inV.value); if (isNaN(v) || v < 0) return bad("Écris une vitesse positive, par exemple 80."); if (m === "t" && v === 0) return bad("À 0 km/h, on n'avance pas : on n'arrive jamais !"); }
+    var SI = (m !== "v" && uV.value === "m/s") || (m === "v" && uD.value === "m" && uT.value === "s");
+    var L = SI ? "m" : "km", T = SI ? "s" : "h", V = SI ? "m/s" : "km/h";
+    var dc, tc, vc;
+    if (m !== "d") {
+      dc = d;
+      if (uD.value !== L) {
+        if (L === "km") { dc = d / 1000; st.push(line("d = " + fmt(d) + " m = " + fmt(d) + " ÷ 1 000 " + eqs(dc) + fmt(dc) + " km")); }
+        else { dc = d * 1000; st.push(line("d = " + fmt(d) + " km = " + fmt(d) + " × 1 000 " + eqs(dc) + fmt(dc) + " m")); }
+      }
+    }
+    if (m !== "t") {
+      tc = T === "h" ? t : t * 3600;
+      var plain = /^\s*(\d+([.,]\d+)?|[.,]\d+)\s*$/.test(inT.value), x = num(inT.value);
+      if (plain && uT.value === T) { /* rien à convertir */ }
+      else if (plain && T === "h" && uT.value === "min") st.push(line("t = " + fmt(x) + " min = " + fmt(x) + " ÷ 60 " + eqs(tc) + fmt(tc) + " h"));
+      else if (plain && T === "h" && uT.value === "s") st.push(line("t = " + fmt(x) + " s = " + fmt(x) + " ÷ 3 600 " + eqs(tc) + fmt(tc) + " h"));
+      else if (plain && T === "s" && uT.value === "h") st.push(line("t = " + fmt(x) + " h = " + fmt(x) + " × 3 600 " + eqs(tc) + fmt(tc) + " s"));
+      else if (plain && T === "s" && uT.value === "min") st.push(line("t = " + fmt(x) + " min = " + fmt(x) + " × 60 " + eqs(tc) + fmt(tc) + " s"));
+      else st.push(line("t = " + formatHMS(t) + " " + eqs(tc) + fmt(tc) + " " + T + (T === "h" ? '<span class="why"> (les minutes ÷ 60)</span>' : "")));
+    }
+    if (m !== "v") {
+      vc = v;
+      if (uV.value !== V) { vc = v / 3.6; st.push(line("v = " + fmt(v) + " km/h = " + fmt(v) + " ÷ 3,6 " + eqs(vc) + fmt(vc) + " m/s")); }
+    }
+    if (st.length) st.unshift('<span class="why">On met les unités d\'accord : ' + L + ", " + T + " et " + V + ".</span>");
+    if (m === "d") {
+      var r = distance(vc, tc);
+      st.push(line("d = v × t = " + fmt(vc) + " × " + fmt(tc) + " " + eqs(r) + "<b>" + fmt(r) + " " + L + "</b>"));
+      st.push(line(L === "km" ? "soit " + (exact(r * 1000) ? "" : "≈ ") + fmt(r * 1000) + " m" : "soit " + (exact(r / 1000) ? "" : "≈ ") + fmt(r / 1000) + " km"));
+    } else if (m === "t") {
+      var r2 = duree(dc, vc);
+      st.push(line("t = d ÷ v = " + fmt(dc) + " ÷ " + fmt(vc) + " " + eqs(r2) + fmt(r2) + " " + T));
+      var hrs = T === "h" ? r2 : r2 / 3600;
+      st.push(line("soit <b>" + formatHMS(hrs) + "</b>"));
+      var fr = r2 - Math.floor(r2);
+      if (T === "h" && fr > 1e-9 && Math.abs(fr * 100 - Math.round(fr * 100)) < 1e-6) st.push('<span class="why">' + fmt(r2 - Math.floor(r2)) + " h × 60 " + eqs((r2 - Math.floor(r2)) * 60) + fmt((r2 - Math.floor(r2)) * 60) + " min, pas " + fmt(Math.round((r2 - Math.floor(r2)) * 100)) + " min !</span>");
+    } else {
+      var r3 = vitesse(dc, tc);
+      st.push(line("v = d ÷ t = " + fmt(dc) + " ÷ " + fmt(tc) + " " + eqs(r3) + "<b>" + fmt(r3, 2) + " " + V + "</b>"));
+      st.push(line(V === "km/h" ? "soit " + fmt(r3, 2) + " ÷ 3,6 ≈ " + fmt(kmhToMs(r3), 2) + " m/s" : "soit " + fmt(r3, 2) + " × 3,6 ≈ " + fmt(msToKmh(r3), 2) + " km/h"));
+    }
+    out.innerHTML = st.join("");
+  }
+  ["d", "t", "v"].forEach(function (k) { $(modes[k]).addEventListener("click", function () { setMode(k); }); });
+  [inD, inT, inV].forEach(function (e) { e.addEventListener("input", calc); });
+  [uD, uT, uV].forEach(function (e) { e.addEventListener("change", calc); });
+  setMode("d");
+
+  /* ---------- Étape 3 : durées ---------- */
+  var durIn = $("durIn"), durEx = ["1,5 h", "0,25 h", "2 h 45", "100 min", "1,30 h", "1:20"];
+  durEx.forEach(function (s, i) {
+    var b = document.createElement("button"); b.type = "button"; b.id = "dex" + i; b.textContent = s;
+    b.addEventListener("click", function () { durIn.value = s; dur(); });
+    $("durEx").appendChild(b);
+  });
+  function dur() {
+    var out = $("durOut"), h = parseDuration(durIn.value, "h");
+    if (isNaN(h) || h < 0) { out.innerHTML = '<p class="err">Écris une durée, par exemple 1,5 h, 2h45, 1:20 ou 100 min.</p>'; return; }
+    var S = Math.round(h * 3600), H = Math.floor(S / 3600), M = Math.floor((S % 3600) / 60), R = S % 60, frac = Math.max(0, h - H);
+    var decCalc = fmt(H) + " + " + M + " ÷ 60" + (R ? " + " + R + " ÷ 3 600" : "") + " " + eqs(h) + fmt(h, 4) + " h";
+    var hmCalc = fmt(H) + " h + " + fmt(frac, 4) + " h = " + fmt(H) + " h + " + fmt(frac, 4) + " × 60 min " + eqs(frac * 60) + fmt(H) + " h " + fmt(frac * 60, 2) + " min";
+    var html =
+      '<div class="res"><span class="res-name">En heures et minutes</span><span class="res-val">' + formatHMS(h) + '</span><span class="res-calc">' + hmCalc + "</span></div>" +
+      '<div class="res"><span class="res-name">En heures décimales</span><span class="res-val">' + eqs(h) + fmt(h, 4) + ' h</span><span class="res-calc">' + decCalc + "</span></div>" +
+      '<div class="res"><span class="res-name">En minutes</span><span class="res-val">' + eqs(h * 60) + fmt(hToMin(h), 2) + ' min</span><span class="res-calc">' + fmt(h, 4) + " × 60 " + eqs(h * 60) + fmt(h * 60, 2) + " min</span></div>";
+    var trap = durIn.value.replace(/\s/g, "").match(/^(\d+)[.,](\d\d)h?$/i);
+    if (trap) html += '<div class="verdict no">Attention au piège !<span>' + trap[1] + "," + trap[2] + " h n'est pas " + trap[1] + " h " + trap[2] + " min. C'est " + formatHMS(h) + ". Pour " + trap[1] + " h " + trap[2] + " min, écris " + trap[1] + "h" + trap[2] + ".</span></div>";
+    out.innerHTML = html;
+  }
+  durIn.addEventListener("input", dur); dur();
+
+  /* ---------- Étape 4 : km/h et m/s ---------- */
+  var cvK = $("cvK"), cvM = $("cvM");
+  function cvShow(k) {
+    var ms = kmhToMs(k);
+    $("cvOut").innerHTML = line(fmt(k) + " km/h = " + fmt(k * 1000) + " m en 3 600 s") + line("= " + fmt(k * 1000) + " ÷ 3 600 " + eqs(ms) + fmt(ms) + " m/s") + '<span class="why">Raccourci : ' + fmt(k) + " ÷ 3,6 " + eqs(ms) + fmt(ms) + " m/s. Et dans l'autre sens : " + fmt(ms) + " × 3,6 " + eqs(k) + fmt(k) + " km/h.</span>";
+  }
+  cvK.addEventListener("input", function () { var k = num(cvK.value); if (isNaN(k)) { $("cvOut").innerHTML = '<span class="err">Écris un nombre.</span>'; return; } cvM.value = fmt(kmhToMs(k), 4); cvShow(k); });
+  cvM.addEventListener("input", function () { var m = num(cvM.value); if (isNaN(m)) { $("cvOut").innerHTML = '<span class="err">Écris un nombre.</span>'; return; } var k = msToKmh(m); cvK.value = fmt(k, 4); cvShow(k); });
+  cvShow(36);
+
+  var famous = [
+    ["La marche", 5, true],
+    ["Usain Bolt, moyenne du record du 100 m (9,58 s, 2009)", 100 / 9.58 * 3.6, false],
+    ["Un guépard qui sprinte", 100, true],
+    ["Un TGV en service", 320, false],
+    ["Un avion de ligne", 900, true],
+    ["Le son dans l'air", 1224, true],
+    ["La Terre autour du Soleil (30 km/s)", 108000, true],
+    ["La lumière (300 000 km/s)", 1.08e9, true]
+  ];
+  var LOGMAX = 9.2, VMAX = 1.08e9;
+  function sv(x) { return fmt(x, x < 100 ? 2 : 0); }
+  $("speeds").innerHTML = famous.map(function (f, i) {
+    var ms = kmhToMs(f[1]), pk = f[2] || !exact(f[1]) ? "≈ " : "", pm = f[2] || !exact(ms) ? "≈ " : "";
+    return '<li><div class="sp-top"><span class="sp-name">' + f[0] + '</span><span class="sp-val">' + pk + sv(f[1]) + " km/h · " + pm + sv(ms) + ' m/s</span></div><div class="bar-track"><div class="bar-fill" id="bar' + i + '"></div></div></li>';
+  }).join("");
+  function setScale(log) {
+    $("scLog").setAttribute("aria-pressed", log ? "true" : "false");
+    $("scLin").setAttribute("aria-pressed", log ? "false" : "true");
+    famous.forEach(function (f, i) {
+      var w = log ? Math.log10(f[1]) / LOGMAX * 100 : f[1] / VMAX * 100;
+      $("bar" + i).style.width = Math.max(0, Math.min(100, w)) + "%";
+    });
+    $("scNote").textContent = log
+      ? "Échelle « × 10 » (on dit logarithmique) : chaque fois que la barre s'allonge d'un même pas, la vitesse est multipliée par 10. On peut ainsi tout comparer."
+      : "Échelle normale : la lumière écrase tout. La barre de l'avion fait moins d'un millionième de celle de la lumière, on ne la voit même pas.";
+  }
+  $("scLog").addEventListener("click", function () { setScale(true); });
+  $("scLin").addEventListener("click", function () { setScale(false); });
+  setScale(true);
+
+  /* ---------- Étape 5 : trajet ---------- */
+  var segCols = ["var(--acc)", "var(--two)", "var(--ok)"], segDef = [["30 min", "60"], ["15 min", "0"], ["45 min", "80"]];
+  segDef.forEach(function (s, i) {
+    var div = document.createElement("div"); div.className = "seg";
+    div.innerHTML = '<span class="seg-name"><span class="dot" style="background:' + segCols[i] + '"></span>Morceau ' + (i + 1) + "</span>" +
+      '<label for="sgT' + i + '">Durée<input id="sgT' + i + '" type="text" autocomplete="off" value="' + s[0] + '"></label>' +
+      '<label for="sgV' + i + '">Vitesse (km/h)<input id="sgV' + i + '" type="text" inputmode="decimal" autocomplete="off" value="' + s[1] + '"></label>';
+    $("segs").appendChild(div);
+  });
+  function niceStep(raw) { var p = Math.pow(10, Math.floor(Math.log10(raw))), n = raw / p; return (n <= 1 ? 1 : n <= 2 ? 2 : n <= 2.5 ? 2.5 : n <= 5 ? 5 : 10) * p; }
+  function axis(max) { var st = niceStep(max / 4); return { st: st, top: Math.ceil(max / st - 1e-9) * st }; }
+  function trip() {
+    var out = $("tripOut"), svg = $("tripG"), segs = [];
+    for (var i = 0; i < 3; i++) {
+      var t = parseDuration($("sgT" + i).value, "min"), v = num($("sgV" + i).value);
+      if (isNaN(t) || t <= 0) { out.innerHTML = '<p class="err">Morceau ' + (i + 1) + " : écris une durée, par exemple 30 min, 1h15 ou 45.</p>"; clear(svg); return; }
+      if (isNaN(v) || v < 0) { out.innerHTML = '<p class="err">Morceau ' + (i + 1) + " : écris une vitesse positive (0 pour un arrêt).</p>"; clear(svg); return; }
+      segs.push({ t: t, v: v });
+    }
+    var tot = trajet(segs), W = 640, H = 360, L = 70, B = 56, T = 20, R = 24;
+    var ax = axis(tot.t * 60), ay = axis(Math.max(tot.d, 1));
+    function X(m) { return L + m / ax.top * (W - L - R); }
+    function Y(d) { return H - B - d / ay.top * (H - B - T); }
+    clear(svg);
+    for (var g = 0; g <= ax.top + 1e-9; g += ax.st) {
+      mk(svg, "line", { x1: X(g), y1: T, x2: X(g), y2: H - B, stroke: "var(--line)", "stroke-width": 1 });
+      mk(svg, "text", { x: X(g), y: H - B + 22, "text-anchor": "middle", "font-size": 16 }, fmt(g));
+    }
+    for (var gy = 0; gy <= ay.top + 1e-9; gy += ay.st) {
+      mk(svg, "line", { x1: L, y1: Y(gy), x2: W - R, y2: Y(gy), stroke: "var(--line)", "stroke-width": 1 });
+      mk(svg, "text", { x: L - 8, y: Y(gy) + 5, "text-anchor": "end", "font-size": 16 }, fmt(gy));
+    }
+    mk(svg, "line", { x1: L, y1: H - B, x2: W - R, y2: H - B, stroke: "var(--ink)", "stroke-width": 2 });
+    mk(svg, "line", { x1: L, y1: T, x2: L, y2: H - B, stroke: "var(--ink)", "stroke-width": 2 });
+    mk(svg, "text", { x: W - R, y: H - 6, "text-anchor": "end", "font-size": 16 }, "temps (min)");
+    mk(svg, "text", { x: L + 10, y: T + 18, "font-size": 16 }, "distance (km)");
+    mk(svg, "line", { x1: X(0), y1: Y(0), x2: X(tot.t * 60), y2: Y(tot.d), stroke: "var(--ink-soft)", "stroke-width": 2, "stroke-dasharray": "7 6" });
+    var cm = 0, cd = 0, rows = [], pts = [[0, 0]];
+    segs.forEach(function (s, i) {
+      var dd = distance(s.v, s.t);
+      mk(svg, "line", { x1: X(cm), y1: Y(cd), x2: X(cm + s.t * 60), y2: Y(cd + dd), stroke: segCols[i], "stroke-width": 5, "stroke-linecap": "round" });
+      cm += s.t * 60; cd += dd; pts.push([cm, cd]);
+      rows.push('<div class="res"><span class="res-name"><span class="dot" style="background:' + segCols[i] + '"></span> Morceau ' + (i + 1) + (s.v === 0 ? " (arrêt)" : "") + '</span><span class="res-val">' + fmt(dd, 2) + ' km</span><span class="res-calc">' + formatHMS(s.t) + " " + eqs(s.t) + fmt(s.t) + " h, donc d = " + fmt(s.v) + " × " + fmt(s.t) + " " + eqs(dd) + fmt(dd) + " km</span></div>");
+    });
+    pts.forEach(function (p) { mk(svg, "circle", { cx: X(p[0]), cy: Y(p[1]), r: 5, fill: "var(--ink)", stroke: "var(--card)", "stroke-width": 2 }); });
+    rows.push('<div class="res total"><span class="res-name">Vitesse moyenne</span><span class="res-val">' + eqs(tot.v) + fmt(tot.v, 2) + ' km/h</span><span class="res-calc">' + fmt(tot.d, 2) + " km en " + formatHMS(tot.t) + " (" + fmt(tot.t) + " h) : " + fmt(tot.d, 2) + " ÷ " + fmt(tot.t) + " " + eqs(tot.v) + fmt(tot.v, 2) + " km/h</span></div>");
+    out.innerHTML = rows.join("");
+  }
+  for (var si = 0; si < 3; si++) { $("sgT" + si).addEventListener("input", trip); $("sgV" + si).addEventListener("input", trip); }
+  trip();
+
+  /* ---------- Étape 6 : aller-retour ---------- */
+  function ar() {
+    var v1 = num($("arV1").value), v2 = num($("arV2").value), d = num($("arD").value), st = $("arSteps"), vd = $("arVerdict");
+    if (isNaN(v1) || isNaN(v2) || isNaN(d) || v1 <= 0 || v2 <= 0 || d <= 0) { st.innerHTML = '<span class="err">Écris trois nombres plus grands que 0.</span>'; vd.className = "verdict"; vd.innerHTML = ""; $("arA").style.width = "50%"; $("arB").style.width = "50%"; $("arA").textContent = ""; $("arB").textContent = ""; return; }
+    var r = allerRetour(v1, v2, d);
+    $("arA").style.width = (r.t1 / r.t * 100) + "%"; $("arB").style.width = (r.t2 / r.t * 100) + "%";
+    $("arA").textContent = "aller " + formatHMS(r.t1); $("arB").textContent = "retour " + formatHMS(r.t2);
+    st.innerHTML = line("Aller : t = " + fmt(d) + " ÷ " + fmt(v1) + " " + eqs(r.t1) + fmt(r.t1) + " h" + (exact(r.t1) && r.t1 % 1 === 0 ? "" : " (" + formatHMS(r.t1) + ")")) +
+      line("Retour : t = " + fmt(d) + " ÷ " + fmt(v2) + " " + eqs(r.t2) + fmt(r.t2) + " h" + (exact(r.t2) && r.t2 % 1 === 0 ? "" : " (" + formatHMS(r.t2) + ")")) +
+      line("En tout : " + fmt(2 * d) + " km en " + fmt(r.t) + " h") +
+      line("Vitesse moyenne = " + fmt(2 * d) + " ÷ " + fmt(r.t) + " " + eqs(r.v) + "<b>" + fmt(r.v, 2) + " km/h</b>");
+    if (Math.abs(v1 - v2) < 1e-9) { vd.className = "verdict yes"; vd.innerHTML = "Les deux vitesses sont égales.<span>Ici, la vitesse moyenne vaut bien " + fmt(v1) + " km/h. C'est le seul cas où la moyenne des vitesses tombe juste.</span>"; }
+    else { var slow = Math.min(v1, v2); vd.className = "verdict no"; vd.innerHTML = "La moyenne des vitesses donne (" + fmt(v1) + " + " + fmt(v2) + ") ÷ 2 = " + fmt(r.moyenneDesVitesses, 2) + " km/h : c'est faux !<span>Tu passes plus de temps à rouler à " + fmt(slow) + " km/h. La vitesse lente compte donc plus dans la moyenne.</span>"; }
+  }
+  ["arV1", "arV2", "arD"].forEach(function (id) { $(id).addEventListener("input", ar); }); ar();
+
+  /* ---------- Étape 9 : quiz ---------- */
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  function trio() { var v, tm; do { v = pick([30, 40, 60, 80, 90, 120]); tm = pick([15, 20, 30, 40, 45, 75, 90, 105]); } while ((v * tm / 60) % 1 !== 0); return { v: v, tm: tm, d: v * tm / 60 }; }
+  var gens = [
+    function () { var o = trio(); return { q: "Une voiture roule à " + o.v + " km/h pendant " + formatHMS(o.tm / 60) + ". Quelle distance parcourt-elle (en km) ?", a: o.d, how: "t = " + o.tm + " ÷ 60 " + eqs(o.tm / 60) + fmt(o.tm / 60) + " h, donc d = v × t = " + o.v + " × " + fmt(o.tm / 60) + " = " + fmt(o.d) + " km" }; },
+    function () { var o = trio(); return { q: "Un train roule à " + o.v + " km/h. Combien de minutes lui faut-il pour faire " + o.d + " km ?", a: o.tm, how: "t = d ÷ v = " + o.d + " ÷ " + o.v + " " + eqs(o.tm / 60) + fmt(o.tm / 60) + " h, et " + fmt(o.tm / 60) + " × 60 = " + o.tm + " min" }; },
+    function () { var o = trio(); return { q: "Un scooter parcourt " + o.d + " km en " + o.tm + " min. Quelle est sa vitesse moyenne (en km/h) ?", a: o.v, how: "t = " + o.tm + " ÷ 60 " + eqs(o.tm / 60) + fmt(o.tm / 60) + " h, donc v = d ÷ t = " + o.d + " ÷ " + fmt(o.tm / 60) + " = " + o.v + " km/h" }; },
+    function () { var m = pick([6, 12, 15, 18, 30, 36, 45, 48, 90, 105, 135, 150]); return { q: "Écris " + m + " min en heures, avec un nombre décimal (en h).", a: m / 60, how: m + " ÷ 60 = " + fmt(m / 60) + " h" }; },
+    function () { var h = pick([0.1, 0.2, 0.25, 0.4, 0.75, 1.2, 1.25, 1.5, 1.75, 2.5]); return { q: "Combien de minutes font " + fmt(h) + " h ?", a: h * 60, how: fmt(h) + " × 60 = " + fmt(h * 60) + " min, soit " + formatHMS(h) }; },
+    function () { var v = pick([2, 5, 10, 15, 20, 25, 30, 50]); return { q: "Convertis " + v + " m/s en km/h.", a: v * 3.6, how: v + " × 3,6 = " + fmt(v * 3.6) + " km/h" }; },
+    function () { var v = pick([18, 36, 54, 72, 90, 108, 126, 144]); return { q: "Convertis " + v + " km/h en m/s.", a: v / 3.6, how: v + " ÷ 3,6 = " + fmt(v / 3.6) + " m/s" }; },
+    function () { var d = pick([100, 200, 400, 800, 1000]), v = pick([4, 5, 8, 10]); return { q: "Un coureur parcourt " + d + " m en " + fmt(d / v) + " s. Quelle est sa vitesse (en m/s) ?", a: v, how: "v = d ÷ t = " + d + " ÷ " + fmt(d / v) + " = " + v + " m/s" }; }
+  ];
+  var quiz = $("quiz"), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ""; done = [];
+    var order = gens.map(function (g, i) { return i; });
+    for (var j = order.length - 1; j > 0; j--) { var r = Math.floor(Math.random() * (j + 1)), tmp = order[j]; order[j] = order[r]; order[r] = tmp; }
+    for (var k = 0; k < 8; k++) {
+      var Q = gens[order[k]](), li = document.createElement("li");
+      li.innerHTML = "<span>" + Q.q + '</span><input type="text" id="qa' + k + '" inputmode="decimal" autocomplete="off" aria-label="Ta réponse à la question ' + (k + 1) + '"><button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+      quiz.appendChild(li);
+      (function (k, Q) {
+        function check() {
+          var fb = $("qf" + k), x = num($("qa" + k).value);
+          if (isNaN(x)) { fb.className = "fb"; fb.textContent = "Écris un nombre."; return; }
+          if (Math.abs(x - Q.a) <= Math.max(0.006, Math.abs(Q.a) * 0.001)) { fb.className = "fb ok"; fb.innerHTML = "Bravo, c'est juste !<span>" + Q.how + "</span>"; done[k] = true; }
+          else { done[k] = false; fb.className = "fb no"; fb.innerHTML = "Pas tout à fait : la réponse est " + fmt(Q.a, 2) + ".<span>" + Q.how + "</span>"; }
+          $("score").textContent = done.filter(Boolean).length + " / 8";
+        }
+        $("qb" + k).addEventListener("click", check);
+        $("qa" + k).addEventListener("keydown", function (e) { if (e.key === "Enter") check(); });
+      })(k, Q);
+    }
+    $("score").textContent = "0 / 8";
+  }
+  $("newQuiz").addEventListener("click", newQuiz);
+  newQuiz();
+})();
+</script>
+</body>
+</html>
