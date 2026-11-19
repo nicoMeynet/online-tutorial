@@ -16,6 +16,13 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 
 TOPICS = [
+    ("les mélanges et les solutions", "les-melanges-et-les-solutions.html"),
+    ("les transformations chimiques", "les-transformations-chimiques.html"),
+    ("l'Univers et le système solaire", "l-univers-et-le-systeme-solaire.html"),
+    ("l'Univers", "l-univers-et-le-systeme-solaire.html"),
+    ("les forces", "les-forces.html"),
+    ("les formes d'énergie", "les-formes-d-energie.html"),
+    ("le son", "le-son.html"),
     ("les états de la matière", "les-etats-de-la-matiere.html"),
     ("les atomes et les molécules", "les-atomes-et-les-molecules.html"),
     ("le mouvement", "le-mouvement.html"),

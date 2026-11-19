@@ -70,6 +70,12 @@ Accueil de la physique : [physique.html](physique.html).
 | [Le poids et la masse](le-poids-et-la-masse.html) | Masse et poids, un dynamomètre virtuel, P = m × g, ton poids sur la Lune et les planètes, le poids comme une flèche, la station spatiale, un quiz. |
 | [Les circuits électriques](les-circuits-electriques.html) | La boucle, les symboles, conducteurs et isolants, un simulateur série et dérivation, le sens du courant, la DEL, la sécurité, un quiz. |
 | [La lumière](la-lumiere.html) | Sources et objets diffusants, propagation rectiligne, ombres et éclipses, vitesse de la lumière, prisme, synthèse RVB, couleur perçue, réflexion, un quiz. |
+| [Les mélanges et les solutions](les-melanges-et-les-solutions.html) | Homogène ou hétérogène, miscible ou non, dissolution et conservation de la masse, solubilité et saturation, concentration en g/L et dilution, séparer un mélange, un quiz. |
+| [Les transformations chimiques](les-transformations-chimiques.html) | Transformation physique ou chimique, réactifs et produits, le triangle du feu, les atomes réarrangés, la conservation de la masse, équilibrer une équation, un quiz. |
+| [L'Univers et le système solaire](l-univers-et-le-systeme-solaire.html) | Notre adresse dans l'Univers, le système solaire à l'échelle, les fiches des planètes, unité astronomique et année-lumière, voyages spatiaux, un quiz. |
+| [Les forces](les-forces.html) | Actions mécaniques de contact et à distance, le diagramme objet-interaction, la force en flèche, l'équilibre, l'inertie et les frottements, un quiz. |
+| [Les formes d'énergie](les-formes-d-energie.html) | Les formes d'énergie, la conservation, les chaînes énergétiques, le rendement, le skate-park cinétique ↔ potentielle, les énergies renouvelables, un quiz. |
+| [Le son](le-son.html) | La vibration, la propagation de proche en proche, pas de son dans le vide, la vitesse du son, la distance d'un orage, l'écho, les sons audibles, les décibels, un quiz. |
 
 ## Pour réviser
 
