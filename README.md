@@ -1,6 +1,6 @@
 # Online tutorial
 
-Petits tutoriels interactifs en français, pour les élèves du collège.
+Petits tutoriels interactifs en français, pour les élèves du secondaire I (Suisse romande, de la 8H à la 11H).
 
 Chaque tutoriel est une seule page HTML, sans installation. Il suffit de l'ouvrir dans un navigateur, sur ordinateur ou sur téléphone.
 
@@ -46,11 +46,11 @@ Chaque tutoriel est une seule page HTML, sans installation. Il suffit de l'ouvri
 | [L'équation produit nul et les systèmes](l-equation-produit-nul-et-les-systemes.html) | A × B = 0, x² = a, factoriser pour résoudre, les systèmes (substitution, combinaison) et leur lecture graphique, un quiz. |
 | [Les arrondis et les ordres de grandeur](les-arrondis-et-ordres-de-grandeur.html) | Troncature et arrondi, valeurs approchées et encadrements, chiffres significatifs, estimer un calcul, les pièges des arrondis, un quiz. |
 | [Les grandeurs composées](les-grandeurs-composees.html) | Débit, masse volumique, énergie en kWh, consommation, densité de population, prix unitaire et conversions, un quiz. |
-| [Le second degré](le-second-degre.html) | Avant-goût du lycée : la parabole et ses curseurs, la forme canonique, le discriminant et les solutions de ax² + bx + c = 0, un quiz. |
-| [Les vecteurs](les-vecteurs.html) | Avant-goût du lycée : déplacement, égalité, coordonnées, relation de Chasles, multiplication par un nombre, norme, l'avion dans le vent, un quiz. |
-| [Les suites](les-suites.html) | Avant-goût du lycée : suites arithmétiques et géométriques, croissance linéaire contre exponentielle, limites, la conjecture de Syracuse, un quiz. |
-| [La dérivée](la-derivee.html) | Avant-goût du lycée : de la vitesse moyenne à la vitesse instantanée, de la sécante à la tangente, le sens de variation, un quiz. |
-| [Les nombres complexes](les-nombres-complexes.html) | Avant-goût du lycée : i² = −1, le plan complexe, addition et rotation, module, résoudre x² + 1 = 0, Mandelbrot, un quiz. |
+| [Le second degré](le-second-degre.html) | Avant-goût du secondaire II : la parabole et ses curseurs, la forme canonique, le discriminant et les solutions de ax² + bx + c = 0, un quiz. |
+| [Les vecteurs](les-vecteurs.html) | Avant-goût du secondaire II : déplacement, égalité, coordonnées, relation de Chasles, multiplication par un nombre, norme, l'avion dans le vent, un quiz. |
+| [Les suites](les-suites.html) | Avant-goût du secondaire II : suites arithmétiques et géométriques, croissance linéaire contre exponentielle, limites, la conjecture de Syracuse, un quiz. |
+| [La dérivée](la-derivee.html) | Avant-goût du secondaire II : de la vitesse moyenne à la vitesse instantanée, de la sécante à la tangente, le sens de variation, un quiz. |
+| [Les nombres complexes](les-nombres-complexes.html) | Avant-goût du secondaire II : i² = −1, le plan complexe, addition et rotation, module, résoudre x² + 1 = 0, Mandelbrot, un quiz. |
 | [La cryptographie](la-cryptographie.html) | Code de César et sa roue, casser un code par force brute et par les fréquences, Vigenère, l'arithmétique de l'horloge, l'idée du RSA avec de petits nombres premiers, un quiz. |
 | [Le binaire et les bases](le-binaire-et-les-bases.html) | Base 10, 60, 12 et 20, le binaire avec des ampoules, les conversions pas à pas, l'hexadécimal et les couleurs, les octets, le code ASCII, un tour de magie, un quiz. |
 | [Les paradoxes de probabilité](les-paradoxes-de-probabilite.html) | Monty Hall, les anniversaires, l'erreur du joueur, les deux enfants, les faux positifs, les dés non transitifs et le paradoxe de Simpson, avec des simulations, un quiz. |
@@ -93,16 +93,17 @@ Accueil du numérique : [numerique.html](numerique.html).
 | Tutoriel | Sujet |
 |---|---|
 | [Repérer les arnaques et l'hameçonnage](reperer-les-arnaques.html) | Faux e-mails, SMS, appels et messages : les signaux d'alerte, lire un lien, l'IA et les arnaques, une boîte de réception à trier, les conséquences et quoi faire si on s'est fait avoir, un quiz. |
+| [Les mots de passe](les-mots-de-passe.html) | Pourquoi un mot de passe compte, comment on se le fait voler, un testeur de solidité, la phrase de passe, un mot de passe par compte, le gestionnaire, la double authentification, que faire si un compte est piraté, un quiz. |
 
 ## Pour réviser
 
 | Page | Contenu |
 |---|---|
 | [Mon parcours](parcours.html) | Une formation personnalisée : 8 parcours (maths et physique), la prochaine étape conseillée selon ce qui est réussi, les prérequis à revoir et des conseils. Générée par `python tools/parcours.py`. |
-| [Quiz brevet mélangé](revisions-brevet.html) | 60 types de questions tirées au hasard dans tous les thèmes du collège, mode entraînement ou examen, score par thème et tutoriels à revoir. |
+| [Grand quiz de révision : maths](revisions-brevet.html) | 60 types de questions tirées au hasard dans tous les thèmes du collège, mode entraînement ou examen, score par thème et tutoriels à revoir. |
 | [Fiches à imprimer](fiches.html) | L'essentiel de chaque tutoriel (sa partie « À retenir »), une catégorie par feuille. Générée par `python tools/fiches.py`. |
 | [Glossaire](glossaire.html) | Plus de 360 mots de maths expliqués simplement, avec un exemple et un lien vers le bon tutoriel. Lien direct vers un mot : `glossaire.html#hypotenuse`. |
-| [Quiz brevet de physique](revisions-brevet-physique.html) | Des questions de physique-chimie tirées au hasard dans les 4 thèmes, mode entraînement ou examen, score par thème. |
+| [Grand quiz de révision : physique-chimie](revisions-brevet-physique.html) | Des questions de physique-chimie tirées au hasard dans les 4 thèmes, mode entraînement ou examen, score par thème. |
 | [Glossaire de physique](glossaire-physique.html) | Les mots de la physique-chimie expliqués simplement, avec leur unité, un exemple et un lien vers le bon tutoriel. |
 
 La **progression** (tutoriels ouverts, meilleur score à chaque quiz) est enregistrée par [progress.js](progress.js) dans le navigateur de l'élève, sans compte ni serveur. Elle s'affiche sur l'accueil.

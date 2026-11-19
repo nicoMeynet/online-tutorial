@@ -17,32 +17,32 @@ import difficulte  # noqa: E402
 ROOT = Path(__file__).resolve().parent.parent
 
 TRACKS = [
-    ("bases", "maths", "Les bases du calcul", "6ᵉ–5ᵉ", "Calculer sans se tromper, les fractions, la proportionnalité et les premières figures.", [
+    ("bases", "maths", "Les bases du calcul", "8H–9H", "Calculer sans se tromper, les fractions, la proportionnalité et les premières figures.", [
         "les-priorites-de-calcul", "les-nombres-relatifs", "les-fractions", "les-arrondis-et-ordres-de-grandeur",
         "la-proportionnalite", "les-conversions", "les-angles-et-triangles", "les-formes-geometriques"]),
-    ("quatrieme", "maths", "Cap sur la 4ᵉ", "5ᵉ–4ᵉ", "Les lettres entrent en scène : puissances, calcul littéral, équations, Pythagore.", [
+    ("quatrieme", "maths", "Cap sur la 10H", "9H–10H", "Les lettres entrent en scène : puissances, calcul littéral, équations, Pythagore.", [
         "les-puissances", "le-calcul-litteral", "les-equations", "les-pourcentages", "la-vitesse",
         "le-reperage", "le-theoreme-de-pythagore", "les-transformations", "les-droites-remarquables",
         "les-quadrilateres", "les-statistiques"]),
-    ("brevet", "maths", "Objectif brevet", "3ᵉ", "Tout le programme de 3ᵉ, jusqu'au quiz brevet.", [
+    ("brevet", "maths", "Objectif 11H", "11H", "Tout le programme de 11H, jusqu'au grand quiz de révision.", [
         "les-identites-remarquables", "l-equation-produit-nul-et-les-systemes", "les-inequations", "les-fonctions",
         "les-racines-carrees", "les-nombres-premiers", "le-theoreme-de-thales", "la-trigonometrie",
         "les-echelles", "la-sphere-et-la-boule", "les-grandeurs-composees", "les-probabilites",
         "l-algorithmique", "la-demonstration", "revisions-brevet"]),
-    ("lycee", "maths", "Avant-goût du lycée", "3ᵉ → 2nde", "Pour les curieux qui veulent prendre de l'avance.", [
+    ("lycee", "maths", "Avant-goût du secondaire II", "11H → secondaire II", "Pour les curieux qui veulent prendre de l'avance.", [
         "les-ensembles-de-nombres", "le-second-degre", "les-vecteurs", "les-suites", "la-derivee", "les-nombres-complexes"]),
     ("curiosites", "maths", "Maths et curiosités", "tous niveaux", "Les nombres célèbres, les codes secrets, les jeux et la musique.", [
         "le-nombre-pi", "le-nombre-d-or", "le-nombre-e", "les-grands-nombres-et-l-infini", "le-binaire-et-les-bases",
         "la-cryptographie", "les-paradoxes-de-probabilite", "les-fractales", "les-jeux-de-strategie", "les-maths-et-la-musique"]),
-    ("physique1", "physique", "Découvrir la physique-chimie", "5ᵉ–4ᵉ", "La matière, le mouvement, l'électricité, la lumière et le son.", [
+    ("physique1", "physique", "Découvrir la physique-chimie", "9H–10H", "La matière, le mouvement, l'électricité, la lumière et le son.", [
         "les-etats-de-la-matiere", "les-melanges-et-les-solutions", "les-atomes-et-les-molecules", "le-mouvement",
         "les-circuits-electriques", "la-lumiere", "le-son", "l-univers-et-le-systeme-solaire"]),
-    ("physique2", "physique", "Physique-chimie : objectif brevet", "4ᵉ–3ᵉ", "Réactions, forces, énergie, électricité et signaux, jusqu'au quiz brevet.", [
+    ("physique2", "physique", "Physique-chimie : objectif 11H", "10H–11H", "Réactions, forces, énergie, électricité et signaux, jusqu'au grand quiz de révision.", [
         "les-transformations-chimiques", "les-acides-et-les-bases", "les-forces", "le-poids-et-la-masse", "la-gravitation",
         "les-formes-d-energie", "l-energie-cinetique-et-la-securite-routiere", "la-loi-d-ohm",
         "la-puissance-et-l-energie-electrique", "les-signaux-et-la-communication", "revisions-brevet-physique"]),
-    ("securite", "numerique", "Se protéger en ligne", "collège", "Repérer les arnaques et garder ses comptes en sécurité.", [
-        "reperer-les-arnaques"]),
+    ("securite", "numerique", "Se protéger en ligne", "secondaire I", "Repérer les arnaques et garder ses comptes en sécurité.", [
+        "reperer-les-arnaques", "les-mots-de-passe"]),
     ("pcurio", "physique", "Physique et curiosités", "tous niveaux", "La physique du ciel, du sport et du climat.", [
         "le-ciel-bleu-et-l-arc-en-ciel", "la-physique-du-sport", "le-climat-et-l-effet-de-serre"]),
 ]
@@ -111,8 +111,8 @@ PRE = {
 NOQUIZ = ["le-nombre-pi", "le-nombre-e", "le-theoreme-de-pythagore", "le-theoreme-de-thales", "les-formes-geometriques"]
 
 EXTRA = {
-    "revisions-brevet": ("Quiz brevet de maths", "Des questions de tous les thèmes, avec ton score par thème.", "🎯"),
-    "revisions-brevet-physique": ("Quiz brevet de physique", "Des questions de physique-chimie de tous les thèmes.", "🎯"),
+    "revisions-brevet": ("Grand quiz de révision : maths", "Des questions de tous les thèmes, avec ton score par thème.", "🎯"),
+    "revisions-brevet-physique": ("Grand quiz de révision : physique", "Des questions de physique-chimie de tous les thèmes.", "🎯"),
 }
 
 CSS = r"""

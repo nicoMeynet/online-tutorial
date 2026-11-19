@@ -19,6 +19,7 @@ import difficulte  # noqa: E402
 ROOT = Path(__file__).resolve().parent.parent
 
 TOPICS = [
+    ("les mots de passe", "les-mots-de-passe.html"),
     ("les arnaques", "reperer-les-arnaques.html"),
     ("l'hameçonnage", "reperer-les-arnaques.html"),
     ("le ciel bleu et l'arc-en-ciel", "le-ciel-bleu-et-l-arc-en-ciel.html"),

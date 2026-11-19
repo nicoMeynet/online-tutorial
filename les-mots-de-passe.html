@@ -1,0 +1,1011 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Les mots de passe</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, marge rouge. Accent bleu-vert profond (#0f766e), avec rouge, orange, ambre et vert pour les niveaux de solidité. Tous les services, adresses et mots de passe des exemples sont inventés (domaines en .exemple). Rien de ce qui est tapé n'est envoyé ni enregistré. */
+:root {
+  --paper: #f6faf9;
+  --grid: #dfecea;
+  --card: #ffffff;
+  --ink: #132a28;
+  --ink-soft: #4f6a67;
+  --acc: #0f766e;
+  --acc-soft: #d4efeb;
+  --warn: #d97706;
+  --warn-soft: #fdf0d6;
+  --warn-ink: #92400e;
+  --org: #ea580c;
+  --org-soft: #fde4d4;
+  --lime: #4d8a17;
+  --lime-soft: #e6f3d6;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #fff0a3;
+  --line: #d3e3e0;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0d1716; --grid: #172524; --card: #12201f; --ink: #e8f3f1; --ink-soft: #a3bdb9;
+    --acc: #5eead4; --acc-soft: #113a36; --warn: #f5a524; --warn-soft: #3d2a0c; --warn-ink: #fbbf5a;
+    --org: #fb923c; --org-soft: #3d2210; --lime: #a3e36b; --lime-soft: #233414;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #2a3e3c;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0d1716; --grid: #172524; --card: #12201f; --ink: #e8f3f1; --ink-soft: #a3bdb9;
+  --acc: #5eead4; --acc-soft: #113a36; --warn: #f5a524; --warn-soft: #3d2a0c; --warn-ink: #fbbf5a;
+  --org: #fb923c; --org-soft: #3d2210; --lime: #a3e36b; --lime-soft: #233414;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #2a3e3c;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--acc); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note.warn { border-left-color: var(--warn); background: var(--warn-soft); }
+.note.ok { border-left-color: var(--ok); background: var(--ok-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+.fig svg { width: 100%; height: auto; display: block; }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 8px 12px; min-height: 44px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+button:disabled { opacity: .5; cursor: default; transform: none; }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+input[type="text"] { font: inherit; font-family: var(--f-mono); font-size: 1rem; padding: 8px 10px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; }
+input[type="range"] { width: 100%; accent-color: var(--acc); }
+select { font: inherit; font-size: 1rem; padding: 8px 8px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; }
+.param { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.param label { font-weight: 700; }
+.params { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.privacy { font-size: .9rem; color: var(--ok); font-weight: 700; display: flex; gap: 6px; align-items: flex-start; }
+.privacy::before { content: "🔒"; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
+.tag.ok { color: var(--ok); }
+.tag.no { color: var(--red); }
+.tag.warn { color: var(--warn-ink); }
+.tag.acc { color: var(--acc); }
+.formula { font-family: var(--f-mono); font-size: 1.1rem; text-align: center; background: var(--paper); border: 1.5px dashed var(--line); border-radius: 8px; padding: 10px; overflow-wrap: anywhere; }
+
+.verdict { border-radius: 8px; padding: 12px 14px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+.verdict.yes { background: var(--ok-soft); color: var(--ok); }
+.verdict.no { background: var(--red-soft); color: var(--red); }
+.verdict.mid { background: var(--warn-soft); color: var(--warn-ink); }
+.verdict span { font-weight: 400; color: var(--ink); }
+
+/* Compteur de solidité */
+.meter { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.meter i { height: 14px; border-radius: 4px; background: var(--line); display: block; }
+.lv0 .meter i:nth-child(-n+1) { background: var(--red); }
+.lv1 .meter i:nth-child(-n+2) { background: var(--org); }
+.lv2 .meter i:nth-child(-n+3) { background: var(--warn); }
+.lv3 .meter i:nth-child(-n+4) { background: var(--lime); }
+.lv4 .meter i:nth-child(-n+5) { background: var(--ok); }
+.lvl-name { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; }
+.lv0 .lvl-name { color: var(--red); } .lv1 .lvl-name { color: var(--org); } .lv2 .lvl-name { color: var(--warn-ink); } .lv3 .lvl-name { color: var(--lime); } .lv4 .lvl-name { color: var(--ok); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-family: var(--f-mono); font-size: .82rem; border: 1.5px solid var(--line); border-radius: 999px; padding: 2px 10px; color: var(--ink-soft); }
+.chip.on { border-color: var(--acc); color: var(--acc); background: var(--acc-soft); font-weight: 600; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.stat { background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 10px; min-width: 0; }
+.stat b { display: block; font-family: var(--f-mono); font-size: 1.05rem; overflow-wrap: anywhere; }
+.stat small { color: var(--ink-soft); font-size: .85rem; }
+.issues { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.issues li { border-left: 4px solid var(--org); background: var(--org-soft); border-radius: 0 8px 8px 0; padding: 6px 10px; font-size: .95rem; overflow-wrap: anywhere; }
+.issues li.good { border-left-color: var(--ok); background: var(--ok-soft); }
+
+/* Longueur contre complexité */
+.rows { display: flex; flex-direction: column; gap: 10px; }
+.row { display: grid; grid-template-columns: minmax(0, 150px) minmax(0, 1fr); gap: 4px 12px; align-items: center; }
+.row .lab { font-weight: 700; font-size: .95rem; }
+.row .bar { height: 18px; border-radius: 4px; background: var(--acc); min-width: 2px; transition: width .25s; }
+.row .val { grid-column: 2; font-family: var(--f-mono); font-size: .85rem; color: var(--ink-soft); overflow-wrap: anywhere; }
+@media (max-width: 520px) { .row { grid-template-columns: minmax(0, 1fr); } .row .val { grid-column: 1; } }
+
+/* Phrase de passe */
+.phrase { font-family: var(--f-mono); font-size: clamp(1.1rem, 4.5vw, 1.5rem); font-weight: 600; color: var(--acc); background: var(--paper); border: 2px dashed var(--acc); border-radius: 10px; padding: 14px; text-align: center; overflow-wrap: anywhere; }
+.cmp { width: 100%; border-collapse: collapse; font-size: .92rem; font-variant-numeric: tabular-nums; }
+.cmp th, .cmp td { border: 1.5px solid var(--line); padding: 6px 8px; text-align: left; vertical-align: top; }
+.cmp th { font-family: var(--f-display); background: var(--paper); }
+.cmp td.n { font-family: var(--f-mono); white-space: nowrap; }
+.scroll { overflow-x: auto; }
+
+/* Domino de la fuite */
+.dom { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.acct { border: 2px solid var(--ok); background: var(--ok-soft); border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; min-width: 0; transition: transform .3s; }
+.acct strong { font-family: var(--f-display); font-size: 1.1rem; }
+.acct .kind { font-size: .85rem; color: var(--ink-soft); }
+.acct .st { font-family: var(--f-mono); font-size: .8rem; font-weight: 600; color: var(--ok); }
+.acct.fall { border-color: var(--red); background: var(--red-soft); transform: rotate(-3deg); }
+.acct.fall .st { color: var(--red); }
+.acct.leak { border-style: dashed; }
+.log { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.log li { border-left: 4px solid var(--acc); background: var(--paper); border-radius: 0 8px 8px 0; padding: 6px 10px; font-size: .95rem; overflow-wrap: anywhere; }
+.log li.bad { border-left-color: var(--red); }
+.log li.good { border-left-color: var(--ok); }
+.leakfile { font-family: var(--f-mono); font-size: .85rem; background: var(--paper); border: 1.5px dashed var(--line); border-radius: 8px; padding: 8px 10px; overflow-wrap: anywhere; }
+
+/* Double authentification */
+.tfa-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 200px); gap: 14px; align-items: start; }
+@media (max-width: 600px) { .tfa-grid { grid-template-columns: minmax(0, 1fr); } }
+.phone { border: 2.5px solid var(--ink); border-radius: 22px; padding: 18px 12px; background: var(--paper); display: flex; flex-direction: column; gap: 8px; min-height: 180px; }
+.phone .top { width: 50px; height: 6px; border-radius: 3px; background: var(--line); align-self: center; }
+.phone .who { font-family: var(--f-mono); font-size: .75rem; color: var(--ink-soft); text-align: center; }
+.notif { background: var(--card); border: 1.5px solid var(--line); border-radius: 12px; padding: 8px 10px; font-size: .9rem; overflow-wrap: anywhere; }
+.notif b { font-family: var(--f-mono); font-size: 1.1rem; color: var(--acc); letter-spacing: .08em; }
+
+/* Checklist */
+.steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; counter-reset: st; }
+.steps li { counter-increment: st; display: grid; grid-template-columns: 34px 1fr; gap: 10px; align-items: start; border: 1.5px solid var(--line); border-radius: 10px; padding: 8px 10px; background: var(--card); }
+.steps li::before { content: counter(st); width: 30px; height: 30px; border-radius: 50%; background: var(--acc); color: var(--card); display: grid; place-items: center; font-family: var(--f-display); font-weight: 800; }
+.steps li.done { opacity: .6; }
+.steps li.done::before { content: "✓"; background: var(--ok); }
+.steps label { display: flex; gap: 8px; align-items: flex-start; cursor: pointer; min-width: 0; }
+.steps input { width: 22px; height: 22px; margin-top: 3px; accent-color: var(--ok); flex: none; }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 220px auto; gap: 10px; align-items: center; }
+.quiz li > span:first-child { min-width: 0; overflow-wrap: anywhere; }
+.quiz select { font-size: .95rem; padding: 6px 6px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb:empty { display: none; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc); }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 140px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+details ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+<!--ticons--><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Tutoriels"><script src="progress.js" defer></script><!--/ticons-->
+<style id="tnav-css">
+.tnav-top { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin: 0 0 4px; }
+.tnav-home { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font-weight: 700; font-size: .95rem; text-decoration: none; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tnav-home:hover, .tnav-home:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.tnav-bottom { margin-top: 8px; display: flex; flex-direction: column; gap: 12px; }
+.tnav-bottom h2 { margin: 0; }
+.tnav-pn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tnav-pn a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--ink, #222); border-radius: 10px;
+  background: var(--card, #fff); color: var(--ink, #222); text-decoration: none; box-shadow: 3px 3px 0 var(--ink, #222); min-width: 0; }
+.tnav-pn a span { font-size: .85rem; color: var(--ink-soft, #666); }
+.tnav-pn a strong { overflow-wrap: anywhere; }
+.tnav-pn a.next { text-align: right; grid-column: 2; }
+.tnav-bottom .tnav-home { align-self: center; }
+@media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
+.diff { font: 700 .72rem/1.2 var(--f-mono, monospace); padding: 2px 8px; border-radius: 99px; border: 1.5px solid; white-space: nowrap; }
+.diff.d1 { color: #15803d; border-color: #15803d; background: #dcf3e3; }
+.diff.d2 { color: #a15c07; border-color: #b45309; background: #fbe7cf; }
+.diff.d3 { color: #b91c1c; border-color: #b91c1c; background: #fde2e2; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root:not([data-theme="light"]) .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root:not([data-theme="light"]) .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; } }
+:root[data-theme="dark"] .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root[data-theme="dark"] .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root[data-theme="dark"] .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; }
+</style>
+</head>
+<body>
+<main class="page">
+<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="numerique.html">← Tous les tutoriels numériques</a><span class="diff d1" title="Difficulté : facile">Facile</span></nav><!--/tnav-->
+
+
+  <header class="hero">
+    <span class="eyebrow">Tutoriel numérique · niveau secondaire I</span>
+    <h1>Les mots de passe</h1>
+    <p class="lead">Ton mot de passe, c'est la clé de ta maison en ligne : ton jeu, ta messagerie, tes photos, ton e-mail. Ici, tu vas apprendre à en créer de vraiment solides, à les retenir sans te prendre la tête, et à les protéger. Avec un peu de calcul, tu vas voir pourquoi <strong>la longueur gagne</strong>.</p>
+    <div class="box fig">
+      <svg viewBox="0 0 360 170" role="img" aria-label="Un cadenas à côté d'un compteur de solidité à cinq barres, de très faible à très solide">
+        <rect x="30" y="70" width="90" height="80" rx="12" fill="var(--acc-soft)" stroke="var(--acc)" stroke-width="3"/>
+        <path d="M48 70 V48 a27 27 0 0 1 54 0 V70" fill="none" stroke="var(--acc)" stroke-width="6" stroke-linecap="round"/>
+        <circle cx="75" cy="103" r="9" fill="var(--acc)"/>
+        <rect x="71" y="106" width="8" height="22" rx="3" fill="var(--acc)"/>
+        <g>
+          <rect x="160" y="120" width="30" height="20" rx="3" fill="var(--red)"/>
+          <rect x="198" y="105" width="30" height="35" rx="3" fill="var(--org)"/>
+          <rect x="236" y="90" width="30" height="50" rx="3" fill="var(--warn)"/>
+          <rect x="274" y="70" width="30" height="70" rx="3" fill="var(--lime)"/>
+          <rect x="312" y="45" width="30" height="95" rx="3" fill="var(--ok)"/>
+        </g>
+        <text x="160" y="160" font-size="13">faible</text>
+        <text x="342" y="160" font-size="13" text-anchor="end">solide</text>
+        <text x="160" y="30" font-size="14" font-weight="600">hibou tambour</text>
+        <text x="160" y="48" font-size="14" font-weight="600">nuage valise…</text>
+      </svg>
+    </div>
+    <p class="soft">Tous les sites, applis, adresses et mots de passe de cette page sont <strong>inventés</strong> (les adresses finissent par <span class="mono">.exemple</span>). Tout ce que tu tapes reste dans ta page : <strong>rien n'est envoyé ni enregistré</strong>. Et même comme ça : <strong>ne tape jamais ici un vrai mot de passe</strong>, ni nulle part ailleurs que sur le vrai site.</p>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · Pourquoi c'est important</span>
+    <h2>Une clé qui ouvre beaucoup de portes</h2>
+    <p>Quelqu'un qui connaît ton mot de passe <strong>devient toi</strong> aux yeux du site. Il peut faire tout ce que tu fais, et parfois pire.</p>
+    <div class="cards">
+      <div class="box"><span class="tag no">Jeu</span><strong>Ton compte de jeu</strong><span class="soft">Il vend tes objets rares, dépense ton argent virtuel, change le mot de passe pour que tu ne puisses plus rentrer.</span></div>
+      <div class="box"><span class="tag no">Réseau social</span><strong>Ton profil</strong><span class="soft">Il publie à ta place, lit tes messages privés, voit tes photos, envoie des arnaques à tous tes amis (le tutoriel sur <a class="tlink" href="reperer-les-arnaques.html">les arnaques</a> en parle).</span></div>
+      <div class="box"><span class="tag no">Messagerie</span><strong>Tes conversations</strong><span class="soft">Il se fait passer pour toi auprès de ta famille : « Je suis bloqué, envoie-moi 50 francs… »</span></div>
+      <div class="box"><span class="tag no">E-mail</span><strong>Ta boîte e-mail</strong><span class="soft">La plus importante de toutes. Voici pourquoi, juste en dessous.</span></div>
+    </div>
+    <div class="note red">
+      <span class="note-title">L'e-mail, c'est le passe-partout</span>
+      <span>Sur presque tous les sites, il y a un bouton <strong>« Mot de passe oublié ? »</strong>. Il envoie un lien de changement de mot de passe… <strong>dans ta boîte e-mail</strong>. Donc celui qui entre dans ton e-mail peut, de là, prendre presque tous tes autres comptes. <span class="hl">Ton e-mail mérite ton meilleur mot de passe.</span></span>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · Comment on les vole</span>
+    <h2>Sept façons de perdre son mot de passe</h2>
+    <p>Les pirates ne sont pas des magiciens. Ils utilisent presque toujours les mêmes astuces. Les connaître, c'est déjà se protéger.</p>
+    <div class="cards">
+      <div class="box"><span class="tag warn">Deviner</span><strong>Ce qu'on sait de toi</strong><span class="soft">Ton anniversaire, le nom de ton chat, ton club de foot : souvent visibles sur tes réseaux.</span></div>
+      <div class="box"><span class="tag warn">Liste</span><strong>Les mots de passe courants</strong><span class="soft">Le pirate essaie d'abord une liste des mots de passe que tout le monde utilise : « 123456 », « azerty », « soleil »…</span></div>
+      <div class="box"><span class="tag warn">Force brute</span><strong>Tout essayer</strong><span class="soft">Un ordinateur essaie toutes les combinaisons, une par une, très vite. Plus il y en a, plus c'est long : on va calculer ça.</span></div>
+      <div class="box"><span class="tag no">Fuite</span><strong>La fuite de données</strong><span class="soft">Un site se fait pirater, et la liste de ses comptes se retrouve sur internet. Si tu utilises le même mot de passe ailleurs, tout tombe (étape 6).</span></div>
+      <div class="box"><span class="tag no">Faux site</span><strong>L'hameçonnage</strong><span class="soft">Un faux message t'envoie sur un faux site, et tu tapes toi-même ton mot de passe. Le tutoriel sur <a class="tlink" href="reperer-les-arnaques.html">les arnaques</a> t'apprend à le repérer.</span></div>
+      <div class="box"><span class="tag warn">Épaule</span><strong>Le regard par-dessus l'épaule</strong><span class="soft">Quelqu'un regarde tes doigts quand tu tapes, en classe, dans le bus.</span></div>
+      <div class="box"><span class="tag warn">Téléphone</span><strong>L'appareil ouvert</strong><span class="soft">Un téléphone sans verrouillage, prêté ou oublié sur une table : tous les comptes sont déjà connectés.</span></div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Le compteur</span>
+    <h2>Combien d'essais pour tout essayer ?</h2>
+    <p>Imagine un cadenas de vélo à <strong>3 chiffres</strong>. Chaque roue a 10 positions (0 à 9). Le nombre de combinaisons est 10 × 10 × 10 = <strong>10³ = 1 000</strong>. Pour un mot de passe, c'est pareil : on compte combien de caractères possibles il y a à chaque place (<strong>l'alphabet</strong>), et on multiplie autant de fois qu'il y a de places (<strong>la longueur</strong>).</p>
+    <div class="formula">combinaisons = (taille de l'alphabet)<sup>longueur</sup></div>
+    <div class="cards">
+      <div class="box"><span class="tag acc">26</span><strong>minuscules</strong><span class="soft mono">a b c … z</span></div>
+      <div class="box"><span class="tag acc">52</span><strong>+ majuscules</strong><span class="soft mono">A B C … Z</span></div>
+      <div class="box"><span class="tag acc">62</span><strong>+ chiffres</strong><span class="soft mono">0 1 2 … 9</span></div>
+      <div class="box"><span class="tag acc">≈ 94</span><strong>+ symboles</strong><span class="soft mono">! ? # @ % & …</span></div>
+    </div>
+    <p>Ce sont des puissances : le tutoriel sur <a class="tlink" href="les-puissances.html">les puissances</a> explique pourquoi elles grandissent si vite. Les nombres deviennent énormes, alors on les écrit en <strong>notation scientifique</strong> : 6,1 × 10¹⁵ veut dire 61 suivi de 14 zéros.</p>
+
+    <div class="box">
+      <h3>Teste un mot de passe d'exemple</h3>
+      <div class="note warn">
+        <span class="note-title">Champ de démonstration</span>
+        <span>Ce champ affiche ce que tu tapes en clair, exprès. <strong>N'y tape jamais un vrai mot de passe.</strong> Invente-en un, ou utilise les boutons « exemple ».</span>
+      </div>
+      <div class="params">
+        <div class="param"><label for="pw">Mot de passe d'exemple</label><input type="text" id="pw" maxlength="64" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="invente un exemple…"></div>
+        <div class="param"><label for="nm">Ton prénom (facultatif)</label><input type="text" id="nm" maxlength="30" autocomplete="off" spellcheck="false" placeholder="pour voir s'il est dedans"></div>
+      </div>
+      <span class="privacy">Rien n'est envoyé ni enregistré : le calcul se fait dans ta page, et tout s'efface quand tu la fermes.</span>
+      <div class="btns" id="exBtns" role="group" aria-label="Générer un exemple">
+        <button type="button" data-ex="trap">Exemple piège</button>
+        <button type="button" data-ex="short">Court et compliqué</button>
+        <button type="button" data-ex="long">Long en minuscules</button>
+        <button type="button" data-ex="phrase">Phrase de passe</button>
+        <button type="button" data-ex="clear">Effacer</button>
+      </div>
+      <div class="param"><label for="rate">Vitesse supposée du pirate</label>
+        <select id="rate">
+          <option value="1000">1 000 essais par seconde (site en ligne qui ne bloquerait pas : rare)</option>
+          <option value="10000000000" selected>10 milliards par seconde (ordinateur puissant, liste volée)</option>
+          <option value="1000000000000">1 000 milliards par seconde (énorme groupe de machines)</option>
+        </select>
+      </div>
+      <div id="mOut" class="lv0" aria-live="polite">
+        <div class="meter" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+        <p class="lvl-name" id="mLvl">—</p>
+        <div class="chips" id="mChips"></div>
+        <div class="stats">
+          <div class="stat"><small>Longueur</small><b id="mLen">0</b></div>
+          <div class="stat"><small>Alphabet</small><b id="mAlpha">0</b></div>
+          <div class="stat"><small>Combinaisons</small><b id="mComb">—</b></div>
+          <div class="stat"><small>Pour tout essayer</small><b id="mTime">—</b></div>
+        </div>
+        <p class="soft" id="mCalc"></p>
+        <ul class="issues" id="mIssues"></ul>
+      </div>
+      <p class="soft">La vitesse est un <strong>ordre de grandeur</strong>, pas une mesure exacte. Sur un vrai site en ligne, c'est beaucoup plus lent : le site bloque après quelques erreurs. Le danger vient surtout d'une <strong>liste volée</strong>, que le pirate attaque tranquillement sur ses machines. En moyenne, il tombe sur le bon mot de passe à mi-chemin, donc en deux fois moins de temps.</p>
+    </div>
+    <div class="note warn">
+      <span class="note-title">Les motifs comptent plus que le calcul</span>
+      <span>Le calcul suppose que chaque caractère est tiré <strong>au hasard</strong>. Mais un pirate n'essaie pas au hasard : il commence par les mots courants, les dates, les suites du clavier, les prénoms. C'est pour ça que le compteur baisse la note quand il repère un motif. Notre liste de mots courants est petite et inventée pour la démo ; les vraies listes des pirates contiennent des millions de mots.</span>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · Longueur contre complexité</span>
+    <h2>Un caractère de plus vaut mieux qu'un symbole de plus</h2>
+    <p>Ajouter <strong>un caractère</strong> multiplie le nombre de combinaisons par la taille de l'alphabet (×26 en minuscules). Passer des minuscules à « tous les caractères » multiplie seulement chaque place par 94 ÷ 26 ≈ 3,6. Bouge le curseur et compare.</p>
+    <div class="box">
+      <div class="param"><label for="len">Longueur : <span id="lenV" class="mono">8</span> caractères</label><input type="range" id="len" min="4" max="24" step="1" value="8"></div>
+      <div class="rows" id="rows"></div>
+      <p id="lenMsg"></p>
+    </div>
+    <p class="soft">Les informaticiens comptent aussi en <strong>bits</strong> : un mot de passe de 52 bits a environ 2⁵² combinaisons. Chaque bit de plus double le nombre d'essais. Le tutoriel sur <a class="tlink" href="le-binaire-et-les-bases.html">le binaire et les bases</a> explique ces puissances de 2.</p>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · La phrase de passe</span>
+    <h2>Des mots au hasard, faciles à retenir</h2>
+    <p>Une <strong>phrase de passe</strong>, c'est plusieurs mots <strong>tirés au hasard</strong>, mis bout à bout : longue, donc solide, et pourtant facile à retenir. Le mot important est « au hasard » : une phrase que tu choisis toi-même (une chanson, une citation célèbre) se devine beaucoup plus facilement.</p>
+    <div class="box">
+      <h3>Générateur de phrase de passe</h3>
+      <div class="params">
+        <div class="param"><label for="nw">Nombre de mots</label>
+          <select id="nw"><option value="3">3 mots</option><option value="4">4 mots</option><option value="5" selected>5 mots</option><option value="6">6 mots</option></select>
+        </div>
+        <div class="param"><label for="sep">Séparateur</label>
+          <select id="sep"><option value=" ">espace</option><option value="-">tiret</option><option value=".">point</option></select>
+        </div>
+      </div>
+      <div class="btns"><button type="button" id="genP">Nouvelle phrase</button></div>
+      <p class="phrase" id="phr" aria-live="polite">…</p>
+      <span class="privacy">Tirée au hasard dans ta page (avec le générateur sécurisé du navigateur). Rien n'est envoyé ni enregistré.</span>
+      <div class="scroll">
+        <table class="cmp">
+          <thead><tr><th>Si le pirate sait que…</th><th>Combinaisons</th><th>Pour tout essayer*</th></tr></thead>
+          <tbody id="cmpBody"></tbody>
+        </table>
+      </div>
+      <p class="soft">* à 10 milliards d'essais par seconde, ordre de grandeur.</p>
+    </div>
+    <div class="note warn">
+      <span class="note-title">Honnêtement : notre liste est trop petite</span>
+      <span>Le générateur de cette page pioche dans à peine plus de <strong>200 mots</strong>, pour jouer. Un pirate qui connaît la liste n'a qu'environ 200<sup>n</sup> phrases à essayer : c'est peu. Les vrais générateurs (par exemple celui d'un gestionnaire de mots de passe) utilisent des listes d'environ <strong>7 776 mots</strong>. Pourquoi 7 776 ? Parce que 6⁵ = 7 776 : on peut tirer chaque mot en lançant <strong>5 dés</strong> ! Avec une telle liste, <strong>5 mots</strong> ou plus, c'est solide. Prends donc cette phrase comme modèle, pas comme vrai mot de passe.</span>
+    </div>
+    <h3>Comment la retenir</h3>
+    <div class="cards">
+      <div class="box"><span class="tag ok">Image</span><strong>Fais-en un petit film</strong><span class="soft">« hibou tambour nuage valise castor » : un hibou joue du tambour sur un nuage, pendant qu'un castor fait sa valise. Plus c'est absurde, mieux on s'en souvient.</span></div>
+      <div class="box"><span class="tag ok">Répétition</span><strong>Tape-la souvent</strong><span class="soft">Les premiers jours, tes doigts apprennent. Après une semaine, elle vient toute seule.</span></div>
+      <div class="box"><span class="tag ok">Garde le hasard</span><strong>Ne change pas les mots</strong><span class="soft">Si un mot ne te plaît pas, relance tout le tirage plutôt que de choisir toi-même un mot « joli » : ton choix serait plus facile à deviner.</span></div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · Un mot de passe par compte</span>
+    <h2>La fuite de données et l'effet domino</h2>
+    <p>Même ton mot de passe le plus solide ne sert à rien si le site lui-même se fait pirater et que la liste fuit. Ce qui compte alors, c'est de ne <strong>jamais réutiliser</strong> le même mot de passe ailleurs. Choisis une situation, puis lance l'histoire.</p>
+    <div class="box">
+      <div class="btns" id="reuseBtns" role="group" aria-label="Tes habitudes">
+        <button type="button" data-reuse="1" aria-pressed="true">Même mot de passe partout</button>
+        <button type="button" data-reuse="0" aria-pressed="false">Un mot de passe différent par compte</button>
+      </div>
+      <div class="param"><label for="leakSel">Quel site se fait pirater ?</label>
+        <select id="leakSel"><option value="pixelia">Pixelia (ton jeu en ligne)</option><option value="photoclic">Photoclic (tes photos)</option><option value="bavardo">Bavardo (ta messagerie)</option><option value="postello">Postello (ta boîte e-mail)</option></select>
+      </div>
+      <div class="btns"><button type="button" id="runLeak">Lancer l'histoire</button></div>
+      <div class="dom" id="dom"></div>
+      <ol class="log" id="leakLog" aria-live="polite"></ol>
+    </div>
+    <div class="note ok">
+      <span class="note-title">Ce qu'il faut retenir</span>
+      <span>Avec un mot de passe différent par compte, une fuite ne fait tomber <strong>qu'un seul</strong> domino… sauf si c'est ta boîte e-mail, qui permet de réinitialiser les autres. D'où deux réflexes : un mot de passe unique partout, et la <strong>double authentification</strong> sur ton e-mail (étape 7).</span>
+    </div>
+
+    <h3>Mais comment retenir vingt mots de passe différents ?</h3>
+    <p>Personne ne peut. La solution s'appelle un <strong>gestionnaire de mots de passe</strong> : c'est un <strong>coffre-fort</strong> numérique. Tu retiens <strong>un seul</strong> mot de passe très solide (le mot de passe maître, idéalement une longue phrase de passe), et le coffre garde tous les autres, chiffrés. Le tutoriel sur <a class="tlink" href="la-cryptographie.html">la cryptographie</a> explique comment on rend un message illisible sans la clé.</p>
+    <div class="cards">
+      <div class="box"><span class="tag ok">Avantage</span><strong>Un seul à retenir</strong><span class="soft">Le coffre invente pour chaque site un mot de passe long et unique, et le remplit pour toi.</span></div>
+      <div class="box"><span class="tag ok">Avantage</span><strong>Il reconnaît le vrai site</strong><span class="soft">Sur un faux site à l'adresse bizarre, il ne propose rien. C'est un bon signal d'alarme.</span></div>
+      <div class="box"><span class="tag warn">À faire avec un adulte</span><strong>Bien le choisir</strong><span class="soft">Choisissez ensemble un gestionnaire connu, installé depuis le magasin d'applis officiel ou le site officiel. Activez la double authentification dessus.</span></div>
+      <div class="box"><span class="tag warn">Attention</span><strong>Le mot de passe maître</strong><span class="soft">Souvent, personne ne peut le récupérer si tu l'oublies. Tu peux le noter sur un papier rangé en lieu sûr à la maison, avec tes parents.</span></div>
+      <div class="box"><span class="tag acc">Autre solution</span><strong>Le navigateur</strong><span class="soft">Ton navigateur ou ton téléphone peut aussi enregistrer tes mots de passe. Ça marche bien, à condition que l'appareil soit verrouillé par un code.</span></div>
+      <div class="box"><span class="tag no">Jamais</span><strong>À la vue de tous</strong><span class="soft">Pas de carnet qui traîne sur le bureau, pas de post-it sur l'écran, pas de mot de passe envoyé dans un message ou gardé dans une photo.</span></div>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · La double authentification</span>
+    <h2>Une deuxième preuve que c'est bien toi</h2>
+    <p>La <strong>double authentification</strong> (ou « validation en deux étapes ») demande, en plus du mot de passe, une <strong>deuxième preuve</strong> : quelque chose que tu <em>as</em> (ton téléphone, une clé) ou que tu <em>es</em> (ton doigt, ton visage). Un pirate qui a volé ton mot de passe reste alors bloqué à la porte.</p>
+    <div class="cards">
+      <div class="box"><span class="tag acc">SMS</span><strong>Un code par SMS</strong><span class="soft">Le site envoie un code à ton numéro. Bien mieux que rien.</span></div>
+      <div class="box"><span class="tag acc">Appli</span><strong>Une appli de codes</strong><span class="soft">Une appli sur ton téléphone affiche un nouveau code toutes les 30 secondes. Plus sûr que le SMS.</span></div>
+      <div class="box"><span class="tag acc">Clé</span><strong>Une clé physique</strong><span class="soft">Une petite clé USB spéciale que tu branches ou que tu approches du téléphone.</span></div>
+      <div class="box"><span class="tag acc">Corps</span><strong>Empreinte ou visage</strong><span class="soft">Ton téléphone vérifie que c'est bien toi. L'empreinte reste dans ton appareil.</span></div>
+    </div>
+    <div class="box">
+      <h3>Le pirate a volé ton mot de passe Bavardo</h3>
+      <div class="btns" id="tfaBtns" role="group" aria-label="Double authentification">
+        <button type="button" data-tfa="0" aria-pressed="true">Sans double authentification</button>
+        <button type="button" data-tfa="1" aria-pressed="false">Avec double authentification</button>
+      </div>
+      <div class="tfa-grid">
+        <div style="display:flex;flex-direction:column;gap:10px;min-width:0">
+          <div class="btns"><button type="button" id="tfaGo">Le pirate essaie de se connecter</button></div>
+          <ol class="log" id="tfaLog" aria-live="polite"></ol>
+          <div class="btns" id="tfaChoice" hidden>
+            <button type="button" data-give="1">J'envoie le code</button>
+            <button type="button" data-give="0">Je ne le donne pas</button>
+          </div>
+          <div id="tfaOut"></div>
+        </div>
+        <div class="phone" aria-label="Ton téléphone">
+          <span class="top"></span>
+          <span class="who">ton téléphone</span>
+          <div id="phoneBox"><p class="soft" style="font-size:.9rem;text-align:center">Aucune notification.</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="note red">
+      <span class="note-title">Le code, c'est pour toi seul</span>
+      <span><strong>Ne donne jamais ton code de validation à personne</strong> : ni à un « support », ni à un « ami », ni par message, ni au téléphone. Un vrai service ne te le demande jamais. Si tu reçois un code sans avoir rien demandé, c'est que quelqu'un a ton mot de passe : change-le. Le tutoriel sur <a class="tlink" href="reperer-les-arnaques.html">les arnaques</a> montre ces pièges en détail.</span>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Les bonnes habitudes</span>
+    <h2>Des réflexes simples, tous les jours</h2>
+    <div class="cards">
+      <div class="box"><span class="tag ok">Verrouille</span><strong>Ton téléphone</strong><span class="soft">Un code, une empreinte ou ton visage. Un appareil ouvert, c'est tous tes comptes ouverts.</span></div>
+      <div class="box"><span class="tag ok">Garde-le</span><strong>Même pour ton meilleur ami</strong><span class="soft">Les amitiés changent, les téléphones se prêtent. Un mot de passe ne se partage pas (sauf avec tes parents, si vous l'avez décidé ensemble).</span></div>
+      <div class="box"><span class="tag ok">Déconnecte-toi</span><strong>Sur un ordinateur partagé</strong><span class="soft">À l'école, à la bibliothèque, chez un copain : déconnecte-toi, et refuse « Enregistrer le mot de passe ».</span></div>
+      <div class="box"><span class="tag ok">Invente</span><strong>Les questions secrètes</strong><span class="soft">« Nom de ton premier animal ? » : la vraie réponse est souvent sur tes réseaux. Donne une fausse réponse que tu gardes dans ton gestionnaire.</span></div>
+      <div class="box"><span class="tag ok">Lis</span><strong>Les alertes de connexion</strong><span class="soft">« Connexion inhabituelle depuis un nouvel appareil » : si ce n'est pas toi, change tout de suite le mot de passe, depuis l'appli officielle (pas depuis un lien reçu).</span></div>
+      <div class="box"><span class="tag ok">Change</span><strong>Après une fuite</strong><span class="soft">Si un site annonce une fuite, change ce mot de passe, et partout où tu l'avais réutilisé.</span></div>
+    </div>
+    <div class="box">
+      <h3>Mon compte a été piraté : que faire ?</h3>
+      <p class="soft">Pas de panique, ce n'est pas ta faute. Suis les étapes dans l'ordre ; tu peux les cocher au fur et à mesure.</p>
+      <ol class="steps" id="hackSteps"></ol>
+    </div>
+    <div class="note ok">
+      <span class="note-title">Où trouver de l'aide, en Suisse</span>
+      <span>• <strong>Pro Juventute, le 147</strong> : aide gratuite et confidentielle pour les jeunes, par téléphone, SMS ou chat.</span>
+      <span>• <strong>L'Office fédéral de la cybersécurité (OFCS)</strong>, ncsc.admin.ch : pour signaler un incident et trouver des conseils.</span>
+      <span>• <strong>antiphishing.ch</strong> : pour signaler un site d'hameçonnage.</span>
+      <span>• <strong>Prévention Suisse de la Criminalité</strong>, skppsc.ch : des conseils de prévention.</span>
+      <span>• <strong>La police, le 117</strong> : pour les cas graves (chantage, menaces), avec un adulte.</span>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Attention</span>
+    <h2>Les erreurs fréquentes</h2>
+    <div class="cards">
+      <div class="box"><span class="tag no">Faux</span><strong>« Un mot de passe compliqué mais court suffit. »</strong><span class="soft">94⁸ ≈ 6,1 × 10¹⁵ : environ une semaine à 10 milliards d'essais par seconde. 5 mots au hasard dans une grande liste tiennent des dizaines d'années.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« Changer un chiffre à la fin suffit. »</strong><span class="soft">Soleil2024 → Soleil2025 : c'est le premier essai d'un pirate qui a l'ancien mot de passe. Il faut en changer complètement.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« Personne ne s'intéresse à mon compte. »</strong><span class="soft">Les pirates attaquent des milliers de comptes d'un coup, avec des machines. Ton compte de jeu, tes contacts, ton e-mail ont de la valeur pour eux.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« Remplacer o par 0 et a par @, c'est malin. »</strong><span class="soft">« S0l3il » : les pirates connaissent ces remplacements depuis longtemps et les essaient automatiquement.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« Un seul bon mot de passe pour tout, c'est plus simple. »</strong><span class="soft">Une seule fuite, et tous les dominos tombent (étape 6).</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« Avec la double authentification, je peux donner le code à l'assistance. »</strong><span class="soft">Le code est justement ce qui bloque le pirate. Le donner, c'est lui ouvrir la porte.</span></div>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Choisis ta réponse, puis vérifie.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Recommencer</button>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · Un peu d'histoire</span>
+    <h2>Du mot des sentinelles aux clés d'accès</h2>
+    <ol class="timeline">
+      <li><span class="when">Antiquité</span><div class="what"><strong>Le mot des sentinelles</strong><span>Selon l'historien grec Polybe, l'armée romaine faisait circuler chaque soir un mot de passe gravé sur une tablette. Qui ne le connaissait pas ne passait pas.</span></div></li>
+      <li><span class="when">années 1960</span><div class="what"><strong>Les premiers ordinateurs partagés</strong><span>Au MIT, aux États-Unis, plusieurs personnes utilisent le même grand ordinateur. On donne à chacune un mot de passe pour séparer les fichiers : c'est souvent cité comme l'un des tout premiers usages informatiques. On raconte que, déjà, le fichier des mots de passe a été affiché par erreur…</span></div></li>
+      <li><span class="when">années 1970</span><div class="what"><strong>On arrête de les garder en clair</strong><span>Les systèmes commencent à stocker une version « brouillée » des mots de passe au lieu des mots de passe eux-mêmes. C'est cette version qu'un pirate essaie de retrouver après une fuite.</span></div></li>
+      <li><span class="when">fin des années 1990</span><div class="what"><strong>Les gestionnaires de mots de passe</strong><span>Les premiers coffres-forts à mots de passe apparaissent, car on a de plus en plus de comptes.</span></div></li>
+      <li><span class="when">années 2010</span><div class="what"><strong>Fuites géantes et double authentification</strong><span>De grosses fuites de données touchent des millions de comptes. La validation en deux étapes se répand.</span></div></li>
+      <li><span class="when">aujourd'hui</span><div class="what"><strong>Les clés d'accès</strong><span>Les <em>clés d'accès</em> (en anglais <em>passkeys</em>) remplacent peu à peu le mot de passe : ton appareil prouve que c'est toi avec ton empreinte, ton visage ou ton code. Il n'y a plus rien à taper, donc plus rien à voler sur un faux site. C'est sans doute l'avenir, mais les mots de passe seront encore là longtemps.</span></div></li>
+    </ol>
+  </section>
+
+  <!-- 12 -->
+  <section>
+    <span class="eyebrow">Étape 12 · À toi de jouer</span>
+    <h2>Exercices</h2>
+    <div class="exos">
+      <details>
+        <summary>1. Le code PIN<span class="q">Un code PIN de téléphone a 4 chiffres. Combien y a-t-il de combinaisons ? Pourquoi est-ce quand même assez sûr pour un téléphone ?</span></summary>
+        <div>
+          <span>10 possibilités pour chaque chiffre, 4 chiffres : 10 × 10 × 10 × 10 = <strong>10⁴ = 10 000</strong> combinaisons.</span>
+          <span>C'est très peu pour un ordinateur. Mais le téléphone <strong>bloque</strong> après quelques erreurs (et attend de plus en plus longtemps) : personne ne peut essayer 10 000 codes. Un code à 6 chiffres donne 10⁶ = 1 000 000 de combinaisons, c'est encore mieux.</span>
+        </div>
+      </details>
+      <details>
+        <summary>2. Long ou compliqué ?<span class="q">Compare A : 8 caractères pris parmi les 94 du clavier, et B : 12 minuscules au hasard. Lequel a le plus de combinaisons ?</span></summary>
+        <div>
+          <span>A : 94⁸ ≈ 6,1 × 10¹⁵. B : 26¹² ≈ 9,5 × 10¹⁶.</span>
+          <span><strong>B gagne</strong>, environ 15 fois plus de combinaisons, alors qu'il n'utilise que des minuscules. Et il est plus facile à taper sur un téléphone !</span>
+        </div>
+      </details>
+      <details>
+        <summary>3. Un de plus<span class="q">Par combien multiplie-t-on le nombre de combinaisons quand on ajoute un caractère à un mot de passe en minuscules ? Et quand on passe d'un code de 4 chiffres à 6 chiffres ?</span></summary>
+        <div>
+          <span>Un caractère minuscule de plus : <strong>× 26</strong>.</span>
+          <span>De 4 à 6 chiffres : 10⁶ ÷ 10⁴ = 10² = <strong>× 100</strong>.</span>
+        </div>
+      </details>
+      <details>
+        <summary>4. La phrase de passe<span class="q">Avec une liste de 7 776 mots, combien de phrases de 4 mots ? De 5 mots ?</span></summary>
+        <div>
+          <span>4 mots : 7 776⁴ ≈ 3,7 × 10¹⁵ (à peu près comme 8 caractères au hasard, 94⁸ ≈ 6,1 × 10¹⁵).</span>
+          <span>5 mots : 7 776⁵ ≈ 2,8 × 10¹⁹, soit environ <strong>7 776 fois plus</strong>. À 10 milliards d'essais par seconde : environ 90 ans. C'est pour ça qu'on conseille au moins 5 mots pour les comptes importants.</span>
+        </div>
+      </details>
+      <details>
+        <summary>5. Trois situations<span class="q">a) Tu as fini ton exposé sur un ordinateur de l'école. b) Tu reçois « Nouvelle connexion à Bavardo depuis un appareil inconnu », mais tu n'as rien fait. c) Un site te demande « Le nom de ton premier animal ? », et tout le monde connaît ton chien Gribouille sur tes photos.</span></summary>
+        <div>
+          <ul>
+            <li>a) Tu te <strong>déconnectes</strong> de tous tes comptes et tu refuses d'enregistrer le mot de passe.</li>
+            <li>b) Tu ouvres toi-même l'appli officielle (pas le lien du message), tu <strong>changes le mot de passe</strong>, tu actives la double authentification et tu préviens un adulte.</li>
+            <li>c) Tu donnes une <strong>fausse réponse</strong> inventée (par exemple une phrase de passe), que tu gardes dans ton gestionnaire. « Gribouille » se devine trop facilement.</li>
+          </ul>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• Ton <strong>e-mail</strong> est le passe-partout de tous tes comptes : protège-le en premier.</span>
+      <span>• Nombre de combinaisons = (taille de l'alphabet)<sup>longueur</sup> : <strong>la longueur gagne</strong> sur la complexité.</span>
+      <span>• Une <strong>phrase de passe</strong> de 5 mots tirés au hasard est solide et facile à retenir.</span>
+      <span>• <strong>Un mot de passe différent par compte</strong>, rangé dans un gestionnaire de mots de passe choisi avec un adulte.</span>
+      <span>• Active la <strong>double authentification</strong>, et ne donne <strong>jamais</strong> ton code à personne.</span>
+      <span>• Verrouille ton téléphone, ne partage pas tes mots de passe, déconnecte-toi sur un ordinateur partagé.</span>
+      <span>• Compte piraté : en parler à un adulte, changer les mots de passe en commençant par l'e-mail, prévenir tes amis. En Suisse, le 147 peut t'aider.</span>
+    </div>
+  </section>
+
+  <!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"><a class="prev" href="reperer-les-arnaques.html"><span>← Précédent</span><strong>Repérer les arnaques et l&#x27;hameçonnage</strong></a></div><a class="tnav-home" href="numerique.html">⌂ Tous les tutoriels numériques</a></nav><!--/tnav-->
+<footer>Fiche de révision · Les mots de passe</footer>
+</main>
+
+<script>
+(function () {
+  /*
+   * Hooks de test : window.__mdp
+   *   entropy(pw, prenom?, rate?)    -> {alphabet, length, combos, log10, bits, seconds, timeText,
+   *   combinations(...)                  issues:[{code, text}], level (0–4), label}
+   *                                     alphabet = 26 (a-z) + 26 (A-Z) + 10 (0-9) + 32 (tout le reste) ; max 94
+   *                                     combos = alphabet^length ; rate par défaut 1e10 essais/s
+   *                                     codes : 'mot' (mot courant), 'prenom', 'suite' (clavier/abc/123), 'repet', 'date'
+   *                                     niveau de base par log10 : <12 → 0, <16 → 1, <20 → 2, <25 → 3, sinon 4 ;
+   *                                     −1 par type de motif ; 0 si (presque) tout le mot de passe est un motif
+   *   passphrase(n, sep?)            -> chaîne de n mots tirés (crypto.getRandomValues) dans WORDS, séparés par sep (défaut ' ')
+   *   timeToCrack(combos, rate?)     -> {seconds, text} (temps pour essayer TOUTES les combinaisons)
+   *   leakDomino(reuse, leaked?)     -> [{id, name, why}] comptes tombés ; leaked parmi 'pixelia','photoclic','bavardo','postello'
+   *                                     why : 'fuite' | 'même mot de passe' | 'réinitialisation par e-mail'
+   *   twoFactor(twofaOn, codeGiven)  -> true si le pirate (qui a le mot de passe) entre
+   *   fmtSci(log10), words, common, quiz
+   * Rien n'est envoyé, enregistré ni affiché dans la console : tout reste dans la page.
+   */
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function fmtInt(n) { return Number(n).toLocaleString('fr-FR', { maximumFractionDigits: 0 }).replace(/[\u202f\u00a0 ]/g, '\u00a0'); }
+  function fmtDec(x) { return String(x).replace('.', ','); }
+  var SUP = { '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '-': '⁻' };
+  function sup(n) { return String(n).split('').map(function (c) { return SUP[c] || c; }).join(''); }
+
+  /* ---------- Hasard sécurisé ---------- */
+  function randInt(n) {
+    var c = window.crypto || window.msCrypto;
+    if (c && c.getRandomValues) {
+      var lim = Math.floor(4294967296 / n) * n, buf = new Uint32Array(1), x;
+      do { c.getRandomValues(buf); x = buf[0]; } while (x >= lim);
+      return x % n;
+    }
+    return Math.floor(Math.random() * n);
+  }
+
+  /* ---------- Notation scientifique et durées ---------- */
+  function fmtSci(lg) {
+    if (!isFinite(lg)) return '∞';
+    if (lg < 6) return fmtInt(Math.round(Math.pow(10, lg)));
+    var k = Math.floor(lg), m = Math.round(Math.pow(10, lg - k) * 10) / 10;
+    if (m >= 10) { m = 1; k += 1; }
+    return fmtDec(m) + ' × 10' + sup(k);
+  }
+  function round2(x) { if (x <= 0) return 0; var p = Math.pow(10, Math.floor(Math.log10(x)) - 1); return Math.round(x / p) * p; }
+  function unit(x, s, p) { var v = x < 10 ? Math.round(x * 10) / 10 : Math.round(x); return fmtDec(v) + ' ' + (v >= 2 ? p : s); }
+  function timeText(sec) {
+    if (!(sec >= 1)) return 'moins d\'une seconde';
+    if (sec < 60) return unit(sec, 'seconde', 'secondes');
+    if (sec < 3600) return unit(sec / 60, 'minute', 'minutes');
+    if (sec < 86400) return unit(sec / 3600, 'heure', 'heures');
+    var y = sec / (365.25 * 86400);
+    if (y < 1) return unit(sec / 86400, 'jour', 'jours');
+    var t;
+    if (y < 1000) t = unit(y, 'an', 'ans');
+    else if (y < 1e6) t = 'environ ' + fmtInt(round2(y)) + ' ans';
+    else if (y < 1e9) t = 'environ ' + unit(y / 1e6, 'million', 'millions') + ' d\'années';
+    else if (y < 1e12) t = 'environ ' + unit(y / 1e9, 'milliard', 'milliards') + ' d\'années';
+    else t = 'environ ' + fmtSci(Math.log10(y)) + ' années';
+    if (y > 1.38e10) t += ' (plus que l\'âge de l\'Univers, environ 13,8 milliards d\'années)';
+    return t;
+  }
+  function timeToCrack(combos, rate) {
+    rate = rate || 1e10;
+    var s = combos / rate;
+    return { seconds: s, text: timeText(s) };
+  }
+
+  /* ---------- Listes (inventées pour la démo) ---------- */
+  var COMMON = ['motdepasse', 'password', 'bonjour', 'soleil', 'football', 'princesse', 'dragon', 'chaton', 'doudou', 'loulou', 'licorne', 'jetaime', 'iloveyou', 'secret', 'bisous', 'coucou', 'admin', 'ninja', 'superstar', 'maman', 'papa', 'chouchou', 'amour', 'bienvenue', 'pixelia', 'bavardo', 'photoclic', 'postello'];
+  var SEQS = ['azertyuiop', 'qsdfghjklm', 'wxcvbn', 'qwertyuiop', 'asdfghjkl', 'zxcvbnm', 'qwertzuiop', 'yxcvbnm', '01234567890', 'abcdefghijklmnopqrstuvwxyz'];
+  SEQS = SEQS.concat(SEQS.map(function (s) { return s.split('').reverse().join(''); }));
+  var WORDS = ('abeille abricot aigle album ancre arbre ardoise avion balcon baleine ballon bambou barque bateau berger biscuit bocal bonnet bouchon bougie ' +
+    'boussole bouton brioche brouette bulle buisson cactus cadre cahier camion canard canne carotte cartable castor cerise chameau chapeau chariot chaussette ' +
+    'chemin cheval chocolat citron clairon clocher cochon coffre colline comete concombre corbeau cornichon coton crayon crocodile cygne dauphin desert domino ' +
+    'echarpe ecureuil elephant epinard escargot etoile falaise fanfare fenetre feutre ficelle flamant fleuve foret fourmi fraise framboise fromage fusee galet ' +
+    'gant gateau girafe glacier gomme gorille grenier grenouille guitare hamac hamster harpe herisson hibou horloge igloo iguane jardin jongleur kayak ' +
+    'kiwi koala lampe lapin lavande legume lezard lion loutre lune manchot mangue marmotte marteau melon meteore miroir montagne moulin mouton myrtille ' +
+    'navet nuage oasis olive orange orage ours pagaie panda papillon parapluie pasteque pelican pendule phare piano pinceau pingouin pirate planete plume ' +
+    'poire poivron pomme pompier potiron poulpe prairie puzzle radis raquette renard requin robot rocher roseau ruche sable sapin sardine savon scooter ' +
+    'serpent sifflet singe sirop skate soupe souris tambour tapis taupe theiere tigre tomate tortue toupie tracteur train trampoline trompette tulipe ' +
+    'valise vanille velo violon volcan wagon yaourt zebre abri antenne autruche bambin bassin bison boulon cabane cascade castagne citrouille cordon ' +
+    'dentelle dinde drapeau epice fanal fougere gazelle grillon hublot jasmin jument lanterne luciole mammouth mouette noisette ortie pantoufle perroquet').split(' ');
+
+  /* ---------- Analyse d'un mot de passe ---------- */
+  var LEET1 = { '0': 'o', '1': 'i', '3': 'e', '4': 'a', '5': 's', '7': 't', '@': 'a', '$': 's', '!': 'i' };
+  var LEET2 = { '0': 'o', '1': 'l', '3': 'e', '4': 'a', '5': 's', '7': 't', '@': 'a', '$': 's', '!': 'l' };
+  function baseChar(c) {
+    var b = c.toLowerCase().normalize ? c.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '') : c.toLowerCase();
+    return b.length === 1 ? b : '?';
+  }
+  function leet(arr, map) { return arr.map(function (c) { return map[c] || c; }).join(''); }
+  function markAll(str, sub, mask) {
+    var found = false, i = str.indexOf(sub);
+    while (sub && i !== -1) { found = true; for (var j = i; j < i + sub.length; j++) mask[j] = true; i = str.indexOf(sub, i + 1); }
+    return found;
+  }
+  var LABELS = ['Très faible', 'Faible', 'Moyen', 'Solide', 'Très solide'];
+
+  function entropy(pw, prenom, rate) {
+    rate = rate || 1e10;
+    var chars = Array.from(String(pw == null ? '' : pw)), L = chars.length;
+    var low = false, up = false, dig = false, sym = false;
+    chars.forEach(function (c) {
+      if (/^[a-z]$/.test(c)) low = true; else if (/^[A-Z]$/.test(c)) up = true; else if (/^[0-9]$/.test(c)) dig = true; else sym = true;
+    });
+    var A = (low ? 26 : 0) + (up ? 26 : 0) + (dig ? 10 : 0) + (sym ? 32 : 0);
+    var lg = L ? L * Math.log10(A) : 0;
+    var combos = L ? Math.pow(A, L) : 1;
+    /* Une phrase de mots courants : le pirate essaie des mots entiers (liste de 7 776 mots), pas des lettres. */
+    var wordsIn = String(pw == null ? '' : pw).trim().split(/[\s\-_.]+/).filter(function (w) { return w.length >= 2; });
+    var asWords = wordsIn.length >= 3 && wordsIn.every(function (w) { return /^[a-zA-Zà-ÿÀ-ß]+$/.test(w); });
+    if (asWords) {
+      var lgW = wordsIn.length * Math.log10(7776);
+      if (lgW < lg) { lg = lgW; combos = Math.pow(7776, wordsIn.length); }
+    }
+    var issues = [], codes = {}, mask = chars.map(function () { return false; });
+    function add(code, text) { if (!codes[code]) { codes[code] = true; issues.push({ code: code, text: text }); } }
+
+    var b = chars.map(baseChar), s = b.join(''), v1 = leet(b, LEET1), v2 = leet(b, LEET2);
+    COMMON.forEach(function (w) {
+      var f = markAll(s, w, mask); f = markAll(v1, w, mask) || f; f = markAll(v2, w, mask) || f;
+      if (f) add('mot', 'Contient un mot de passe très courant : « ' + w + ' ». Les pirates l\'essaient en premier, même écrit avec des chiffres à la place des lettres.');
+    });
+    var pn = Array.from(String(prenom || '').trim()).map(baseChar).join('');
+    if (pn.length >= 3) {
+      var fp = markAll(s, pn, mask); fp = markAll(v1, pn, mask) || fp; fp = markAll(v2, pn, mask) || fp;
+      if (fp) add('prenom', 'Contient ton prénom : c\'est la première chose qu\'on devine.');
+    }
+    for (var i = 0; i + 4 <= L; i++) {
+      for (var j = L; j >= i + 4; j--) {
+        var sub = s.slice(i, j), hit = SEQS.some(function (q) { return q.indexOf(sub) !== -1; });
+        if (hit) { for (var k = i; k < j; k++) mask[k] = true; add('suite', 'Contient une suite toute faite : « ' + sub + ' » (clavier, alphabet ou chiffres qui se suivent).'); i = j - 1; break; }
+      }
+    }
+    var re = /(.)\1{2,}|(.{2,4})\2+/g, m;
+    while ((m = re.exec(s)) !== null) {
+      for (var r = m.index; r < m.index + m[0].length; r++) mask[r] = true;
+      add('repet', 'Contient une répétition : « ' + m[0] + ' ». Ça n\'ajoute presque rien.');
+    }
+    var red = /(19[5-9]\d|20[0-4]\d)/g;
+    while ((m = red.exec(s)) !== null) {
+      for (var d = m.index; d < m.index + 4; d++) mask[d] = true;
+      add('date', 'Ressemble à une année : « ' + m[0] + ' ». Une date de naissance ou une année se devine vite.');
+    }
+    var free = mask.filter(function (x) { return !x; }).length;
+    var base = lg < 12 ? 0 : lg < 16 ? 1 : lg < 20 ? 2 : lg < 25 ? 3 : 4;
+    var level = (!L || (issues.length && free <= 2)) ? 0 : Math.max(0, base - issues.length);
+    var t = timeToCrack(combos, rate);
+    return { alphabet: A, length: L, combos: combos, log10: lg, bits: lg / Math.log10(2), words: asWords ? wordsIn.length : 0, seconds: t.seconds, timeText: t.text, issues: issues, level: level, label: LABELS[level] };
+  }
+
+  function passphrase(n, sep) {
+    n = Math.max(1, Math.min(12, Math.floor(n) || 5));
+    var out = [];
+    for (var i = 0; i < n; i++) out.push(WORDS[randInt(WORDS.length)]);
+    return out.join(sep == null ? ' ' : sep);
+  }
+  function randomChars(n, alphabet) { var s = ''; for (var i = 0; i < n; i++) s += alphabet.charAt(randInt(alphabet.length)); return s; }
+  var ALL94 = ''; for (var cc = 33; cc <= 126; cc++) ALL94 += String.fromCharCode(cc);
+
+  /* ---------- Widget : compteur ---------- */
+  var TRAPS = ['Soleil2012!', 'azerty123', 'Pixelia2013', 'L0ul0u!!', 'motdepasse1', 'Dragon1999', 'aaaa1234', 'Chouchou2010'];
+  function renderMeter() {
+    var pw = $('pw').value, rate = Number($('rate').value);
+    var r = entropy(pw, $('nm').value, rate);
+    $('mOut').className = 'lv' + r.level;
+    $('mLvl').textContent = r.length ? r.label : '—';
+    var chars = Array.from(pw);
+    var has = { low: chars.some(function (c) { return /^[a-z]$/.test(c); }), up: chars.some(function (c) { return /^[A-Z]$/.test(c); }), dig: chars.some(function (c) { return /^[0-9]$/.test(c); }), sym: chars.some(function (c) { return !/^[A-Za-z0-9]$/.test(c); }) };
+    $('mChips').innerHTML = [['low', 'minuscules +26'], ['up', 'majuscules +26'], ['dig', 'chiffres +10'], ['sym', 'symboles, espaces, accents +32']].map(function (x) {
+      return '<span class="chip' + (has[x[0]] ? ' on' : '') + '">' + (has[x[0]] ? '✓ ' : '') + x[1] + '</span>';
+    }).join('');
+    $('mLen').textContent = r.length;
+    $('mAlpha').textContent = r.alphabet;
+    $('mComb').textContent = r.length ? fmtSci(r.log10) : '—';
+    $('mTime').textContent = r.length ? r.timeText : '—';
+    $('mCalc').textContent = r.length ? (r.words ? 'Phrase de ' + r.words + ' mots : un pirate essaie des mots entiers, 7 776' + sup(r.words) : r.alphabet + sup(r.length)) + ' ≈ ' + fmtSci(r.log10) + ' combinaisons (≈ ' + fmtInt(r.bits) + ' bits). À ' + $('rate').selectedOptions[0].textContent.split(' (')[0] + ', il faut ' + r.timeText + ' pour toutes les essayer.' : 'Tape un exemple ou appuie sur un bouton.';
+    var li = r.issues.map(function (x) { return '<li>' + esc(x.text) + '</li>'; });
+    if (r.length && !r.issues.length) li.push('<li class="good">Aucun motif connu repéré dans notre petite liste.</li>');
+    if (r.length && r.length < 12) li.push('<li>Moins de 12 caractères : la façon la plus simple de le renforcer, c\'est de l\'allonger.</li>');
+    if (r.issues.length) li.push('<li>Attention : ces motifs sont essayés en premier, donc le vrai temps est bien plus court que le calcul.</li>');
+    $('mIssues').innerHTML = li.join('');
+  }
+  $('pw').addEventListener('input', renderMeter);
+  $('nm').addEventListener('input', renderMeter);
+  $('rate').addEventListener('change', renderMeter);
+  $('exBtns').addEventListener('click', function (e) {
+    var bt = e.target.closest('button'); if (!bt) return;
+    var k = bt.getAttribute('data-ex'), v = '';
+    if (k === 'trap') v = TRAPS[randInt(TRAPS.length)];
+    else if (k === 'short') v = randomChars(8, ALL94);
+    else if (k === 'long') v = randomChars(14, 'abcdefghijklmnopqrstuvwxyz');
+    else if (k === 'phrase') v = passphrase(5, ' ');
+    $('pw').value = v;
+    if (k === 'clear') $('nm').value = '';
+    renderMeter();
+  });
+  renderMeter();
+
+  /* ---------- Widget : longueur contre complexité ---------- */
+  var ALPHAS = [[10, 'chiffres (10)'], [26, 'minuscules (26)'], [52, 'min. + maj. (52)'], [62, '+ chiffres (62)'], [94, 'tout (94)']];
+  function renderLen() {
+    var L = Number($('len').value);
+    $('lenV').textContent = L;
+    var max = 24 * Math.log10(94);
+    $('rows').innerHTML = ALPHAS.map(function (a) {
+      var lg = L * Math.log10(a[0]);
+      return '<div class="row"><span class="lab">' + a[1] + '</span><span class="bar" style="width:' + (100 * lg / max).toFixed(1) + '%"></span><span class="val">' + a[0] + sup(L) + ' ≈ ' + fmtSci(lg) + ' · ' + timeToCrack(Math.pow(a[0], L), 1e10).text + '</span></div>';
+    }).join('');
+    var need = Math.ceil(L * Math.log10(94) / Math.log10(26) - 1e-9);
+    $('lenMsg').innerHTML = 'Pour faire aussi bien que <strong>' + L + ' caractères</strong> pris parmi les 94, il suffit de <strong>' + need + ' minuscules</strong> au hasard. Et ' + (L + 1) + ' caractères au lieu de ' + L + ', c\'est ' + fmtInt(94) + ' fois plus de combinaisons avec tous les caractères, ou 26 fois plus en minuscules. Temps indiqués à 10 milliards d\'essais par seconde.';
+  }
+  $('len').addEventListener('input', renderLen);
+  renderLen();
+
+  /* ---------- Widget : phrase de passe ---------- */
+  function renderPhrase() {
+    var n = Number($('nw').value);
+    $('phr').textContent = passphrase(n, $('sep').value);
+    var rows = [
+      ['tu utilises ' + n + ' mots de notre petite liste de ' + WORDS.length + ' mots', n * Math.log10(WORDS.length), WORDS.length + sup(n)],
+      ['tu utilises ' + n + ' mots d\'une vraie liste de 7 776 mots', n * Math.log10(7776), '7 776' + sup(n)],
+      ['pour comparer : 8 caractères au hasard parmi 94', 8 * Math.log10(94), '94⁸'],
+      ['il ne sait rien et essaie lettre par lettre (' + Array.from($('phr').textContent).length + ' caractères)', Array.from($('phr').textContent).length * Math.log10(entropy($('phr').textContent).alphabet), entropy($('phr').textContent).alphabet + sup(Array.from($('phr').textContent).length)]
+    ];
+    $('cmpBody').innerHTML = rows.map(function (r) {
+      return '<tr><td>' + esc(r[0]) + '</td><td class="n">' + r[2] + ' ≈ ' + fmtSci(r[1]) + '</td><td>' + esc(timeText(Math.pow(10, r[1]) / 1e10)) + '</td></tr>';
+    }).join('');
+  }
+  $('genP').addEventListener('click', renderPhrase);
+  $('nw').addEventListener('change', renderPhrase);
+  $('sep').addEventListener('change', renderPhrase);
+  renderPhrase();
+
+  /* ---------- Widget : effet domino ---------- */
+  var ACCTS = [
+    { id: 'pixelia', name: 'Pixelia', kind: 'ton jeu en ligne' },
+    { id: 'photoclic', name: 'Photoclic', kind: 'tes photos' },
+    { id: 'bavardo', name: 'Bavardo', kind: 'ta messagerie' },
+    { id: 'postello', name: 'Postello', kind: 'ta boîte e-mail' }
+  ];
+  function nameOf(id) { for (var i = 0; i < ACCTS.length; i++) if (ACCTS[i].id === id) return ACCTS[i].name; return id; }
+  function leakDomino(reuse, leaked) {
+    leaked = leaked || 'pixelia';
+    if (!ACCTS.some(function (a) { return a.id === leaked; })) return [];
+    var out = [{ id: leaked, name: nameOf(leaked), why: 'fuite' }];
+    ACCTS.forEach(function (a) {
+      if (a.id === leaked) return;
+      if (reuse) out.push({ id: a.id, name: a.name, why: 'même mot de passe' });
+      else if (leaked === 'postello') out.push({ id: a.id, name: a.name, why: 'réinitialisation par e-mail' });
+    });
+    return out;
+  }
+  var reuse = true, timers = [];
+  function drawDom(fallen) {
+    var map = {}; fallen.forEach(function (f) { map[f.id] = f.why; });
+    $('dom').innerHTML = ACCTS.map(function (a) {
+      var w = map[a.id];
+      return '<div class="acct' + (w ? ' fall' : '') + (w === 'fuite' ? ' leak' : '') + '"><strong>' + a.name + '</strong><span class="kind">' + a.kind + '</span><span class="st">' + (w ? '✗ piraté (' + w + ')' : '✓ protégé') + '</span></div>';
+    }).join('');
+  }
+  function runLeak() {
+    timers.forEach(clearTimeout); timers = [];
+    var leaked = $('leakSel').value, res = leakDomino(reuse, leaked), log = $('leakLog');
+    log.innerHTML = ''; drawDom([]);
+    var steps = [
+      ['', 'Des pirates attaquent le site ' + nameOf(leaked) + ' et volent la liste de ses comptes. Ton adresse e-mail et ton mot de passe sont dedans.<div class="leakfile">fuite_' + leaked + '.txt<br>…<br>toi@postello.exemple : ••••••••••<br>…</div>', [res[0]]]
+    ];
+    var others = res.slice(1);
+    if (reuse) {
+      steps.push(['bad', 'Leur programme essaie automatiquement le même e-mail et le même mot de passe sur d\'autres sites connus…', [res[0]]]);
+      steps.push(['bad', 'Ça marche partout : ' + others.map(function (o) { return o.name; }).join(', ') + ' tombent. Avec ta boîte e-mail, ils peuvent même changer tes autres mots de passe.', res]);
+    } else if (leaked === 'postello') {
+      steps.push(['bad', 'Ils essaient ce mot de passe ailleurs : il ne marche nulle part. Mais ils sont dans ta boîte e-mail…', [res[0]]]);
+      steps.push(['bad', '… alors ils cliquent sur « Mot de passe oublié ? » sur tes autres comptes, et reçoivent les liens chez toi : ' + others.map(function (o) { return o.name; }).join(', ') + ' tombent. Avec la double authentification sur ton e-mail, ils seraient restés bloqués.', res]);
+    } else {
+      steps.push(['good', 'Leur programme essaie ce mot de passe sur d\'autres sites… Il ne marche nulle part : tes autres mots de passe sont différents.', res]);
+      steps.push(['good', 'Un seul domino tombe. Tu changes le mot de passe de ' + nameOf(leaked) + ', et l\'histoire s\'arrête là.', res]);
+    }
+    steps.forEach(function (st, k) {
+      timers.push(setTimeout(function () {
+        var li = document.createElement('li'); if (st[0]) li.className = st[0]; li.innerHTML = st[1]; log.appendChild(li); drawDom(st[2]);
+      }, k * 1100));
+    });
+  }
+  $('reuseBtns').addEventListener('click', function (e) {
+    var bt = e.target.closest('button'); if (!bt) return;
+    reuse = bt.getAttribute('data-reuse') === '1';
+    Array.prototype.forEach.call(this.querySelectorAll('button'), function (x) { x.setAttribute('aria-pressed', x === bt ? 'true' : 'false'); });
+    timers.forEach(clearTimeout); timers = []; $('leakLog').innerHTML = ''; drawDom([]);
+  });
+  $('runLeak').addEventListener('click', runLeak);
+  drawDom([]);
+
+  /* ---------- Widget : double authentification ---------- */
+  function twoFactor(on, codeGiven) { return !on || !!codeGiven; }
+  var tfa = false, tfaCode = '';
+  function tfaReset() {
+    $('tfaLog').innerHTML = ''; $('tfaOut').innerHTML = ''; $('tfaChoice').hidden = true;
+    $('phoneBox').innerHTML = '<p class="soft" style="font-size:.9rem;text-align:center">Aucune notification.</p>';
+  }
+  function tfaLine(cls, html) { var li = document.createElement('li'); if (cls) li.className = cls; li.innerHTML = html; $('tfaLog').appendChild(li); }
+  $('tfaBtns').addEventListener('click', function (e) {
+    var bt = e.target.closest('button'); if (!bt) return;
+    tfa = bt.getAttribute('data-tfa') === '1';
+    Array.prototype.forEach.call(this.querySelectorAll('button'), function (x) { x.setAttribute('aria-pressed', x === bt ? 'true' : 'false'); });
+    tfaReset();
+  });
+  $('tfaGo').addEventListener('click', function () {
+    tfaReset();
+    tfaLine('', 'Le pirate tape ton identifiant et ton mot de passe volé sur bavardo.exemple.');
+    tfaLine('', 'Bavardo : « Mot de passe correct. »');
+    if (!twoFactor(tfa, false)) {
+      tfaLine('good', 'Bavardo : « Étape 2 : entre le code envoyé sur le téléphone du propriétaire. »');
+      tfaCode = String(randInt(1000000)); while (tfaCode.length < 6) tfaCode = '0' + tfaCode;
+      $('phoneBox').innerHTML = '<div class="notif">Bavardo : ton code est <b>' + tfaCode.slice(0, 3) + ' ' + tfaCode.slice(3) + '</b>. Ne le donne à personne. Ce n\'est pas toi ? Change ton mot de passe.</div><div class="notif">Message de « Support_Bavardo » : Bonjour, on t\'a envoyé un code par erreur, renvoie-le-nous vite pour vérifier ton compte !</div>';
+      tfaLine('', 'Le pirate n\'a pas ton téléphone : il est bloqué. Alors il essaie une ruse… Regarde ton téléphone. Que fais-tu ?');
+      $('tfaChoice').hidden = false;
+    } else {
+      $('tfaOut').innerHTML = '<div class="verdict no">Le pirate est entré.<span>Sans deuxième preuve, le mot de passe suffit : il lit tes conversations et peut écrire à tes amis en se faisant passer pour toi.</span></div>';
+    }
+  });
+  $('tfaChoice').addEventListener('click', function (e) {
+    var bt = e.target.closest('button'); if (!bt) return;
+    var give = bt.getAttribute('data-give') === '1';
+    $('tfaChoice').hidden = true;
+    if (twoFactor(tfa, give)) $('tfaOut').innerHTML = '<div class="verdict no">Le pirate est entré.<span>En donnant le code, tu lui as ouvert la porte. « Support_Bavardo » était le pirate. Un vrai service ne demande jamais ce code.</span></div>';
+    else $('tfaOut').innerHTML = '<div class="verdict yes">Le pirate reste dehors.<span>Bravo. Maintenant, change ton mot de passe Bavardo depuis l\'appli officielle (il est connu du pirate) et préviens un adulte.</span></div>';
+  });
+
+  /* ---------- Checklist compte piraté ---------- */
+  var HACK = [
+    'Respire : ce n\'est pas ta faute. Préviens un adulte de confiance (parent, prof).',
+    'Essaie de te connecter par l\'appli ou le site officiel (jamais par un lien reçu), et utilise « Mot de passe oublié ? ».',
+    'Si tu ne peux plus entrer, suis la procédure « compte piraté » dans l\'aide officielle du service.',
+    'Change tes mots de passe, en commençant par ton e-mail, puis le compte piraté, puis tous ceux qui avaient le même mot de passe.',
+    'Active la double authentification sur ces comptes.',
+    'Vérifie les appareils connectés et l\'adresse de récupération : déconnecte ce que tu ne reconnais pas.',
+    'Préviens tes amis : qu\'ils ne cliquent sur rien de ce qui a été envoyé depuis ton compte.',
+    'Si on te menace ou te fait du chantage, ne paie rien et garde les preuves : en Suisse, appelle le 147 et, avec un adulte, la police.'
+  ];
+  $('hackSteps').innerHTML = HACK.map(function (t, k) { return '<li><label><input type="checkbox" id="hk' + k + '"><span>' + esc(t) + '</span></label></li>'; }).join('');
+  $('hackSteps').addEventListener('change', function (e) { var li = e.target.closest('li'); if (li) li.classList.toggle('done', e.target.checked); });
+
+  /* ---------- Quiz ---------- */
+  var QZ = [
+    { q: 'Lequel de ces mots de passe est le plus solide ?', o: [['a', 'P@s5!'], ['b', 'hibou tambour nuage valise castor (tirés au hasard)'], ['c', 'Soleil2012']], a: 'b', how: 'Cinq mots au hasard : très long. « P@s5! » est trop court, « Soleil2012 » est un mot courant suivi d\'une année.' },
+    { q: 'Combien de combinaisons pour un code de 4 chiffres ?', o: [['a', '4 × 10 = 40'], ['b', '4⁴ = 256'], ['c', '10⁴ = 10 000']], a: 'c', how: '10 possibilités par chiffre, 4 chiffres : 10 × 10 × 10 × 10 = 10⁴.' },
+    { q: 'On ajoute une minuscule à un mot de passe en minuscules. Le nombre de combinaisons est…', o: [['a', 'augmenté de 1'], ['b', 'multiplié par 2'], ['c', 'multiplié par 26']], a: 'c', how: 'La nouvelle place peut prendre 26 valeurs : 26ⁿ devient 26ⁿ⁺¹ = 26ⁿ × 26.' },
+    { q: 'Qu\'est-ce que la double authentification ?', o: [['a', 'avoir deux fois le même mot de passe'], ['b', 'une deuxième preuve en plus du mot de passe (code, clé, empreinte)'], ['c', 'changer son mot de passe deux fois par an']], a: 'b', how: 'Même avec ton mot de passe, le pirate n\'a pas ton téléphone ni ton doigt.' },
+    { q: 'Pixelia annonce une fuite de données. Que fais-tu ?', o: [['a', 'rien, ce n\'est qu\'un jeu'], ['b', 'je change ce mot de passe, et partout où je l\'avais réutilisé'], ['c', 'j\'ajoute un chiffre à la fin']], a: 'b', how: 'Le mot de passe est connu des pirates : il faut le remplacer complètement, partout où il servait.' },
+    { q: 'Quel compte faut-il protéger en premier ?', o: [['a', 'l\'appli météo'], ['b', 'le jeu en ligne'], ['c', 'la boîte e-mail']], a: 'c', how: 'Avec « Mot de passe oublié ? », ta boîte e-mail permet de reprendre presque tous tes autres comptes.' },
+    { q: 'Un « support » t\'écrit : « Renvoie-nous le code que tu viens de recevoir. » Tu…', o: [['a', 'le donnes, c\'est le support'], ['b', 'ne le donnes pas et changes ton mot de passe'], ['c', 'donnes seulement les 3 premiers chiffres']], a: 'b', how: 'Personne d\'honnête ne demande ce code. Si tu l\'as reçu sans rien demander, quelqu\'un a ton mot de passe.' },
+    { q: 'Vrai ou faux : je peux donner mon mot de passe à ma meilleure amie, puisqu\'on se dit tout.', o: [['v', 'Vrai'], ['f', 'Faux']], a: 'f', how: 'Les amitiés changent et les téléphones se prêtent. Un mot de passe ne se partage pas.' }
+  ];
+  var quiz = $('quiz'), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ''; done = [];
+    QZ.forEach(function (Q, k) {
+      var li = document.createElement('li');
+      li.innerHTML = '<span>' + esc(Q.q) + '</span><select id="qa' + k + '" aria-label="Ta réponse à la question ' + (k + 1) + '"><option value="">…</option>' + Q.o.map(function (o) { return '<option value="' + o[0] + '">' + esc(o[1]) + '</option>'; }).join('') + '</select><button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+      quiz.appendChild(li);
+      function check() {
+        var fb = $('qf' + k), v = $('qa' + k).value;
+        if (!v) { fb.className = 'fb'; fb.textContent = 'Choisis une réponse.'; return; }
+        if (v === Q.a) { fb.className = 'fb ok'; fb.innerHTML = 'Bravo, c\'est juste !<span>' + esc(Q.how) + '</span>'; done[k] = true; }
+        else {
+          done[k] = false;
+          var good = Q.o.filter(function (o) { return o[0] === Q.a; })[0][1];
+          fb.className = 'fb no'; fb.innerHTML = 'Pas tout à fait : la bonne réponse est « ' + esc(good) + ' ».<span>' + esc(Q.how) + '</span>';
+        }
+        $('score').textContent = done.filter(Boolean).length + ' / 8';
+      }
+      $('qb' + k).addEventListener('click', check);
+      $('qa' + k).addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+    });
+    $('score').textContent = '0 / 8';
+  }
+  $('newQuiz').addEventListener('click', newQuiz);
+  newQuiz();
+
+  window.__mdp = { entropy: entropy, combinations: entropy, passphrase: passphrase, timeToCrack: timeToCrack, leakDomino: leakDomino, twoFactor: twoFactor, fmtSci: fmtSci, words: WORDS, common: COMMON, quiz: QZ };
+})();
+</script>
+</body>
+</html>

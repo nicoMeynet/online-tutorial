@@ -34,7 +34,7 @@ DIFF = {
     "les-signaux-et-la-communication": 2, "le-ciel-bleu-et-l-arc-en-ciel": 2, "la-physique-du-sport": 2,
     "le-climat-et-l-effet-de-serre": 2, "revisions-brevet-physique": 3,
     # Numérique
-    "reperer-les-arnaques": 1,
+    "reperer-les-arnaques": 1, "les-mots-de-passe": 1,
 }
 
 BADGE_CSS = (".diff { font: 700 .72rem/1.2 var(--f-mono, monospace); padding: 2px 8px; border-radius: 99px; border: 1.5px solid; white-space: nowrap; }\n"
