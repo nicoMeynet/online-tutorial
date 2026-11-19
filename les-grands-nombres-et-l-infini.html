@@ -1,0 +1,870 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Les grands nombres et l'infini</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, encre indigo (comme un ciel de nuit sans fin), rose pour les nouveaux venus, marge rouge. */
+:root {
+  --paper: #f7f7fb;
+  --grid: #e3e3f1;
+  --card: #ffffff;
+  --ink: #1c1a3a;
+  --ink-soft: #57557a;
+  --acc: #4f46e5;
+  --acc-soft: #e2e3fd;
+  --two: #be123c;
+  --two-soft: #fde2e7;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #fff0a3;
+  --line: #d9d9ea;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0e0d1c; --grid: #19182e; --card: #15142a; --ink: #ecebfb; --ink-soft: #aeacca;
+    --acc: #a5b4fc; --acc-soft: #23224a; --two: #fda4af; --two-soft: #3d1724;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #2d2b4a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0e0d1c; --grid: #19182e; --card: #15142a; --ink: #ecebfb; --ink-soft: #aeacca;
+  --acc: #a5b4fc; --acc-soft: #23224a; --two: #fda4af; --two-soft: #3d1724;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #2d2b4a;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+a { color: var(--acc); font-weight: 700; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero-top { display: flex; flex-wrap: wrap; gap: 18px; align-items: center; }
+.big-inf { font-family: var(--f-display); font-weight: 800; font-size: clamp(4rem, 14vw, 6.5rem); line-height: 1; color: var(--acc); }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+.ladder { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-family: var(--f-mono); font-weight: 600; }
+.ladder li { border: 1.5px solid var(--line); border-radius: 999px; padding: 2px 10px; background: var(--paper); }
+.ladder li.end { border-color: var(--two); color: var(--two); background: var(--two-soft); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note.two { border-left-color: var(--two); background: var(--two-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 6px 12px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+button:disabled { opacity: .5; cursor: default; transform: none; box-shadow: 3px 3px 0 var(--ink); }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+input[type="text"] { font: inherit; font-family: var(--f-mono); font-size: 1.05rem; padding: 8px 10px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; }
+input[type="range"] { width: 100%; accent-color: var(--acc); }
+.param { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.param label { font-weight: 700; }
+.sliders { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 18px; align-items: end; }
+@media (max-width: 600px) { .sliders { grid-template-columns: 1fr; } }
+
+.big { font-family: var(--f-mono); font-weight: 600; font-size: clamp(1.3rem, 4vw, 1.7rem); color: var(--acc); overflow-wrap: anywhere; }
+.full { font-family: var(--f-mono); font-weight: 600; font-size: 1rem; color: var(--acc); overflow-wrap: anywhere; }
+.results { display: flex; flex-direction: column; gap: 8px; font-variant-numeric: tabular-nums; }
+.res { border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 12px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 2px; }
+.res-name { font-family: var(--f-display); font-weight: 700; }
+.res-val { font-family: var(--f-mono); font-weight: 600; color: var(--acc); font-size: 1.05rem; overflow-wrap: anywhere; }
+.res-calc { font-family: var(--f-mono); font-size: .85rem; color: var(--ink-soft); overflow-wrap: anywhere; }
+.res.gold { border-color: var(--two); background: var(--two-soft); }
+.res.gold .res-val { color: var(--ink); }
+.steps { display: flex; flex-direction: column; gap: 6px; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; padding: 12px 14px; font-family: var(--f-mono); font-size: .98rem; overflow-wrap: anywhere; }
+.steps b { color: var(--acc); }
+.steps .why { font-family: var(--f-body); font-size: .9rem; color: var(--ink-soft); }
+.verdict { border-radius: 8px; padding: 12px 14px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+.verdict.yes { background: var(--ok-soft); color: var(--ok); }
+.verdict.no { background: var(--red-soft); color: var(--red); }
+.verdict span { font-weight: 400; color: var(--ink); }
+.err { color: var(--red); font-weight: 700; }
+
+.graph svg { width: 100%; height: auto; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; display: block; }
+.two-col { display: grid; grid-template-columns: 260px 1fr; gap: 20px; align-items: start; }
+.two-col > svg { width: 100%; max-width: 260px; height: auto; display: block; }
+.two-col > div { min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+@media (max-width: 600px) { .two-col { grid-template-columns: 1fr; } .two-col > svg { margin: 0 auto; max-width: 280px; } }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.cards .m { font-family: var(--f-mono); font-size: 1.05rem; font-weight: 600; color: var(--acc); overflow-wrap: anywhere; }
+@media (max-width: 600px) { .cards { grid-template-columns: 1fr; } }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
+.tag.ok { color: var(--ok); }
+.tag.no { color: var(--red); }
+.tag.acc { color: var(--acc); }
+.tag.two { color: var(--two); }
+
+table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+th, td { padding: 7px 8px; border-bottom: 1px dashed var(--line); text-align: center; font-family: var(--f-mono); white-space: nowrap; }
+thead th { border-bottom: 2px solid var(--ink); font-family: var(--f-display); }
+.scroll { overflow-x: auto; }
+
+/* Liste des paires n ↔ 2n */
+.pairs { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 14px; font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+.pairs li { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: center; border: 1.5px solid var(--line); border-radius: 8px; padding: 4px 10px; background: var(--paper); }
+.pairs .a { text-align: right; color: var(--acc); font-weight: 600; overflow-wrap: anywhere; }
+.pairs .b { color: var(--two); font-weight: 600; overflow-wrap: anywhere; }
+@media (max-width: 600px) { .pairs { grid-template-columns: 1fr; } }
+
+/* Tableau de Cantor */
+.cantor td, .cantor th { padding: 5px 6px; font-size: 1.05rem; }
+.cantor th { font-family: var(--f-display); text-align: left; }
+.cantor td.diag { background: var(--hl); font-weight: 700; border-radius: 4px; }
+.cantor tr.new td, .cantor tr.new th { border-top: 2px solid var(--ink); color: var(--two); font-weight: 700; }
+.cantor tr.new td.done { background: var(--two-soft); }
+
+#hotel .guest { transition: transform .7s ease, opacity .5s ease; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 110px auto; gap: 10px; align-items: center; }
+.quiz .q { font-size: 1rem; min-width: 0; overflow-wrap: anywhere; }
+.quiz input[type="text"] { font-size: 1rem; padding: 6px 8px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz .q { grid-column: 1 / -1; } }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc); }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 120px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+</head>
+<body>
+<main class="page">
+
+  <header class="hero">
+    <div class="hero-top">
+      <div class="big-inf" aria-hidden="true">∞</div>
+      <div style="display:flex;flex-direction:column;gap:10px;min-width:0;flex:1 1 280px">
+        <span class="eyebrow">Tutoriel de maths · niveau collège (curiosité)</span>
+        <h1>Les grands nombres et l'infini</h1>
+        <p class="lead">Jusqu'où peut-on compter ? Un million, un milliard, un googol… Et que se passe-t-il après, quand on ne s'arrête jamais ?</p>
+      </div>
+    </div>
+    <div class="box">
+      <ul class="ladder" aria-label="Des nombres de plus en plus grands">
+        <li>1</li><li>1 000</li><li>1 000 000</li><li>10<sup>9</sup></li><li>10<sup>22</sup></li><li>10<sup>80</sup></li><li>10<sup>100</sup></li><li>…</li><li class="end">∞ ?</li>
+      </ul>
+      <span class="soft">Tous ces nombres sont énormes, mais ils restent des nombres : on peut toujours ajouter 1. L'infini, c'est autre chose. Et tu vas voir qu'il réserve des surprises.</span>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · Compter très loin</span>
+    <h2>Combien de temps pour compter jusqu'à… ?</h2>
+    <p>Imagine que tu dis un nombre <strong>chaque seconde</strong>, sans jamais dormir ni manger. Pour compter jusqu'à 1 000, il te faut 1 000 secondes, soit moins de 17 minutes. Et pour aller plus loin ?</p>
+    <div class="box">
+      <div class="btns" id="countPresets" role="group" aria-label="Exemples de nombres"></div>
+      <div class="param">
+        <label for="countIn">Compter jusqu'à (un entier entre 1 et 10<sup>15</sup>, tu peux écrire 10^12)</label>
+        <input id="countIn" type="text" inputmode="numeric" autocomplete="off" value="1000000">
+      </div>
+      <div class="results" id="countOut" aria-live="polite"></div>
+      <p class="soft">En vrai, ce serait encore plus long : dire « sept cent quatre-vingt-trois millions quatre cent mille deux cent douze » prend bien plus d'une seconde ! Ici, on compte une année comme 365 jours.</p>
+    </div>
+    <p>Pour décrire le monde, on rencontre des nombres bien plus grands encore. Ce sont des <strong>estimations</strong> : les scientifiques ne les ont pas comptés un par un, et les valeurs varient selon les sources.</p>
+    <div class="cards">
+      <div class="box"><span class="tag acc">Estimation</span><strong>Les grains de sable sur la Terre</strong><span class="m">≈ 10<sup>18</sup> à 10<sup>19</sup></span><span class="soft">Plages et déserts réunis. C'est une estimation très approximative, qui dépend de la taille choisie pour un grain.</span></div>
+      <div class="box"><span class="tag acc">Estimation</span><strong>Les étoiles de l'univers observable</strong><span class="m">≈ 10<sup>22</sup></span><span class="soft">Peut-être plus : selon les études, on trouve de 10<sup>22</sup> à 10<sup>24</sup>. Sans doute plus que de grains de sable sur Terre !</span></div>
+      <div class="box"><span class="tag acc">Estimation</span><strong>Les atomes de l'univers observable</strong><span class="m">≈ 10<sup>80</sup></span><span class="soft">Un 1 suivi de 80 zéros. C'est l'ordre de grandeur le plus souvent cité.</span></div>
+      <div class="box"><span class="tag two">Nombre exact</span><strong>Le googol</strong><span class="m">10<sup>100</sup></span><span class="soft">Un 1 suivi de 100 zéros. C'est plus que le nombre d'atomes de l'univers observable. Le nom « Google » vient de ce mot.</span></div>
+      <div class="box"><span class="tag two">Nombre exact</span><strong>Le googolplex</strong><span class="m">10<sup>googol</sup></span><span class="soft">Un 1 suivi d'un googol de zéros. Pour l'écrire en entier, il faudrait plus de chiffres qu'il n'y a d'atomes dans l'univers observable. Pourtant, c'est un nombre <strong>fini</strong>.</span></div>
+    </div>
+    <div class="box">
+      <h3>Le googol écrit en entier</h3>
+      <p class="full" id="googol"></p>
+      <p class="soft" id="googolInfo"></p>
+    </div>
+    <p class="soft">Pour écrire ces nombres avec des exposants, revois le <a href="les-puissances.html">tutoriel sur les puissances</a>.</p>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · La croissance qui explose</span>
+    <h2>Plier une feuille de papier jusqu'à la Lune</h2>
+    <p>Une feuille de papier mesure environ <strong>0,1 mm</strong> d'épaisseur. Plie-la en deux : 0,2 mm. Encore : 0,4 mm. À chaque pliage, l'épaisseur <strong>double</strong>. Après k pliages, elle vaut <span class="hl">0,1 mm × 2<sup>k</sup></span>.</p>
+    <div class="box">
+      <div class="param">
+        <label for="folds">Nombre de pliages : <span class="mono" id="foldsOut">0</span></label>
+        <input id="folds" type="range" min="0" max="50" step="1" value="0">
+      </div>
+      <div class="results" id="foldRes" aria-live="polite"></div>
+      <div class="graph"><svg id="foldSvg" viewBox="0 0 640 150" role="img" aria-label="Comparaison de l'épaisseur avec un objet connu"></svg></div>
+    </div>
+    <div class="note">
+      <span class="note-title">42 pliages pour dépasser la Lune</span>
+      <span>0,1 mm × 2<sup>42</sup> ≈ 439 805 km. La Lune est en moyenne à environ 384 400 km de la Terre. En pratique, on ne peut pas plier une vraie feuille plus de 7 ou 8 fois (le record est d'environ 12 pliages, avec une feuille géante). Mais le calcul montre la force du doublement.</span>
+    </div>
+    <h3>Ajouter ou doubler ?</h3>
+    <p>On te propose deux cagnottes. <strong>A</strong> commence à 100 € et gagne <strong>100 € chaque jour</strong> (100, 200, 300…). <strong>B</strong> commence à <strong>1 centime</strong> et <strong>double chaque jour</strong> (0,01 €, 0,02 €, 0,04 €…). Laquelle choisis-tu ?</p>
+    <div class="box">
+      <div class="param">
+        <label for="days">Jour : <span class="mono" id="daysOut">10</span></label>
+        <input id="days" type="range" min="1" max="30" step="1" value="10">
+      </div>
+      <div class="graph"><svg id="linSvg" viewBox="0 0 640 190" role="img" aria-label="Barres comparant les deux cagnottes"></svg></div>
+      <div class="verdict" id="linOut" aria-live="polite"></div>
+    </div>
+    <p>Ajouter toujours la même quantité, c'est une croissance <strong>linéaire</strong>. Multiplier toujours par le même nombre, c'est une croissance <strong>exponentielle</strong>. Au début, l'exponentielle paraît lente. Puis elle dépasse tout.</p>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · L'hôtel de Hilbert</span>
+    <h2>Un hôtel complet… où il reste toujours de la place</h2>
+    <p>Imagine un hôtel avec une <strong>infinité</strong> de chambres, numérotées 1, 2, 3, 4… sans fin. Ce soir, <strong>toutes</strong> les chambres sont occupées. Un nouveau client arrive. Peut-on le loger ?</p>
+    <p>Dans un hôtel normal, non. Ici, oui ! Le directeur demande à chaque client de passer de la chambre <strong>n</strong> à la chambre <strong>n + 1</strong>. Personne ne se retrouve dehors, car il y a toujours une chambre suivante. Et la chambre 1 est libre.</p>
+    <div class="box">
+      <div class="btns" role="group" aria-label="Actions sur l'hôtel">
+        <button type="button" id="hOne">Un nouveau client</button>
+        <button type="button" id="hBus">Un car infini de clients</button>
+        <button type="button" id="hReset">Recommencer</button>
+      </div>
+      <div class="graph"><svg id="hotel" viewBox="0 0 640 170" role="img" aria-label="Les chambres 1 à 12 de l'hôtel de Hilbert avec leurs clients"></svg></div>
+      <div class="steps" id="hotelLog" aria-live="polite"></div>
+      <p class="soft">On ne voit que les 12 premières chambres, mais l'hôtel continue sans fin. Le numéro dans chaque rond est l'ancienne chambre du client. Les ronds roses sont les nouveaux.</p>
+    </div>
+    <p>Et si un car arrive avec une <strong>infinité</strong> de nouveaux clients ? Le directeur demande à chaque client de passer de la chambre <strong>n</strong> à la chambre <strong>2n</strong>. Les anciens clients occupent alors toutes les chambres paires. Toutes les chambres impaires (1, 3, 5, 7…) sont libres : il y en a une infinité, une pour chaque passager du car.</p>
+    <div class="box">
+      <div class="param">
+        <label for="roomIn">Un client est dans la chambre…</label>
+        <input id="roomIn" type="text" inputmode="numeric" autocomplete="off" value="7">
+      </div>
+      <div class="results" id="roomOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · Une partie aussi grande que le tout</span>
+    <h2>Autant de nombres pairs que d'entiers</h2>
+    <p>Les nombres pairs (2, 4, 6…) sont une partie des entiers (1, 2, 3…). On a envie de dire qu'il y en a deux fois moins. Pourtant, on peut les <strong>associer deux par deux</strong> : chaque entier <strong>n</strong> avec le nombre pair <strong>2n</strong>. Chaque entier a son partenaire pair, et chaque pair a son partenaire entier. Personne n'est oublié, personne n'est en double.</p>
+    <p>Quand on peut faire ces paires, les mathématiciens disent que les deux ensembles ont <strong>autant</strong> d'éléments. Pour les ensembles infinis, <span class="hl">une partie peut être aussi grande que le tout</span>. C'est exactement l'hôtel de Hilbert avec la règle n → 2n.</p>
+    <div class="box">
+      <div class="sliders">
+        <div class="param">
+          <label for="pairStart">Commencer la liste à n = <span class="mono" id="pairStartOut">1</span></label>
+          <input id="pairStart" type="range" min="1" max="1000" step="1" value="1">
+        </div>
+        <div class="param">
+          <label for="pairIn">Trouver le partenaire de…</label>
+          <input id="pairIn" type="text" inputmode="numeric" autocomplete="off" value="2026">
+        </div>
+      </div>
+      <ul class="pairs" id="pairList" aria-label="Paires entier et nombre pair"></ul>
+      <div class="verdict yes" id="pairOut" aria-live="polite"></div>
+    </div>
+    <h3>Et les fractions ?</h3>
+    <p>Entre 0 et 1, il y a déjà une infinité de fractions. On pourrait croire qu'il y a « plus » de fractions que d'entiers. Pourtant, on peut les numéroter toutes ! L'idée, due à Cantor : ranger les fractions dans un tableau, puis le parcourir en <strong>zigzag</strong>. On saute les fractions déjà rencontrées, comme 2/2 = 1/1 ou 2/4 = 1/2.</p>
+    <div class="box">
+      <div class="graph"><svg id="fracSvg" viewBox="0 0 640 420" role="img" aria-label="Tableau des fractions parcouru en zigzag"></svg></div>
+      <div class="btns">
+        <button type="button" id="fracNext">Fraction suivante</button>
+        <button type="button" id="fracAll">Tout montrer</button>
+        <button type="button" id="fracReset">Recommencer</button>
+      </div>
+      <div class="steps" id="fracOut" aria-live="polite"></div>
+    </div>
+    <p class="soft">Le zigzag passe par chaque case du tableau (qui continue sans fin). Chaque fraction positive reçoit donc un numéro : 1, 2, 3… Il y a autant de fractions positives que d'entiers.</p>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Des infinis plus grands que d'autres</span>
+    <h2>L'argument de la diagonale de Cantor</h2>
+    <p>Alors, tous les infinis sont-ils pareils ? Non ! En 1891, Georg Cantor montre qu'on <strong>ne peut pas</strong> numéroter tous les nombres décimaux entre 0 et 1 (avec leur infinité de chiffres après la virgule). Son idée : supposons qu'on ait une liste numérotée. On va fabriquer un nombre qui n'est <strong>pas</strong> dans la liste.</p>
+    <p>La règle : on regarde le 1<sup>er</sup> chiffre du n° 1, le 2<sup>e</sup> chiffre du n° 2, le 3<sup>e</sup> chiffre du n° 3… (la <strong>diagonale</strong>). À chaque fois, on écrit un chiffre <strong>différent</strong> : un 5, sauf si le chiffre de la diagonale est déjà 5, et alors on écrit 4.</p>
+    <div class="box">
+      <div class="btns">
+        <button type="button" id="cNew">Nouvelle liste</button>
+        <button type="button" id="cStep">Chiffre suivant</button>
+        <button type="button" id="cAll">Tout construire</button>
+      </div>
+      <div class="scroll"><table class="cantor" id="cantor" aria-label="Liste de nombres décimaux et nombre construit par la diagonale"></table></div>
+      <div class="steps" id="cantorLog" aria-live="polite"></div>
+      <div class="verdict" id="cantorOut" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Pourquoi c'est imparable</span>
+      <span>Ici, la liste n'a que 8 nombres, et on ne montre que 8 chiffres. Mais le raisonnement marche pour n'importe quelle liste, même infinie : le nouveau nombre diffère du n° 1 au 1<sup>er</sup> chiffre, du n° 2 au 2<sup>e</sup> chiffre, du n° 1 000 au 1 000<sup>e</sup> chiffre… Il n'est donc égal à <strong>aucun</strong> nombre de la liste. Aucune liste ne peut tous les contenir.</span>
+      <span>On évite les chiffres 0 et 9 exprès : 0,1999… et 0,2000… sont le même nombre, et on ne veut pas tomber dans ce piège.</span>
+    </div>
+    <p>Conclusion : il y a « plus » de nombres réels (les nombres à virgule, avec une infinité de chiffres possibles) que d'entiers. L'infini des entiers et l'infini des réels <span class="hl">ne sont pas de la même taille</span>. Et Cantor a montré qu'il existe même une infinité d'infinis différents !</p>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · Additionner une infinité de nombres</span>
+    <h2>Une somme sans fin qui vaut 1</h2>
+    <p>Peut-on additionner une infinité de nombres et trouver un résultat fini ? Prends un carré d'aire 1. Colorie la moitié, puis la moitié de ce qui reste, puis encore la moitié de ce qui reste…</p>
+    <div class="box">
+      <div class="two-col">
+        <svg id="square" viewBox="0 0 320 320" role="img" aria-label="Carré rempli par des moitiés successives"></svg>
+        <div>
+          <div class="param">
+            <label for="terms">Nombre de morceaux : <span class="mono" id="termsOut">3</span></label>
+            <input id="terms" type="range" min="1" max="40" step="1" value="3">
+          </div>
+          <div class="results" id="sqOut" aria-live="polite"></div>
+        </div>
+      </div>
+    </div>
+    <p>Il reste toujours un petit morceau, mais il devient aussi petit qu'on veut. Les mathématiciens disent que la somme infinie <span class="hl">1/2 + 1/4 + 1/8 + 1/16 + … = 1</span>.</p>
+    <div class="note two">
+      <span class="note-title">Achille et la tortue (Zénon, vers −450)</span>
+      <span>Achille court deux fois plus vite qu'une tortue, qui part devant lui. Pour la rattraper, il doit d'abord atteindre l'endroit où elle était : disons qu'il lui faut 1/2 minute. Pendant ce temps, la tortue a avancé, deux fois moins loin. Achille met 1/4 de minute pour y arriver. Puis 1/8 de minute, puis 1/16…</span>
+      <span>Zénon disait : il y a une infinité d'étapes, donc Achille ne rattrape jamais la tortue ! Mais la somme des durées vaut 1/2 + 1/4 + 1/8 + … = <strong>1 minute</strong>. Une infinité d'étapes peut tenir dans un temps fini. Au bout d'une minute, Achille rattrape la tortue.</span>
+    </div>
+    <h3>Mais attention : certaines sommes infinies explosent</h3>
+    <p>Regarde 1 + 1/2 + 1/3 + 1/4 + 1/5 + … Les morceaux deviennent aussi de plus en plus petits. Pourtant, cette somme <strong>dépasse n'importe quel nombre</strong>, à condition d'ajouter assez de termes. Elle grandit très, très lentement.</p>
+    <div class="box">
+      <div class="btns" id="hTargets" role="group" aria-label="Valeur à dépasser"></div>
+      <div class="results" id="harmOut" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Pourquoi elle grandit sans fin</span>
+      <span>On regroupe les termes : 1/3 + 1/4 est plus grand que 1/4 + 1/4 = 1/2. Puis 1/5 + 1/6 + 1/7 + 1/8 est plus grand que 4 × 1/8 = 1/2. Et ainsi de suite : on peut former autant de paquets plus grands que 1/2 qu'on veut. Donc la somme finit par dépasser 10, 100, 1 000… Pour dépasser 20, il faut environ 272 millions de termes. Pour dépasser 100, environ 1,5 × 10<sup>43</sup> termes !</span>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Le symbole ∞ et les pièges</span>
+    <h2>L'infini n'est pas un nombre comme les autres</h2>
+    <p>Le symbole <strong>∞</strong> se lit « infini ». Il ressemble à un 8 couché. Il sert à dire « sans fin », mais on ne peut pas calculer avec lui comme avec 3 ou 7.</p>
+    <div class="cards">
+      <div class="box"><span class="tag no">Piège</span><strong>∞ n'est pas un nombre</strong><span class="soft">Ce n'est pas le « plus grand nombre ». Il n'existe pas de plus grand nombre : à n'importe quel entier, on peut ajouter 1.</span></div>
+      <div class="box"><span class="tag no">Piège</span><strong>« ∞ + 1 = ∞ » ?</strong><span class="soft">C'est une façon de parler de l'hôtel de Hilbert : un client de plus, et l'hôtel n'est pas « plus plein ». Mais ce n'est pas un calcul normal. Si c'en était un, on enlèverait ∞ des deux côtés et on trouverait 1 = 0 !</span></div>
+      <div class="box"><span class="tag no">Piège</span><strong>« ∞ − ∞ » n'a pas de réponse</strong><span class="soft">Si tous les clients de l'hôtel partent, il reste 0 client. Si seuls ceux des chambres impaires partent, il en reste une infinité. Dans les deux cas, une infinité s'en va.</span></div>
+      <div class="box"><span class="tag no">Piège</span><strong>Très grand n'est pas infini</strong><span class="soft">Un googolplex est gigantesque, mais il est fini : il y a des nombres plus grands, comme googolplex + 1. Aucun nombre, même énorme, n'est « presque infini ».</span></div>
+      <div class="box"><span class="tag no">Piège</span><strong>Diviser par 0</strong><span class="soft">Au collège, diviser par 0 est <strong>impossible</strong>. 5 ÷ 0 n'est pas égal à ∞ : ce calcul n'a pas de sens. Tu verras plus tard, au lycée, comment parler de ce qui se passe quand on divise par un nombre de plus en plus proche de 0.</span></div>
+      <div class="box"><span class="tag ok">Bonne idée</span><strong>Parler de taille</strong><span class="soft">Pour comparer deux ensembles infinis, on ne compte pas : on essaie de faire des <strong>paires</strong>, comme n ↔ 2n. C'est l'idée de Cantor.</span></div>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Réponds par un nombre. Pour les sommes, tu peux écrire une fraction (comme 7/8) ou un nombre décimal.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Nouvelles questions</button>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Un peu d'histoire</span>
+    <h2>2 500 ans pour apprivoiser l'infini</h2>
+    <ol class="timeline">
+      <li><span class="when">vers −450</span><div class="what"><strong>Zénon d'Élée</strong><span>Ce philosophe grec invente des paradoxes, comme Achille et la tortue, pour montrer que l'infini pose des problèmes à la pensée. Ils ont fait réfléchir les savants pendant plus de 2 000 ans.</span></div></li>
+      <li><span class="when">vers −250</span><div class="what"><strong>Archimède, L'Arénaire</strong><span>Il cherche combien de grains de sable rempliraient l'univers tel qu'on l'imaginait à son époque. Il invente une façon de nommer des nombres immenses et trouve environ 10<sup>63</sup> grains (en écriture moderne). Son message : un nombre très grand n'est pas infini.</span></div></li>
+      <li><span class="when">1655</span><div class="what"><strong>John Wallis</strong><span>Ce mathématicien anglais utilise pour la première fois le symbole ∞ pour l'infini. On ne sait pas exactement pourquoi il a choisi cette forme.</span></div></li>
+      <li><span class="when">1874–1891</span><div class="what"><strong>Georg Cantor</strong><span>Il compare les ensembles infinis avec des paires. Il montre qu'il y a autant de fractions que d'entiers, mais plus de nombres réels (diagonale de 1891). Beaucoup de mathématiciens de son époque refusent ses idées, qui sont aujourd'hui à la base des mathématiques.</span></div></li>
+      <li><span class="when">vers 1920</span><div class="what"><strong>Le googol</strong><span>Le mathématicien américain Edward Kasner demande à son jeune neveu un nom pour 10<sup>100</sup>. L'enfant propose « googol ». Kasner le rend célèbre dans un livre en 1940.</span></div></li>
+      <li><span class="when">1924</span><div class="what"><strong>David Hilbert</strong><span>D'après les historiens, il présente l'hôtel aux chambres infinies dans une conférence en 1924. L'histoire devient célèbre plus tard, grâce au livre du physicien George Gamow (1947).</span></div></li>
+    </ol>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · À toi de jouer</span>
+    <h2>Six problèmes</h2>
+    <div class="exos">
+      <details>
+        <summary>Compter jusqu'à un million<span class="q">À un nombre par seconde, combien de jours faut-il environ pour compter jusqu'à 1 000 000 ?</span></summary>
+        <div><span>Un jour dure 24 × 60 × 60 = 86 400 secondes. 1 000 000 ÷ 86 400 ≈ 11,6. Il faut donc environ <strong>11 jours et demi</strong> (exactement 11 jours 13 h 46 min 40 s).</span></div>
+      </details>
+      <details>
+        <summary>Dix pliages<span class="q">Une feuille de 0,1 mm est pliée en deux 10 fois. Quelle est son épaisseur ?</span></summary>
+        <div><span>2<sup>10</sup> = 1 024, donc 0,1 × 1 024 = <strong>102,4 mm</strong>, soit environ 10 cm.</span></div>
+      </details>
+      <details>
+        <summary>Trois nouveaux clients<span class="q">L'hôtel de Hilbert est plein. Trois clients arrivent. Le directeur décale tout le monde de n vers n + 3. Où va le client de la chambre 7 ? Qui occupe les chambres 1, 2 et 3 ?</span></summary>
+        <div><span>Le client de la chambre 7 va dans la chambre 7 + 3 = <strong>10</strong>. Les chambres 1, 2 et 3 sont libres : on y met les <strong>trois nouveaux clients</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Le partenaire pair<span class="q">Avec la règle n ↔ 2n, quel nombre pair est associé à 37 ? Et quel entier est associé à 2 026 ?</span></summary>
+        <div><span>37 est associé à 2 × 37 = <strong>74</strong>. 2 026 est associé à 2 026 ÷ 2 = <strong>1 013</strong>.</span></div>
+      </details>
+      <details>
+        <summary>La somme des moitiés<span class="q">Calcule 1/2 + 1/4 + 1/8 + 1/16 + 1/32. Combien manque-t-il pour arriver à 1 ?</span></summary>
+        <div><span>En trente-deuxièmes : 16/32 + 8/32 + 4/32 + 2/32 + 1/32 = <strong>31/32</strong>. Il manque <strong>1/32</strong> : c'est toujours le dernier morceau ajouté.</span></div>
+      </details>
+      <details>
+        <summary>La diagonale à la main<span class="q">Une liste commence par 0,1234…, 0,5555…, 0,9090…, 0,3337… Avec la règle de Cantor (écrire 5, ou 4 si le chiffre est 5), quels sont les 4 premiers chiffres du nouveau nombre ?</span></summary>
+        <div><span>La diagonale donne 1, 5, 9, 7. On écrit 5, puis 4 (car c'était un 5), puis 5, puis 5 : le nouveau nombre commence par <strong>0,5455…</strong> Il diffère de chacun des quatre nombres à au moins un chiffre.</span></div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• Il n'y a pas de plus grand nombre : on peut toujours ajouter 1. Un nombre très grand, comme le googol (10<sup>100</sup>), reste <strong>fini</strong>.</span>
+      <span>• Doubler fait grandir <strong>très vite</strong> (croissance exponentielle) : 42 pliages de papier dépasseraient la distance Terre–Lune.</span>
+      <span>• Deux ensembles ont <strong>autant</strong> d'éléments si on peut les associer par <strong>paires</strong>. Il y a autant de nombres pairs, et autant de fractions, que d'entiers.</span>
+      <span>• Il y a des infinis plus grands que d'autres : il y a <strong>plus</strong> de nombres réels que d'entiers (diagonale de Cantor).</span>
+      <span>• Une somme infinie peut avoir un résultat fini : 1/2 + 1/4 + 1/8 + … = 1. Mais 1 + 1/2 + 1/3 + … grandit sans limite.</span>
+      <span>• <strong>∞</strong> n'est pas un nombre : on ne calcule pas avec lui comme avec les autres, et diviser par 0 reste impossible.</span>
+    </div>
+  </section>
+
+  <footer>Fiche de révision · Les grands nombres et l'infini</footer>
+</main>
+
+<script>
+(function () {
+  var NS = "http://www.w3.org/2000/svg";
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function fmt(x, d) { var r = Math.round(x * 1e6) / 1e6; if (Object.is(r, -0)) r = 0; return r.toLocaleString("fr-FR", { maximumFractionDigits: d == null ? 3 : d }).replace("-", "−"); }
+  function big(b) { return BigInt(b).toLocaleString("fr-FR"); }
+  function num(s) {
+    var t = String(s).replace(/\s/g, "").replace(/[−–]/g, "-").replace(",", ".");
+    if (t === "") return NaN;
+    var m = t.match(/^(-?\d+(?:\.\d+)?)\/(-?\d+(?:\.\d+)?)$/);
+    if (m) { var b = Number(m[2]); return b === 0 ? NaN : Number(m[1]) / b; }
+    var x = Number(t); return isFinite(x) ? x : NaN;
+  }
+  function mk(svg, name, attrs, text) { var e = document.createElementNS(NS, name); for (var a in attrs) e.setAttribute(a, attrs[a]); if (text != null) e.textContent = text; svg.appendChild(e); return e; }
+  function clear(el) { while (el.firstChild) el.removeChild(el.firstChild); }
+  function sup(n) { return "<sup>" + n + "</sup>"; }
+  function pow2(k) { var r = BigInt(1); for (var i = 0; i < k; i++) r = r * BigInt(2); return r; }
+  function gcd(a, b) { while (b) { var t = a % b; a = b; b = t; } return a; }
+
+  /* ---------- Fonctions pures ---------- */
+  var MAXC = BigInt("1000000000000000");
+  function parseBig(s) {
+    var t = String(s).replace(/[\s.]/g, "");
+    var m = t.match(/^10\^(\d{1,2})$/);
+    if (m) { var r = BigInt(1); for (var i = 0; i < Number(m[1]); i++) r = r * BigInt(10); return r; }
+    if (!/^\d{1,16}$/.test(t)) return null;
+    return BigInt(t);
+  }
+  function countTime(n) {
+    var s = BigInt(n), Y = BigInt(31536000), D = BigInt(86400), H = BigInt(3600), M = BigInt(60);
+    var y = s / Y; s = s % Y; var d = s / D; s = s % D; var h = s / H; s = s % H; var mi = s / M; s = s % M;
+    return { years: y.toString(), days: d.toString(), hours: h.toString(), minutes: mi.toString(), seconds: s.toString() };
+  }
+  function foldThickness(k) { return 0.1 * Math.pow(2, k); }
+  function foldExactMm(k) { var s = pow2(k).toString(); if (s.length === 1) s = "0" + s; var ip = s.slice(0, -1), dp = s.slice(-1); return BigInt(ip).toLocaleString("fr-FR") + (dp === "0" ? "" : "," + dp); }
+  function linVsExp(d) { return { lin: 100 * d, exp: 0.01 * Math.pow(2, d - 1) }; }
+  function crossDay() { for (var d = 1; d < 100; d++) { var v = linVsExp(d); if (v.exp > v.lin) return d; } return null; }
+  function hilbert(n, rule, k) { return rule === "double" ? 2 * n : n + (k == null ? 1 : k); }
+  var fracOrder = (function () {
+    var list = [];
+    for (var s = 2; s <= 6; s++) {
+      for (var j = 1; j < s; j++) { var p = s % 2 === 0 ? j : s - j; list.push({ p: p, q: s - p, ok: gcd(p, s - p) === 1 }); }
+    }
+    return list;
+  })();
+  function fractionAt(i) {
+    var c = 0;
+    for (var s = 2; ; s++) {
+      for (var j = 1; j < s; j++) { var p = s % 2 === 0 ? j : s - j, q = s - p; if (gcd(p, q) === 1) { c++; if (c === i) return [p, q]; } }
+    }
+  }
+  function diagonal(rows) { return rows.map(function (r, i) { return r.charAt(i) === "5" ? "4" : "5"; }).join(""); }
+  function geomSum(n) { var d = pow2(n); return { num: (d - BigInt(1)).toString(), den: d.toString() }; }
+  function harmonicReach(t) { var s = 0, n = 0; while (s <= t) { n++; s += 1 / n; } return n; }
+  function harmonic(n) { var s = 0; for (var i = 1; i <= n; i++) s += 1 / i; return s; }
+
+  window.__infini = { parseBig: parseBig, countTime: countTime, foldThickness: foldThickness, foldExactMm: foldExactMm, linVsExp: linVsExp, crossDay: crossDay, hilbert: hilbert, fractionAt: fractionAt, diagonal: diagonal, geomSum: geomSum, harmonicReach: harmonicReach, harmonic: harmonic };
+
+  /* ---------- 1. Compter ---------- */
+  var countIn = document.getElementById("countIn"), countOut = document.getElementById("countOut");
+  var cPre = [["1 000", "1000"], ["1 million", "1000000"], ["1 milliard", "1000000000"], ["1 000 milliards", "1000000000000"], ["10¹⁵", "1000000000000000"]];
+  cPre.forEach(function (p, i) {
+    var b = document.createElement("button"); b.type = "button"; b.id = "cp" + i; b.textContent = p[0];
+    b.addEventListener("click", function () { countIn.value = p[1]; count(); });
+    document.getElementById("countPresets").appendChild(b);
+  });
+  function plural(v, one, many) { return big(v) + " " + (v === "1" ? one : many); }
+  function count() {
+    var n = parseBig(countIn.value);
+    cPre.forEach(function (p, i) { document.getElementById("cp" + i).setAttribute("aria-pressed", n !== null && n.toString() === p[1] ? "true" : "false"); });
+    if (n === null || n < BigInt(1) || n > MAXC) { countOut.innerHTML = "<p class=\"err\">Écris un entier entre 1 et 1 000 000 000 000 000 (10^15).</p>"; return; }
+    var t = countTime(n), parts = [];
+    if (t.years !== "0") parts.push(plural(t.years, "an", "ans"));
+    if (t.days !== "0") parts.push(plural(t.days, "jour", "jours"));
+    if (t.hours !== "0") parts.push(t.hours + " h");
+    if (t.minutes !== "0") parts.push(t.minutes + " min");
+    if (t.seconds !== "0") parts.push(t.seconds + " s");
+    var yrs = Number(n) / 31557600, life = "";
+    if (yrs < 1 / 365.25) life = "Moins d'une journée : facile (avec un peu de patience) !";
+    else if (yrs < 1) life = "Moins d'un an, mais il faudrait ne jamais dormir.";
+    else if (yrs < 80) life = "Une bonne partie d'une vie humaine.";
+    else if (yrs < 5000) life = "Bien plus qu'une vie humaine (environ 80 ans). Impossible pour une seule personne !";
+    else life = "Plus long que toute l'histoire de l'écriture (environ 5 000 ans).";
+    countOut.innerHTML =
+      "<div class=\"res\"><span class=\"res-name\">Nombre de secondes</span><span class=\"res-val\">" + big(n) + " s</span></div>" +
+      "<div class=\"res gold\"><span class=\"res-name\">Durée exacte</span><span class=\"res-val\">" + parts.join(" ") + "</span><span class=\"res-calc\">1 an = 365 × 86 400 = 31 536 000 s ; 1 jour = 86 400 s</span></div>" +
+      "<div class=\"res\"><span class=\"res-name\">En années</span><span class=\"res-val\">≈ " + fmt(yrs, yrs < 10 ? 4 : 0) + " an" + (yrs >= 2 ? "s" : "") + "</span><span class=\"res-calc\">" + life + "</span></div>";
+  }
+  countIn.addEventListener("input", count); count();
+  var gg = BigInt(1); for (var gi = 0; gi < 100; gi++) gg = gg * BigInt(10);
+  document.getElementById("googol").textContent = big(gg);
+  document.getElementById("googolInfo").textContent = "Il a " + gg.toString().length + " chiffres. Pour compter jusqu'à un googol à un nombre par seconde, il faudrait environ 3 × 10⁹² années. L'univers a environ 14 milliards d'années (1,4 × 10¹⁰).";
+
+  /* ---------- 2. Pliages ---------- */
+  var refs = [
+    [0.00167, "une pièce de 1 centime (environ 1,7 mm)"], [0.016, "un dé à jouer (environ 1,6 cm)"], [0.22, "un ballon de foot (environ 22 cm)"],
+    [1.7, "une personne (environ 1,70 m)"], [30, "un immeuble de 10 étages (environ 30 m)"], [330, "la tour Eiffel (330 m)"],
+    [8849, "l'Everest (8 849 m)"], [400000, "l'altitude de la Station spatiale internationale (environ 400 km)"],
+    [12742000, "le diamètre de la Terre (environ 12 742 km)"], [384400000, "la distance Terre–Lune (environ 384 400 km)"],
+    [149600000000, "la distance Terre–Soleil (environ 150 millions de km)"]
+  ];
+  function unit(m) {
+    if (m < 0.01) return fmt(m * 1000, 1) + " mm";
+    if (m < 1) return fmt(m * 100, 1) + " cm";
+    if (m < 1000) return fmt(m, 1) + " m";
+    return fmt(m / 1000, 0) + " km";
+  }
+  var folds = document.getElementById("folds");
+  function fold() {
+    var k = parseInt(folds.value, 10), m = foldThickness(k) / 1000, below = null, above = null;
+    document.getElementById("foldsOut").textContent = k;
+    refs.forEach(function (r) { if (r[0] <= m) below = r; else if (!above) above = r; });
+    document.getElementById("foldRes").innerHTML =
+      "<div class=\"res gold\"><span class=\"res-name\">Épaisseur après " + k + " pliage" + (k > 1 ? "s" : "") + "</span><span class=\"res-val\">" + unit(m) + "</span><span class=\"res-calc\">0,1 mm × 2" + sup(k) + " = 0,1 × " + big(pow2(k)) + " = " + foldExactMm(k) + " mm</span></div>" +
+      "<div class=\"res\"><span class=\"res-name\">Plus épais que</span><span class=\"res-val\">" + (below ? below[1] : "rien de connu : c'est juste une feuille") + "</span></div>" +
+      "<div class=\"res\"><span class=\"res-name\">Pas encore</span><span class=\"res-val\">" + (above ? above[1] : "rien dans la liste : on a dépassé tout !") + "</span></div>";
+    var svg = document.getElementById("foldSvg"); clear(svg);
+    var refM = above ? above[0] : m, w = 600 * Math.min(1, m / refM);
+    mk(svg, "text", { x: 20, y: 34, "font-size": 18 }, "Pile de papier");
+    mk(svg, "rect", { x: 20, y: 44, width: Math.max(2, w), height: 26, rx: 4, fill: "var(--acc)" });
+    mk(svg, "text", { x: 20, y: 102, "font-size": 18 }, above ? "Prochain objet" : "Pile entière");
+    mk(svg, "rect", { x: 20, y: 112, width: 600, height: 26, rx: 4, fill: above ? "var(--two)" : "var(--acc)", opacity: above ? 0.85 : 0.35 });
+  }
+  folds.addEventListener("input", fold); fold();
+
+  var days = document.getElementById("days"), cross = crossDay();
+  function lin() {
+    var d = parseInt(days.value, 10), v = linVsExp(d), mx = Math.max(v.lin, v.exp), svg = document.getElementById("linSvg");
+    document.getElementById("daysOut").textContent = d;
+    clear(svg);
+    mk(svg, "text", { x: 20, y: 34, "font-size": 18 }, "A (+100 € par jour) : " + fmt(v.lin, 2) + " €");
+    mk(svg, "rect", { x: 20, y: 44, width: Math.max(2, 600 * v.lin / mx), height: 30, rx: 4, fill: "var(--acc)" });
+    mk(svg, "text", { x: 20, y: 118, "font-size": 18 }, "B (× 2 par jour) : " + fmt(v.exp, 2) + " €");
+    mk(svg, "rect", { x: 20, y: 128, width: Math.max(2, 600 * v.exp / mx), height: 30, rx: 4, fill: "var(--two)" });
+    var out = document.getElementById("linOut");
+    if (v.exp > v.lin) { out.className = "verdict no"; out.innerHTML = "B a dépassé A !<span>Au jour " + d + ", B vaut " + fmt(v.exp / v.lin, 1) + " fois plus que A. B passe devant au jour " + cross + ". Au jour 30, B vaut plus de 5 millions d'euros, A seulement 3 000 €.</span>"; }
+    else { out.className = "verdict yes"; out.innerHTML = "Pour l'instant, A est devant.<span>Patience : B double chaque jour. Avance jusqu'au jour " + cross + ".</span>"; }
+  }
+  days.addEventListener("input", lin); lin();
+
+  /* ---------- 3. Hôtel de Hilbert ---------- */
+  var hsvg = document.getElementById("hotel"), RW = 640 / 12, guests = [], gLayer, newCount = 0, busCount = 0;
+  function roomX(r) { return (r - 0.5) * RW; }
+  function placeGuest(g) {
+    var x = g.room <= 12 ? roomX(g.room) : 640 + 40, y = g.fresh ? 40 : 100;
+    g.el.style.transform = "translate(" + x + "px, " + y + "px)";
+    g.el.style.opacity = g.room <= 12 && !g.fresh ? 1 : 0;
+  }
+  function addGuest(label, room, isNew) {
+    var gEl = document.createElementNS(NS, "g"); gEl.setAttribute("class", "guest");
+    mk(gEl, "circle", { cx: 0, cy: 0, r: 21, fill: isNew ? "var(--two)" : "var(--acc-soft)", stroke: isNew ? "var(--two)" : "var(--acc)", "stroke-width": 2 });
+    mk(gEl, "text", { x: 0, y: 6, "text-anchor": "middle", "font-size": 18, "font-weight": 600, style: isNew ? "fill: var(--card)" : "" }, label);
+    gLayer.appendChild(gEl);
+    var g = { label: label, room: room, el: gEl, fresh: isNew };
+    guests.push(g); placeGuest(g);
+    if (isNew) {
+      setTimeout(function () { g.fresh = false; placeGuest(g); }, reduce ? 0 : 30);
+    }
+    return g;
+  }
+  var hLog = document.getElementById("hotelLog"), busy = false, gen = 0;
+  function hReset() {
+    gen++; busy = false; clear(hsvg); guests = []; newCount = 0; busCount = 0;
+    for (var r = 1; r <= 12; r++) {
+      mk(hsvg, "rect", { x: (r - 1) * RW + 3, y: 46, width: RW - 6, height: 108, rx: 6, fill: "var(--card)", stroke: "var(--ink)", "stroke-width": 1.5 });
+      mk(hsvg, "text", { x: roomX(r), y: 32, "text-anchor": "middle", "font-size": 18, "font-weight": 600 }, String(r));
+    }
+    gLayer = document.createElementNS(NS, "g"); hsvg.appendChild(gLayer);
+    for (var i = 1; i <= 12; i++) addGuest(String(i), i, false);
+    guests.forEach(function (g) { g.fresh = false; placeGuest(g); });
+    hLog.innerHTML = "<span>L'hôtel est complet : le client n° n est dans la chambre n.</span><span class=\"why\">Choisis une action.</span>";
+  }
+  function move(rule) {
+    if (busy) return;
+    busy = true;
+    var myGen = gen;
+    guests.forEach(function (g) { g.room = hilbert(g.room, rule, 1); placeGuest(g); });
+    var delay = reduce ? 0 : 750;
+    setTimeout(function () {
+      if (myGen !== gen) return;
+      guests = guests.filter(function (g) { if (g.room > 24) { g.el.parentNode.removeChild(g.el); return false; } return true; });
+      if (rule === "double") {
+        busCount++;
+        for (var k = 1; k <= 6; k++) addGuest("B" + k, 2 * k - 1, true);
+        hLog.innerHTML = "<span>Règle : chambre <b>n</b> → chambre <b>2n</b>.</span><span>1 → 2, 2 → 4, 3 → 6, 4 → 8, 5 → 10…</span><span>Les chambres impaires 1, 3, 5, 7… sont libres. Le passager n° k du car va dans la chambre <b>2k − 1</b>.</span>";
+      } else {
+        newCount++;
+        addGuest("N" + newCount, 1, true);
+        hLog.innerHTML = "<span>Règle : chambre <b>n</b> → chambre <b>n + 1</b>.</span><span>1 → 2, 2 → 3, 3 → 4… 12 → 13, et ainsi de suite.</span><span>La chambre 1 est libre : le nouveau client N" + newCount + " s'y installe. L'hôtel est de nouveau complet !</span>";
+      }
+      busy = false;
+    }, delay);
+  }
+  document.getElementById("hOne").addEventListener("click", function () { move("plus"); });
+  document.getElementById("hBus").addEventListener("click", function () { move("double"); });
+  document.getElementById("hReset").addEventListener("click", hReset);
+  hReset();
+
+  var roomIn = document.getElementById("roomIn");
+  function room() {
+    var t = roomIn.value.replace(/\s/g, ""), out = document.getElementById("roomOut");
+    if (!/^\d{1,15}$/.test(t) || Number(t) < 1) { out.innerHTML = "<p class=\"err\">Écris un numéro de chambre : un entier à partir de 1.</p>"; return; }
+    var n = BigInt(t);
+    out.innerHTML =
+      "<div class=\"res\"><span class=\"res-name\">Un nouveau client (n → n + 1)</span><span class=\"res-val\">chambre " + big(n + BigInt(1)) + "</span></div>" +
+      "<div class=\"res\"><span class=\"res-name\">Trois nouveaux clients (n → n + 3)</span><span class=\"res-val\">chambre " + big(n + BigInt(3)) + "</span></div>" +
+      "<div class=\"res gold\"><span class=\"res-name\">Un car infini (n → 2n)</span><span class=\"res-val\">chambre " + big(n * BigInt(2)) + "</span><span class=\"res-calc\">Et le passager n° " + big(n) + " du car va dans la chambre 2 × " + big(n) + " − 1 = " + big(n * BigInt(2) - BigInt(1)) + ".</span></div>";
+  }
+  roomIn.addEventListener("input", room); room();
+
+  /* ---------- 4. Paires et fractions ---------- */
+  var pairStart = document.getElementById("pairStart"), pairIn = document.getElementById("pairIn");
+  function pairs() {
+    var s = parseInt(pairStart.value, 10), html = "";
+    document.getElementById("pairStartOut").textContent = s.toLocaleString("fr-FR");
+    for (var n = s; n < s + 10; n++) html += "<li><span class=\"a\">" + n.toLocaleString("fr-FR") + "</span><span>↔</span><span class=\"b\">" + (2 * n).toLocaleString("fr-FR") + "</span></li>";
+    html += "<li><span class=\"a\">…</span><span>↔</span><span class=\"b\">…</span></li>";
+    document.getElementById("pairList").innerHTML = html;
+  }
+  function partner() {
+    var t = pairIn.value.replace(/\s/g, ""), out = document.getElementById("pairOut");
+    if (!/^\d{1,15}$/.test(t) || Number(t) < 1) { out.className = "verdict no"; out.innerHTML = "Écris un entier à partir de 1."; return; }
+    var n = BigInt(t), two = BigInt(2), msg;
+    out.className = "verdict yes";
+    msg = "En tant qu'entier, " + big(n) + " est associé au nombre pair " + big(n * two) + ".";
+    if (n % two === BigInt(0)) msg += "<span>En tant que nombre pair, " + big(n) + " est associé à l'entier " + big(n / two) + ".</span>";
+    else msg += "<span>" + big(n) + " est impair : il n'est pas dans la liste des pairs, mais il a quand même son partenaire pair.</span>";
+    out.innerHTML = msg;
+  }
+  pairStart.addEventListener("input", pairs); pairIn.addEventListener("input", partner); pairs(); partner();
+
+  var fsvg = document.getElementById("fracSvg"), fStep = 0, CW = 110, CH = 66, OX = 80, OY = 64;
+  function cellC(p, q) { return [OX + (q - 1) * CW + CW / 2, OY + (p - 1) * CH + CH / 2]; }
+  function drawFrac() {
+    clear(fsvg);
+    mk(fsvg, "text", { x: OX + 2.5 * CW, y: 26, "text-anchor": "middle", "font-size": 18 }, "dénominateur →");
+    for (var q = 1; q <= 5; q++) mk(fsvg, "text", { x: OX + (q - 0.5) * CW, y: 54, "text-anchor": "middle", "font-size": 18, "font-weight": 600 }, String(q));
+    for (var p = 1; p <= 5; p++) mk(fsvg, "text", { x: OX - 20, y: OY + (p - 0.5) * CH + 6, "text-anchor": "middle", "font-size": 18, "font-weight": 600 }, String(p));
+    mk(fsvg, "text", { x: 22, y: OY + 2.5 * CH, "text-anchor": "middle", "font-size": 18, transform: "rotate(-90 22 " + (OY + 2.5 * CH) + ")" }, "numérateur →");
+    var state = {}, count = 0, numbers = {};
+    for (var i = 0; i < fStep; i++) { var f = fracOrder[i]; if (f.ok) { count++; numbers[f.p + "/" + f.q] = count; } state[f.p + "/" + f.q] = f.ok ? "ok" : "skip"; }
+    for (p = 1; p <= 5; p++) for (q = 1; q <= 5; q++) {
+      var key = p + "/" + q, st = state[key], c = cellC(p, q);
+      mk(fsvg, "rect", { x: c[0] - CW / 2 + 4, y: c[1] - CH / 2 + 4, width: CW - 8, height: CH - 8, rx: 6, fill: st === "ok" ? "var(--acc-soft)" : "var(--card)", stroke: st === "ok" ? "var(--acc)" : "var(--line)", "stroke-width": 1.5 });
+      mk(fsvg, "text", { x: c[0], y: c[1] + 7, "text-anchor": "middle", "font-size": 22, "font-weight": st === "ok" ? 700 : 400, opacity: st === "skip" ? 0.4 : 1 }, key);
+      if (st === "skip") mk(fsvg, "line", { x1: c[0] - 26, y1: c[1], x2: c[0] + 26, y2: c[1], stroke: "var(--red)", "stroke-width": 2.5 });
+    }
+    if (fStep > 1) {
+      var pts = [];
+      for (i = 0; i < fStep; i++) { var cc = cellC(fracOrder[i].p, fracOrder[i].q); pts.push(cc[0] + "," + (cc[1] - 22)); }
+      mk(fsvg, "polyline", { points: pts.join(" "), fill: "none", stroke: "var(--two)", "stroke-width": 3, "stroke-linejoin": "round", "stroke-linecap": "round" });
+    }
+    var lines = [], list = [];
+    fracOrder.slice(0, fStep).forEach(function (f) { if (f.ok) list.push("<b>" + numbers[f.p + "/" + f.q] + "</b> ↔ " + f.p + "/" + f.q); });
+    if (fStep === 0) lines.push("<span class=\"why\">Clique sur « Fraction suivante » pour commencer le zigzag.</span>");
+    else {
+      var last = fracOrder[fStep - 1];
+      lines.push(last.ok ? "<span>Nouvelle fraction : " + last.p + "/" + last.q + " reçoit le numéro " + count + ".</span>" : "<span>" + last.p + "/" + last.q + " = " + (last.p / gcd(last.p, last.q)) + "/" + (last.q / gcd(last.p, last.q)) + " est déjà comptée : on la saute.</span>");
+      lines.push("<span>" + list.join(" · ") + "</span>");
+      if (fStep === fracOrder.length) lines.push("<span class=\"why\">Le tableau continue sans fin, et le zigzag aussi : 6/1, 5/2, 4/3… Toutes les fractions finissent par avoir un numéro.</span>");
+    }
+    document.getElementById("fracOut").innerHTML = lines.join("");
+    document.getElementById("fracNext").disabled = fStep >= fracOrder.length;
+  }
+  document.getElementById("fracNext").addEventListener("click", function () { if (fStep < fracOrder.length) { fStep++; drawFrac(); } });
+  document.getElementById("fracAll").addEventListener("click", function () { fStep = fracOrder.length; drawFrac(); });
+  document.getElementById("fracReset").addEventListener("click", function () { fStep = 0; drawFrac(); });
+  drawFrac();
+
+  /* ---------- 5. Diagonale de Cantor ---------- */
+  var rows = [], cDone = 0, ND = 8;
+  function cNew() {
+    rows = [];
+    for (var i = 0; i < ND; i++) { var s = ""; for (var j = 0; j < ND; j++) s += String(Math.floor(Math.random() * 10)); rows.push(s); }
+    cDone = 0; cDraw();
+  }
+  function cDraw() {
+    var newD = diagonal(rows), html = "<thead><tr><th>N°</th><th></th>";
+    for (var j = 1; j <= ND; j++) html += "<th>" + j + "<sup>" + (j === 1 ? "er" : "e") + "</sup></th>";
+    html += "<th></th></tr></thead><tbody>";
+    rows.forEach(function (r, i) {
+      html += "<tr><th>n° " + (i + 1) + "</th><td>0,</td>";
+      for (var j = 0; j < ND; j++) html += "<td" + (i === j ? " class=\"diag\"" : "") + ">" + r.charAt(j) + "</td>";
+      html += "<td>…</td></tr>";
+    });
+    html += "<tr class=\"new\"><th>Nouveau</th><td>0,</td>";
+    for (j = 0; j < ND; j++) html += "<td" + (j < cDone ? " class=\"done\"" : "") + ">" + (j < cDone ? newD.charAt(j) : "?") + "</td>";
+    html += "<td>…</td></tr></tbody>";
+    document.getElementById("cantor").innerHTML = html;
+    var log = [];
+    for (j = 0; j < cDone; j++) log.push("<span>Chiffre " + (j + 1) + " : le n° " + (j + 1) + " a un <b>" + rows[j].charAt(j) + "</b> ici, on écrit <b>" + newD.charAt(j) + "</b>.</span>");
+    if (cDone === 0) log.push("<span class=\"why\">La diagonale est surlignée. Clique sur « Chiffre suivant ».</span>");
+    document.getElementById("cantorLog").innerHTML = log.join("");
+    var out = document.getElementById("cantorOut");
+    if (cDone === ND) {
+      out.className = "verdict yes";
+      out.innerHTML = "Le nouveau nombre 0," + newD + "… n'est pas dans la liste !<span>Il diffère du n° 1 au 1er chiffre, du n° 2 au 2e chiffre… et du n° 8 au 8e chiffre. Il ne peut être égal à aucun d'eux.</span>";
+    } else { out.className = "verdict"; out.innerHTML = "<span>Nouveau nombre en construction : " + cDone + " chiffre" + (cDone > 1 ? "s" : "") + " sur " + ND + ".</span>"; }
+    document.getElementById("cStep").disabled = cDone >= ND;
+  }
+  document.getElementById("cNew").addEventListener("click", cNew);
+  document.getElementById("cStep").addEventListener("click", function () { if (cDone < ND) { cDone++; cDraw(); } });
+  document.getElementById("cAll").addEventListener("click", function () { cDone = ND; cDraw(); });
+  cNew();
+
+  /* ---------- 6. Sommes infinies ---------- */
+  var terms = document.getElementById("terms");
+  function square() {
+    var n = parseInt(terms.value, 10), svg = document.getElementById("square"), x = 0, y = 0, w = 320, h = 320;
+    document.getElementById("termsOut").textContent = n;
+    clear(svg);
+    mk(svg, "rect", { x: 0, y: 0, width: 320, height: 320, fill: "var(--card)" });
+    for (var k = 1; k <= n; k++) {
+      var px, py, pw, ph;
+      if (k % 2 === 1) { px = x; py = y; pw = w / 2; ph = h; x += w / 2; w /= 2; }
+      else { px = x; py = y; pw = w; ph = h / 2; y += h / 2; h /= 2; }
+      mk(svg, "rect", { x: px, y: py, width: pw, height: ph, fill: k % 2 ? "var(--acc)" : "var(--two)", opacity: 0.85, stroke: "var(--card)", "stroke-width": k < 10 ? 1.5 : 0.3 });
+      if (k <= 4) mk(svg, "text", { x: px + pw / 2, y: py + ph / 2 + 8, "text-anchor": "middle", "font-size": k < 4 ? 24 : 20, "font-weight": 700, style: "fill: var(--card)" }, "1/" + Math.pow(2, k));
+    }
+    mk(svg, "rect", { x: 1, y: 1, width: 318, height: 318, fill: "none", stroke: "var(--ink)", "stroke-width": 2 });
+    var g = geomSum(n), terms_ = [];
+    for (k = 1; k <= Math.min(n, 4); k++) terms_.push("1/" + Math.pow(2, k));
+    var expr = terms_.join(" + ") + (n > 4 ? " + … + 1/2" + sup(n) : "");
+    document.getElementById("sqOut").innerHTML =
+      "<div class=\"res\"><span class=\"res-name\">La somme</span><span class=\"res-calc\">" + expr + "</span><span class=\"res-val\">= " + big(g.num) + "/" + big(g.den) + "</span></div>" +
+      "<div class=\"res gold\"><span class=\"res-name\">En décimal</span><span class=\"res-val\">≈ " + (Number(g.num) / Number(g.den)).toLocaleString("fr-FR", { maximumFractionDigits: 12 }) + "</span></div>" +
+      "<div class=\"res\"><span class=\"res-name\">Il manque pour arriver à 1</span><span class=\"res-val\">1/" + big(g.den) + "</span><span class=\"res-calc\">C'est exactement le dernier morceau ajouté.</span></div>";
+  }
+  terms.addEventListener("input", square); square();
+
+  var targets = [2, 3, 5, 8, 10];
+  targets.forEach(function (t, i) {
+    var b = document.createElement("button"); b.type = "button"; b.id = "ht" + i; b.textContent = "Dépasser " + t;
+    b.addEventListener("click", function () { harm(i); });
+    document.getElementById("hTargets").appendChild(b);
+  });
+  function harm(i) {
+    var t = targets[i], n = harmonicReach(t);
+    targets.forEach(function (x, j) { document.getElementById("ht" + j).setAttribute("aria-pressed", j === i ? "true" : "false"); });
+    document.getElementById("harmOut").innerHTML =
+      "<div class=\"res gold\"><span class=\"res-name\">Il faut " + n.toLocaleString("fr-FR") + " termes pour dépasser " + t + "</span><span class=\"res-calc\">1 + 1/2 + … + 1/" + n.toLocaleString("fr-FR") + " ≈ " + harmonic(n).toLocaleString("fr-FR", { maximumFractionDigits: 6 }) + "</span><span class=\"res-calc\">avec un terme de moins : 1 + 1/2 + … + 1/" + (n - 1).toLocaleString("fr-FR") + " ≈ " + harmonic(n - 1).toLocaleString("fr-FR", { maximumFractionDigits: 6 }) + "</span></div>";
+  }
+  harm(4);
+
+  /* ---------- 8. Quiz ---------- */
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  function rnd(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+  function makeQ(t) {
+    var v = rnd(0, 2);
+    if (t === 0) {
+      if (v === 0) { var k = rnd(4, 16); return { q: "On part de 1 et on double " + k + " fois. Quel nombre obtient-on ?", a: Math.pow(2, k), how: "2" + sup(k) + " = " + Math.pow(2, k).toLocaleString("fr-FR") }; }
+      if (v === 1) { var f = rnd(3, 10); return { q: "Une feuille de 0,1 mm est pliée en deux " + f + " fois. Quelle est son épaisseur (en mm) ?", a: 0.1 * Math.pow(2, f), how: "0,1 × 2" + sup(f) + " = 0,1 × " + Math.pow(2, f).toLocaleString("fr-FR") + " = " + fmt(0.1 * Math.pow(2, f), 1) + " mm" }; }
+      var d = pick([20, 30, 40, 50]); return { q: "Un nénuphar double sa surface chaque jour. Il couvre tout l'étang au jour " + d + ". Quel jour en couvrait-il la moitié ?", a: d - 1, how: "Il double chaque jour : la veille, il en couvrait la moitié. Jour " + (d - 1) + "." };
+    }
+    if (t === 1) {
+      if (v === 0) { var dd = rnd(2, 9); return { q: "À un nombre par seconde, combien de jours pour compter jusqu'à " + (86400 * dd).toLocaleString("fr-FR") + " ?", a: dd, how: (86400 * dd).toLocaleString("fr-FR") + " ÷ 86 400 = " + dd + " jours" }; }
+      if (v === 1) { var hh = rnd(2, 12); return { q: "À un nombre par seconde, combien d'heures pour compter jusqu'à " + (3600 * hh).toLocaleString("fr-FR") + " ?", a: hh, how: (3600 * hh).toLocaleString("fr-FR") + " ÷ 3 600 = " + hh + " h" }; }
+      var mm = rnd(5, 50); return { q: "À un nombre par seconde, combien de minutes pour compter jusqu'à " + (60 * mm).toLocaleString("fr-FR") + " ?", a: mm, how: (60 * mm).toLocaleString("fr-FR") + " ÷ 60 = " + mm + " min" };
+    }
+    if (t === 2) {
+      var n = rnd(3, 500);
+      if (v === 0) { var kk = rnd(1, 9); return { q: "Hôtel de Hilbert : " + kk + " nouveau" + (kk > 1 ? "x clients arrivent" : " client arrive") + ". Chacun passe de la chambre n à la chambre n + " + kk + ". Où va le client de la chambre " + n + " ?", a: hilbert(n, "plus", kk), how: n + " + " + kk + " = " + (n + kk) }; }
+      if (v === 1) return { q: "Hôtel de Hilbert : un car infini arrive. Chacun passe de la chambre n à la chambre 2n. Où va le client de la chambre " + n + " ?", a: hilbert(n, "double"), how: "2 × " + n + " = " + 2 * n };
+      return { q: "Après la règle n → 2n, un client est dans la chambre " + 2 * n + ". Dans quelle chambre était-il avant ?", a: n, how: 2 * n + " ÷ 2 = " + n };
+    }
+    var m = rnd(2, 6), g = geomSum(m), parts = [];
+    for (var i = 1; i <= m; i++) parts.push("1/" + Math.pow(2, i));
+    if (v === 2) return { q: "Combien manque-t-il à " + parts.join(" + ") + " pour arriver à 1 ?", a: 1 / Number(g.den), how: "La somme vaut " + g.num + "/" + g.den + ", il manque 1/" + g.den + " = " + fmt(1 / Number(g.den), 6) };
+    return { q: "Calcule " + parts.join(" + ") + ".", a: Number(g.num) / Number(g.den), how: "= " + g.num + "/" + g.den + " = " + fmt(Number(g.num) / Number(g.den), 6) };
+  }
+  var quiz = document.getElementById("quiz"), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ""; done = [];
+    var types = [0, 0, 1, 1, 2, 2, 3, 3];
+    for (var s = types.length - 1; s > 0; s--) { var r = Math.floor(Math.random() * (s + 1)), tmp = types[s]; types[s] = types[r]; types[r] = tmp; }
+    for (var k = 0; k < 8; k++) {
+      var Q = makeQ(types[k]), li = document.createElement("li");
+      li.innerHTML = "<span class=\"q\">" + Q.q + "</span><input type=\"text\" id=\"qa" + k + "\" inputmode=\"decimal\" autocomplete=\"off\" aria-label=\"Ta réponse à la question " + (k + 1) + "\"><button type=\"button\" id=\"qb" + k + "\">Vérifier</button><span class=\"fb\" id=\"qf" + k + "\" aria-live=\"polite\"></span>";
+      quiz.appendChild(li);
+      (function (k, Q) {
+        function check() {
+          var fb = document.getElementById("qf" + k), x = num(document.getElementById("qa" + k).value);
+          if (isNaN(x)) { fb.className = "fb"; fb.textContent = "Écris un nombre (ou une fraction comme 7/8)."; return; }
+          if (Math.abs(x - Q.a) < 1e-6 * Math.max(1, Math.abs(Q.a))) { fb.className = "fb ok"; fb.textContent = "Bravo, c'est juste !"; done[k] = true; }
+          else { done[k] = false; fb.className = "fb no"; fb.innerHTML = "Pas tout à fait : la réponse est " + fmt(Q.a, 6) + ".<span>" + Q.how + "</span>"; }
+          document.getElementById("score").textContent = done.filter(Boolean).length + " / 8";
+        }
+        document.getElementById("qb" + k).addEventListener("click", check);
+        document.getElementById("qa" + k).addEventListener("keydown", function (e) { if (e.key === "Enter") check(); });
+      })(k, Q);
+    }
+    document.getElementById("score").textContent = "0 / 8";
+  }
+  document.getElementById("newQuiz").addEventListener("click", newQuiz);
+  newQuiz();
+})();
+</script>
+</body>
+</html>

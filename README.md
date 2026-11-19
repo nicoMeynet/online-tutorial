@@ -32,6 +32,12 @@ Chaque tutoriel est une seule page HTML, sans installation. Il suffit de l'ouvri
 | [La vitesse](la-vitesse.html) | v = d ÷ t avec une course animée, le triangle magique, les durées, km/h et m/s, le graphique distance-temps, la vitesse moyenne, un quiz. |
 | [Les transformations](les-transformations.html) | Symétrie axiale et centrale, translation, rotation, homothétie, ce qui se conserve, rosaces et frises, un jeu et un quiz. |
 | [Le repérage](le-reperage.html) | Abscisse, coordonnées, chasse au trésor, distance et milieu, l'espace, latitude et longitude, distances entre villes, un quiz. |
+| [Les inéquations](les-inequations.html) | Les signes < > ≤ ≥, tester une valeur, résoudre pas à pas (changement de sens), la droite graduée, des problèmes, un quiz. |
+| [Les conversions d'unités](les-conversions.html) | Le système métrique, les tableaux de conversion (longueurs, masses, capacités, aires, volumes), les durées, un convertisseur universel, un quiz. |
+| [Les échelles et les agrandissements](les-echelles.html) | Lire et calculer une échelle, mesurer sur une carte, plans et maquettes, agrandir et réduire (k, k², k³), un quiz. |
+| [L'algorithmique](l-algorithmique.html) | Un robot à programmer avec des blocs, boucles et polygones, conditions et nombre mystère (dichotomie), variables, somme de Gauss, un quiz. |
+| [Le nombre d'or](le-nombre-d-or.html) | Fibonacci, le rapport qui tend vers φ, le rectangle et la spirale d'or, le tournesol, le pentagone, mythes et réalités, un quiz. |
+| [Les grands nombres et l'infini](les-grands-nombres-et-l-infini.html) | Compter très loin, la croissance exponentielle, l'hôtel de Hilbert, autant de pairs que d'entiers, Cantor, les sommes infinies, un quiz. |
 
 ## Ajouter un tutoriel
 

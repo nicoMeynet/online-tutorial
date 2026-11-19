@@ -1,0 +1,894 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Les inéquations</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, encre violette, marge rouge. Les solutions sont toujours en vert, sur la droite graduée comme dans les calculs. */
+:root {
+  --paper: #f9f7fc;
+  --grid: #e9e3f3;
+  --card: #ffffff;
+  --ink: #221a33;
+  --ink-soft: #5f5475;
+  --acc: #7c3aed;
+  --acc-soft: #ede4fd;
+  --sol: #15803d;
+  --sol-soft: #d9f2e1;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #fff0a3;
+  --line: #ddd3ec;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #120f19; --grid: #1e1929; --card: #19151f; --ink: #efeaf7; --ink-soft: #b8accb;
+    --acc: #c4b5fd; --acc-soft: #2d2347; --sol: #6fd39f; --sol-soft: #173a29;
+    --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #342b45;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #120f19; --grid: #1e1929; --card: #19151f; --ink: #efeaf7; --ink-soft: #b8accb;
+  --acc: #c4b5fd; --acc-soft: #2d2347; --sol: #6fd39f; --sol-soft: #173a29;
+  --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #342b45;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+.x { color: var(--acc); font-weight: 700; font-style: italic; }
+.g { color: var(--sol); font-weight: 700; }
+section { display: flex; flex-direction: column; gap: 18px; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+.big-ineq { font-family: var(--f-mono); font-weight: 600; font-size: clamp(1.5rem, 7vw, 2.3rem); overflow-wrap: anywhere; }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+.line svg { width: 100%; height: auto; display: block; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 6px 12px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button.ex { font-family: var(--f-mono); font-weight: 600; font-size: .92rem; }
+button.sign { font-family: var(--f-mono); font-size: 1.15rem; min-width: 46px; padding: 4px 10px; }
+button.sign.good { background: var(--sol); color: var(--card); }
+button.sign.bad { background: var(--red); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+input[type="text"] { font: inherit; font-family: var(--f-mono); font-size: 1.15rem; padding: 10px 12px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; }
+input[type="range"] { width: 100%; accent-color: var(--acc); }
+.param { display: flex; flex-direction: column; gap: 2px; }
+.param label, label.big { font-weight: 700; }
+.err { color: var(--red); font-weight: 700; }
+
+/* Tableau des signes */
+.tbl { border-collapse: separate; border-spacing: 0; width: 100%; min-width: 480px; }
+.tbl th, .tbl td { border: 1.5px solid var(--line); padding: 8px 10px; text-align: left; vertical-align: top; }
+.tbl th { font-family: var(--f-display); background: var(--paper); }
+.tbl td:first-child { font-family: var(--f-mono); font-size: 1.5rem; font-weight: 700; color: var(--acc); text-align: center; }
+.tbl td.m { font-family: var(--f-mono); white-space: nowrap; }
+.scroll { overflow-x: auto; }
+
+/* Jeu des phrases */
+.match { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.match li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.match .fb { font-size: .95rem; }
+.match .fb.ok { color: var(--sol); font-weight: 700; }
+.match .fb.no { color: var(--red); font-weight: 700; }
+
+.verdict { border-radius: 8px; padding: 12px 14px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+.verdict.yes { background: var(--sol-soft); color: var(--sol); }
+.verdict.no { background: var(--red-soft); color: var(--red); }
+.verdict span { font-weight: 400; color: var(--ink); overflow-wrap: anywhere; }
+.verdict .mono { font-size: .98rem; }
+
+.rules, .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+.rules .box, .cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; color: var(--acc); }
+.rules .box.warn { border-color: var(--red); background: var(--red-soft); }
+.inputs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 14px; align-items: end; }
+.inputs label { font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 600px) { .inputs { grid-template-columns: 1fr; } }
+
+.steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.steps li { display: flex; flex-direction: column; gap: 2px; padding-bottom: 10px; border-bottom: 1px dashed var(--line); }
+.steps li:last-child { border-bottom: 0; padding-bottom: 0; }
+.steps li.flip { background: var(--red-soft); border: 2px solid var(--red); border-radius: 8px; padding: 8px 12px; }
+.steps li.flip .act, .steps li.flip .why { color: var(--red); font-weight: 700; }
+.steps .e { font-family: var(--f-mono); font-size: 1.15rem; font-weight: 600; overflow-wrap: anywhere; }
+.steps .why { font-size: .92rem; color: var(--ink-soft); }
+.steps .act { font-family: var(--f-mono); font-size: .88rem; color: var(--acc); font-weight: 600; }
+.steps .sol { font-family: var(--f-mono); font-size: 1.4rem; font-weight: 700; color: var(--sol); overflow-wrap: anywhere; }
+.steps .chk { font-family: var(--f-mono); font-size: .92rem; color: var(--sol); overflow-wrap: anywhere; }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
+.quiz .q { font-family: var(--f-mono); font-size: 1.05rem; font-weight: 600; overflow-wrap: anywhere; }
+.quiz .qrow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.quiz .qrow .xl { font-family: var(--f-mono); font-size: 1.2rem; }
+.quiz input[type="text"] { font-size: 1rem; padding: 6px 8px; width: 110px; }
+.quiz .fb { font-size: .95rem; }
+.quiz .fb.ok { color: var(--sol); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; overflow-wrap: anywhere; }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc); }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 120px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+</head>
+<body>
+<main class="page">
+
+  <header class="hero">
+    <span class="eyebrow">Tutoriel de maths · niveau 3<sup>e</sup></span>
+    <h1>Les inéquations</h1>
+    <p class="lead">Dans une équation, on cherche un seul nombre caché. Dans une inéquation, il y a souvent une infinité de solutions possibles : « au moins 12 ans », « au plus 3 bonbons », « moins de 50 € ».</p>
+    <div class="box">
+      <div class="big-ineq"><span class="x">x</span> ≥ 12</div>
+      <div class="line"><svg id="heroLine" viewBox="0 0 640 130" role="img" aria-label="Droite graduée : 12 et tous les nombres plus grands sont coloriés en vert"></svg></div>
+      <span class="soft">« Au moins 12 ans » : 12 ans, c'est bon. 13 ans, 15 ans, 40 ans aussi. Toutes les solutions sont en vert.</span>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · Les signes &lt; &gt; ≤ ≥</span>
+    <h2>Quatre signes pour comparer</h2>
+    <p>Une <strong>inégalité</strong> compare deux nombres. La pointe du signe montre toujours le <strong>plus petit</strong> nombre. Le côté ouvert est tourné vers le plus grand.</p>
+    <div class="box">
+      <div class="scroll">
+        <table class="tbl" aria-label="Les quatre signes d'inégalité">
+          <tr><th>Signe</th><th>Se lit</th><th>Exemple</th><th>Type</th></tr>
+          <tr><td>&lt;</td><td>« est strictement inférieur à »</td><td class="m">3 &lt; 7</td><td>strict</td></tr>
+          <tr><td>&gt;</td><td>« est strictement supérieur à »</td><td class="m">10 &gt; −2</td><td>strict</td></tr>
+          <tr><td>≤</td><td>« est inférieur ou égal à »</td><td class="m">4 ≤ 4</td><td>large</td></tr>
+          <tr><td>≥</td><td>« est supérieur ou égal à »</td><td class="m">9 ≥ 5</td><td>large</td></tr>
+        </table>
+      </div>
+      <p><strong>Strict</strong> : le nombre de la frontière n'est pas permis. <strong>Large</strong> : il est permis (le petit trait sous le signe, c'est un morceau du signe =).</p>
+    </div>
+    <div class="note">
+      <span class="note-title">Traduire les phrases de tous les jours</span>
+      <span>« au moins 12 » : <span class="mono">x ≥ 12</span> · « moins de 50 € » : <span class="mono">x &lt; 50</span> · « pas plus de 3 » : <span class="mono">x ≤ 3</span> · « plus de 100 » : <span class="mono">x &gt; 100</span>.</span>
+      <span>Le bon réflexe : demande-toi si le nombre de la frontière est permis.</span>
+    </div>
+    <h3>Le jeu des phrases</h3>
+    <p>Pour chaque phrase, choisis le bon signe.</p>
+    <ol class="match" id="match"></ol>
+    <div class="btns">
+      <span class="score" id="matchScore">0 / 6</span>
+      <button id="matchReset" type="button">Recommencer</button>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · Tester une valeur</span>
+    <h2>Est-ce que ce nombre marche ?</h2>
+    <p>Le nombre 4 est-il une solution de <span class="mono">3<span class="x">x</span> − 2 &gt; 7</span> ? On remplace <span class="x">x</span> par 4 : 3 × 4 − 2 = 10. Et 10 &gt; 7 est vrai. Donc <strong>4 est une solution</strong>. Mais ce n'est pas la seule !</p>
+    <div class="box">
+      <div class="btns" id="testPresets" role="group" aria-label="Choisir une inéquation"></div>
+      <div class="param">
+        <label for="tx">Valeur de x : <span class="mono" id="txOut">4</span></label>
+        <input id="tx" type="range" min="-5" max="10" step="0.5" value="4">
+      </div>
+      <div class="verdict" id="tOut" aria-live="polite"></div>
+      <div class="line"><svg id="tLine" viewBox="0 0 640 110" role="img" aria-label="Valeurs déjà testées : en vert les solutions, en rouge les autres"></svg></div>
+      <span class="soft">Chaque valeur testée reste sur la droite : vert si elle marche, rouge sinon. Tu vois une frontière apparaître ?</span>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Résoudre</span>
+    <h2>Les mêmes règles, avec un piège</h2>
+    <p>Si tu as fait le tutoriel sur les équations, tu connais déjà presque tout. On transforme l'inéquation en faisant la même chose des deux côtés. Une seule règle est nouvelle.</p>
+    <div class="rules">
+      <div class="box"><strong>Ajouter ou soustraire</strong><span>le même nombre des deux côtés : le signe <strong>ne change pas</strong>.</span><span class="mono soft">x + 5 &gt; 12 → x &gt; 7</span></div>
+      <div class="box"><strong>Multiplier ou diviser par un positif</strong><span>des deux côtés : le signe <strong>ne change pas</strong>.</span><span class="mono soft">3x ≤ 18 → x ≤ 6</span></div>
+      <div class="box warn"><strong>Multiplier ou diviser par un négatif</strong><span>des deux côtés : on <strong>change le sens</strong> du signe !</span><span class="mono soft">−2x &lt; 8 → x &gt; −4</span></div>
+    </div>
+    <h3>Pourquoi le signe se retourne ?</h3>
+    <p>On sait que 2 &lt; 5. Multiplions les deux nombres par −1 : on obtient −2 et −5. Or −2 est plus grand que −5 (il fait moins froid à −2 °C qu'à −5 °C). Donc <span class="hl">−2 &gt; −5</span> : le sens a changé. Sur la droite graduée, multiplier par un négatif retourne tout autour de 0, et l'ordre s'inverse.</p>
+    <div class="box">
+      <span>Départ : <span class="mono">2 &lt; 5</span>. Choisis une opération à faire aux deux nombres :</span>
+      <div class="btns" id="flipOps" role="group" aria-label="Opérations à appliquer à 2 et 5"></div>
+      <div class="line"><svg id="flipSvg" viewBox="0 0 640 170" role="img" aria-label="Droite graduée avec les deux nombres transformés"></svg></div>
+      <span class="soft" style="font-size:.92rem">En violet, au-dessus : ce que devient 2. En noir, en dessous : ce que devient 5. Les petits ronds gris sont 2 et 5 au départ.</span>
+      <div class="verdict" id="flipOut" aria-live="polite"></div>
+    </div>
+    <h3>Le solveur pas à pas</h3>
+    <p>Tape une inéquation avec l'inconnue x, ou choisis un exemple. La page la résout comme sur ta copie. L'étape où le signe se retourne est encadrée en rouge.</p>
+    <div class="box">
+      <div class="btns" id="presets" role="group" aria-label="Exemples d'inéquations"></div>
+      <label class="big" for="ineqIn">Ton inéquation :</label>
+      <input id="ineqIn" type="text" autocomplete="off" spellcheck="false" value="5 − 2x ≥ 1">
+      <p class="soft" style="font-size:.9rem">Signes acceptés : &lt;, &gt;, &lt;= ou ≤, &gt;= ou ≥. Tu peux utiliser des parenthèses comme 2(x + 3), des fractions comme x/2, et des nombres à virgule comme 1,5.</p>
+      <ol class="steps" id="solveOut" aria-live="polite"></ol>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · Représenter sur une droite graduée</span>
+    <h2>Colorier toutes les solutions</h2>
+    <p>On ne peut pas écrire une infinité de nombres. Alors on les <strong>colorie</strong> sur une droite graduée. La frontière est marquée par un <strong>crochet</strong>, comme au collège en France :</p>
+    <div class="rules">
+      <div class="box"><strong>Crochet tourné vers les solutions</strong><span>Le nombre de la frontière <strong>fait partie</strong> des solutions (signes ≤ et ≥).</span></div>
+      <div class="box"><strong>Crochet tourné vers l'extérieur</strong><span>Le nombre de la frontière <strong>ne fait pas partie</strong> des solutions (signes &lt; et &gt;).</span></div>
+    </div>
+    <div class="box">
+      <div class="btns" id="nlOps" role="group" aria-label="Choisir le signe"></div>
+      <div class="param">
+        <label for="nlK">Frontière : <span class="mono" id="nlKOut">3</span></label>
+        <input id="nlK" type="range" min="-8" max="8" step="1" value="3">
+      </div>
+      <div class="line"><svg id="nlSvg" viewBox="0 0 640 130" role="img" aria-label="Droite graduée des solutions"></svg></div>
+      <div class="verdict yes" id="nlText" aria-live="polite"></div>
+      <div class="btns" role="group" aria-label="Façon de marquer la frontière">
+        <span class="soft">Frontière :</span>
+        <button id="nlBr" type="button" aria-pressed="true">Crochet</button>
+        <button id="nlDot" type="button" aria-pressed="false">Point</button>
+      </div>
+      <span class="soft" style="font-size:.92rem">Cette droite suit aussi le solveur de l'étape 3 : quand tu changes ton inéquation là-haut, elle se met à jour.</span>
+    </div>
+    <div class="note">
+      <span class="note-title">D'autres façons de dessiner</span>
+      <span>Dans certains livres, on dessine un <strong>point plein</strong> quand la frontière est comprise et un <strong>point vide</strong> quand elle ne l'est pas (bouton « Point »). D'autres professeurs hachurent la partie qui n'est <em>pas</em> solution. Toutes ces façons sont justes : suis celle de ton professeur.</span>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Dans la vraie vie</span>
+    <h2>Des inéquations partout</h2>
+    <div class="box">
+      <h3>Combien de places de cinéma ?</h3>
+      <p>Tu as un budget. Une place coûte un certain prix, et tu achètes aussi un pop-corn. Combien de places peux-tu acheter au maximum ?</p>
+      <div class="inputs">
+        <label for="bB">Budget (€)<input id="bB" type="text" inputmode="decimal" autocomplete="off" value="40"></label>
+        <label for="bP">Prix d'une place (€)<input id="bP" type="text" inputmode="decimal" autocomplete="off" value="7,5"></label>
+        <label for="bF">Pop-corn (€)<input id="bF" type="text" inputmode="decimal" autocomplete="off" value="4"></label>
+      </div>
+      <ol class="steps" id="budOut" aria-live="polite"></ol>
+    </div>
+    <div class="cards">
+      <div class="box">
+        <span class="tag">Forfaits</span>
+        <strong>Quand l'abonnement devient-il intéressant ?</strong>
+        <span class="soft">Club A : 20 € par mois, plus 2 € par séance. Club B : 5 € la séance. Soit x le nombre de séances. Le club A est moins cher si 20 + 2x &lt; 5x, donc 20 &lt; 3x, donc x &gt; 6,67. <strong>À partir de 7 séances</strong>, l'abonnement gagne.</span>
+        <button id="forfaitBtn" type="button" style="align-self:flex-start">Voir dans le solveur</button>
+      </div>
+      <div class="box">
+        <span class="tag">Manège</span>
+        <strong>La taille minimum</strong>
+        <span class="soft">« Taille minimum : 1,20 m. » Si t est ta taille, il faut t ≥ 1,20. Tu mesures 1,20 m pile ? C'est bon, le signe est large. Tu mesures 1,18 m ? 1,18 ≥ 1,20 est faux : ce sera l'année prochaine !</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · Les pièges</span>
+    <h2>Les erreurs les plus fréquentes</h2>
+    <div class="cards">
+      <div class="box"><strong>Oublier de retourner le signe</strong><span class="soft">−3x &gt; 12 donne x &lt; −4, et pas x &gt; −4. Dès que tu divises ou multiplies par un nombre négatif, le sens change.</span></div>
+      <div class="box"><strong>« Au moins » ou « plus de » ?</strong><span class="soft">« Au moins 18 ans » : 18 ans, c'est bon, donc x ≥ 18. « Plus de 18 ans » : 18 ans pile, ce n'est pas plus de 18, donc x &gt; 18.</span></div>
+      <div class="box"><strong>Croire qu'il y a une seule solution</strong><span class="soft">x &gt; 3 ne veut pas dire « x vaut 3 » ou « x vaut 4 ». Ce sont <strong>tous</strong> les nombres plus grands que 3 : 3,1 ; 4 ; 100 ; 1 000 000…</span></div>
+      <div class="box"><strong>Retourner le signe pour rien</strong><span class="soft">3x &lt; −6 donne x &lt; −2. On divise par 3, qui est positif : on ne change rien, même si −6 est négatif.</span></div>
+    </div>
+    <div class="note red">
+      <span class="note-title">Vérifie avec une valeur</span>
+      <span>Choisis un nombre facile dans ta réponse et remplace x dans l'inéquation de départ. Si l'inégalité est fausse, tu t'es trompé quelque part (souvent le sens du signe). Exemple : pour −3x &gt; 12, ta réponse x &lt; −4 contient −5. Et −3 × (−5) = 15 &gt; 12 : c'est vrai !</span>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Quiz</span>
+    <h2>Huit inéquations pour t'entraîner</h2>
+    <p>Résous sur une feuille. Puis choisis le signe et écris le nombre de la frontière. Si tu te trompes, la page montre les étapes.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Nouvelles questions</button>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Un peu d'histoire</span>
+    <h2>D'où viennent ces signes ?</h2>
+    <ol class="timeline">
+      <li><span class="when">1631</span><div class="what"><strong>Thomas Harriot</strong><span>On attribue les signes &lt; et &gt; à ce savant anglais. Il est mort en 1621, et son livre d'algèbre a été publié après sa mort, en 1631. On raconte qu'il a aussi dessiné la Lune avec une lunette, peut-être même avant Galilée.</span></div></li>
+      <li><span class="when">1734</span><div class="what"><strong>Pierre Bouguer</strong><span>On attribue à ce savant français les signes « inférieur ou égal » et « supérieur ou égal ». Il les écrivait avec deux petits traits dessous : ≦ et ≧. Il a aussi participé à une grande expédition au Pérou pour mesurer la forme de la Terre.</span></div></li>
+      <li><span class="when">aujourd'hui</span><div class="what"><strong>Un seul petit trait</strong><span>En France, on écrit surtout ≤ et ≥ avec un seul trait. Sur une calculatrice ou un clavier, on tape souvent &lt;= et &gt;=.</span></div></li>
+    </ol>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · À toi de jouer</span>
+    <h2>Six problèmes</h2>
+    <div class="exos">
+      <details>
+        <summary>Pour commencer<span class="q">Résous 2x + 3 &gt; 11.</span></summary>
+        <div><span>On soustrait 3 : 2x &gt; 8. On divise par 2 (positif) : <strong>x &gt; 4</strong>.</span><span>Ce sont tous les nombres strictement plus grands que 4.</span></div>
+      </details>
+      <details>
+        <summary>Attention au signe<span class="q">Résous 5 − 3x ≤ 14.</span></summary>
+        <div><span>On soustrait 5 : −3x ≤ 9. On divise par −3, un nombre négatif, donc on change le sens : <strong>x ≥ −3</strong>.</span><span>Vérification avec x = 0 : 5 − 0 = 5 et 5 ≤ 14, c'est vrai.</span></div>
+      </details>
+      <details>
+        <summary>Est-ce une solution ?<span class="q">Le nombre −2 est-il une solution de 4x + 1 &lt; x − 3 ?</span></summary>
+        <div><span>À gauche : 4 × (−2) + 1 = −7. À droite : −2 − 3 = −5.</span><span>−7 &lt; −5 est vrai : <strong>oui, −2 est une solution</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Les deux taxis<span class="q">Le taxi A coûte 4 € de départ plus 1,50 € par km. Le taxi B coûte 2 € par km. Pour quelles distances le taxi A est-il moins cher ?</span></summary>
+        <div><span>Soit x la distance en km : 4 + 1,5x &lt; 2x.</span><span>4 &lt; 0,5x, donc x &gt; 8. <strong>Pour plus de 8 km</strong>, le taxi A est moins cher.</span></div>
+      </details>
+      <details>
+        <summary>La moyenne<span class="q">Léo a eu 11 et 8 à ses deux premiers contrôles. Quelle note doit-il avoir au troisième pour avoir au moins 12 de moyenne ?</span></summary>
+        <div>
+          <span>Soit x la troisième note : (11 + 8 + x) ÷ 3 ≥ 12.</span>
+          <span>On multiplie par 3 : 19 + x ≥ 36, donc x ≥ 17. <strong>Il lui faut au moins 17.</strong></span>
+          <button id="moyBtn" type="button" style="align-self:flex-start">Résoudre avec le solveur</button>
+        </div>
+      </details>
+      <details>
+        <summary>Le rectangle<span class="q">Un rectangle a une longueur de 10 cm et une largeur x. Son périmètre ne doit pas dépasser 32 cm. Quelles largeurs sont possibles ?</span></summary>
+        <div><span>2(x + 10) ≤ 32, donc 2x + 20 ≤ 32, donc 2x ≤ 12, donc x ≤ 6.</span><span>Une largeur est positive : <strong>la largeur est comprise entre 0 et 6 cm</strong> (6 cm compris).</span></div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• Une <strong>inéquation</strong> compare deux expressions avec &lt;, &gt;, ≤ ou ≥. Elle a souvent une <strong>infinité de solutions</strong>.</span>
+      <span>• On peut <strong>ajouter ou soustraire</strong> le même nombre des deux côtés, et <strong>multiplier ou diviser par un positif</strong> : le signe ne change pas.</span>
+      <span>• Si on <strong>multiplie ou divise par un négatif</strong>, on <strong>change le sens</strong> du signe.</span>
+      <span>• On représente les solutions sur une <strong>droite graduée</strong>. Le crochet est tourné vers les solutions si la frontière est comprise.</span>
+      <span>• On vérifie toujours avec une valeur choisie dans la réponse.</span>
+    </div>
+  </section>
+
+  <footer>Fiche de révision · Les inéquations</footer>
+</main>
+
+<script>
+(function () {
+  var NS = "http://www.w3.org/2000/svg";
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+  function fmt(x, d) { var r = Math.round(x * 1e6) / 1e6; if (Object.is(r, -0)) r = 0; return r.toLocaleString("fr-FR", { maximumFractionDigits: d == null ? 3 : d }).replace("-", "−"); }
+  function num(s) { var t = String(s).replace(/\s/g, "").replace(/[−–]/g, "-").replace(",", "."); if (t === "") return NaN; var x = Number(t); return isFinite(x) ? x : NaN; }
+  function mk(svg, name, attrs, text) { var e = document.createElementNS(NS, name); for (var a in attrs) e.setAttribute(a, attrs[a]); if (text != null) e.textContent = text; svg.appendChild(e); return e; }
+  function clear(svg) { while (svg.firstChild) svg.removeChild(svg.firstChild); }
+  function rnd(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+
+  /* ---------- Fractions exactes ---------- */
+  function gcd(a, b) { a = Math.abs(a); b = Math.abs(b); while (b) { var t = b; b = a % b; a = t; } return a || 1; }
+  function Q(n, d) { if (d === undefined) d = 1; if (d < 0) { n = -n; d = -d; } var g = gcd(n, d); return { n: n / g, d: d / g }; }
+  function add(a, b) { return Q(a.n * b.d + b.n * a.d, a.d * b.d); }
+  function sub(a, b) { return Q(a.n * b.d - b.n * a.d, a.d * b.d); }
+  function mul(a, b) { return Q(a.n * b.n, a.d * b.d); }
+  function div(a, b) { return Q(a.n * b.d, a.d * b.n); }
+  function zero(a) { return a.n === 0; }
+  function eq(a, b) { return a.n === b.n && a.d === b.d; }
+  function qs(a) { var s = Math.abs(a.n) + (a.d === 1 ? "" : "/" + a.d); return (a.n < 0 ? "−" : "") + s; }
+  function qdec(a) { return (a.n / a.d).toLocaleString("fr-FR", { maximumFractionDigits: 3 }).replace("-", "−"); }
+  function isDec(a) { var d = a.d; while (d % 2 === 0) d /= 2; while (d % 5 === 0) d /= 5; return d === 1 && a.d <= 1000; }
+  function showQ(a) { return a.d === 1 ? qs(a) : (isDec(a) ? qdec(a) : qs(a)); }
+  function val(a) { return a.n / a.d; }
+
+  /* ---------- Signes ---------- */
+  var OPS = { "<": "<", ">": ">", "<=": "≤", ">=": "≥" };
+  var FLIP = { "<": ">", ">": "<", "<=": ">=", ">=": "<=" };
+  function normOps(s) { return String(s).replace(/≤|⩽|=</g, "<=").replace(/≥|⩾|=>/g, ">="); }
+  function normOp(s) { var t = normOps(String(s).trim()); return OPS[t] ? t : null; }
+  function holds(op, a, b) {
+    var s = typeof a === "number" ? Math.sign(a - b) : Math.sign(sub(a, b).n);
+    if (op === "<") return s < 0;
+    if (op === ">") return s > 0;
+    if (op === "<=") return s <= 0;
+    return s >= 0;
+  }
+  function phrase(op, k) {
+    if (op === ">") return "tous les nombres strictement plus grands que " + k;
+    if (op === ">=") return "tous les nombres plus grands que " + k + " ou égaux à " + k;
+    if (op === "<") return "tous les nombres strictement plus petits que " + k;
+    return "tous les nombres plus petits que " + k + " ou égaux à " + k;
+  }
+  function interval(op, k) {
+    if (op === ">") return "]" + k + " ; +∞[";
+    if (op === ">=") return "[" + k + " ; +∞[";
+    if (op === "<") return "]−∞ ; " + k + "[";
+    return "]−∞ ; " + k + "]";
+  }
+
+  /* ---------- Lecture d'une expression du premier degré ---------- */
+  function tokenize(s) {
+    if (/[²³^]/.test(s)) throw new Error("Il y a un x² : c'est du second degré, qu'on verra au lycée.");
+    s = s.replace(/[−–—]/g, "-").replace(/[×·*]/g, "*").replace(/[÷:]/g, "/").replace(/X/g, "x");
+    var t = [], i = 0;
+    while (i < s.length) {
+      var c = s[i];
+      if (/\s/.test(c)) { i++; continue; }
+      if (/[0-9.,]/.test(c)) {
+        var j = i; while (j < s.length && /[0-9.,]/.test(s[j])) j++;
+        var raw = s.slice(i, j).replace(",", ".");
+        if (raw.split(".").length > 2 || raw === ".") throw new Error("Le nombre « " + s.slice(i, j) + " » est mal écrit.");
+        var dec = (raw.split(".")[1] || "").length, m = Math.pow(10, dec);
+        t.push({ k: "n", v: Q(Math.round(parseFloat(raw) * m), m) }); i = j; continue;
+      }
+      if (c === "x") { t.push({ k: "x" }); i++; continue; }
+      if ("+-*/()".indexOf(c) >= 0) { t.push({ k: c }); i++; continue; }
+      if ("[]".indexOf(c) >= 0) { t.push({ k: c === "[" ? "(" : ")" }); i++; continue; }
+      throw new Error("Je ne connais pas le signe « " + c + " ». Utilise la lettre x pour l'inconnue.");
+    }
+    var out = [];
+    t.forEach(function (tk) {
+      var p = out[out.length - 1];
+      if (p && (p.k === "n" || p.k === "x" || p.k === ")") && (tk.k === "x" || tk.k === "(" || (tk.k === "n" && p.k !== "n"))) out.push({ k: "*" });
+      out.push(tk);
+    });
+    return out;
+  }
+  function parseLin(str) {
+    var t = tokenize(str), i = 0;
+    if (!t.length) throw new Error("Un des deux membres est vide.");
+    function peek() { return t[i]; }
+    function expr() {
+      var v = term();
+      while (peek() && (peek().k === "+" || peek().k === "-")) { var o = t[i++].k, w = term(); v = o === "+" ? { a: add(v.a, w.a), b: add(v.b, w.b) } : { a: sub(v.a, w.a), b: sub(v.b, w.b) }; }
+      return v;
+    }
+    function term() {
+      var v = factor();
+      while (peek() && (peek().k === "*" || peek().k === "/")) {
+        var o = t[i++].k, w = factor();
+        if (o === "*") {
+          if (!zero(v.a) && !zero(w.a)) throw new Error("Il y a x × x : c'est du second degré, qu'on verra au lycée.");
+          v = zero(v.a) ? { a: mul(v.b, w.a), b: mul(v.b, w.b) } : { a: mul(v.a, w.b), b: mul(v.b, w.b) };
+        } else {
+          if (!zero(w.a)) throw new Error("Diviser par x n'est pas au programme ici.");
+          if (zero(w.b)) throw new Error("On ne peut pas diviser par 0 !");
+          v = { a: div(v.a, w.b), b: div(v.b, w.b) };
+        }
+      }
+      return v;
+    }
+    function factor() {
+      var tk = t[i];
+      if (!tk) throw new Error("Il manque quelque chose à la fin.");
+      if (tk.k === "+") { i++; return factor(); }
+      if (tk.k === "-") { i++; var f = factor(); return { a: Q(-f.a.n, f.a.d), b: Q(-f.b.n, f.b.d) }; }
+      if (tk.k === "n") { i++; return { a: Q(0), b: tk.v }; }
+      if (tk.k === "x") { i++; return { a: Q(1), b: Q(0) }; }
+      if (tk.k === "(") { i++; var v = expr(); if (!t[i] || t[i].k !== ")") throw new Error("Il manque une parenthèse fermante."); i++; return v; }
+      throw new Error("Il manque un nombre à côté d'un signe.");
+    }
+    var r = expr();
+    if (i < t.length) throw new Error(t[i].k === ")" ? "Il y a une parenthèse fermante en trop." : "Je n'arrive pas à lire ce membre.");
+    return r;
+  }
+  function coefX(a) {
+    if (a.n === a.d) return "x";
+    if (a.n === -a.d) return "−x";
+    return (a.d === 1 ? qs(a) : (a.n < 0 ? "−" : "") + "(" + qs(Q(Math.abs(a.n), a.d)) + ")") + "x";
+  }
+  function linStr(L) {
+    var s = "";
+    if (!zero(L.a)) s = coefX(L.a);
+    if (!zero(L.b)) {
+      if (s) s += L.b.n > 0 ? " + " + qs(L.b) : " − " + qs(Q(-L.b.n, L.b.d));
+      else s = qs(L.b);
+    }
+    return s || "0";
+  }
+  function plusMinus(q, withX) {
+    var abs = Q(Math.abs(q.n), q.d), t = withX ? coefX(abs) : qs(abs);
+    return (q.n > 0 ? "On soustrait " : "On ajoute ") + t + " des deux côtés";
+  }
+  function substitute(side, x) {
+    var s = showQ(x), v = x.n < 0 ? "(" + s + ")" : s;
+    return side.replace(/[−–]/g, "-").replace(/(\d)\s*x/g, "$1 × " + v).replace(/\)\s*x/g, ") × " + v).replace(/x/g, v).replace(/-/g, "−");
+  }
+  function evalLin(L, x) { return add(mul(L.a, x), L.b); }
+  function sideCalc(side, x) { return /[xX]/.test(side) ? substitute(side, x) + " = " : ""; }
+
+  function parseIneq(input) {
+    var s = normOps(input), m = s.match(/<=|>=|<|>/g);
+    if (!m) {
+      if (s.indexOf("=") >= 0) throw new Error("C'est une équation (signe =). Ici, il faut un signe <, >, ≤ ou ≥.");
+      throw new Error("Il manque le signe <, >, ≤ ou ≥.");
+    }
+    if (m.length > 1) throw new Error("Il ne faut qu'un seul signe d'inégalité.");
+    var op = m[0], i = s.indexOf(op), left = s.slice(0, i).trim(), right = s.slice(i + op.length).trim();
+    if (/=/.test(left + right)) throw new Error("Il y a un signe = en trop.");
+    if (!left || !right) throw new Error("Un des deux membres est vide.");
+    return { op: op, left: left, right: right, L: parseLin(left), R: parseLin(right) };
+  }
+
+  function solveIneq(input) {
+    if (!/x|X/.test(input)) throw new Error("Il n'y a pas d'inconnue x dans ton inéquation.");
+    var p = parseIneq(input), op = p.op, steps = [], flipped = false;
+    var canon = function (s) { return normOps(s).replace(/\s/g, "").replace(/[−–-]/g, "-").replace(/[*×·]/g, ""); };
+    steps.push({ e: p.left + " " + OPS[op] + " " + p.right, why: "L'inéquation de départ." });
+    var reduced = linStr(p.L) + " " + OPS[op] + " " + linStr(p.R);
+    if (canon(reduced) !== canon(p.left + op + p.right)) steps.push({ e: reduced, why: "On développe, on réduit et on range chaque membre." });
+    var A = p.L.a, B = p.L.b, C = p.R.a, D = p.R.b;
+    if (!zero(C)) { A = sub(A, C); steps.push({ act: plusMinus(C, true), e: linStr({ a: A, b: B }) + " " + OPS[op] + " " + qs(D), why: "Tous les x sont à gauche. Le signe ne change pas." }); }
+    if (zero(A)) {
+      var ok = holds(op, B, D);
+      steps.push({ e: qs(B) + " " + OPS[op] + " " + qs(D), why: "Les x ont disparu ! Cette inégalité est " + (ok ? "toujours vraie." : "toujours fausse.") });
+      return { steps: steps, kind: ok ? "all" : "none", op: op, flipped: false, text: ok ? "Tous les nombres sont solutions" : "Pas de solution" };
+    }
+    if (!zero(B)) { D = sub(D, B); steps.push({ act: plusMinus(B, false), e: coefX(A) + " " + OPS[op] + " " + qs(D), why: "Tous les nombres sont à droite. Le signe ne change pas." }); }
+    var x = div(D, A), approx = x.d === 1 ? "" : " (environ " + qdec(x) + ")";
+    if (!(A.n === 1 && A.d === 1)) {
+      if (A.n < 0) {
+        op = FLIP[op]; flipped = true;
+        steps.push({ flip: true, act: "On divise les deux côtés par " + qs(A) + ", un nombre négatif", e: "x " + OPS[op] + " " + showQ(x), why: "Attention : on divise par un nombre négatif, donc on change le sens du signe !" + approx });
+      } else {
+        steps.push({ act: "On divise les deux côtés par " + qs(A), e: "x " + OPS[op] + " " + showQ(x), why: "On divise par un nombre positif : le signe ne change pas." + approx });
+      }
+    }
+    var kv = val(x), t = (op === ">" || op === ">=") ? (x.d === 1 ? x.n + 1 : Math.floor(kv) + 1) : (x.d === 1 ? x.n - 1 : Math.ceil(kv) - 1);
+    var tq = Q(t), vl = evalLin(p.L, tq), vr = evalLin(p.R, tq), good = holds(p.op, vl, vr);
+    var check = "On teste x = " + qs(tq) + " : à gauche " + sideCalc(p.left, tq) + showQ(vl) + ", à droite " + sideCalc(p.right, tq) + showQ(vr) + ". " + showQ(vl) + " " + OPS[p.op] + " " + showQ(vr) + (good ? " est vrai ✓" : " est faux ✗");
+    var k = showQ(x);
+    return {
+      steps: steps, kind: "one", op: op, x: x, bound: k, flipped: flipped,
+      text: "x " + OPS[op] + " " + k, phrase: phrase(op, k) + (x.d === 1 || isDec(x) ? "" : approx),
+      interval: interval(op, k), check: check, test: t,
+      boundNote: op.length === 2 ? k + " fait partie des solutions (signe " + OPS[op] + ")." : k + " ne fait pas partie des solutions (inégalité stricte)."
+    };
+  }
+  function testValue(input, v) { var p = parseIneq(input), xq = typeof v === "number" ? Q(Math.round(v * 1000), 1000) : v; return holds(p.op, evalLin(p.L, xq), evalLin(p.R, xq)); }
+
+  /* ---------- Droite graduée ---------- */
+  function drawLine(svg, st, style) {
+    clear(svg);
+    var y = 68, kv = st.kind === "one" ? val(st.k) : 0, c = Math.round(kv), lo = c - 6, hi = c + 6;
+    function X(v) { return 30 + (v - lo) / (hi - lo) * 580; }
+    var stepL = Math.max(String(Math.abs(lo)).length, String(Math.abs(hi)).length) >= 3 ? 2 : 1;
+    function seg(a, b) {
+      var l = Math.min(a, b), r = Math.max(a, b);
+      mk(svg, "rect", { x: l, y: y - 11, width: r - l, height: 22, fill: "var(--sol-soft)" });
+      mk(svg, "line", { x1: l, y1: y, x2: r, y2: y, stroke: "var(--sol)", "stroke-width": 7 });
+    }
+    var right = st.op === ">" || st.op === ">=";
+    if (st.kind === "all") seg(8, 632);
+    else if (st.kind === "one") seg(X(kv), right ? 632 : 8);
+    mk(svg, "line", { x1: 8, y1: y, x2: 624, y2: y, stroke: "var(--ink)", "stroke-width": 2 });
+    mk(svg, "path", { d: "M622 " + (y - 7) + " L634 " + y + " L622 " + (y + 7) + " Z", fill: "var(--ink)" });
+    for (var v = lo; v <= hi; v++) {
+      mk(svg, "line", { x1: X(v), y1: y - 7, x2: X(v), y2: y + 7, stroke: "var(--ink)", "stroke-width": 2 });
+      if (v % stepL === 0) mk(svg, "text", { x: X(v), y: y + 36, "text-anchor": "middle", "font-size": 18 }, String(v).replace("-", "−"));
+    }
+    if (st.kind === "one") {
+      var px = X(kv), inc = st.op.length === 2;
+      if (style === "dot") {
+        mk(svg, "circle", { cx: px, cy: y, r: 9, fill: inc ? "var(--sol)" : "var(--card)", stroke: "var(--sol)", "stroke-width": 3.5 });
+      } else {
+        var dir = right ? 1 : -1, dx = (inc ? 12 : -12) * dir;
+        mk(svg, "path", { d: "M" + (px + dx) + " " + (y - 20) + " L" + px + " " + (y - 20) + " L" + px + " " + (y + 20) + " L" + (px + dx) + " " + (y + 20), fill: "none", stroke: "var(--acc)", "stroke-width": 4.5, "stroke-linejoin": "round" });
+      }
+      mk(svg, "text", { x: px, y: y - 30, "text-anchor": "middle", "font-size": 20, style: "fill:var(--acc);font-weight:600" }, showQ(st.k));
+    } else if (st.kind === "none") {
+      mk(svg, "text", { x: 320, y: y - 26, "text-anchor": "middle", "font-size": 20, style: "fill:var(--red);font-weight:600" }, "Aucune solution");
+    } else {
+      mk(svg, "text", { x: 320, y: y - 26, "text-anchor": "middle", "font-size": 20, style: "fill:var(--sol);font-weight:600" }, "Tous les nombres");
+    }
+  }
+  drawLine(document.getElementById("heroLine"), { kind: "one", op: ">=", k: Q(12) }, "bracket");
+
+  /* ---------- Étape 1 : le jeu des phrases ---------- */
+  var SIGNS = ["<", ">", "<=", ">="];
+  var M = [
+    { p: "Il faut avoir au moins 12 ans pour voir ce film.", op: ">=", k: "12", why: "« Au moins 12 » : 12 ans pile, c'est permis, et plus aussi." },
+    { p: "Ce jean coûte moins de 50 €.", op: "<", k: "50", why: "« Moins de 50 » : 50 € pile, ce n'est pas moins de 50." },
+    { p: "Pas plus de 3 bonbons par personne !", op: "<=", k: "3", why: "« Pas plus de 3 » : 3 bonbons, c'est permis, 4 non." },
+    { p: "Plus de 100 personnes sont venues au concert.", op: ">", k: "100", why: "« Plus de 100 » : 100 pile, ce n'est pas plus de 100." },
+    { p: "Il faut mesurer au minimum 1,40 m pour ce manège.", op: ">=", k: "1,40", why: "« Au minimum 1,40 m » : 1,40 m pile, c'est bon." },
+    { p: "Au plus 25 élèves par classe.", op: "<=", k: "25", why: "« Au plus 25 » : 25 élèves, c'est permis, 26 non." }
+  ];
+  var matchDone = [], matchList = document.getElementById("match");
+  function matchScore() { document.getElementById("matchScore").textContent = matchDone.filter(Boolean).length + " / " + M.length; }
+  function buildMatch() {
+    matchList.innerHTML = ""; matchDone = [];
+    M.forEach(function (it, i) {
+      var li = document.createElement("li");
+      li.innerHTML = "<span>" + esc(it.p) + "</span><div class=\"btns\" role=\"group\" aria-label=\"Choisir le signe pour la phrase " + (i + 1) + "\"><span class=\"mono\">x</span></div><span class=\"fb\" id=\"mf" + i + "\" aria-live=\"polite\"></span>";
+      var grp = li.querySelector(".btns");
+      SIGNS.forEach(function (op, j) {
+        var b = document.createElement("button"); b.type = "button"; b.className = "sign"; b.id = "m" + i + "_" + j; b.textContent = OPS[op];
+        b.setAttribute("aria-label", "x " + OPS[op] + " " + it.k);
+        b.addEventListener("click", function () {
+          SIGNS.forEach(function (o, jj) { document.getElementById("m" + i + "_" + jj).className = "sign"; });
+          var fb = document.getElementById("mf" + i);
+          if (op === it.op) { b.className = "sign good"; fb.className = "fb ok"; fb.textContent = "Bravo ! x " + OPS[op] + " " + it.k + ". " + it.why; matchDone[i] = true; }
+          else { b.className = "sign bad"; fb.className = "fb no"; fb.textContent = "Pas tout à fait. Indice : est-ce que " + it.k + " lui-même est permis ? Et les nombres plus grands ?"; matchDone[i] = false; }
+          matchScore();
+        });
+        grp.appendChild(b);
+      });
+      grp.appendChild(document.createTextNode(" "));
+      var kk = document.createElement("span"); kk.className = "mono"; kk.textContent = it.k; grp.appendChild(kk);
+      matchList.appendChild(li);
+    });
+    matchScore();
+  }
+  document.getElementById("matchReset").addEventListener("click", buildMatch);
+  buildMatch();
+
+  /* ---------- Étape 2 : tester une valeur ---------- */
+  var TESTS = ["3x − 2 > 7", "5 − 2x ≥ 1", "4x + 1 ≤ 2x + 9", "x + 4 < 2"];
+  var curTest = 0, tested = {}, tx = document.getElementById("tx");
+  TESTS.forEach(function (s, i) {
+    var b = document.createElement("button"); b.type = "button"; b.className = "ex"; b.id = "tp" + i; b.textContent = s;
+    b.addEventListener("click", function () { curTest = i; tested = {}; testRender(); });
+    document.getElementById("testPresets").appendChild(b);
+  });
+  function testRender() {
+    TESTS.forEach(function (s, j) { document.getElementById("tp" + j).setAttribute("aria-pressed", j === curTest ? "true" : "false"); });
+    var v = parseFloat(tx.value), x = Q(Math.round(v * 2), 2), p = parseIneq(TESTS[curTest]);
+    var vl = evalLin(p.L, x), vr = evalLin(p.R, x), ok = holds(p.op, vl, vr), xs = showQ(x);
+    tested[v] = ok;
+    document.getElementById("txOut").textContent = xs;
+    var out = document.getElementById("tOut");
+    out.className = "verdict " + (ok ? "yes" : "no");
+    out.innerHTML = (ok ? "Oui, x = " + esc(xs) + " est une solution." : "Non, x = " + esc(xs) + " n'est pas une solution.") +
+      "<span class=\"mono\">À gauche : " + esc(sideCalc(p.left, x) + showQ(vl)) + "</span>" +
+      "<span class=\"mono\">À droite : " + esc(sideCalc(p.right, x) + showQ(vr)) + "</span>" +
+      "<span class=\"mono\">" + esc(showQ(vl) + " " + OPS[p.op] + " " + showQ(vr)) + " : " + (ok ? "vrai" : "faux") + "</span>";
+    var svg = document.getElementById("tLine"); clear(svg);
+    var y = 50; function X(t) { return 30 + (t + 5) / 15 * 580; }
+    mk(svg, "line", { x1: 8, y1: y, x2: 624, y2: y, stroke: "var(--ink)", "stroke-width": 2 });
+    mk(svg, "path", { d: "M622 " + (y - 7) + " L634 " + y + " L622 " + (y + 7) + " Z", fill: "var(--ink)" });
+    for (var t = -5; t <= 10; t++) {
+      mk(svg, "line", { x1: X(t), y1: y - 6, x2: X(t), y2: y + 6, stroke: "var(--ink)", "stroke-width": 2 });
+      mk(svg, "text", { x: X(t), y: y + 38, "text-anchor": "middle", "font-size": 18 }, String(t).replace("-", "−"));
+    }
+    Object.keys(tested).forEach(function (key) { mk(svg, "circle", { cx: X(parseFloat(key)), cy: y, r: 7, fill: tested[key] ? "var(--sol)" : "var(--red)", opacity: .8 }); });
+    mk(svg, "circle", { cx: X(v), cy: y, r: 12, fill: "none", stroke: "var(--acc)", "stroke-width": 3 });
+  }
+  tx.addEventListener("input", testRender);
+  testRender();
+
+  /* ---------- Étape 3 : pourquoi le signe se retourne ---------- */
+  var FOPS = [
+    { lab: "× 2", t: "*", k: 2 }, { lab: "× (−1)", t: "*", k: -1 }, { lab: "× (−3)", t: "*", k: -3 },
+    { lab: "+ 4", t: "+", k: 4 }, { lab: "− 7", t: "+", k: -7 }, { lab: "÷ 2", t: "/", k: 2 }, { lab: "÷ (−2)", t: "/", k: -2 }
+  ];
+  function flipRender(i) {
+    FOPS.forEach(function (f, j) { document.getElementById("fo" + j).setAttribute("aria-pressed", j === i ? "true" : "false"); });
+    var f = FOPS[i], ap = function (v) { return f.t === "*" ? v * f.k : f.t === "/" ? v / f.k : v + f.k; };
+    var a = ap(2), b = ap(5), kept = a < b, sym = kept ? "<" : ">";
+    var out = document.getElementById("flipOut");
+    out.className = "verdict " + (kept ? "yes" : "no");
+    out.innerHTML = (kept ? "Le sens ne change pas." : "Le sens change !") +
+      "<span class=\"mono\">2 " + esc(f.lab) + " = " + fmt(a) + " et 5 " + esc(f.lab) + " = " + fmt(b) + "</span>" +
+      "<span class=\"mono\">2 &lt; 5 devient " + fmt(a) + " " + esc(sym) + " " + fmt(b) + "</span>" +
+      "<span>" + (kept ? (f.k < 0 && f.t === "+" ? "Soustraire un nombre ne retourne jamais le signe, même un grand nombre." : "Ajouter, soustraire, ou multiplier par un positif garde l'ordre.") : "On a multiplié ou divisé par un nombre négatif : l'ordre est retourné.") + "</span>";
+    var svg = document.getElementById("flipSvg"); clear(svg);
+    var y = 80; function X(v) { return 30 + (v + 16) / 32 * 580; }
+    mk(svg, "line", { x1: 8, y1: y, x2: 624, y2: y, stroke: "var(--ink)", "stroke-width": 2 });
+    mk(svg, "path", { d: "M622 " + (y - 7) + " L634 " + y + " L622 " + (y + 7) + " Z", fill: "var(--ink)" });
+    for (var v = -16; v <= 16; v++) {
+      var big = v % 5 === 0;
+      mk(svg, "line", { x1: X(v), y1: y - (big ? 8 : 4), x2: X(v), y2: y + (big ? 8 : 4), stroke: "var(--ink)", "stroke-width": big ? 2 : 1 });
+      if (big) mk(svg, "text", { x: X(v), y: 160, "text-anchor": "middle", "font-size": 18, style: "fill:var(--ink-soft)" }, String(v).replace("-", "−"));
+    }
+    [2, 5].forEach(function (o) { mk(svg, "circle", { cx: X(o), cy: y, r: 6, fill: "var(--line)", stroke: "var(--ink-soft)", "stroke-width": 1.5 }); });
+    mk(svg, "circle", { cx: X(a), cy: y, r: 9, fill: "var(--acc)" });
+    mk(svg, "text", { x: X(a), y: 48, "text-anchor": "middle", "font-size": 20, style: "fill:var(--acc);font-weight:600" }, fmt(a));
+    mk(svg, "circle", { cx: X(b), cy: y, r: 9, fill: "var(--ink)" });
+    mk(svg, "text", { x: X(b), y: 122, "text-anchor": "middle", "font-size": 20, style: "font-weight:600" }, fmt(b));
+  }
+  FOPS.forEach(function (f, i) {
+    var b = document.createElement("button"); b.type = "button"; b.className = "ex"; b.id = "fo" + i; b.textContent = f.lab;
+    b.addEventListener("click", function () { flipRender(i); });
+    document.getElementById("flipOps").appendChild(b);
+  });
+  flipRender(1);
+
+  /* ---------- Étape 4 : droite graduée (état partagé avec le solveur) ---------- */
+  var nl = { kind: "one", op: ">", k: Q(3) }, nlStyle = "bracket", nlK = document.getElementById("nlK");
+  function nlRender() {
+    SIGNS.forEach(function (op, j) { document.getElementById("nlo" + j).setAttribute("aria-pressed", nl.kind === "one" && op === nl.op ? "true" : "false"); });
+    document.getElementById("nlBr").setAttribute("aria-pressed", nlStyle === "bracket" ? "true" : "false");
+    document.getElementById("nlDot").setAttribute("aria-pressed", nlStyle === "dot" ? "true" : "false");
+    drawLine(document.getElementById("nlSvg"), nl, nlStyle);
+    var t = document.getElementById("nlText");
+    if (nl.kind === "one") {
+      var k = showQ(nl.k), inc = nl.op.length === 2;
+      document.getElementById("nlKOut").textContent = k;
+      t.className = "verdict yes";
+      t.innerHTML = "x " + esc(OPS[nl.op]) + " " + esc(k) + "<span>Les solutions sont " + esc(phrase(nl.op, k)) + ".</span><span>" +
+        (nlStyle === "dot" ? (inc ? "Point plein : " + esc(k) + " est compris." : "Point vide : " + esc(k) + " n'est pas compris.") :
+          (inc ? "Le crochet est tourné vers les solutions : " + esc(k) + " est compris." : "Le crochet est tourné vers l'extérieur : " + esc(k) + " n'est pas compris.")) + "</span>";
+    } else if (nl.kind === "all") { t.className = "verdict yes"; t.innerHTML = "Tous les nombres sont solutions.<span>Toute la droite est coloriée.</span>"; }
+    else { t.className = "verdict no"; t.innerHTML = "Pas de solution.<span>Rien n'est colorié.</span>"; }
+  }
+  SIGNS.forEach(function (op, j) {
+    var b = document.createElement("button"); b.type = "button"; b.className = "sign"; b.id = "nlo" + j; b.textContent = "x " + OPS[op];
+    b.addEventListener("click", function () { if (nl.kind !== "one") nl = { kind: "one", op: op, k: Q(parseInt(nlK.value, 10)) }; nl.op = op; nlRender(); });
+    document.getElementById("nlOps").appendChild(b);
+  });
+  nlK.addEventListener("input", function () { nl = { kind: "one", op: nl.kind === "one" ? nl.op : ">", k: Q(parseInt(nlK.value, 10)) }; nlRender(); });
+  document.getElementById("nlBr").addEventListener("click", function () { nlStyle = "bracket"; nlRender(); });
+  document.getElementById("nlDot").addEventListener("click", function () { nlStyle = "dot"; nlRender(); });
+  function nlFromSolver(r) {
+    if (r.kind === "one") { nl = { kind: "one", op: r.op, k: r.x }; nlK.value = Math.max(-8, Math.min(8, Math.round(val(r.x)))); }
+    else nl = { kind: r.kind };
+    nlRender();
+  }
+
+  /* ---------- Étape 3 : le solveur ---------- */
+  var ineqIn = document.getElementById("ineqIn"), out = document.getElementById("solveOut");
+  function render() {
+    try {
+      var r = solveIneq(ineqIn.value), html = r.steps.map(function (s) {
+        return "<li" + (s.flip ? " class=\"flip\"" : "") + ">" + (s.act ? "<span class=\"act\">" + esc(s.act) + "</span>" : "") + "<span class=\"e\">" + esc(s.e) + "</span>" + (s.why ? "<span class=\"why\">" + esc(s.why) + "</span>" : "") + "</li>";
+      }).join("");
+      if (r.kind === "one") html += "<li><span class=\"why\">Solution</span><span class=\"sol\">" + esc(r.text) + "</span><span>Les solutions sont " + esc(r.phrase) + ". " + esc(r.boundNote) + "</span><span class=\"soft\" style=\"font-size:.9rem\">Au lycée, tu écriras : x ∈ " + esc(r.interval) + "</span><span class=\"chk\">Vérification. " + esc(r.check) + "</span></li>";
+      else if (r.kind === "none") html += "<li><span class=\"sol\" style=\"color:var(--red)\">Pas de solution</span><span class=\"why\">Cette inégalité est fausse, quel que soit x.</span></li>";
+      else html += "<li><span class=\"sol\">Tous les nombres sont solutions</span><span class=\"why\">Cette inégalité est toujours vraie, quel que soit x.</span></li>";
+      out.innerHTML = html;
+      nlFromSolver(r);
+    } catch (e) { out.innerHTML = "<li><span class=\"err\">" + esc(e.message) + "</span></li>"; }
+  }
+  ["5 − 2x ≥ 1", "3x − 2 > 7", "4x + 1 ≤ 2x + 9", "−3x < 12", "2(x − 1) ≥ 5x + 4", "x/2 + 1 > 3", "2x + 1 < 2x + 5"].forEach(function (ex, k) {
+    var b = document.createElement("button"); b.type = "button"; b.className = "ex"; b.id = "pre" + k; b.textContent = ex;
+    b.addEventListener("click", function () { ineqIn.value = ex; render(); });
+    document.getElementById("presets").appendChild(b);
+  });
+  ineqIn.addEventListener("input", render);
+  render();
+  function toSolver(s) { ineqIn.value = s; render(); ineqIn.scrollIntoView({ behavior: "smooth", block: "center" }); }
+  document.getElementById("forfaitBtn").addEventListener("click", function () { toSolver("20 + 2x < 5x"); });
+  document.getElementById("moyBtn").addEventListener("click", function () { toSolver("(11 + 8 + x)/3 ≥ 12"); });
+
+  /* ---------- Étape 5 : le budget cinéma ---------- */
+  var bB = document.getElementById("bB"), bP = document.getElementById("bP"), bF = document.getElementById("bF");
+  function budget() {
+    var B = num(bB.value), P = num(bP.value), F = num(bF.value), o = document.getElementById("budOut");
+    if (isNaN(F) && bF.value.trim() === "") F = 0;
+    if (isNaN(B) || isNaN(P) || isNaN(F) || B < 0 || P <= 0 || F < 0) { o.innerHTML = "<li><span class=\"err\">Écris un budget, un prix de place positif et un prix de pop-corn (0 si tu n'en prends pas).</span></li>"; return; }
+    if (F > B) { o.innerHTML = "<li><span class=\"err\">Le pop-corn coûte déjà plus que ton budget !</span></li>"; return; }
+    var r = Math.round((B - F) * 100) / 100, q = r / P, n = Math.floor(q + 1e-9), exact = Math.abs(q * 1000 - Math.round(q * 1000)) < 1e-6;
+    var list = n <= 12 ? Array.from({ length: n + 1 }, function (_, i) { return i; }).join(", ") : "0, 1, 2, … " + n;
+    o.innerHTML =
+      "<li><span class=\"why\">Soit x le nombre de places. Le prix total ne doit pas dépasser le budget :</span><span class=\"e\">" + fmt(P, 2) + "x + " + fmt(F, 2) + " ≤ " + fmt(B, 2) + "</span></li>" +
+      "<li><span class=\"act\">On soustrait " + fmt(F, 2) + " des deux côtés</span><span class=\"e\">" + fmt(P, 2) + "x ≤ " + fmt(r, 2) + "</span></li>" +
+      "<li><span class=\"act\">On divise par " + fmt(P, 2) + " (positif : le signe ne change pas)</span><span class=\"e\">x ≤ " + (exact ? "" : "environ ") + fmt(q, 2) + "</span></li>" +
+      "<li><span class=\"why\">On ne peut pas acheter un morceau de place : x est un nombre entier. Les solutions sont " + list + ".</span><span class=\"sol\">Au maximum " + n + " place" + (n > 1 ? "s" : "") + "</span>" +
+      "<span class=\"chk\">" + n + " place" + (n > 1 ? "s" : "") + " : " + fmt(P, 2) + " × " + n + " + " + fmt(F, 2) + " = " + fmt(P * n + F, 2) + " € ≤ " + fmt(B, 2) + " € ✓</span>" +
+      "<span class=\"chk\" style=\"color:var(--red)\">" + (n + 1) + " places : " + fmt(P, 2) + " × " + (n + 1) + " + " + fmt(F, 2) + " = " + fmt(P * (n + 1) + F, 2) + " € &gt; " + fmt(B, 2) + " € ✗</span></li>";
+  }
+  [bB, bP, bF].forEach(function (e) { e.addEventListener("input", budget); });
+  budget();
+
+  /* ---------- Étape 7 : quiz ---------- */
+  function term(n, withX, first) {
+    var abs = Math.abs(n), t = withX ? (abs === 1 ? "x" : abs + "x") : String(abs);
+    if (first) return (n < 0 ? "−" : "") + t;
+    return (n < 0 ? " − " : " + ") + t;
+  }
+  function nstr(n) { return String(n).replace("-", "−"); }
+  function makeIneq() {
+    var k = rnd(-6, 9), op = pick(SIGNS), f = rnd(0, 3), a, b, c, d;
+    if (f === 0) { a = pick([2, 3, 4, 5, 6, -2, -3, -4, -5]); b = rnd(-9, 12) || 4; return term(a, true, true) + term(b) + " " + OPS[op] + " " + nstr(a * k + b); }
+    if (f === 1) {
+      a = rnd(3, 7); c = rnd(1, a - 1); if (Math.random() < 0.5) { var s = a; a = c; c = s; }
+      b = rnd(-8, 10) || 2; d = (a - c) * k + b;
+      return term(a, true, true) + term(b) + " " + OPS[op] + " " + term(c, true, true) + (d ? term(d) : "");
+    }
+    if (f === 2) { b = rnd(1, 12); a = rnd(2, 5); return b + term(-a, true) + " " + OPS[op] + " " + nstr(b - a * k); }
+    a = rnd(2, 4); b = rnd(-5, 6) || 1; return a + "(x" + term(b) + ") " + OPS[op] + " " + nstr(a * (k + b));
+  }
+  var quiz = document.getElementById("quiz"), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ""; done = [];
+    for (var k = 0; k < 8; k++) {
+      var e = makeIneq(), li = document.createElement("li");
+      li.innerHTML = "<span class=\"q\">" + esc(e).replace(/x/g, "<span class=\"x\">x</span>") + "</span>" +
+        "<div class=\"qrow\"><span class=\"xl x\">x</span><span class=\"btns\" role=\"group\" aria-label=\"Signe de la réponse " + (k + 1) + "\" id=\"qg" + k + "\"></span>" +
+        "<input type=\"text\" id=\"qa" + k + "\" inputmode=\"decimal\" autocomplete=\"off\" aria-label=\"Nombre de la frontière pour l'inéquation " + (k + 1) + "\" placeholder=\"nombre\">" +
+        "<button type=\"button\" id=\"qb" + k + "\">Vérifier</button></div>" +
+        "<span class=\"fb\" id=\"qf" + k + "\" aria-live=\"polite\"></span>";
+      quiz.appendChild(li);
+      (function (k, e) {
+        var chosen = null, g = document.getElementById("qg" + k);
+        function setSign(op) { chosen = op; SIGNS.forEach(function (o, j) { document.getElementById("qs" + k + "_" + j).setAttribute("aria-pressed", o === op ? "true" : "false"); }); }
+        SIGNS.forEach(function (op, j) {
+          var b = document.createElement("button"); b.type = "button"; b.className = "sign"; b.id = "qs" + k + "_" + j; b.textContent = OPS[op]; b.setAttribute("aria-pressed", "false");
+          b.addEventListener("click", function () { setSign(op); });
+          g.appendChild(b);
+        });
+        function check() {
+          var fb = document.getElementById("qf" + k), raw = normOps(document.getElementById("qa" + k).value).trim();
+          var m = raw.match(/^x?\s*(<=|>=|<|>)\s*(.*)$/);
+          if (m) { setSign(m[1]); raw = m[2].trim(); }
+          if (!chosen) { fb.className = "fb"; fb.textContent = "Choisis un signe."; return; }
+          if (!raw) { fb.className = "fb"; fb.textContent = "Écris le nombre de la frontière."; return; }
+          var r = solveIneq(e), ans;
+          try { var L = parseLin(raw); if (!zero(L.a)) throw 0; ans = L.b; } catch (er) { fb.className = "fb no"; fb.textContent = "Écris un nombre, comme 4 ou −2."; return; }
+          var how = r.steps.slice(1).map(function (s) { return s.e + (s.flip ? " (on change le sens)" : ""); }).join("  →  ");
+          if (eq(ans, r.x) && chosen === r.op) { fb.className = "fb ok"; fb.textContent = "Bravo, " + r.text + " !"; done[k] = true; }
+          else {
+            done[k] = false; fb.className = "fb no";
+            var hint = eq(ans, r.x) ? "Le nombre est bon, mais pas le signe : " : (chosen === r.op ? "Le signe est bon, mais pas le nombre : " : "Pas tout à fait : ");
+            fb.innerHTML = esc(hint + r.text + ".") + "<span>" + esc(how) + "</span>";
+          }
+          document.getElementById("score").textContent = done.filter(Boolean).length + " / 8";
+        }
+        document.getElementById("qb" + k).addEventListener("click", check);
+        document.getElementById("qa" + k).addEventListener("keydown", function (ev) { if (ev.key === "Enter") check(); });
+      })(k, e);
+    }
+    document.getElementById("score").textContent = "0 / 8";
+  }
+  document.getElementById("newQuiz").addEventListener("click", newQuiz);
+  newQuiz();
+
+  window.__ineq = {
+    parseIneq: parseIneq, solveIneq: solveIneq, testValue: testValue, holds: holds,
+    flipOp: function (op) { return FLIP[normOp(op)]; }, normOp: normOp, phrase: phrase, interval: interval,
+    makeIneq: makeIneq, fraction: qs
+  };
+})();
+</script>
+</body>
+</html>

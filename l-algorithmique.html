@@ -1,0 +1,1164 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>L'algorithmique</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, encre rose (comme un surligneur), marge rouge. Les blocs de programme ont une couleur par famille : mouvement, contrôle, opérateurs, variables. */
+:root {
+  --paper: #fbf7f9;
+  --grid: #efe3ea;
+  --card: #ffffff;
+  --ink: #2a1622;
+  --ink-soft: #6b5060;
+  --acc: #db2777;
+  --acc-soft: #fce7f3;
+  --mv: #2563eb;
+  --mv-soft: #dde8fd;
+  --ctl: #d97706;
+  --ctl-soft: #fdf0d5;
+  --op: #16a34a;
+  --op-soft: #dcf5e3;
+  --var: #ea580c;
+  --var-soft: #fde4d4;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #fff0a3;
+  --line: #e6d5df;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #140d11; --grid: #22161d; --card: #1b1218; --ink: #f6ecf1; --ink-soft: #c4a9b8;
+    --acc: #f9a8d4; --acc-soft: #4a1a33; --mv: #93b4ff; --mv-soft: #172a4d; --ctl: #fbbf5a; --ctl-soft: #3d2a0c;
+    --op: #6fdc95; --op-soft: #12341f; --var: #fb9a62; --var-soft: #40210f;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #3a2631;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #140d11; --grid: #22161d; --card: #1b1218; --ink: #f6ecf1; --ink-soft: #c4a9b8;
+  --acc: #f9a8d4; --acc-soft: #4a1a33; --mv: #93b4ff; --mv-soft: #172a4d; --ctl: #fbbf5a; --ctl-soft: #3d2a0c;
+  --op: #6fdc95; --op-soft: #12341f; --var: #fb9a62; --var-soft: #40210f;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #3a2631;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+a { color: var(--acc); font-weight: 700; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 6px 12px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); min-height: 40px; }
+button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+button:disabled { opacity: .45; cursor: default; transform: none; box-shadow: 3px 3px 0 var(--ink); }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+input[type="text"] { font: inherit; font-family: var(--f-mono); font-size: 1.05rem; padding: 8px 10px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; }
+input[type="range"] { width: 100%; accent-color: var(--acc); }
+.param { display: flex; flex-direction: column; gap: 2px; }
+.param label { font-weight: 700; }
+.inline { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.inline input[type="text"] { width: 7em; }
+
+/* Les blocs */
+.blk { --c: var(--mv); --cs: var(--mv-soft); display: flex; flex-wrap: wrap; align-items: center; gap: 6px; min-height: 40px; padding: 5px 10px; border: 2px solid var(--c); border-left-width: 8px; border-radius: 8px; background: var(--cs); color: var(--ink); font-family: var(--f-display); font-weight: 700; line-height: 1.25; min-width: 0; }
+.mv { --c: var(--mv); --cs: var(--mv-soft); }
+.ctl { --c: var(--ctl); --cs: var(--ctl-soft); }
+.op { --c: var(--op); --cs: var(--op-soft); }
+.var { --c: var(--var); --cs: var(--var-soft); }
+.say { --c: var(--acc); --cs: var(--acc-soft); }
+.slot { font-family: var(--f-mono); font-weight: 600; background: var(--card); border: 1.5px solid var(--c); border-radius: 999px; padding: 0 8px; }
+.slot.op { border-color: var(--op); background: var(--op-soft); }
+.code, .prog { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.loop { --c: var(--ctl); --cs: var(--ctl-soft); border: 2px solid var(--c); border-left-width: 8px; border-radius: 8px; background: var(--cs); padding: 6px 8px 8px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.loop > .lh { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-family: var(--f-display); font-weight: 700; min-height: 32px; }
+.loop > .inner { list-style: none; margin: 0 0 0 8px; padding: 6px; display: flex; flex-direction: column; gap: 6px; background: var(--card); border-radius: 6px; min-height: 40px; min-width: 0; }
+.blk.cur { background: var(--hl); outline: 3px solid var(--acc); outline-offset: 1px; }
+.loop.inloop { outline: 2px dashed var(--acc); outline-offset: 1px; }
+.loop.target { box-shadow: 0 0 0 3px var(--acc); }
+.blk.on { background: var(--hl); outline: 3px solid var(--acc); outline-offset: 1px; }
+.blk.off { opacity: .45; }
+.mini { min-width: 40px; min-height: 40px; padding: 0 8px; box-shadow: 2px 2px 0 var(--ink); }
+.mini:hover { box-shadow: 3px 3px 0 var(--ink); }
+.blk .mini, .loop .mini { margin-left: auto; }
+.loop .lh .mini { margin-left: 0; }
+.loop .lh .del { margin-left: auto; }
+.prog .blk { flex-wrap: nowrap; padding-right: 4px; }
+.prog .blk > span { flex: 1; min-width: 0; }
+.prog .lh { gap: 4px; }
+.nval { font-family: var(--f-mono); font-weight: 600; min-width: 1.4em; text-align: center; }
+.empty { color: var(--ink-soft); font-style: italic; font-size: .95rem; padding: 4px; list-style: none; }
+.pal { display: flex; flex-wrap: wrap; gap: 8px; }
+.pal button { border-color: var(--c); background: var(--cs); box-shadow: 3px 3px 0 var(--c); border-left-width: 8px; min-height: 44px; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px; font-size: .9rem; }
+.legend .blk { min-height: 32px; padding: 2px 10px; font-weight: 500; }
+
+.robot { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+@media (max-width: 600px) { .robot { grid-template-columns: 1fr; } }
+.robot .side { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.graph svg, .robot svg { width: 100%; height: auto; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; display: block; }
+.status { font-family: var(--f-mono); font-size: .92rem; color: var(--ink-soft); min-height: 1.6em; }
+.verdict { border-radius: 8px; padding: 12px 14px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+.verdict:empty { display: none; }
+.verdict.yes { background: var(--ok-soft); color: var(--ok); }
+.verdict.no { background: var(--red-soft); color: var(--red); }
+.verdict.info { background: var(--acc-soft); color: var(--ink); }
+.verdict span { font-weight: 400; color: var(--ink); }
+
+.results { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
+.res { border: 1.5px solid var(--line); border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; background: var(--paper); min-width: 0; }
+.res strong { font-family: var(--f-display); }
+.res .m { font-family: var(--f-mono); font-size: .95rem; overflow-wrap: anywhere; }
+.res .m b { color: var(--acc); }
+.err { color: var(--red); font-weight: 700; }
+
+.steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; counter-reset: st; }
+.steps li { counter-increment: st; display: grid; grid-template-columns: 2em 1fr; gap: 10px; align-items: baseline; padding: 6px 10px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--card); }
+.steps li::before { content: counter(st); font-family: var(--f-mono); font-weight: 600; color: var(--acc); }
+
+.ttable { border-collapse: separate; border-spacing: 0; width: 100%; font-variant-numeric: tabular-nums; }
+.ttable th, .ttable td { border: 1.5px solid var(--ink); padding: 6px 10px; text-align: center; font-family: var(--f-mono); font-size: 1rem; }
+.ttable th { font-family: var(--f-display); background: var(--paper); }
+.ttable td:first-child { text-align: left; white-space: nowrap; }
+.ttable tr.now td { background: var(--hl); }
+.ttable td.chg { color: var(--acc); font-weight: 600; }
+.scroll { overflow-x: auto; }
+.vboxes { display: flex; flex-wrap: wrap; gap: 16px; }
+.vbox { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.vbox .nm { font-family: var(--f-mono); font-weight: 600; color: var(--var); }
+.vbox .vv { width: 84px; height: 64px; border: 2.5px solid var(--var); border-radius: 6px 6px 12px 12px; background: var(--var-soft); display: grid; place-items: center; font-family: var(--f-mono); font-size: 1.5rem; font-weight: 600; }
+.glog { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; font-family: var(--f-mono); font-size: .95rem; }
+.glog li { padding: 4px 10px; border-radius: 6px; background: var(--paper); border: 1px solid var(--line); overflow-wrap: anywhere; }
+.glog li.win { background: var(--ok-soft); color: var(--ok); font-weight: 600; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
+.tag.ok { color: var(--ok); }
+.tag.no { color: var(--red); }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 110px auto; gap: 10px; align-items: center; }
+.quiz li > span:first-child { min-width: 0; overflow-wrap: anywhere; }
+.quiz input[type="text"] { font-size: 1rem; padding: 6px 8px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; }
+.quiz svg { display: block; width: 100%; max-width: 300px; height: auto; margin-top: 8px; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; }
+.quiz .pc { font-family: var(--f-mono); font-size: .95rem; color: var(--acc); display: block; margin-top: 4px; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc); }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 120px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+</head>
+<body>
+<main class="page">
+
+  <header class="hero">
+    <span class="eyebrow">Tutoriel de maths · niveau 5<sup>e</sup>–3<sup>e</sup></span>
+    <h1>L'algorithmique</h1>
+    <p class="lead">Un algorithme, c'est une recette très précise. Une suite d'instructions qu'un ordinateur, ou un robot, peut suivre pas à pas, sans jamais rien deviner.</p>
+    <div class="box">
+      <ul class="code" aria-label="Exemple de programme en blocs">
+        <li class="loop"><div class="lh">répéter <span class="slot">4</span> fois</div>
+          <ul class="inner">
+            <li class="blk mv">avancer de <span class="slot">3</span> cases</li>
+            <li class="blk mv">tourner à droite ↻</li>
+          </ul>
+        </li>
+      </ul>
+      <span class="soft">Ce petit programme fait dessiner un carré. Quatre blocs suffisent, grâce à la boucle « répéter ».</span>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · C'est quoi un algorithme ?</span>
+    <h2>Une recette d'instructions, dans l'ordre</h2>
+    <p>Un <strong>algorithme</strong> est une liste d'instructions <strong>précises</strong>, à faire <strong>dans un ordre donné</strong>, pour résoudre un problème. Quand on l'écrit dans un langage que l'ordinateur comprend, cela devient un <strong>programme</strong>.</p>
+    <p>Tu en suis déjà tous les jours, sans le savoir.</p>
+    <div class="cards">
+      <div class="box"><span class="tag ok">En cuisine</span><strong>Une recette de crêpes</strong><span class="soft">Mettre la farine, ajouter les œufs, verser le lait petit à petit, mélanger. Si on inverse les étapes, la pâte rate.</span></div>
+      <div class="box"><span class="tag ok">En voiture</span><strong>Un itinéraire</strong><span class="soft">« Tout droit sur 500 m, puis à gauche au rond-point. » Le GPS calcule cet algorithme pour toi.</span></div>
+      <div class="box"><span class="tag ok">Le matin</span><strong>Faire ses lacets</strong><span class="soft">Croiser les lacets, faire une boucle, enrouler l'autre lacet autour, tirer. Les mêmes gestes, toujours dans le même ordre.</span></div>
+    </div>
+    <h3>Exemple : se brosser les dents</h3>
+    <ol class="steps">
+      <li><span>Prendre la brosse à dents.</span></li>
+      <li><span>Mettre du dentifrice sur la brosse.</span></li>
+      <li><span>Brosser pendant 2 minutes.</span></li>
+      <li><span>Rincer la brosse et la bouche.</span></li>
+    </ol>
+    <p>Pour un humain, c'est assez clair. Pour un robot, il faudrait être beaucoup plus précis : combien de dentifrice ? Quelles dents ? Dans quel sens ? Un ordinateur ne devine rien.</p>
+    <div class="note">
+      <span class="note-title">D'où vient le mot ?</span>
+      <span>Le mot « algorithme » vient du nom d'un savant de Bagdad, <strong>al-Khwarizmi</strong>, qui vivait vers l'an 820. Il a écrit un livre célèbre pour résoudre des équations, étape par étape. Son titre a aussi donné le mot « algèbre ». Pour en savoir plus, va voir le <a href="les-equations.html">tutoriel sur les équations</a>.</span>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · Le robot sur la grille</span>
+    <h2>Programme le robot</h2>
+    <p>Le robot doit atteindre l'<strong>étoile</strong> sans toucher les murs. Clique sur les blocs pour construire ton programme, comme dans les logiciels de programmation par blocs (par exemple Scratch, utilisé au collège). Puis lance-le, ou avance <strong>pas à pas</strong> pour voir chaque bloc s'exécuter.</p>
+    <div class="legend" aria-label="Familles de blocs">
+      <span class="blk mv">Mouvement</span><span class="blk ctl">Contrôle</span><span class="blk op">Opérateurs</span><span class="blk var">Variables</span><span class="blk say">Affichage</span>
+    </div>
+    <div class="box">
+      <div class="btns" id="levels" role="group" aria-label="Choix du niveau"></div>
+      <p id="levelText"></p>
+      <div class="robot">
+        <svg id="robotSvg" viewBox="0 0 640 640" role="img" aria-label="Grille de 8 cases sur 8 avec le robot, l'étoile et les murs"></svg>
+        <div class="side">
+          <strong>Les blocs</strong>
+          <div class="pal" role="group" aria-label="Ajouter un bloc">
+            <button type="button" id="pal-fwd" class="mv">avancer</button>
+            <button type="button" id="pal-left" class="mv">tourner à gauche ↺</button>
+            <button type="button" id="pal-right" class="mv">tourner à droite ↻</button>
+            <button type="button" id="pal-rep" class="ctl">répéter … fois</button>
+          </div>
+          <span class="soft" id="progTarget" aria-live="polite"></span>
+          <div class="btns">
+            <button type="button" id="progOut">Sortir de la boucle</button>
+            <button type="button" id="progClear">Tout effacer</button>
+          </div>
+          <strong>Ton programme <span class="soft mono" id="progCount"></span></strong>
+          <ol class="prog" id="progList" aria-label="Ton programme"></ol>
+        </div>
+      </div>
+      <div class="btns">
+        <button type="button" id="robotRun">Lancer</button>
+        <button type="button" id="robotStep">Pas à pas</button>
+        <button type="button" id="robotReset">Remettre au départ</button>
+      </div>
+      <p class="status" id="robotStatus" aria-live="polite"></p>
+      <div class="verdict" id="robotOut" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Comment ajouter des blocs dans une boucle ?</span>
+      <span>Quand tu ajoutes un bloc « répéter », les blocs suivants vont <strong>dedans</strong> (la boucle est entourée en rose). Clique sur « Sortir de la boucle » pour continuer après. Tu peux aussi cliquer sur le mot « répéter » d'une boucle pour la choisir, et sur − ou + pour changer le nombre de tours.</span>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Les boucles</span>
+    <h2>Répéter, au lieu de recopier</h2>
+    <p>Pour dessiner un carré, on peut écrire huit blocs : avancer, tourner, avancer, tourner, avancer, tourner, avancer, tourner. Ce sont <strong>quatre fois les deux mêmes blocs</strong>. Une <strong>boucle</strong> dit à l'ordinateur de répéter des instructions un certain nombre de fois : « répéter 4 fois : avancer de 3, tourner à droite ».</p>
+    <p>Ici, un stylo suit le programme et dessine. Choisis le nombre de côtés : le stylo dessine un <strong>polygone régulier</strong>. À chaque coin, il tourne de <span class="hl">360° ÷ nombre de côtés</span>.</p>
+    <div class="box">
+      <div class="param">
+        <label for="polyN">Nombre de côtés : <span class="mono" id="polyNOut">4</span></label>
+        <input id="polyN" type="range" min="3" max="20" step="1" value="4">
+      </div>
+      <ul class="code" id="polyCode" aria-label="Programme du polygone"></ul>
+      <div class="graph"><svg id="polySvg" viewBox="0 0 640 420" role="img" aria-label="Dessin du polygone par le stylo"></svg></div>
+      <div class="btns">
+        <button type="button" id="polyDraw">Dessiner</button>
+        <button type="button" id="polyStep">Pas à pas</button>
+      </div>
+      <p class="status" id="polyStatus" aria-live="polite"></p>
+      <div class="results" id="polyInfo"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Pourquoi 360 ÷ n ?</span>
+      <span>Quand le stylo revient au départ, il a fait un tour complet sur lui-même : 360°. Il a tourné n fois du même angle, donc chaque virage fait 360 ÷ n. Attention, ce n'est pas l'angle à l'intérieur du polygone : l'angle intérieur vaut 180° moins l'angle tourné. Revois les angles dans le <a href="les-angles-et-triangles.html">tutoriel sur les angles</a>.</span>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · Les conditions</span>
+    <h2>Si … alors … sinon …</h2>
+    <p>Un programme peut <strong>choisir</strong>. Une <strong>condition</strong> est une question dont la réponse est vrai ou faux. Si c'est vrai, l'ordinateur fait la partie « alors ». Sinon, il fait la partie « sinon ».</p>
+    <div class="box">
+      <h3>Le bulletin</h3>
+      <div class="param">
+        <label for="gradeN">Note sur 20 : <span class="mono" id="gradeOut">12</span></label>
+        <input id="gradeN" type="range" min="0" max="20" step="0.5" value="12">
+      </div>
+      <ul class="code" aria-label="Programme du bulletin">
+        <li class="loop"><div class="lh">si <span class="slot op">note ≥ 10</span> alors</div>
+          <ul class="inner"><li class="blk say" id="gradeYes">dire « reçu »</li></ul>
+          <div class="lh">sinon</div>
+          <ul class="inner"><li class="blk say" id="gradeNo">dire « à revoir »</li></ul>
+        </li>
+      </ul>
+      <div class="verdict" id="gradeV" aria-live="polite"></div>
+    </div>
+
+    <h3>Le jeu du nombre mystère</h3>
+    <p>L'ordinateur choisit un nombre entier entre 1 et 100. Tu proposes un nombre, il répond « plus grand » ou « plus petit ». Voici son algorithme :</p>
+    <ul class="code" aria-label="Algorithme du nombre mystère">
+      <li class="blk var">mettre <span class="slot">secret</span> à <span class="slot op">nombre au hasard entre 1 et 100</span></li>
+      <li class="loop"><div class="lh">répéter jusqu'à <span class="slot op">proposition = secret</span></div>
+        <ul class="inner">
+          <li class="blk say">demander une proposition</li>
+          <li class="loop"><div class="lh">si <span class="slot op">proposition &lt; secret</span> alors</div>
+            <ul class="inner"><li class="blk say">dire « plus grand »</li></ul>
+            <div class="lh">sinon, si <span class="slot op">proposition &gt; secret</span> alors</div>
+            <ul class="inner"><li class="blk say">dire « plus petit »</li></ul>
+          </li>
+        </ul>
+      </li>
+      <li class="blk say">dire « gagné ! »</li>
+    </ul>
+    <div class="box">
+      <h3>À toi de jouer</h3>
+      <div class="inline">
+        <label for="guessIn"><strong>Ta proposition</strong></label>
+        <input id="guessIn" type="text" inputmode="numeric" autocomplete="off">
+        <button type="button" id="guessBtn">Proposer</button>
+        <button type="button" id="guessNew">Nouveau nombre</button>
+      </div>
+      <div class="verdict" id="guessOut" aria-live="polite"></div>
+      <ol class="glog" id="guessLog"></ol>
+    </div>
+    <div class="box">
+      <h3>L'ordinateur joue avec la dichotomie</h3>
+      <p>La stratégie maligne : toujours proposer le <strong>milieu</strong> des nombres encore possibles. Chaque réponse élimine la moitié des nombres. C'est la <strong>dichotomie</strong> (« couper en deux »).</p>
+      <div class="inline">
+        <label for="dichoSecret"><strong>Nombre à trouver</strong></label>
+        <input id="dichoSecret" type="text" inputmode="numeric" autocomplete="off" value="73">
+        <button type="button" id="dichoRand">Au hasard</button>
+      </div>
+      <div class="graph"><svg id="dichoSvg" viewBox="0 0 640 130" role="img" aria-label="Droite graduée de 1 à 100 avec les nombres encore possibles"></svg></div>
+      <div class="btns">
+        <button type="button" id="dichoPlay">L'ordinateur joue</button>
+        <button type="button" id="dichoStep">Pas à pas</button>
+      </div>
+      <ol class="glog" id="dichoLog"></ol>
+      <div class="verdict" id="dichoOut" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Pourquoi 7 essais suffisent toujours</span>
+      <span>Au départ, il y a 100 nombres possibles. Après chaque essai raté, il en reste au plus la moitié : 100, puis 50, 25, 12, 6, 3, 1. Au 7<sup>e</sup> essai, il ne reste qu'un seul nombre. En effet, 2<sup>7</sup> = 128 est plus grand que 100.</span>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Les variables</span>
+    <h2>Une boîte avec un nom</h2>
+    <p>Une <strong>variable</strong> est comme une boîte avec une étiquette. L'étiquette est son <strong>nom</strong> (a, b, score…). Dans la boîte, on range une <strong>valeur</strong>. On écrit <span class="mono">a ← 3</span> pour dire « mettre 3 dans la boîte a ». Quand on met une nouvelle valeur, l'ancienne est effacée.</p>
+    <p>Pour suivre un programme, on remplit un <strong>tableau de suivi</strong> : une ligne par instruction, une colonne par variable.</p>
+    <div class="box">
+      <ul class="code" id="varCode" aria-label="Programme avec deux variables"></ul>
+      <div class="vboxes" id="varBoxes" aria-live="polite"></div>
+      <div class="scroll"><table class="ttable" id="varTable"></table></div>
+      <div class="btns">
+        <button type="button" id="varStep">Pas à pas</button>
+        <button type="button" id="varAll">Tout remplir</button>
+        <button type="button" id="varReset">Recommencer</button>
+      </div>
+      <p class="status" id="varStatus" aria-live="polite"></p>
+    </div>
+    <div class="note">
+      <span class="note-title">a ← a × b, c'est possible ?</span>
+      <span>Oui ! L'ordinateur calcule d'abord à droite de la flèche avec les valeurs actuelles, puis range le résultat dans a. Ce n'est pas une équation : la flèche veut dire « devient ».</span>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · Un vrai algorithme de maths</span>
+    <h2>Additionner 1 + 2 + 3 + … + n</h2>
+    <p>On veut la somme de tous les entiers de 1 à n. Avec une boucle et deux variables, l'ordinateur ajoute les nombres un par un : <strong>s</strong> garde la somme, <strong>i</strong> le nombre à ajouter.</p>
+    <div class="box">
+      <div class="param">
+        <label for="sumN">n = <span class="mono" id="sumNOut">5</span></label>
+        <input id="sumN" type="range" min="1" max="15" step="1" value="5">
+      </div>
+      <ul class="code" id="sumCode" aria-label="Programme de la somme"></ul>
+      <div class="scroll"><table class="ttable" id="sumTable"></table></div>
+      <div class="btns">
+        <button type="button" id="sumStep">Pas à pas</button>
+        <button type="button" id="sumAll">Tout remplir</button>
+        <button type="button" id="sumReset">Recommencer</button>
+      </div>
+      <p class="status" id="sumStatus" aria-live="polite"></p>
+      <div class="results" id="gaussOut"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Le raccourci du jeune Gauss</span>
+      <span>Vers 1785, le maître du jeune Carl Friedrich Gauss, 8 ans, demande à la classe de calculer 1 + 2 + … + 100. Gauss répond presque tout de suite : 5 050. Son idée : 1 + 100 = 101, 2 + 99 = 101, 3 + 98 = 101… Il y a 50 paires qui valent 101, donc 50 × 101 = 5 050. En général : <strong>1 + 2 + … + n = n × (n + 1) ÷ 2</strong>. Deux algorithmes donnent le même résultat, mais le second est bien plus rapide.</span>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Les pièges</span>
+    <h2>L'ordinateur fait exactement ce que tu écris</h2>
+    <div class="cards">
+      <div class="box"><strong>L'ordre compte</strong><span class="soft">« Avancer puis tourner » et « tourner puis avancer » n'envoient pas le robot au même endroit. C'est comme mettre ses chaussettes après ses chaussures.</span></div>
+      <div class="box"><strong>La boucle infinie</strong><span class="soft">Une boucle « répéter jusqu'à » s'arrête seulement quand la condition devient vraie. Si elle ne le devient jamais, le programme tourne pour toujours.</span></div>
+      <div class="box"><strong>La variable vide</strong><span class="soft">On ne peut pas calculer s ← s + 1 si s n'a pas encore de valeur. Il faut d'abord <strong>initialiser</strong> la variable, par exemple s ← 0.</span></div>
+      <div class="box"><strong>Aucune devinette</strong><span class="soft">L'ordinateur ne sait pas ce que tu « voulais dire ». Un bloc oublié, un nombre faux, et il se trompe, très vite et sans prévenir.</span></div>
+    </div>
+    <div class="box">
+      <h3>Essaie : une boucle qui ne s'arrête jamais</h3>
+      <p>On part de x = 0 et on ajoute 3 à chaque tour. Compare les deux conditions d'arrêt.</p>
+      <div class="results">
+        <div class="res"><strong>Version 1</strong><span class="m">x ← 0</span><span class="m">répéter jusqu'à x = 10 :</span><span class="m">&nbsp;&nbsp;x ← x + 3</span></div>
+        <div class="res"><strong>Version 2</strong><span class="m">x ← 0</span><span class="m">répéter jusqu'à x ≥ 10 :</span><span class="m">&nbsp;&nbsp;x ← x + 3</span></div>
+      </div>
+      <div class="btns">
+        <button type="button" id="loopBad">Lancer la version 1</button>
+        <button type="button" id="loopGood">Lancer la version 2</button>
+      </div>
+      <div class="verdict" id="loopOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Fais tourner les programmes dans ta tête, ou sur un brouillon avec un tableau de suivi. Pour le robot, réponds avec les coordonnées « x ; y » de la case.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Nouvelles questions</button>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Un peu d'histoire</span>
+    <h2>Des recettes aux ordinateurs</h2>
+    <ol class="timeline">
+      <li><span class="when">vers 820</span><div class="what"><strong>Al-Khwarizmi, à Bagdad</strong><span>Il explique des méthodes de calcul étape par étape, avec les chiffres venus d'Inde. Son nom, traduit en latin, donne le mot « algorithme ».</span></div></li>
+      <li><span class="when">1843</span><div class="what"><strong>Ada Lovelace</strong><span>Elle étudie une machine à calculer imaginée par Charles Babbage. Elle écrit une méthode pour lui faire calculer des nombres compliqués. On la présente souvent comme le premier programme informatique.</span></div></li>
+      <li><span class="when">1936</span><div class="what"><strong>Alan Turing</strong><span>Il imagine une machine très simple, capable de suivre n'importe quel algorithme : une machine « universelle ». C'est l'idée de base de tous les ordinateurs.</span></div></li>
+      <li><span class="when">aujourd'hui</span><div class="what"><strong>Partout</strong><span>Les applications du téléphone, les jeux vidéo, le GPS qui cherche le chemin le plus court, les moteurs de recherche : ce sont des algorithmes.</span></div></li>
+    </ol>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · À toi de jouer</span>
+    <h2>Six exercices</h2>
+    <div class="exos">
+      <details>
+        <summary>Le robot<span class="q">Le robot part de la case (0 ; 0), tourné vers la droite. Programme : avancer, avancer, tourner à gauche, répéter 3 fois [ avancer ]. Où arrive-t-il ?</span></summary>
+        <div><span>Deux pas vers la droite : (2 ; 0). Il tourne vers le haut, puis avance 3 fois : <strong>(2 ; 3)</strong>.</span></div>
+      </details>
+      <details>
+        <summary>L'octogone<span class="q">Pour dessiner un octogone régulier (8 côtés), combien de fois faut-il répéter, et de combien tourner ?</span></summary>
+        <div><span>Répéter <strong>8 fois</strong> : avancer, puis tourner de 360 ÷ 8 = <strong>45°</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Le tableau de suivi<span class="q">a ← 5 ; b ← 2 ; a ← a + b ; b ← a × b. Que valent a et b à la fin ?</span></summary>
+        <div><span>a = 5, puis b = 2, puis a = 5 + 2 = 7, puis b = 7 × 2 = 14. À la fin : <strong>a = 7 et b = 14</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Échanger deux variables<span class="q">a vaut 4 et b vaut 9. Léo écrit : a ← b ; b ← a. Pourquoi est-ce faux ? Comment échanger a et b ?</span></summary>
+        <div><span>Après a ← b, a vaut 9 et le 4 est perdu. Puis b ← a donne b = 9. Les deux valent 9 !</span><span>Il faut une troisième boîte : <strong>c ← a ; a ← b ; b ← c</strong>. Alors a = 9 et b = 4.</span></div>
+      </details>
+      <details>
+        <summary>Le nombre mystère géant<span class="q">Le nombre mystère est entre 1 et 1 000. Avec la dichotomie, combien d'essais faut-il au maximum ?</span></summary>
+        <div><span>À chaque essai, on coupe en deux : 1 000, 500, 250, 125, 62, 31, 15, 7, 3, 1. Il faut au plus <strong>10 essais</strong>, car 2<sup>10</sup> = 1 024 est plus grand que 1 000.</span></div>
+      </details>
+      <details>
+        <summary>L'algorithme d'Euclide<span class="q">Pour trouver le PGCD de deux nombres, on divise le plus grand par le plus petit, puis on recommence avec le plus petit et le reste, jusqu'à un reste nul. Le PGCD est le dernier reste non nul. Calcule le PGCD de 84 et 60.</span></summary>
+        <div><span>84 = 1 × 60 + <strong>24</strong> ; 60 = 2 × 24 + <strong>12</strong> ; 24 = 2 × 12 + 0.</span><span>Le dernier reste non nul est 12 : <strong>PGCD(84 ; 60) = 12</strong>. Cet algorithme a plus de 2 000 ans !</span></div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• Un <strong>algorithme</strong> est une suite d'instructions précises, dans un ordre donné. Un <strong>programme</strong> l'écrit pour un ordinateur.</span>
+      <span>• Une <strong>boucle</strong> (« répéter n fois ») évite de recopier les mêmes instructions. Polygone régulier à n côtés : répéter n fois, tourner de <strong>360 ÷ n</strong>.</span>
+      <span>• Une <strong>condition</strong> (« si … alors … sinon … ») permet de choisir selon une réponse vraie ou fausse.</span>
+      <span>• Une <strong>variable</strong> est une boîte avec un nom qui garde une valeur. a ← 3 veut dire « a devient 3 ». On la suit avec un <strong>tableau de suivi</strong>.</span>
+      <span>• La <strong>dichotomie</strong> coupe en deux à chaque essai : 7 essais suffisent entre 1 et 100.</span>
+      <span>• Pièges : l'ordre compte, une boucle doit pouvoir s'arrêter, une variable doit être initialisée.</span>
+    </div>
+  </section>
+
+  <footer>Fiche de révision · L'algorithmique</footer>
+</main>
+
+<script>
+(function () {
+  "use strict";
+  var NS = "http://www.w3.org/2000/svg";
+  var reduce = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  function $(id) { return document.getElementById(id); }
+  function fmt(x, d) { var r = Math.round(x * 1e6) / 1e6; if (Object.is(r, -0)) r = 0; return r.toLocaleString("fr-FR", { maximumFractionDigits: d == null ? 3 : d }).replace("-", "−"); }
+  function mk(svg, name, attrs, text) { var e = document.createElementNS(NS, name); for (var a in attrs) e.setAttribute(a, attrs[a]); if (text != null) e.textContent = text; svg.appendChild(e); return e; }
+  function clear(el) { while (el.firstChild) el.removeChild(el.firstChild); }
+  function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  function btn(text, cls, id, onClick, label) { var b = el("button", cls, text); b.type = "button"; if (id) b.id = id; if (label) b.setAttribute("aria-label", label); b.addEventListener("click", onClick); return b; }
+  function rnd(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  function exact(x) { return Math.abs(x * 100 - Math.round(x * 100)) < 1e-9; }
+  /* Animation : requestAnimationFrame ; si l'utilisateur préfère moins de mouvement, on saute directement à la fin de chaque étape. */
+  function animate(dur, onFrame, onDone) {
+    var h = { stop: false }, t0 = null;
+    function tick(t) {
+      if (h.stop) return;
+      if (t0 === null) t0 = t;
+      var p = dur > 0 ? Math.min(1, (t - t0) / dur) : 1;
+      onFrame(reduce ? (p >= 1 ? 1 : 0) : p);
+      if (p < 1) requestAnimationFrame(tick); else if (onDone) onDone();
+    }
+    requestAnimationFrame(tick);
+    return h;
+  }
+
+  /* ---------- Interpréteur de blocs (pur) ---------- */
+  /* Un programme est une liste de blocs : {t:"fwd"}, {t:"left"}, {t:"right"}, {t:"rep", n:3, body:[...]} */
+  var DX = [1, 0, -1, 0], DY = [0, 1, 0, -1]; /* 0 droite, 1 haut, 2 gauche, 3 bas */
+  var LABEL = { fwd: "avancer", left: "tourner à gauche", right: "tourner à droite" };
+  function flatten(prog, limit) {
+    limit = limit || 1000;
+    var out = [];
+    function walk(list, loops) {
+      for (var i = 0; i < list.length && out.length < limit; i++) {
+        var b = list[i];
+        if (b.t === "rep") {
+          for (var k = 0; k < b.n && out.length < limit; k++) walk(b.body || [], loops.concat([{ id: b.id, i: k + 1, n: b.n }]));
+        } else out.push({ t: b.t, id: b.id, loops: loops });
+      }
+    }
+    walk(prog || [], []);
+    return out;
+  }
+  function countBlocks(prog) { var c = 0; (prog || []).forEach(function (b) { c++; if (b.t === "rep") c += countBlocks(b.body); }); return c; }
+  function hasRep(prog) { return (prog || []).some(function (b) { return b.t === "rep"; }); }
+  function runRobot(prog, lvl) {
+    var size = lvl.size || 8, wall = {};
+    (lvl.walls || []).forEach(function (w) { wall[w[0] + "," + w[1]] = true; });
+    var s = { x: lvl.start[0], y: lvl.start[1], d: lvl.dir || 0 };
+    var steps = flatten(prog), states = [{ x: s.x, y: s.y, d: s.d, step: -1 }], result = "end";
+    for (var i = 0; i < steps.length; i++) {
+      var t = steps[i].t;
+      if (t === "left") s.d = (s.d + 1) % 4;
+      else if (t === "right") s.d = (s.d + 3) % 4;
+      else if (t === "fwd") {
+        var nx = s.x + DX[s.d], ny = s.y + DY[s.d];
+        if (nx < 0 || ny < 0 || nx >= size || ny >= size) { result = "out"; states.push({ x: s.x, y: s.y, d: s.d, step: i, bump: true }); break; }
+        if (wall[nx + "," + ny]) { result = "wall"; states.push({ x: s.x, y: s.y, d: s.d, step: i, bump: true }); break; }
+        s.x = nx; s.y = ny;
+      }
+      states.push({ x: s.x, y: s.y, d: s.d, step: i });
+    }
+    if (result === "end" && lvl.goal && s.x === lvl.goal[0] && s.y === lvl.goal[1]) result = "goal";
+    return { states: states, steps: steps, result: result, x: s.x, y: s.y, d: s.d, blocks: countBlocks(prog) };
+  }
+  function progText(prog) {
+    return prog.map(function (b) { return b.t === "rep" ? "répéter " + b.n + " fois [ " + progText(b.body) + " ]" : LABEL[b.t]; }).join(" ; ");
+  }
+
+  /* ---------- Robot : niveaux ---------- */
+  var LV = [
+    { name: "Niveau 1", text: "Fais avancer le robot jusqu'à l'étoile. Essaie d'abord sans boucle, puis avec « répéter ».", size: 8, start: [1, 1], dir: 0, goal: [6, 1], walls: [[2, 3], [3, 3], [4, 3], [5, 6], [1, 5], [6, 4]], best: 2 },
+    { name: "Niveau 2", text: "Monte l'escalier : un pas à droite, un pas vers le haut, et ainsi de suite.", size: 8, start: [0, 0], dir: 0, goal: [4, 4], walls: [[2, 0], [3, 1], [4, 2], [5, 3], [0, 1], [1, 2], [2, 3], [3, 4]], best: 5 },
+    { name: "Niveau 3", text: "Le grand escalier, avec des marches de 3 cases. Essaie une boucle dans une boucle !", size: 8, start: [0, 0], dir: 0, goal: [6, 6], walls: [[0, 1], [1, 1], [2, 1], [2, 2], [4, 0], [4, 1], [4, 2], [2, 3], [3, 4], [4, 4], [5, 4], [5, 5], [7, 3], [7, 4], [7, 5], [6, 7]], best: 7 }
+  ];
+  var level = 0, prog = [], target = null, uid = 0, C = 80;
+  var svgR = $("robotSvg"), robotG = null, trail = null, trailPts = [];
+  function cellC(x, y) { return [x * C + C / 2, (7 - y) * C + C / 2]; }
+  function starPts(cx, cy, R, r) { var p = []; for (var k = 0; k < 10; k++) { var a = -Math.PI / 2 + k * Math.PI / 5, q = k % 2 ? r : R; p.push((cx + q * Math.cos(a)).toFixed(1) + "," + (cy + q * Math.sin(a)).toFixed(1)); } return p.join(" "); }
+  function drawLevel() {
+    var L = LV[level];
+    clear(svgR);
+    for (var i = 0; i <= 8; i++) {
+      mk(svgR, "line", { x1: i * C, y1: 0, x2: i * C, y2: 640, stroke: "var(--line)", "stroke-width": 2 });
+      mk(svgR, "line", { x1: 0, y1: i * C, x2: 640, y2: i * C, stroke: "var(--line)", "stroke-width": 2 });
+    }
+    L.walls.forEach(function (w) { var c = cellC(w[0], w[1]); mk(svgR, "rect", { x: c[0] - 36, y: c[1] - 36, width: 72, height: 72, rx: 8, fill: "var(--ink-soft)" }); });
+    var s = cellC(L.start[0], L.start[1]);
+    mk(svgR, "rect", { x: s[0] - 34, y: s[1] - 34, width: 68, height: 68, rx: 8, fill: "none", stroke: "var(--mv)", "stroke-width": 3, "stroke-dasharray": "8 6" });
+    var g = cellC(L.goal[0], L.goal[1]);
+    mk(svgR, "polygon", { points: starPts(g[0], g[1], 32, 14), fill: "var(--ctl)", stroke: "var(--ink)", "stroke-width": 2.5, "stroke-linejoin": "round" });
+    trail = mk(svgR, "polyline", { fill: "none", stroke: "var(--acc)", "stroke-width": 8, "stroke-linecap": "round", "stroke-linejoin": "round", opacity: 0.55 });
+    robotG = mk(svgR, "g", {});
+    mk(robotG, "circle", { cx: 0, cy: 0, r: 30, fill: "var(--mv-soft)", stroke: "var(--mv)", "stroke-width": 5 });
+    mk(robotG, "polygon", { points: "-13,-17 21,0 -13,17", fill: "var(--mv)" });
+  }
+  function placeRobot(px, py, ang) { robotG.setAttribute("transform", "translate(" + px.toFixed(1) + " " + py.toFixed(1) + ") rotate(" + ang.toFixed(1) + ")"); }
+  function updateTrail(extra) { var p = trailPts.slice(); if (extra) p.push(extra); trail.setAttribute("points", p.map(function (q) { return q[0].toFixed(1) + "," + q[1].toFixed(1); }).join(" ")); }
+
+  /* Éditeur de programme */
+  function newBlock(t) { var b = { t: t, id: "b" + (++uid) }; if (t === "rep") { b.n = 2; b.body = []; } return b; }
+  function locate(list, id, parent) {
+    for (var i = 0; i < list.length; i++) {
+      var b = list[i];
+      if (b.id === id) return { list: list, i: i, parent: parent };
+      if (b.t === "rep") { var r = locate(b.body, id, b); if (r) return r; }
+    }
+    return null;
+  }
+  function depth(id) { var d = 0, loc = locate(prog, id, null); while (loc && loc.parent) { d++; loc = locate(prog, loc.parent.id, null); } return d; }
+  function say(msg, cls) { var o = $("robotOut"); o.className = "verdict " + (cls || "info"); o.textContent = msg; }
+  function addBlock(t) {
+    if (countBlocks(prog) >= 30) { say("30 blocs au maximum. Utilise « répéter » pour raccourcir ton programme !"); return; }
+    if (t === "rep" && target && depth(target.id) >= 1) { say("Ici, on peut mettre une boucle dans une boucle, mais pas plus. Sors de la boucle d'abord."); return; }
+    var b = newBlock(t);
+    (target ? target.body : prog).push(b);
+    if (t === "rep") target = b;
+    renderProg();
+  }
+  function removeBlock(id) {
+    var loc = locate(prog, id, null); if (!loc) return;
+    loc.list.splice(loc.i, 1);
+    if (target && !locate(prog, target.id, null)) target = loc.parent;
+    renderProg();
+  }
+  function parentOf(b) { var loc = locate(prog, b.id, null); return loc ? loc.parent : null; }
+  function renderProg() {
+    var focusId = document.activeElement && document.activeElement.id;
+    var ol = $("progList"); clear(ol);
+    buildList(ol, prog);
+    if (!prog.length) ol.appendChild(el("li", "empty", "Vide : clique sur un bloc pour l'ajouter."));
+    var n = countBlocks(prog);
+    $("progCount").textContent = "(" + n + (n > 1 ? " blocs)" : " bloc)");
+    $("progTarget").textContent = target ? "Les nouveaux blocs vont dans la boucle « répéter " + target.n + " fois » entourée en rose." : "Les nouveaux blocs vont à la fin du programme.";
+    $("progOut").disabled = !target;
+    resetRobot();
+    if (focusId && $(focusId)) $(focusId).focus();
+  }
+  function buildList(container, list) {
+    list.forEach(function (b) {
+      var li = el("li");
+      li.id = "pb-" + b.id;
+      if (b.t === "rep") {
+        li.className = "loop" + (target === b ? " target" : "");
+        var head = el("div", "lh");
+        var sel = btn("répéter", "mini", "pb-" + b.id + "-sel", function () { target = target === b ? parentOf(b) : b; renderProg(); }, "Répéter : choisir cette boucle pour y ajouter des blocs");
+        sel.setAttribute("aria-pressed", target === b ? "true" : "false");
+        head.appendChild(sel);
+        head.appendChild(btn("−", "mini", "pb-" + b.id + "-m", function () { b.n = Math.max(1, b.n - 1); renderProg(); }, "Une fois de moins"));
+        head.appendChild(el("span", "nval", String(b.n)));
+        head.appendChild(btn("+", "mini", "pb-" + b.id + "-p", function () { b.n = Math.min(9, b.n + 1); renderProg(); }, "Une fois de plus"));
+        head.appendChild(el("span", null, "fois"));
+        head.appendChild(btn("×", "mini del", "pb-" + b.id + "-del", function () { removeBlock(b.id); }, "Supprimer la boucle répéter " + b.n + " fois et son contenu"));
+        li.appendChild(head);
+        var inner = el("ol", "inner");
+        buildList(inner, b.body);
+        if (!b.body.length) inner.appendChild(el("li", "empty", target === b ? "Les blocs arrivent ici." : "Vide."));
+        li.appendChild(inner);
+      } else {
+        li.className = "blk mv";
+        li.appendChild(el("span", null, LABEL[b.t] + (b.t === "left" ? " ↺" : b.t === "right" ? " ↻" : "")));
+        li.appendChild(btn("×", "mini", "pb-" + b.id + "-del", function () { removeBlock(b.id); }, "Supprimer le bloc " + LABEL[b.t]));
+      }
+      container.appendChild(li);
+    });
+  }
+
+  /* Exécution */
+  var rs = { res: null, i: 0, playing: false, anim: null, angle: 0 };
+  function highlight(info) {
+    var old = document.querySelectorAll("#progList .cur, #progList .inloop");
+    for (var k = 0; k < old.length; k++) old[k].classList.remove("cur", "inloop");
+    if (!info) return;
+    var e = $("pb-" + info.id); if (e) e.classList.add("cur");
+    info.loops.forEach(function (l) { var x = $("pb-" + l.id); if (x) x.classList.add("inloop"); });
+  }
+  function resetRobot() {
+    if (rs.anim) rs.anim.stop = true;
+    rs.anim = null; rs.res = null; rs.i = 0; rs.playing = false; rs.pending = null;
+    var L = LV[level], c = cellC(L.start[0], L.start[1]);
+    rs.angle = -90 * L.dir; placeRobot(c[0], c[1], rs.angle);
+    trailPts = [c]; updateTrail();
+    highlight(null);
+    $("robotRun").textContent = "Lancer";
+    $("robotStatus").textContent = prog.length ? "Prêt. Lance le programme ou avance pas à pas." : "";
+    var o = $("robotOut"); o.className = "verdict"; o.textContent = "";
+  }
+  function finish() {
+    rs.playing = false; highlight(null); $("robotRun").textContent = "Relancer";
+    var r = rs.res, L = LV[level], o = $("robotOut"), n = r.blocks, txt;
+    $("robotStatus").textContent = "Programme terminé après " + r.steps.length + (r.steps.length > 1 ? " instructions exécutées." : " instruction exécutée.");
+    if (r.result === "goal") {
+      if (!hasRepDeep(prog)) txt = "Astuce : avec « répéter », ton programme serait plus court. Notre record pour ce niveau : " + L.best + " blocs.";
+      else if (n <= L.best) txt = "Tu as égalé notre record : " + L.best + " blocs. Les boucles rendent le programme bien plus court !";
+      else txt = "Notre record pour ce niveau : " + L.best + " blocs. Avec « répéter », peux-tu raccourcir encore ?";
+      if (level < 2) txt += " Passe au niveau suivant !";
+      o.className = "verdict yes"; o.innerHTML = "Bravo, le robot est sur l'étoile ! Ton programme utilise " + n + (n > 1 ? " blocs." : " bloc.");
+      o.appendChild(el("span", null, txt));
+    } else {
+      o.className = "verdict no";
+      o.textContent = r.result === "wall" ? "Aïe, un mur ! Le robot s'arrête." : r.result === "out" ? "Le robot allait sortir de la grille !" : "Le programme est fini, mais le robot n'est pas sur l'étoile.";
+      o.appendChild(el("span", null, r.result === "end" ? "Regarde où il s'est arrêté et complète ton programme." : "L'ordinateur a suivi ton programme à la lettre. Corrige-le et relance."));
+    }
+  }
+  function hasRepDeep(p) { return hasRep(p); }
+  function stepRobot(then) {
+    if (rs.anim) { if (then) rs.pending = then; return; }
+    if (!prog.length) { $("robotStatus").textContent = "Ton programme est vide : ajoute des blocs."; return; }
+    if (rs.res && rs.i >= rs.res.states.length - 1) resetRobot();
+    if (!rs.res) { rs.res = runRobot(prog, LV[level]); rs.i = 0; var o = $("robotOut"); o.className = "verdict"; o.textContent = ""; }
+    var st = rs.res.states;
+    if (st.length < 2) { finish(); return; }
+    var a = st[rs.i], b = st[rs.i + 1], info = rs.res.steps[b.step];
+    highlight(info);
+    $("robotStatus").textContent = "Bloc " + (b.step + 1) + " sur " + rs.res.steps.length + " : " + LABEL[info.t] + (info.loops.length ? " (" + info.loops.slice().reverse().map(function (l) { return "tour " + l.i + " sur " + l.n; }).join(", dans le ") + ")" : "");
+    var ca = cellC(a.x, a.y), cb = cellC(b.x, b.y), a0 = rs.angle;
+    var diff = -90 * b.d - a0; diff = ((diff % 360) + 540) % 360 - 180;
+    rs.anim = animate(340, function (p) {
+      if (b.bump) { var k = Math.sin(Math.PI * p) * 0.3; placeRobot(ca[0] + DX[b.d] * C * k, ca[1] - DY[b.d] * C * k, a0); }
+      else { var px = ca[0] + (cb[0] - ca[0]) * p, py = ca[1] + (cb[1] - ca[1]) * p; placeRobot(px, py, a0 + diff * p); updateTrail([px, py]); }
+    }, function () {
+      rs.anim = null; rs.angle = a0 + diff; rs.i++;
+      if (!b.bump && (cb[0] !== ca[0] || cb[1] !== ca[1])) trailPts.push(cb);
+      updateTrail();
+      var nx = then || rs.pending; rs.pending = null;
+      if (rs.i >= st.length - 1) finish(); else if (nx) nx();
+    });
+  }
+  function play() {
+    if (rs.playing) { rs.playing = false; $("robotRun").textContent = "Continuer"; return; }
+    if (!prog.length) { $("robotStatus").textContent = "Ton programme est vide : ajoute des blocs."; return; }
+    if (rs.res && rs.i >= rs.res.states.length - 1) resetRobot();
+    rs.playing = true; $("robotRun").textContent = "Pause";
+    (function next() { if (rs.playing) stepRobot(next); })();
+  }
+  function setLevel(i) {
+    level = i; prog = []; target = null;
+    LV.forEach(function (L, j) { $("lvl" + j).setAttribute("aria-pressed", j === i ? "true" : "false"); });
+    $("levelText").textContent = LV[i].text;
+    drawLevel(); renderProg();
+  }
+  LV.forEach(function (L, j) { $("levels").appendChild(btn(L.name, "", "lvl" + j, function () { setLevel(j); })); });
+  $("pal-fwd").addEventListener("click", function () { addBlock("fwd"); });
+  $("pal-left").addEventListener("click", function () { addBlock("left"); });
+  $("pal-right").addEventListener("click", function () { addBlock("right"); });
+  $("pal-rep").addEventListener("click", function () { addBlock("rep"); });
+  $("progOut").addEventListener("click", function () { if (target) { target = parentOf(target); renderProg(); } });
+  $("progClear").addEventListener("click", function () { prog = []; target = null; renderProg(); });
+  $("robotRun").addEventListener("click", play);
+  $("robotStep").addEventListener("click", function () { if (rs.playing) { rs.playing = false; $("robotRun").textContent = "Continuer"; return; } stepRobot(null); });
+  $("robotReset").addEventListener("click", resetRobot);
+  setLevel(0);
+
+  /* ---------- Polygones (stylo) ---------- */
+  function polygon(n, side) {
+    var pts = [[0, 0]], x = 0, y = 0, h = 0, a = 360 / n;
+    for (var i = 0; i < n; i++) { x += side * Math.cos(h * Math.PI / 180); y += side * Math.sin(h * Math.PI / 180); pts.push([x, y]); h += a; }
+    return { angle: a, interior: 180 - a, total: n * a, points: pts };
+  }
+  var pv = { n: 4, upto: 4, anim: null, pts: [], side: 150, angle: 90 };
+  var polySvg = $("polySvg");
+  function polySetup() {
+    var n = pv.n, side = Math.round(600 / n), P = polygon(n, side), S = 2;
+    var xs = P.points.map(function (p) { return p[0]; }), ys = P.points.map(function (p) { return p[1]; });
+    var minX = Math.min.apply(null, xs), maxX = Math.max.apply(null, xs), minY = Math.min.apply(null, ys), maxY = Math.max.apply(null, ys);
+    var ox = 320 - (minX + maxX) / 2 * S, oy = 210 - (minY + maxY) / 2 * S;
+    pv.side = side; pv.angle = P.angle;
+    pv.pts = P.points.map(function (p) { return [ox + p[0] * S, oy + p[1] * S]; });
+    var ang = exact(P.angle) ? fmt(P.angle) : "≈ " + fmt(P.angle, 2);
+    var code = $("polyCode"); clear(code);
+    code.innerHTML = "<li class='loop'><div class='lh'>répéter <span class='slot'>" + n + "</span> fois</div><ul class='inner'><li class='blk mv' id='polyFwd'>avancer de <span class='slot'>" + side + "</span> pas</li><li class='blk mv' id='polyTurn'>tourner à droite ↻ de <span class='slot'>" + ang + "°</span></li></ul></li>";
+    $("polyInfo").innerHTML = "<div class='res'><strong>Angle tourné</strong><span class='m'>360 ÷ " + n + " <b>" + (exact(P.angle) ? "= " : "≈ ") + fmt(P.angle, 2) + "°</b></span></div>" +
+      "<div class='res'><strong>Tous les virages</strong><span class='m'>" + n + " × " + fmt(P.angle, 2) + "° " + (exact(P.angle) ? "=" : "≈") + " <b>360°</b></span><span class='m'>un tour complet</span></div>" +
+      "<div class='res'><strong>Angle intérieur</strong><span class='m'>180° − " + fmt(P.angle, 2) + "° <b>" + (exact(P.interior) ? "= " : "≈ ") + fmt(P.interior, 2) + "°</b></span></div>";
+  }
+  function polyDrawAt(u) {
+    clear(polySvg);
+    var n = pv.n, k = Math.min(n, Math.floor(u)), f = u - k, pts = pv.pts.slice(0, k + 1);
+    var cur = pts[pts.length - 1];
+    if (k < n && f > 0) { var A = pv.pts[k], B = pv.pts[k + 1]; cur = [A[0] + (B[0] - A[0]) * f, A[1] + (B[1] - A[1]) * f]; pts.push(cur); }
+    mk(polySvg, "polygon", { points: pv.pts.slice(0, n).map(function (p) { return p[0].toFixed(1) + "," + p[1].toFixed(1); }).join(" "), fill: "none", stroke: "var(--line)", "stroke-width": 2, "stroke-dasharray": "6 6" });
+    mk(polySvg, "polyline", { points: pts.map(function (p) { return p[0].toFixed(1) + "," + p[1].toFixed(1); }).join(" "), fill: "none", stroke: "var(--acc)", "stroke-width": 6, "stroke-linecap": "round", "stroke-linejoin": "round" });
+    mk(polySvg, "circle", { cx: pv.pts[0][0], cy: pv.pts[0][1], r: 7, fill: "var(--ink)" });
+    mk(polySvg, "text", { x: pv.pts[0][0], y: pv.pts[0][1] - 16, "text-anchor": "middle", "font-size": 24 }, "départ");
+    var head = (k >= n ? 0 : k) * pv.angle;
+    var g = mk(polySvg, "g", { transform: "translate(" + cur[0].toFixed(1) + " " + cur[1].toFixed(1) + ") rotate(" + head.toFixed(1) + ")" });
+    mk(g, "polygon", { points: "-18,-18 26,0 -18,18", fill: "var(--mv)", stroke: "var(--card)", "stroke-width": 2 });
+  }
+  function polyMark(which) {
+    var f = $("polyFwd"), t = $("polyTurn"); if (!f) return;
+    f.classList.toggle("cur", which === "fwd"); t.classList.toggle("cur", which === "turn");
+  }
+  function polyStop() { if (pv.anim) pv.anim.stop = true; pv.anim = null; }
+  function polyTo(from, to, dur, done) {
+    polyStop();
+    pv.anim = animate(dur, function (p) { pv.upto = from + (to - from) * p; polyDrawAt(pv.upto); polyMark(p < 1 ? "fwd" : "turn"); }, function () { pv.anim = null; pv.upto = to; if (done) done(); });
+  }
+  function polyStatus(k) {
+    $("polyStatus").textContent = k >= pv.n ? "Fini ! Le stylo est revenu au départ après " + pv.n + " virages." : "Tour " + k + " sur " + pv.n + " : avancer de " + pv.side + " pas, puis tourner à droite.";
+  }
+  $("polyN").addEventListener("input", function () {
+    polyStop(); pv.n = parseInt(this.value, 10); $("polyNOut").textContent = pv.n;
+    polySetup(); pv.upto = pv.n; polyDrawAt(pv.n); $("polyStatus").textContent = "";
+  });
+  $("polyDraw").addEventListener("click", function () {
+    var n = pv.n; $("polyStatus").textContent = "Le stylo dessine…";
+    polyTo(0, n, reduce ? 0 : Math.min(4000, n * 380), function () { polyMark(null); polyStatus(n); });
+  });
+  $("polyStep").addEventListener("click", function () {
+    if (pv.anim) return;
+    var u = Math.floor(pv.upto + 1e-9); if (u >= pv.n) { u = 0; pv.upto = 0; }
+    polyTo(u, u + 1, 380, function () { polyStatus(u + 1); if (u + 1 >= pv.n) polyMark(null); });
+    polyStatus(u + 1);
+  });
+  polySetup(); polyDrawAt(pv.n);
+
+  /* ---------- Condition : le bulletin ---------- */
+  function grade() {
+    var g = parseFloat($("gradeN").value), ok = g >= 10;
+    $("gradeOut").textContent = fmt(g);
+    $("gradeYes").className = "blk say " + (ok ? "on" : "off");
+    $("gradeNo").className = "blk say " + (ok ? "off" : "on");
+    var v = $("gradeV"); v.className = "verdict " + (ok ? "yes" : "no");
+    v.textContent = "L'ordinateur dit : « " + (ok ? "reçu" : "à revoir") + " »";
+    v.appendChild(el("span", null, "Condition : " + fmt(g) + " ≥ 10 est " + (ok ? "vrai, donc on fait la partie « alors »." : "faux, donc on fait la partie « sinon ».")));
+  }
+  $("gradeN").addEventListener("input", grade); grade();
+
+  /* ---------- Nombre mystère ---------- */
+  function guessStep(secret, guess) { return guess < secret ? "plus grand" : guess > secret ? "plus petit" : "gagné"; }
+  function dichoStep(lo, hi) { return Math.floor((lo + hi) / 2); }
+  function dichotomy(secret, lo, hi) {
+    lo = lo == null ? 1 : lo; hi = hi == null ? 100 : hi;
+    var out = [];
+    while (lo <= hi && out.length < 64) {
+      var g = dichoStep(lo, hi), r = guessStep(secret, g);
+      out.push({ g: g, lo: lo, hi: hi, r: r });
+      if (r === "gagné") break;
+      if (r === "plus grand") lo = g + 1; else hi = g - 1;
+    }
+    return out;
+  }
+  var gs = { secret: rnd(1, 100), tries: 0, over: false };
+  function guessPlay() {
+    var inp = $("guessIn"), out = $("guessOut"), t = inp.value.trim(), g = /^\d+$/.test(t) ? parseInt(t, 10) : NaN;
+    if (gs.over) { out.className = "verdict info"; out.textContent = "Partie finie. Clique sur « Nouveau nombre » pour rejouer."; return; }
+    if (isNaN(g) || g < 1 || g > 100) { out.className = "verdict no"; out.textContent = "Écris un nombre entier entre 1 et 100."; return; }
+    gs.tries++;
+    var r = guessStep(gs.secret, g), li = el("li", r === "gagné" ? "win" : "", "Essai " + gs.tries + " : " + g + " → " + r);
+    $("guessLog").appendChild(li);
+    if (r === "gagné") {
+      gs.over = true; out.className = "verdict yes";
+      out.textContent = "Gagné en " + gs.tries + (gs.tries > 1 ? " essais !" : " essai !");
+      out.appendChild(el("span", null, gs.tries <= 7 ? "Aussi fort que la dichotomie, qui gagne toujours en 7 essais au plus." : "Avec la dichotomie, 7 essais suffisent toujours. Regarde l'ordinateur jouer juste en dessous."));
+    } else { out.className = "verdict info"; out.textContent = "C'est " + r + " que " + g + "."; }
+    inp.value = ""; inp.focus();
+  }
+  function guessNew() { gs = { secret: rnd(1, 100), tries: 0, over: false }; clear($("guessLog")); var o = $("guessOut"); o.className = "verdict info"; o.textContent = "J'ai choisi un nouveau nombre entre 1 et 100."; }
+  $("guessBtn").addEventListener("click", guessPlay);
+  $("guessIn").addEventListener("keydown", function (e) { if (e.key === "Enter") guessPlay(); });
+  $("guessNew").addEventListener("click", guessNew);
+
+  var ds = { list: null, i: 0, playing: false, anim: null, secret: 73 };
+  var dSvg = $("dichoSvg");
+  function dX(v) { return 30 + (v - 1) / 99 * 580; }
+  function dDraw(lo, hi, g) {
+    clear(dSvg);
+    if (lo <= hi) mk(dSvg, "rect", { x: dX(lo) - 5, y: 46, width: dX(hi) - dX(lo) + 10, height: 28, rx: 6, fill: "var(--acc-soft)", stroke: "var(--acc)", "stroke-width": 2 });
+    mk(dSvg, "line", { x1: 30, y1: 60, x2: 610, y2: 60, stroke: "var(--ink)", "stroke-width": 2.5 });
+    [1, 25, 50, 75, 100].forEach(function (v) { mk(dSvg, "line", { x1: dX(v), y1: 52, x2: dX(v), y2: 68, stroke: "var(--ink)", "stroke-width": 2 }); mk(dSvg, "text", { x: dX(v), y: 100, "text-anchor": "middle", "font-size": 20 }, String(v)); });
+    mk(dSvg, "circle", { cx: dX(ds.secret), cy: 60, r: 7, fill: "var(--ok)", stroke: "var(--card)", "stroke-width": 2 });
+    if (g != null) {
+      mk(dSvg, "line", { x1: dX(g), y1: 28, x2: dX(g), y2: 78, stroke: "var(--acc)", "stroke-width": 4 });
+      mk(dSvg, "text", { x: Math.min(590, Math.max(50, dX(g))), y: 22, "text-anchor": "middle", "font-size": 22, "font-weight": 600, style: "fill: var(--acc)" }, String(g));
+    }
+  }
+  function dReset() {
+    if (ds.anim) ds.anim.stop = true;
+    var t = $("dichoSecret").value.trim(), s = /^\d+$/.test(t) ? parseInt(t, 10) : NaN;
+    ds.anim = null; ds.playing = false; ds.i = 0; clear($("dichoLog"));
+    var o = $("dichoOut"); o.className = "verdict"; o.textContent = "";
+    $("dichoPlay").textContent = "L'ordinateur joue";
+    if (isNaN(s) || s < 1 || s > 100) { ds.list = null; o.className = "verdict no"; o.textContent = "Écris un nombre entier entre 1 et 100."; dDraw(1, 100, null); return false; }
+    ds.secret = s; ds.list = dichotomy(s); dDraw(1, 100, null); return true;
+  }
+  function dStep(then) {
+    if (ds.anim) return;
+    if (!ds.list || ds.i >= ds.list.length) { if (!dReset()) return; }
+    var e = ds.list[ds.i]; ds.i++;
+    dDraw(e.lo, e.hi, e.g);
+    $("dichoLog").appendChild(el("li", e.r === "gagné" ? "win" : "", "Essai " + ds.i + " : possibles de " + e.lo + " à " + e.hi + " (" + (e.hi - e.lo + 1) + " nombres). Milieu : " + e.g + " → " + e.r));
+    if (e.r === "gagné") {
+      ds.playing = false; $("dichoPlay").textContent = "L'ordinateur joue";
+      var o = $("dichoOut"); o.className = "verdict yes"; o.textContent = "Trouvé en " + ds.i + (ds.i > 1 ? " essais." : " essai.");
+      o.appendChild(el("span", null, "Quel que soit le nombre entre 1 et 100, la dichotomie le trouve en 7 essais au plus."));
+      return;
+    }
+    if (then) ds.anim = animate(reduce ? 500 : 700, function () {}, function () { ds.anim = null; then(); });
+  }
+  $("dichoPlay").addEventListener("click", function () {
+    if (ds.playing) { ds.playing = false; $("dichoPlay").textContent = "Continuer"; return; }
+    if (!ds.list || ds.i >= ds.list.length || ds.i === 0) { if (!dReset()) return; }
+    ds.playing = true; $("dichoPlay").textContent = "Pause";
+    (function next() { if (ds.playing) dStep(next); })();
+  });
+  $("dichoStep").addEventListener("click", function () { if (ds.playing) { ds.playing = false; $("dichoPlay").textContent = "Continuer"; return; } dStep(null); });
+  $("dichoRand").addEventListener("click", function () { $("dichoSecret").value = rnd(1, 100); dReset(); });
+  $("dichoSecret").addEventListener("input", dReset);
+  dReset();
+
+  /* ---------- Variables (pur) ---------- */
+  /* Instruction : {v:"a", x:3} (a ← 3) ou {v:"a", x:"a", op:"*", y:"b"} (a ← a × b) */
+  var OPS = { "+": "+", "-": "−", "*": "×" };
+  function val(t, env) { if (typeof t === "number") return t; return Object.prototype.hasOwnProperty.call(env, t) ? env[t] : NaN; }
+  function runVars(p) {
+    var env = {}, snaps = [];
+    for (var i = 0; i < p.length; i++) {
+      var q = p[i], x = val(q.x, env), r;
+      if (!q.op) r = x;
+      else { var y = val(q.y, env); r = q.op === "+" ? x + y : q.op === "-" ? x - y : q.op === "*" ? x * y : NaN; }
+      if (isNaN(r)) return { env: env, snaps: snaps, error: i };
+      env[q.v] = r;
+      var c = {}; for (var k in env) c[k] = env[k]; snaps.push(c);
+    }
+    return { env: env, snaps: snaps, error: -1 };
+  }
+  function term(t) { return typeof t === "number" ? fmt(t) : t; }
+  function instrText(q) { return q.v + " ← " + term(q.x) + (q.op ? " " + OPS[q.op] + " " + term(q.y) : ""); }
+
+  var VP = [{ v: "a", x: 3 }, { v: "b", x: "a", op: "+", y: 2 }, { v: "a", x: "a", op: "*", y: "b" }, { v: "b", x: "b", op: "-", y: 1 }, { v: "a", x: "a", op: "-", y: "b" }];
+  var vr = runVars(VP), vi = 0;
+  (function () {
+    var code = $("varCode");
+    VP.forEach(function (q, i) { var li = el("li", "blk var", instrText(q)); li.id = "varL" + i; li.style.fontFamily = "var(--f-mono)"; code.appendChild(li); });
+    var t = $("varTable"), h = "<tr><th>Instruction</th><th>a</th><th>b</th></tr>";
+    VP.forEach(function (q, i) { h += "<tr id='varR" + i + "'><td>" + instrText(q) + "</td><td id='varA" + i + "'></td><td id='varB" + i + "'></td></tr>"; });
+    t.innerHTML = h;
+  })();
+  function varBoxes(env) {
+    var b = $("varBoxes"); clear(b);
+    ["a", "b"].forEach(function (n) { var d = el("div", "vbox"); d.appendChild(el("span", "nm", n)); d.appendChild(el("span", "vv", env && n in env ? fmt(env[n]) : "?")); b.appendChild(d); });
+  }
+  function varShow(upto) {
+    for (var i = 0; i < VP.length; i++) {
+      var s = vr.snaps[i], prev = i ? vr.snaps[i - 1] : {}, on = i < upto;
+      $("varA" + i).textContent = on && "a" in s ? fmt(s.a) : on ? "?" : "";
+      $("varB" + i).textContent = on && "b" in s ? fmt(s.b) : on ? "?" : "";
+      $("varA" + i).className = on && VP[i].v === "a" ? "chg" : "";
+      $("varB" + i).className = on && VP[i].v === "b" ? "chg" : "";
+      $("varR" + i).className = i === upto - 1 ? "now" : "";
+      $("varL" + i).classList.toggle("cur", i === upto - 1);
+    }
+    varBoxes(upto ? vr.snaps[upto - 1] : null);
+    var st = $("varStatus");
+    if (!upto) st.textContent = "Les boîtes sont vides. Clique sur « Pas à pas ».";
+    else {
+      var q = VP[upto - 1], prevEnv = upto > 1 ? vr.snaps[upto - 2] : {};
+      var calc = q.op ? term(typeof q.x === "number" ? q.x : prevEnv[q.x]) + " " + OPS[q.op] + " " + term(typeof q.y === "number" ? q.y : prevEnv[q.y]) + " = " + fmt(vr.snaps[upto - 1][q.v]) : fmt(vr.snaps[upto - 1][q.v]);
+      st.textContent = "Ligne " + upto + " : " + q.v + " devient " + calc + "." + (upto === VP.length ? " À la fin, a = " + fmt(vr.env.a) + " et b = " + fmt(vr.env.b) + "." : "");
+    }
+  }
+  $("varStep").addEventListener("click", function () { vi = vi >= VP.length ? 0 : vi + 1; varShow(vi); });
+  $("varAll").addEventListener("click", function () { vi = VP.length; varShow(vi); });
+  $("varReset").addEventListener("click", function () { vi = 0; varShow(0); });
+  varShow(0);
+
+  /* ---------- Somme 1 + 2 + … + n ---------- */
+  function sumLoop(n) { var s = 0, i = 1, tr = [{ tour: 0, s: 0, i: 1 }]; for (var k = 1; k <= n; k++) { s = s + i; i = i + 1; tr.push({ tour: k, s: s, i: i }); } return { s: s, trace: tr }; }
+  function gauss(n) { return n * (n + 1) / 2; }
+  var sm = { n: 5, k: -1, r: null };
+  function sumSetup() {
+    var n = sm.n; sm.r = sumLoop(n); sm.k = -1;
+    $("sumCode").innerHTML = "<li class='blk var' id='sumL0'>s ← 0</li><li class='blk var' id='sumL1'>i ← 1</li><li class='loop' id='sumLoopBlk'><div class='lh'>répéter <span class='slot'>" + n + "</span> fois</div><ul class='inner'><li class='blk var' id='sumL2'>s ← s + i</li><li class='blk var' id='sumL3'>i ← i + 1</li></ul></li><li class='blk say'>afficher s</li>";
+    var h = "<tr><th>Moment</th><th>s</th><th>i</th></tr>";
+    sm.r.trace.forEach(function (t, j) { h += "<tr id='sumR" + j + "'><td>" + (j ? "après le tour " + j : "départ") + "</td><td id='sumS" + j + "'></td><td id='sumI" + j + "'></td></tr>"; });
+    $("sumTable").innerHTML = h;
+    $("gaussOut").innerHTML = "<div class='res'><strong>Avec la boucle</strong><span class='m'>" + (n <= 6 ? sm.r.trace.slice(1).map(function (t) { return t.tour; }).join(" + ") : "1 + 2 + … + " + n) + "</span><span class='m'>= <b>" + fmt(sm.r.s) + "</b> en " + n + (n > 1 ? " additions" : " addition") + "</span></div>" +
+      "<div class='res'><strong>Avec la formule de Gauss</strong><span class='m'>" + n + " × " + (n + 1) + " ÷ 2</span><span class='m'>= <b>" + fmt(gauss(n)) + "</b> en 3 opérations</span></div>" +
+      "<div class='res'><strong>Pour n = 100</strong><span class='m'>100 × 101 ÷ 2 = <b>5 050</b></span><span class='m'>la boucle ferait 100 tours</span></div>";
+    sumShow();
+  }
+  function sumShow() {
+    var tr = sm.r.trace;
+    tr.forEach(function (t, j) {
+      var on = j <= sm.k;
+      $("sumS" + j).textContent = on ? fmt(t.s) : ""; $("sumI" + j).textContent = on ? fmt(t.i) : "";
+      $("sumR" + j).className = j === sm.k ? "now" : "";
+    });
+    ["sumL0", "sumL1", "sumL2", "sumL3"].forEach(function (id, j) { $(id).classList.toggle("cur", sm.k === 0 ? j < 2 : sm.k > 0 && j >= 2); });
+    var st = $("sumStatus");
+    if (sm.k < 0) st.textContent = "Clique sur « Pas à pas » pour suivre la boucle.";
+    else if (sm.k === 0) st.textContent = "Départ : on initialise s à 0 et i à 1.";
+    else { var t = tr[sm.k]; st.textContent = "Tour " + sm.k + " sur " + sm.n + " : s ← " + fmt(tr[sm.k - 1].s) + " + " + fmt(tr[sm.k - 1].i) + " = " + fmt(t.s) + ", puis i devient " + fmt(t.i) + "." + (sm.k === sm.n ? " Fini : l'ordinateur affiche " + fmt(t.s) + "." : ""); }
+  }
+  $("sumN").addEventListener("input", function () { sm.n = parseInt(this.value, 10); $("sumNOut").textContent = sm.n; sumSetup(); });
+  $("sumStep").addEventListener("click", function () { sm.k = sm.k >= sm.n ? -1 : sm.k + 1; sumShow(); });
+  $("sumAll").addEventListener("click", function () { sm.k = sm.n; sumShow(); });
+  $("sumReset").addEventListener("click", function () { sm.k = -1; sumShow(); });
+  sumSetup();
+
+  /* ---------- Boucle infinie ---------- */
+  function untilLoop(start, add, stop, cond, maxTours) {
+    var x = start, vals = [];
+    for (var k = 0; k < maxTours; k++) {
+      if (cond === "eq" ? x === stop : x >= stop) return { values: vals, stopped: true, x: x };
+      x += add; vals.push(x);
+    }
+    return { values: vals, stopped: (cond === "eq" ? x === stop : x >= stop), x: x };
+  }
+  function loopDemo(cond) {
+    var r = untilLoop(0, 3, 10, cond, 20), o = $("loopOut");
+    if (r.stopped) { o.className = "verdict yes"; o.textContent = "La boucle s'arrête après " + r.values.length + " tours, avec x = " + r.x + "."; o.appendChild(el("span", "mono", "x : 0 → " + r.values.join(" → "))); }
+    else { o.className = "verdict no"; o.textContent = "Boucle infinie ! On l'a arrêtée de force au bout de 20 tours."; o.appendChild(el("span", "mono", "x : 0 → " + r.values.join(" → ") + " → …")); o.appendChild(el("span", null, "x saute de 9 à 12 : il ne vaut jamais exactement 10, donc la condition n'est jamais vraie.")); }
+  }
+  $("loopBad").addEventListener("click", function () { loopDemo("eq"); });
+  $("loopGood").addEventListener("click", function () { loopDemo("ge"); });
+
+  /* ---------- Quiz ---------- */
+  function rep(n, body) { return { t: "rep", n: n, body: body }; }
+  function genRobot() {
+    for (var tries = 0; tries < 300; tries++) {
+      var p = [], len = rnd(3, 5), turns = 0;
+      for (var i = 0; i < len; i++) {
+        var r = rnd(0, 5);
+        if (r < 2) p.push({ t: "fwd" }); else if (r === 2) { p.push({ t: "left" }); turns++; } else if (r === 3) { p.push({ t: "right" }); turns++; } else p.push(rep(rnd(2, 3), [{ t: "fwd" }]));
+      }
+      var res = runRobot(p, { size: 5, start: [0, 0], dir: 0, walls: [] });
+      if (res.result === "end" && turns > 0 && res.x + res.y >= 2 && res.y > 0) {
+        var path = ["(0 ; 0)"];
+        res.states.forEach(function (s, j) { if (j && res.steps[s.step].t === "fwd") path.push("(" + s.x + " ; " + s.y + ")"); });
+        return { kind: "robot", q: "Le robot part de la case (0 ; 0), tourné vers la droite. Sur quelle case arrive-t-il ?", code: progText(p), a: [res.x, res.y], how: "Cases visitées : " + path.join(" → ") };
+      }
+    }
+    return { kind: "robot", q: "Le robot part de la case (0 ; 0), tourné vers la droite. Sur quelle case arrive-t-il ?", code: "avancer ; tourner à gauche ; avancer", a: [1, 1], how: "Cases visitées : (0 ; 0) → (1 ; 0) → (1 ; 1)" };
+  }
+  function genVar() {
+    var t = rnd(0, 3), p, ask, P = rnd(2, 6), Q = rnd(1, 5);
+    if (t === 0) { p = [{ v: "a", x: P }, { v: "b", x: "a", op: "+", y: Q }, { v: "a", x: "a", op: "*", y: "b" }]; ask = "a"; }
+    else if (t === 1) { p = [{ v: "a", x: P }, { v: "b", x: Q + 1 }, { v: "a", x: "a", op: "+", y: "b" }, { v: "b", x: "a", op: "-", y: "b" }]; ask = "b"; }
+    else if (t === 2) { p = [{ v: "x", x: P }, { v: "x", x: "x", op: "*", y: 3 }, { v: "x", x: "x", op: "-", y: Q }]; ask = "x"; }
+    else { p = [{ v: "a", x: P }, { v: "b", x: "a", op: "*", y: Q + 1 }, { v: "a", x: "b", op: "-", y: "a" }]; ask = "a"; }
+    var r = runVars(p);
+    return { q: "Que vaut " + ask + " à la fin de ce programme ?", code: p.map(instrText).join(" ; "), a: r.env[ask], how: r.snaps.map(function (s, i) { return p[i].v + " = " + fmt(s[p[i].v]); }).join(" ; ") };
+  }
+  function genSides() { var ang = pick([120, 90, 72, 60, 45, 40, 36, 30, 24, 20]), n = 360 / ang; return { q: "Pour dessiner un polygone régulier, le stylo tourne de " + ang + "° à chaque coin. Combien de fois faut-il répéter « avancer, tourner » ?", a: n, how: "360 ÷ " + ang + " = " + n + " côtés, donc " + n + " répétitions" }; }
+  function genAngle() { var n = pick([3, 4, 5, 6, 8, 9, 10, 12]), names = { 3: "un triangle équilatéral", 4: "un carré", 5: "un pentagone régulier", 6: "un hexagone régulier", 8: "un octogone régulier", 9: "un ennéagone régulier (9 côtés)", 10: "un décagone régulier (10 côtés)", 12: "un dodécagone régulier (12 côtés)" }; return { q: "Pour dessiner " + names[n] + ", de combien de degrés le stylo doit-il tourner à chaque coin ?", a: 360 / n, how: "360 ÷ " + n + " = " + fmt(360 / n) + "°" }; }
+  function genNested() {
+    var a = rnd(2, 5), b = rnd(2, 4), t = rnd(0, 1), p = t ? [rep(a, [{ t: "fwd" }, rep(b, [{ t: "fwd" }])])] : [rep(a, [rep(b, [{ t: "fwd" }]), { t: "right" }])];
+    var n = flatten(p).filter(function (s) { return s.t === "fwd"; }).length;
+    return { q: "Combien de fois le bloc « avancer » est-il exécuté ?", code: progText(p), a: n, how: t ? a + " tours × (1 + " + b + ") = " + n : a + " tours × " + b + " = " + n };
+  }
+  function genSum() {
+    if (rnd(0, 1)) { var n = rnd(3, 8), r = sumLoop(n); return { q: "Que vaut s à la fin ?", code: "s ← 0 ; i ← 1 ; répéter " + n + " fois [ s ← s + i ; i ← i + 1 ]", a: r.s, how: "s : " + r.trace.map(function (t) { return t.s; }).join(" → ") + " (c'est 1 + … + " + n + " = " + n + " × " + (n + 1) + " ÷ 2)" }; }
+    var m = rnd(3, 7), k = rnd(2, 9), vals = [0]; for (var j = 1; j <= m; j++) vals.push(j * k);
+    return { q: "Que vaut s à la fin ?", code: "s ← 0 ; répéter " + m + " fois [ s ← s + " + k + " ]", a: m * k, how: "s : " + vals.join(" → ") };
+  }
+  function miniGrid() {
+    var s = document.createElementNS(NS, "svg"); s.setAttribute("viewBox", "0 0 640 640"); s.setAttribute("role", "img"); s.setAttribute("aria-label", "Grille de 5 cases sur 5, robot sur la case (0 ; 0) tourné vers la droite");
+    for (var i = 0; i <= 5; i++) {
+      mk(s, "line", { x1: 80 + i * 110, y1: 10, x2: 80 + i * 110, y2: 560, stroke: "var(--line)", "stroke-width": 3 });
+      mk(s, "line", { x1: 80, y1: 10 + i * 110, x2: 630, y2: 10 + i * 110, stroke: "var(--line)", "stroke-width": 3 });
+    }
+    for (var k = 0; k < 5; k++) {
+      mk(s, "text", { x: 135 + k * 110, y: 610, "text-anchor": "middle", "font-size": 40 }, String(k));
+      mk(s, "text", { x: 40, y: 520 - k * 110, "text-anchor": "middle", "font-size": 40 }, String(k));
+    }
+    mk(s, "text", { x: 620, y: 612, "text-anchor": "end", "font-size": 34, style: "fill: var(--ink-soft)" }, "x");
+    var g = mk(s, "g", { transform: "translate(135 505)" });
+    mk(g, "circle", { cx: 0, cy: 0, r: 40, fill: "var(--mv-soft)", stroke: "var(--mv)", "stroke-width": 6 });
+    mk(g, "polygon", { points: "-17,-22 28,0 -17,22", fill: "var(--mv)" });
+    return s;
+  }
+  function parseNum(s) { var t = String(s).replace(/\s/g, "").replace(/[−–]/g, "-").replace(",", "."); if (t === "") return NaN; var x = Number(t); return isFinite(x) ? x : NaN; }
+  var quiz = $("quiz"), done = [];
+  function newQuiz() {
+    clear(quiz); done = [];
+    var gens = [genRobot, genVar, genSides, genAngle, genRobot, genVar, genNested, genSum];
+    gens.forEach(function (G, k) {
+      var Q = G(), li = el("li"), qs = el("span", null, Q.q);
+      if (Q.code) qs.appendChild(el("span", "pc", Q.code));
+      if (Q.kind === "robot") qs.appendChild(miniGrid());
+      li.appendChild(qs);
+      var inp = el("input"); inp.type = "text"; inp.id = "qa" + k; inp.autocomplete = "off"; inp.inputMode = Q.kind === "robot" ? "text" : "decimal";
+      inp.setAttribute("aria-label", "Ta réponse à la question " + (k + 1)); if (Q.kind === "robot") inp.placeholder = "x ; y";
+      li.appendChild(inp);
+      var fb = el("span", "fb"); fb.id = "qf" + k; fb.setAttribute("aria-live", "polite");
+      function check() {
+        var v = inp.value, ok;
+        if (Q.kind === "robot") {
+          var m = v.replace(/[−–]/g, "-").match(/-?\d+/g);
+          if (!m || m.length !== 2) { fb.className = "fb"; fb.textContent = "Écris deux nombres, par exemple 2 ; 3."; return; }
+          ok = parseInt(m[0], 10) === Q.a[0] && parseInt(m[1], 10) === Q.a[1];
+        } else {
+          var x = parseNum(v);
+          if (isNaN(x)) { fb.className = "fb"; fb.textContent = "Écris un nombre."; return; }
+          ok = Math.abs(x - Q.a) < 0.006;
+        }
+        done[k] = ok;
+        if (ok) { fb.className = "fb ok"; fb.textContent = "Bravo, c'est juste !"; }
+        else { fb.className = "fb no"; fb.textContent = "Pas tout à fait : la réponse est " + (Q.kind === "robot" ? "(" + Q.a[0] + " ; " + Q.a[1] + ")" : fmt(Q.a, 2)) + "."; }
+        fb.appendChild(el("span", null, Q.how));
+        $("score").textContent = done.filter(Boolean).length + " / 8";
+      }
+      li.appendChild(btn("Vérifier", "", "qb" + k, check));
+      li.appendChild(fb);
+      inp.addEventListener("keydown", function (e) { if (e.key === "Enter") check(); });
+      quiz.appendChild(li);
+    });
+    $("score").textContent = "0 / 8";
+  }
+  $("newQuiz").addEventListener("click", newQuiz);
+  newQuiz();
+
+  window.__algo = {
+    flatten: flatten, countBlocks: countBlocks, runRobot: runRobot, levels: LV, progText: progText,
+    polygon: polygon, guessStep: guessStep, dichoStep: dichoStep, dichotomy: dichotomy,
+    runVars: runVars, sumLoop: sumLoop, gauss: gauss, untilLoop: untilLoop
+  };
+})();
+</script>
+</body>
+</html>

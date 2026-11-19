@@ -1,0 +1,773 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Le nombre d'or</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, encre brun doré, accent or, vert pour la nature, marge rouge. */
+:root {
+  --paper: #fbf8f0;
+  --grid: #efe6d1;
+  --card: #ffffff;
+  --ink: #2a2112;
+  --ink-soft: #6b5a3c;
+  --acc: #a16207;
+  --acc-soft: #fbefcc;
+  --two: #15803d;
+  --two-soft: #dcf1e2;
+  --ok: #15803d;
+  --ok-soft: #dcf1e2;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #fff0a3;
+  --line: #e6dcc4;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #14110a; --grid: #211b10; --card: #1b170e; --ink: #f5eedc; --ink-soft: #c4b590;
+    --acc: #facc15; --acc-soft: #3f3410; --two: #6fd39f; --two-soft: #173a29;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #3a3120;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #14110a; --grid: #211b10; --card: #1b170e; --ink: #f5eedc; --ink-soft: #c4b590;
+  --acc: #facc15; --acc-soft: #3f3410; --two: #6fd39f; --two-soft: #173a29;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #3a3120;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero-top { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+.big-phi { font-family: var(--f-display); font-weight: 800; color: var(--acc); font-size: clamp(6rem, 22vw, 10rem); line-height: .8; transform: rotate(-4deg); }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+.fibline { font-family: var(--f-mono); font-size: 1.05rem; overflow-wrap: anywhere; }
+.fibline b { color: var(--acc); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note.green { border-left-color: var(--two); background: var(--two-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+.figure svg { display: block; width: 100%; height: auto; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 6px 12px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+input[type="text"] { font: inherit; font-family: var(--f-mono); font-size: 1.05rem; padding: 8px 10px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; }
+input[type="range"] { width: 100%; accent-color: var(--acc); }
+input[type="checkbox"] { accent-color: var(--acc); width: 1.1em; height: 1.1em; }
+.param { display: flex; flex-direction: column; gap: 2px; }
+.param label { font-weight: 700; }
+.check { display: flex; gap: 8px; align-items: center; font-weight: 700; }
+.inputs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 14px; align-items: end; }
+.inputs label { font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+.err { color: var(--red); font-weight: 700; }
+
+/* Tableaux */
+.scroll { overflow-x: auto; }
+.scroll.tall { max-height: 380px; overflow-y: auto; border: 1.5px solid var(--line); border-radius: 8px; }
+.ptable { border-collapse: separate; border-spacing: 0; width: 100%; font-variant-numeric: tabular-nums; }
+.ptable th, .ptable td { border-bottom: 1.5px solid var(--line); padding: 6px 10px; text-align: right; font-family: var(--f-mono); font-size: .98rem; white-space: nowrap; }
+.ptable th { font-family: var(--f-display); background: var(--paper); position: sticky; top: 0; border-bottom: 2px solid var(--ink); }
+.ptable td:first-child, .ptable th:first-child { text-align: left; color: var(--ink-soft); }
+.ptable td.big { color: var(--acc); font-weight: 600; }
+.ptable tr.near td { background: var(--acc-soft); }
+
+.results { display: flex; flex-direction: column; gap: 8px; font-variant-numeric: tabular-nums; }
+.res { border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 12px; display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; align-items: baseline; }
+.res-name { font-family: var(--f-display); font-weight: 700; }
+.res-val { font-family: var(--f-mono); font-weight: 600; color: var(--acc); font-size: 1.05rem; white-space: nowrap; }
+.res-val.g { color: var(--two); }
+.res-calc { grid-column: 1 / -1; font-family: var(--f-mono); font-size: .85rem; color: var(--ink-soft); overflow-wrap: anywhere; }
+.res.wide .res-val { white-space: normal; overflow-wrap: anywhere; text-align: right; }
+
+.steps { font-family: var(--f-mono); font-size: .98rem; display: flex; flex-direction: column; gap: 6px; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; padding: 12px 14px; overflow-wrap: anywhere; }
+.steps b { color: var(--acc); }
+.rab { display: inline-block; min-width: 1.6em; text-align: center; border-radius: 6px; padding: 0 4px; margin: 1px; font-weight: 600; }
+.rab.a { background: var(--acc-soft); color: var(--acc); border: 1.5px solid var(--acc); }
+.rab.b { background: var(--two-soft); color: var(--two); border: 1.5px dashed var(--two); }
+
+.verdict { border-radius: 8px; padding: 12px 14px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; background: var(--paper); border: 1.5px solid var(--line); }
+.verdict.yes { background: var(--ok-soft); color: var(--ok); border-color: transparent; }
+.verdict.no { background: var(--red-soft); color: var(--red); border-color: transparent; }
+.verdict span { font-weight: 400; color: var(--ink); }
+
+.formula { font-family: var(--f-display); font-weight: 800; font-size: clamp(1.6rem, 6vw, 2.2rem); color: var(--acc); }
+.formula sup { font-size: .6em; }
+.digits { font-family: var(--f-mono); font-size: 1.05rem; line-height: 1.9; word-spacing: .3em; overflow-wrap: anywhere; }
+
+.split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+@media (max-width: 600px) { .split { grid-template-columns: 1fr; } .inputs { grid-template-columns: 1fr 1fr; } }
+.sunwrap { display: flex; justify-content: center; }
+#sun { display: block; width: 100%; max-width: 520px; aspect-ratio: 1 / 1; height: auto; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
+.tag.ok { color: var(--ok); }
+.tag.no { color: var(--red); }
+.tag.mid { color: var(--acc); }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 110px auto; gap: 10px; align-items: center; }
+.quiz input[type="text"] { font-size: 1rem; padding: 6px 8px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc); }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 120px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+@media (prefers-reduced-motion: reduce) { button:hover, button:active { transform: none; } }
+</style>
+
+</head>
+<body>
+<main class="page">
+
+  <header class="hero">
+    <div class="hero-top">
+      <div class="big-phi" aria-hidden="true">φ</div>
+      <div style="display:flex;flex-direction:column;gap:10px;min-width:0;flex:1 1 280px">
+        <span class="eyebrow">Tutoriel de maths · niveau 4<sup>e</sup>–3<sup>e</sup></span>
+        <h1>Le nombre d'or</h1>
+        <p class="lead">φ ≈ 1,618 : un nombre qui apparaît dans les tournesols, les pentagones et la suite de Fibonacci… et dans beaucoup de légendes.</p>
+      </div>
+    </div>
+    <div class="box">
+      <p class="fibline">1, 1, 2, 3, 5, 8, 13, 21, 34, <b>55</b>, <b>89</b>, 144, 233…</p>
+      <p>Divise un nombre de cette liste par celui d'avant : 89 ÷ 55 ≈ <strong>1,618</strong>. Ce n'est pas un hasard. Dans cette fiche, tu vas voir d'où vient ce nombre, où on le trouve vraiment, et où il n'est qu'une belle histoire.</p>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · La suite de Fibonacci</span>
+    <h2>Chaque nombre est la somme des deux d'avant</h2>
+    <p>On part de <strong>1</strong> et <strong>1</strong>. Ensuite, chaque nombre est la <span class="hl">somme des deux précédents</span> : 1 + 1 = 2, puis 1 + 2 = 3, puis 2 + 3 = 5, puis 3 + 5 = 8… C'est la <strong>suite de Fibonacci</strong>.</p>
+    <p>En 1202, le mathématicien italien Fibonacci pose ce problème dans son livre <em>Liber Abaci</em>. On le raconte ici un peu simplifié. Un couple de lapereaux naît. Au bout d'un mois, il devient adulte. Chaque mois, chaque couple adulte donne naissance à un nouveau couple de lapereaux. Les lapins ne meurent jamais. Combien de couples chaque mois ?</p>
+    <div class="box">
+      <h3>Les lapins mois par mois</h3>
+      <p class="soft"><span class="rab a">A</span> = couple adulte, <span class="rab b">b</span> = couple de bébés. Chaque A reste et fait naître un b. Chaque b devient un A.</p>
+      <div class="steps" id="rabbits"></div>
+      <p>Le nombre de couples ce mois-ci = les couples du mois d'avant (personne ne meurt) + les bébés. Et il y a autant de bébés que de couples d'il y a deux mois (ce sont eux, les adultes). D'où la règle : <strong>somme des deux précédents</strong>.</p>
+    </div>
+    <div class="box">
+      <h3>La machine à Fibonacci</h3>
+      <div class="param">
+        <label for="fibN">Calculer jusqu'au terme numéro <span class="mono" id="fibNOut">30</span></label>
+        <input id="fibN" type="range" min="10" max="100" step="1" value="30">
+      </div>
+      <div class="results"><div class="res wide"><span class="res-name" id="fibName">F(30)</span><span class="res-val" id="fibVal"></span><span class="res-calc" id="fibCalc"></span></div></div>
+      <div class="scroll tall"><table class="ptable" id="fibTable" aria-label="Termes de la suite de Fibonacci"></table></div>
+      <p class="soft">Les nombres grandissent très vite. Les nombres « normaux » d'un ordinateur sont exacts seulement jusqu'à environ 9 millions de milliards : à partir du 79<sup>e</sup> terme, ils arrondiraient. La page utilise donc des « grands entiers », qui gardent tous les chiffres.</p>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · Le rapport qui se stabilise</span>
+    <h2>Diviser un terme par le précédent</h2>
+    <p>Calcule 2 ÷ 1 = 2, puis 3 ÷ 2 = 1,5, puis 5 ÷ 3 ≈ 1,667, puis 8 ÷ 5 = 1,6… Le résultat passe <strong>au-dessus</strong>, puis <strong>en dessous</strong>, puis au-dessus… et se rapproche à chaque fois d'un même nombre : <span class="hl"><strong>1,618…</strong></span></p>
+    <p>Le plus surprenant : ça marche avec <strong>n'importe quels</strong> nombres de départ positifs. Essaie avec 4 et 9, ou avec tes propres nombres.</p>
+    <div class="box">
+      <div class="btns" id="ratioPresets" role="group" aria-label="Nombres de départ"></div>
+      <div class="inputs">
+        <label for="ra">Premier nombre<input id="ra" type="text" inputmode="decimal" autocomplete="off" value="1"></label>
+        <label for="rb">Deuxième nombre<input id="rb" type="text" inputmode="decimal" autocomplete="off" value="1"></label>
+      </div>
+      <div class="figure"><svg id="ratioChart" viewBox="0 0 640 300" role="img" aria-label="Graphique du rapport entre deux termes qui se rapproche de 1,618"></svg></div>
+      <div class="scroll"><table class="ptable" id="ratioTable" aria-label="Termes et rapports"></table></div>
+      <div class="verdict" id="ratioOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Le nombre d'or</span>
+    <h2>φ = (1 + √5) ÷ 2</h2>
+    <p>Le nombre vers lequel le rapport se rapproche s'appelle le <strong>nombre d'or</strong>. On le note <strong>φ</strong> (la lettre grecque « phi »). Sa valeur exacte utilise une racine carrée :</p>
+    <div class="box">
+      <div class="formula">φ = (1 + √5) ÷ 2 ≈ 1,6180339887</div>
+      <h3>Les 30 premières décimales</h3>
+      <p class="digits" id="phiDigits"></p>
+    </div>
+
+    <h3 style="font-size:1.5rem;margin-top:12px">Le partage d'or</h3>
+    <p>Coupe un segment en deux morceaux : un grand <strong>a</strong> et un petit <strong>b</strong>. Le partage est « d'or » quand <span class="hl">le tout est au grand morceau comme le grand est au petit</span> : (a + b) ÷ a = a ÷ b. Ce rapport vaut alors φ. Bouge la coupure.</p>
+    <div class="box">
+      <div class="figure"><svg id="cutSvg" viewBox="0 0 640 130" role="img" aria-label="Un segment coupé en deux morceaux a et b"></svg></div>
+      <div class="param">
+        <label for="cut">Position de la coupure</label>
+        <input id="cut" type="range" min="0.5" max="0.95" step="0.001" value="0.75">
+      </div>
+      <div class="btns"><button type="button" id="cutGold">Placer au partage d'or</button></div>
+      <div class="results">
+        <div class="res"><span class="res-name">Le tout ÷ le grand</span><span class="res-val" id="cutR1"></span></div>
+        <div class="res"><span class="res-name">Le grand ÷ le petit</span><span class="res-val g" id="cutR2"></span></div>
+      </div>
+      <div class="verdict" id="cutOut" aria-live="polite"></div>
+    </div>
+
+    <h3 style="font-size:1.5rem;margin-top:12px">Deux propriétés magiques</h3>
+    <p>φ est le seul nombre positif qui vérifie <span class="mono">φ² = φ + 1</span>. Pour le mettre au carré, il suffit d'ajouter 1 ! Et en divisant par φ : <span class="mono">1 ÷ φ = φ − 1</span>. Pour l'inverser, il suffit d'enlever 1. Vérifie avec la calculatrice de la page :</p>
+    <div class="results" id="phiProps"></div>
+
+    <h3 style="font-size:1.5rem;margin-top:12px">Un nombre irrationnel</h3>
+    <p>Comme √2 et π, φ est <strong>irrationnel</strong> : ses décimales ne s'arrêtent jamais et ne se répètent jamais en boucle. On ne peut pas l'écrire comme une fraction. (Le tutoriel sur les ensembles de nombres explique ce mot en détail.)</p>
+    <p>On peut quand même l'écrire comme un étage infini de fractions, avec seulement des 1. Chaque étage de plus donne une fraction… faite de deux nombres de Fibonacci :</p>
+    <div class="steps" id="cfrac"></div>
+    <div class="note">
+      <span class="note-title">Le nombre « le plus irrationnel »</span>
+      <span>Comme cet étage de fractions ne contient que des 1, les fractions approchent φ <strong>plus lentement</strong> que n'importe quel autre nombre. On dit parfois que φ est le nombre le plus difficile à approcher par une fraction. Retiens cette idée : elle explique les tournesols de l'étape 5.</span>
+    </div>
+    <p class="soft">Les tutoriels sur π et sur e présentent deux autres nombres célèbres. Différence importante : φ est la solution d'une équation simple (x² = x + 1), ce qui n'est pas le cas de π et e.</p>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · Le rectangle d'or et la spirale</span>
+    <h2>Un carré, un rectangle, et on recommence</h2>
+    <p>Un <strong>rectangle d'or</strong> a une longueur égale à φ fois sa largeur (par exemple 1,618 sur 1). Enlève-lui un carré : il reste un <strong>rectangle d'or plus petit</strong>, tourné d'un quart de tour. On peut recommencer à l'infini. Trace un quart de cercle dans chaque carré : tu obtiens une spirale.</p>
+    <div class="box">
+      <div class="figure"><svg id="rectSvg" viewBox="0 0 640 400" role="img" aria-label="Rectangle d'or découpé en carrés, avec une spirale de quarts de cercle"></svg></div>
+      <div class="param">
+        <label for="rectN">Nombre de carrés : <span class="mono" id="rectNOut">5</span></label>
+        <input id="rectN" type="range" min="1" max="10" step="1" value="5">
+      </div>
+      <label class="check" for="logSp"><input type="checkbox" id="logSp"> Comparer avec une vraie spirale logarithmique (pointillés verts)</label>
+      <p class="soft" id="rectInfo"></p>
+    </div>
+    <div class="note">
+      <span class="note-title">Presque une spirale logarithmique</span>
+      <span>La spirale des quarts de cercle est très proche d'une <strong>spirale logarithmique</strong> (une spirale qui s'élargit toujours au même rythme). Mais pas exactement : à chaque changement de carré, la courbure change d'un coup. La vraie spirale d'or, elle, s'élargit en douceur, d'un facteur φ à chaque quart de tour.</span>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Dans la nature : la phyllotaxie</span>
+    <h2>Le secret des tournesols</h2>
+    <p>Au cœur d'un tournesol, les graines naissent au centre une par une. Chaque nouvelle graine tourne d'un <strong>même angle</strong> par rapport à la précédente, puis est poussée vers l'extérieur. La <strong>phyllotaxie</strong>, c'est l'étude de cette disposition des graines, des feuilles et des écailles.</p>
+    <p>Quel angle choisir pour ne laisser aucun trou ? La réponse est l'<span class="hl"><strong>angle d'or</strong> : 360° ÷ φ² ≈ 137,5°</span>. Essaie d'autres angles.</p>
+    <div class="box">
+      <div class="sunwrap"><canvas id="sun" role="img" aria-label="Tournesol virtuel : graines placées en spirale"></canvas></div>
+      <div class="btns" id="anglePresets" role="group" aria-label="Angles à essayer"></div>
+      <div class="param">
+        <label for="angle">Angle entre deux graines : <span class="mono" id="angleOut"></span></label>
+        <input id="angle" type="range" min="100" max="180" step="0.1" value="137.5">
+      </div>
+      <div class="param">
+        <label for="seeds">Nombre de graines : <span class="mono" id="seedsOut">500</span></label>
+        <input id="seeds" type="range" min="50" max="1000" step="10" value="500">
+      </div>
+      <div class="btns" id="spiralBtns" role="group" aria-label="Montrer les spirales"></div>
+      <div class="btns"><button type="button" id="grow">Faire pousser</button></div>
+      <div class="verdict" id="sunOut" aria-live="polite"></div>
+    </div>
+    <div class="cards">
+      <div class="box"><span class="tag ok">Réel</span><strong>Le tournesol</strong><span class="soft">On compte souvent 34 spirales dans un sens et 55 dans l'autre (ou 21 et 34, ou 55 et 89 pour les très grands).</span></div>
+      <div class="box"><span class="tag ok">Réel</span><strong>La pomme de pin</strong><span class="soft">Ses écailles forment en général 8 spirales dans un sens et 13 dans l'autre.</span></div>
+      <div class="box"><span class="tag ok">Réel</span><strong>L'ananas</strong><span class="soft">Ses « yeux » hexagonaux forment souvent des familles de 8 et 13 spirales (et parfois 21).</span></div>
+    </div>
+    <div class="note green">
+      <span class="note-title">Pourquoi des nombres de Fibonacci ?</span>
+      <span>L'angle d'or est lié à φ, et les fractions qui approchent le mieux φ sont des rapports de Fibonacci. Les spirales qu'on voit relient donc des graines numérotées k et k + 21, ou k + 34, ou k + 55. Honnêteté : ça ne marche pas à 100 %. Une grande étude de 2016 sur plus de 600 tournesols a trouvé des nombres de Fibonacci dans la plupart des cas, mais environ 1 tournesol sur 5 s'en écartait.</span>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · Le pentagone et l'étoile</span>
+    <h2>φ caché dans un pentagone régulier</h2>
+    <p>Un <strong>pentagone régulier</strong> a 5 côtés égaux et 5 angles égaux. Trace ses 5 diagonales : tu obtiens une étoile à cinq branches, le <strong>pentagramme</strong>. Dans tout pentagone régulier, <span class="hl">diagonale ÷ côté = φ</span>, exactement.</p>
+    <div class="box">
+      <div class="figure"><svg id="pentaSvg" viewBox="0 0 640 400" role="img" aria-label="Pentagone régulier avec ses diagonales qui forment une étoile"></svg></div>
+      <div class="param">
+        <label for="pentaR">Taille du pentagone</label>
+        <input id="pentaR" type="range" min="70" max="180" step="1" value="170">
+      </div>
+      <div class="results" id="pentaOut"></div>
+      <p class="soft">Les mesures sont faites sur le dessin, en pixels. Change la taille : les longueurs changent, mais les rapports restent égaux à φ.</p>
+    </div>
+    <div class="note">
+      <span class="note-title">Une étoile pleine de φ</span>
+      <span>Les diagonales se coupent entre elles selon le partage d'or. Sur la diagonale AC, le point Q découpe AC en un grand morceau AQ et un petit QC, avec AC ÷ AQ = φ. Au centre, il y a un petit pentagone… dans lequel on peut redessiner une étoile, et ainsi de suite.</span>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Mythe ou réalité ?</span>
+    <h2>Le nombre d'or est-il partout ?</h2>
+    <p>Sur Internet, on lit que φ est caché dans les monuments, les tableaux, le corps humain, et qu'il serait la clé de la beauté. Beaucoup de ces affirmations sont <strong>fausses ou exagérées</strong>. Voici le tri.</p>
+    <div class="cards">
+      <div class="box"><span class="tag mid">Pas prouvé</span><strong>Le Parthénon</strong><span class="soft">On dit que sa façade forme un rectangle d'or. Aucun texte grec ne le dit. Selon l'endroit où on mesure (avec ou sans les marches, avec ou sans le toit), on trouve des rapports différents. Les mesures ont souvent été « arrangées ».</span></div>
+      <div class="box"><span class="tag no">Mythe</span><strong>La Joconde</strong><span class="soft">Aucun document de Léonard de Vinci ne montre qu'il a utilisé φ pour ce tableau. Les rectangles d'or dessinés dessus sont placés après coup, là où ça arrange.</span></div>
+      <div class="box"><span class="tag no">Mythe</span><strong>Le corps humain « parfait »</strong><span class="soft">Taille ÷ hauteur du nombril vaudrait φ chez une personne « parfaite ». En réalité, ce rapport change d'une personne à l'autre et n'a aucun lien prouvé avec la beauté.</span></div>
+      <div class="box"><span class="tag no">Mythe</span><strong>La coquille du nautile</strong><span class="soft">C'est bien une belle spirale logarithmique. Mais elle s'élargit d'environ 3 fois par tour, alors que la spirale d'or s'élargit de presque 7 fois (φ⁴ ≈ 6,85). Ce n'est pas une spirale d'or.</span></div>
+      <div class="box"><span class="tag mid">Pas prouvé</span><strong>Le rectangle « le plus beau »</strong><span class="soft">Depuis 1876, des chercheurs demandent aux gens leur rectangle préféré. Les réponses sont très variées : aucune préférence claire pour le rectangle d'or.</span></div>
+      <div class="box"><span class="tag ok">Réel</span><strong>Les tournesols</strong><span class="soft">L'angle d'or et les spirales de Fibonacci s'observent vraiment, chez les tournesols, les pommes de pin, les ananas. Très souvent, mais pas toujours.</span></div>
+      <div class="box"><span class="tag ok">Réel</span><strong>Le pentagone</strong><span class="soft">C'est mathématique : dans tout pentagone régulier, diagonale ÷ côté = φ exactement. On le démontre, pas besoin de mesurer.</span></div>
+      <div class="box"><span class="tag ok">Réel</span><strong>Le Modulor de Le Corbusier</strong><span class="soft">Au XX<sup>e</sup> siècle, l'architecte Le Corbusier a créé le Modulor (publié en 1948), une échelle de mesures basée sur φ et le corps humain. Il l'a utilisé volontairement, par exemple pour la Cité radieuse de Marseille.</span></div>
+    </div>
+    <div class="note red">
+      <span class="note-title">Comment repérer un mythe ?</span>
+      <span>Avec beaucoup de mesures, on finit toujours par trouver un rapport proche de 1,6. Mais 1,6 n'est pas 1,618. Et sans texte de l'époque, rien ne prouve que l'artiste l'a fait exprès. Pose-toi deux questions : « Qui a mesuré, et où ? » et « Y a-t-il une preuve écrite ? »</span>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Quiz</span>
+    <h2>Huit questions dorées</h2>
+    <p>Réponds avec un nombre. Tu peux utiliser φ ≈ 1,618. Arrondis quand la question le demande.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Nouvelles questions</button>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Un peu d'histoire</span>
+    <h2>De Euclide au Modulor</h2>
+    <ol class="timeline">
+      <li><span class="when">vers −300</span><div class="what"><strong>Euclide, en Grèce</strong><span>Dans ses <em>Éléments</em>, il décrit le « partage en extrême et moyenne raison » : c'est notre partage d'or. Il s'en sert pour construire le pentagone régulier.</span></div></li>
+      <li><span class="when">1202</span><div class="what"><strong>Fibonacci, en Italie</strong><span>Le problème des lapins du <em>Liber Abaci</em> fait connaître la suite en Europe. Des savants indiens l'avaient déjà étudiée des siècles plus tôt, pour compter les rythmes des poèmes.</span></div></li>
+      <li><span class="when">1509</span><div class="what"><strong>Luca Pacioli</strong><span>Il publie <em>De divina proportione</em> (« La divine proportion »), illustré par Léonard de Vinci. Le livre parle surtout de géométrie : Léonard y dessine des solides, pas des visages.</span></div></li>
+      <li><span class="when">vers 1610</span><div class="what"><strong>Johannes Kepler</strong><span>L'astronome remarque que les rapports de Fibonacci se rapprochent du partage d'or.</span></div></li>
+      <li><span class="when">1835</span><div class="what"><strong>Le mot « or » arrive</strong><span>L'expression « section d'or » apparaît dans un livre de l'Allemand Martin Ohm. C'est la plus ancienne trace connue : le nom est donc récent !</span></div></li>
+      <li><span class="when">vers 1909–1914</span><div class="what"><strong>La lettre φ</strong><span>Le mathématicien américain Mark Barr aurait proposé φ, en l'honneur du sculpteur grec Phidias. Elle apparaît dans un livre de 1914. Le lien avec Phidias est d'ailleurs lui-même une légende.</span></div></li>
+      <li><span class="when">1931</span><div class="what"><strong>« Le Nombre d'or »</strong><span>Le livre de Matila Ghyka rend l'expression célèbre en français, et beaucoup de légendes avec.</span></div></li>
+      <li><span class="when">1948</span><div class="what"><strong>Le Modulor</strong><span>Le Corbusier publie son système de mesures basé sur φ.</span></div></li>
+      <li><span class="when">1979</span><div class="what"><strong>Le tournesol en équation</strong><span>Helmut Vogel propose le modèle utilisé à l'étape 5 : graine numéro k à la distance √k du centre, tournée de k fois l'angle d'or.</span></div></li>
+    </ol>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · À toi de jouer</span>
+    <h2>Six problèmes</h2>
+    <div class="exos">
+      <details>
+        <summary>La suite continue<span class="q">Écris les trois termes qui suivent : 1, 1, 2, 3, 5, 8, 13, 21, …</span></summary>
+        <div><span>13 + 21 = <strong>34</strong>, puis 21 + 34 = <strong>55</strong>, puis 34 + 55 = <strong>89</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Une autre suite<span class="q">On part de 2 et 1 (suite de Lucas) : 2, 1, 3, 4, 7, 11, … Écris les deux termes suivants, puis calcule le rapport du dernier par l'avant-dernier.</span></summary>
+        <div><span>7 + 11 = 18, puis 11 + 18 = <strong>29</strong>. Rapport : 29 ÷ 18 ≈ <strong>1,611</strong>. On se rapproche encore de φ ≈ 1,618, avec d'autres nombres de départ.</span></div>
+      </details>
+      <details>
+        <summary>Vérifier φ² = φ + 1<span class="q">Avec φ ≈ 1,618, calcule φ² et φ + 1. Calcule aussi 1 ÷ 1,618 et 1,618 − 1.</span></summary>
+        <div><span>1,618 × 1,618 = 2,617 924 ≈ <strong>2,618</strong>, et 1,618 + 1 = <strong>2,618</strong>. Puis 1 ÷ 1,618 ≈ <strong>0,618</strong> et 1,618 − 1 = <strong>0,618</strong>. Les petites différences viennent de l'arrondi de φ.</span></div>
+      </details>
+      <details>
+        <summary>Le rectangle d'or<span class="q">Un rectangle d'or a une longueur de 10 cm. Quelle est sa largeur ? On enlève un carré : quelles sont les dimensions du rectangle qui reste ?</span></summary>
+        <div><span>Largeur : 10 ÷ 1,618 ≈ <strong>6,18 cm</strong>. On enlève un carré de 6,18 cm de côté : il reste un rectangle de 6,18 cm sur 10 − 6,18 = <strong>3,82 cm</strong>. Et 6,18 ÷ 3,82 ≈ 1,618 : c'est encore un rectangle d'or.</span></div>
+      </details>
+      <details>
+        <summary>Le pentagone<span class="q">Un pentagone régulier a des côtés de 6 cm. Combien mesure une diagonale, au centième ?</span></summary>
+        <div><span>Diagonale = côté × φ ≈ 6 × 1,618 034 ≈ <strong>9,71 cm</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Esprit critique<span class="q">Léa mesure 1,60 m et son nombril est à 0,97 m du sol. 1,60 ÷ 0,97 ≈ 1,65. Un site dit : « Léa a les proportions du nombre d'or, c'est la preuve que φ est partout ! » Qu'en penses-tu ?</span></summary>
+        <div><span>1,65 n'est pas 1,618. Et ce rapport change d'une personne à l'autre : chez beaucoup de gens, il tombe « près de 1,6 » par hasard, comme beaucoup d'autres rapports. Une seule mesure ne <strong>prouve rien</strong>. C'est exactement comme ça que naissent les mythes.</span></div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• <strong>Suite de Fibonacci</strong> : 1, 1, 2, 3, 5, 8, 13… chaque terme est la somme des deux précédents.</span>
+      <span>• Le rapport d'un terme par le précédent se rapproche du <strong>nombre d'or</strong> φ = (1 + √5) ÷ 2 ≈ 1,618, quels que soient les deux nombres de départ positifs.</span>
+      <span>• <span class="mono">φ² = φ + 1</span> et <span class="mono">1 ÷ φ = φ − 1</span>. φ est <strong>irrationnel</strong>.</span>
+      <span>• Rectangle d'or : on enlève un carré, il reste un rectangle d'or. Pentagone régulier : diagonale ÷ côté = φ.</span>
+      <span>• Dans les tournesols, l'<strong>angle d'or</strong> (≈ 137,5°) range les graines sans trou, avec des spirales en nombres de Fibonacci.</span>
+      <span>• Parthénon, Joconde, corps « parfait », nautile : des <strong>légendes</strong>, ou des affirmations sans preuve.</span>
+    </div>
+  </section>
+
+  <footer>Fiche de révision · Le nombre d'or</footer>
+</main>
+
+<script>
+(function () {
+  var NS = "http://www.w3.org/2000/svg";
+  var PHI = (1 + Math.sqrt(5)) / 2;
+  var GOLDEN = 360 / (PHI * PHI);
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function fmt(x, d) { var r = Math.round(x * 1e9) / 1e9; if (Object.is(r, -0)) r = 0; return r.toLocaleString("fr-FR", { maximumFractionDigits: d == null ? 3 : d }).replace("-", "−"); }
+  function fmtF(x, d) { return x.toLocaleString("fr-FR", { minimumFractionDigits: d, maximumFractionDigits: d }).replace("-", "−"); }
+  function num(s) { var t = String(s).replace(/\s/g, "").replace(/[−–]/g, "-").replace(",", "."); if (t === "") return NaN; var x = Number(t); return isFinite(x) ? x : NaN; }
+  function mk(svg, name, attrs, text) { var e = document.createElementNS(NS, name); for (var a in attrs) e.setAttribute(a, attrs[a]); if (text != null) e.textContent = text; svg.appendChild(e); return e; }
+  function clear(el) { while (el.firstChild) el.removeChild(el.firstChild); }
+  function group(s) { var neg = s.charAt(0) === "-"; if (neg) s = s.slice(1); var out = ""; while (s.length > 3) { out = " " + s.slice(-3) + out; s = s.slice(0, -3); } return (neg ? "−" : "") + s + out; }
+
+  /* ---------- Fonctions pures ---------- */
+  function fibBig(n) { var a = 0n, b = 1n; for (var i = 0; i < n; i++) { var t = a + b; a = b; b = t; } return a; }
+  function fibonacci(n) { n = Math.floor(Number(n)); if (!(n >= 0)) return "0"; return fibBig(n).toString(); }
+  function ratioSequence(a, b, count) { var u = [a, b], r = []; for (var i = 0; i < count; i++) { r.push(u[u.length - 1] / u[u.length - 2]); u.push(u[u.length - 1] + u[u.length - 2]); } return r; }
+  function terms(a, b, count) { var u = [a, b]; while (u.length < count) u.push(u[u.length - 1] + u[u.length - 2]); return u; }
+  function convergents(n) { var out = [], p0 = 1n, q0 = 0n, p1 = 1n, q1 = 1n; for (var i = 0; i < n; i++) { out.push(p1.toString() + "/" + q1.toString()); var p2 = p1 + p0, q2 = q1 + q0; p0 = p1; q0 = q1; p1 = p2; q1 = q2; } return out; }
+  function isqrt(n) { if (n < 2n) return n; var x = n, y = (x + 1n) / 2n; while (y < x) { x = y; y = (x + n / x) / 2n; } return x; }
+  function phiDigits(k) { k = Math.max(1, Math.floor(k)); var g = k + 5, P = 10n ** BigInt(g); var v = (P + isqrt(5n * P * P)) / 2n; var s = v.toString(); s = s.slice(0, 1 + k); return s.charAt(0) + "," + s.slice(1); }
+  var PHI_REF = "1,6180339887498948482045868343656381177203091798057628621354486227";
+  function checkPhiDigits(k) { k = k == null ? 60 : k; return phiDigits(k) === PHI_REF.slice(0, 2 + k); }
+  window.__or = { fibonacci: fibonacci, ratioSequence: ratioSequence, convergents: convergents, phiDigits: phiDigits, checkPhiDigits: checkPhiDigits, goldenAngle: function () { return GOLDEN; } };
+
+  /* ---------- Étape 1 : lapins ---------- */
+  (function () {
+    var w = "b", html = [];
+    for (var m = 1; m <= 7; m++) {
+      var chips = w.split("").map(function (c) { return '<span class="rab ' + (c === "A" ? "a" : "b") + '">' + c + "</span>"; }).join("");
+      html.push("<span>Mois " + m + " : " + chips + " → <b>" + w.length + "</b> couple" + (w.length > 1 ? "s" : "") + "</span>");
+      w = w.split("").map(function (c) { return c === "A" ? "Ab" : "A"; }).join("");
+    }
+    document.getElementById("rabbits").innerHTML = html.join("");
+  })();
+
+  /* ---------- Étape 1 : machine à Fibonacci ---------- */
+  var fibN = document.getElementById("fibN");
+  function fibUpdate() {
+    var n = parseInt(fibN.value, 10), a = 1n, b = 1n, rows = ["<tr><th>n</th><th>F(n)</th><th>chiffres</th></tr>"];
+    for (var i = 1; i <= n; i++) {
+      var s = a.toString();
+      rows.push("<tr><td>" + i + "</td><td" + (i === n ? ' class="big"' : "") + ">" + group(s) + "</td><td>" + s.length + "</td></tr>");
+      var t = a + b; a = b; b = t;
+    }
+    document.getElementById("fibTable").innerHTML = rows.join("");
+    var f = fibBig(n), fs = f.toString(), p1 = fibBig(n - 1).toString(), p2 = fibBig(n - 2).toString();
+    document.getElementById("fibNOut").textContent = n;
+    document.getElementById("fibName").textContent = "F(" + n + ")";
+    document.getElementById("fibVal").textContent = group(fs);
+    document.getElementById("fibCalc").textContent = "= F(" + (n - 2) + ") + F(" + (n - 1) + ") = " + group(p2) + " + " + group(p1) + " · " + fs.length + " chiffres";
+  }
+  fibN.addEventListener("input", fibUpdate); fibUpdate();
+
+  /* ---------- Étape 2 : rapports ---------- */
+  var rPresets = [["1 et 1", 1, 1], ["4 et 9", 4, 9], ["2 et 1", 2, 1], ["10 et 3", 10, 3], ["1 et 100", 1, 100]];
+  var ra = document.getElementById("ra"), rb = document.getElementById("rb");
+  rPresets.forEach(function (p, i) {
+    var b = document.createElement("button"); b.type = "button"; b.id = "rp" + i; b.textContent = p[0];
+    b.addEventListener("click", function () { ra.value = fmt(p[1]); rb.value = fmt(p[2]); ratioUpdate(); });
+    document.getElementById("ratioPresets").appendChild(b);
+  });
+  function ratioUpdate() {
+    var a = num(ra.value), b = num(rb.value), out = document.getElementById("ratioOut"), svg = document.getElementById("ratioChart"), tb = document.getElementById("ratioTable");
+    rPresets.forEach(function (p, i) { document.getElementById("rp" + i).setAttribute("aria-pressed", p[1] === a && p[2] === b ? "true" : "false"); });
+    clear(svg);
+    if (isNaN(a) || isNaN(b) || a <= 0 || b <= 0) { out.className = "verdict no"; out.innerHTML = "Choisis deux nombres positifs.<span>Avec 0 ou des nombres négatifs, on risque de diviser par 0.</span>"; tb.innerHTML = ""; return; }
+    var N = 16, u = terms(a, b, N), r = [];
+    for (var i = 1; i < N; i++) r.push(u[i] / u[i - 1]);
+    var rows = ["<tr><th>n</th><th>terme</th><th>terme ÷ précédent</th><th>écart avec φ</th></tr>"];
+    for (var j = 0; j < N; j++) {
+      var cell = j === 0 ? "" : fmtF(r[j - 1], 6), gap = j === 0 ? "" : (r[j - 1] >= PHI ? "+" : "−") + fmtF(Math.abs(r[j - 1] - PHI), 6);
+      rows.push("<tr" + (j > 0 && Math.abs(r[j - 1] - PHI) < 0.001 ? ' class="near"' : "") + "><td>" + (j + 1) + "</td><td>" + fmt(u[j], 2) + '</td><td class="big">' + cell + "</td><td>" + gap + "</td></tr>");
+    }
+    tb.innerHTML = rows.join("");
+    // graphique
+    var W = 640, H = 300, L = 70, R = 20, T = 20, B = 46;
+    var lo = Math.min(1, Math.min.apply(null, r)), hi = Math.max(2, Math.max.apply(null, r));
+    lo = Math.max(lo, 0); hi = Math.min(hi, 4);
+    lo = Math.floor(lo * 2) / 2; hi = Math.ceil(hi * 2) / 2;
+    function X(k) { return L + (k - 2) / (N - 2) * (W - L - R); }
+    function Y(v) { return H - B - (Math.max(lo, Math.min(hi, v)) - lo) / (hi - lo) * (H - B - T); }
+    for (var g = lo; g <= hi + 1e-9; g += 0.5) {
+      mk(svg, "line", { x1: L, y1: Y(g), x2: W - R, y2: Y(g), stroke: "var(--line)", "stroke-width": 1 });
+      mk(svg, "text", { x: L - 8, y: Y(g) + 6, "text-anchor": "end", "font-size": 18 }, fmt(g, 1));
+    }
+    for (var k = 2; k <= N; k += 2) mk(svg, "text", { x: X(k), y: H - B + 26, "text-anchor": "middle", "font-size": 18 }, k);
+    mk(svg, "line", { x1: L, y1: H - B, x2: W - R, y2: H - B, stroke: "var(--ink)", "stroke-width": 2 });
+    mk(svg, "line", { x1: L, y1: T, x2: L, y2: H - B, stroke: "var(--ink)", "stroke-width": 2 });
+    mk(svg, "line", { x1: L, y1: Y(PHI), x2: W - R, y2: Y(PHI), stroke: "var(--two)", "stroke-width": 2.5, "stroke-dasharray": "8 6" });
+    mk(svg, "text", { x: W - R - 4, y: Y(PHI) - 10, "text-anchor": "end", "font-size": 18, style: "fill:var(--two)" }, "φ ≈ 1,618");
+    var pts = r.map(function (v, i) { return X(i + 2) + "," + Y(v); }).join(" ");
+    mk(svg, "polyline", { points: pts, fill: "none", stroke: "var(--acc)", "stroke-width": 2.5 });
+    r.forEach(function (v, i) {
+      var clipped = v < lo || v > hi;
+      mk(svg, "circle", { cx: X(i + 2), cy: Y(v), r: 6, fill: clipped ? "var(--card)" : "var(--acc)", stroke: clipped ? "var(--acc)" : "var(--card)", "stroke-width": 2 });
+    });
+    var last = r[r.length - 1];
+    out.className = "verdict yes";
+    out.innerHTML = "Après 15 divisions : " + fmtF(last, 6) + "<span>φ vaut 1,618034… L'écart n'est plus que de " + fmt(Math.abs(last - PHI), 7) + ". Le rapport saute au-dessus puis en dessous de φ, en se rapprochant à chaque fois.</span>";
+  }
+  ra.addEventListener("input", ratioUpdate); rb.addEventListener("input", ratioUpdate); ratioUpdate();
+
+  /* ---------- Étape 3 : décimales, partage d'or, propriétés ---------- */
+  (function () {
+    var d = phiDigits(30), dec = d.split(",")[1], parts = [];
+    for (var i = 0; i < dec.length; i += 5) parts.push(dec.slice(i, i + 5));
+    document.getElementById("phiDigits").textContent = d.split(",")[0] + "," + parts.join(" ") + "…";
+    var props = [
+      ["φ", fmtF(PHI, 10), "(1 + √5) ÷ 2"],
+      ["φ²", fmtF(PHI * PHI, 10), "φ × φ"],
+      ["φ + 1", fmtF(PHI + 1, 10), "même nombre que φ² !"],
+      ["1 ÷ φ", fmtF(1 / PHI, 10), "l'inverse de φ"],
+      ["φ − 1", fmtF(PHI - 1, 10), "même nombre que 1 ÷ φ !"]
+    ];
+    document.getElementById("phiProps").innerHTML = props.map(function (p, i) {
+      return '<div class="res"><span class="res-name">' + p[0] + '</span><span class="res-val' + (i === 2 || i === 4 ? " g" : "") + '">≈ ' + p[1] + '</span><span class="res-calc">' + p[2] + "</span></div>";
+    }).join("");
+    var cv = convergents(8), lines = [];
+    function nest(k) { return k === 0 ? "1" : "1 + 1/" + (k === 1 ? "1" : "(" + nest(k - 1) + ")"); }
+    for (var k = 0; k < 8; k++) {
+      var pq = cv[k].split("/"), val = Number(pq[0]) / Number(pq[1]);
+      var left = k <= 3 ? nest(k) : "… " + (k + 1) + " étages";
+      lines.push("<span>" + left + " = <b>" + cv[k].replace("/", "/") + "</b> " + (Math.abs(val * 1000 - Math.round(val * 1000)) < 1e-9 ? "= " : "≈ ") + fmt(val, 3) + "</span>");
+    }
+    lines.push("<span>… on se rapproche de <b>φ ≈ 1,618</b></span>");
+    document.getElementById("cfrac").innerHTML = lines.join("");
+  })();
+
+  var cut = document.getElementById("cut");
+  function cutUpdate() {
+    var t = Number(cut.value), svg = document.getElementById("cutSvg"), x0 = 30, x1 = 610, xc = x0 + t * (x1 - x0);
+    clear(svg);
+    mk(svg, "line", { x1: x0, y1: 60, x2: xc, y2: 60, stroke: "var(--acc)", "stroke-width": 10, "stroke-linecap": "round" });
+    mk(svg, "line", { x1: xc, y1: 60, x2: x1, y2: 60, stroke: "var(--two)", "stroke-width": 10, "stroke-linecap": "round" });
+    mk(svg, "line", { x1: xc, y1: 40, x2: xc, y2: 80, stroke: "var(--ink)", "stroke-width": 3 });
+    mk(svg, "text", { x: (x0 + xc) / 2, y: 34, "text-anchor": "middle", "font-size": 22, "font-weight": 700 }, "a");
+    mk(svg, "text", { x: (xc + x1) / 2, y: 34, "text-anchor": "middle", "font-size": 22, "font-weight": 700 }, "b");
+    mk(svg, "path", { d: "M" + x0 + " 92 v8 H" + x1 + " v-8", fill: "none", stroke: "var(--ink-soft)", "stroke-width": 2 });
+    mk(svg, "text", { x: (x0 + x1) / 2, y: 122, "text-anchor": "middle", "font-size": 20 }, "a + b");
+    var r1 = 1 / t, r2 = t / (1 - t), out = document.getElementById("cutOut");
+    document.getElementById("cutR1").textContent = "≈ " + fmtF(r1, 3);
+    document.getElementById("cutR2").textContent = "≈ " + fmtF(r2, 3);
+    if (Math.abs(r1 - r2) < 0.01) { out.className = "verdict yes"; out.innerHTML = "Les deux rapports sont égaux : c'est le partage d'or !<span>Ils valent tous les deux φ ≈ 1,618. Le grand morceau fait environ 61,8 % du segment.</span>"; }
+    else { out.className = "verdict"; out.innerHTML = "<span>Les deux rapports sont différents. " + (r2 > r1 ? "Le petit morceau est trop petit : déplace la coupure vers la gauche." : "Le petit morceau est trop grand : déplace la coupure vers la droite.") + "</span>"; }
+  }
+  cut.addEventListener("input", cutUpdate);
+  document.getElementById("cutGold").addEventListener("click", function () { cut.value = String(1 / PHI); cutUpdate(); });
+  cutUpdate();
+
+  /* ---------- Étape 4 : rectangle d'or ---------- */
+  var rectN = document.getElementById("rectN"), logSp = document.getElementById("logSp");
+  function rectUpdate() {
+    var n = parseInt(rectN.value, 10), svg = document.getElementById("rectSvg");
+    clear(svg);
+    var x = 20, y = 14, w = 600, h = 600 / PHI, h0 = h, path = "", s, sq, st, en;
+    mk(svg, "rect", { x: x, y: y, width: w, height: h, fill: "none", stroke: "var(--ink)", "stroke-width": 2.5 });
+    for (var i = 0; i < n; i++) {
+      var d = i % 4;
+      if (d === 0) { s = h; sq = [x, y]; st = [x, y + s]; en = [x + s, y]; x += s; w -= s; }
+      else if (d === 1) { s = w; sq = [x, y]; st = [x, y]; en = [x + s, y + s]; y += s; h -= s; }
+      else if (d === 2) { s = h; sq = [x + w - s, y]; st = [x + w, y]; en = [x + w - s, y + s]; w -= s; }
+      else { s = w; sq = [x, y + h - s]; st = [x + s, y + h]; en = [x, y + h - s]; h -= s; }
+      mk(svg, "rect", { x: sq[0], y: sq[1], width: s, height: s, fill: i % 2 ? "var(--two-soft)" : "var(--acc-soft)", stroke: "var(--ink)", "stroke-width": 1.5 });
+      if (s > 56) mk(svg, "text", { x: sq[0] + s / 2, y: sq[1] + s / 2 + 7, "text-anchor": "middle", "font-size": s > 120 ? 22 : 18, style: "fill:var(--ink-soft)" }, fmt(s / h0, 3));
+      path += (i === 0 ? "M" + st[0] + " " + st[1] : "") + " A" + s + " " + s + " 0 0 1 " + en[0] + " " + en[1];
+    }
+    mk(svg, "rect", { x: x, y: y, width: Math.max(w, 0), height: Math.max(h, 0), fill: "none", stroke: "var(--acc)", "stroke-width": 2.5, "stroke-dasharray": "6 4" });
+    if (logSp.checked) {
+      // centre limite : on découpe beaucoup de fois
+      var X = 20, Y = 14, Wd = 600, Hd = 600 / PHI;
+      for (var j = 0; j < 60; j++) { var e = j % 4; if (e === 0) { X += Hd; Wd -= Hd; } else if (e === 1) { Y += Wd; Hd -= Wd; } else if (e === 2) { Wd -= Hd; } else { Hd -= Wd; } }
+      var cx = X + Wd / 2, cy = Y + Hd / 2, vx = 20 - cx, vy = 14 + h0 - cy, r0 = Math.hypot(vx, vy), th0 = Math.atan2(vy, vx), pts = [];
+      var tMax = n * Math.PI / 2;
+      for (var k = 0; k <= 240; k++) { var t = tMax * k / 240, rr = r0 * Math.pow(PHI, -2 * t / Math.PI); pts.push((cx + rr * Math.cos(th0 + t)).toFixed(2) + "," + (cy + rr * Math.sin(th0 + t)).toFixed(2)); }
+      mk(svg, "polyline", { points: pts.join(" "), fill: "none", stroke: "var(--two)", "stroke-width": 3, "stroke-dasharray": "7 5" });
+    }
+    mk(svg, "path", { d: path, fill: "none", stroke: "var(--red)", "stroke-width": 3.5, "stroke-linecap": "round" });
+    document.getElementById("rectNOut").textContent = n;
+    document.getElementById("rectInfo").textContent = "Le grand rectangle mesure 1,618 sur 1. Les nombres dans les carrés sont leurs côtés : chaque carré est φ fois plus petit que le précédent (1 ; 0,618 ; 0,382 ; 0,236…). Le rectangle en pointillés dorés est le rectangle d'or qui reste.";
+  }
+  rectN.addEventListener("input", rectUpdate); logSp.addEventListener("change", rectUpdate); rectUpdate();
+
+  /* ---------- Étape 5 : tournesol ---------- */
+  var canvas = document.getElementById("sun"), ctx = canvas.getContext("2d");
+  var angleIn = document.getElementById("angle"), seedsIn = document.getElementById("seeds");
+  var alpha = GOLDEN, nSeeds = 500, spiral = 0, shown = 500, anim = null;
+  var aPresets = [["Angle d'or", GOLDEN], ["137°", 137], ["138°", 138], ["120°", 120], ["90°", 90], ["135°", 135]];
+  aPresets.forEach(function (p, i) {
+    var b = document.createElement("button"); b.type = "button"; b.id = "ap" + i; b.textContent = p[0];
+    b.addEventListener("click", function () { alpha = p[1]; angleIn.value = String(Math.round(p[1] * 10) / 10); sunUpdate(); });
+    document.getElementById("anglePresets").appendChild(b);
+  });
+  [["Pas de spirale", 0], ["13 spirales", 13], ["21 spirales", 21], ["34 spirales", 34], ["55 spirales", 55]].forEach(function (p, i) {
+    var b = document.createElement("button"); b.type = "button"; b.id = "sp" + i; b.textContent = p[0]; b.dataset.v = p[1];
+    b.addEventListener("click", function () { spiral = p[1]; drawSun(); pressSpiral(); });
+    document.getElementById("spiralBtns").appendChild(b);
+  });
+  function pressSpiral() { for (var i = 0; i < 5; i++) { var b = document.getElementById("sp" + i); b.setAttribute("aria-pressed", Number(b.dataset.v) === spiral ? "true" : "false"); } }
+  function tok(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || "#888"; }
+  function drawSun() {
+    var css = canvas.clientWidth || 320, dpr = window.devicePixelRatio || 1, S = Math.round(css * dpr);
+    if (canvas.width !== S) { canvas.width = S; canvas.height = S; }
+    ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, S, S);
+    var c = (S / 2 - 6 * dpr) / Math.sqrt(nSeeds + 0.5), mid = S / 2, rad = alpha * Math.PI / 180, P = [];
+    for (var k = 1; k <= shown; k++) { var r = c * Math.sqrt(k), a = k * rad; P.push([mid + r * Math.cos(a), mid + r * Math.sin(a)]); }
+    var acc = tok("--acc"), two = tok("--two"), ink = tok("--ink-soft");
+    var dot = Math.max(1.2 * dpr, c * 0.5);
+    for (var i = 0; i < P.length; i++) {
+      ctx.beginPath(); ctx.arc(P[i][0], P[i][1], dot * (0.75 + 0.25 * Math.sqrt((i + 1) / nSeeds)), 0, 2 * Math.PI);
+      ctx.fillStyle = i < 8 ? ink : acc; ctx.fill();
+    }
+    if (spiral) {
+      ctx.strokeStyle = two; ctx.lineWidth = Math.max(1, c * 0.22); ctx.globalAlpha = 0.85; ctx.beginPath();
+      for (var j = 0; j + spiral < P.length; j++) { ctx.moveTo(P[j][0], P[j][1]); ctx.lineTo(P[j + spiral][0], P[j + spiral][1]); }
+      ctx.stroke(); ctx.globalAlpha = 1;
+    }
+  }
+  function gcd(a, b) { while (b) { var t = a % b; a = b; b = t; } return a; }
+  function sunText() {
+    var out = document.getElementById("sunOut"), isG = Math.abs(alpha - GOLDEN) < 0.01;
+    document.getElementById("angleOut").textContent = isG ? "≈ 137,508° (angle d'or)" : fmt(alpha, 1) + "°";
+    aPresets.forEach(function (p, i) { document.getElementById("ap" + i).setAttribute("aria-pressed", Math.abs(p[1] - alpha) < 1e-9 ? "true" : "false"); });
+    var tenth = Math.round(alpha * 10), g = gcd(tenth, 3600), q = 3600 / g, p = tenth / g;
+    var extra = spiral ? " Les traits verts relient chaque graine k à la graine k + " + spiral + "." : "";
+    if (isG) { out.className = "verdict yes"; out.innerHTML = "Angle d'or : les graines se serrent sans laisser de trou." + "<span>Aucune fraction simple de tour ne l'approche bien, donc les graines ne s'alignent jamais. Choisis « 21 », « 34 » ou « 55 spirales » : ce sont des nombres de Fibonacci." + extra + "</span>"; }
+    else if (q <= 60 && Math.abs(alpha * 10 - tenth) < 1e-6) { out.className = "verdict no"; out.innerHTML = "Cet angle vaut " + p + "/" + q + " de tour : les graines finissent par former " + q + " rayons droits.<span>Ajoute des graines pour bien les voir, loin du centre. Entre les rayons, il reste de grands trous : beaucoup de place perdue." + extra + "</span>"; }
+    else { out.className = "verdict no"; out.innerHTML = "Pas tout à fait l'angle d'or : des bras ou des rayons apparaissent.<span>Ajoute des graines : les trous entre les bras se voient de mieux en mieux. Une toute petite différence d'angle suffit à tout changer." + extra + "</span>"; }
+  }
+  function sunUpdate() {
+    nSeeds = parseInt(seedsIn.value, 10); shown = nSeeds;
+    document.getElementById("seedsOut").textContent = nSeeds;
+    if (anim) { cancelAnimationFrame(anim); anim = null; }
+    sunText(); drawSun();
+  }
+  angleIn.addEventListener("input", function () { alpha = Number(angleIn.value); sunUpdate(); });
+  seedsIn.addEventListener("input", sunUpdate);
+  document.getElementById("grow").addEventListener("click", function () {
+    if (anim) cancelAnimationFrame(anim);
+    if (reduce) { shown = nSeeds; drawSun(); return; }
+    var t0 = null, dur = 2500;
+    function step(ts) { if (t0 === null) t0 = ts; var f = Math.min(1, (ts - t0) / dur); shown = Math.max(1, Math.round(nSeeds * f)); drawSun(); if (f < 1) anim = requestAnimationFrame(step); else anim = null; }
+    anim = requestAnimationFrame(step);
+  });
+  pressSpiral(); sunUpdate();
+  window.addEventListener("resize", drawSun);
+  if (window.matchMedia) { var mq = window.matchMedia("(prefers-color-scheme: dark)"); if (mq.addEventListener) mq.addEventListener("change", drawSun); }
+  if (window.MutationObserver) new MutationObserver(drawSun).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+
+  /* ---------- Étape 6 : pentagone ---------- */
+  var pentaR = document.getElementById("pentaR");
+  function inter(p1, p2, p3, p4) {
+    var d = (p1[0] - p2[0]) * (p3[1] - p4[1]) - (p1[1] - p2[1]) * (p3[0] - p4[0]);
+    var t = ((p1[0] - p3[0]) * (p3[1] - p4[1]) - (p1[1] - p3[1]) * (p3[0] - p4[0])) / d;
+    return [p1[0] + t * (p2[0] - p1[0]), p1[1] + t * (p2[1] - p1[1])];
+  }
+  function dist(p, q) { return Math.hypot(p[0] - q[0], p[1] - q[1]); }
+  function pentaUpdate() {
+    var R = Number(pentaR.value), svg = document.getElementById("pentaSvg"), cx = 320, cy = 212, V = [], names = ["A", "B", "C", "D", "E"];
+    clear(svg);
+    for (var i = 0; i < 5; i++) { var a = -Math.PI / 2 + i * 2 * Math.PI / 5; V.push([cx + R * Math.cos(a), cy + R * Math.sin(a)]); }
+    var I = [];
+    for (var k = 0; k < 5; k++) I.push(inter(V[k], V[(k + 2) % 5], V[(k + 1) % 5], V[(k + 4) % 5]));
+    mk(svg, "polygon", { points: V.map(function (p) { return p.join(","); }).join(" "), fill: "var(--card)", stroke: "var(--ink)", "stroke-width": 2 });
+    mk(svg, "polygon", { points: I.map(function (p) { return p.join(","); }).join(" "), fill: "var(--acc-soft)", stroke: "none" });
+    mk(svg, "polygon", { points: [0, 2, 4, 1, 3].map(function (j) { return V[j].join(","); }).join(" "), fill: "none", stroke: "var(--ink-soft)", "stroke-width": 1.5 });
+    var A = V[0], B = V[1], C = V[2], Pp = inter(A, C, B, V[4]), Q = inter(A, C, B, V[3]);
+    mk(svg, "line", { x1: A[0], y1: A[1], x2: B[0], y2: B[1], stroke: "var(--acc)", "stroke-width": 7, "stroke-linecap": "round" });
+    mk(svg, "line", { x1: A[0], y1: A[1], x2: C[0], y2: C[1], stroke: "var(--red)", "stroke-width": 4, "stroke-linecap": "round" });
+    mk(svg, "line", { x1: A[0], y1: A[1], x2: Q[0], y2: Q[1], stroke: "var(--two)", "stroke-width": 4, "stroke-dasharray": "2 7", "stroke-linecap": "round" });
+    [Pp, Q].forEach(function (p, i) { mk(svg, "circle", { cx: p[0], cy: p[1], r: 5, fill: "var(--two)" }); });
+    mk(svg, "text", { x: Q[0] - 22, y: Q[1] + 6, "text-anchor": "middle", "font-size": 18, "font-weight": 700, style: "fill:var(--two)" }, "Q");
+    V.forEach(function (p, i) {
+      var dx = p[0] - cx, dy = p[1] - cy, L = Math.hypot(dx, dy);
+      mk(svg, "circle", { cx: p[0], cy: p[1], r: 4.5, fill: "var(--ink)" });
+      mk(svg, "text", { x: p[0] + dx / L * 24, y: p[1] + dy / L * 24 + 7, "text-anchor": "middle", "font-size": 20, "font-weight": 700 }, names[i]);
+    });
+    var side = dist(A, B), diag = dist(A, C), aq = dist(A, Q);
+    document.getElementById("pentaOut").innerHTML =
+      '<div class="res"><span class="res-name">Côté AB (doré)</span><span class="res-val">' + fmtF(side, 1) + ' px</span></div>' +
+      '<div class="res"><span class="res-name">Diagonale AC (rouge)</span><span class="res-val">' + fmtF(diag, 1) + ' px</span></div>' +
+      '<div class="res"><span class="res-name">Diagonale ÷ côté</span><span class="res-val">≈ ' + fmtF(diag / side, 4) + '</span><span class="res-calc">' + fmtF(diag, 1) + " ÷ " + fmtF(side, 1) + " : c'est φ !</span></div>" +
+      '<div class="res"><span class="res-name">AC ÷ AQ (vert)</span><span class="res-val g">≈ ' + fmtF(diag / aq, 4) + '</span><span class="res-calc">' + fmtF(diag, 1) + " ÷ " + fmtF(aq, 1) + " : encore φ, la diagonale est coupée selon le partage d'or. Et AQ = AB !</span></div>";
+  }
+  pentaR.addEventListener("input", pentaUpdate); pentaUpdate();
+
+  /* ---------- Quiz ---------- */
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  function rnd(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+  function r2(x) { return Math.round(x * 100) / 100; }
+  var gen = [
+    function () { var a = rnd(1, 9), b = rnd(1, 9), u = terms(a, b, 6); return { q: "Chaque terme est la somme des deux précédents : " + u.slice(0, 5).join(" ; ") + " ; … Quel est le terme suivant ?", a: u[5], tol: 1e-9, how: u[3] + " + " + u[4] + " = " + u[5] }; },
+    function () { var n = rnd(5, 9), u = terms(1, 1, n), s = u.reduce(function (x, y) { return x + y; }, 0); return { q: "Additionne les " + n + " premiers termes de la suite de Fibonacci (1, 1, 2, 3, …).", a: s, tol: 1e-9, how: u.join(" + ") + " = " + s + " (astuce : c'est le terme numéro " + (n + 2) + " moins 1)" }; },
+    function () { var k = rnd(7, 14), u = terms(1, 1, k + 1), v = u[k] / u[k - 1]; return { q: "Calcule " + u[k] + " ÷ " + u[k - 1] + " (deux termes de Fibonacci), arrondi au centième.", a: r2(v), tol: 0.006, how: u[k] + " ÷ " + u[k - 1] + " ≈ " + fmt(v, 4) + ", donc ≈ " + fmtF(r2(v), 2) }; },
+    function () { return pick([{ q: "L'angle d'or vaut 360° ÷ φ². Avec φ² ≈ 2,618, calcule-le au dixième de degré.", a: 137.5, tol: 0.06, how: "360 ÷ 2,618 ≈ 137,51, donc ≈ 137,5°" }, { q: "Calcule 360° − 360° ÷ φ au dixième de degré (avec φ ≈ 1,618).", a: 137.5, tol: 0.06, how: "360 ÷ 1,618 ≈ 222,5 et 360 − 222,5 = 137,5° : c'est l'angle d'or" }]); },
+    function () { var c = pick([[90, 1, 4], [120, 1, 3], [72, 1, 5], [144, 2, 5], [60, 1, 6], [45, 1, 8], [135, 3, 8], [160, 4, 9]]); return { q: "Un tournesol virtuel tourne de " + c[0] + "° entre deux graines. Combien de rayons droits forment les graines ?", a: c[2], tol: 1e-9, how: c[0] + " ÷ 360 = " + c[1] + "/" + c[2] + " de tour : on revient au même endroit toutes les " + c[2] + " graines" }; },
+    function () { return pick([{ q: "Combien vaut φ² − φ ?", a: 1, tol: 0.006, how: "φ² = φ + 1, donc φ² − φ = 1" }, { q: "Combien vaut φ × (φ − 1) ?", a: 1, tol: 0.006, how: "φ − 1 = 1 ÷ φ, donc φ × (1 ÷ φ) = 1" }, { q: "Combien vaut φ² − φ − 1 ?", a: 0, tol: 0.006, how: "φ² = φ + 1, donc φ² − φ − 1 = 0" }, { q: "Combien vaut 1 ÷ φ + 1, arrondi au centième ?", a: 1.62, tol: 0.006, how: "1 ÷ φ = φ − 1, donc 1 ÷ φ + 1 = φ ≈ 1,62" }]); },
+    function () { var s = pick([2, 3, 4, 5, 8, 10]); return { q: "Un pentagone régulier a des côtés de " + s + " cm. Combien mesure une diagonale (en cm, au centième) ?", a: r2(s * PHI), tol: 0.006, how: s + " × φ ≈ " + s + " × 1,618 03 ≈ " + fmtF(r2(s * PHI), 2) + " cm" }; },
+    function () { var n = rnd(10, 15), f = Number(fibonacci(n)); return { q: "La suite de Fibonacci commence par 1, 1, 2, 3, 5, 8, 13, 21… Quel est son " + n + "<sup>e</sup> terme ?", a: f, tol: 1e-9, how: "On continue : " + terms(1, 1, n).slice(7).join(", ") }; }
+  ];
+  var quiz = document.getElementById("quiz"), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ""; done = [];
+    var order = gen.slice(); for (var i = order.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = order[i]; order[i] = order[j]; order[j] = t; }
+    for (var k = 0; k < 8; k++) {
+      var Q = order[k](), li = document.createElement("li");
+      li.innerHTML = "<span>" + Q.q + '</span><input type="text" id="qa' + k + '" inputmode="decimal" autocomplete="off" aria-label="Ta réponse à la question ' + (k + 1) + '"><button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+      quiz.appendChild(li);
+      (function (k, Q) {
+        function check() {
+          var fb = document.getElementById("qf" + k), x = num(document.getElementById("qa" + k).value);
+          if (isNaN(x)) { fb.className = "fb"; fb.textContent = "Écris un nombre."; return; }
+          if (Math.abs(x - Q.a) <= Q.tol + 1e-9) { fb.className = "fb ok"; fb.textContent = "Bravo, c'est juste !"; done[k] = true; }
+          else { done[k] = false; fb.className = "fb no"; fb.innerHTML = "Pas tout à fait : la réponse est " + fmt(Q.a, 2) + ".<span>" + Q.how + "</span>"; }
+          document.getElementById("score").textContent = done.filter(Boolean).length + " / 8";
+        }
+        document.getElementById("qb" + k).addEventListener("click", check);
+        document.getElementById("qa" + k).addEventListener("keydown", function (e) { if (e.key === "Enter") check(); });
+      })(k, Q);
+    }
+    document.getElementById("score").textContent = "0 / 8";
+  }
+  document.getElementById("newQuiz").addEventListener("click", newQuiz);
+  newQuiz();
+})();
+</script>
+</body>
+</html>
