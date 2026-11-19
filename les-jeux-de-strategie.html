@@ -1,0 +1,1132 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Les jeux de stratégie</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, encre brun foncé, accent or (comme une médaille de champion), marge rouge. Les allumettes et les plateaux de jeu sont au centre. */
+:root {
+  --paper: #fbf8f0;
+  --grid: #eee5d0;
+  --card: #ffffff;
+  --ink: #2a2110;
+  --ink-soft: #6b5c40;
+  --acc: #a16207;
+  --acc-soft: #fbefc9;
+  --two: #1c64c8;
+  --two-soft: #dbe8fa;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #fff0a3;
+  --line: #e6dac0;
+  --wood: #d9a35b;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #13110a; --grid: #211d12; --card: #1b170d; --ink: #f5efe0; --ink-soft: #c4b796;
+    --acc: #fbbf24; --acc-soft: #3f3210; --two: #7fb0ff; --two-soft: #1a2a45;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #3a321e; --wood: #c8924c;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #13110a; --grid: #211d12; --card: #1b170d; --ink: #f5efe0; --ink-soft: #c4b796;
+  --acc: #fbbf24; --acc-soft: #3f3210; --two: #7fb0ff; --two-soft: #1a2a45;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #3a321e; --wood: #c8924c;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 8px 14px; min-height: 44px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+button:disabled { opacity: .4; cursor: not-allowed; transform: none; box-shadow: 3px 3px 0 var(--ink); }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.btns .lab { font-weight: 700; margin-right: 2px; }
+input[type="text"] { font: inherit; font-family: var(--f-mono); font-size: 1.05rem; padding: 8px 10px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; }
+input[type="range"] { width: 100%; accent-color: var(--acc); }
+.param { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.param label { font-weight: 700; }
+.params { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px 16px; }
+
+.verdict { border-radius: 8px; padding: 12px 14px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+.verdict:empty { display: none; }
+.verdict.yes { background: var(--ok-soft); color: var(--ok); }
+.verdict.no { background: var(--red-soft); color: var(--red); }
+.verdict.info { background: var(--acc-soft); color: var(--ink); }
+.verdict.cpu { background: var(--two-soft); color: var(--ink); }
+.verdict span { font-weight: 400; color: var(--ink); overflow-wrap: anywhere; }
+.log { font-family: var(--f-mono); font-size: .88rem; color: var(--ink-soft); overflow-wrap: anywhere; min-height: 1.4em; }
+.big { font-family: var(--f-display); font-weight: 800; font-size: 1.5rem; }
+
+/* Allumettes */
+.sticks { display: flex; flex-wrap: wrap; gap: 12px 7px; align-items: flex-end; min-height: 64px; padding: 10px 4px 4px; }
+.m { display: block; width: 10px; height: 50px; border-radius: 3px; background: var(--wood); position: relative; flex: none; }
+.m::before { content: ""; position: absolute; top: -6px; left: -2px; width: 14px; height: 14px; border-radius: 50%; background: var(--red); }
+.m.hint { box-shadow: 0 0 0 3px var(--acc); }
+.m.cpu { box-shadow: 0 0 0 3px var(--two); opacity: .5; }
+.m.gap { margin-left: 14px; }
+.count { font-family: var(--f-mono); font-weight: 600; color: var(--acc); }
+
+/* Nim */
+.heaps { display: flex; flex-direction: column; gap: 6px; }
+.heap { display: grid; grid-template-columns: 34px 1fr; align-items: end; gap: 6px; border-bottom: 1.5px dashed var(--line); padding-bottom: 4px; min-width: 0; }
+.heap > b { font-family: var(--f-display); font-size: 1.2rem; padding-bottom: 6px; }
+.stks { display: flex; flex-wrap: wrap; gap: 0; min-height: 66px; align-items: flex-end; min-width: 0; }
+button.stk { width: 26px; height: 66px; min-height: 0; padding: 8px 0 2px; border: 0; background: transparent; box-shadow: none; display: flex; align-items: flex-end; justify-content: center; border-radius: 6px; }
+button.stk:hover { transform: none; box-shadow: none; background: var(--acc-soft); }
+button.stk:active { transform: none; box-shadow: none; }
+button.stk:disabled { opacity: 1; cursor: default; box-shadow: none; }
+button.stk.sel .m { box-shadow: 0 0 0 3px var(--acc); opacity: .55; }
+button.stk.cpu .m { box-shadow: 0 0 0 3px var(--two); opacity: .5; }
+
+/* Tableaux */
+.scroll { overflow-x: auto; }
+.tbl { border-collapse: separate; border-spacing: 0; width: 100%; font-variant-numeric: tabular-nums; }
+.tbl th, .tbl td { border: 1.5px solid var(--ink); padding: 6px 8px; text-align: center; font-family: var(--f-mono); font-size: 1rem; }
+.tbl th { font-family: var(--f-display); background: var(--paper); }
+.tbl th.l { text-align: left; }
+.tbl td.odd { background: var(--red-soft); color: var(--red); font-weight: 700; }
+.tbl td.even { background: var(--ok-soft); color: var(--ok); font-weight: 700; }
+.tbl tr.sum td { background: var(--acc-soft); font-weight: 700; }
+.tbl td.k { color: var(--acc); font-weight: 700; }
+.tbl td.c { color: var(--two); font-weight: 700; }
+
+/* G / P */
+.gp { display: grid; grid-template-columns: repeat(auto-fill, minmax(46px, 1fr)); gap: 6px; }
+.gp div { border: 1.5px solid var(--line); border-radius: 8px; text-align: center; padding: 4px 0; font-family: var(--f-mono); display: flex; flex-direction: column; line-height: 1.2; }
+.gp div b { font-size: 1.05rem; }
+.gp .P { background: var(--red-soft); color: var(--red); border-color: var(--red); }
+.gp .G { background: var(--ok-soft); color: var(--ok); border-color: var(--ok); }
+.gp .last { outline: 3px solid var(--acc); outline-offset: 1px; }
+
+/* Ligne des nombres (course à 20) */
+.nl { display: flex; flex-wrap: wrap; gap: 6px; }
+.nl span { width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--line); display: grid; place-items: center; font-family: var(--f-mono); font-size: .9rem; background: var(--card); }
+.nl .on { background: var(--acc-soft); border-color: var(--acc); }
+.nl .cur { background: var(--acc); color: var(--card); border-color: var(--acc); font-weight: 700; }
+.nl .key { border: 3px solid var(--ok); font-weight: 700; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chips span { font-family: var(--f-mono); font-weight: 600; padding: 2px 10px; border-radius: 999px; border: 1.5px solid var(--ok); color: var(--ok); background: var(--ok-soft); }
+
+/* Morpion */
+.ttt { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; width: 100%; max-width: 300px; }
+.ttt button { aspect-ratio: 1 / 1; font-size: 2.4rem; padding: 0; box-shadow: none; line-height: 1; }
+.ttt button:hover { transform: none; box-shadow: none; background: var(--acc-soft); }
+.ttt button:active { transform: none; box-shadow: none; }
+.ttt button:disabled { opacity: 1; cursor: default; box-shadow: none; }
+.ttt button.k { color: var(--acc); }
+.ttt button.c { color: var(--two); }
+.ttt button.win { background: var(--ok-soft); border-color: var(--ok); }
+.scores { display: flex; flex-wrap: wrap; gap: 8px 18px; font-family: var(--f-mono); font-weight: 600; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
+.tag.ok { color: var(--ok); }
+.tag.no { color: var(--red); }
+.tag.acc { color: var(--acc); }
+
+.errs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.errs li { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--paper); }
+.errs .bad { color: var(--red); text-decoration: line-through; overflow-wrap: anywhere; }
+.errs .good { color: var(--ok); font-weight: 700; overflow-wrap: anywhere; }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 110px auto; gap: 10px; align-items: center; }
+.quiz li > span:first-child { overflow-wrap: anywhere; min-width: 0; }
+.quiz input[type="text"] { font-size: 1rem; padding: 6px 8px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb:empty { display: none; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc); }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 120px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+<!--ticons--><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Tutoriels"><!--/ticons-->
+<style id="tnav-css">
+.tnav-top { display: flex; margin: 0 0 4px; }
+.tnav-home { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font-weight: 700; font-size: .95rem; text-decoration: none; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tnav-home:hover, .tnav-home:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.tnav-bottom { margin-top: 8px; display: flex; flex-direction: column; gap: 12px; }
+.tnav-bottom h2 { margin: 0; }
+.tnav-pn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tnav-pn a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--ink, #222); border-radius: 10px;
+  background: var(--card, #fff); color: var(--ink, #222); text-decoration: none; box-shadow: 3px 3px 0 var(--ink, #222); min-width: 0; }
+.tnav-pn a span { font-size: .85rem; color: var(--ink-soft, #666); }
+.tnav-pn a strong { overflow-wrap: anywhere; }
+.tnav-pn a.next { text-align: right; grid-column: 2; }
+.tnav-bottom .tnav-home { align-self: center; }
+@media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
+</style>
+</head>
+<body>
+<main class="page">
+<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="index.html">← Tous les tutoriels</a></nav><!--/tnav-->
+
+
+  <header class="hero">
+    <span class="eyebrow">Tutoriel de maths · niveau collège · curiosité</span>
+    <h1>Les jeux de stratégie</h1>
+    <p class="lead">Dans certains jeux, il n'y a ni dé ni chance : tout se décide dans ta tête. Et parfois, les maths te donnent une recette pour gagner à tous les coups. On va jouer contre l'ordinateur… et découvrir ses secrets.</p>
+    <div class="box">
+      <div class="sticks" id="heroSticks" role="img" aria-label="21 allumettes : une à gauche, puis cinq paquets de 4"></div>
+      <span class="soft">21 allumettes. Le secret est caché dans ce dessin : <strong>1</strong> allumette, puis des paquets de <strong>4</strong>. Tu comprendras pourquoi à l'étape 3.</span>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · L'idée</span>
+    <h2>Des jeux sans hasard</h2>
+    <p>Tous les jeux de cette page ont les mêmes règles de base : <strong>deux joueurs</strong> jouent <strong>chacun leur tour</strong>, <strong>sans hasard</strong>, et chacun voit tout le jeu. Pas de dé, pas de carte cachée. Le résultat dépend seulement des choix des joueurs.</p>
+    <div class="cards">
+      <div class="box"><span class="tag ok">Ici</span><strong>Allumettes, Nim, morpion</strong><span class="soft">Tout est visible, rien n'est tiré au sort. On peut tout calculer.</span></div>
+      <div class="box"><span class="tag no">Pas ici</span><strong>Petits chevaux, poker</strong><span class="soft">Le dé ou les cartes cachées ajoutent du hasard : c'est le domaine du tutoriel sur <a class="tlink" href="les-probabilites.html">les probabilités</a>.</span></div>
+    </div>
+    <p>Une <strong>stratégie gagnante</strong>, c'est une recette qui te fait gagner <span class="hl">quoi que fasse l'adversaire</span>. Pas une astuce qui marche « souvent » : une méthode qui marche <em>toujours</em>.</p>
+    <div class="note">
+      <span class="note-title">Deux mots qu'on va utiliser partout</span>
+      <span>Une <strong>position</strong>, c'est l'état du jeu à un moment (par exemple : « il reste 7 allumettes, c'est à moi »).</span>
+      <span>Elle est <strong>P (perdante)</strong> si le joueur qui doit jouer perd forcément, quand l'autre joue bien. Elle est <strong>G (gagnante)</strong> si le joueur qui doit jouer peut gagner à coup sûr.</span>
+      <span>Le grand secret : <strong>laisse toujours une position P à ton adversaire</strong>.</span>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · Le jeu des allumettes</span>
+    <h2>21 allumettes, et la dernière gagne</h2>
+    <p>Règle : on pose des allumettes sur la table. Chacun son tour, on en prend <strong>1, 2 ou 3</strong>. <strong>Celui qui prend la dernière allumette gagne.</strong> (Il existe une autre version où celui qui prend la dernière perd ; on la verra dans les exercices.)</p>
+    <p>Joue plusieurs parties. L'ordinateur a l'air très fort… Essaie de deviner sa méthode avant d'appuyer sur « Montre-moi la stratégie ».</p>
+    <div class="box">
+      <div class="params">
+        <div class="param">
+          <label for="alN">Allumettes au départ : <span class="mono" id="alNOut">21</span></label>
+          <input id="alN" type="range" min="5" max="30" step="1" value="21">
+        </div>
+      </div>
+      <div class="btns" role="group" aria-label="Qui commence ?">
+        <span class="lab">Qui commence ?</span>
+        <button type="button" id="alKid" aria-pressed="true">Toi</button>
+        <button type="button" id="alCpuFirst" aria-pressed="false">L'ordinateur</button>
+      </div>
+      <div class="sticks" id="alSticks" aria-hidden="true"></div>
+      <p>Il reste <span class="count" id="alCount">21 allumettes</span>.</p>
+      <div class="btns" role="group" aria-label="Combien d'allumettes prends-tu ?">
+        <button type="button" id="alT1">Prendre 1</button>
+        <button type="button" id="alT2">Prendre 2</button>
+        <button type="button" id="alT3">Prendre 3</button>
+      </div>
+      <div class="verdict" id="alOut" aria-live="polite"></div>
+      <div class="btns">
+        <button type="button" id="alShow" aria-pressed="false">Montre-moi la stratégie</button>
+        <button type="button" id="alNew">Rejouer</button>
+      </div>
+      <p class="log" id="alLog"></p>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Gagnante ou perdante ?</span>
+    <h2>Le secret des multiples de 4</h2>
+    <p>Le secret de l'ordinateur : il laisse toujours un <strong>multiple de 4</strong> (4, 8, 12, 16, 20…). Pourquoi ça marche ? S'il reste 4 allumettes et que c'est à toi : tu prends 1, 2 ou 3, il en reste 3, 2 ou 1… et l'ordinateur prend tout. Avec 8, tu prends x, il prend 4 − x, et il reste 4. Il y a toujours une paire de coups qui fait <strong>4</strong> : 1 + 3, 2 + 2 ou 3 + 1.</p>
+    <p>Mais comment trouver ça tout seul ? On part de la <strong>fin</strong> et on remonte. Avec 0 allumette, celui qui doit jouer a déjà perdu (l'autre a pris la dernière) : 0 est <strong>P</strong>. Ensuite, une position est <strong>G</strong> si on peut aller vers une position P, et <strong>P</strong> si tous les coups mènent vers des positions G.</p>
+    <div class="box">
+      <h3>Remplis le tableau en partant de la fin</h3>
+      <div class="btns" role="group" aria-label="Combien peut-on prendre au maximum ?">
+        <span class="lab">On peut prendre de 1 à</span>
+        <button type="button" id="gpK2" aria-pressed="false">2</button>
+        <button type="button" id="gpK3" aria-pressed="true">3</button>
+        <button type="button" id="gpK4" aria-pressed="false">4</button>
+      </div>
+      <div class="gp" id="gpGrid" aria-live="polite"></div>
+      <div class="verdict info" id="gpOut"></div>
+      <div class="btns">
+        <button type="button" id="gpStep">Case suivante</button>
+        <button type="button" id="gpAll">Tout remplir</button>
+        <button type="button" id="gpReset">Recommencer</button>
+      </div>
+    </div>
+    <div class="note">
+      <span class="note-title">Ce qu'on découvre</span>
+      <span>Quand on peut prendre de 1 à 3, les positions P sont 0, 4, 8, 12, 16, 20 : les <strong>multiples de 4</strong>. Avec 21 allumettes au départ, le premier joueur prend 1 et laisse 20. Ensuite, il complète toujours à 4.</span>
+      <span>Si on peut prendre de 1 à k, les positions P sont les multiples de <strong>k + 1</strong>.</span>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · La course à 20</span>
+    <h2>Le premier qui dit « 20 » a gagné</h2>
+    <p>On part de 0. Chacun son tour, on ajoute <strong>1 ou 2</strong> au nombre précédent, et on dit le résultat à voix haute. <strong>Le premier qui dit 20 gagne.</strong></p>
+    <div class="box">
+      <div class="btns" role="group" aria-label="Qui commence ?">
+        <span class="lab">Qui commence ?</span>
+        <button type="button" id="crKid" aria-pressed="true">Toi</button>
+        <button type="button" id="crCpuFirst" aria-pressed="false">L'ordinateur</button>
+      </div>
+      <p>Nombre dit : <span class="big" id="crTotal">0</span></p>
+      <div class="nl" id="crLine" aria-hidden="true"></div>
+      <div class="btns" role="group" aria-label="Ton coup">
+        <button type="button" id="crP1">+ 1</button>
+        <button type="button" id="crP2">+ 2</button>
+      </div>
+      <div class="verdict" id="crOut" aria-live="polite"></div>
+      <div class="btns">
+        <button type="button" id="crShow" aria-pressed="false">Montre les nombres-clés</button>
+        <button type="button" id="crNew">Rejouer</button>
+      </div>
+      <p class="log" id="crLog"></p>
+    </div>
+    <p>Les nombres-clés sont <strong>2, 5, 8, 11, 14, 17, 20</strong>. Celui qui dit 17 gagne : l'autre dit 18 ou 19, et il peut dire 20. De même, celui qui dit 14 peut atteindre 17, et ainsi de suite. On descend de 3 en 3 depuis 20, parce qu'un tour complet (toi + l'autre) peut toujours faire <strong>3</strong> : 1 + 2 ou 2 + 1.</p>
+    <div class="note">
+      <span class="note-title">C'est le même jeu !</span>
+      <span>La course à 20, c'est le jeu des allumettes déguisé : 20 allumettes, on en prend 1 ou 2, celui qui prend la dernière gagne. Dire 2, c'est laisser 18 « allumettes » à l'autre, un multiple de 3.</span>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Raisonner à rebours</span>
+    <h2>Partir de la fin pour trouver le début</h2>
+    <p>Dans tous ces jeux, on a utilisé la même idée : on ne réfléchit pas depuis le début, mais depuis <strong>la fin</strong>. « Pour gagner, je dois dire 20. Pour pouvoir dire 20, je dois dire 17. Pour dire 17, je dois dire 14… » C'est le <strong>raisonnement à rebours</strong> : on remonte le temps, une étape après l'autre.</p>
+    <div class="box">
+      <h3>Invente ta propre course</h3>
+      <div class="params">
+        <div class="param">
+          <label for="gnN">Le but à atteindre : <span class="mono" id="gnNOut">20</span></label>
+          <input id="gnN" type="range" min="5" max="100" step="1" value="20">
+        </div>
+        <div class="param">
+          <label for="gnK">On ajoute de 1 à : <span class="mono" id="gnKOut">2</span></label>
+          <input id="gnK" type="range" min="2" max="10" step="1" value="2">
+        </div>
+      </div>
+      <p>Nombres-clés (ceux qu'il faut dire) :</p>
+      <div class="chips" id="gnKeys"></div>
+      <div class="verdict" id="gnOut" aria-live="polite"></div>
+    </div>
+    <p>Pourquoi le premier joueur gagne-t-il parfois à coup sûr ? Dans un jeu sans hasard qui finit toujours et sans match nul, on peut étiqueter <strong>chaque</strong> position G ou P en remontant depuis la fin. La position de départ est donc G ou P :</p>
+    <div class="cards">
+      <div class="box"><span class="tag ok">Départ G</span><strong>Le premier joueur gagne</strong><span class="soft">Exemple : 21 allumettes. Il prend 1, et la suite est sous contrôle.</span></div>
+      <div class="box"><span class="tag no">Départ P</span><strong>Le second joueur gagne</strong><span class="soft">Exemple : 20 allumettes. Quoi que fasse le premier, l'autre complète à 4.</span></div>
+    </div>
+    <p class="soft">Avec des matchs nuls possibles (comme au morpion), il y a trois cas : le premier gagne, le second gagne, ou les deux peuvent forcer le nul. Pour le morpion, c'est le nul. Pour les échecs aussi, une des trois réponses est la bonne… mais le jeu est si énorme que personne ne sait laquelle !</p>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · Le jeu de Nim</span>
+    <h2>Trois tas et un code secret en binaire</h2>
+    <p>Règle : il y a <strong>trois tas</strong> d'allumettes. Chacun son tour, on choisit <strong>un seul tas</strong> et on y prend <strong>autant d'allumettes qu'on veut</strong> (au moins une). <strong>Celui qui prend la dernière gagne.</strong> Touche une allumette : tu prends celle-là et toutes celles à sa droite, puis appuie sur « Prendre ».</p>
+    <div class="box">
+      <div class="params">
+        <div class="param"><label for="nA">Tas A : <span class="mono" id="nAOut">3</span></label><input id="nA" type="range" min="1" max="10" step="1" value="3"></div>
+        <div class="param"><label for="nB">Tas B : <span class="mono" id="nBOut">4</span></label><input id="nB" type="range" min="1" max="10" step="1" value="4"></div>
+        <div class="param"><label for="nC">Tas C : <span class="mono" id="nCOut">5</span></label><input id="nC" type="range" min="1" max="10" step="1" value="5"></div>
+      </div>
+      <div class="btns" role="group" aria-label="Qui commence ?">
+        <span class="lab">Qui commence ?</span>
+        <button type="button" id="nmKid" aria-pressed="true">Toi</button>
+        <button type="button" id="nmCpuFirst" aria-pressed="false">L'ordinateur</button>
+      </div>
+      <div class="heaps" id="nmHeaps"></div>
+      <p id="nmSel" class="soft">Touche une allumette pour choisir ton coup.</p>
+      <div class="btns">
+        <button type="button" id="nmTake">Prendre</button>
+        <button type="button" id="nmHintBtn">Un indice</button>
+        <button type="button" id="nmNew">Rejouer</button>
+      </div>
+      <div class="verdict" id="nmHint" aria-live="polite"></div>
+      <div class="verdict" id="nmOut" aria-live="polite"></div>
+      <p class="log" id="nmLog"></p>
+      <h3>Les tas écrits en binaire</h3>
+      <div class="scroll"><table class="tbl" id="nmBin"></table></div>
+    </div>
+    <p>Comment l'ordinateur fait-il ? Il écrit chaque tas en <strong>binaire</strong>, c'est-à-dire avec des paquets de 8, 4, 2 et 1 (comme dans le tutoriel sur <a class="tlink" href="le-binaire-et-les-bases.html">le binaire et les bases</a>). Par exemple 5 = 4 + 1 s'écrit 0101, et 6 = 4 + 2 s'écrit 0110.</p>
+    <p>Puis il compte les « 1 » dans chaque colonne. La règle découverte par Charles Bouton :</p>
+    <div class="note">
+      <span class="note-title">La somme de Nim</span>
+      <span>Si <strong>chaque colonne a un nombre pair de 1</strong>, la position est <strong>P</strong> : celui qui doit jouer va perdre.</span>
+      <span>Sinon, elle est <strong>G</strong> : il existe un coup qui rend toutes les colonnes paires. C'est ce coup que l'ordinateur joue.</span>
+      <span>On écrit 1 sous chaque colonne impaire, 0 sous chaque colonne paire : ce nombre binaire s'appelle la <strong>somme de Nim</strong>. Position P ⟺ somme de Nim = 0.</span>
+    </div>
+    <p>Pourquoi ça marche ? Quand toutes les colonnes sont paires, n'importe quel coup change un seul tas, donc au moins une colonne devient impaire. Et quand une colonne est impaire, on peut toujours réparer. À la fin, tous les tas sont à 0 : toutes les colonnes sont paires. C'est forcément l'ordinateur qui y arrive.</p>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Le morpion</span>
+    <h2>Le morpion : personne ne peut gagner</h2>
+    <p>Tu connais sûrement : une grille 3 × 3, on pose chacun son tour une croix ou un rond, et le premier qui aligne trois symboles (en ligne, en colonne ou en diagonale) gagne. Les croix (✕) commencent toujours.</p>
+    <div class="box">
+      <div class="btns" role="group" aria-label="Niveau de l'ordinateur">
+        <span class="lab">Ordinateur :</span>
+        <button type="button" id="ttL0" aria-pressed="false">Hasard</button>
+        <button type="button" id="ttL1" aria-pressed="false">Moyen</button>
+        <button type="button" id="ttL2" aria-pressed="true">Parfait</button>
+      </div>
+      <div class="btns" role="group" aria-label="Qui commence ?">
+        <span class="lab">Qui commence ?</span>
+        <button type="button" id="ttKid" aria-pressed="true">Toi (✕)</button>
+        <button type="button" id="ttCpuFirst" aria-pressed="false">L'ordinateur (✕)</button>
+      </div>
+      <div class="ttt" id="ttBoard" role="group" aria-label="Grille de morpion"></div>
+      <div class="verdict" id="ttOut" aria-live="polite"></div>
+      <div class="scores" id="ttScore"></div>
+      <div class="btns">
+        <button type="button" id="ttNew">Rejouer</button>
+        <button type="button" id="ttAuto">Ordinateur parfait contre lui-même</button>
+      </div>
+    </div>
+    <p><strong>Hasard</strong> joue n'importe où. <strong>Moyen</strong> gagne s'il peut, bloque s'il doit, sinon joue au hasard. <strong>Parfait</strong> regarde toutes les suites possibles de la partie, jusqu'à la fin, en raisonnant à rebours : c'est l'algorithme du <strong>minimax</strong>. Il suppose que tu joues toujours ton meilleur coup, et il choisit le coup qui est le meilleur pour lui dans ce cas-là.</p>
+    <div class="note">
+      <span class="note-title">Le résultat</span>
+      <span>Contre « Parfait », tu ne peux jamais gagner. Mais si tu joues bien, tu ne perds jamais non plus : <strong>avec un jeu parfait des deux côtés, c'est toujours match nul</strong>. Regarde l'ordinateur jouer contre lui-même : nul, à chaque fois.</span>
+    </div>
+    <div class="box">
+      <h3>Combien de parties de morpion existe-t-il ?</h3>
+      <p>Il y a 9 × 8 × 7 × … × 1 = 362 880 façons de remplir la grille case par case. Mais une partie s'arrête dès que quelqu'un a aligné trois symboles. L'ordinateur peut compter toutes les vraies parties.</p>
+      <div class="btns"><button type="button" id="ttCount">Compter toutes les parties</button></div>
+      <div class="verdict" id="ttCountOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Le dilemme du prisonnier</span>
+    <h2>Coopérer ou trahir ?</h2>
+    <p>Un jeu très différent : les deux joueurs choisissent <strong>en même temps</strong>, sans savoir ce que fait l'autre. Chacun peut <strong>coopérer</strong> ou <strong>trahir</strong>. Les points :</p>
+    <div class="scroll">
+      <table class="tbl" aria-label="Points du dilemme du prisonnier">
+        <tr><th class="l">Toi \ L'autre</th><th>Il coopère</th><th>Il trahit</th></tr>
+        <tr><th class="l">Tu coopères</th><td>3 pour toi, 3 pour lui</td><td>0 pour toi, 5 pour lui</td></tr>
+        <tr><th class="l">Tu trahis</th><td>5 pour toi, 0 pour lui</td><td>1 pour toi, 1 pour lui</td></tr>
+      </table>
+    </div>
+    <p>Le piège : quoi que fasse l'autre, trahir te rapporte plus <em>sur une manche</em> (5 au lieu de 3, ou 1 au lieu de 0). Mais si les deux trahissent, ils n'ont que 1 point chacun, alors qu'en coopérant ils en auraient 3. Que faire quand on joue <strong>plusieurs fois</strong> ?</p>
+    <div class="box">
+      <div class="btns" role="group" aria-label="Choisis ton adversaire">
+        <span class="lab">Adversaire :</span>
+        <button type="button" id="pdO0" aria-pressed="false">Gentil</button>
+        <button type="button" id="pdO1" aria-pressed="false">Méchant</button>
+        <button type="button" id="pdO2" aria-pressed="true">Donnant-donnant</button>
+      </div>
+      <p class="soft" id="pdDesc"></p>
+      <p>Manche <span class="mono" id="pdRound">1</span> / 10 · Toi <span class="big" id="pdMe">0</span> · Lui <span class="big" id="pdHim">0</span></p>
+      <div class="btns">
+        <button type="button" id="pdC">Je coopère</button>
+        <button type="button" id="pdD">Je trahis</button>
+      </div>
+      <div class="verdict" id="pdOut" aria-live="polite"></div>
+      <div class="scroll"><table class="tbl" id="pdHist"></table></div>
+      <div class="btns"><button type="button" id="pdNew">Rejouer</button></div>
+    </div>
+    <div class="box">
+      <h3>Le tournoi</h3>
+      <p>Chaque stratégie joue 10 manches contre chacune des autres (et une fois contre elle-même). On additionne tous les points. Deux stratégies en plus : <strong>rancunier</strong> coopère jusqu'à la première trahison, puis trahit pour toujours ; <strong>lunatique</strong> coopère, trahit, coopère, trahit…</p>
+      <div class="btns"><button type="button" id="pdTour">Lancer le tournoi</button></div>
+      <div class="scroll"><table class="tbl" id="pdTourOut"></table></div>
+      <div class="verdict" id="pdTourNote"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">La leçon</span>
+      <span>« Méchant » ne perd jamais un duel… mais il ne finit pas premier, parce que personne ne coopère avec lui. Les stratégies qui commencent gentiment et <strong>répondent</strong> aux trahisons (donnant-donnant, rancunier) gagnent le plus de points. Ici, le but n'est pas de battre l'autre : c'est d'avoir <strong>beaucoup de points</strong>.</span>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Un peu d'histoire</span>
+    <h2>Des jeux aux mathématiques</h2>
+    <ol class="timeline">
+      <li><span class="when">début du XVII<sup>e</sup> siècle</span><div class="what"><strong>Claude-Gaspard Bachet de Méziriac</strong><span>Dans un livre de « problèmes plaisants », il décrit un jeu de course : on ajoute de 1 à 10, et le premier qui atteint 100 gagne. Il donne déjà la méthode pour gagner à coup sûr.</span></div></li>
+      <li><span class="when">vers 1901</span><div class="what"><strong>Charles Bouton, aux États-Unis</strong><span>Il donne la solution complète du jeu de Nim, avec l'écriture en binaire. Le nom « Nim » viendrait peut-être de l'allemand <em>nimm !</em>, qui veut dire « prends ! ».</span></div></li>
+      <li><span class="when">début du XX<sup>e</sup> siècle</span><div class="what"><strong>Ernst Zermelo</strong><span>Il montre que dans un jeu comme les échecs, un des joueurs peut forcer la victoire, ou bien les deux peuvent forcer le nul. Mais il ne dit pas lequel !</span></div></li>
+      <li><span class="when">années 1920 à 1940</span><div class="what"><strong>John von Neumann</strong><span>Il fonde la <strong>théorie des jeux</strong> : l'étude mathématique des décisions quand plusieurs personnes s'affrontent. Avec l'économiste Oskar Morgenstern, il l'applique à l'économie. L'idée du minimax vient de ses travaux.</span></div></li>
+      <li><span class="when">vers 1950</span><div class="what"><strong>Le dilemme du prisonnier</strong><span>Des chercheurs américains l'imaginent pour montrer qu'agir chacun pour soi peut être mauvais pour tout le monde. Il sert aujourd'hui en économie, en biologie, en politique.</span></div></li>
+      <li><span class="when">vers 1980</span><div class="what"><strong>Le tournoi de Robert Axelrod</strong><span>Il invite des chercheurs à envoyer des programmes qui jouent au dilemme répété. Le gagnant est l'un des plus simples : donnant-donnant, proposé par Anatol Rapoport.</span></div></li>
+    </ol>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · Attention</span>
+    <h2>Les erreurs fréquentes</h2>
+    <div class="box">
+      <ul class="errs">
+        <li><span class="bad">« Il faut prendre le plus d'allumettes possible. »</span><span class="good">Il faut laisser une position P (un multiple de 4).</span><span class="soft">Avec 6 allumettes, prendre 3 laisse 3 : l'autre prend tout. Il fallait prendre 2.</span></li>
+        <li><span class="bad">« Celui qui commence gagne toujours. »</span><span class="good">Ça dépend de la position de départ.</span><span class="soft">Avec 20 allumettes (1 à 3), c'est le second joueur qui gagne.</span></li>
+        <li><span class="bad">« P veut dire que c'est une bonne position pour moi. »</span><span class="good">P est perdante pour celui qui doit jouer.</span><span class="soft">C'est la position qu'on veut <em>laisser</em> à l'adversaire.</span></li>
+        <li><span class="bad">Somme de Nim de 1, 2 et 3 = 1 + 2 + 3 = 6</span><span class="good">Somme de Nim de 1, 2 et 3 = 0</span><span class="soft">01, 10 et 11 : chaque colonne a deux 1. On ne fait pas une addition normale.</span></li>
+        <li><span class="bad">« Contre l'ordinateur parfait au morpion, on perd forcément. »</span><span class="good">On peut toujours faire match nul.</span><span class="soft">Le morpion est un jeu nul quand les deux jouent bien.</span></li>
+        <li><span class="bad">« Au dilemme du prisonnier, il faut battre l'autre. »</span><span class="good">Le but est d'avoir beaucoup de points.</span><span class="soft">Deux joueurs qui coopèrent 10 fois gagnent 30 points chacun ; deux traîtres, 10 chacun.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Écris seulement un nombre entier.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Nouvelles questions</button>
+    </div>
+  </section>
+
+  <!-- 12 -->
+  <section>
+    <span class="eyebrow">Étape 12 · À toi de jouer</span>
+    <h2>Six défis</h2>
+    <div class="exos">
+      <details>
+        <summary>30 allumettes<span class="q">Il y a 30 allumettes, on en prend 1, 2 ou 3, celui qui prend la dernière gagne. Veux-tu commencer ? Que joues-tu ?</span></summary>
+        <div><span>30 n'est pas un multiple de 4 : c'est une position G. Je commence et je prends <strong>2</strong> pour laisser 28. Ensuite je complète toujours à 4.</span></div>
+      </details>
+      <details>
+        <summary>La version « qui perd »<span class="q">Même jeu avec 21 allumettes, mais celui qui prend la dernière <em>perd</em>. Veux-tu commencer ?</span></summary>
+        <div><span>À rebours : s'il reste 1 allumette, celui qui joue doit la prendre et perd. Donc 1 est P. Puis 5, 9, 13, 17, 21 sont P (on ajoute 4 à chaque fois).</span><span>21 est P : il vaut mieux <strong>laisser l'autre commencer</strong>, puis lui laisser 17, 13, 9, 5 et enfin 1.</span></div>
+      </details>
+      <details>
+        <summary>Course à 30<span class="q">On ajoute 1, 2 ou 3, et le premier qui dit 30 gagne. Quels sont les nombres-clés ?</span></summary>
+        <div><span>On descend de 4 en 4 depuis 30 : <strong>30, 26, 22, 18, 14, 10, 6, 2</strong>. Le premier joueur dit 2 et gagne.</span></div>
+      </details>
+      <details>
+        <summary>Nim (1)<span class="q">Les tas sont 1, 2 et 3. C'est à toi. Peux-tu gagner à coup sûr ?</span></summary>
+        <div><span>En binaire : 01, 10, 11. Chaque colonne a deux 1 : somme de Nim = 0. C'est une position <strong>P</strong> : si l'adversaire joue bien, tu perds. Essaie avec le jeu de l'étape 6 !</span></div>
+      </details>
+      <details>
+        <summary>Nim (2)<span class="q">Les tas sont 2, 5 et 6. Trouve le coup gagnant.</span></summary>
+        <div><span>2 = 010, 5 = 101, 6 = 110. Colonne du 4 : deux 1 (pair). Colonne du 2 : deux 1 (pair). Colonne du 1 : un seul 1 (impair). Somme de Nim = 1.</span><span>Il faut changer le tas qui a un 1 dans la colonne du 1 : le tas de 5. On le passe à 4 (100) : on <strong>prend 1 allumette du tas de 5</strong>. Il reste 2, 4, 6 : 010, 100, 110, toutes les colonnes sont paires.</span></div>
+      </details>
+      <details>
+        <summary>Donnant-donnant<span class="q">Donnant-donnant joue 10 manches contre Méchant. Combien de points chacun ?</span></summary>
+        <div><span>Manche 1 : donnant-donnant coopère, méchant trahit : 0 et 5. Ensuite donnant-donnant copie la trahison : 9 manches à 1 point chacun.</span><span>Donnant-donnant : 0 + 9 = <strong>9</strong>. Méchant : 5 + 9 = <strong>14</strong>.</span></div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• Une position est <strong>P</strong> si le joueur qui doit jouer perd quand l'autre joue bien, <strong>G</strong> sinon. Pour gagner : <strong>laisse toujours une position P</strong>.</span>
+      <span>• On trouve les positions P en <strong>raisonnant à rebours</strong> : on part de la fin et on remonte.</span>
+      <span>• Allumettes (1 à 3, la dernière gagne) : laisse un <strong>multiple de 4</strong>. Course à 20 (+1 ou +2) : dis <strong>2, 5, 8, 11, 14, 17, 20</strong>.</span>
+      <span>• Nim : écris les tas en binaire. Position P ⟺ chaque colonne a un nombre <strong>pair</strong> de 1 (somme de Nim = 0).</span>
+      <span>• Morpion : avec un jeu parfait des deux côtés, c'est <strong>toujours nul</strong>.</span>
+      <span>• Dilemme du prisonnier répété : commencer gentiment et répondre aux trahisons (donnant-donnant) rapporte beaucoup de points.</span>
+    </div>
+  </section>
+
+  <!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"><a class="prev" href="les-fractales.html"><span>← Précédent</span><strong>Les fractales</strong></a><a class="next" href="les-maths-et-la-musique.html"><span>Suivant →</span><strong>Les maths et la musique</strong></a></div><a class="tnav-home" href="index.html">⌂ Tous les tutoriels</a></nav><!--/tnav-->
+<footer>Fiche de révision · Les jeux de stratégie</footer>
+</main>
+
+<script>
+(function () {
+  /* Test hooks (window.__jeu) :
+     allumMove(n, k)        -> nombre d'allumettes à prendre pour laisser un multiple de k + 1 (k = 3 par défaut) ; 0 si n est déjà une position P
+     gpTable(n, k)          -> ['P','G',…] pour 0..n (prendre 1 à k, la dernière gagne), ex. gpTable(8, 3) = P G G G P G G G P
+     courseKeys(N, k)       -> nombres-clés de la course à N (on ajoute 1 à k), ex. courseKeys(20, 2) = [2, 5, 8, 11, 14, 17, 20]
+     courseMove(t, N, k)    -> combien ajouter quand le total vaut t pour dire un nombre-clé ; 0 si aucun coup gagnant
+     nimSum(heaps)          -> somme de Nim (ou exclusif bit à bit), ex. nimSum([1, 2, 3]) = 0, nimSum([2, 5, 6]) = 1
+     nimMove(heaps)         -> { heap, take, leave } coup gagnant, ou null si somme de Nim = 0
+     toBin(n, bits)         -> écriture binaire sur 'bits' chiffres, ex. toBin(5, 4) = '0101'
+     tttWinner(b)           -> { who: 'X'|'O', line: [i, j, k] } ou null ; b = tableau de 9 cases '' / 'X' / 'O'
+     tttValue(b, p)         -> valeur minimax pour le joueur p qui doit jouer (> 0 gagne, 0 nul, < 0 perd) ; tttValue(vide, 'X') = 0
+     tttBest(b, p)          -> indice (0..8) d'un meilleur coup pour p (choisi au hasard parmi les meilleurs)
+     tttMedium(b, p)        -> indice : gagne si possible, sinon bloque, sinon au hasard
+     tttCount()             -> { games: 255168, positions: 5478, xWins, oWins, draws }
+     pdPayoff(a, b)         -> [points de a, points de b], a et b valent 'C' (coopère) ou 'D' (trahit)
+     pdChoice(name, mine, his) -> 'C' | 'D' pour la stratégie name ('gentil','mechant','donnant','rancunier','lunatique')
+     pdMatch(s1, s2, r)     -> { a, b, ma, mb, pa, pb } : totaux, coups et points manche par manche (r = 10 par défaut)
+     pdTournament(names, r) -> [{ name, total, won, draw, lost }] trié du meilleur au moins bon
+  */
+  var $ = function (id) { return document.getElementById(id); };
+  var DELAY = 650;
+  function fmt(x) { return Number(x).toLocaleString('fr-FR'); }
+  function num(s) { var t = String(s).replace(/\s/g, '').replace(/[−–]/g, '-').replace(',', '.'); if (t === '') return NaN; var x = Number(t); return isFinite(x) ? x : NaN; }
+  function rnd(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  function press(ids, on) { ids.forEach(function (id) { $(id).setAttribute('aria-pressed', id === on ? 'true' : 'false'); }); }
+  function pl(n, w) { return n + ' ' + w + (n > 1 ? 's' : ''); }
+
+  /* ================= Maths ================= */
+  function allumMove(n, k) { k = k || 3; return n % (k + 1); }
+  function gpTable(n, k) {
+    k = k || 3; var t = [];
+    for (var i = 0; i <= n; i++) {
+      var g = false;
+      for (var m = 1; m <= k && m <= i; m++) if (t[i - m] === 'P') g = true;
+      t.push(g ? 'G' : 'P');
+    }
+    return t;
+  }
+  function courseKeys(N, k) { k = k || 2; var a = []; for (var x = N % (k + 1); x <= N; x += k + 1) if (x > 0) a.push(x); return a; }
+  function courseMove(t, N, k) { k = k || 2; return (N - t) % (k + 1); }
+
+  function nimSum(h) { return h.reduce(function (s, v) { return s ^ v; }, 0); }
+  function nimMove(h) {
+    var s = nimSum(h); if (s === 0) return null;
+    for (var i = 0; i < h.length; i++) { var t = h[i] ^ s; if (t < h[i]) return { heap: i, take: h[i] - t, leave: t }; }
+    return null;
+  }
+  function toBin(n, bits) { var s = n.toString(2); while (s.length < bits) s = '0' + s; return s; }
+
+  var LINES = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
+  function other(p) { return p === 'X' ? 'O' : 'X'; }
+  function tttWinner(b) {
+    for (var i = 0; i < LINES.length; i++) { var L = LINES[i]; if (b[L[0]] && b[L[0]] === b[L[1]] && b[L[0]] === b[L[2]]) return { who: b[L[0]], line: L }; }
+    return null;
+  }
+  function empties(b) { var e = []; for (var i = 0; i < 9; i++) if (!b[i]) e.push(i); return e; }
+  var memo = {};
+  function tttValue(b, p) {
+    var key = b.map(function (c) { return c || '.'; }).join('') + p;
+    if (key in memo) return memo[key];
+    var w = tttWinner(b), e = empties(b), v;
+    if (w) v = (w.who === p ? 1 : -1) * (1 + e.length);
+    else if (e.length === 0) v = 0;
+    else {
+      v = -Infinity;
+      for (var i = 0; i < e.length; i++) { b[e[i]] = p; var c = -tttValue(b, other(p)); b[e[i]] = ''; if (c > v) v = c; }
+    }
+    memo[key] = v; return v;
+  }
+  function tttBest(b, p) {
+    var e = empties(b), best = -Infinity, list = [];
+    e.forEach(function (i) { b[i] = p; var c = -tttValue(b, other(p)); b[i] = ''; if (c > best) { best = c; list = [i]; } else if (c === best) list.push(i); });
+    return pick(list);
+  }
+  function tttMedium(b, p) {
+    var e = empties(b), i;
+    for (i = 0; i < e.length; i++) { b[e[i]] = p; var w = tttWinner(b); b[e[i]] = ''; if (w) return e[i]; }
+    for (i = 0; i < e.length; i++) { b[e[i]] = other(p); var w2 = tttWinner(b); b[e[i]] = ''; if (w2) return e[i]; }
+    return pick(e);
+  }
+  function tttCount() {
+    var r = { games: 0, positions: 0, xWins: 0, oWins: 0, draws: 0 }, seen = {}, b = ['', '', '', '', '', '', '', '', ''];
+    function dfs(p) {
+      var key = b.join(',');
+      if (!seen[key]) { seen[key] = true; r.positions++; }
+      var w = tttWinner(b), e = empties(b);
+      if (w || e.length === 0) { r.games++; if (!w) r.draws++; else if (w.who === 'X') r.xWins++; else r.oWins++; return; }
+      for (var i = 0; i < e.length; i++) { b[e[i]] = p; dfs(other(p)); b[e[i]] = ''; }
+    }
+    dfs('X');
+    return r;
+  }
+
+  var PAY = { CC: [3, 3], CD: [0, 5], DC: [5, 0], DD: [1, 1] };
+  function pdPayoff(a, b) { return PAY[a + b].slice(); }
+  var STRATS = {
+    gentil: function () { return 'C'; },
+    mechant: function () { return 'D'; },
+    donnant: function (mine, his) { return his.length ? his[his.length - 1] : 'C'; },
+    rancunier: function (mine, his) { return his.indexOf('D') >= 0 ? 'D' : 'C'; },
+    lunatique: function (mine) { return mine.length % 2 === 0 ? 'C' : 'D'; }
+  };
+  var SNAME = { gentil: 'Gentil', mechant: 'Méchant', donnant: 'Donnant-donnant', rancunier: 'Rancunier', lunatique: 'Lunatique' };
+  function pdChoice(name, mine, his) { return STRATS[name](mine, his); }
+  function pdMatch(s1, s2, r) {
+    r = r || 10; var R = { a: 0, b: 0, ma: [], mb: [], pa: [], pb: [] };
+    for (var i = 0; i < r; i++) {
+      var x = pdChoice(s1, R.ma, R.mb), y = pdChoice(s2, R.mb, R.ma), p = pdPayoff(x, y);
+      R.ma.push(x); R.mb.push(y); R.pa.push(p[0]); R.pb.push(p[1]); R.a += p[0]; R.b += p[1];
+    }
+    return R;
+  }
+  function pdTournament(names, r) {
+    var T = {};
+    names.forEach(function (n) { T[n] = { name: n, total: 0, won: 0, draw: 0, lost: 0 }; });
+    for (var i = 0; i < names.length; i++) for (var j = i; j < names.length; j++) {
+      var M = pdMatch(names[i], names[j], r);
+      if (i === j) { T[names[i]].total += M.a; continue; }
+      T[names[i]].total += M.a; T[names[j]].total += M.b;
+      if (M.a > M.b) { T[names[i]].won++; T[names[j]].lost++; }
+      else if (M.a < M.b) { T[names[j]].won++; T[names[i]].lost++; }
+      else { T[names[i]].draw++; T[names[j]].draw++; }
+    }
+    return names.map(function (n) { return T[n]; }).sort(function (p, q) { return q.total - p.total; });
+  }
+
+  /* ================= Hero ================= */
+  (function () {
+    var h = '';
+    for (var j = 0; j < 21; j++) h += '<span class="m' + (j === 0 ? ' hint' : '') + (j > 0 && (21 - j) % 4 === 0 ? ' gap' : '') + '"></span>';
+    $('heroSticks').innerHTML = h;
+  })();
+
+  /* ================= Allumettes ================= */
+  var al = { start: 21, n: 21, kidFirst: true, turn: 'kid', over: false, winner: null, gen: 0, log: [], show: false, cpuTake: 0 };
+  function alNew() {
+    al.gen++; al.start = +$('alN').value; al.n = al.start; al.turn = al.kidFirst ? 'kid' : 'cpu';
+    al.over = false; al.winner = null; al.log = []; al.cpuTake = 0;
+    alRender(); if (al.turn === 'cpu') alCpu();
+  }
+  function alRender() {
+    $('alNOut').textContent = al.start;
+    var r = allumMove(al.n, 3), h = '', kidTurn = !al.over && al.turn === 'kid' && !al.cpuTake;
+    for (var j = 0; j < al.n; j++) {
+      var cls = 'm';
+      if (al.show && kidTurn && j < r) cls += ' hint';
+      if (al.cpuTake && j < al.cpuTake) cls += ' cpu';
+      if (al.show && j > 0 && (al.n - j) % 4 === 0) cls += ' gap';
+      h += '<span class="' + cls + '"></span>';
+    }
+    $('alSticks').innerHTML = h || '<span class="soft">Plus aucune allumette.</span>';
+    $('alCount').textContent = al.n > 1 ? al.n + ' allumettes' : al.n + ' allumette';
+    for (var m = 1; m <= 3; m++) $('alT' + m).disabled = !kidTurn || m > al.n;
+    var out = $('alOut');
+    if (al.over) {
+      if (al.winner === 'kid') { out.className = 'verdict yes'; out.innerHTML = 'Bravo, tu as pris la dernière allumette : tu as gagné !<span>Tu as trouvé le secret, ou tu as eu de la chance ? Rejoue pour vérifier.</span>'; }
+      else { out.className = 'verdict no'; out.innerHTML = 'L\'ordinateur a pris la dernière allumette : il a gagné.<span>' + (al.show ? 'Rejoue et suis les allumettes entourées.' : 'Indice : regarde combien il en reste après chaque coup de l\'ordinateur.') + '</span>'; }
+    } else if (al.cpuTake) {
+      out.className = 'verdict cpu'; out.innerHTML = 'L\'ordinateur prend ' + pl(al.cpuTake, 'allumette') + '.';
+    } else if (al.turn === 'cpu') {
+      out.className = 'verdict cpu'; out.innerHTML = 'L\'ordinateur réfléchit…';
+    } else {
+      out.className = 'verdict info';
+      var t = 'À toi ! Prends 1, 2 ou 3 allumettes.';
+      if (al.show) t += r ? '<span>Il reste ' + al.n + '. Le multiple de 4 juste en dessous est ' + (al.n - r) + ' : prends <strong>' + r + '</strong> (les allumettes entourées).</span>'
+        : '<span>Aïe : ' + al.n + ' est un multiple de 4, c\'est une position P. Aucun coup ne gagne à coup sûr. Prends-en une et espère une erreur… (l\'ordinateur n\'en fait pas).</span>';
+      out.innerHTML = t;
+    }
+    $('alLog').textContent = al.log.join(' · ');
+  }
+  function alTake(who, m) {
+    al.n -= m; al.cpuTake = 0;
+    al.log.push((who === 'kid' ? 'Toi −' : 'Ordi −') + m + ' → ' + al.n);
+    if (al.n === 0) { al.over = true; al.winner = who; } else al.turn = who === 'kid' ? 'cpu' : 'kid';
+    alRender(); if (!al.over && al.turn === 'cpu') alCpu();
+  }
+  function alCpu() {
+    var g = al.gen;
+    setTimeout(function () {
+      if (g !== al.gen) return;
+      var m = allumMove(al.n, 3); if (!m) m = rnd(1, Math.min(3, al.n));
+      al.cpuTake = m; alRender();
+      setTimeout(function () { if (g !== al.gen) return; alTake('cpu', m); }, DELAY);
+    }, 450);
+  }
+  [1, 2, 3].forEach(function (m) { $('alT' + m).addEventListener('click', function () { if (!al.over && al.turn === 'kid' && !al.cpuTake && m <= al.n) alTake('kid', m); }); });
+  $('alN').addEventListener('input', alNew);
+  $('alNew').addEventListener('click', alNew);
+  $('alKid').addEventListener('click', function () { al.kidFirst = true; press(['alKid', 'alCpuFirst'], 'alKid'); alNew(); });
+  $('alCpuFirst').addEventListener('click', function () { al.kidFirst = false; press(['alKid', 'alCpuFirst'], 'alCpuFirst'); alNew(); });
+  $('alShow').addEventListener('click', function () { al.show = !al.show; $('alShow').setAttribute('aria-pressed', al.show ? 'true' : 'false'); alRender(); });
+  alNew();
+
+  /* ================= Tableau G / P ================= */
+  var gp = { k: 3, filled: 0, max: 24 };
+  function gpRender() {
+    var t = gpTable(gp.max, gp.k), h = '';
+    for (var i = 0; i <= gp.max; i++) {
+      var f = i < gp.filled;
+      h += '<div class="' + (f ? t[i] : '') + (f && i === gp.filled - 1 ? ' last' : '') + '"><span>' + i + '</span><b>' + (f ? t[i] : '?') + '</b></div>';
+    }
+    $('gpGrid').innerHTML = h;
+    var out = $('gpOut'), n = gp.filled - 1;
+    if (n < 0) { out.innerHTML = 'Chaque case est un nombre d\'allumettes restantes. Appuie sur « Case suivante ».'; }
+    else if (n === 0) { out.innerHTML = '0 allumette : P.<span>Celui qui doit jouer ne peut plus rien prendre : l\'autre vient de prendre la dernière. Il a perdu.</span>'; }
+    else {
+      var moves = [], win = 0;
+      for (var m = 1; m <= gp.k && m <= n; m++) { moves.push(n - m + ' (' + t[n - m] + ')'); if (!win && t[n - m] === 'P') win = m; }
+      out.innerHTML = n + ' allumettes : ' + t[n] + '.<span>On peut aller vers ' + moves.join(', ') + '. ' +
+        (win ? 'On peut atteindre une position P en prenant ' + win + ' : donc ' + n + ' est G.' : 'Tous les coups mènent vers une position G : donc ' + n + ' est P.') +
+        (gp.filled > gp.max ? ' Les positions P sont tous les multiples de ' + (gp.k + 1) + '.' : '') + '</span>';
+    }
+    $('gpStep').disabled = gp.filled > gp.max;
+  }
+  function gpSetK(k) { gp.k = k; gp.filled = 0; press(['gpK2', 'gpK3', 'gpK4'], 'gpK' + k); gpRender(); }
+  [2, 3, 4].forEach(function (k) { $('gpK' + k).addEventListener('click', function () { gpSetK(k); }); });
+  $('gpStep').addEventListener('click', function () { if (gp.filled <= gp.max) gp.filled++; gpRender(); });
+  $('gpAll').addEventListener('click', function () { gp.filled = gp.max + 1; gpRender(); });
+  $('gpReset').addEventListener('click', function () { gp.filled = 0; gpRender(); });
+  gpRender();
+
+  /* ================= Course à 20 ================= */
+  var cr = { t: 0, kidFirst: true, turn: 'kid', over: false, winner: null, gen: 0, log: [], show: false, cpuAdd: 0 };
+  var CR_KEYS = courseKeys(20, 2);
+  function crNew() {
+    cr.gen++; cr.t = 0; cr.turn = cr.kidFirst ? 'kid' : 'cpu'; cr.over = false; cr.winner = null; cr.log = []; cr.cpuAdd = 0;
+    crRender(); if (cr.turn === 'cpu') crCpu();
+  }
+  function crRender() {
+    var h = '';
+    for (var i = 0; i <= 20; i++) {
+      var cls = i === cr.t ? 'cur' : (i < cr.t ? 'on' : '');
+      if (cr.show && CR_KEYS.indexOf(i) >= 0) cls += ' key';
+      h += '<span class="' + cls + '">' + i + '</span>';
+    }
+    $('crLine').innerHTML = h; $('crTotal').textContent = cr.t;
+    var kidTurn = !cr.over && cr.turn === 'kid' && !cr.cpuAdd;
+    $('crP1').disabled = !kidTurn; $('crP2').disabled = !kidTurn || cr.t + 2 > 20;
+    var out = $('crOut');
+    if (cr.over) {
+      if (cr.winner === 'kid') { out.className = 'verdict yes'; out.innerHTML = 'Tu as dit 20 : tu as gagné !'; }
+      else { out.className = 'verdict no'; out.innerHTML = 'L\'ordinateur a dit 20 : il a gagné.<span>Regarde les nombres qu\'il a dits. Tu vois une régularité ?</span>'; }
+    } else if (cr.cpuAdd) { out.className = 'verdict cpu'; out.innerHTML = 'L\'ordinateur ajoute ' + cr.cpuAdd + ' et dit « ' + (cr.t + cr.cpuAdd) + ' ».'; }
+    else if (cr.turn === 'cpu') { out.className = 'verdict cpu'; out.innerHTML = 'L\'ordinateur réfléchit…'; }
+    else {
+      var r = courseMove(cr.t, 20, 2);
+      out.className = 'verdict info';
+      out.innerHTML = 'À toi ! Ajoute 1 ou 2.' + (cr.show ? (r ? '<span>Le prochain nombre-clé est ' + (cr.t + r) + ' : ajoute <strong>' + r + '</strong>.</span>' : '<span>' + (cr.t === 0 ? 'Tu pars de 0, et 0 n\'est pas un nombre-clé : en commençant, tu peux toujours dire 2.' : cr.t + ' est un nombre-clé dit par l\'ordinateur : aucun coup ne gagne à coup sûr.') + '</span>') : '');
+    }
+    $('crLog').textContent = cr.log.join(' · ');
+  }
+  function crAdd(who, m) {
+    cr.t += m; cr.cpuAdd = 0; cr.log.push((who === 'kid' ? 'Toi : ' : 'Ordi : ') + cr.t);
+    if (cr.t === 20) { cr.over = true; cr.winner = who; } else cr.turn = who === 'kid' ? 'cpu' : 'kid';
+    crRender(); if (!cr.over && cr.turn === 'cpu') crCpu();
+  }
+  function crCpu() {
+    var g = cr.gen;
+    setTimeout(function () {
+      if (g !== cr.gen) return;
+      var m = courseMove(cr.t, 20, 2); if (!m) m = cr.t + 2 > 20 ? 1 : rnd(1, 2);
+      cr.cpuAdd = m; crRender();
+      setTimeout(function () { if (g !== cr.gen) return; crAdd('cpu', m); }, DELAY);
+    }, 450);
+  }
+  $('crP1').addEventListener('click', function () { if (!cr.over && cr.turn === 'kid' && !cr.cpuAdd) crAdd('kid', 1); });
+  $('crP2').addEventListener('click', function () { if (!cr.over && cr.turn === 'kid' && !cr.cpuAdd && cr.t + 2 <= 20) crAdd('kid', 2); });
+  $('crNew').addEventListener('click', crNew);
+  $('crKid').addEventListener('click', function () { cr.kidFirst = true; press(['crKid', 'crCpuFirst'], 'crKid'); crNew(); });
+  $('crCpuFirst').addEventListener('click', function () { cr.kidFirst = false; press(['crKid', 'crCpuFirst'], 'crCpuFirst'); crNew(); });
+  $('crShow').addEventListener('click', function () { cr.show = !cr.show; $('crShow').setAttribute('aria-pressed', cr.show ? 'true' : 'false'); crRender(); });
+  crNew();
+
+  /* ================= Course généralisée ================= */
+  function gnRender() {
+    var N = +$('gnN').value, k = +$('gnK').value, keys = courseKeys(N, k), r = N % (k + 1);
+    $('gnNOut').textContent = N; $('gnKOut').textContent = k;
+    $('gnKeys').innerHTML = keys.map(function (x) { return '<span>' + x + '</span>'; }).join('');
+    var out = $('gnOut');
+    if (r) { out.className = 'verdict yes'; out.innerHTML = 'Le premier joueur gagne : il dit ' + r + ' tout de suite.<span>On descend de ' + (k + 1) + ' en ' + (k + 1) + ' depuis ' + N + ' (car 1 + ' + k + ' = ' + (k + 1) + '). ' + N + ' = ' + Math.floor(N / (k + 1)) + ' × ' + (k + 1) + ' + ' + r + ', donc le plus petit nombre-clé est ' + r + '. Ensuite, si l\'autre ajoute x, il ajoute ' + (k + 1) + ' − x.</span>'; }
+    else { out.className = 'verdict no'; out.innerHTML = 'Le premier joueur perd (si l\'autre joue bien).<span>' + N + ' = ' + (N / (k + 1)) + ' × ' + (k + 1) + ' : en descendant de ' + (k + 1) + ' en ' + (k + 1) + ', on tombe sur 0. Le départ est une position P : le second joueur peut toujours compléter à ' + (k + 1) + '.</span>'; }
+  }
+  $('gnN').addEventListener('input', gnRender); $('gnK').addEventListener('input', gnRender); gnRender();
+
+  /* ================= Nim ================= */
+  var HN = ['A', 'B', 'C'];
+  var nim = { h: [3, 4, 5], kidFirst: true, turn: 'kid', over: false, winner: null, sel: null, cpuSel: null, gen: 0, hint: 0, log: [] };
+  function nimNew() {
+    nim.gen++;
+    nim.h = [+$('nA').value, +$('nB').value, +$('nC').value];
+    $('nAOut').textContent = nim.h[0]; $('nBOut').textContent = nim.h[1]; $('nCOut').textContent = nim.h[2];
+    nim.turn = nim.kidFirst ? 'kid' : 'cpu'; nim.over = false; nim.winner = null; nim.sel = null; nim.cpuSel = null; nim.hint = 0; nim.log = [];
+    $('nmHint').className = 'verdict'; $('nmHint').innerHTML = '';
+    nimRender(); if (nim.turn === 'cpu') nimCpu();
+  }
+  function binHTML(h) {
+    var bits = [8, 4, 2, 1], s = nimSum(h);
+    var head = '<tr><th class="l">Tas</th>' + bits.map(function (b) { return '<th>' + b + '</th>'; }).join('') + '</tr>';
+    var rows = h.map(function (v, i) { return '<tr><th class="l">' + HN[i] + ' = ' + v + '</th>' + bits.map(function (b) { return '<td>' + ((v & b) ? 1 : 0) + '</td>'; }).join('') + '</tr>'; }).join('');
+    var cnt = '<tr><th class="l">Nombre de 1</th>' + bits.map(function (b) { var c = h.filter(function (v) { return v & b; }).length; return '<td class="' + (c % 2 ? 'odd' : 'even') + '">' + c + '</td>'; }).join('') + '</tr>';
+    var sumRow = '<tr class="sum"><th class="l">Somme de Nim = ' + s + '</th>' + bits.map(function (b) { return '<td>' + ((s & b) ? 1 : 0) + '</td>'; }).join('') + '</tr>';
+    return head + rows + cnt + sumRow;
+  }
+  function nimRender() {
+    var kidTurn = !nim.over && nim.turn === 'kid' && !nim.cpuSel, h = '';
+    for (var i = 0; i < 3; i++) {
+      h += '<div class="heap"><b>' + HN[i] + '</b><div class="stks">';
+      for (var j = 0; j < nim.h[i]; j++) {
+        var cls = 'stk';
+        if (nim.sel && nim.sel.heap === i && j >= nim.sel.j) cls += ' sel';
+        if (nim.cpuSel && nim.cpuSel.heap === i && j >= nim.h[i] - nim.cpuSel.take) cls += ' cpu';
+        h += '<button type="button" class="' + cls + '" data-h="' + i + '" data-j="' + j + '" aria-label="Tas ' + HN[i] + ', allumette ' + (j + 1) + '"' + (kidTurn ? '' : ' disabled') + '><span class="m"></span></button>';
+      }
+      if (!nim.h[i]) h += '<span class="soft" style="padding-bottom:8px">vide</span>';
+      h += '</div></div>';
+    }
+    $('nmHeaps').innerHTML = h;
+    if (nim.sel) { var k = nim.h[nim.sel.heap] - nim.sel.j; $('nmSel').textContent = 'Tu prends ' + pl(k, 'allumette') + ' du tas ' + HN[nim.sel.heap] + ' : il en restera ' + nim.sel.j + '.'; }
+    else $('nmSel').textContent = kidTurn ? 'Touche une allumette pour choisir ton coup.' : '';
+    $('nmTake').disabled = !kidTurn || !nim.sel;
+    $('nmHintBtn').disabled = !kidTurn;
+    $('nmBin').innerHTML = binHTML(nim.h);
+    var out = $('nmOut');
+    if (nim.over) {
+      if (nim.winner === 'kid') { out.className = 'verdict yes'; out.innerHTML = 'Tu as pris la dernière allumette : tu as gagné !'; }
+      else { out.className = 'verdict no'; out.innerHTML = 'L\'ordinateur a pris la dernière allumette : il a gagné.<span>Regarde le tableau binaire après chacun de ses coups : toutes les colonnes sont paires.</span>'; }
+    } else if (nim.cpuSel) { out.className = 'verdict cpu'; out.innerHTML = 'L\'ordinateur prend ' + pl(nim.cpuSel.take, 'allumette') + ' du tas ' + HN[nim.cpuSel.heap] + '.'; }
+    else if (nim.turn === 'cpu') { out.className = 'verdict cpu'; out.innerHTML = 'L\'ordinateur réfléchit…'; }
+    else { out.className = 'verdict info'; out.innerHTML = 'À toi de jouer !'; }
+    $('nmLog').textContent = nim.log.join(' · ');
+  }
+  function nimApply(who, heap, take) {
+    nim.h[heap] -= take; nim.sel = null; nim.cpuSel = null; nim.hint = 0;
+    $('nmHint').className = 'verdict'; $('nmHint').innerHTML = '';
+    nim.log.push((who === 'kid' ? 'Toi : ' : 'Ordi : ') + '−' + take + ' en ' + HN[heap] + ' → ' + nim.h.join('-'));
+    if (nim.h[0] + nim.h[1] + nim.h[2] === 0) { nim.over = true; nim.winner = who; } else nim.turn = who === 'kid' ? 'cpu' : 'kid';
+    nimRender(); if (!nim.over && nim.turn === 'cpu') nimCpu();
+  }
+  function nimCpu() {
+    var g = nim.gen;
+    setTimeout(function () {
+      if (g !== nim.gen) return;
+      var mv = nimMove(nim.h);
+      if (!mv) { var big = 0; for (var i = 1; i < 3; i++) if (nim.h[i] > nim.h[big]) big = i; mv = { heap: big, take: 1 }; }
+      nim.cpuSel = { heap: mv.heap, take: mv.take }; nimRender();
+      setTimeout(function () { if (g !== nim.gen) return; nimApply('cpu', mv.heap, mv.take); }, DELAY + 250);
+    }, 450);
+  }
+  $('nmHeaps').addEventListener('click', function (e) {
+    var b = e.target.closest ? e.target.closest('.stk') : null;
+    if (!b || nim.over || nim.turn !== 'kid' || nim.cpuSel) return;
+    nim.sel = { heap: +b.getAttribute('data-h'), j: +b.getAttribute('data-j') }; nimRender();
+  });
+  $('nmTake').addEventListener('click', function () {
+    if (!nim.sel || nim.over || nim.turn !== 'kid' || nim.cpuSel) return;
+    nimApply('kid', nim.sel.heap, nim.h[nim.sel.heap] - nim.sel.j);
+  });
+  $('nmHintBtn').addEventListener('click', function () {
+    if (nim.over || nim.turn !== 'kid') return;
+    var s = nimSum(nim.h), mv = nimMove(nim.h), out = $('nmHint'), odd = [8, 4, 2, 1].filter(function (b) { return s & b; });
+    nim.hint = Math.min(nim.hint + 1, 2);
+    out.className = 'verdict info';
+    if (!mv) { out.innerHTML = 'Somme de Nim = 0 : toutes les colonnes sont paires.<span>C\'est une position P pour toi. Aucun coup ne gagne à coup sûr : prends une seule allumette et espère une erreur.</span>'; return; }
+    var t = 'Indice ' + nim.hint + ' / 2<span>Somme de Nim = ' + s + '. Colonne' + (odd.length > 1 ? 's' : '') + ' impaire' + (odd.length > 1 ? 's' : '') + ' : ' + odd.join(', ') + '. Il faut rendre toutes les colonnes paires.</span>';
+    if (nim.hint >= 2) t += '<span>Joue dans le tas ' + HN[mv.heap] + ' : passe-le de ' + nim.h[mv.heap] + ' (' + toBin(nim.h[mv.heap], 4) + ') à ' + mv.leave + ' (' + toBin(mv.leave, 4) + '). Prends donc ' + pl(mv.take, 'allumette') + '.</span>';
+    out.innerHTML = t;
+  });
+  ['nA', 'nB', 'nC'].forEach(function (id) { $(id).addEventListener('input', nimNew); });
+  $('nmNew').addEventListener('click', nimNew);
+  $('nmKid').addEventListener('click', function () { nim.kidFirst = true; press(['nmKid', 'nmCpuFirst'], 'nmKid'); nimNew(); });
+  $('nmCpuFirst').addEventListener('click', function () { nim.kidFirst = false; press(['nmKid', 'nmCpuFirst'], 'nmCpuFirst'); nimNew(); });
+  nimNew();
+
+  /* ================= Morpion ================= */
+  var LEVELS = ['hasard', 'moyen', 'parfait'];
+  var tt = { b: [], kidFirst: true, kid: 'X', turn: 'X', level: 'parfait', over: false, win: null, auto: false, gen: 0, sc: { k: 0, c: 0, d: 0 } };
+  var ttCells = [];
+  for (var ci = 0; ci < 9; ci++) {
+    (function (i) {
+      var b = document.createElement('button'); b.type = 'button'; b.setAttribute('aria-label', 'Case ' + (i + 1));
+      b.addEventListener('click', function () { if (!tt.over && !tt.auto && tt.turn === tt.kid && !tt.b[i]) ttPlay(i); });
+      $('ttBoard').appendChild(b); ttCells.push(b);
+    })(ci);
+  }
+  function ttNew(auto) {
+    tt.gen++; tt.b = ['', '', '', '', '', '', '', '', '']; tt.auto = !!auto; tt.kid = tt.kidFirst ? 'X' : 'O';
+    tt.turn = 'X'; tt.over = false; tt.win = null; ttRender(); ttNext();
+  }
+  function sym(p) { return p === 'X' ? '✕' : (p === 'O' ? '◯' : ''); }
+  function ttRender() {
+    for (var i = 0; i < 9; i++) {
+      var c = ttCells[i], p = tt.b[i];
+      c.textContent = sym(p);
+      c.className = p ? (tt.auto ? (p === 'X' ? 'k' : 'c') : (p === tt.kid ? 'k' : 'c')) : '';
+      if (tt.win && tt.win.line.indexOf(i) >= 0) c.className += ' win';
+      c.disabled = tt.over || tt.auto || tt.turn !== tt.kid || !!p;
+      c.setAttribute('aria-label', 'Case ' + (i + 1) + (p ? ' : ' + (p === 'X' ? 'croix' : 'rond') : ' : vide'));
+    }
+    var out = $('ttOut');
+    if (tt.over) {
+      if (tt.auto) { out.className = 'verdict info'; out.innerHTML = tt.win ? 'Victoire de ' + sym(tt.win.who) + ' ?! (cela ne devrait jamais arriver)' : 'Match nul, comme toujours !<span>Deux joueurs parfaits ne peuvent jamais se battre au morpion.</span>'; }
+      else if (!tt.win) { out.className = 'verdict info'; out.innerHTML = 'Match nul !' + (tt.level === 'parfait' ? '<span>C\'est le meilleur résultat possible contre un joueur parfait. Bien joué !</span>' : ''); }
+      else if (tt.win.who === tt.kid) { out.className = 'verdict yes'; out.innerHTML = 'Bravo, tu as aligné trois ' + (tt.kid === 'X' ? 'croix' : 'ronds') + ' : tu as gagné !' + (tt.level !== 'parfait' ? '<span>Essaie maintenant le niveau « Parfait ».</span>' : ''); }
+      else { out.className = 'verdict no'; out.innerHTML = 'L\'ordinateur a aligné trois symboles : il a gagné.<span>Contre « Parfait », vise le match nul : bloque chaque menace.</span>'; }
+    } else if (tt.auto || tt.turn !== tt.kid) { out.className = 'verdict cpu'; out.innerHTML = (tt.auto ? 'L\'ordinateur ' + sym(tt.turn) : 'L\'ordinateur') + ' réfléchit…'; }
+    else { out.className = 'verdict info'; out.innerHTML = 'À toi ! Tu joues les ' + (tt.kid === 'X' ? 'croix ✕' : 'ronds ◯') + '.'; }
+    $('ttScore').innerHTML = '<span>Toi : ' + tt.sc.k + '</span><span>Ordinateur : ' + tt.sc.c + '</span><span>Nuls : ' + tt.sc.d + '</span>';
+    $('ttAuto').disabled = tt.auto && !tt.over;
+  }
+  function ttPlay(i) {
+    tt.b[i] = tt.turn;
+    var w = tttWinner(tt.b);
+    if (w) { tt.over = true; tt.win = w; if (!tt.auto) { if (w.who === tt.kid) tt.sc.k++; else tt.sc.c++; } }
+    else if (empties(tt.b).length === 0) { tt.over = true; if (!tt.auto) tt.sc.d++; }
+    else tt.turn = other(tt.turn);
+    ttRender(); ttNext();
+  }
+  function ttNext() {
+    if (tt.over || (!tt.auto && tt.turn === tt.kid)) return;
+    var g = tt.gen;
+    setTimeout(function () {
+      if (g !== tt.gen || tt.over) return;
+      var lvl = tt.auto ? 'parfait' : tt.level;
+      var i = lvl === 'hasard' ? pick(empties(tt.b)) : (lvl === 'moyen' ? tttMedium(tt.b, tt.turn) : tttBest(tt.b, tt.turn));
+      ttPlay(i);
+    }, DELAY);
+  }
+  LEVELS.forEach(function (l, i) { $('ttL' + i).addEventListener('click', function () { tt.level = l; press(['ttL0', 'ttL1', 'ttL2'], 'ttL' + i); ttNew(false); }); });
+  $('ttKid').addEventListener('click', function () { tt.kidFirst = true; press(['ttKid', 'ttCpuFirst'], 'ttKid'); ttNew(false); });
+  $('ttCpuFirst').addEventListener('click', function () { tt.kidFirst = false; press(['ttKid', 'ttCpuFirst'], 'ttCpuFirst'); ttNew(false); });
+  $('ttNew').addEventListener('click', function () { ttNew(false); });
+  $('ttAuto').addEventListener('click', function () { ttNew(true); });
+  ttNew(false);
+  $('ttCount').addEventListener('click', function () {
+    var r = tttCount();
+    $('ttCountOut').className = 'verdict info';
+    $('ttCountOut').innerHTML = fmt(r.games) + ' parties différentes !<span>Les croix en gagnent ' + fmt(r.xWins) + ', les ronds ' + fmt(r.oWins) + ', et ' + fmt(r.draws) + ' finissent par un nul.</span><span>Il y a ' + fmt(r.positions) + ' grilles différentes qu\'on peut voir pendant une partie (grille vide comprise). Si on considère qu\'une grille tournée ou retournée comme dans un miroir est la même, il en reste seulement 765.</span><span>Pour les échecs, le nombre de parties possibles est si grand qu\'aucun ordinateur ne pourra jamais toutes les compter.</span>';
+  });
+
+  /* ================= Dilemme du prisonnier ================= */
+  var OPP = ['gentil', 'mechant', 'donnant'];
+  var DESC = { gentil: 'Gentil coopère toujours, quoi que tu fasses.', mechant: 'Méchant trahit toujours, quoi que tu fasses.', donnant: 'Donnant-donnant coopère au premier tour, puis copie ton coup du tour précédent.' };
+  var pd = { opp: 'donnant', me: [], him: [], pm: [], ph: [], busy: false, gen: 0 };
+  function pdNew() { pd.gen++; pd.me = []; pd.him = []; pd.pm = []; pd.ph = []; pd.busy = false; pdRender(); }
+  function sum(a) { return a.reduce(function (s, v) { return s + v; }, 0); }
+  function word(c) { return c === 'C' ? 'coopère' : 'trahit'; }
+  function pdRender(pending) {
+    var n = pd.me.length, done = n >= 10, tm = sum(pd.pm), th = sum(pd.ph);
+    $('pdDesc').textContent = DESC[pd.opp];
+    $('pdRound').textContent = Math.min(n + 1, 10); $('pdMe').textContent = tm; $('pdHim').textContent = th;
+    $('pdC').disabled = $('pdD').disabled = done || pd.busy;
+    var rows = '<tr><th>Manche</th><th>Toi</th><th>Lui</th><th>Points</th></tr>';
+    for (var i = 0; i < n; i++) rows += '<tr><td>' + (i + 1) + '</td><td class="k">' + word(pd.me[i]) + '</td><td class="c">' + word(pd.him[i]) + '</td><td>' + pd.pm[i] + ' – ' + pd.ph[i] + '</td></tr>';
+    $('pdHist').innerHTML = n ? rows : '';
+    var out = $('pdOut');
+    if (pending) { out.className = 'verdict cpu'; out.innerHTML = 'Tu ' + word(pending) + '… ' + SNAME[pd.opp] + ' dévoile son choix…'; }
+    else if (done) {
+      var lesson = { gentil: 'Contre Gentil, trahir rapporte beaucoup… mais dans la vraie vie, peu de gens se laissent faire 10 fois.', mechant: 'Contre Méchant, le mieux est de trahir aussi : 10 points chacun. Personne ne s\'en sort bien.', donnant: 'Contre Donnant-donnant, coopérer à chaque manche donne 30 points chacun : c\'est le plus gros total possible pour vous deux.' }[pd.opp];
+      if (tm > th) { out.className = 'verdict yes'; out.innerHTML = 'Fini ! Tu gagnes le duel : ' + tm + ' points contre ' + th + '.<span>' + lesson + '</span>'; }
+      else if (tm === th) { out.className = 'verdict info'; out.innerHTML = 'Fini ! Égalité : ' + tm + ' points chacun.<span>' + lesson + '</span>'; }
+      else { out.className = 'verdict no'; out.innerHTML = 'Fini ! ' + SNAME[pd.opp] + ' a plus de points : ' + th + ' contre ' + tm + ' pour toi.<span>' + lesson + '</span>'; }
+    } else if (n) { out.className = 'verdict info'; out.innerHTML = 'Manche ' + n + ' : tu ' + word(pd.me[n - 1]) + ', ' + SNAME[pd.opp] + ' ' + word(pd.him[n - 1]) + '.<span>Tu gagnes ' + pd.pm[n - 1] + ' point' + (pd.pm[n - 1] > 1 ? 's' : '') + ', lui ' + pd.ph[n - 1] + '.</span>'; }
+    else { out.className = 'verdict info'; out.innerHTML = 'Choisis : coopérer ou trahir ? Ton adversaire choisit en même temps que toi.'; }
+  }
+  function pdPlay(c) {
+    if (pd.busy || pd.me.length >= 10) return;
+    var o = pdChoice(pd.opp, pd.him, pd.me), g = pd.gen; /* choix fait AVANT de connaître le tien */
+    pd.busy = true; pdRender(c);
+    setTimeout(function () {
+      if (g !== pd.gen) return;
+      var p = pdPayoff(c, o); pd.me.push(c); pd.him.push(o); pd.pm.push(p[0]); pd.ph.push(p[1]); pd.busy = false; pdRender();
+    }, DELAY);
+  }
+  OPP.forEach(function (s, i) { $('pdO' + i).addEventListener('click', function () { pd.opp = s; press(['pdO0', 'pdO1', 'pdO2'], 'pdO' + i); pdNew(); }); });
+  $('pdC').addEventListener('click', function () { pdPlay('C'); });
+  $('pdD').addEventListener('click', function () { pdPlay('D'); });
+  $('pdNew').addEventListener('click', pdNew);
+  pdNew();
+  $('pdTour').addEventListener('click', function () {
+    var R = pdTournament(['gentil', 'mechant', 'donnant', 'rancunier', 'lunatique'], 10);
+    $('pdTourOut').innerHTML = '<tr><th>Rang</th><th class="l">Stratégie</th><th>Points</th><th>Duels gagnés / nuls / perdus</th></tr>' +
+      R.map(function (r, i) { return '<tr><td>' + (i + 1) + '</td><td style="text-align:left">' + SNAME[r.name] + '</td><td><strong>' + r.total + '</strong></td><td>' + r.won + ' / ' + r.draw + ' / ' + r.lost + '</td></tr>'; }).join('');
+    var m = R.filter(function (r) { return r.name === 'mechant'; })[0];
+    $('pdTourNote').className = 'verdict info';
+    $('pdTourNote').innerHTML = 'Méchant a perdu ' + m.lost + ' duel' + (m.lost > 1 ? 's' : '') + ', mais il finit seulement ' + (R.indexOf(m) + 1) + '<sup>e</sup>.<span>Gagner chaque duel n\'est pas la même chose que gagner beaucoup de points.</span>';
+  });
+
+  /* ================= Quiz ================= */
+  function makeQ(t) {
+    var n, k, N, r, h, s, i, mv;
+    if (t === 0) { do { n = rnd(6, 30); } while (n % 4 === 0); r = n % 4; return { q: 'Allumettes (on prend 1, 2 ou 3, la dernière gagne). Il en reste ' + n + ' et c\'est à toi. Combien en prends-tu pour gagner à coup sûr ?', a: r, how: 'Laisse un multiple de 4 : ' + n + ' − ' + r + ' = ' + (n - r) + ' = ' + ((n - r) / 4) + ' × 4' }; }
+    if (t === 1) { k = rnd(4, 6); do { n = rnd(10, 40); } while (n % (k + 1) === 0); r = n % (k + 1); return { q: 'Allumettes, mais on peut prendre de 1 à ' + k + ' (la dernière gagne). Il en reste ' + n + '. Combien en prends-tu ?', a: r, how: 'Laisse un multiple de ' + (k + 1) + ' (= 1 + ' + k + ') : ' + n + ' − ' + r + ' = ' + (n - r) }; }
+    if (t === 2) { do { N = rnd(15, 40); } while (N % 3 === 0); r = N % 3; return { q: 'Course à ' + N + ' : on ajoute 1 ou 2, le premier qui dit ' + N + ' gagne. Tu commences. Quel nombre dis-tu ?', a: r, how: 'Nombres-clés : ' + courseKeys(N, 2).join(', ') + '. Le plus petit est ' + r }; }
+    if (t === 3) { k = rnd(3, 10); do { N = rnd(30, 100); } while (N % (k + 1) === 0); r = N % (k + 1); return { q: 'Course à ' + N + ' : on ajoute de 1 à ' + k + '. Tu commences. Quel nombre dois-tu dire en premier ?', a: r, how: N + ' = ' + Math.floor(N / (k + 1)) + ' × ' + (k + 1) + ' + ' + r + ' : le plus petit nombre-clé est ' + r }; }
+    if (t === 4) { h = [rnd(1, 7), rnd(1, 7), rnd(1, 7)]; s = nimSum(h); return { q: 'Quelle est la somme de Nim des tas ' + h.join(', ') + ' ?', a: s, how: h.map(function (v) { return v + ' = ' + toBin(v, 3); }).join(' ; ') + ' → colonnes impaires : ' + toBin(s, 3) + ' = ' + s }; }
+    if (t === 5) {
+      do { h = [rnd(1, 9), rnd(1, 9), rnd(1, 9)]; s = nimSum(h); } while (s === 0);
+      mv = nimMove(h);
+      return { q: 'Nim avec les tas A = ' + h[0] + ', B = ' + h[1] + ', C = ' + h[2] + '. Le coup gagnant se joue dans le tas ' + HN[mv.heap] + '. Combien d\'allumettes doit-il y rester ?', a: mv.leave, how: 'Somme de Nim = ' + s + '. ' + HN[mv.heap] + ' = ' + toBin(h[mv.heap], 4) + ' doit devenir ' + toBin(mv.leave, 4) + ' = ' + mv.leave + ' pour que toutes les colonnes soient paires' };
+    }
+    if (t === 6) {
+      if (Math.random() < 0.5) return { q: 'Au morpion, combien y a-t-il d\'alignements gagnants (lignes, colonnes et diagonales) ?', a: 8, how: '3 lignes + 3 colonnes + 2 diagonales = 8' };
+      return { q: 'Au morpion, le premier joueur a 9 cases. Si on regroupe les cases qui se ressemblent par symétrie, combien de premiers coups vraiment différents y a-t-il ?', a: 3, how: 'Un coin, un bord ou le centre : 3' };
+    }
+    var pairs = [['gentil', 'gentil'], ['gentil', 'mechant'], ['mechant', 'gentil'], ['mechant', 'mechant'], ['donnant', 'mechant'], ['mechant', 'donnant'], ['donnant', 'donnant']];
+    var P = pick(pairs), M = pdMatch(P[0], P[1], 10);
+    return { q: 'Dilemme du prisonnier : tu joues comme « ' + SNAME[P[0]] + ' » contre « ' + SNAME[P[1]] + ' » pendant 10 manches. Combien de points as-tu à la fin ?', a: M.a, how: 'Tes points manche par manche : ' + M.pa.join(' + ') + ' = ' + M.a };
+  }
+  var quiz = $('quiz'), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ''; done = [];
+    for (var k = 0; k < 8; k++) {
+      var Q = makeQ(k), li = document.createElement('li');
+      li.innerHTML = '<span>' + Q.q + '</span><input type="text" id="qa' + k + '" inputmode="numeric" autocomplete="off" aria-label="Ta réponse à la question ' + (k + 1) + '"><button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+      quiz.appendChild(li);
+      (function (k, Q) {
+        function check() {
+          var fb = $('qf' + k), x = num($('qa' + k).value);
+          if (isNaN(x)) { fb.className = 'fb'; fb.textContent = 'Écris un nombre.'; return; }
+          if (x === Q.a) { fb.className = 'fb ok'; fb.innerHTML = 'Bravo, c\'est juste !'; done[k] = true; }
+          else { done[k] = false; fb.className = 'fb no'; fb.innerHTML = 'Pas tout à fait : la réponse est ' + fmt(Q.a) + '.<span>' + Q.how + '</span>'; }
+          $('score').textContent = done.filter(Boolean).length + ' / 8';
+        }
+        $('qb' + k).addEventListener('click', check);
+        $('qa' + k).addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+      })(k, Q);
+    }
+    $('score').textContent = '0 / 8';
+  }
+  $('newQuiz').addEventListener('click', newQuiz);
+  newQuiz();
+
+  window.__jeu = { allumMove: allumMove, gpTable: gpTable, courseKeys: courseKeys, courseMove: courseMove, nimSum: nimSum, nimMove: nimMove, toBin: toBin,
+    tttWinner: tttWinner, tttValue: tttValue, tttBest: tttBest, tttMedium: tttMedium, tttCount: tttCount,
+    pdPayoff: pdPayoff, pdChoice: pdChoice, pdMatch: pdMatch, pdTournament: pdTournament };
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1065 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Les fractales</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, encre brune, marge rouge, accent orange (comme un flocon au coucher du soleil). Les dessins fractals sont au centre. */
+:root {
+  --paper: #fbf7f3;
+  --grid: #efe4da;
+  --card: #ffffff;
+  --ink: #2a1c12;
+  --ink-soft: #6d5747;
+  --acc: #ea580c;
+  --acc-text: #c2410c;
+  --acc-soft: #ffedd5;
+  --two: #1c64c8;
+  --two-soft: #dbe8fa;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #fff0a3;
+  --line: #e6d7ca;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #15100b; --grid: #231a12; --card: #1d150f; --ink: #f5ece4; --ink-soft: #c2ab99;
+    --acc: #fb923c; --acc-text: #fdba74; --acc-soft: #46260f; --two: #7fb0ff; --two-soft: #1a2a45;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #3a2b1f;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #15100b; --grid: #231a12; --card: #1d150f; --ink: #f5ece4; --ink-soft: #c2ab99;
+  --acc: #fb923c; --acc-text: #fdba74; --acc-soft: #46260f; --two: #7fb0ff; --two-soft: #1a2a45;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #3a2b1f;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+.hero svg { width: 100%; max-width: 420px; height: auto; align-self: center; }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 8px 14px; min-height: 44px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button[aria-pressed="true"] { background: var(--acc); color: #fff; }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+input[type="text"] { font: inherit; font-family: var(--f-mono); font-size: 1.05rem; padding: 8px 10px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; }
+input[type="range"] { width: 100%; accent-color: var(--acc); min-height: 32px; }
+.param { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.param label { font-weight: 700; }
+.params { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px 18px; }
+.check { display: flex; gap: 8px; align-items: center; font-weight: 700; cursor: pointer; }
+.check input { width: 22px; height: 22px; accent-color: var(--acc); }
+
+.fig svg, .fig canvas { width: 100%; height: auto; display: block; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; }
+.fig.narrow { max-width: 340px; width: 100%; align-self: center; }
+.fig.mid { max-width: 480px; width: 100%; align-self: center; }
+.cap { font-size: .92rem; color: var(--ink-soft); text-align: center; }
+.big { font-family: var(--f-display); font-weight: 800; font-size: 1.35rem; color: var(--acc-text); }
+
+.stab { border-collapse: separate; border-spacing: 0; width: 100%; font-variant-numeric: tabular-nums; }
+.stab th, .stab td { border: 1.5px solid var(--ink); padding: 6px 8px; text-align: center; font-family: var(--f-mono); font-size: .95rem; }
+.stab th { font-family: var(--f-display); background: var(--paper); }
+.stab tr.cur td { background: var(--acc-soft); font-weight: 600; }
+.scroll { overflow-x: auto; }
+
+.results { display: flex; flex-direction: column; gap: 8px; font-variant-numeric: tabular-nums; }
+.res { border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 12px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; align-items: baseline; }
+.res-name { font-family: var(--f-display); font-weight: 700; }
+.res-val { font-family: var(--f-mono); font-weight: 600; color: var(--acc-text); font-size: 1.05rem; white-space: nowrap; }
+.res-calc { grid-column: 1 / -1; font-family: var(--f-mono); font-size: .9rem; color: var(--ink-soft); overflow-wrap: anywhere; }
+.res.total { border-color: var(--ok); background: var(--ok-soft); }
+.res.total .res-val { color: var(--ok); }
+.err { color: var(--red); font-weight: 700; }
+
+.inputs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 14px; align-items: end; }
+.inputs label { font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.cards svg { width: 100%; max-width: 160px; height: auto; align-self: center; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; color: var(--acc-text); }
+
+.die { display: inline-grid; place-items: center; width: 44px; height: 44px; border: 2px solid var(--ink); border-radius: 8px; font-family: var(--f-display); font-weight: 800; font-size: 1.4rem; background: var(--card); }
+.dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; vertical-align: middle; margin-right: 4px; }
+
+.errs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.errs li { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--paper); }
+.errs .bad { color: var(--red); text-decoration: line-through; overflow-wrap: anywhere; }
+.errs .good { color: var(--ok); font-weight: 700; overflow-wrap: anywhere; }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 110px auto; gap: 10px; align-items: center; }
+.quiz input[type="text"] { font-size: 1rem; padding: 6px 8px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc-text); }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 120px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+<!--ticons--><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Tutoriels"><!--/ticons-->
+<style id="tnav-css">
+.tnav-top { display: flex; margin: 0 0 4px; }
+.tnav-home { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font-weight: 700; font-size: .95rem; text-decoration: none; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tnav-home:hover, .tnav-home:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.tnav-bottom { margin-top: 8px; display: flex; flex-direction: column; gap: 12px; }
+.tnav-bottom h2 { margin: 0; }
+.tnav-pn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tnav-pn a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--ink, #222); border-radius: 10px;
+  background: var(--card, #fff); color: var(--ink, #222); text-decoration: none; box-shadow: 3px 3px 0 var(--ink, #222); min-width: 0; }
+.tnav-pn a span { font-size: .85rem; color: var(--ink-soft, #666); }
+.tnav-pn a strong { overflow-wrap: anywhere; }
+.tnav-pn a.next { text-align: right; grid-column: 2; }
+.tnav-bottom .tnav-home { align-self: center; }
+@media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
+</style>
+</head>
+<body>
+<main class="page">
+<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="index.html">← Tous les tutoriels</a></nav><!--/tnav-->
+
+
+  <header class="hero">
+    <span class="eyebrow">Tutoriel de maths · niveau collège · curiosité</span>
+    <h1>Les fractales</h1>
+    <p class="lead">Une forme qui contient des copies d'elle-même, qui contiennent des copies d'elles-mêmes… à l'infini. Avec une règle toute simple, répétée encore et encore, on fabrique des flocons, des arbres, des fougères et des côtes de longueur infinie.</p>
+    <svg id="heroSvg" viewBox="-12 -12 344 394" role="img" aria-label="Un flocon de Koch à l'étape 4"></svg>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · L'idée</span>
+    <h2>Zoomer… et retrouver la même forme</h2>
+    <p>Une <strong>fractale</strong> est une forme <strong>autosimilaire</strong> : quand on regarde un petit morceau à la loupe, on retrouve <span class="hl">la même forme que le tout</span>, en plus petit. Et en zoomant encore, encore la même.</p>
+    <div class="box">
+      <h3>La loupe magique</h3>
+      <p>Voici une courbe de Koch (tu vas apprendre à la fabriquer à l'étape 2). Fais glisser le zoom : on agrandit le coin gauche de la courbe.</p>
+      <div class="param">
+        <label for="zoom">Zoom : <span class="mono" id="zoomOut">× 1</span></label>
+        <input id="zoom" type="range" min="0" max="3" step="0.02" value="0">
+      </div>
+      <div class="fig"><svg id="zoomSvg" viewBox="-6 -110 372 120" role="img" aria-label="Courbe de Koch agrandie"></svg></div>
+      <p class="soft" id="zoomMsg" aria-live="polite"></p>
+    </div>
+    <h3>Des fractales dans la nature</h3>
+    <div class="cards">
+      <div class="box"><span class="tag">Légume</span><strong>Le chou romanesco</strong>
+        <svg viewBox="0 0 160 120" aria-hidden="true" id="natRomanesco"></svg>
+        <span class="soft">Une pyramide de petites pyramides, faites de pyramides encore plus petites.</span></div>
+      <div class="box"><span class="tag">Plante</span><strong>La fougère</strong>
+        <svg viewBox="0 0 160 120" aria-hidden="true" id="natFern"></svg>
+        <span class="soft">Chaque feuille ressemble à la fougère entière. Tu la dessineras à l'étape 6.</span></div>
+      <div class="box"><span class="tag">Ciel</span><strong>Les éclairs</strong>
+        <svg viewBox="0 0 160 120" aria-hidden="true" id="natBolt"></svg>
+        <span class="soft">Un éclair se divise en branches, qui se divisent en petites branches.</span></div>
+      <div class="box"><span class="tag">Arbre</span><strong>Les arbres</strong>
+        <svg viewBox="0 0 160 120" aria-hidden="true" id="natTree"></svg>
+        <span class="soft">Une branche, c'est presque un petit arbre. Et nos poumons et nos vaisseaux sanguins se ramifient pareil.</span></div>
+      <div class="box"><span class="tag">Géographie</span><strong>Les côtes</strong>
+        <svg viewBox="0 0 160 120" aria-hidden="true" id="natCoast"></svg>
+        <span class="soft">Une côte rocheuse a des baies, dans les baies des criques, dans les criques des rochers…</span></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Dans la nature, ça s'arrête</span>
+      <span>Le chou romanesco n'a que quelques niveaux de petites pyramides, puis on arrive aux cellules. Seules les fractales <strong>mathématiques</strong> continuent vraiment à l'infini.</span>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · Le flocon de Koch</span>
+    <h2>Un périmètre infini autour d'une aire finie</h2>
+    <p>On part d'un triangle équilatéral. La règle : on coupe <strong>chaque côté en trois</strong>, on enlève le morceau du milieu et on le remplace par <strong>deux côtés d'un petit triangle</strong> pointé vers l'extérieur. Chaque côté devient 4 côtés, chacun 3 fois plus petit. Puis on recommence avec tous les côtés.</p>
+    <div class="box">
+      <div class="param">
+        <label for="kochN">Étape : <span class="mono" id="kochNOut">0</span></label>
+        <input id="kochN" type="range" min="0" max="5" step="1" value="0">
+      </div>
+      <div class="fig mid"><svg id="kochSvg" viewBox="-12 -12 344 394" role="img" aria-label="Flocon de Koch"></svg></div>
+      <p class="soft">Le triangle de départ a des côtés de 9 cm. L'aire est donnée « en triangles de départ » : 1 = l'aire du triangle du début.</p>
+      <div class="scroll">
+        <table class="stab" id="kochTable" aria-label="Côtés, périmètre et aire du flocon"></table>
+      </div>
+    </div>
+    <div class="box">
+      <h3>Et si on continue ?</h3>
+      <div class="inputs">
+        <label for="kochFar">Étape n (de 0 à 200)<input id="kochFar" type="text" inputmode="numeric" autocomplete="off" value="50"></label>
+      </div>
+      <div class="results" id="kochFarOut" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Pourquoi le périmètre explose ?</span>
+      <span>À chaque étape, le périmètre est multiplié par <strong>4/3</strong> (4 morceaux d'un tiers au lieu de 3). Multiplier sans fin par un nombre plus grand que 1, c'est une <strong>suite géométrique</strong> qui grandit sans limite : regarde le tutoriel sur <a class="tlink" href="les-suites.html">les suites</a>, et le tutoriel sur <a class="tlink" href="les-grands-nombres-et-l-infini.html">les grands nombres et l'infini</a>. L'aire, elle, ajoute des triangles de plus en plus minuscules : elle ne dépasse jamais <strong>8/5 = 1,6</strong> fois le triangle de départ.</span>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Le triangle de Sierpiński</span>
+    <h2>Des trous dans des trous</h2>
+    <p>Cette fois, on part d'un triangle plein. La règle : on relie les milieux des côtés et on <strong>enlève le triangle du milieu</strong>. Il reste 3 triangles, deux fois plus petits. On recommence dans chacun.</p>
+    <div class="box">
+      <div class="param">
+        <label for="sierN">Étape : <span class="mono" id="sierNOut">0</span></label>
+        <input id="sierN" type="range" min="0" max="7" step="1" value="0">
+      </div>
+      <div class="fig mid"><svg id="sierSvg" viewBox="0 0 400 350" role="img" aria-label="Triangle de Sierpiński"></svg></div>
+      <div class="results" id="sierOut" aria-live="polite"></div>
+    </div>
+    <div class="box">
+      <h3>Surprise : il se cache dans le triangle de Pascal</h3>
+      <p>Dans le triangle de Pascal, chaque nombre est la <strong>somme des deux nombres au-dessus</strong> de lui (tu l'as peut-être vu dans le tutoriel sur <a class="tlink" href="les-identites-remarquables.html">les identités remarquables</a>). Colorions en orange les nombres <strong>impairs</strong>, et laissons les nombres pairs en blanc.</p>
+      <div class="btns" role="group" aria-label="Nombre de lignes" id="pasBtns"></div>
+      <div class="fig"><svg id="pasSvg" viewBox="0 0 400 350" role="img" aria-label="Triangle de Pascal, nombres impairs colorés"></svg></div>
+      <p class="soft" id="pasMsg" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · Le jeu du chaos</span>
+    <h2>Le hasard dessine un triangle de Sierpiński</h2>
+    <p>Un jeu étonnant. Prends trois sommets A, B, C et un point de départ dans le triangle. Puis lance un dé : <strong>1 ou 2 → A</strong>, <strong>3 ou 4 → B</strong>, <strong>5 ou 6 → C</strong>. Avance <strong>à mi-chemin</strong> vers le sommet tiré, et marque un point. Recommence des milliers de fois.</p>
+    <div class="box">
+      <div class="btns">
+        <button type="button" id="chOne">Lancer le dé</button>
+        <button type="button" id="chK">+ 1 000 points</button>
+        <button type="button" id="chTenK">+ 10 000 points</button>
+        <button type="button" id="chClear">Effacer</button>
+      </div>
+      <label class="check"><input type="checkbox" id="chNoAnim"> Sans animation (tout d'un coup)</label>
+      <div class="fig mid"><canvas id="chCanvas" width="480" height="420" aria-label="Jeu du chaos : points dessinés au hasard"></canvas></div>
+      <p class="cap">Touche le dessin pour choisir un nouveau point de départ.</p>
+      <div class="btns"><span class="die" id="chDie" aria-hidden="true">?</span><span id="chMsg" aria-live="polite">Lance le dé pour placer le premier point.</span></div>
+      <p class="soft"><span class="dot" style="background:var(--acc)"></span>vers A <span class="dot" style="background:var(--two);margin-left:8px"></span>vers B <span class="dot" style="background:var(--ok);margin-left:8px"></span>vers C : chaque couleur remplit une des trois copies.</p>
+    </div>
+    <div class="note">
+      <span class="note-title">Pourquoi ça marche ?</span>
+      <span>Aller à mi-chemin vers A, c'est rétrécir tout le dessin de moitié vers A : on tombe dans la copie du haut. Le triangle de Sierpiński est exactement la forme qui ne change pas quand on fait ces trois « rétrécissements ». Les trous du milieu ne reçoivent jamais de point (sauf peut-être les tout premiers).</span>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · L'arbre fractal</span>
+    <h2>Un tronc, deux branches, quatre branches…</h2>
+    <p>Règle : au bout de chaque branche, on fait pousser <strong>deux branches plus courtes</strong>, l'une tournée à gauche, l'autre à droite. Le programme s'appelle lui-même : c'est la <strong>récursivité</strong> (un mot que tu retrouveras dans le tutoriel sur <a class="tlink" href="l-algorithmique.html">l'algorithmique</a>).</p>
+    <div class="box">
+      <div class="params">
+        <div class="param"><label for="trA">Angle : <span class="mono" id="trAOut">25°</span></label><input id="trA" type="range" min="0" max="90" step="1" value="25"></div>
+        <div class="param"><label for="trR">Rapport : <span class="mono" id="trROut">0,7</span></label><input id="trR" type="range" min="0.5" max="0.85" step="0.01" value="0.7"></div>
+        <div class="param"><label for="trD">Niveaux : <span class="mono" id="trDOut">9</span></label><input id="trD" type="range" min="1" max="12" step="1" value="9"></div>
+      </div>
+      <div class="fig"><canvas id="trCanvas" width="520" height="400" aria-label="Arbre fractal"></canvas></div>
+      <div class="results" id="trOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · La fougère de Barnsley</span>
+    <h2>Quatre règles et un peu de hasard</h2>
+    <p>Comme au jeu du chaos, on déplace un point au hasard. Mais cette fois il y a 4 règles, chacune avec sa chance d'être choisie :</p>
+    <div class="results">
+      <div class="res"><span class="res-name">Règle 1 : la tige</span><span class="res-val">1 %</span><span class="res-calc">écrase le point sur la tige</span></div>
+      <div class="res"><span class="res-name">Règle 2 : toute la fougère, un peu plus petite</span><span class="res-val">85 %</span><span class="res-calc">la fougère entière, réduite et légèrement tournée, posée plus haut</span></div>
+      <div class="res"><span class="res-name">Règle 3 : la grande feuille de gauche</span><span class="res-val">7 %</span><span class="res-calc">une petite fougère tournée vers la gauche</span></div>
+      <div class="res"><span class="res-name">Règle 4 : la grande feuille de droite</span><span class="res-val">7 %</span><span class="res-calc">une petite fougère tournée vers la droite</span></div>
+    </div>
+    <div class="box">
+      <div class="btns">
+        <button type="button" id="fnAdd">+ 5 000 points</button>
+        <button type="button" id="fnClear">Effacer</button>
+      </div>
+      <label class="check"><input type="checkbox" id="fnColor"> Colorer selon la règle</label>
+      <div class="fig narrow"><canvas id="fnCanvas" width="360" height="480" aria-label="Fougère de Barnsley"></canvas></div>
+      <p class="cap" id="fnMsg" aria-live="polite"></p>
+    </div>
+    <div class="note">
+      <span class="note-title">Une fougère dans une ligne de calcul</span>
+      <span>Chaque règle est un petit calcul du type x' = 0,85x + 0,04y et y' = −0,04x + 0,85y + 1,6. Quelques nombres suffisent à décrire toute une plante : c'est pour ça que les fractales servent à dessiner des paysages dans les films et les jeux vidéo.</span>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Tapis et éponge</span>
+    <h2>Le tapis de Sierpiński et l'éponge de Menger</h2>
+    <p>Le <strong>tapis</strong> : on coupe un carré en 9 petits carrés (3 × 3) et on enlève celui du centre. Il en reste 8. On recommence dans chacun. L'<strong>éponge</strong> fait la même chose en 3D : on coupe un cube en 27 petits cubes, on enlève le cube central et les 6 cubes au centre des faces. Il en reste 20.</p>
+    <div class="box">
+      <h3>Le tapis</h3>
+      <div class="btns" role="group" aria-label="Étape du tapis" id="carBtns"></div>
+      <div class="fig narrow"><svg id="carSvg" viewBox="0 0 270 270" role="img" aria-label="Tapis de Sierpiński"></svg></div>
+      <div class="results" id="carOut" aria-live="polite"></div>
+    </div>
+    <div class="box">
+      <h3>L'éponge</h3>
+      <div class="btns" role="group" aria-label="Étape de l'éponge" id="menBtns"></div>
+      <div class="fig narrow"><svg id="menSvg" viewBox="-140 -10 280 300" role="img" aria-label="Éponge de Menger en perspective"></svg></div>
+      <div class="results" id="menOut" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Une éponge sans volume</span>
+      <span>À chaque étape, l'éponge garde 20/27 de son volume. Après beaucoup d'étapes, le volume tend vers 0… alors que la surface des trous, elle, grandit sans fin. Encore un objet bizarre !</span>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · La dimension fractale</span>
+    <h2>Une dimension à virgule ?</h2>
+    <p>Une ligne est de dimension 1, un carré de dimension 2, un cube de dimension 3. Voici un moyen de le retrouver : <strong>on compte les copies</strong>. Si on double la taille…</p>
+    <div class="scroll">
+      <table class="stab" aria-label="Nombre de copies quand on double la taille">
+        <tr><th>Forme</th><th>Taille × 2</th><th>Copies</th><th>2<sup>d</sup> = copies</th></tr>
+        <tr><td>Segment</td><td>× 2</td><td>2</td><td>2<sup>1</sup> = 2 → d = 1</td></tr>
+        <tr><td>Carré</td><td>× 2</td><td>4</td><td>2<sup>2</sup> = 4 → d = 2</td></tr>
+        <tr><td>Cube</td><td>× 2</td><td>8</td><td>2<sup>3</sup> = 8 → d = 3</td></tr>
+        <tr class="cur"><td>Sierpiński</td><td>× 2</td><td>3</td><td>2<sup>d</sup> = 3 → d ≈ 1,58</td></tr>
+      </table>
+    </div>
+    <p>Le triangle de Sierpiński deux fois plus grand contient <strong>3 copies</strong> de lui-même. Il faut un d tel que 2<sup>d</sup> = 3 : c'est entre 1 (2¹ = 2) et 2 (2² = 4). Avec une calculatrice : d = log 3 ÷ log 2 ≈ <strong>1,58</strong>. Il est « plus qu'une ligne, moins qu'une surface ».</p>
+    <div class="box">
+      <h3>Calculatrice de dimension</h3>
+      <div class="btns" role="group" aria-label="Exemples" id="dimBtns"></div>
+      <div class="inputs">
+        <label for="dimR">On agrandit × r<input id="dimR" type="text" inputmode="decimal" autocomplete="off" value="2"></label>
+        <label for="dimN">On obtient N copies<input id="dimN" type="text" inputmode="decimal" autocomplete="off" value="3"></label>
+      </div>
+      <div class="results" id="dimOut" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Le log, c'est quoi ?</span>
+      <span>Pas besoin de tout comprendre : « log N ÷ log r » est juste la touche de la calculatrice qui trouve d tel que r<sup>d</sup> = N (voir le tutoriel sur <a class="tlink" href="les-puissances.html">les puissances</a>). Tu peux vérifier : 2<sup>1,585</sup> ≈ 3.</span>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · La côte de Bretagne</span>
+    <h2>Plus la règle est petite, plus la côte est longue</h2>
+    <p>Combien mesure une côte ? On prend un compas (ou une règle) d'une certaine longueur, et on « marche » le long de la côte, pas après pas, d'un bout à l'autre. Puis on compte : nombre de pas × longueur de la règle.</p>
+    <div class="box">
+      <div class="param">
+        <label for="coL">Longueur de la règle : <span class="mono" id="coLOut">40 km</span></label>
+        <input id="coL" type="range" min="0" max="5" step="1" value="1">
+      </div>
+      <div class="fig"><svg id="coSvg" viewBox="0 0 400 260" role="img" aria-label="Une côte découpée mesurée avec une règle"></svg></div>
+      <div class="results" id="coOut" aria-live="polite"></div>
+      <div class="scroll"><table class="stab" id="coTable" aria-label="Mesures de la côte selon la règle"></table></div>
+      <div class="btns"><button type="button" id="coNew">Une autre côte</button></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Le paradoxe</span>
+      <span>Une petite règle entre dans les baies et les criques que la grande règle sautait. Sur une vraie côte, il y a toujours des détails plus petits (rochers, cailloux, grains de sable) : la longueur mesurée continue de grandir. C'est pour ça que les atlas ne donnent pas tous la même longueur pour une même côte. (Entre deux règles proches, la mesure peut parfois baisser un tout petit peu : c'est la tendance générale qui compte.)</span>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · Un peu d'histoire</span>
+    <h2>Des « monstres » devenus stars</h2>
+    <ol class="timeline">
+      <li><span class="when">1904</span><div class="what"><strong>Helge von Koch</strong><span>Ce mathématicien suédois invente sa courbe : une ligne continue, mais si « pointue » partout qu'on ne peut y tracer de tangente nulle part. On la trouvait alors monstrueuse.</span></div></li>
+      <li><span class="when">vers 1915</span><div class="what"><strong>Wacław Sierpiński</strong><span>Le mathématicien polonais étudie son triangle, puis son tapis quelques années plus tard.</span></div></li>
+      <li><span class="when">années 1920</span><div class="what"><strong>Karl Menger</strong><span>Il décrit l'éponge qui porte son nom, en cherchant à définir ce qu'est une dimension.</span></div></li>
+      <li><span class="when">vers 1960</span><div class="what"><strong>Lewis Fry Richardson</strong><span>Ce scientifique anglais remarque que la longueur des côtes et des frontières dépend de la règle utilisée.</span></div></li>
+      <li><span class="when">1967 · 1975</span><div class="what"><strong>Benoît Mandelbrot</strong><span>Il écrit un article célèbre sur la longueur de la côte de la Grande-Bretagne, puis, vers 1975, il invente le mot <strong>« fractale »</strong>, du latin <em>fractus</em> : « brisé ». Il montre que ces formes décrivent très bien la nature. Son ensemble le plus célèbre, l'ensemble de Mandelbrot, se dessine avec des nombres complexes : tu en trouveras un petit dessin dans le tutoriel sur <a class="tlink" href="les-nombres-complexes.html">les nombres complexes</a>.</span></div></li>
+      <li><span class="when">années 1980</span><div class="what"><strong>Michael Barnsley</strong><span>Il popularise le jeu du chaos et la fougère faite de quatre règles. Avec les ordinateurs, les fractales envahissent les écrans.</span></div></li>
+    </ol>
+  </section>
+
+  <section>
+    <span class="eyebrow">Attention</span>
+    <h2>Les erreurs fréquentes</h2>
+    <div class="box">
+      <ul class="errs">
+        <li><span class="bad">Une fractale, c'est juste une forme compliquée.</span><span class="good">Une fractale contient des copies d'elle-même en plus petit (autosimilarité).</span><span class="soft">Un gribouillis est compliqué, mais il ne se répète pas quand on zoome.</span></li>
+        <li><span class="bad">Le flocon a un périmètre infini, donc une aire infinie.</span><span class="good">Périmètre infini, mais aire finie : 8/5 du triangle de départ.</span><span class="soft">Le flocon tient toujours dans un cercle autour du triangle.</span></li>
+        <li><span class="bad">À l'étape 3, le flocon a 3 × 4 × 3 = 36 côtés.</span><span class="good">À l'étape n, il a 3 × 4ⁿ côtés : 3 × 4³ = 192 à l'étape 3.</span><span class="soft">On multiplie par 4 à chaque étape, c'est une puissance.</span></li>
+        <li><span class="bad">Sierpiński : 3 copies pour une taille × 2, donc d = 3 ÷ 2 = 1,5.</span><span class="good">2<sup>d</sup> = 3, donc d = log 3 ÷ log 2 ≈ 1,58.</span><span class="soft">La dimension est un exposant, pas une division.</span></li>
+        <li><span class="bad">Une règle plus petite donne la même longueur, juste plus précise.</span><span class="good">Une règle plus petite donne une côte plus longue.</span><span class="soft">Elle suit des détails que la grande règle coupait en ligne droite.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Réponds par un nombre. Pour la dimension, arrondis au centième (par exemple 1,58).</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Nouvelles questions</button>
+    </div>
+  </section>
+
+  <!-- 12 -->
+  <section>
+    <span class="eyebrow">Étape 12 · À toi de jouer</span>
+    <h2>Cinq problèmes</h2>
+    <div class="exos">
+      <details>
+        <summary>Le flocon à l'étape 2<span class="q">Le triangle de départ a des côtés de 9 cm. Combien le flocon a-t-il de côtés à l'étape 2 ? Quelle est la longueur d'un côté ? Le périmètre ?</span></summary>
+        <div><span>Côtés : 3 × 4² = 48. Longueur d'un côté : 9 ÷ 3² = 1 cm. Périmètre : 48 × 1 = <strong>48 cm</strong> (on retrouve 27 × 4/3 × 4/3 = 48).</span></div>
+      </details>
+      <details>
+        <summary>Combien de triangles ?<span class="q">Combien de petits triangles pleins le triangle de Sierpiński a-t-il à l'étape 5 ? Quelle part de l'aire de départ reste-t-il ?</span></summary>
+        <div><span>3⁵ = <strong>243</strong> triangles. Chacun a une aire de (1/4)⁵ du départ, donc il reste (3/4)⁵ = 243/1 024 ≈ <strong>0,24</strong>, soit environ 24 % de l'aire.</span></div>
+      </details>
+      <details>
+        <summary>La dimension du flocon<span class="q">Un côté de la courbe de Koch agrandi 3 fois contient 4 copies. Quelle est sa dimension ?</span></summary>
+        <div><span>3<sup>d</sup> = 4, donc d = log 4 ÷ log 3 ≈ <strong>1,26</strong>. Entre 1 (3¹ = 3) et 2 (3² = 9), plus près de 1 : la courbe est « un peu plus qu'une ligne ».</span></div>
+      </details>
+      <details>
+        <summary>L'arbre<span class="q">Un arbre fractal a 10 niveaux (le tronc compte pour le niveau 1). Combien a-t-il de branches au dernier niveau ? Et en tout ?</span></summary>
+        <div><span>Le nombre double à chaque niveau : 1, 2, 4, 8… Au niveau 10 : 2⁹ = <strong>512</strong> branches. En tout : 1 + 2 + 4 + … + 512 = 2¹⁰ − 1 = <strong>1 023</strong> branches.</span></div>
+      </details>
+      <details>
+        <summary>La côte<span class="q">Avec une règle de 20 km, on compte 14 pas. Avec une règle de 5 km, on compte 70 pas. Quelles longueurs trouve-t-on ? Pourquoi ne sont-elles pas égales ?</span></summary>
+        <div><span>14 × 20 = <strong>280 km</strong> et 70 × 5 = <strong>350 km</strong>. La règle de 5 km suit les baies que la règle de 20 km coupait tout droit : la côte paraît plus longue.</span></div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• Une <strong>fractale</strong> est <strong>autosimilaire</strong> : en zoomant, on retrouve la même forme en plus petit.</span>
+      <span>• On la fabrique en <strong>répétant une règle simple</strong> à l'infini (récursivité), ou avec des règles tirées au hasard (jeu du chaos, fougère).</span>
+      <span>• Flocon de Koch : <strong>3 × 4ⁿ</strong> côtés, périmètre × 4/3 à chaque étape → <strong>infini</strong> ; aire <strong>finie</strong> = 8/5 du triangle.</span>
+      <span>• Sierpiński : 3ⁿ triangles ; il apparaît dans le jeu du chaos et dans les nombres impairs du triangle de Pascal.</span>
+      <span>• <strong>Dimension fractale</strong> : si agrandir × r donne N copies, r<sup>d</sup> = N, donc d = log N ÷ log r (Sierpiński ≈ 1,58).</span>
+      <span>• La longueur d'une côte dépend de la règle : plus elle est petite, plus la côte est longue.</span>
+    </div>
+  </section>
+
+  <!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"><a class="prev" href="les-paradoxes-de-probabilite.html"><span>← Précédent</span><strong>Les paradoxes de probabilité</strong></a><a class="next" href="les-jeux-de-strategie.html"><span>Suivant →</span><strong>Les jeux de stratégie</strong></a></div><a class="tnav-home" href="index.html">⌂ Tous les tutoriels</a></nav><!--/tnav-->
+<footer>Fiche de révision · Les fractales</footer>
+</main>
+
+<script>
+(function () {
+  /* Test hooks (window.__fra) :
+     kochPoints(n)             -> [[x, y], …] : sommets du flocon à l'étape n (triangle de côté 320, pointe en haut)
+     kochStats(n, c = 9)       -> { sides: 3·4ⁿ, side: c/3ⁿ, perimeter: 3c·(4/3)ⁿ, area: 1 + 3/5·(1 − (4/9)ⁿ) } (aire en triangles de départ)
+     polyArea(pts)             -> aire (formule du lacet), pour vérifier kochPoints : polyArea(kochPoints(1)) / polyArea(kochPoints(0)) = 4/3
+     sierpinski(n)             -> { triangles: 3ⁿ, area: (3/4)ⁿ }
+     chaosStep(p, v)           -> [x, y] : milieu de p et du sommet v (mi-chemin)
+     pascalRow(n)              -> number[] : ligne n du triangle de Pascal (exacte jusqu'à n ≈ 55)
+     parityRow(n)              -> number[] : ligne n modulo 2 (1 = impair)
+     treeBranches(d)           -> { last: 2^(d−1), total: 2^d − 1 }
+     fernStep(x, y, u)         -> [x', y', règle] avec u dans [0 ; 1[ (règles 1 à 4, probas 1 %, 85 %, 7 %, 7 %)
+     carpet(n)                 -> { squares: 8ⁿ, holes: (8ⁿ − 1)/7, area: (8/9)ⁿ }
+     menger(n)                 -> { cubes: 20ⁿ, volume: (20/27)ⁿ }
+     mengerCubes(n)            -> [[x, y, z], …] : petits cubes restants (côté 1, grille 3ⁿ)
+     dimension(N, r)           -> log N / log r, ou null si r ≤ 1 ou N < 1 ou entrée invalide
+     coast(seed)               -> [[x, y], …] : côte découpée (déplacement du milieu, 257 points)
+     divider(pts, L)           -> { steps, rem, length, path } : mesure au compas d'ouverture L (en unités du dessin)
+  */
+  var NS = 'http://www.w3.org/2000/svg';
+  function fmt(x, d) { var r = Math.round(x * 1e6) / 1e6; if (Object.is(r, -0)) r = 0; return r.toLocaleString('fr-FR', { maximumFractionDigits: d == null ? 3 : d }).replace('-', '−'); }
+  function num(s) { var t = String(s).replace(/\s/g, '').replace(/[−–]/g, '-').replace(',', '.'); if (t === '') return NaN; var x = Number(t); return isFinite(x) ? x : NaN; }
+  function mk(svg, name, attrs, text) { var e = document.createElementNS(NS, name); for (var a in attrs) e.setAttribute(a, attrs[a]); if (text != null) e.textContent = text; svg.appendChild(e); return e; }
+  function clear(el) { while (el.firstChild) el.removeChild(el.firstChild); }
+  function css(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || '#888'; }
+  function ptsStr(pts, d) { var s = []; for (var i = 0; i < pts.length; i++) s.push(pts[i][0].toFixed(d) + ',' + pts[i][1].toFixed(d)); return s.join(' '); }
+  function res(name, val, calc, cls) { return '<div class="res' + (cls ? ' ' + cls : '') + '"><span class="res-name">' + name + '</span><span class="res-val">' + val + '</span>' + (calc ? '<span class="res-calc">' + calc + '</span>' : '') + '</div>'; }
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var SUP = { 0: '⁰', 1: '¹', 2: '²', 3: '³', 4: '⁴', 5: '⁵', 6: '⁶', 7: '⁷', 8: '⁸', 9: '⁹' };
+  function sup(n) { return String(n).split('').map(function (c) { return SUP[c] || c; }).join(''); }
+
+  /* ---------- Koch ---------- */
+  function kochRefine(pts, closed) {
+    var out = [], n = pts.length, m = closed ? n : n - 1, c = Math.cos(-Math.PI / 3), s = Math.sin(-Math.PI / 3);
+    for (var i = 0; i < m; i++) {
+      var a = pts[i], b = pts[(i + 1) % n], dx = (b[0] - a[0]) / 3, dy = (b[1] - a[1]) / 3;
+      var p1 = [a[0] + dx, a[1] + dy], p3 = [a[0] + 2 * dx, a[1] + 2 * dy];
+      var pk = [p1[0] + dx * c - dy * s, p1[1] + dx * s + dy * c];
+      out.push(a, p1, pk, p3);
+    }
+    if (!closed) out.push(pts[n - 1]);
+    return out;
+  }
+  function kochPoints(n) {
+    var S = 320, h = S * Math.sqrt(3) / 2, top = 0;
+    var pts = [[S / 2, top], [S, top + h], [0, top + h]];
+    for (var k = 0; k < n; k++) pts = kochRefine(pts, true);
+    return pts;
+  }
+  function kochCurve(n, W) { var pts = [[0, 0], [W, 0]]; for (var k = 0; k < n; k++) pts = kochRefine(pts, false); return pts; }
+  function kochStats(n, c) {
+    if (c == null) c = 9;
+    return { sides: 3 * Math.pow(4, n), side: c / Math.pow(3, n), perimeter: 3 * c * Math.pow(4 / 3, n), area: 1 + 0.6 * (1 - Math.pow(4 / 9, n)) };
+  }
+  function polyArea(pts) { var a = 0; for (var i = 0; i < pts.length; i++) { var p = pts[i], q = pts[(i + 1) % pts.length]; a += p[0] * q[1] - q[0] * p[1]; } return Math.abs(a) / 2; }
+
+  // Héros
+  (function () {
+    var svg = document.getElementById('heroSvg');
+    mk(svg, 'polygon', { points: ptsStr(kochPoints(4), 2), fill: 'var(--acc-soft)', stroke: 'var(--acc)', 'stroke-width': 1.5, 'stroke-linejoin': 'round' });
+  })();
+
+  // Loupe
+  (function () {
+    var svg = document.getElementById('zoomSvg'), W = 360, zr = document.getElementById('zoom');
+    mk(svg, 'polyline', { points: ptsStr(kochCurve(7, W), 3), fill: 'none', stroke: 'var(--acc)', 'stroke-width': 2, 'vector-effect': 'non-scaling-stroke', 'stroke-linejoin': 'round' });
+    var box = mk(svg, 'rect', { x: 0, y: -40, width: W / 3, height: 42, fill: 'none', stroke: 'var(--two)', 'stroke-width': 1.5, 'stroke-dasharray': '5 4', 'vector-effect': 'non-scaling-stroke' });
+    function upd() {
+      var k = parseFloat(zr.value), z = Math.pow(3, k);
+      svg.setAttribute('viewBox', [-6 / z, -110 / z, 372 / z, 120 / z].map(function (v) { return v.toFixed(5); }).join(' '));
+      box.setAttribute('x', 0); box.setAttribute('y', (-40 / z).toFixed(5)); box.setAttribute('width', (W / 3 / z).toFixed(5)); box.setAttribute('height', (42 / z).toFixed(5));
+      document.getElementById('zoomOut').textContent = '× ' + fmt(z, 1);
+      var near = Math.abs(k - Math.round(k)) < 0.03;
+      document.getElementById('zoomMsg').textContent = near
+        ? (Math.round(k) === 0 ? 'La courbe entière. Le cadre bleu montre la partie qu\'on va agrandir.' : 'Zoom × ' + Math.pow(3, Math.round(k)) + ' : exactement la même courbe qu\'au début ! Elle contient une copie d\'elle-même 3 fois plus petite.')
+        : 'On agrandit… continue jusqu\'à × 3, × 9 ou × 27.';
+    }
+    zr.addEventListener('input', upd); upd();
+  })();
+
+  // Petits dessins de la nature
+  (function () {
+    // romanesco : pyramides de pyramides
+    var r = document.getElementById('natRomanesco');
+    function cone(x, y, s, d) {
+      mk(r, 'polygon', { points: (x - s / 2) + ',' + y + ' ' + (x + s / 2) + ',' + y + ' ' + x + ',' + (y - s), fill: d === 0 ? 'var(--ok)' : 'none', stroke: 'var(--ok)', 'stroke-width': 1 });
+      if (d > 0) { cone(x - s / 4, y, s / 2, d - 1); cone(x + s / 4, y, s / 2, d - 1); cone(x, y - s / 2, s / 2, d - 1); }
+    }
+    cone(80, 112, 104, 3);
+    // fougère simplifiée
+    var f = document.getElementById('natFern');
+    function frond(x, y, len, ang, d) {
+      if (d === 0 || len < 2) return;
+      var x2 = x + len * Math.cos(ang), y2 = y - len * Math.sin(ang);
+      mk(f, 'line', { x1: x.toFixed(1), y1: y.toFixed(1), x2: x2.toFixed(1), y2: y2.toFixed(1), stroke: 'var(--ok)', 'stroke-width': 1.2, 'stroke-linecap': 'round' });
+      for (var i = 1; i <= 5; i++) {
+        var t = i / 6, px = x + (x2 - x) * t, py = y + (y2 - y) * t, l = len * 0.42 * (1 - t * 0.6);
+        frond(px, py, l, ang + 1.0, d - 1); frond(px, py, l, ang - 1.0, d - 1);
+      }
+    }
+    frond(80, 116, 104, Math.PI / 2 - 0.08, 3);
+    // éclair
+    var b = document.getElementById('natBolt'), rng = mulberry(7);
+    function bolt(x, y, ang, len, d) {
+      if (d === 0) return;
+      var pts = [[x, y]], cx = x, cy = y;
+      for (var i = 0; i < 4; i++) { var a = ang + (rng() - 0.5) * 0.9; cx += len / 4 * Math.cos(a); cy += len / 4 * Math.sin(a); pts.push([cx, cy]); if (rng() < 0.5) bolt(cx, cy, ang + (rng() < 0.5 ? -0.7 : 0.7), len * 0.45, d - 1); }
+      mk(b, 'polyline', { points: ptsStr(pts, 1), fill: 'none', stroke: 'var(--acc)', 'stroke-width': d, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' });
+    }
+    bolt(80, 4, Math.PI / 2, 110, 3);
+    // arbre
+    var t = document.getElementById('natTree');
+    function tb(x, y, len, ang, d) {
+      if (d === 0) return;
+      var x2 = x + len * Math.cos(ang), y2 = y - len * Math.sin(ang);
+      mk(t, 'line', { x1: x.toFixed(1), y1: y.toFixed(1), x2: x2.toFixed(1), y2: y2.toFixed(1), stroke: d > 3 ? 'var(--ink-soft)' : 'var(--ok)', 'stroke-width': Math.max(1, d * 0.8), 'stroke-linecap': 'round' });
+      tb(x2, y2, len * 0.72, ang + 0.45, d - 1); tb(x2, y2, len * 0.72, ang - 0.45, d - 1);
+    }
+    tb(80, 118, 34, Math.PI / 2, 7);
+    // côte
+    var c = document.getElementById('natCoast'), cp = coast(11).map(function (p) { return [p[0] * 0.4, 20 + p[1] * 0.34]; });
+    mk(c, 'polygon', { points: ptsStr(cp.concat([[160, 120], [0, 120]]), 1), fill: 'var(--two-soft)', stroke: 'var(--two)', 'stroke-width': 1.2, 'stroke-linejoin': 'round' });
+  })();
+
+  // Flocon interactif
+  var kochN = document.getElementById('kochN');
+  function drawKoch() {
+    var n = parseInt(kochN.value, 10), svg = document.getElementById('kochSvg');
+    document.getElementById('kochNOut').textContent = n;
+    clear(svg);
+    if (n > 0) mk(svg, 'polygon', { points: ptsStr(kochPoints(0), 2), fill: 'none', stroke: 'var(--ink-soft)', 'stroke-width': 1, 'stroke-dasharray': '4 4' });
+    mk(svg, 'polygon', { points: ptsStr(kochPoints(n), 2), fill: 'var(--acc-soft)', 'fill-opacity': 0.8, stroke: 'var(--acc)', 'stroke-width': n > 3 ? 1.2 : 2, 'stroke-linejoin': 'round' });
+    var rows = '<tr><th>Étape</th><th>Côtés</th><th>1 côté</th><th>Périmètre</th><th>Aire</th></tr>';
+    for (var k = 0; k <= 5; k++) {
+      var s = kochStats(k);
+      rows += '<tr' + (k === n ? ' class="cur"' : '') + '><td>' + k + '</td><td>' + fmt(s.sides) + '</td><td>' + (k <= 2 ? fmt(s.side) : '9/' + fmt(Math.pow(3, k))) + ' cm</td><td>' + fmt(s.perimeter, 2) + ' cm</td><td>' + fmt(s.area, 3) + '</td></tr>';
+    }
+    rows += '<tr><td>∞</td><td>∞</td><td>→ 0</td><td>∞</td><td>8/5 = 1,6</td></tr>';
+    document.getElementById('kochTable').innerHTML = rows;
+  }
+  kochN.addEventListener('input', drawKoch); drawKoch();
+
+  var kochFar = document.getElementById('kochFar');
+  function far() {
+    var n = num(kochFar.value), out = document.getElementById('kochFarOut');
+    if (isNaN(n) || n < 0 || n > 200 || !Number.isInteger(n)) { out.innerHTML = '<p class="err">Écris un nombre entier entre 0 et 200.</p>'; return; }
+    var s = kochStats(n), km = s.perimeter / 100000, cmp;
+    if (km < 1) cmp = 'Moins d\'un kilomètre : ça tient encore sur une table… pour l\'instant.';
+    else if (km < 40000) cmp = 'Déjà plus long qu\'une randonnée !';
+    else if (km < 1.5e8) cmp = 'Plus que ' + fmt(Math.floor(km / 40000)) + ' fois le tour de la Terre (40 000 km) !';
+    else cmp = 'Plus de ' + fmt(Math.floor(km / 1.5e8)) + ' fois la distance de la Terre au Soleil (150 millions de km) !';
+    var big = s.sides >= 1e9;
+    out.innerHTML = res('Nombre de côtés', big ? '≈ ' + (s.sides / Math.pow(10, Math.floor(Math.log10(s.sides)))).toFixed(2).replace('.', ',') + ' × 10' + sup(Math.floor(Math.log10(s.sides))) : fmt(s.sides), '3 × 4' + sup(n)) +
+      res('Périmètre', km >= 1 ? '≈ ' + (km >= 1e12 ? (km / Math.pow(10, Math.floor(Math.log10(km)))).toFixed(2).replace('.', ',') + ' × 10' + sup(Math.floor(Math.log10(km))) : fmt(Math.round(km))) + ' km' : fmt(s.perimeter, 2) + ' cm', '27 × (4/3)' + sup(n) + ' cm. ' + cmp) +
+      res('Aire', fmt(s.area, 6) + ' fois le triangle', 'Toujours moins que 1,6 triangle de départ (≈ ' + fmt(1.6 * 81 * Math.sqrt(3) / 4, 2) + ' cm²).', 'total');
+  }
+  kochFar.addEventListener('input', far); far();
+
+  /* ---------- Sierpiński ---------- */
+  function sierpinski(n) { return { triangles: Math.pow(3, n), area: Math.pow(0.75, n) }; }
+  var sierN = document.getElementById('sierN');
+  function drawSier() {
+    var n = parseInt(sierN.value, 10), svg = document.getElementById('sierSvg'), tris = [];
+    document.getElementById('sierNOut').textContent = n;
+    clear(svg);
+    function rec(a, b, c, d) {
+      if (d === 0) { tris.push(a, b, c); return; }
+      var ab = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], bc = [(b[0] + c[0]) / 2, (b[1] + c[1]) / 2], ca = [(c[0] + a[0]) / 2, (c[1] + a[1]) / 2];
+      rec(a, ab, ca, d - 1); rec(ab, b, bc, d - 1); rec(ca, bc, c, d - 1);
+    }
+    var A = [200, 8], B = [392, 8 + 192 * Math.sqrt(3)], C = [8, 8 + 192 * Math.sqrt(3)];
+    mk(svg, 'polygon', { points: ptsStr([A, B, C], 1), fill: 'var(--card)', stroke: 'var(--ink-soft)', 'stroke-width': 1 });
+    rec(A, B, C, n);
+    var d = '';
+    for (var i = 0; i < tris.length; i += 3) d += 'M' + tris[i][0].toFixed(2) + ' ' + tris[i][1].toFixed(2) + 'L' + tris[i + 1][0].toFixed(2) + ' ' + tris[i + 1][1].toFixed(2) + 'L' + tris[i + 2][0].toFixed(2) + ' ' + tris[i + 2][1].toFixed(2) + 'Z';
+    mk(svg, 'path', { d: d, fill: 'var(--acc)' });
+    var s = sierpinski(n);
+    document.getElementById('sierOut').innerHTML = res('Petits triangles pleins', fmt(s.triangles), '3' + sup(n) + ' : chaque étape multiplie par 3') +
+      res('Aire qui reste', fmt(s.area * 100, 1) + ' %', '(3/4)' + sup(n) + ' : on garde 3 quarts à chaque étape. Ça tend vers 0 %.');
+  }
+  sierN.addEventListener('input', drawSier); drawSier();
+
+  // Pascal modulo 2
+  function pascalRow(n) { var r = [1]; for (var i = 0; i < n; i++) { var nr = [1]; for (var k = 1; k < r.length; k++) nr.push(r[k - 1] + r[k]); nr.push(1); r = nr; } return r; }
+  function parityRow(n) { var r = [1]; for (var i = 0; i < n; i++) { var nr = [1]; for (var k = 1; k < r.length; k++) nr.push(r[k - 1] ^ r[k]); nr.push(1); r = nr; } return r; }
+  var pasRows = 8;
+  [8, 16, 32, 64].forEach(function (n) {
+    var b = document.createElement('button'); b.type = 'button'; b.id = 'pas' + n; b.textContent = n + ' lignes';
+    b.addEventListener('click', function () { pasRows = n; drawPascal(); });
+    document.getElementById('pasBtns').appendChild(b);
+  });
+  function drawPascal() {
+    var svg = document.getElementById('pasSvg'), n = pasRows, w = 392 / n, h = w * 0.87, withNum = n <= 8;
+    [8, 16, 32, 64].forEach(function (m) { document.getElementById('pas' + m).setAttribute('aria-pressed', m === n ? 'true' : 'false'); });
+    clear(svg);
+    svg.setAttribute('viewBox', '0 0 400 ' + Math.ceil(n * h + 8));
+    var odd = '', even = '', r = [1], odds = 0;
+    for (var i = 0; i < n; i++) {
+      if (i > 0) { var nr = [1]; for (var k = 1; k < r.length; k++) nr.push(r[k - 1] + r[k]); nr.push(1); r = nr; }
+      var p = parityRow(i);
+      for (var k2 = 0; k2 <= i; k2++) {
+        var x = 200 + (k2 - i / 2) * w - w / 2, y = 4 + i * h, cell = 'M' + (x + 0.5).toFixed(2) + ' ' + y.toFixed(2) + 'h' + (w - 1).toFixed(2) + 'v' + (h - 1).toFixed(2) + 'h' + (-(w - 1)).toFixed(2) + 'Z';
+        if (p[k2]) { odd += cell; odds++; } else even += cell;
+        if (withNum) mk(svg, 'text', { x: (x + w / 2).toFixed(1), y: (y + h / 2 + 6).toFixed(1), 'text-anchor': 'middle', 'font-size': 16, 'font-weight': 600, style: p[k2] ? 'fill:#2a1c12' : '' }, String(r[k2]));
+      }
+    }
+    var gOdd = mk(svg, 'path', { d: odd, fill: 'var(--acc)' }), gEven = mk(svg, 'path', { d: even, fill: 'var(--card)', stroke: 'var(--line)', 'stroke-width': n > 16 ? 0 : 1 });
+    svg.insertBefore(gEven, svg.firstChild); svg.insertBefore(gOdd, svg.firstChild);
+    document.getElementById('pasMsg').textContent = withNum
+      ? 'Les 8 premières lignes. Les impairs (en orange) forment déjà des triangles. Passe à 32 ou 64 lignes !'
+      : n + ' lignes : ' + fmt(odds) + ' nombres impairs sur ' + fmt(n * (n + 1) / 2) + '. Le dessin du triangle de Sierpiński apparaît tout seul, juste en regardant pair ou impair !';
+  }
+  drawPascal();
+
+  /* ---------- Jeu du chaos ---------- */
+  var chV = [[240, 18], [20, 400], [460, 400]], chNames = ['A', 'B', 'C'];
+  function chaosStep(p, v) { return [(p[0] + v[0]) / 2, (p[1] + v[1]) / 2]; }
+  var chCv = document.getElementById('chCanvas'), chCtx = chCv.getContext('2d'), MAXP = 100000;
+  var chPts = new Float32Array(MAXP * 2), chWho = new Uint8Array(MAXP), chCount = 0, chCur = [240, 280], chQueue = 0, chRunning = false;
+  function chCols() { return [css('--acc'), css('--two'), css('--ok')]; }
+  function chFrame() {
+    var ctx = chCtx, cols = chCols();
+    ctx.clearRect(0, 0, 480, 420);
+    ctx.fillStyle = css('--ink'); ctx.font = '700 20px ' + 'system-ui, sans-serif';
+    ctx.strokeStyle = css('--line'); ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(chV[0][0], chV[0][1]); ctx.lineTo(chV[1][0], chV[1][1]); ctx.lineTo(chV[2][0], chV[2][1]); ctx.closePath(); ctx.stroke();
+    ctx.fillStyle = css('--ink');
+    ctx.fillText('A', 252, 22); ctx.fillText('B', 8, 418); ctx.fillText('C', 458, 418);
+    for (var i = 0; i < chV.length; i++) { ctx.beginPath(); ctx.arc(chV[i][0], chV[i][1], 5, 0, 7); ctx.fill(); }
+  }
+  function chDot(i, big) {
+    var ctx = chCtx; ctx.fillStyle = chCols()[chWho[i]];
+    var x = chPts[2 * i], y = chPts[2 * i + 1];
+    if (big) { ctx.beginPath(); ctx.arc(x, y, 4, 0, 7); ctx.fill(); } else ctx.fillRect(x - 0.8, y - 0.8, 1.6, 1.6);
+  }
+  function chRedraw() { chFrame(); for (var i = 0; i < chCount; i++) chDot(i, chCount < 40); drawStart(); }
+  function drawStart() { var ctx = chCtx; ctx.strokeStyle = css('--red'); ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(chCur[0], chCur[1], 6, 0, 7); ctx.stroke(); }
+  function chAdd(m) {
+    var cols = chCols(), ctx = chCtx;
+    for (var j = 0; j < m && chCount < MAXP; j++) {
+      var v = Math.floor(Math.random() * 3);
+      chCur = chaosStep(chCur, chV[v]);
+      chPts[2 * chCount] = chCur[0]; chPts[2 * chCount + 1] = chCur[1]; chWho[chCount] = v;
+      ctx.fillStyle = cols[v]; ctx.fillRect(chCur[0] - 0.8, chCur[1] - 0.8, 1.6, 1.6);
+      chCount++;
+    }
+  }
+  function chMsg() { document.getElementById('chMsg').textContent = fmt(chCount) + ' points' + (chCount >= MAXP ? ' (c\'est le maximum, efface pour recommencer)' : '') + '.'; }
+  function chLoop() {
+    if (chQueue <= 0 || chCount >= MAXP) { chRunning = false; chQueue = 0; chMsg(); return; }
+    var m = Math.min(chQueue, Math.max(60, Math.ceil(chQueue / 25)));
+    chAdd(m); chQueue -= m; chMsg();
+    requestAnimationFrame(chLoop);
+  }
+  function chBulk(m) {
+    document.getElementById('chDie').textContent = '…';
+    if (chCount < 40) chRedrawSmall();
+    if (reduceMotion || document.getElementById('chNoAnim').checked) { chAdd(m); chMsg(); return; }
+    chQueue += m; if (!chRunning) { chRunning = true; requestAnimationFrame(chLoop); }
+  }
+  function chRedrawSmall() { chFrame(); for (var i = 0; i < chCount; i++) chDot(i, false); }
+  document.getElementById('chOne').addEventListener('click', function () {
+    if (chCount >= MAXP) return;
+    var die = 1 + Math.floor(Math.random() * 6), v = Math.floor((die - 1) / 2), from = chCur;
+    chCur = chaosStep(chCur, chV[v]);
+    chPts[2 * chCount] = chCur[0]; chPts[2 * chCount + 1] = chCur[1]; chWho[chCount] = v; chCount++;
+    chFrame(); for (var i = 0; i < chCount; i++) chDot(i, chCount < 40);
+    var ctx = chCtx; ctx.strokeStyle = chCols()[v]; ctx.setLineDash([5, 4]); ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(from[0], from[1]); ctx.lineTo(chV[v][0], chV[v][1]); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle = chCols()[v]; ctx.beginPath(); ctx.arc(chCur[0], chCur[1], 6, 0, 7); ctx.fill();
+    document.getElementById('chDie').textContent = die;
+    document.getElementById('chMsg').textContent = 'Le dé donne ' + die + ' → sommet ' + chNames[v] + ' : le nouveau point est au milieu, sur le pointillé. (' + fmt(chCount) + ' point' + (chCount > 1 ? 's' : '') + ')';
+  });
+  document.getElementById('chK').addEventListener('click', function () { chBulk(1000); });
+  document.getElementById('chTenK').addEventListener('click', function () { chBulk(10000); });
+  document.getElementById('chClear').addEventListener('click', function () { chQueue = 0; chCount = 0; chRedraw(); document.getElementById('chDie').textContent = '?'; document.getElementById('chMsg').textContent = 'Tout est effacé. Lance le dé !'; });
+  function inTri(p) {
+    function sg(a, b, c) { return (a[0] - c[0]) * (b[1] - c[1]) - (b[0] - c[0]) * (a[1] - c[1]); }
+    var d1 = sg(p, chV[0], chV[1]), d2 = sg(p, chV[1], chV[2]), d3 = sg(p, chV[2], chV[0]);
+    return !((d1 < 0 || d2 < 0 || d3 < 0) && (d1 > 0 || d2 > 0 || d3 > 0));
+  }
+  chCv.addEventListener('click', function (e) {
+    var r = chCv.getBoundingClientRect(), p = [(e.clientX - r.left) * 480 / r.width, (e.clientY - r.top) * 420 / r.height];
+    if (!inTri(p)) { document.getElementById('chMsg').textContent = 'Choisis un point à l\'intérieur du triangle.'; return; }
+    chQueue = 0; chCount = 0; chCur = p; chRedraw();
+    document.getElementById('chDie').textContent = '?';
+    document.getElementById('chMsg').textContent = 'Nouveau départ choisi (cercle rouge). Lance le dé !';
+  });
+  chRedraw();
+
+  /* ---------- Arbre ---------- */
+  var trA = document.getElementById('trA'), trR = document.getElementById('trR'), trD = document.getElementById('trD');
+  function treeBranches(d) { return { last: Math.pow(2, d - 1), total: Math.pow(2, d) - 1 }; }
+  function drawTree() {
+    var A = parseInt(trA.value, 10) * Math.PI / 180, R = parseFloat(trR.value), D = parseInt(trD.value, 10);
+    var cap = window.innerWidth < 520 ? 10 : 12, capped = D > cap; if (capped) D = cap;
+    document.getElementById('trAOut').textContent = trA.value + '°';
+    document.getElementById('trROut').textContent = fmt(R, 2);
+    document.getElementById('trDOut').textContent = trD.value;
+    var ctx = document.getElementById('trCanvas').getContext('2d'), W = 520, H = 400;
+    ctx.clearRect(0, 0, W, H);
+    var L = 0.92 * (H - 10) * (1 - R) / (1 - Math.pow(R, D));
+    var levels = []; for (var i = 0; i < D; i++) levels.push([]);
+    function br(x, y, len, ang, d) {
+      var x2 = x + len * Math.cos(ang), y2 = y - len * Math.sin(ang);
+      levels[d].push(x, y, x2, y2);
+      if (d + 1 < D) { br(x2, y2, len * R, ang + A, d + 1); br(x2, y2, len * R, ang - A, d + 1); }
+    }
+    br(W / 2, H - 4, L, Math.PI / 2, 0);
+    var ink = css('--ink-soft'), leaf = css('--ok'), acc = css('--acc');
+    ctx.lineCap = 'round';
+    for (var k = 0; k < D; k++) {
+      var s = levels[k];
+      ctx.strokeStyle = k === D - 1 && D > 2 ? acc : (k >= D - 3 ? leaf : ink);
+      ctx.lineWidth = Math.max(1, (D - k) * 1.1);
+      ctx.beginPath();
+      for (var j = 0; j < s.length; j += 4) { ctx.moveTo(s[j], s[j + 1]); ctx.lineTo(s[j + 2], s[j + 3]); }
+      ctx.stroke();
+    }
+    var t = treeBranches(D);
+    document.getElementById('trOut').innerHTML = res('Branches au dernier niveau', fmt(t.last), '2' + sup(D - 1) + ' : le nombre double à chaque niveau') +
+      res('Branches en tout', fmt(t.total), '1 + 2 + 4 + … = 2' + sup(D) + ' − 1') +
+      (capped ? '<p class="soft">Sur un petit écran, on s\'arrête à ' + cap + ' niveaux pour que le dessin reste rapide.</p>' : '') +
+      (parseInt(trA.value, 10) === 0 ? '<p class="soft">Angle 0° : toutes les branches se superposent sur le tronc !</p>' : '');
+  }
+  [trA, trR, trD].forEach(function (e) { e.addEventListener('input', drawTree); });
+  drawTree();
+
+  /* ---------- Fougère ---------- */
+  function fernStep(x, y, u) {
+    if (u < 0.01) return [0, 0.16 * y, 1];
+    if (u < 0.86) return [0.85 * x + 0.04 * y, -0.04 * x + 0.85 * y + 1.6, 2];
+    if (u < 0.93) return [0.2 * x - 0.26 * y, 0.23 * x + 0.22 * y + 1.6, 3];
+    return [-0.15 * x + 0.28 * y, 0.26 * x + 0.24 * y + 0.44, 4];
+  }
+  var FMAX = 200000, fnPts = new Float32Array(FMAX * 2), fnWho = new Uint8Array(FMAX), fnCount = 0, fnX = 0, fnY = 0;
+  var fnCtx = document.getElementById('fnCanvas').getContext('2d');
+  function fnPx(x, y) { return [180 + (x - 0.237) * 46, 474 - y * 46]; }
+  function fnDraw(from) {
+    var color = document.getElementById('fnColor').checked, cols = [null, css('--ink-soft'), css('--ok'), css('--acc'), css('--two')], g = css('--ok');
+    if (from === 0) fnCtx.clearRect(0, 0, 360, 480);
+    for (var i = from; i < fnCount; i++) {
+      var p = fnPx(fnPts[2 * i], fnPts[2 * i + 1]);
+      fnCtx.fillStyle = color ? cols[fnWho[i]] : g;
+      fnCtx.fillRect(p[0] - 0.6, p[1] - 0.6, 1.2, 1.2);
+    }
+    document.getElementById('fnMsg').textContent = fmt(fnCount) + ' points' + (fnCount >= FMAX ? ' (maximum atteint)' : '') + '.';
+  }
+  function fnAdd(m) {
+    var start = fnCount;
+    for (var j = 0; j < m && fnCount < FMAX; j++) {
+      var r = fernStep(fnX, fnY, Math.random()); fnX = r[0]; fnY = r[1];
+      fnPts[2 * fnCount] = fnX; fnPts[2 * fnCount + 1] = fnY; fnWho[fnCount] = r[2]; fnCount++;
+    }
+    fnDraw(start);
+  }
+  document.getElementById('fnAdd').addEventListener('click', function () { fnAdd(5000); });
+  document.getElementById('fnClear').addEventListener('click', function () { fnCount = 0; fnX = 0; fnY = 0; fnDraw(0); });
+  document.getElementById('fnColor').addEventListener('change', function () { fnDraw(0); });
+  fnAdd(5000);
+
+  /* ---------- Tapis et éponge ---------- */
+  function carpet(n) { return { squares: Math.pow(8, n), holes: (Math.pow(8, n) - 1) / 7, area: Math.pow(8 / 9, n) }; }
+  function menger(n) { return { cubes: Math.pow(20, n), volume: Math.pow(20 / 27, n) }; }
+  var carN = 2, menN = 1;
+  [0, 1, 2, 3, 4].forEach(function (n) {
+    var b = document.createElement('button'); b.type = 'button'; b.id = 'car' + n; b.textContent = 'Étape ' + n;
+    b.addEventListener('click', function () { carN = n; drawCarpet(); });
+    document.getElementById('carBtns').appendChild(b);
+  });
+  function drawCarpet() {
+    var svg = document.getElementById('carSvg'), d = '';
+    [0, 1, 2, 3, 4].forEach(function (m) { document.getElementById('car' + m).setAttribute('aria-pressed', m === carN ? 'true' : 'false'); });
+    clear(svg);
+    mk(svg, 'rect', { x: 0, y: 0, width: 270, height: 270, fill: 'var(--acc)' });
+    function rec(x, y, s, k) {
+      if (k === 0) return;
+      var t = s / 3;
+      d += 'M' + (x + t).toFixed(3) + ' ' + (y + t).toFixed(3) + 'h' + t.toFixed(3) + 'v' + t.toFixed(3) + 'h' + (-t).toFixed(3) + 'Z';
+      for (var i = 0; i < 3; i++) for (var j = 0; j < 3; j++) if (i !== 1 || j !== 1) rec(x + i * t, y + j * t, t, k - 1);
+    }
+    rec(0, 0, 270, carN);
+    mk(svg, 'path', { d: d, fill: 'var(--paper)' });
+    var c = carpet(carN);
+    document.getElementById('carOut').innerHTML = res('Petits carrés pleins', fmt(c.squares), '8' + sup(carN)) + res('Trous', fmt(c.holes), '1 + 8 + 64 + …') + res('Aire qui reste', fmt(c.area * 100, 1) + ' %', '(8/9)' + sup(carN));
+  }
+  drawCarpet();
+
+  function mengerCubes(n) {
+    var cubes = [[0, 0, 0]], size = 1;
+    for (var k = 0; k < n; k++) {
+      var nc = [];
+      cubes.forEach(function (c) {
+        for (var i = 0; i < 3; i++) for (var j = 0; j < 3; j++) for (var l = 0; l < 3; l++) {
+          if ((i === 1) + (j === 1) + (l === 1) >= 2) continue;
+          nc.push([c[0] * 3 + i, c[1] * 3 + j, c[2] * 3 + l]);
+        }
+      });
+      cubes = nc; size *= 3;
+    }
+    return cubes;
+  }
+  [0, 1, 2].forEach(function (n) {
+    var b = document.createElement('button'); b.type = 'button'; b.id = 'men' + n; b.textContent = 'Étape ' + n;
+    b.addEventListener('click', function () { menN = n; drawMenger(); });
+    document.getElementById('menBtns').appendChild(b);
+  });
+  function drawMenger() {
+    var svg = document.getElementById('menSvg'), cubes = mengerCubes(menN), g = Math.pow(3, menN), u = 140 / g;
+    [0, 1, 2].forEach(function (m) { document.getElementById('men' + m).setAttribute('aria-pressed', m === menN ? 'true' : 'false'); });
+    clear(svg);
+    var cx = Math.cos(Math.PI / 6), sx = 0.5;
+    function P(x, y, z) { return ((x - y) * cx * u).toFixed(2) + ',' + ((x + y) * sx * u - z * u + 140).toFixed(2); }
+    cubes.sort(function (a, b) { return (a[0] + a[1] + a[2]) - (b[0] + b[1] + b[2]); });
+    // Peintre : on dessine cube par cube pour que les cubes proches cachent les cubes lointains
+    var sw = menN === 2 ? 0.4 : 1;
+    cubes.forEach(function (c) {
+      var x = c[0], y = c[1], z = c[2];
+      mk(svg, 'path', { d: 'M' + P(x + 1, y, z) + 'L' + P(x + 1, y + 1, z) + 'L' + P(x + 1, y + 1, z + 1) + 'L' + P(x + 1, y, z + 1) + 'Z', fill: 'var(--acc)', stroke: 'var(--ink)', 'stroke-width': sw, 'stroke-linejoin': 'round' });
+      mk(svg, 'path', { d: 'M' + P(x, y + 1, z) + 'L' + P(x + 1, y + 1, z) + 'L' + P(x + 1, y + 1, z + 1) + 'L' + P(x, y + 1, z + 1) + 'Z', fill: 'var(--acc-soft)', stroke: 'var(--ink)', 'stroke-width': sw, 'stroke-linejoin': 'round' });
+      mk(svg, 'path', { d: 'M' + P(x, y, z + 1) + 'L' + P(x + 1, y, z + 1) + 'L' + P(x + 1, y + 1, z + 1) + 'L' + P(x, y + 1, z + 1) + 'Z', fill: 'var(--card)', stroke: 'var(--ink)', 'stroke-width': sw, 'stroke-linejoin': 'round' });
+    });
+    var m = menger(menN);
+    document.getElementById('menOut').innerHTML = res('Petits cubes', fmt(m.cubes), '20' + sup(menN)) + res('Volume qui reste', fmt(m.volume * 100, 1) + ' %', '(20/27)' + sup(menN));
+  }
+  drawMenger();
+
+  /* ---------- Dimension ---------- */
+  function dimension(N, r) { if (!isFinite(N) || !isFinite(r) || r <= 1 || N < 1) return null; return Math.log(N) / Math.log(r); }
+  var dimR = document.getElementById('dimR'), dimN = document.getElementById('dimN');
+  var dimEx = [['Segment', 2, 2], ['Carré', 2, 4], ['Cube', 2, 8], ['Sierpiński', 2, 3], ['Koch', 3, 4], ['Tapis', 3, 8], ['Éponge', 3, 20]];
+  dimEx.forEach(function (e, i) {
+    var b = document.createElement('button'); b.type = 'button'; b.id = 'dim' + i; b.textContent = e[0];
+    b.addEventListener('click', function () { dimR.value = fmt(e[1]); dimN.value = fmt(e[2]); dimCalc(); });
+    document.getElementById('dimBtns').appendChild(b);
+  });
+  function dimCalc() {
+    var r = num(dimR.value), N = num(dimN.value), out = document.getElementById('dimOut');
+    dimEx.forEach(function (e, i) { document.getElementById('dim' + i).setAttribute('aria-pressed', e[1] === r && e[2] === N ? 'true' : 'false'); });
+    if (isNaN(r) || isNaN(N)) { out.innerHTML = '<p class="err">Écris deux nombres.</p>'; return; }
+    if (r <= 1) { out.innerHTML = '<p class="err">Il faut agrandir : r doit être plus grand que 1.</p>'; return; }
+    if (N < 1) { out.innerHTML = '<p class="err">Il faut au moins 1 copie.</p>'; return; }
+    var d = dimension(N, r), exact = Math.abs(d - Math.round(d)) < 1e-9;
+    var what = d < 1e-9 ? 'Une seule copie : c\'est un point, dimension 0.' : d < 1 ? 'Moins qu\'une ligne : une « poussière » de points.' : exact && d <= 3 ? 'Une dimension entière, comme ' + ['un point', 'une ligne', 'une surface', 'un volume'][Math.round(d)] + '.' : d < 2 ? 'Entre une ligne (1) et une surface (2).' : d < 3 ? 'Entre une surface (2) et un volume (3).' : 'Plus que 3 : impossible à construire dans notre espace, mais les maths n\'ont pas peur !';
+    out.innerHTML = res('Dimension d', (exact ? '= ' : '≈ ') + fmt(d, exact ? 0 : 3), 'log ' + fmt(N) + ' ÷ log ' + fmt(r) + ' = ' + fmt(Math.log10(N), 4) + ' ÷ ' + fmt(Math.log10(r), 4), 'total') +
+      res('Vérification', fmt(r) + 'ᵈ' + ' ' + (exact ? '= ' : '≈ ') + fmt(Math.pow(r, d), 3), fmt(r) + ' à la puissance ' + fmt(d, 3) + ' redonne ' + fmt(N) + ' copies. ' + what);
+  }
+  dimR.addEventListener('input', dimCalc); dimN.addEventListener('input', dimCalc); dimCalc();
+
+  /* ---------- Côte ---------- */
+  function mulberry(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+  function coast(seed) {
+    var rng = mulberry(seed), pts = [[6, 140], [394, 120]];
+    for (var lev = 0; lev < 8; lev++) {
+      var np = [];
+      for (var i = 0; i < pts.length - 1; i++) {
+        var a = pts[i], b = pts[i + 1], dx = b[0] - a[0], dy = b[1] - a[1], f = (rng() - 0.5) * (lev === 0 ? 0.8 : 0.95);
+        var m = [(a[0] + b[0]) / 2 - dy * f, (a[1] + b[1]) / 2 + dx * f];
+        m[1] = Math.max(14, Math.min(246, m[1])); m[0] = Math.max(2, Math.min(398, m[0]));
+        np.push(a, m);
+      }
+      np.push(pts[pts.length - 1]); pts = np;
+    }
+    return pts;
+  }
+  function dist(a, b) { return Math.hypot(a[0] - b[0], a[1] - b[1]); }
+  function divider(pts, L) {
+    var cur = pts[0], i = 0, path = [cur], steps = 0, guard = 0;
+    while (guard++ < 100000) {
+      var found = false;
+      for (var j = i; j < pts.length - 1; j++) {
+        var a = j === i ? cur : pts[j], b = pts[j + 1];
+        if (dist(cur, b) >= L) {
+          var dx = b[0] - a[0], dy = b[1] - a[1], fx = a[0] - cur[0], fy = a[1] - cur[1];
+          var A = dx * dx + dy * dy, B = fx * dx + fy * dy, C = fx * fx + fy * fy - L * L;
+          var t = (-B + Math.sqrt(Math.max(0, B * B - A * C))) / A;
+          t = Math.max(0, Math.min(1, t));
+          cur = [a[0] + t * dx, a[1] + t * dy]; i = j; path.push(cur); steps++; found = true; break;
+        }
+      }
+      if (!found) break;
+    }
+    var last = pts[pts.length - 1], rem = dist(cur, last);
+    if (rem > 1e-9) path.push(last);
+    return { steps: steps, rem: rem, length: steps * L + rem, path: path };
+  }
+  var coSeed = 3, coPts = coast(coSeed), KM = 0.5, rulers = [80, 40, 20, 10, 5, 2.5], coSeen = {};
+  var coL = document.getElementById('coL');
+  function coDraw() {
+    var Lkm = rulers[parseInt(coL.value, 10)], L = Lkm / KM, svg = document.getElementById('coSvg');
+    document.getElementById('coLOut').textContent = fmt(Lkm) + ' km';
+    clear(svg);
+    mk(svg, 'polygon', { points: ptsStr(coPts.concat([[400, 0], [0, 0]]), 2), fill: 'var(--two-soft)' });
+    mk(svg, 'polyline', { points: ptsStr(coPts, 2), fill: 'none', stroke: 'var(--ink)', 'stroke-width': 1.5, 'stroke-linejoin': 'round' });
+    mk(svg, 'text', { x: 14, y: 30, 'font-size': 14, fill: 'var(--two)' }, 'mer');
+    mk(svg, 'text', { x: 14, y: 250, 'font-size': 14 }, 'terre');
+    var r = divider(coPts, L);
+    mk(svg, 'polyline', { points: ptsStr(r.path, 2), fill: 'none', stroke: 'var(--acc)', 'stroke-width': 2.5, 'stroke-linejoin': 'round' });
+    if (L >= 10) r.path.forEach(function (p) { mk(svg, 'circle', { cx: p[0].toFixed(2), cy: p[1].toFixed(2), r: 3.5, fill: 'var(--acc)', stroke: 'var(--card)', 'stroke-width': 1 }); });
+    mk(svg, 'rect', { x: 240, y: 216, width: 120, height: 30, rx: 4, fill: 'var(--card)', stroke: 'var(--line)' });
+    mk(svg, 'line', { x1: 250, y1: 238, x2: 250 + 50 / KM, y2: 238, stroke: 'var(--ink)', 'stroke-width': 2 });
+    mk(svg, 'text', { x: 300, y: 232, 'text-anchor': 'middle', 'font-size': 12 }, '50 km');
+    var lenKm = r.length * KM, fine = 0;
+    for (var i = 0; i < coPts.length - 1; i++) fine += dist(coPts[i], coPts[i + 1]);
+    coSeen[Lkm] = { steps: r.steps, rem: r.rem * KM, len: lenKm };
+    document.getElementById('coOut').innerHTML = res('Nombre de pas', fmt(r.steps) + (r.rem > 1e-6 ? ' + un bout' : ''), fmt(r.steps) + ' × ' + fmt(Lkm) + ' km' + (r.rem > 1e-6 ? ' + ' + fmt(r.rem * KM, 1) + ' km (dernier bout)' : '')) +
+      res('Longueur mesurée', '≈ ' + fmt(Math.round(lenKm)) + ' km', 'Le dessin lui-même mesure ≈ ' + fmt(Math.round(fine * KM)) + ' km, mais une vraie côte aurait encore plus de détails.', 'total');
+    var rows = '<tr><th>Règle</th><th>Pas</th><th>Longueur</th></tr>';
+    rulers.forEach(function (k) { var s = coSeen[k]; rows += '<tr' + (k === Lkm ? ' class="cur"' : '') + '><td>' + fmt(k) + ' km</td><td>' + (s ? fmt(s.steps) : '…') + '</td><td>' + (s ? '≈ ' + fmt(Math.round(s.len)) + ' km' : 'essaie !') + '</td></tr>'; });
+    document.getElementById('coTable').innerHTML = rows;
+  }
+  coL.addEventListener('input', coDraw);
+  document.getElementById('coNew').addEventListener('click', function () { coSeed = 1 + Math.floor(Math.random() * 100000); coPts = coast(coSeed); coSeen = {}; coDraw(); });
+  coDraw();
+
+  /* ---------- Changement de thème : on redessine les canvas ---------- */
+  function redrawAll() { chRedraw(); drawTree(); fnDraw(0); }
+  if (window.matchMedia) { var mq = window.matchMedia('(prefers-color-scheme: dark)'); if (mq.addEventListener) mq.addEventListener('change', redrawAll); }
+  if (window.MutationObserver) new MutationObserver(redrawAll).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  window.addEventListener('resize', function () { if (parseInt(trD.value, 10) > 10) drawTree(); });
+
+  /* ---------- Quiz ---------- */
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  function rnd(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+  var makers = [
+    function () { var n = rnd(1, 5), a = 3 * Math.pow(4, n); return { q: 'Combien de côtés le flocon de Koch a-t-il à l\'étape ' + n + ' ?', a: a, how: '3 × 4' + sup(n) + ' = ' + fmt(a) }; },
+    function () { var n = rnd(1, 6), a = Math.pow(3, n); return { q: 'Combien de petits triangles pleins le triangle de Sierpiński a-t-il à l\'étape ' + n + ' ?', a: a, how: '3' + sup(n) + ' = ' + fmt(a) }; },
+    function () { var n = rnd(1, 3), c = 27, a = 3 * Math.pow(4, n) * c / Math.pow(3, n); return { q: 'Le triangle de départ a des côtés de 27 cm. Quel est le périmètre du flocon à l\'étape ' + n + ' (en cm) ?', a: a, how: fmt(3 * Math.pow(4, n)) + ' côtés de ' + fmt(c / Math.pow(3, n)) + ' cm = ' + fmt(a) + ' cm' }; },
+    function () { var n = rnd(1, 4), a = Math.pow(8, n); return { q: 'Combien de petits carrés pleins le tapis de Sierpiński a-t-il à l\'étape ' + n + ' ?', a: a, how: '8' + sup(n) + ' = ' + fmt(a) }; },
+    function () { var n = rnd(1, 3), a = Math.pow(20, n); return { q: 'Combien de petits cubes l\'éponge de Menger a-t-elle à l\'étape ' + n + ' ?', a: a, how: '20' + sup(n) + ' = ' + fmt(a) }; },
+    function () { var d = rnd(3, 10), a = Math.pow(2, d) - 1; return { q: 'Un arbre fractal a ' + d + ' niveaux (le tronc est le niveau 1). Combien a-t-il de branches en tout ?', a: a, how: '2' + sup(d) + ' − 1 = ' + fmt(a) }; },
+    function () { var e = pick([[2, 3, 'le triangle de Sierpiński'], [3, 4, 'la courbe de Koch'], [3, 8, 'le tapis de Sierpiński'], [3, 20, 'l\'éponge de Menger'], [3, 2, 'l\'ensemble de Cantor']]), d = Math.log(e[1]) / Math.log(e[0]); return { q: 'Pour ' + e[2] + ', agrandir × ' + e[0] + ' donne ' + e[1] + ' copies. Quelle est sa dimension (au centième) ?', a: d, tol: 0.011, how: 'log ' + e[1] + ' ÷ log ' + e[0] + ' ≈ ' + fmt(d, 2) }; },
+    function () { var L = pick([2, 5, 10, 20]), s = rnd(12, 60), a = L * s; return { q: 'On mesure une côte avec une règle de ' + L + ' km. On compte ' + s + ' pas. Quelle longueur trouve-t-on (en km) ?', a: a, how: s + ' × ' + L + ' = ' + fmt(a) + ' km' }; }
+  ];
+  var quiz = document.getElementById('quiz'), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ''; done = [];
+    for (var k = 0; k < 8; k++) {
+      var Q = makers[k](), li = document.createElement('li');
+      li.innerHTML = '<span>' + Q.q + '</span><input type="text" id="qa' + k + '" inputmode="decimal" autocomplete="off" aria-label="Ta réponse à la question ' + (k + 1) + '"><button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+      quiz.appendChild(li);
+      (function (k, Q) {
+        function check() {
+          var fb = document.getElementById('qf' + k), x = num(document.getElementById('qa' + k).value);
+          if (isNaN(x)) { fb.className = 'fb'; fb.textContent = 'Écris un nombre.'; return; }
+          if (Math.abs(x - Q.a) < (Q.tol || 0.006)) { fb.className = 'fb ok'; fb.textContent = 'Bravo, c\'est juste !'; done[k] = true; }
+          else { done[k] = false; fb.className = 'fb no'; fb.innerHTML = 'Pas tout à fait : la réponse est ' + fmt(Q.a, 2) + '.<span>' + Q.how + '</span>'; }
+          document.getElementById('score').textContent = done.filter(Boolean).length + ' / 8';
+        }
+        document.getElementById('qb' + k).addEventListener('click', check);
+        document.getElementById('qa' + k).addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+      })(k, Q);
+    }
+    document.getElementById('score').textContent = '0 / 8';
+  }
+  document.getElementById('newQuiz').addEventListener('click', newQuiz);
+  newQuiz();
+
+  window.__fra = { kochPoints: kochPoints, kochStats: kochStats, polyArea: polyArea, sierpinski: sierpinski, chaosStep: chaosStep, pascalRow: pascalRow, parityRow: parityRow, treeBranches: treeBranches, fernStep: fernStep, carpet: carpet, menger: menger, mengerCubes: mengerCubes, dimension: dimension, coast: coast, divider: divider };
+})();
+</script>
+</body>
+</html>

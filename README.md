@@ -51,10 +51,16 @@ Chaque tutoriel est une seule page HTML, sans installation. Il suffit de l'ouvri
 | [Les suites](les-suites.html) | Avant-goût du lycée : suites arithmétiques et géométriques, croissance linéaire contre exponentielle, limites, la conjecture de Syracuse, un quiz. |
 | [La dérivée](la-derivee.html) | Avant-goût du lycée : de la vitesse moyenne à la vitesse instantanée, de la sécante à la tangente, le sens de variation, un quiz. |
 | [Les nombres complexes](les-nombres-complexes.html) | Avant-goût du lycée : i² = −1, le plan complexe, addition et rotation, module, résoudre x² + 1 = 0, Mandelbrot, un quiz. |
+| [La cryptographie](la-cryptographie.html) | Code de César et sa roue, casser un code par force brute et par les fréquences, Vigenère, l'arithmétique de l'horloge, l'idée du RSA avec de petits nombres premiers, un quiz. |
+| [Le binaire et les bases](le-binaire-et-les-bases.html) | Base 10, 60, 12 et 20, le binaire avec des ampoules, les conversions pas à pas, l'hexadécimal et les couleurs, les octets, le code ASCII, un tour de magie, un quiz. |
+| [Les paradoxes de probabilité](les-paradoxes-de-probabilite.html) | Monty Hall, les anniversaires, l'erreur du joueur, les deux enfants, les faux positifs, les dés non transitifs et le paradoxe de Simpson, avec des simulations, un quiz. |
+| [Les fractales](les-fractales.html) | Autosimilarité, le flocon de Koch (périmètre infini, aire finie), le triangle de Sierpiński et le jeu du chaos, l'arbre et la fougère, la dimension fractale, la côte de Bretagne, un quiz. |
+| [Les jeux de stratégie](les-jeux-de-strategie.html) | Allumettes, course à 20, Nim et la somme de Nim, morpion contre l'ordinateur, raisonner à rebours, le dilemme du prisonnier, un quiz. |
+| [Les maths et la musique](les-maths-et-la-musique.html) | Fréquences et ondes, l'octave, la corde de Pythagore, les intervalles, la gamme tempérée et un mini-piano, les rythmes en fractions, un quiz. |
 
 ## Ajouter un tutoriel
 
 1. Ajouter un fichier `nom-du-tutoriel.html` à la racine.
 2. Ajouter une ligne dans le tableau ci-dessus.
 3. Ajouter une carte dans `index.html`, dans la bonne catégorie.
-4. Lancer `python tools/liens.py` : il ajoute le retour à l'accueil, les liens « précédent / suivant » (dans l'ordre de `index.html`) et transforme les mentions « le tutoriel sur … » en liens. On peut le relancer sans risque.
+4. Lancer `python tools/liens.py` : il ajoute le logo (icône d'onglet et d'écran d'accueil), le retour à l'accueil, les liens « précédent / suivant » (dans l'ordre de `index.html`) et transforme les mentions « le tutoriel sur … » en liens. On peut le relancer sans risque.

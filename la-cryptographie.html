@@ -1,0 +1,1086 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>La cryptographie</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, encre vert profond (comme l'encre sympathique des espions), marge rouge. La roue de César et les histogrammes de lettres sont au centre. */
+:root {
+  --paper: #f6f9f6;
+  --grid: #e1ebe3;
+  --card: #ffffff;
+  --ink: #12241a;
+  --ink-soft: #4d6355;
+  --acc: #15803d;
+  --acc-soft: #dcfce7;
+  --two: #6d28d9;
+  --two-soft: #ede9fe;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #fff0a3;
+  --line: #d4e2d8;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0c140f; --grid: #16221a; --card: #111b15; --ink: #e8f3ec; --ink-soft: #a6bfae;
+    --acc: #4ade80; --acc-soft: #133222; --two: #b9a3ff; --two-soft: #2a2148;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #24352a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0c140f; --grid: #16221a; --card: #111b15; --ink: #e8f3ec; --ink-soft: #a6bfae;
+  --acc: #4ade80; --acc-soft: #133222; --two: #b9a3ff; --two-soft: #2a2148;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #24352a;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note.two { border-left-color: var(--two); background: var(--two-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 6px 12px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); min-height: 40px; }
+button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.btns.tight { gap: 6px; }
+.btns.tight button { padding: 4px 8px; min-width: 42px; font-family: var(--f-mono); }
+input[type="text"], textarea { font: inherit; font-family: var(--f-mono); font-size: 1.05rem; padding: 8px 10px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; }
+textarea { resize: vertical; min-height: 72px; }
+input[type="range"] { width: 100%; accent-color: var(--acc); }
+.param { display: flex; flex-direction: column; gap: 2px; }
+.param label, label.lab { font-weight: 700; }
+.row2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 14px; }
+@media (max-width: 520px) { .row2 { grid-template-columns: 1fr; } }
+.scroll { overflow-x: auto; }
+
+.out { font-family: var(--f-mono); font-size: 1.05rem; background: var(--paper); border: 1.5px dashed var(--acc); border-radius: 8px; padding: 10px 12px; overflow-wrap: anywhere; white-space: pre-wrap; min-height: 2.6em; letter-spacing: .04em; }
+.out.big { font-size: 1.15rem; font-weight: 600; color: var(--acc); }
+.err { color: var(--red); font-weight: 700; }
+.verdict { border-radius: 8px; padding: 12px 14px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+.verdict:empty { display: none; }
+.verdict.yes { background: var(--ok-soft); color: var(--ok); }
+.verdict.no { background: var(--red-soft); color: var(--red); }
+.verdict span { font-weight: 400; color: var(--ink); }
+
+/* Bande alphabet : clair au-dessus, chiffré en dessous */
+.strip { display: grid; grid-template-columns: repeat(26, minmax(0, 1fr)); font-family: var(--f-mono); font-size: .82rem; text-align: center; border: 1.5px solid var(--line); border-radius: 8px; overflow: hidden; }
+.strip span { padding: 3px 0; line-height: 1.3; }
+.strip .p { background: var(--paper); }
+.strip .c { background: var(--acc-soft); color: var(--acc); font-weight: 600; }
+.strip .on { background: var(--hl); color: var(--ink); }
+.striplab { display: flex; justify-content: space-between; font-size: .85rem; color: var(--ink-soft); flex-wrap: wrap; gap: 4px; }
+
+.wheel { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.wheel svg { width: 100%; max-width: 300px; height: auto; touch-action: none; cursor: grab; user-select: none; -webkit-user-select: none; }
+.wheel svg.drag { cursor: grabbing; }
+.kbig { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc); text-align: center; }
+
+.fig svg { width: 100%; height: auto; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; }
+.fig.free svg { background: transparent; border: 0; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: .9rem; color: var(--ink-soft); }
+.legend i { display: inline-block; width: 14px; height: 14px; border-radius: 3px; vertical-align: -2px; margin-right: 6px; }
+
+.brute { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 6px; }
+.brute button { width: 100%; text-align: left; font-family: var(--f-mono); font-weight: 400; font-size: .92rem; box-shadow: none; border-width: 1.5px; border-color: var(--line); display: flex; gap: 10px; overflow-wrap: anywhere; min-width: 0; }
+.brute button b { color: var(--acc); flex: none; width: 3.2em; }
+.brute button.good { background: var(--ok-soft); border-color: var(--ok); }
+.brute button.bad { background: var(--red-soft); border-color: var(--red); }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; color: var(--acc); }
+.tag.two { color: var(--two); }
+.tag.red { color: var(--red); }
+
+.methods { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 12px; }
+.method { border: 1.5px solid var(--line); border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; background: var(--paper); min-width: 0; }
+.method strong { font-family: var(--f-display); }
+.method .m { font-family: var(--f-mono); font-size: .95rem; overflow-wrap: anywhere; }
+.method .m b { color: var(--acc); }
+.pairs { display: flex; flex-wrap: wrap; gap: 6px; }
+.pairs button { font-family: var(--f-mono); font-weight: 400; font-size: .9rem; padding: 4px 8px; box-shadow: none; border-width: 1.5px; }
+.pairs button[aria-pressed="true"] { background: var(--hl); color: var(--ink); }
+.keytab { display: grid; grid-template-columns: repeat(13, minmax(0, 1fr)); gap: 4px; font-family: var(--f-mono); font-size: .85rem; text-align: center; }
+.keytab span { border: 1.5px solid var(--line); border-radius: 6px; padding: 2px 0; line-height: 1.25; background: var(--paper); }
+.keytab b { display: block; color: var(--acc); }
+.vig svg { min-width: 490px; width: 100%; height: auto; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; }
+.calc { font-family: var(--f-mono); font-size: 1rem; overflow-wrap: anywhere; }
+.calc b { color: var(--acc); }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 130px auto; gap: 10px; align-items: center; }
+.quiz li > span:first-child { overflow-wrap: anywhere; min-width: 0; }
+.quiz input[type="text"] { font-size: 1rem; padding: 6px 8px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb:empty { display: none; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc); }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 130px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); overflow-wrap: anywhere; }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+<!--ticons--><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Tutoriels"><!--/ticons-->
+<style id="tnav-css">
+.tnav-top { display: flex; margin: 0 0 4px; }
+.tnav-home { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font-weight: 700; font-size: .95rem; text-decoration: none; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tnav-home:hover, .tnav-home:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.tnav-bottom { margin-top: 8px; display: flex; flex-direction: column; gap: 12px; }
+.tnav-bottom h2 { margin: 0; }
+.tnav-pn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tnav-pn a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--ink, #222); border-radius: 10px;
+  background: var(--card, #fff); color: var(--ink, #222); text-decoration: none; box-shadow: 3px 3px 0 var(--ink, #222); min-width: 0; }
+.tnav-pn a span { font-size: .85rem; color: var(--ink-soft, #666); }
+.tnav-pn a strong { overflow-wrap: anywhere; }
+.tnav-pn a.next { text-align: right; grid-column: 2; }
+.tnav-bottom .tnav-home { align-self: center; }
+@media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
+</style>
+</head>
+<body>
+<main class="page">
+<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="index.html">← Tous les tutoriels</a></nav><!--/tnav-->
+
+
+  <header class="hero">
+    <span class="eyebrow">Tutoriel de maths · niveau collège · curiosité</span>
+    <h1>La cryptographie</h1>
+    <p class="lead">Des messages que seul ton ami peut lire. Des espions qui comptent les lettres pour les casser. Et, aujourd'hui, des nombres premiers qui protègent tes messages sur ton téléphone. Bienvenue dans le monde des codes secrets.</p>
+    <div class="box fig free">
+      <svg viewBox="0 0 360 96" role="img" aria-label="Le mot BONJOUR, chiffré avec un décalage de 3, devient ERQMRXU">
+        <rect x="4" y="22" width="132" height="44" rx="8" fill="var(--paper)" stroke="var(--ink)" stroke-width="2"/>
+        <text x="70" y="52" text-anchor="middle" font-size="20" font-weight="600">BONJOUR</text>
+        <text x="70" y="15" text-anchor="middle" font-size="11" style="fill:var(--ink-soft)">message clair</text>
+        <path d="M144 44 H212" stroke="var(--acc)" stroke-width="3" fill="none"/>
+        <path d="M206 37 L216 44 L206 51 Z" fill="var(--acc)"/>
+        <circle cx="180" cy="44" r="15" fill="var(--acc-soft)" stroke="var(--acc)" stroke-width="2"/>
+        <text x="180" y="49" text-anchor="middle" font-size="14" font-weight="600" style="fill:var(--acc)">+3</text>
+        <text x="180" y="84" text-anchor="middle" font-size="11" style="fill:var(--ink-soft)">la clé</text>
+        <rect x="224" y="22" width="132" height="44" rx="8" fill="var(--acc-soft)" stroke="var(--acc)" stroke-width="2"/>
+        <text x="290" y="52" text-anchor="middle" font-size="20" font-weight="600" style="fill:var(--acc)">ERQMRXU</text>
+        <text x="290" y="15" text-anchor="middle" font-size="11" style="fill:var(--ink-soft)">message chiffré</text>
+      </svg>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · Pourquoi cacher ?</span>
+    <h2>Écrire pour un seul lecteur</h2>
+    <p>Depuis toujours, on veut envoyer des messages que <strong>personne d'autre</strong> ne peut lire : un général qui donne des ordres à ses troupes, un marchand qui protège ses affaires, deux amis qui se passent un mot en classe. Aujourd'hui, c'est partout : ta carte bancaire, les sites en « https », les messageries de ton téléphone.</p>
+    <p>La <strong>cryptographie</strong> (du grec <em>kryptos</em>, « caché », et <em>graphein</em>, « écrire ») est la science des messages secrets. Et c'est beaucoup de maths !</p>
+    <div class="cards">
+      <div class="box"><span class="tag">Le clair</span><strong>Message clair</strong><span class="soft">Le message normal, que tout le monde peut lire : « RENDEZ-VOUS À MIDI ».</span></div>
+      <div class="box"><span class="tag">Le chiffré</span><strong>Message chiffré</strong><span class="soft">Le message transformé, illisible : « UHQGHC-YRXV D PLGL ».</span></div>
+      <div class="box"><span class="tag">Chiffrer</span><strong>Chiffrer</strong><span class="soft">Transformer le clair en chiffré, avec une méthode et une clé.</span></div>
+      <div class="box"><span class="tag">Déchiffrer</span><strong>Déchiffrer</strong><span class="soft">Retrouver le clair quand on <strong>connaît</strong> la clé. C'est le travail du vrai destinataire.</span></div>
+      <div class="box"><span class="tag two">La clé</span><strong>La clé</strong><span class="soft">Le petit secret partagé : un nombre, un mot… Sans elle, la méthode ne sert à rien.</span></div>
+      <div class="box"><span class="tag red">Casser</span><strong>Casser un code</strong><span class="soft">Lire le message <strong>sans</strong> connaître la clé. On dit aussi <em>décrypter</em>. C'est le travail de l'espion.</span></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Petit point de vocabulaire</span>
+      <span>On entend souvent « crypter », mais les spécialistes disent <strong>chiffrer</strong>. Et « décrypter » ne veut pas dire « déchiffrer » : décrypter, c'est réussir <strong>sans</strong> la clé.</span>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · Le code de César</span>
+    <h2>Décaler toutes les lettres</h2>
+    <p>On raconte que Jules César remplaçait chaque lettre par celle qui se trouve <strong>3 places plus loin</strong> dans l'alphabet : A devient D, B devient E, C devient F… Et à la fin ? On fait le tour : X devient A, Y devient B, Z devient C. Le nombre de places, c'est <span class="hl">la clé</span> (on l'appelle le <strong>décalage</strong>).</p>
+    <div class="box wheel">
+      <h3>La roue de César</h3>
+      <p class="soft" style="text-align:center">Fais tourner la roue intérieure avec le doigt (ou la souris), ou utilise les flèches. Lis de l'extérieur (clair) vers l'intérieur (chiffré).</p>
+      <svg id="wheel" viewBox="0 0 320 320" tabindex="0" role="slider" aria-label="Roue de César : décalage" aria-valuemin="0" aria-valuemax="25" aria-valuenow="3"></svg>
+      <div class="btns">
+        <button type="button" id="wPrev" aria-label="Diminuer le décalage">◀ −1</button>
+        <span class="kbig" id="wK" aria-live="polite">décalage 3</span>
+        <button type="button" id="wNext" aria-label="Augmenter le décalage">+1 ▶</button>
+      </div>
+      <div style="width:100%;display:flex;flex-direction:column;gap:4px">
+        <div class="striplab"><span>clair ↓</span><span>chiffré ↓</span></div>
+        <div class="strip" id="wStrip" aria-label="Table de correspondance"></div>
+      </div>
+    </div>
+
+    <div class="box">
+      <h3>La machine à César</h3>
+      <div class="param">
+        <label class="lab" for="cIn">Ton message :</label>
+        <textarea id="cIn" rows="2" autocomplete="off" spellcheck="false">Rendez-vous à midi, près du préau !</textarea>
+      </div>
+      <div class="param">
+        <label for="cK">Décalage (la clé) : <span class="mono" id="cKOut">3</span></label>
+        <input id="cK" type="range" min="0" max="25" step="1" value="3">
+      </div>
+      <div class="btns" role="group" aria-label="Sens">
+        <button type="button" id="cEnc" aria-pressed="true">Chiffrer</button>
+        <button type="button" id="cDec" aria-pressed="false">Déchiffrer</button>
+      </div>
+      <div class="out big" id="cOut" aria-live="polite"></div>
+      <p class="soft" id="cInfo"></p>
+    </div>
+    <div class="note">
+      <span class="note-title">Et les accents, les espaces, la ponctuation ?</span>
+      <span>César n'utilisait que 26 lettres. Ici, la machine écrit tout en majuscules et <strong>enlève les accents</strong> : é, è, ê deviennent E, à devient A, ç devient C, œ devient OE. Les espaces, chiffres et signes de ponctuation sont <strong>laissés tels quels</strong>. C'est pratique, mais attention : ils donnent des indices à l'espion (on voit la longueur des mots !). Les vrais espions supprimaient souvent les espaces.</span>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · L'horloge des lettres</span>
+    <h2>Compter « modulo 26 »</h2>
+    <p>Sur une horloge, 22 h + 5 h = 3 h : après 24, on repart à 0. Pour les lettres, c'est pareil avec <strong>26</strong>. On numérote A = 0, B = 1, … , Z = 25. Chiffrer avec César, c'est <strong>ajouter</strong> la clé ; si on dépasse 25, on enlève 26. Déchiffrer, c'est <strong>soustraire</strong> la clé ; si on passe sous 0, on ajoute 26.</p>
+    <p>Les mathématiciens écrivent <span class="mono">28 mod 26 = 2</span> : c'est le <strong>reste</strong> de la division de 28 par 26. On parle d'<strong>arithmétique modulaire</strong>, ou « calcul sur une horloge ».</p>
+    <div class="box">
+      <div class="fig free"><svg id="clock" viewBox="0 0 300 300" role="img" aria-label="Horloge à 26 cases : les lettres de A à Z numérotées de 0 à 25" style="max-width:320px;margin:0 auto;display:block"></svg></div>
+      <div class="row2">
+        <div class="param">
+          <label for="mX">Lettre de départ : <span class="mono" id="mXOut">W</span></label>
+          <input id="mX" type="range" min="0" max="25" step="1" value="22">
+        </div>
+        <div class="param">
+          <label for="mK">Clé : <span class="mono" id="mKOut">7</span></label>
+          <input id="mK" type="range" min="0" max="25" step="1" value="7">
+        </div>
+      </div>
+      <div class="btns" role="group" aria-label="Sens du calcul">
+        <button type="button" id="mFwd" aria-pressed="true">Avancer (chiffrer)</button>
+        <button type="button" id="mBack" aria-pressed="false">Reculer (déchiffrer)</button>
+      </div>
+      <div class="calc" id="mOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · Casser César (1)</span>
+    <h2>La force brute : tout essayer</h2>
+    <p>Un espion a intercepté un message. Il sait que c'est un code de César, mais il ne connaît pas la clé. Bonne nouvelle pour lui : il n'y a que <strong>25 décalages possibles</strong> (le décalage 0 ne cache rien, et 26 revient à 0). Il suffit de les essayer tous ! C'est la méthode de la <strong>force brute</strong>.</p>
+    <div class="box">
+      <h3>Message intercepté</h3>
+      <div class="out big" id="bCipher"></div>
+      <p class="soft">Voici le message déchiffré avec chacun des 25 décalages. Clique sur la ligne qui veut dire quelque chose.</p>
+      <ul class="brute" id="bList"></ul>
+      <div class="verdict" id="bOut" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="bNew">Nouveau message</button></div>
+    </div>
+    <div class="note red">
+      <span class="note-title">Leçon n° 1 des cryptographes</span>
+      <span>S'il y a <strong>peu de clés possibles</strong>, le code est faible : un espion patient (ou un ordinateur, en une fraction de seconde) les essaie toutes.</span>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Casser César (2)</span>
+    <h2>L'analyse des fréquences</h2>
+    <p>En français, toutes les lettres ne sont pas aussi fréquentes. Le <strong>E</strong> est de loin le champion : environ <strong>15 %</strong> des lettres d'un texte ! Viennent ensuite S, A, I, T, N… Et des lettres comme K ou W sont très rares.</p>
+    <p>Avec César, chaque lettre est toujours remplacée par la même lettre. Donc la lettre la plus fréquente du message chiffré est <span class="hl">très probablement un E déguisé</span>. On compte, et on trouve la clé.</p>
+    <div class="box">
+      <h3>À toi de casser ce message</h3>
+      <div class="out" id="fCipher"></div>
+      <div class="fig"><svg id="fHist" viewBox="0 0 400 220" role="img" aria-label="Histogramme des lettres du message chiffré, comparé aux fréquences du français"></svg></div>
+      <div class="legend"><span><i style="background:var(--acc)"></i>lettres du message chiffré (en %)</span><span><i style="border:2px solid var(--two)"></i>français normal, décalé de ta clé</span></div>
+      <div class="param">
+        <label for="fG">Ton décalage : <span class="mono" id="fGOut">0</span></label>
+        <input id="fG" type="range" min="0" max="25" step="1" value="0">
+      </div>
+      <p class="soft">Bouge le curseur jusqu'à ce que les cadres violets se posent sur les barres vertes. Sous chaque lettre chiffrée, tu vois la lettre claire qu'elle deviendrait.</p>
+      <div class="out" id="fDec" aria-live="polite"></div>
+      <div class="verdict" id="fOut" aria-live="polite"></div>
+      <div class="btns">
+        <button type="button" id="fHint">Un indice</button>
+        <button type="button" id="fAuto">L'ordinateur cherche</button>
+        <button type="button" id="fNew">Nouveau message</button>
+      </div>
+    </div>
+    <div class="note two">
+      <span class="note-title">Pourquoi ça marche mieux sur un long texte</span>
+      <span>Sur trois mots, le hasard peut tromper : « UN CHAT GRIS » n'a aucun E. Sur un long texte, les fréquences se rapprochent de celles du français (c'est la loi des grands nombres, voir le tutoriel sur <a class="tlink" href="les-probabilites.html">les probabilités</a>). L'ordinateur compare les 26 décalages et garde celui dont l'histogramme ressemble le plus au français.</span>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · La substitution</span>
+    <h2>Mélanger tout l'alphabet</h2>
+    <p>Pour résister à la force brute, on peut remplacer chaque lettre par <strong>n'importe quelle autre</strong>, sans ordre : A devient Q, B devient M, C devient A… La clé est alors un alphabet mélangé.</p>
+    <p>Combien de clés ? 26 choix pour A, puis 25 pour B, 24 pour C… soit 26 × 25 × 24 × … × 1, ce qu'on note <strong>26!</strong> (« factorielle 26 ») : environ <strong>4 × 10²⁶</strong>, 400 millions de milliards de milliards. À un milliard d'essais par seconde, il faudrait plus de 10 milliards d'années !</p>
+    <div class="box">
+      <h3>Ta clé secrète (alphabet mélangé)</h3>
+      <div class="keytab" id="sKey"></div>
+      <div class="param">
+        <label class="lab" for="sIn">Ton message :</label>
+        <textarea id="sIn" rows="2" autocomplete="off" spellcheck="false">Le trésor est caché sous le grand chêne.</textarea>
+      </div>
+      <div class="out big" id="sOut" aria-live="polite"></div>
+      <p class="soft" id="sCheck"></p>
+      <div class="btns"><button type="button" id="sNew">Nouvelle clé au hasard</button></div>
+    </div>
+    <div class="note red">
+      <span class="note-title">Mais… les fréquences trahissent encore</span>
+      <span>Chaque E est toujours remplacé par la <strong>même</strong> lettre. Donc la lettre la plus fréquente du chiffré est encore probablement un E. Puis on devine les petits mots (LE, LA, DE, ET…), et le message tombe petit à petit. C'est exactement la méthode d'al-Kindi, il y a plus de 1 000 ans.</span>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Le chiffre de Vigenère</span>
+    <h2>Un mot comme clé</h2>
+    <p>Idée géniale : au lieu d'un seul décalage, on en utilise <strong>plusieurs, à tour de rôle</strong>. La clé est un mot, par exemple CLE. Chaque lettre de la clé donne un décalage : C = 2, L = 11, E = 4. On décale la 1<sup>re</sup> lettre du message de 2, la 2<sup>e</sup> de 11, la 3<sup>e</sup> de 4, puis on recommence : 2, 11, 4, 2, 11, 4…</p>
+    <div class="box">
+      <div class="row2">
+        <div class="param">
+          <label class="lab" for="vIn">Ton message :</label>
+          <input id="vIn" type="text" autocomplete="off" spellcheck="false" value="Attaque à l'aube">
+        </div>
+        <div class="param">
+          <label class="lab" for="vKey">Mot-clé :</label>
+          <input id="vKey" type="text" autocomplete="off" spellcheck="false" value="CLE">
+        </div>
+      </div>
+      <div class="btns" role="group" aria-label="Sens">
+        <button type="button" id="vEnc" aria-pressed="true">Chiffrer</button>
+        <button type="button" id="vDec" aria-pressed="false">Déchiffrer</button>
+      </div>
+      <div class="out big" id="vOut" aria-live="polite"></div>
+      <p class="soft">Lettre par lettre (clique sur une étape pour la voir dans le tableau) :</p>
+      <div class="pairs" id="vPairs"></div>
+      <div class="scroll vig"><svg id="vTab" viewBox="0 0 490 490" role="img" aria-label="Tableau de Vigenère : ligne = lettre de la clé, colonne = lettre du message"></svg></div>
+      <p class="soft">Le tableau de Vigenère : on cherche la <strong>colonne</strong> de la lettre du message et la <strong>ligne</strong> de la lettre de la clé. La case où elles se croisent donne la lettre chiffrée.</p>
+    </div>
+
+    <div class="box">
+      <h3>Pourquoi l'analyse des fréquences ne marche plus</h3>
+      <p id="vMix"></p>
+      <div class="row2">
+        <div class="fig"><svg id="vH1" viewBox="0 0 400 150" role="img" aria-label="Histogramme d'un texte chiffré par César"></svg><p class="soft" style="text-align:center">César (décalage 3) : un pic très net</p></div>
+        <div class="fig"><svg id="vH2" viewBox="0 0 400 150" role="img" aria-label="Histogramme du même texte chiffré par Vigenère"></svg><p class="soft" style="text-align:center" id="vH2lab">Vigenère : c'est plus aplati</p></div>
+      </div>
+      <p class="soft">Même texte, deux méthodes. Avec Vigenère, le E est réparti entre plusieurs lettres : le pic disparaît. Plus le mot-clé est long, plus l'histogramme est plat.</p>
+    </div>
+    <div class="note two">
+      <span class="note-title">« Le chiffre indéchiffrable » ?</span>
+      <span>On l'a longtemps cru incassable. Mais si l'espion devine la <strong>longueur</strong> du mot-clé (disons 3), il découpe le message en 3 paquets : les lettres 1, 4, 7… ; les lettres 2, 5, 8… ; etc. Chaque paquet est un simple César, qu'on casse avec les fréquences ! Au XIX<sup>e</sup> siècle, Charles Babbage puis Friedrich Kasiski ont trouvé comment deviner cette longueur.</span>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Le masque jetable</span>
+    <h2>Une clé aussi longue que le message</h2>
+    <p>Et si le mot-clé de Vigenère était aussi long que le message, tiré <strong>au hasard</strong>, et utilisé <strong>une seule fois</strong> ? Alors il n'y a plus de répétition à repérer. On appelle ça le <strong>masque jetable</strong>. Le mathématicien Claude Shannon a démontré, dans les années 1940, qu'on ne peut alors <strong>rien</strong> apprendre du message chiffré, à part sa longueur.</p>
+    <div class="box">
+      <div class="param">
+        <label class="lab" for="oIn">Message secret :</label>
+        <input id="oIn" type="text" autocomplete="off" spellcheck="false" value="Attaque à l'aube">
+      </div>
+      <div class="method"><strong>Le masque (tiré au hasard)</strong><span class="m" id="oKey"></span></div>
+      <div class="method"><strong>Le message chiffré</strong><span class="m" id="oCipher" style="color:var(--acc);font-weight:600"></span></div>
+      <div class="btns"><button type="button" id="oNew">Nouveau masque</button></div>
+      <h3>Le cauchemar de l'espion</h3>
+      <p>L'espion a seulement le message chiffré. Propose-lui un autre message de la même longueur : il existe <strong>toujours</strong> un masque qui donne ce message-là !</p>
+      <div class="param">
+        <label class="lab" for="oFake">Autre message possible :</label>
+        <input id="oFake" type="text" autocomplete="off" spellcheck="false" value="Restez au chaud">
+      </div>
+      <div class="verdict" id="oOut" aria-live="polite"></div>
+    </div>
+    <div class="note red">
+      <span class="note-title">Le problème</span>
+      <span>Il faut un masque aussi long que tous les messages, et le donner en secret au destinataire <strong>avant</strong>. Et si on réutilise un masque, il devient cassable. C'est pour ça qu'on l'utilise très peu (on dit qu'il a servi pour certaines lignes diplomatiques sensibles).</span>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · La clé publique et RSA</span>
+    <h2>Le cadenas que tout le monde peut fermer</h2>
+    <p>Tous les codes vus jusqu'ici ont le même problème : il faut <strong>se mettre d'accord sur la clé en secret</strong>. Comment faire avec un site internet à l'autre bout du monde ? En 1976–1977, des chercheurs ont trouvé une idée folle : <strong>deux clés différentes</strong>. Une pour fermer, une pour ouvrir.</p>
+    <div class="box">
+      <h3>L'histoire du cadenas</h3>
+      <div class="fig free"><svg id="lock" viewBox="0 0 360 160" role="img" aria-label="Alice, Bob et Ève échangent une boîte fermée par un cadenas"></svg></div>
+      <p id="lockTxt" aria-live="polite"></p>
+      <div class="btns" id="lockBtns" role="group" aria-label="Étapes de l'histoire"></div>
+    </div>
+    <p>En maths, le « cadenas » s'appelle la <strong>clé publique</strong> et la clé d'Alice la <strong>clé privée</strong>. La méthode la plus célèbre s'appelle <strong>RSA</strong>, d'après Rivest, Shamir et Adleman (1977). Elle utilise les <strong>nombres premiers</strong> (voir le tutoriel sur <a class="tlink" href="les-nombres-premiers.html">les nombres premiers</a>).</p>
+    <div class="box">
+      <h3>RSA avec de tout petits nombres premiers</h3>
+      <p class="soft">1. Alice choisit deux nombres premiers différents p et q (en secret).</p>
+      <div class="param"><span class="lab">p =</span><div class="btns tight" id="rP" role="group" aria-label="Choix de p"></div></div>
+      <div class="param"><span class="lab">q =</span><div class="btns tight" id="rQ" role="group" aria-label="Choix de q"></div></div>
+      <p class="soft">2. Elle choisit e, qui n'a aucun diviseur commun avec (p − 1) × (q − 1) :</p>
+      <div class="param"><span class="lab">e =</span><div class="btns tight" id="rE" role="group" aria-label="Choix de e"></div></div>
+      <div class="methods" id="rKeys"></div>
+      <div class="param">
+        <label class="lab" for="rM">3. Bob chiffre un nombre m (entre 0 et n − 1) :</label>
+        <input id="rM" type="text" inputmode="numeric" autocomplete="off" value="42">
+      </div>
+      <div class="methods" id="rOut" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Pourquoi c'est sûr ?</span>
+      <span>Pour trouver d, l'espion doit connaître p et q. Il voit n = p × q. Avec n = 143, il trouve vite 11 × 13. Mais en vrai, p et q ont <strong>des centaines de chiffres</strong>. Multiplier deux grands nombres premiers est facile ; retrouver p et q à partir de n est, pour ce qu'on en sait aujourd'hui, beaucoup trop long, même pour les ordinateurs les plus puissants.</span>
+    </div>
+    <div class="note two">
+      <span class="note-title">Et les ordinateurs quantiques ?</span>
+      <span>En 1994, Peter Shor a montré qu'un ordinateur quantique <strong>assez grand</strong> pourrait retrouver p et q rapidement. Les ordinateurs quantiques actuels sont encore bien trop petits pour casser RSA, mais les chercheurs préparent déjà des méthodes dites « post-quantiques ». Autre piste de recherche : la <strong>cryptographie quantique</strong>, qui utilise la physique de la lumière pour partager une clé secrète (si un espion écoute, il laisse des traces). Ce sont des sujets de recherche très actifs.</span>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · Un peu d'histoire</span>
+    <h2>2 500 ans de messages secrets</h2>
+    <ol class="timeline">
+      <li><span class="when">vers le V<sup>e</sup> siècle av. J.-C.</span><div class="what"><strong>La scytale de Sparte</strong><span>D'après des auteurs grecs (comme Plutarque, bien plus tard), les Spartiates enroulaient une bande de cuir autour d'un bâton pour écrire. Déroulée, la bande montrait des lettres mélangées. Seul un bâton de même diamètre permettait de relire.</span></div></li>
+      <li><span class="when">I<sup>er</sup> siècle av. J.-C.</span><div class="what"><strong>Jules César</strong><span>L'historien Suétone raconte que César décalait les lettres de 3 places pour ses lettres secrètes.</span></div></li>
+      <li><span class="when">IX<sup>e</sup> siècle</span><div class="what"><strong>Al-Kindi, à Bagdad</strong><span>Ce savant arabe écrit le plus ancien texte connu qui explique l'analyse des fréquences : compter les lettres pour casser une substitution.</span></div></li>
+      <li><span class="when">XVI<sup>e</sup> siècle</span><div class="what"><strong>Bellaso, puis Vigenère</strong><span>L'Italien Giovan Battista Bellaso décrit un chiffre à mot-clé ; le Français Blaise de Vigenère publie une méthode proche quelques décennies plus tard, et c'est son nom qui est resté. Ce chiffre résiste près de trois siècles.</span></div></li>
+      <li><span class="when">1939–1945</span><div class="what"><strong>Enigma et Alan Turing</strong><span>L'armée allemande chiffre ses messages avec Enigma, une machine à rotors. Des mathématiciens polonais, dont Marian Rejewski, réussissent les premiers à la casser dans les années 1930. Pendant la guerre, Alan Turing et des milliers de personnes à Bletchley Park, en Angleterre, construisent des machines pour retrouver les réglages chaque jour.</span></div></li>
+      <li><span class="when">1976–1977</span><div class="what"><strong>La clé publique, puis RSA</strong><span>Whitfield Diffie et Martin Hellman publient l'idée de la clé publique (1976). Ron Rivest, Adi Shamir et Leonard Adleman inventent RSA l'année suivante. On a appris plus tard que des chercheurs britanniques avaient eu des idées semblables, restées secrètes.</span></div></li>
+      <li><span class="when">aujourd'hui</span><div class="what"><strong>Partout autour de toi</strong><span>Chaque fois que ton téléphone affiche un petit cadenas, des maths de ce genre travaillent pour toi. Et la recherche continue, notamment face aux futurs ordinateurs quantiques.</span></div></li>
+    </ol>
+    <div class="note red">
+      <span class="note-title">Les erreurs fréquentes</span>
+      <span>• <strong>Déchiffrer dans le mauvais sens</strong> : pour défaire un décalage de 3, on recule de 3 (ou on avance de 23), on n'avance pas de 3.</span>
+      <span>• <strong>Oublier de faire le tour</strong> : après Z, on revient à A. Y + 5 = D, pas une lettre « hors de l'alphabet ».</span>
+      <span>• <strong>Confondre déchiffrer et décrypter</strong> : on déchiffre avec la clé, on décrypte (on casse) sans la clé.</span>
+      <span>• <strong>Croire qu'une méthode secrète suffit</strong> : un bon code doit rester sûr même si l'espion connaît la méthode. Tout le secret doit être dans la clé (c'est le principe de Kerckhoffs, XIX<sup>e</sup> siècle).</span>
+      <span>• <strong>Réutiliser un masque jetable</strong> : « jetable » veut dire une seule fois !</span>
+      <span>• <strong>En RSA</strong> : p et q doivent être différents, et le message m doit être plus petit que n.</span>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · Quiz</span>
+    <h2>Huit questions d'agent secret</h2>
+    <p>Réponds avec des lettres (en majuscules ou minuscules) ou avec un nombre.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Nouvelles questions</button>
+    </div>
+  </section>
+
+  <!-- 12 -->
+  <section>
+    <span class="eyebrow">Étape 12 · À toi de jouer</span>
+    <h2>Six missions</h2>
+    <div class="exos">
+      <details>
+        <summary>Message de César<span class="q">Déchiffre « FRGH VHFUHW » (décalage 3).</span></summary>
+        <div><span>On recule chaque lettre de 3 : F → C, R → O, G → D, H → E… On obtient <strong>CODE SECRET</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Force brute<span class="q">Un ordinateur essaie 1 décalage de César par milliseconde. Combien de temps, au maximum, pour casser un message ?</span></summary>
+        <div><span>Il y a 25 décalages utiles, donc au plus <strong>25 millisecondes</strong>, soit 0,025 seconde. César n'est pas sûr du tout !</span></div>
+      </details>
+      <details>
+        <summary>Les fréquences<span class="q">Dans un long message chiffré avec César, la lettre la plus fréquente est X. Quelle est probablement la clé ?</span></summary>
+        <div><span>X est probablement un E. X = 23 et E = 4, donc la clé est 23 − 4 = <strong>19</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Vigenère<span class="q">Chiffre MATHS avec le mot-clé CLE.</span></summary>
+        <div><span>Décalages 2, 11, 4, 2, 11. M (12) + 2 = 14 → O ; A (0) + 11 = 11 → L ; T (19) + 4 = 23 → X ; H (7) + 2 = 9 → J ; S (18) + 11 = 29, 29 − 26 = 3 → D.</span><span>Résultat : <strong>OLXJD</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Casser un petit RSA<span class="q">La clé publique d'Alice est n = 3 233. Trouve ses deux nombres premiers p et q.</span></summary>
+        <div><span>On essaie de diviser par les nombres premiers 2, 3, 5, 7, 11… Il faut aller jusqu'à 53 : 3 233 ÷ 53 = 61. Donc <strong>p = 53 et q = 61</strong>.</span><span>Avec un n de 600 chiffres, cette méthode prendrait bien plus que l'âge de l'Univers.</span></div>
+      </details>
+      <details>
+        <summary>Vérifier une clé RSA<span class="q">p = 5, q = 11, e = 3. Vérifie que d = 27 est la bonne clé privée, puis chiffre m = 2.</span></summary>
+        <div><span>(p − 1) × (q − 1) = 4 × 10 = 40. e × d = 3 × 27 = 81 = 2 × 40 + 1 : le reste est bien 1, donc d = 27 convient.</span><span>n = 55 et 2³ = 8, plus petit que 55 : le message chiffré est <strong>c = 8</strong>.</span></div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• <strong>Chiffrer</strong> transforme un message clair grâce à une <strong>clé</strong> ; <strong>déchiffrer</strong> le retrouve avec la clé ; <strong>casser</strong> (décrypter), c'est y arriver sans la clé.</span>
+      <span>• <strong>César</strong> : on décale chaque lettre du même nombre, en comptant <strong>modulo 26</strong> (après Z, on revient à A).</span>
+      <span>• César se casse par <strong>force brute</strong> (25 essais) ou par <strong>analyse des fréquences</strong> (le E est la lettre la plus fréquente en français).</span>
+      <span>• <strong>Vigenère</strong> utilise un mot-clé : plusieurs décalages à tour de rôle, ce qui mélange les fréquences.</span>
+      <span>• Le <strong>masque jetable</strong> est parfait en théorie, mais difficile en pratique.</span>
+      <span>• <strong>RSA</strong> : une clé publique pour fermer, une clé privée pour ouvrir. Sa sécurité vient de la difficulté à retrouver p et q à partir de n = p × q.</span>
+    </div>
+  </section>
+
+  <!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"><a class="prev" href="les-nombres-complexes.html"><span>← Précédent</span><strong>Les nombres complexes</strong></a><a class="next" href="le-binaire-et-les-bases.html"><span>Suivant →</span><strong>Le binaire et les bases</strong></a></div><a class="tnav-home" href="index.html">⌂ Tous les tutoriels</a></nav><!--/tnav-->
+<footer>Fiche de révision · La cryptographie</footer>
+</main>
+
+<script>
+/*
+  Fonctions de test exposées sur window.__cry :
+    norm(texte) → texte en majuscules, sans accents (œ → OE, æ → AE)
+    mod(a, n) → reste positif de a modulo n (mod(−2, 26) = 24)
+    shiftLetter(lettre, k) → la lettre décalée de k (laisse tout autre caractère inchangé)
+    caesar(texte, k) → texte chiffré par César (k négatif = déchiffrer)
+    bruteForce(chiffré) → tableau de 26 chaînes : déchiffrement avec les décalages 0 à 25
+    letterCounts(texte) → { counts: [26 entiers], total, pct: [26 pourcentages] }
+    crackCaesar(chiffré) → décalage le plus probable (test du khi² contre les fréquences du français)
+    substitute(texte, clé26) / invertKey(clé26) / randomKey() → substitution mono-alphabétique
+    vigenere(texte, motClé, sens) → sens = 1 chiffrer, −1 déchiffrer (la clé n'avance que sur les lettres)
+    padKeyFor(chiffré, clair) → masque qui transforme ce clair en ce chiffré (null si longueurs différentes)
+    gcd(a, b), modInverse(e, m) → inverse de e modulo m (null si pas d'inverse)
+    modPow(b, e, m) → b^e mod m, en BigInt (accepte des Number ou des BigInt)
+    rsaKeys(p, q, e) → { n, phi, e, d } ou { error }
+    FR_FREQ → fréquences du français (en %, de A à Z)
+*/
+(function () {
+  var NS = 'http://www.w3.org/2000/svg';
+  var ABC = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  var FR_FREQ = [7.636, 0.901, 3.260, 3.669, 14.715, 1.066, 0.866, 0.737, 7.529, 0.613, 0.074, 5.456, 2.968, 7.095, 5.796, 2.521, 1.362, 6.693, 7.948, 7.244, 6.311, 1.838, 0.049, 0.427, 0.128, 0.326];
+  function $(id) { return document.getElementById(id); }
+  function fmt(x, d) { var r = Math.round(x * 1e6) / 1e6; if (Object.is(r, -0)) r = 0; return r.toLocaleString('fr-FR', { maximumFractionDigits: d == null ? 3 : d }).replace('-', '−'); }
+  function bigFmt(b) { return String(b).replace(/\B(?=(\d{3})+(?!\d))/g, ' '); }
+  function signed(x) { return x < 0 ? '(−' + (-x) + ')' : String(x); }
+  function mk(svg, name, attrs, text) { var e = document.createElementNS(NS, name); for (var a in attrs) e.setAttribute(a, attrs[a]); if (text != null) e.textContent = text; svg.appendChild(e); return e; }
+  function clear(svg) { while (svg.firstChild) svg.removeChild(svg.firstChild); }
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  function rnd(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+
+  /* ---------- Fonctions mathématiques ---------- */
+  function mod(a, n) { return ((a % n) + n) % n; }
+  function norm(s) {
+    return String(s).replace(/œ/g, 'oe').replace(/Œ/g, 'OE').replace(/æ/g, 'ae').replace(/Æ/g, 'AE')
+      .normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase();
+  }
+  function idx(ch) { return ch.length === 1 ? ABC.indexOf(ch) : -1; }
+  function shiftLetter(ch, k) { var i = idx(ch); return i < 0 ? ch : ABC[mod(i + k, 26)]; }
+  function caesar(text, k) { return norm(text).split('').map(function (c) { return shiftLetter(c, k); }).join(''); }
+  function bruteForce(text) { var r = []; for (var k = 0; k < 26; k++) r.push(caesar(text, -k)); return r; }
+  function letterCounts(text) {
+    var counts = [], total = 0, t = norm(text);
+    for (var i = 0; i < 26; i++) counts.push(0);
+    for (var j = 0; j < t.length; j++) { var x = idx(t[j]); if (x >= 0) { counts[x]++; total++; } }
+    return { counts: counts, total: total, pct: counts.map(function (c) { return total ? 100 * c / total : 0; }) };
+  }
+  function chi2(counts, total, k) {
+    var s = 0;
+    for (var i = 0; i < 26; i++) { var exp = total * FR_FREQ[i] / 100, obs = counts[mod(i + k, 26)]; s += (obs - exp) * (obs - exp) / exp; }
+    return s;
+  }
+  function crackCaesar(text) {
+    var L = letterCounts(text), best = 0, bs = Infinity;
+    if (!L.total) return 0;
+    for (var k = 0; k < 26; k++) { var s = chi2(L.counts, L.total, k); if (s < bs) { bs = s; best = k; } }
+    return best;
+  }
+  function substitute(text, key) { return norm(text).split('').map(function (c) { var i = idx(c); return i < 0 ? c : key[i]; }).join(''); }
+  function invertKey(key) { var inv = []; for (var i = 0; i < 26; i++) inv[ABC.indexOf(key[i])] = ABC[i]; return inv.join(''); }
+  function randomKey() { var a = ABC.split(''); for (var i = 25; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; } return a.join(''); }
+  function keyLetters(key) { return norm(key).replace(/[^A-Z]/g, ''); }
+  function vigenere(text, key, dir) {
+    var K = keyLetters(key); if (!K.length) return null;
+    var j = 0;
+    return norm(text).split('').map(function (c) { if (idx(c) < 0) return c; var s = idx(K[j % K.length]); j++; return shiftLetter(c, dir * s); }).join('');
+  }
+  function vigPairs(text, key, dir) {
+    var K = keyLetters(key), out = [], j = 0, t = norm(text);
+    if (!K.length) return out;
+    for (var i = 0; i < t.length; i++) { if (idx(t[i]) < 0) continue; var kl = K[j % K.length]; out.push({ p: t[i], k: kl, s: idx(kl), c: shiftLetter(t[i], dir * idx(kl)) }); j++; }
+    return out;
+  }
+  function onlyLetters(s) { return norm(s).replace(/[^A-Z]/g, ''); }
+  function padKeyFor(cipher, plain) {
+    var C = onlyLetters(cipher), P = onlyLetters(plain);
+    if (C.length !== P.length) return null;
+    var k = ''; for (var i = 0; i < C.length; i++) k += ABC[mod(idx(C[i]) - idx(P[i]), 26)];
+    return k;
+  }
+  function gcd(a, b) { a = Math.abs(a); b = Math.abs(b); while (b) { var t = a % b; a = b; b = t; } return a; }
+  function modInverse(e, m) {
+    var r0 = m, r1 = mod(e, m), t0 = 0, t1 = 1;
+    while (r1 !== 0) { var q = Math.floor(r0 / r1), r2 = r0 - q * r1, t2 = t0 - q * t1; r0 = r1; r1 = r2; t0 = t1; t1 = t2; }
+    return r0 === 1 ? mod(t0, m) : null;
+  }
+  function modPow(b, e, m) {
+    b = BigInt(b); e = BigInt(e); m = BigInt(m);
+    if (m === 1n) return 0n;
+    var r = 1n; b = ((b % m) + m) % m;
+    while (e > 0n) { if (e & 1n) r = r * b % m; b = b * b % m; e >>= 1n; }
+    return r;
+  }
+  function isPrime(n) { if (n < 2 || n !== Math.floor(n)) return false; for (var d = 2; d * d <= n; d++) if (n % d === 0) return false; return true; }
+  function rsaKeys(p, q, e) {
+    if (!isPrime(p) || !isPrime(q)) return { error: 'p et q doivent être des nombres premiers.' };
+    if (p === q) return { error: 'p et q doivent être différents.' };
+    var n = p * q, phi = (p - 1) * (q - 1);
+    if (!(e > 1 && e < phi) || gcd(e, phi) !== 1) return { error: 'e doit être entre 1 et ' + phi + ' et sans diviseur commun avec ' + phi + '.' };
+    return { n: n, phi: phi, e: e, d: modInverse(e, phi) };
+  }
+
+  /* ---------- Roue de César ---------- */
+  var STEP = 360 / 26, CX = 160, CY = 160, curK = 3;
+  var wheel = $('wheel'), gIn;
+  function polar(r, deg) { var a = (deg - 90) * Math.PI / 180; return [CX + r * Math.cos(a), CY + r * Math.sin(a)]; }
+  function sector(r1, r2, a1, a2) {
+    var p1 = polar(r2, a1), p2 = polar(r2, a2), p3 = polar(r1, a2), p4 = polar(r1, a1);
+    return 'M' + p1[0] + ' ' + p1[1] + ' A' + r2 + ' ' + r2 + ' 0 0 1 ' + p2[0] + ' ' + p2[1] + ' L' + p3[0] + ' ' + p3[1] + ' A' + r1 + ' ' + r1 + ' 0 0 0 ' + p4[0] + ' ' + p4[1] + ' Z';
+  }
+  (function buildWheel() {
+    mk(wheel, 'circle', { cx: CX, cy: CY, r: 156, fill: 'var(--card)', stroke: 'var(--ink)', 'stroke-width': 2.5 });
+    mk(wheel, 'circle', { cx: CX, cy: CY, r: 118, fill: 'var(--acc-soft)', stroke: 'var(--ink)', 'stroke-width': 2 });
+    mk(wheel, 'path', { d: sector(78, 156, -STEP / 2, STEP / 2), fill: 'var(--hl)', stroke: 'var(--red)', 'stroke-width': 2 });
+    for (var i = 0; i < 26; i++) {
+      var a = i * STEP, p = polar(137, a), t1 = polar(118, a + STEP / 2), t2 = polar(156, a + STEP / 2);
+      mk(wheel, 'line', { x1: t1[0], y1: t1[1], x2: t2[0], y2: t2[1], stroke: 'var(--line)', 'stroke-width': 1 });
+      mk(wheel, 'text', { x: p[0], y: p[1] + 6, 'text-anchor': 'middle', 'font-size': 17, 'font-weight': 600, transform: 'rotate(' + a + ' ' + p[0] + ' ' + p[1] + ')' }, ABC[i]);
+    }
+    gIn = mk(wheel, 'g', {});
+    for (var j = 0; j < 26; j++) {
+      var b = j * STEP, q = polar(100, b), u1 = polar(82, b + STEP / 2), u2 = polar(118, b + STEP / 2);
+      mk(gIn, 'line', { x1: u1[0], y1: u1[1], x2: u2[0], y2: u2[1], stroke: 'var(--acc)', 'stroke-width': 1, opacity: 0.35 });
+      mk(gIn, 'text', { x: q[0], y: q[1] + 6, 'text-anchor': 'middle', 'font-size': 17, 'font-weight': 700, style: 'fill:var(--acc)', transform: 'rotate(' + b + ' ' + q[0] + ' ' + q[1] + ')' }, ABC[j]);
+    }
+    mk(wheel, 'circle', { cx: CX, cy: CY, r: 78, fill: 'var(--card)', stroke: 'var(--ink)', 'stroke-width': 2 });
+    mk(wheel, 'text', { x: CX, y: CY - 8, 'text-anchor': 'middle', 'font-size': 13, style: 'fill:var(--ink-soft)' }, 'décalage');
+    mk(wheel, 'text', { x: CX, y: CY + 24, 'text-anchor': 'middle', 'font-size': 34, 'font-weight': 700, id: 'wCenter', style: 'fill:var(--acc)' }, '3');
+  })();
+  function setRot(deg) { gIn.setAttribute('transform', 'rotate(' + deg + ' ' + CX + ' ' + CY + ')'); }
+  function strip() {
+    var h = '';
+    for (var i = 0; i < 26; i++) h += '<span class="p' + (i === 0 ? ' on' : '') + '">' + ABC[i] + '</span>';
+    for (var j = 0; j < 26; j++) h += '<span class="c' + (j === 0 ? ' on' : '') + '">' + ABC[mod(j + curK, 26)] + '</span>';
+    $('wStrip').innerHTML = h;
+  }
+  function setK(k, fromWheelDrag) {
+    curK = mod(k, 26);
+    if (!fromWheelDrag) setRot(-curK * STEP);
+    $('wCenter').textContent = curK;
+    $('wK').textContent = 'décalage ' + curK + ' : A → ' + ABC[curK];
+    wheel.setAttribute('aria-valuenow', curK);
+    wheel.setAttribute('aria-valuetext', 'décalage ' + curK + ', A devient ' + ABC[curK]);
+    $('cK').value = curK; $('cKOut').textContent = curK;
+    strip(); caesarTool();
+  }
+  var drag = null;
+  function ang(ev) { var r = wheel.getBoundingClientRect(); return Math.atan2(ev.clientY - (r.top + r.height / 2), ev.clientX - (r.left + r.width / 2)) * 180 / Math.PI; }
+  wheel.addEventListener('pointerdown', function (ev) {
+    drag = { last: ang(ev), rot: -curK * STEP };
+    wheel.classList.add('drag');
+    try { wheel.setPointerCapture(ev.pointerId); } catch (e) { }
+    ev.preventDefault();
+  });
+  wheel.addEventListener('pointermove', function (ev) {
+    if (!drag) return;
+    var a = ang(ev), d = a - drag.last;
+    if (d > 180) d -= 360; if (d < -180) d += 360;
+    drag.last = a; drag.rot += d; setRot(drag.rot);
+    var k = mod(Math.round(-drag.rot / STEP), 26);
+    if (k !== curK) setK(k, true);
+  });
+  function endDrag() { if (!drag) return; var k = mod(Math.round(-drag.rot / STEP), 26); drag = null; wheel.classList.remove('drag'); setK(k); }
+  wheel.addEventListener('pointerup', endDrag);
+  wheel.addEventListener('pointercancel', endDrag);
+  wheel.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowUp') { setK(curK + 1); e.preventDefault(); }
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') { setK(curK - 1); e.preventDefault(); }
+  });
+  $('wPrev').addEventListener('click', function () { setK(curK - 1); });
+  $('wNext').addEventListener('click', function () { setK(curK + 1); });
+
+  /* ---------- Machine à César ---------- */
+  var cMode = 1;
+  function caesarTool() {
+    var t = $('cIn').value, out = caesar(t, cMode * curK);
+    $('cOut').textContent = out || '…';
+    $('cInfo').textContent = cMode === 1
+      ? 'Chaque lettre avance de ' + curK + ' places (A → ' + ABC[curK] + '). Pour déchiffrer, il faudra reculer de ' + curK + '.'
+      : 'Chaque lettre recule de ' + curK + ' places (' + ABC[curK] + ' → A). Reculer de ' + curK + ', c\'est pareil qu\'avancer de ' + mod(-curK, 26) + '.';
+  }
+  function setMode(m) { cMode = m; $('cEnc').setAttribute('aria-pressed', m === 1); $('cDec').setAttribute('aria-pressed', m === -1); caesarTool(); }
+  $('cEnc').addEventListener('click', function () { setMode(1); });
+  $('cDec').addEventListener('click', function () { setMode(-1); });
+  $('cIn').addEventListener('input', caesarTool);
+  $('cK').addEventListener('input', function () { setK(parseInt($('cK').value, 10)); });
+
+  /* ---------- Horloge modulo 26 ---------- */
+  var mDir = 1, clock = $('clock');
+  function cpol(r, i) { var a = (i * STEP - 90) * Math.PI / 180; return [150 + r * Math.cos(a), 150 + r * Math.sin(a)]; }
+  function drawClock() {
+    var x = parseInt($('mX').value, 10), k = parseInt($('mK').value, 10), s = x + mDir * k, r = mod(s, 26);
+    clear(clock);
+    mk(clock, 'circle', { cx: 150, cy: 150, r: 142, fill: 'var(--card)', stroke: 'var(--ink)', 'stroke-width': 2 });
+    for (var i = 0; i < 26; i++) {
+      var p = cpol(126, i), n = cpol(103, i), on = i === x || i === r;
+      if (on) mk(clock, 'circle', { cx: p[0], cy: p[1], r: 13, fill: i === r ? 'var(--acc)' : 'var(--hl)', stroke: 'var(--ink)', 'stroke-width': 1.5 });
+      mk(clock, 'text', { x: p[0], y: p[1] + 5, 'text-anchor': 'middle', 'font-size': 15, 'font-weight': 700, style: i === r && on ? 'fill:var(--card)' : '' }, ABC[i]);
+      mk(clock, 'text', { x: n[0], y: n[1] + 4, 'text-anchor': 'middle', 'font-size': 11, style: 'fill:var(--ink-soft)' }, i);
+    }
+    var R = 82;
+    if (k > 0) {
+      var a1 = x * STEP, a2 = (x + mDir * k) * STEP, p1 = cpol(R, x), p2 = cpol(R, x + mDir * k);
+      var large = k * STEP > 180 ? 1 : 0, sweep = mDir === 1 ? 1 : 0;
+      mk(clock, 'path', { d: 'M' + p1[0] + ' ' + p1[1] + ' A' + R + ' ' + R + ' 0 ' + large + ' ' + sweep + ' ' + p2[0] + ' ' + p2[1], fill: 'none', stroke: 'var(--acc)', 'stroke-width': 4, 'stroke-linecap': 'round' });
+      var ah = (a2 - 90) * Math.PI / 180, tx = -Math.sin(ah) * mDir, ty = Math.cos(ah) * mDir;
+      mk(clock, 'path', { d: 'M' + (p2[0] + tx * 4) + ' ' + (p2[1] + ty * 4) + ' L' + (p2[0] - tx * 10 + Math.cos(ah) * 7) + ' ' + (p2[1] - ty * 10 + Math.sin(ah) * 7) + ' L' + (p2[0] - tx * 10 - Math.cos(ah) * 7) + ' ' + (p2[1] - ty * 10 - Math.sin(ah) * 7) + ' Z', fill: 'var(--acc)' });
+      mk(clock, 'circle', { cx: p1[0], cy: p1[1], r: 5, fill: 'var(--ink)' });
+    }
+    mk(clock, 'text', { x: 150, y: 146, 'text-anchor': 'middle', 'font-size': 24, 'font-weight': 700 }, ABC[x] + ' → ' + ABC[r]);
+    mk(clock, 'text', { x: 150, y: 168, 'text-anchor': 'middle', 'font-size': 12, style: 'fill:var(--ink-soft)' }, (mDir === 1 ? '+ ' : '− ') + k + ' cases');
+    $('mXOut').textContent = ABC[x] + ' = ' + x; $('mKOut').textContent = k;
+    var line = ABC[x] + ' = ' + x + ' ; ' + x + (mDir === 1 ? ' + ' : ' − ') + k + ' = ' + (s < 0 ? '−' + (-s) : s);
+    if (s > 25) line += ' ; on dépasse 25, on enlève 26 : ' + s + ' − 26 = ' + r;
+    else if (s < 0) line += ' ; on passe sous 0, on ajoute 26 : ' + signed(s).replace(/[()]/g, '') + ' + 26 = ' + r;
+    else line += ' ; pas besoin de faire le tour';
+    $('mOut').innerHTML = esc(line) + ' → <b>' + ABC[r] + '</b>. En maths : ' + signed(s) + ' mod 26 = ' + r + '.';
+  }
+  function setMDir(d) { mDir = d; $('mFwd').setAttribute('aria-pressed', d === 1); $('mBack').setAttribute('aria-pressed', d === -1); drawClock(); }
+  $('mFwd').addEventListener('click', function () { setMDir(1); });
+  $('mBack').addEventListener('click', function () { setMDir(-1); });
+  $('mX').addEventListener('input', drawClock); $('mK').addEventListener('input', drawClock);
+
+  /* ---------- Force brute ---------- */
+  var SHORT = ['On se retrouve à la cantine', 'Le code est sous le tapis', 'Vive les maths', 'La clé est dans le pot de fleurs', 'Le chat noir a mangé la tarte', 'Rendez-vous au gymnase à seize heures'];
+  var bSecret = 0, bMsg = -1;
+  function bruteNew() {
+    var m; do { m = rnd(0, SHORT.length - 1); } while (m === bMsg && SHORT.length > 1); bMsg = m;
+    bSecret = rnd(1, 25);
+    var c = caesar(SHORT[m], bSecret), all = bruteForce(c);
+    $('bCipher').textContent = c;
+    var h = '';
+    for (var t = 1; t < 26; t++) h += '<li><button type="button" data-t="' + t + '"><b>−' + t + '</b><span>' + esc(all[t]) + '</span></button></li>';
+    $('bList').innerHTML = h; $('bOut').className = 'verdict'; $('bOut').innerHTML = '';
+  }
+  $('bList').addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    var t = parseInt(b.getAttribute('data-t'), 10);
+    if (t === bSecret) { b.className = 'good'; $('bOut').className = 'verdict yes'; $('bOut').innerHTML = 'Bien joué, message cassé ! La clé était ' + t + '.<span>Il t\'a fallu au plus 25 essais. Un ordinateur le fait en moins d\'une milliseconde.</span>'; }
+    else { b.className = 'bad'; $('bOut').className = 'verdict no'; $('bOut').innerHTML = 'Ça ne veut rien dire en français. Cherche encore !'; }
+  });
+  $('bNew').addEventListener('click', bruteNew);
+
+  /* ---------- Histogrammes ---------- */
+  function hist(svg, pct, opt) {
+    var W = 400, H = opt.H, L = 6, R = 6, T = 10, B = opt.under ? 40 : 24, slot = (W - L - R) / 26, bw = slot * 0.7;
+    var ymax = Math.max(16, Math.max.apply(null, pct) + 1, opt.ref ? 15.7 : 0);
+    clear(svg);
+    function Y(v) { return H - B - v / ymax * (H - B - T); }
+    [5, 10, 15].forEach(function (g) { if (g < ymax) { mk(svg, 'line', { x1: L, x2: W - R, y1: Y(g), y2: Y(g), stroke: 'var(--line)', 'stroke-width': 1 }); mk(svg, 'text', { x: W - R - 2, y: Y(g) - 3, 'text-anchor': 'end', 'font-size': 10, style: 'fill:var(--ink-soft)' }, g + ' %'); } });
+    var mx = pct.indexOf(Math.max.apply(null, pct));
+    for (var i = 0; i < 26; i++) {
+      var x = L + i * slot + (slot - bw) / 2;
+      mk(svg, 'rect', { x: x, y: Y(pct[i]), width: bw, height: Math.max(0, Y(0) - Y(pct[i])), fill: 'var(--acc)', opacity: 0.85, rx: 1.5 });
+      if (opt.ref) { var rv = opt.ref[i]; mk(svg, 'rect', { x: x - 1, y: Y(rv), width: bw + 2, height: Math.max(0, Y(0) - Y(rv)), fill: 'none', stroke: 'var(--two)', 'stroke-width': 2, rx: 1.5 }); }
+      mk(svg, 'text', { x: x + bw / 2, y: H - B + 15, 'text-anchor': 'middle', 'font-size': 12, 'font-weight': i === mx ? 700 : 400, style: i === mx ? 'fill:var(--acc)' : '' }, ABC[i]);
+      if (opt.under) mk(svg, 'text', { x: x + bw / 2, y: H - B + 32, 'text-anchor': 'middle', 'font-size': 11, style: 'fill:var(--two)' }, opt.under[i]);
+    }
+    mk(svg, 'line', { x1: L, x2: W - R, y1: Y(0), y2: Y(0), stroke: 'var(--ink)', 'stroke-width': 1.5 });
+  }
+
+  /* ---------- Analyse des fréquences ---------- */
+  var LONG = [
+    'La cryptographie est la science des messages secrets. Pour casser un code de César, il suffit de compter les lettres : la plus fréquente est presque toujours le E. Ensuite, on devine les petits mots comme le, la, les et des.',
+    'Rendez-vous demain soir devant la bibliothèque. Apporte le carnet rouge et ne dis rien à personne. Le mot de passe est : les éléphants se souviennent de tout. Je te reconnaîtrai grâce à ton chapeau vert.',
+    'Le trésor est caché sous le grand chêne, près de la rivière. Il faut marcher cent pas vers le nord, puis tourner à gauche et creuser entre les deux pierres blanches. Ne le répète à personne.',
+    'Bravo, tu as réussi à lire ce message sans connaître la clé. Al-Kindi avait déjà expliqué cette méthode il y a plus de mille ans : il suffit de compter les lettres et de les comparer avec celles de la langue.'
+  ];
+  var fSecret = 0, fMsg = -1, fCipherTxt = '';
+  function freqNew() {
+    var m; do { m = rnd(0, LONG.length - 1); } while (m === fMsg); fMsg = m;
+    fSecret = rnd(3, 23);
+    fCipherTxt = caesar(LONG[m], fSecret);
+    $('fCipher').textContent = fCipherTxt;
+    $('fG').value = 0; freqDraw();
+  }
+  function freqDraw() {
+    var g = parseInt($('fG').value, 10), L = letterCounts(fCipherTxt), ref = [], under = [];
+    for (var i = 0; i < 26; i++) { ref.push(FR_FREQ[mod(i - g, 26)]); under.push(ABC[mod(i - g, 26)]); }
+    hist($('fHist'), L.pct, { H: 220, ref: ref, under: under });
+    $('fGOut').textContent = g;
+    $('fDec').textContent = caesar(fCipherTxt, -g);
+    var o = $('fOut');
+    if (g === fSecret) { o.className = 'verdict yes'; o.innerHTML = 'Message cassé ! La clé était ' + g + '.<span>Les cadres violets (le français) collent aux barres vertes, et le texte se lit.</span>'; }
+    else { o.className = 'verdict'; o.innerHTML = ''; }
+  }
+  $('fG').addEventListener('input', freqDraw);
+  $('fNew').addEventListener('click', freqNew);
+  $('fHint').addEventListener('click', function () {
+    var L = letterCounts(fCipherTxt), mx = L.counts.indexOf(Math.max.apply(null, L.counts));
+    $('fOut').className = 'verdict yes';
+    $('fOut').innerHTML = 'Indice : la lettre la plus fréquente du message chiffré est ' + ABC[mx] + ' (' + fmt(L.pct[mx], 1) + ' %).<span>Si c\'est un E déguisé, la clé est ' + ABC[mx] + ' − E = ' + mx + ' − 4 = ' + mod(mx - 4, 26) + '. Essaie ce décalage !</span>';
+  });
+  $('fAuto').addEventListener('click', function () { $('fG').value = crackCaesar(fCipherTxt); freqDraw(); });
+
+  /* ---------- Substitution ---------- */
+  var sKey = randomKey();
+  function subDraw() {
+    var h = '';
+    for (var i = 0; i < 26; i++) h += '<span>' + ABC[i] + '<b>' + sKey[i] + '</b></span>';
+    $('sKey').innerHTML = h;
+    var c = substitute($('sIn').value, sKey);
+    $('sOut').textContent = c || '…';
+    $('sCheck').textContent = 'Pour déchiffrer, on lit la clé à l\'envers : ' + substitute(c, invertKey(sKey));
+  }
+  $('sIn').addEventListener('input', subDraw);
+  $('sNew').addEventListener('click', function () { sKey = randomKey(); subDraw(); });
+
+  /* ---------- Vigenère ---------- */
+  var vMode = 1, vSel = 0, vTab = $('vTab'), vHi = {};
+  (function buildTab() {
+    var C = 18, O = 20;
+    vHi.row = mk(vTab, 'rect', { x: 0, y: 0, width: 490, height: C, fill: 'var(--two-soft)' });
+    vHi.col = mk(vTab, 'rect', { x: 0, y: 0, width: C, height: 490, fill: 'var(--acc-soft)' });
+    vHi.cell = mk(vTab, 'rect', { x: 0, y: 0, width: C, height: C, fill: 'var(--hl)', stroke: 'var(--red)', 'stroke-width': 2 });
+    for (var i = 0; i < 26; i++) {
+      mk(vTab, 'text', { x: O + 2 + i * C + C / 2, y: 14, 'text-anchor': 'middle', 'font-size': 12, 'font-weight': 700, style: 'fill:var(--acc)' }, ABC[i]);
+      mk(vTab, 'text', { x: 10, y: O + 2 + i * C + 13, 'text-anchor': 'middle', 'font-size': 12, 'font-weight': 700, style: 'fill:var(--two)' }, ABC[i]);
+      for (var j = 0; j < 26; j++) mk(vTab, 'text', { x: O + 2 + j * C + C / 2, y: O + 2 + i * C + 13, 'text-anchor': 'middle', 'font-size': 11 }, ABC[(i + j) % 26]);
+    }
+    mk(vTab, 'line', { x1: O, y1: 0, x2: O, y2: 490, stroke: 'var(--ink)', 'stroke-width': 1.5 });
+    mk(vTab, 'line', { x1: 0, y1: O, x2: 490, y2: O, stroke: 'var(--ink)', 'stroke-width': 1.5 });
+    vHi.C = C; vHi.O = O;
+  })();
+  function vHighlight(pair) {
+    var C = vHi.C, O = vHi.O + 2;
+    if (!pair) { [vHi.row, vHi.col, vHi.cell].forEach(function (r) { r.setAttribute('opacity', 0); }); return; }
+    var plain = vMode === 1 ? pair.p : pair.c, r = idx(pair.k), c = idx(plain);
+    [vHi.row, vHi.col, vHi.cell].forEach(function (x) { x.setAttribute('opacity', 1); });
+    vHi.row.setAttribute('y', O + r * C); vHi.col.setAttribute('x', O + c * C);
+    vHi.cell.setAttribute('x', O + c * C); vHi.cell.setAttribute('y', O + r * C);
+  }
+  function vigDraw() {
+    var t = $('vIn').value, k = $('vKey').value, out = vigenere(t, k, vMode);
+    if (out === null) { $('vOut').innerHTML = '<span class="err">Écris un mot-clé avec au moins une lettre.</span>'; $('vPairs').innerHTML = ''; vHighlight(null); vMix(); return; }
+    $('vOut').textContent = out || '…';
+    var P = vigPairs(t, k, vMode).slice(0, 16);
+    if (vSel >= P.length) vSel = 0;
+    $('vPairs').innerHTML = P.map(function (p, i) {
+      var txt = p.p + (vMode === 1 ? ' + ' : ' − ') + p.k + '(' + p.s + ') → ' + p.c;
+      return '<button type="button" data-i="' + i + '" aria-pressed="' + (i === vSel) + '">' + txt + '</button>';
+    }).join('');
+    vHighlight(P[vSel] || null);
+    vMix();
+  }
+  $('vPairs').addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    vSel = parseInt(b.getAttribute('data-i'), 10); vigDraw();
+  });
+  function setV(m) { vMode = m; $('vEnc').setAttribute('aria-pressed', m === 1); $('vDec').setAttribute('aria-pressed', m === -1); vigDraw(); }
+  $('vEnc').addEventListener('click', function () { setV(1); });
+  $('vDec').addEventListener('click', function () { setV(-1); });
+  $('vIn').addEventListener('input', function () { vSel = 0; vigDraw(); });
+  $('vKey').addEventListener('input', function () { vSel = 0; vigDraw(); });
+  function vMix() {
+    var K = keyLetters($('vKey').value), txt = LONG[0];
+    hist($('vH1'), letterCounts(caesar(txt, 3)).pct, { H: 150 });
+    if (!K.length) { clear($('vH2')); $('vMix').textContent = ''; return; }
+    hist($('vH2'), letterCounts(vigenere(txt, K, 1)).pct, { H: 150 });
+    var seen = {}, parts = [];
+    for (var i = 0; i < K.length; i++) if (!seen[K[i]]) { seen[K[i]] = 1; parts.push('E + ' + K[i] + ' → ' + shiftLetter('E', idx(K[i]))); }
+    var outs = {}; parts.forEach(function (p) { outs[p.slice(-1)] = 1; });
+    var n = Object.keys(outs).length;
+    $('vMix').innerHTML = 'Avec le mot-clé <strong class="mono">' + esc(K) + '</strong>, un E du message peut devenir ' + (n > 1 ? '<strong>' + n + ' lettres différentes</strong>' : '<strong>une seule lettre</strong> (le mot-clé n\'a qu\'une sorte de lettre : c\'est un simple César !)') + ' : <span class="mono">' + parts.join(' ; ') + '</span>.';
+    $('vH2lab').textContent = 'Vigenère (clé ' + K + ') : ' + (n > 1 ? 'c\'est plus aplati' : 'comme César');
+  }
+
+  /* ---------- Masque jetable ---------- */
+  var oKey = '';
+  function otpNewKey() { var n = onlyLetters($('oIn').value).length; oKey = ''; for (var i = 0; i < n; i++) oKey += ABC[rnd(0, 25)]; otpDraw(); }
+  function otpDraw() {
+    var P = onlyLetters($('oIn').value);
+    if (oKey.length !== P.length) { var k = ''; for (var i = 0; i < P.length; i++) k += oKey[i] || ABC[rnd(0, 25)]; oKey = k; }
+    var C = P.length ? vigenere(P, oKey, 1) : '';
+    $('oKey').textContent = oKey || '…'; $('oCipher').textContent = C || '…';
+    var F = onlyLetters($('oFake').value), o = $('oOut');
+    if (!P.length) { o.className = 'verdict'; o.innerHTML = ''; return; }
+    if (F.length !== C.length) { o.className = 'verdict no'; o.innerHTML = 'Ton autre message a ' + F.length + ' lettre' + (F.length > 1 ? 's' : '') + ', il en faut exactement ' + C.length + '.<span>Les espaces et les accents ne comptent pas.</span>'; return; }
+    var K2 = padKeyFor(C, F);
+    o.className = 'verdict yes';
+    o.innerHTML = 'Avec le masque ' + K2 + ', le même chiffré ' + C + ' se lit ' + F + ' !<span>Le vrai message et le faux sont aussi probables l\'un que l\'autre. Sans le vrai masque, l\'espion ne peut pas savoir.</span>';
+  }
+  $('oIn').addEventListener('input', otpDraw); $('oFake').addEventListener('input', otpDraw);
+  $('oNew').addEventListener('click', otpNewKey);
+
+  /* ---------- Le cadenas ---------- */
+  var LOCK = [
+    ['1. Le cadenas', 'Alice fabrique des cadenas et en envoie un, ouvert, à Bob. Tout le monde peut en avoir un : c\'est la clé publique. La seule clé qui ouvre ces cadenas, Alice la garde chez elle : c\'est la clé privée.'],
+    ['2. Bob ferme', 'Bob met son message dans une boîte et ferme le cadenas d\'Alice. Clic ! Même Bob ne peut plus ouvrir la boîte.'],
+    ['3. Ève espionne', 'La boîte voyage. Ève l\'intercepte, mais elle n\'a pas la clé : impossible d\'ouvrir. Copier le cadenas ouvert ne l\'aide pas non plus.'],
+    ['4. Alice ouvre', 'La boîte arrive chez Alice, qui l\'ouvre avec sa clé privée. Alice et Bob ne se sont jamais rencontrés pour échanger un secret !']
+  ];
+  var lockStep = 0;
+  function padlock(svg, x, y, open) {
+    mk(svg, 'path', { d: open ? 'M' + (x - 8) + ' ' + (y - 6) + ' v-10 a8 8 0 0 1 16 0 v4' : 'M' + (x - 8) + ' ' + y + ' v-8 a8 8 0 0 1 16 0 v8', fill: 'none', stroke: 'var(--ink)', 'stroke-width': 3.5, 'stroke-linecap': 'round' });
+    mk(svg, 'rect', { x: x - 13, y: y, width: 26, height: 20, rx: 3, fill: 'var(--two)', stroke: 'var(--ink)', 'stroke-width': 2 });
+    mk(svg, 'circle', { cx: x, cy: y + 9, r: 2.5, fill: 'var(--card)' });
+  }
+  function keyIcon(svg, x, y) {
+    mk(svg, 'circle', { cx: x, cy: y, r: 7, fill: 'none', stroke: 'var(--acc)', 'stroke-width': 3 });
+    mk(svg, 'path', { d: 'M' + (x + 7) + ' ' + y + ' h18 m-6 0 v6 m-5 -6 v5', fill: 'none', stroke: 'var(--acc)', 'stroke-width': 3, 'stroke-linecap': 'round' });
+  }
+  function drawLock() {
+    var svg = $('lock'); clear(svg);
+    [['Alice', 40], ['Bob', 320]].forEach(function (p) { mk(svg, 'circle', { cx: p[1], cy: 104, r: 14, fill: 'var(--acc-soft)', stroke: 'var(--ink)', 'stroke-width': 2 }); mk(svg, 'text', { x: p[1], y: 142, 'text-anchor': 'middle', 'font-size': 14, 'font-weight': 700 }, p[0]); });
+    mk(svg, 'circle', { cx: 180, cy: 116, r: 12, fill: 'var(--red-soft)', stroke: 'var(--red)', 'stroke-width': 2 });
+    mk(svg, 'text', { x: 180, y: 150, 'text-anchor': 'middle', 'font-size': 13, 'font-weight': 700, style: 'fill:var(--red)' }, 'Ève');
+    keyIcon(svg, 22, 66);
+    var bx = [320, 290, 180, 70][lockStep];
+    if (lockStep === 0) { padlock(svg, 280, 56, true); mk(svg, 'path', { d: 'M80 40 H250', stroke: 'var(--ink-soft)', 'stroke-width': 2, 'stroke-dasharray': '5 5', fill: 'none' }); mk(svg, 'path', { d: 'M244 34 L254 40 L244 46 Z', fill: 'var(--ink-soft)' }); }
+    else {
+      mk(svg, 'rect', { x: bx - 34, y: 50, width: 68, height: 44, rx: 5, fill: 'var(--paper)', stroke: 'var(--ink)', 'stroke-width': 2 });
+      if (lockStep === 3) mk(svg, 'text', { x: bx, y: 78, 'text-anchor': 'middle', 'font-size': 12, 'font-weight': 700, style: 'fill:var(--acc)' }, 'SALUT !');
+      padlock(svg, bx, 40, lockStep === 3);
+      if (lockStep === 2) mk(svg, 'text', { x: 206, y: 112, 'font-size': 18, 'font-weight': 700, style: 'fill:var(--red)' }, '?');
+    }
+    $('lockTxt').textContent = LOCK[lockStep][1];
+    LOCK.forEach(function (s, i) { $('lk' + i).setAttribute('aria-pressed', i === lockStep); });
+  }
+  LOCK.forEach(function (s, i) { var b = document.createElement('button'); b.type = 'button'; b.id = 'lk' + i; b.textContent = s[0]; b.addEventListener('click', function () { lockStep = i; drawLock(); }); $('lockBtns').appendChild(b); });
+
+  /* ---------- RSA ---------- */
+  var PR = [3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61], rp = 11, rq = 13, re = 7;
+  function primeBtns(id, get, set) {
+    var box = $(id);
+    PR.forEach(function (p) { var b = document.createElement('button'); b.type = 'button'; b.textContent = p; b.setAttribute('data-v', p); b.addEventListener('click', function () { set(p); rsaDraw(); }); box.appendChild(b); });
+  }
+  primeBtns('rP', function () { return rp; }, function (v) { rp = v; });
+  primeBtns('rQ', function () { return rq; }, function (v) { rq = v; });
+  function pressRow(id, v) { Array.prototype.forEach.call($(id).children, function (b) { b.setAttribute('aria-pressed', String(parseInt(b.getAttribute('data-v'), 10) === v)); }); }
+  function rsaDraw() {
+    pressRow('rP', rp); pressRow('rQ', rq);
+    var keys = $('rKeys'), out = $('rOut'), eBox = $('rE');
+    if (rp === rq) { eBox.innerHTML = ''; keys.innerHTML = '<p class="err">p et q doivent être différents (sinon n = p² et on retrouve p trop facilement).</p>'; out.innerHTML = ''; return; }
+    var phi = (rp - 1) * (rq - 1), es = [];
+    for (var e = 3; e < phi && es.length < 8; e += 2) if (gcd(e, phi) === 1) es.push(e);
+    if (es.indexOf(re) < 0) re = es[0];
+    eBox.innerHTML = es.map(function (v) { return '<button type="button" data-v="' + v + '" aria-pressed="' + (v === re) + '">' + v + '</button>'; }).join('');
+    var K = rsaKeys(rp, rq, re), n = K.n, d = K.d, ed = re * d;
+    keys.innerHTML =
+      '<div class="method"><strong>Les nombres d\'Alice</strong><span class="m">n = p × q = ' + rp + ' × ' + rq + ' = <b>' + fmt(n) + '</b></span><span class="m">(p − 1) × (q − 1) = ' + (rp - 1) + ' × ' + (rq - 1) + ' = ' + fmt(phi) + '</span></div>' +
+      '<div class="method"><strong>Clé publique (le cadenas)</strong><span class="m">n = <b>' + fmt(n) + '</b> et e = <b>' + re + '</b></span><span class="soft">Alice la donne à tout le monde.</span></div>' +
+      '<div class="method"><strong>Clé privée (la clé d\'Alice)</strong><span class="m">d = <b>' + fmt(d) + '</b></span><span class="m">car e × d = ' + re + ' × ' + fmt(d) + ' = ' + fmt(ed) + ' = ' + Math.floor(ed / phi) + ' × ' + fmt(phi) + ' + 1</span></div>';
+    var mRaw = $('rM').value.replace(/\s/g, '');
+    if (!/^\d+$/.test(mRaw)) { out.innerHTML = '<p class="err">Écris un nombre entier positif (ou 0).</p>'; return; }
+    var m = parseInt(mRaw, 10);
+    if (m >= n) { out.innerHTML = '<p class="err">m doit être plus petit que n = ' + fmt(n) + '. Sinon, on ne peut pas le retrouver : on ne garde que des restes de la division par n.</p>'; return; }
+    var c = modPow(m, re, n), back = modPow(c, d, n), big = BigInt(m) ** BigInt(re), bigS = big.toString();
+    var steps = [], v = 1n, N = BigInt(n);
+    for (var i = 1; i <= re && re <= 15; i++) { v = v * BigInt(m) % N; steps.push(m + '<sup>' + i + '</sup> → ' + bigFmt(v)); }
+    var digitsD = m <= 1 ? 1 : Math.floor(d * Math.log10(Number(c) || 1)) + 1;
+    out.innerHTML =
+      '<div class="method"><strong>Bob chiffre avec (n, e)</strong><span class="m">c = m<sup>e</sup> mod n = ' + m + '<sup>' + re + '</sup> mod ' + fmt(n) + '</span>' +
+      '<span class="m">' + m + '<sup>' + re + '</sup> = ' + (bigS.length <= 30 ? bigFmt(bigS) : 'un nombre de ' + bigS.length + ' chiffres') + '</span>' +
+      '<span class="m">reste de la division par ' + fmt(n) + ' : <b>c = ' + bigFmt(c) + '</b></span>' +
+      (steps.length ? '<span class="soft">Astuce : on multiplie par ' + m + ' à chaque étape et on garde seulement le reste : ' + steps.join(' ; ') + '.</span>' : '') + '</div>' +
+      '<div class="method"><strong>Alice déchiffre avec d</strong><span class="m">c<sup>d</sup> mod n = ' + bigFmt(c) + '<sup>' + fmt(d) + '</sup> mod ' + fmt(n) + '</span>' +
+      '<span class="m">' + (c <= 1n ? 'ici c<sup>d</sup> = ' + c : 'c<sup>d</sup> a environ ' + fmt(digitsD) + ' chiffres ! L\'ordinateur garde seulement les restes au fur et à mesure.') + '</span>' +
+      '<span class="m">résultat : <b>' + bigFmt(back) + '</b> ' + (back === BigInt(m) ? '= m ✓ Alice retrouve le message.' : '≠ m (problème !)') + '</span></div>' +
+      (m <= 1 ? '<p class="soft">Remarque : 0 et 1 ne changent pas (0<sup>e</sup> = 0 et 1<sup>e</sup> = 1). En vrai, on évite ces messages trop simples.</p>' : '');
+  }
+  $('rE').addEventListener('click', function (e) { var b = e.target.closest('button'); if (!b) return; re = parseInt(b.getAttribute('data-v'), 10); rsaDraw(); });
+  $('rM').addEventListener('input', rsaDraw);
+
+  /* ---------- Quiz ---------- */
+  var WORDS = ['CHAT', 'LUNE', 'CODE', 'MATHS', 'ROBOT', 'PIZZA', 'ZERO', 'VELO', 'TAXI', 'JOUR'];
+  function makeQ(t) {
+    var w, k, a, b;
+    if (t === 0) { w = pick(WORDS); k = rnd(1, 6); return { q: 'Chiffre le mot ' + w + ' avec César, décalage ' + k + '.', a: caesar(w, k), how: w.split('').map(function (c) { return c + ' → ' + shiftLetter(c, k); }).join(', ') }; }
+    if (t === 1) { w = pick(WORDS); k = rnd(2, 9); var c1 = caesar(w, k); return { q: 'Déchiffre ' + c1 + ' (César, décalage ' + k + ').', a: w, how: 'On recule chaque lettre de ' + k + ' : ' + c1.split('').map(function (c) { return c + ' → ' + shiftLetter(c, -k); }).join(', ') }; }
+    if (t === 2) { a = rnd(14, 25); b = rnd(26 - a, 20); return { q: 'Sur l\'horloge à 26 cases, combien vaut (' + a + ' + ' + b + ') mod 26 ?', a: mod(a + b, 26), num: true, how: a + ' + ' + b + ' = ' + (a + b) + (a + b >= 26 ? ', puis ' + (a + b) + ' − 26 = ' + mod(a + b, 26) : '') }; }
+    if (t === 3) { k = rnd(1, 25); var L = ABC[mod(4 + k, 26)]; return { q: 'Dans un long texte chiffré par César, la lettre la plus fréquente est ' + L + '. Quel est probablement le décalage ?', a: k, num: true, how: L + ' est sûrement un E : ' + L + ' = ' + mod(4 + k, 26) + ', E = 4, donc ' + mod(4 + k, 26) + ' − 4' + (4 + k >= 26 ? ' + 26' : '') + ' = ' + k }; }
+    if (t === 4) { var P = ABC[rnd(0, 25)], K = ABC[rnd(1, 25)]; return { q: 'Vigenère : la lettre ' + P + ' chiffrée avec la lettre de clé ' + K + ' donne quelle lettre ?', a: shiftLetter(P, idx(K)), how: P + ' = ' + idx(P) + ', ' + K + ' = ' + idx(K) + ' : ' + idx(P) + ' + ' + idx(K) + ' = ' + (idx(P) + idx(K)) + (idx(P) + idx(K) > 25 ? ' − 26 = ' + mod(idx(P) + idx(K), 26) : '') + ' → ' + shiftLetter(P, idx(K)) }; }
+    if (t === 5) { var ps = [3, 5, 7, 11, 13], p = pick(ps), q; do { q = pick(ps); } while (q === p); if (Math.random() < 0.5) return { q: 'RSA : p = ' + p + ' et q = ' + q + '. Combien vaut n ?', a: p * q, num: true, how: 'n = p × q = ' + p + ' × ' + q + ' = ' + p * q }; return { q: 'RSA : p = ' + p + ' et q = ' + q + '. Combien vaut (p − 1) × (q − 1) ?', a: (p - 1) * (q - 1), num: true, how: (p - 1) + ' × ' + (q - 1) + ' = ' + (p - 1) * (q - 1) }; }
+    if (t === 6) { var NE = pick([[33, 3], [55, 3], [35, 5]]), m = rnd(2, NE[1] === 5 ? 3 : 4), pw = Math.pow(m, NE[1]), cc = pw % NE[0]; return { q: 'RSA : clé publique n = ' + NE[0] + ', e = ' + NE[1] + '. Chiffre m = ' + m + ' (calcule ' + m + '<sup>' + NE[1] + '</sup> mod ' + NE[0] + ').', a: cc, num: true, how: m + '<sup>' + NE[1] + '</sup> = ' + pw + (pw >= NE[0] ? ' = ' + Math.floor(pw / NE[0]) + ' × ' + NE[0] + ' + ' + cc : ', plus petit que ' + NE[0]) + ', donc c = ' + cc }; }
+    k = rnd(3, 9); var X = ABC[rnd(0, k - 1)];
+    return { q: 'Avec César, décalage ' + k + ', une lettre est devenue ' + X + '. Quelle était la lettre de départ ?', a: shiftLetter(X, -k), how: X + ' = ' + idx(X) + ' ; ' + idx(X) + ' − ' + k + ' = −' + (k - idx(X)) + ', on ajoute 26 : ' + mod(idx(X) - k, 26) + ' → ' + shiftLetter(X, -k) };
+  }
+  function num(s) { var t = String(s).replace(/\s/g, '').replace(/[−–]/g, '-').replace(',', '.'); if (t === '') return NaN; var x = Number(t); return isFinite(x) ? x : NaN; }
+  var quiz = $('quiz'), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ''; done = [];
+    for (var k = 0; k < 8; k++) {
+      var Q = makeQ(k), li = document.createElement('li');
+      li.innerHTML = '<span>' + Q.q + '</span><input type="text" id="qa' + k + '" inputmode="' + (Q.num ? 'numeric' : 'text') + '" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Ta réponse à la question ' + (k + 1) + '"><button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+      quiz.appendChild(li);
+      (function (k, Q) {
+        function check() {
+          var fb = $('qf' + k), raw = $('qa' + k).value, good;
+          if (Q.num) { var x = num(raw); if (isNaN(x)) { fb.className = 'fb'; fb.textContent = 'Écris un nombre.'; return; } good = x === Q.a; }
+          else { var s = onlyLetters(raw); if (!s) { fb.className = 'fb'; fb.textContent = 'Écris une réponse en lettres.'; return; } good = s === Q.a; }
+          if (good) { fb.className = 'fb ok'; fb.innerHTML = 'Bravo, c\'est juste !'; done[k] = true; }
+          else { done[k] = false; fb.className = 'fb no'; fb.innerHTML = 'Pas tout à fait : la réponse est ' + Q.a + '.<span>' + Q.how + '</span>'; }
+          $('score').textContent = done.filter(Boolean).length + ' / 8';
+        }
+        $('qb' + k).addEventListener('click', check);
+        $('qa' + k).addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+      })(k, Q);
+    }
+    $('score').textContent = '0 / 8';
+  }
+  $('newQuiz').addEventListener('click', newQuiz);
+
+  /* ---------- Démarrage ---------- */
+  setK(3); drawClock(); bruteNew(); freqNew(); subDraw(); vigDraw(); otpNewKey(); drawLock(); rsaDraw(); newQuiz();
+
+  window.__cry = { norm: norm, mod: mod, shiftLetter: shiftLetter, caesar: caesar, bruteForce: bruteForce, letterCounts: letterCounts, crackCaesar: crackCaesar, substitute: substitute, invertKey: invertKey, randomKey: randomKey, vigenere: vigenere, padKeyFor: padKeyFor, gcd: gcd, modInverse: modInverse, modPow: modPow, rsaKeys: rsaKeys, FR_FREQ: FR_FREQ };
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1002 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Les paradoxes de probabilité</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, encre rouge brique (comme les portes d'un jeu télévisé), marge rouge. Les simulations qu'on relance encore et encore sont au centre. */
+:root {
+  --paper: #fbf7f6;
+  --grid: #efe3e1;
+  --card: #ffffff;
+  --ink: #2a1614;
+  --ink-soft: #6e4f4b;
+  --acc: #b91c1c;
+  --acc-soft: #fde2e2;
+  --two: #1c64c8;
+  --two-soft: #dbe8fa;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #fff0a3;
+  --line: #e6d5d2;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #160d0c; --grid: #241715; --card: #1d1211; --ink: #f6ebe9; --ink-soft: #c9aaa5;
+    --acc: #f87171; --acc-soft: #431818; --two: #7fb0ff; --two-soft: #1a2a45;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #3b2724;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #160d0c; --grid: #241715; --card: #1d1211; --ink: #f6ebe9; --ink-soft: #c9aaa5;
+  --acc: #f87171; --acc-soft: #431818; --two: #7fb0ff; --two-soft: #1a2a45;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #3b2724;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note.blue { border-left-color: var(--two); background: var(--two-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg { display: block; width: 100%; height: auto; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+.fig { background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 6px 12px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); min-height: 40px; }
+button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+button:disabled { opacity: .4; cursor: default; transform: none; box-shadow: 3px 3px 0 var(--ink); }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+input[type="text"] { font: inherit; font-family: var(--f-mono); font-size: 1.05rem; padding: 8px 10px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; }
+input[type="range"] { width: 100%; accent-color: var(--acc); }
+.param { display: flex; flex-direction: column; gap: 2px; }
+.param label { font-weight: 700; }
+.msg { min-height: 3.2em; }
+.big { font-family: var(--f-display); font-weight: 800; font-size: 1.5rem; color: var(--acc); }
+.err { color: var(--red); font-weight: 700; }
+
+/* Les portes */
+.doors { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.door { min-height: 128px; padding: 8px 4px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; background: var(--acc); color: var(--card); border-radius: 10px 10px 4px 4px; min-width: 0; }
+.door .dn { font-family: var(--f-mono); font-size: .95rem; }
+.door .dc { font-size: 1.15rem; overflow-wrap: anywhere; }
+.door.picked { outline: 4px solid var(--two); outline-offset: 3px; }
+.door.goat { background: var(--paper); color: var(--ink-soft); }
+.door.car { background: var(--ok); color: var(--card); }
+.door.final { box-shadow: 0 0 0 4px var(--hl), 3px 3px 0 var(--ink); }
+.doors.mini { grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 4px; }
+.doors.mini .door { min-height: 34px; padding: 0; border-width: 1.5px; box-shadow: none; border-radius: 4px; font-family: var(--f-mono); font-size: .72rem; font-weight: 600; justify-content: center; }
+.doors.mini .door:hover, .doors.mini .door:active { transform: none; box-shadow: none; }
+.doors.mini .door.goat { opacity: .35; }
+.doors.mini .door.picked { outline-width: 3px; outline-offset: 1px; }
+
+/* Barres */
+.bars { display: flex; flex-direction: column; gap: 12px; }
+.barrow { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 10px; font-variant-numeric: tabular-nums; }
+.barrow strong { font-family: var(--f-display); }
+.barrow .val { font-family: var(--f-mono); font-size: .95rem; }
+.track { flex-basis: 100%; height: 22px; border: 1.5px solid var(--ink); border-radius: 6px; overflow: hidden; background: var(--paper); position: relative; }
+.fill { height: 100%; width: 0; background: var(--acc); transition: width .3s; }
+.fill.two { background: var(--two); }
+.mark { position: absolute; top: -2px; bottom: -2px; width: 2px; background: var(--ink); }
+
+/* Tableaux */
+.scroll { overflow-x: auto; }
+.ttable { border-collapse: separate; border-spacing: 0; width: 100%; font-variant-numeric: tabular-nums; }
+.ttable th, .ttable td { border: 1.5px solid var(--line); padding: 8px 8px; text-align: center; font-family: var(--f-mono); font-size: .98rem; }
+.ttable th { font-family: var(--f-display); background: var(--paper); }
+.ttable td.win { background: var(--ok-soft); color: var(--ok); font-weight: 600; }
+.ttable td.lose { background: var(--red-soft); color: var(--red); font-weight: 600; }
+.ttable td.best { background: var(--acc-soft); font-weight: 700; }
+.ttable.duel td, .ttable.duel th { padding: 6px 2px; font-size: .9rem; }
+
+/* Pièces et dates */
+.coins { display: grid; grid-template-columns: repeat(20, minmax(0, 1fr)); gap: 2px; }
+.coin { aspect-ratio: 1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--f-mono); font-size: .62rem; font-weight: 600; border: 1.5px solid var(--ink); }
+.coin.P { background: var(--acc-soft); }
+.coin.F { background: var(--two-soft); }
+.coin.run { background: var(--hl); outline: 2px solid var(--acc); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-family: var(--f-mono); font-size: .85rem; padding: 2px 8px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--paper); }
+.chip.same { border-color: var(--acc); background: var(--acc); color: var(--card); font-weight: 600; }
+
+/* Familles */
+.cases { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.case { border: 2px solid var(--ink); border-radius: 10px; padding: 10px 4px; text-align: center; display: flex; flex-direction: column; gap: 2px; background: var(--card); min-width: 0; }
+.case b { font-family: var(--f-display); font-size: 1.05rem; }
+.case span { font-family: var(--f-mono); font-size: .8rem; color: var(--ink-soft); }
+.case.kept { background: var(--acc-soft); border-color: var(--acc); }
+.case.half { background: repeating-linear-gradient(45deg, var(--acc-soft) 0 8px, var(--card) 8px 16px); border-color: var(--acc); }
+.case.out { opacity: .35; text-decoration: line-through; }
+@media (max-width: 520px) { .cases { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* Légende */
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: .92rem; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 14px; height: 14px; border-radius: 3px; display: inline-block; border: 1.5px solid var(--ink); }
+
+/* Dés */
+.dice { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.die { border: 1.5px solid var(--line); border-radius: 10px; padding: 8px 10px; display: flex; flex-direction: column; gap: 6px; background: var(--paper); }
+.die strong { font-family: var(--f-display); }
+.faces { display: flex; gap: 4px; flex-wrap: wrap; }
+.face { width: 28px; height: 28px; border: 1.5px solid var(--ink); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-family: var(--f-mono); font-weight: 600; background: var(--card); }
+.pickrow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.pickrow > span { font-weight: 700; min-width: 7.5em; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 110px auto; gap: 10px; align-items: center; }
+.quiz li > span:first-child { overflow-wrap: anywhere; min-width: 0; }
+.quiz input[type="text"] { font-size: 1rem; padding: 6px 8px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb:empty { display: none; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc); }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 120px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+<!--ticons--><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Tutoriels"><!--/ticons-->
+<style id="tnav-css">
+.tnav-top { display: flex; margin: 0 0 4px; }
+.tnav-home { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font-weight: 700; font-size: .95rem; text-decoration: none; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tnav-home:hover, .tnav-home:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.tnav-bottom { margin-top: 8px; display: flex; flex-direction: column; gap: 12px; }
+.tnav-bottom h2 { margin: 0; }
+.tnav-pn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tnav-pn a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--ink, #222); border-radius: 10px;
+  background: var(--card, #fff); color: var(--ink, #222); text-decoration: none; box-shadow: 3px 3px 0 var(--ink, #222); min-width: 0; }
+.tnav-pn a span { font-size: .85rem; color: var(--ink-soft, #666); }
+.tnav-pn a strong { overflow-wrap: anywhere; }
+.tnav-pn a.next { text-align: right; grid-column: 2; }
+.tnav-bottom .tnav-home { align-self: center; }
+@media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
+</style>
+</head>
+<body>
+<main class="page">
+<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="index.html">← Tous les tutoriels</a></nav><!--/tnav-->
+
+
+  <header class="hero">
+    <span class="eyebrow">Tutoriel de maths · niveau collège · curiosité</span>
+    <h1>Les paradoxes de probabilité</h1>
+    <p class="lead">Ton intuition est très forte pour beaucoup de choses. Mais avec le hasard, elle se trompe souvent ! Dans ce tutoriel, tu vas jouer, lancer des milliers de pièces et de dés, et découvrir sept situations où la bonne réponse est surprenante.</p>
+    <div class="box">
+      <svg viewBox="0 0 360 160" role="img" aria-label="Trois portes fermées. Derrière l'une d'elles, une voiture ; derrière les deux autres, une chèvre.">
+        <rect x="20" y="20" width="90" height="125" rx="8" fill="var(--acc)" stroke="var(--ink)" stroke-width="2"/>
+        <rect x="135" y="20" width="90" height="125" rx="8" fill="var(--paper)" stroke="var(--ink)" stroke-width="2"/>
+        <rect x="250" y="20" width="90" height="125" rx="8" fill="var(--acc)" stroke="var(--ink)" stroke-width="2"/>
+        <text x="65" y="95" text-anchor="middle" font-size="40" style="fill:var(--card)">?</text>
+        <text x="180" y="90" text-anchor="middle" font-size="17">chèvre</text>
+        <text x="295" y="95" text-anchor="middle" font-size="40" style="fill:var(--card)">?</text>
+        <circle cx="98" cy="85" r="4" fill="var(--card)"/><circle cx="328" cy="85" r="4" fill="var(--card)"/>
+        <text x="65" y="14" text-anchor="middle" font-size="13">1</text>
+        <text x="180" y="14" text-anchor="middle" font-size="13">2</text>
+        <text x="295" y="14" text-anchor="middle" font-size="13">3</text>
+      </svg>
+      <span class="soft">Tu as choisi la porte 1. On t'ouvre la porte 2 : une chèvre. Garder la porte 1 ou changer pour la porte 3 ? Ça a l'air pareil… et pourtant non !</span>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · Le jeu des trois portes</span>
+    <h2>Joue au jeu télévisé</h2>
+    <p>Derrière une des trois portes se cache une <strong>voiture</strong>. Derrière les deux autres, une <strong>chèvre</strong>. Tu choisis une porte. Le présentateur, qui <strong>sait</strong> où est la voiture, ouvre alors une <strong>autre</strong> porte, toujours avec une chèvre. Puis il te demande : « Tu gardes ta porte, ou tu changes ? »</p>
+    <p>Presque tout le monde pense : « Il reste deux portes, donc une chance sur deux. Ça ne sert à rien de changer. » Joue au moins dix parties de chaque façon, et regarde tes résultats.</p>
+    <div class="box">
+      <div class="doors" id="m3Doors" role="group" aria-label="Trois portes"></div>
+      <p class="msg" id="m3Msg" aria-live="polite"></p>
+      <div class="btns">
+        <button type="button" id="m3Keep">Garder ma porte</button>
+        <button type="button" id="m3Change">Changer de porte</button>
+        <button type="button" id="m3New">Nouvelle partie</button>
+      </div>
+      <div class="scroll"><table class="ttable" id="m3Stats"></table></div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · Garder ou changer ?</span>
+    <h2>Mille parties en un clic</h2>
+    <p>Avec dix parties, le hasard peut encore te jouer des tours. L'ordinateur, lui, peut jouer des milliers de parties : une moitié en gardant toujours, l'autre en changeant toujours. Tu peux aussi augmenter le nombre de portes (le présentateur ouvre alors toutes les autres portes à chèvre, sauf une).</p>
+    <div class="box">
+      <div class="param">
+        <label for="simN">Nombre de portes : <span class="mono" id="simNOut">3</span></label>
+        <input id="simN" type="range" min="3" max="100" step="1" value="3">
+      </div>
+      <div class="btns">
+        <button type="button" id="simGo">+ 1 000 parties de chaque</button>
+        <button type="button" id="simReset">Remettre à zéro</button>
+      </div>
+      <div class="bars" id="simBars" aria-live="polite"></div>
+      <p class="soft" id="simExact"></p>
+    </div>
+    <h3>Pourquoi changer gagne 2 fois sur 3</h3>
+    <p>Tout se joue au <strong>premier choix</strong>. Il y a 1 chance sur 3 que ta porte cache la voiture, et 2 chances sur 3 qu'elle cache une chèvre. Le présentateur ne choisit pas au hasard : il évite la voiture.</p>
+    <div class="box">
+      <svg class="fig" viewBox="0 0 360 230" role="img" aria-label="Arbre : premier choix voiture avec probabilité un tiers, alors garder gagne ; premier choix chèvre avec probabilité deux tiers, alors changer gagne.">
+        <circle cx="30" cy="115" r="7" fill="var(--ink)"/>
+        <line x1="30" y1="115" x2="140" y2="55" stroke="var(--ink)" stroke-width="2"/>
+        <line x1="30" y1="115" x2="140" y2="175" stroke="var(--ink)" stroke-width="2"/>
+        <text x="72" y="70" font-size="15" font-weight="600">1/3</text>
+        <text x="72" y="172" font-size="15" font-weight="600">2/3</text>
+        <rect x="140" y="38" width="96" height="34" rx="6" fill="var(--ok-soft)" stroke="var(--ok)" stroke-width="2"/>
+        <text x="188" y="60" text-anchor="middle" font-size="14">voiture</text>
+        <rect x="140" y="158" width="96" height="34" rx="6" fill="var(--acc-soft)" stroke="var(--acc)" stroke-width="2"/>
+        <text x="188" y="180" text-anchor="middle" font-size="14">chèvre</text>
+        <text x="188" y="24" text-anchor="middle" font-size="12" class="soft">ton 1er choix</text>
+        <text x="248" y="50" font-size="13">garder : gagné</text>
+        <text x="248" y="72" font-size="13">changer : perdu</text>
+        <text x="248" y="170" font-size="13">garder : perdu</text>
+        <text x="248" y="192" font-size="13">changer : gagné</text>
+        <text x="188" y="218" text-anchor="middle" font-size="12">(le présentateur a ouvert l'autre chèvre)</text>
+      </svg>
+      <span>Si ton premier choix est une chèvre (2 fois sur 3), le présentateur ouvre l'<strong>autre</strong> chèvre : la porte qui reste cache forcément la voiture. Donc <span class="hl">changer gagne avec une probabilité de 2/3</span>, et garder seulement 1/3.</span>
+    </div>
+    <h3>La version à 100 portes</h3>
+    <p>Si tu n'es pas encore convaincu, imagine 100 portes. Tu en choisis une. Le présentateur ouvre <strong>98 autres portes</strong>, toutes avec des chèvres. Il en reste deux : la tienne et une autre, qu'il a soigneusement évitée. Tu gardes ?</p>
+    <div class="box">
+      <div class="doors mini" id="m100Doors" role="group" aria-label="Cent portes"></div>
+      <p class="msg" id="m100Msg" aria-live="polite"></p>
+      <div class="btns">
+        <button type="button" id="m100Keep">Garder ma porte</button>
+        <button type="button" id="m100Change">Changer de porte</button>
+        <button type="button" id="m100New">Nouvelle partie</button>
+      </div>
+      <div class="scroll"><table class="ttable" id="m100Stats"></table></div>
+    </div>
+    <div class="note">
+      <span class="note-title">L'idée clé</span>
+      <span>Ta première porte avait 1 chance sur 100 d'être la bonne, et l'ouverture des portes ne change rien à ça. Les 99 chances sur 100 restantes se « concentrent » sur la seule porte que le présentateur n'a pas ouverte. Attention : cela marche parce que le présentateur <strong>sait</strong> où est la voiture et l'évite toujours.</span>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Le paradoxe des anniversaires</span>
+    <h2>Deux élèves nés le même jour ?</h2>
+    <p>Dans une classe de 23 élèves, à ton avis, quelle est la probabilité que <strong>deux élèves au moins</strong> aient leur anniversaire le même jour ? Beaucoup de gens répondent « environ 6 % » (23 sur 365). La vraie réponse est <strong>environ 50 %</strong> !</p>
+    <p>Pour simplifier, on oublie le 29 février et on suppose que les 365 jours sont aussi probables les uns que les autres.</p>
+    <div class="box">
+      <div class="param">
+        <label for="bdN">Nombre de personnes : <span class="mono" id="bdNOut">23</span></label>
+        <input id="bdN" type="range" min="2" max="80" step="1" value="23">
+      </div>
+      <p>Probabilité qu'au moins deux personnes aient le même anniversaire : <span class="big" id="bdP"></span></p>
+      <svg class="fig" id="bdCurve" viewBox="0 0 400 230" role="img" aria-label="Courbe de la probabilité en fonction du nombre de personnes"></svg>
+      <p class="soft" id="bdPairs"></p>
+    </div>
+    <h3>Le calcul : on compte le contraire</h3>
+    <p>Il est plus simple de calculer la probabilité que <strong>tous les anniversaires soient différents</strong>. La 1<sup>re</sup> personne peut être née n'importe quel jour : 365/365. La 2<sup>e</sup> doit éviter ce jour : 364/365. La 3<sup>e</sup> doit éviter deux jours : 363/365. Et ainsi de suite. On multiplie (comme sur les branches d'un arbre) :</p>
+    <div class="note blue">
+      <span class="mono">P(tous différents) = 365/365 × 364/365 × 363/365 × … × (365 − n + 1)/365</span>
+      <span class="mono">P(au moins deux pareils) = 1 − P(tous différents)</span>
+      <span class="soft">Au lycée, on l'écrit aussi 1 − 365!/((365 − n)! × 365ⁿ). L'ordinateur, lui, multiplie les fractions une par une pour ne pas manipuler de nombres géants.</span>
+    </div>
+    <div class="box">
+      <h3>Une classe au hasard</h3>
+      <p>L'ordinateur donne à chacune des <span id="bdN2">23</span> personnes un anniversaire au hasard. Les dates en double sont en couleur.</p>
+      <div class="btns">
+        <button type="button" id="bdOne">Former une classe</button>
+        <button type="button" id="bdMany">Former 1 000 classes</button>
+      </div>
+      <p id="bdMsg" aria-live="polite"></p>
+      <div class="chips" id="bdChips"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Pourquoi si peu ?</span>
+      <span>On ne cherche pas quelqu'un né le même jour que <strong>toi</strong>. On cherche <strong>n'importe quelle paire</strong> de personnes. Et dans un groupe de 23, il y a 23 × 22 ÷ 2 = 253 paires ! Chaque paire a une petite chance (1/365) de partager son anniversaire, mais avec 253 essais, ça finit souvent par arriver.</span>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · L'erreur du joueur</span>
+    <h2>La pièce n'a pas de mémoire</h2>
+    <p>Une pièce vient de tomber 5 fois de suite sur <strong>pile</strong>. Beaucoup de joueurs se disent : « Maintenant, <strong>face</strong> doit sortir, c'est son tour ! » C'est faux : la pièce ne se souvient de rien. Au lancer suivant, face a toujours <strong>1 chance sur 2</strong>. Cette idée fausse s'appelle l'<strong>erreur du joueur</strong>.</p>
+    <div class="box">
+      <h3>Vérifions avec un million de lancers</h3>
+      <div class="param">
+        <label for="gfK">Longueur de la série de « pile » : <span class="mono" id="gfKOut">5</span></label>
+        <input id="gfK" type="range" min="1" max="10" step="1" value="5">
+      </div>
+      <div class="btns"><button type="button" id="gfGo">Lancer 1 000 000 de pièces</button></div>
+      <p id="gfMsg" aria-live="polite">L'ordinateur cherche chaque série de « pile » d'affilée et regarde le lancer juste après.</p>
+    </div>
+    <h3>Mais les séries sont plus longues qu'on ne croit</h3>
+    <p>Autre surprise : dans 100 lancers, il y a presque toujours une <strong>longue série</strong>. Si tu demandes à quelqu'un d'inventer 100 lancers « au hasard », il alterne trop souvent pile et face, et n'ose pas écrire 6 ou 7 fois la même chose de suite. Le vrai hasard, lui, ose !</p>
+    <div class="box">
+      <div class="btns">
+        <button type="button" id="rnOne">Lancer 100 pièces</button>
+        <button type="button" id="rnMany">1 000 séries de 100 lancers</button>
+      </div>
+      <div class="coins" id="rnCoins" aria-label="Les 100 lancers"></div>
+      <p id="rnMsg" aria-live="polite"></p>
+      <svg class="fig" id="rnHist" viewBox="0 0 400 200" role="img" aria-label="Histogramme de la plus longue série dans 100 lancers"></svg>
+      <p class="soft">Calcul exact : dans 100 lancers, la plus longue série (de pile ou de face) atteint au moins 6 dans environ 81 % des cas, et au moins 7 dans environ 54 % des cas.</p>
+    </div>
+    <div class="note red">
+      <span class="note-title">Les deux idées vont ensemble</span>
+      <span>Les longues séries arrivent <strong>souvent</strong>, justement parce que la pièce ne « corrige » jamais rien. Une série n'annonce pas la fin de la série, ni sa suite. La loi des grands nombres (voir le tutoriel sur <a class="tlink" href="les-probabilites.html">les probabilités</a>) parle de très nombreux lancers, pas du prochain.</span>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Le paradoxe des deux enfants</span>
+    <h2>Tout dépend de la question</h2>
+    <p>Une famille a deux enfants. On suppose qu'à chaque naissance, fille et garçon ont la même chance, 1/2. Il y a alors 4 cas <strong>aussi probables</strong> les uns que les autres (on note d'abord l'aîné, puis le cadet) :</p>
+    <div class="box">
+      <div class="cases" id="chCases">
+        <div class="case" id="ch0"><b>Fille · Fille</b><span>FF</span></div>
+        <div class="case" id="ch1"><b>Fille · Garçon</b><span>FG</span></div>
+        <div class="case" id="ch2"><b>Garçon · Fille</b><span>GF</span></div>
+        <div class="case" id="ch3"><b>Garçon · Garçon</b><span>GG</span></div>
+      </div>
+      <p><strong>Ce que l'on sait :</strong></p>
+      <div class="btns" id="chConds" role="group" aria-label="Ce que l'on sait">
+        <button type="button" data-c="atLeast">« Au moins un enfant est une fille »</button>
+        <button type="button" data-c="eldest">« L'aînée est une fille »</button>
+        <button type="button" data-c="seen">« Je croise un des enfants au hasard : c'est une fille »</button>
+      </div>
+      <p id="chExact" aria-live="polite"></p>
+      <div class="btns"><button type="button" id="chSim">Simuler 1 000 familles</button></div>
+      <p class="soft" id="chSimOut" aria-live="polite"></p>
+    </div>
+    <div class="note">
+      <span class="note-title">Pourquoi ce n'est pas toujours 1/2</span>
+      <span>« Au moins une fille » élimine seulement le cas GG : il reste FF, FG, GF, et un seul des trois a deux filles, d'où <strong>1/3</strong>. Mais si on sait que c'est <strong>l'aînée</strong> qui est une fille, il reste FF et FG : <strong>1/2</strong>. Et si on a <strong>croisé</strong> un enfant au hasard, une famille FF a plus de chances de nous montrer une fille qu'une famille FG : on retrouve <strong>1/2</strong>. La façon dont on a appris l'information compte. Ce paradoxe est célèbre parce que des personnes très savantes se disputent encore sur la façon de lire certaines phrases !</span>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · Le test qui se trompe</span>
+    <h2>Positif… mais sans doute pas allergique</h2>
+    <p>Imagine une allergie rare, sans gravité : 1 personne sur 100 l'a. Un test la détecte, et il se trompe seulement dans 1 % des cas. Léo fait le test : il est <strong>positif</strong>. Quelle est la probabilité que Léo soit vraiment allergique ? On a envie de dire 99 %. Regardons 1 000 personnes.</p>
+    <div class="box">
+      <div class="param">
+        <label for="tsK">Personnes allergiques sur 1 000 : <span class="mono" id="tsKOut">10</span></label>
+        <input id="tsK" type="range" min="1" max="200" step="1" value="10">
+      </div>
+      <div class="param">
+        <label for="tsE">Le test se trompe dans <span class="mono" id="tsEOut">1</span> % des cas</label>
+        <input id="tsE" type="range" min="0.5" max="20" step="0.5" value="1">
+      </div>
+      <svg class="fig" id="tsGrid" viewBox="0 0 360 225" role="img" aria-label="Grille de 1 000 personnes"></svg>
+      <div class="legend">
+        <span><i style="background:var(--acc)"></i>allergique, test positif</span>
+        <span><i style="background:var(--acc-soft);border-color:var(--acc)"></i>allergique, test négatif (raté)</span>
+        <span><i style="background:var(--two)"></i>pas allergique, test positif (faux positif)</span>
+        <span><i style="background:var(--line)"></i>pas allergique, test négatif</span>
+      </div>
+      <div class="scroll"><table class="ttable" id="tsTable"></table></div>
+      <p id="tsMsg" aria-live="polite"></p>
+      <div class="btns"><button type="button" id="tsPick">Choisir au hasard une personne positive</button></div>
+      <p class="soft" id="tsPickOut" aria-live="polite"></p>
+    </div>
+    <div class="note">
+      <span class="note-title">Ce qui se passe</span>
+      <span>Les personnes <strong>pas allergiques</strong> sont très nombreuses (990 sur 1 000). Même si le test ne se trompe que pour 1 % d'entre elles, cela fait environ 10 faux positifs, autant que les 10 vrais allergiques ! Un test positif pour une chose <strong>rare</strong> est donc souvent un faux positif. C'est pour ça que les médecins refont un deuxième test avant de conclure.</span>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Les dés non transitifs</span>
+    <h2>Pierre, feuille, ciseaux avec des dés</h2>
+    <p>Voici trois dés aux faces un peu spéciales. Le jeu : chacun lance son dé, <strong>le plus grand nombre gagne</strong>. Le dé A bat le dé B plus d'une fois sur deux. Le dé B bat le dé C plus d'une fois sur deux. Donc A bat sûrement C ? <strong>Non !</strong> C bat A. Comme à pierre-feuille-ciseaux, aucun dé n'est le meilleur.</p>
+    <div class="box">
+      <div class="btns" id="dcSets" role="group" aria-label="Choix des dés">
+        <button type="button" data-s="3">3 dés</button>
+        <button type="button" data-s="4">4 dés d'Efron</button>
+      </div>
+      <div class="dice" id="dcDice"></div>
+      <div class="pickrow" id="dcMine"><span>Ton dé :</span></div>
+      <div class="pickrow" id="dcThem"><span>Adversaire :</span></div>
+      <p id="dcExact" aria-live="polite"></p>
+      <div class="scroll"><table class="ttable duel" id="dcTable"></table></div>
+      <div class="btns">
+        <button type="button" id="dcOne">Un duel</button>
+        <button type="button" id="dcMany">1 000 duels</button>
+      </div>
+      <p id="dcSimOut" aria-live="polite"></p>
+      <p class="soft" id="dcCycle"></p>
+    </div>
+    <div class="note">
+      <span class="note-title">Le truc pour gagner</span>
+      <span>Laisse ton adversaire choisir son dé en premier. Puis prends celui qui le bat ! Sur une seule partie, tu peux perdre. Mais sur beaucoup de parties, tu gagnes presque toujours plus souvent que lui. « Battre » n'est pas comme « être plus grand » : ça ne se transmet pas de A à B puis à C.</span>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Le paradoxe de Simpson</span>
+    <h2>Meilleure partout, moins bonne au total</h2>
+    <p>Léa et Tom jouent au basket. Chacun a tiré 100 fois. On compte les tirs réussis, à 2 points (près du panier, plus facile) et à 3 points (de loin, plus difficile). Qui est le meilleur tireur ?</p>
+    <div class="box">
+      <div class="param">
+        <label for="spT">Nombre de tirs à 3 points de Léa (sur 100) : <span class="mono" id="spTOut">80</span></label>
+        <input id="spT" type="range" min="0" max="100" step="20" value="80">
+      </div>
+      <div class="scroll"><table class="ttable" id="spTable"></table></div>
+      <p id="spMsg" aria-live="polite"></p>
+    </div>
+    <div class="note">
+      <span class="note-title">L'explication</span>
+      <span>Léa réussit mieux que Tom à 2 points <strong>et</strong> à 3 points. Mais elle tente surtout des tirs à 3 points, très difficiles, alors que Tom tente surtout des tirs faciles. Le total mélange des groupes de tailles très différentes. Avant de comparer des pourcentages globaux, il faut se demander si on compare des choses comparables.</span>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Les pièges</span>
+    <h2>Les erreurs fréquentes</h2>
+    <div class="cards">
+      <div class="box"><strong>« Il reste deux portes, donc c'est 1/2 »</strong><span class="soft">Deux issues ne veulent pas dire deux issues aussi probables. Au jeu des portes, changer gagne 2 fois sur 3.</span></div>
+      <div class="box"><strong>« Il faut 183 personnes pour avoir 50 % »</strong><span class="soft">Non : 23 suffisent pour une paire quelconque. Pour que quelqu'un ait <strong>ton</strong> anniversaire avec 50 % de chances, il faut environ 253 autres personnes.</span></div>
+      <div class="box"><strong>« Face doit sortir, c'est son tour »</strong><span class="soft">La pièce n'a pas de mémoire : après n'importe quelle série, c'est toujours 1/2.</span></div>
+      <div class="box"><strong>« Le test est fiable à 99 %, donc je suis allergique à 99 % »</strong><span class="soft">Pour une chose rare, il faut compter les faux positifs : ils peuvent être aussi nombreux que les vrais.</span></div>
+      <div class="box"><strong>« A bat B et B bat C, donc A bat C »</strong><span class="soft">Pas forcément avec le hasard : les dés non transitifs tournent en rond.</span></div>
+      <div class="box"><strong>« Meilleur dans chaque groupe, donc meilleur au total »</strong><span class="soft">Le paradoxe de Simpson montre que non, quand les groupes n'ont pas la même taille.</span></div>
+    </div>
+    <div class="note red">
+      <span class="note-title">Le réflexe à prendre</span>
+      <span>Quand un problème de hasard te semble évident, <strong>simule-le</strong> ou fais un <strong>arbre</strong> ou un <strong>tableau</strong>. Les mathématiciens eux-mêmes le font !</span>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Pour une probabilité, tu peux écrire une fraction (1/3), un nombre décimal (0,33) ou un pourcentage (33 %).</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Nouvelles questions</button>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · Un peu d'histoire</span>
+    <h2>Quand les savants se trompent aussi</h2>
+    <ol class="timeline">
+      <li><span class="when">1654</span><div class="what"><strong>Pascal et Fermat</strong><span>Par lettres, ils résolvent des problèmes de jeux de hasard. C'est la naissance du calcul des probabilités (voir le tutoriel sur <a class="tlink" href="les-probabilites.html">les probabilités</a>). Dès le début, les joueurs avaient des intuitions fausses sur leurs chances.</span></div></li>
+      <li><span class="when">1913</span><div class="what"><strong>Le casino de Monte-Carlo</strong><span>On raconte qu'à la roulette, le noir est sorti plus de vingt fois de suite. Des joueurs ont perdu beaucoup d'argent en misant sur le rouge, persuadés qu'il « devait » sortir. On parle parfois d'« erreur de Monte-Carlo ».</span></div></li>
+      <li><span class="when">vers 1940</span><div class="what"><strong>Le problème des anniversaires</strong><span>On l'attribue souvent au mathématicien Richard von Mises. Il est devenu un grand classique des cours de probabilités.</span></div></li>
+      <li><span class="when">1951</span><div class="what"><strong>Edward Simpson</strong><span>Ce statisticien britannique décrit le paradoxe qui porte son nom. D'autres l'avaient remarqué avant lui.</span></div></li>
+      <li><span class="when">vers 1970</span><div class="what"><strong>Les dés d'Efron</strong><span>Le statisticien américain Bradley Efron invente ses dés non transitifs. Le célèbre auteur de jeux mathématiques Martin Gardner les fait connaître.</span></div></li>
+      <li><span class="when">1990</span><div class="what"><strong>Marilyn vos Savant et Monty Hall</strong><span>Le problème des portes vient d'un jeu télévisé américain animé par Monty Hall. Quand Marilyn vos Savant explique dans un magazine qu'il faut changer de porte, elle reçoit des milliers de lettres, dont certaines de docteurs en mathématiques, qui disent qu'elle se trompe. C'est elle qui avait raison. On raconte que même le grand mathématicien Paul Erdős n'a été convaincu qu'en voyant une simulation, comme celle de l'étape 2.</span></div></li>
+    </ol>
+  </section>
+
+  <!-- 12 -->
+  <section>
+    <span class="eyebrow">Étape 12 · À toi de jouer</span>
+    <h2>Six problèmes</h2>
+    <div class="exos">
+      <details>
+        <summary>Quatre portes<span class="q">Il y a 4 portes et une seule voiture. Tu choisis une porte, le présentateur ouvre une autre porte avec une chèvre. Tu changes pour une des deux portes fermées restantes, au hasard. Quelle est ta probabilité de gagner ?</span></summary>
+        <div><span>Ta première porte est mauvaise avec une probabilité de 3/4. Dans ce cas, la voiture est derrière une des deux portes fermées restantes, et tu tombes dessus une fois sur deux : 3/4 × 1/2 = <strong>3/8</strong>, soit 37,5 %. C'est mieux que 1/4 = 25 % si tu gardes.</span></div>
+      </details>
+      <details>
+        <summary>Trois amis<span class="q">Trois amis comparent leurs anniversaires. Quelle est la probabilité qu'au moins deux soient nés le même jour ?</span></summary>
+        <div><span>Tous différents : 365/365 × 364/365 × 363/365 ≈ 0,9918. Donc au moins deux pareils : 1 − 0,9918 ≈ <strong>0,0082</strong>, soit environ 0,82 %. C'est rare avec 3 personnes, mais ça monte très vite.</span></div>
+      </details>
+      <details>
+        <summary>Quelle suite est la plus probable ?<span class="q">En 5 lancers, vaut-il mieux parier sur PPPPP ou sur PFFPF ?</span></summary>
+        <div><span>Aucune ! Chaque suite précise de 5 lancers a une probabilité de 1/2 × 1/2 × 1/2 × 1/2 × 1/2 = <strong>1/32</strong>. PPPPP nous paraît « moins hasardeuse », mais elle est exactement aussi probable.</span></div>
+      </details>
+      <details>
+        <summary>Le test à 10 000 personnes<span class="q">Sur 10 000 personnes, 50 ont l'allergie. Le test se trompe dans 2 % des cas. Si ton test est positif, quelle est la probabilité que tu sois allergique ?</span></summary>
+        <div><span>Vrais positifs : 50 × 0,98 = 49. Faux positifs : 9 950 × 0,02 = 199. Positifs en tout : 49 + 199 = 248. Probabilité : 49/248 ≈ <strong>19,8 %</strong>. Moins d'une chance sur cinq !</span></div>
+      </details>
+      <details>
+        <summary>Au moins un garçon<span class="q">Une famille a deux enfants, et on sait qu'au moins un des deux est un garçon. Quelle est la probabilité que ce soient deux garçons ?</span></summary>
+        <div><span>On élimine FF. Il reste FG, GF et GG, aussi probables. Un seul cas sur trois a deux garçons : <strong>1/3</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Contre le dé C<span class="q">Avec les 4 dés d'Efron, ton ami choisit le dé C (faces 2, 2, 2, 2, 6, 6). Quel dé prends-tu ?</span></summary>
+        <div><span>Le dé <strong>B</strong> (que des 3). B fait 3 à chaque fois : il bat C quand C fait 2, soit 4 fois sur 6 = <strong>2/3</strong>.</span></div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• Avec le hasard, l'intuition se trompe souvent. Pour vérifier : <strong>simuler</strong>, faire un <strong>arbre</strong> ou un <strong>tableau</strong>.</span>
+      <span>• <strong>Monty Hall</strong> : changer de porte gagne avec une probabilité de 2/3 (et (n − 1)/n avec n portes).</span>
+      <span>• <strong>Anniversaires</strong> : dès 23 personnes, il y a plus d'une chance sur deux qu'au moins deux soient nées le même jour. On calcule le contraire : 1 − P(tous différents).</span>
+      <span>• <strong>Erreur du joueur</strong> : une pièce n'a pas de mémoire ; mais les longues séries sont fréquentes.</span>
+      <span>• <strong>Deux enfants</strong> : la réponse dépend de ce qu'on sait exactement (1/3 ou 1/2).</span>
+      <span>• <strong>Faux positifs</strong> : pour une chose rare, un test positif est souvent faux. Compte sur 1 000 personnes.</span>
+      <span>• <strong>Dés non transitifs</strong> et <strong>Simpson</strong> : « battre » ne se transmet pas, et un total peut renverser les comparaisons par groupe.</span>
+    </div>
+  </section>
+
+  <!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"><a class="prev" href="le-binaire-et-les-bases.html"><span>← Précédent</span><strong>Le binaire et les bases</strong></a><a class="next" href="les-fractales.html"><span>Suivant →</span><strong>Les fractales</strong></a></div><a class="tnav-home" href="index.html">⌂ Tous les tutoriels</a></nav><!--/tnav-->
+<footer>Fiche de révision · Les paradoxes de probabilité</footer>
+</main>
+
+<script>
+(function () {
+  /* Fonctions exposées sur window.__par (pour les tests) :
+     montyGame(n, change)        → true si on gagne une partie à n portes (le présentateur ouvre n − 2 chèvres)
+     montySim(n, change, parties)→ nombre de parties gagnées
+     montyExact(n, change)       → [numérateur, dénominateur] : [1, n] en gardant, [n − 1, n] en changeant
+     birthdayExact(n)            → probabilité qu'au moins deux des n personnes aient le même anniversaire (365 jours)
+     pairs(n)                    → n(n − 1)/2, nombre de paires
+     hasShared(tableau)          → true si une valeur apparaît au moins deux fois
+     birthdaySim(n, classes)     → fréquence des classes avec un anniversaire partagé
+     longestRun(tableau)         → longueur de la plus longue série de valeurs identiques consécutives
+     afterStreakSim(k, lancers)  → { seen, face } : séries de k « pile » rencontrées et nombre de « face » juste après
+     childrenExact(cond)         → [num, den], cond ∈ 'atLeast' | 'eldest' | 'seen' (probabilité de deux filles)
+     childrenSim(cond, familles) → { kept, ff }
+     testCounts(k, errPct, pop)  → { tp, fn, fp, tn, ppv } (pop = 1 000 par défaut ; ppv exact, non arrondi)
+     diceDuel(A, B)              → { win, lose, tie, total } sur les 36 couples de faces
+     DICE3, DICE4                → les jeux de dés (objets { A: [...], ... })
+     simpson(t)                  → tableau de Léa (t tirs à 3 points) et Tom
+     parseAnswer(s), fracStr(n, d), gcd(a, b) */
+  var NS = 'http://www.w3.org/2000/svg', NB = ' ';
+  function fmt(x, d) { var r = Math.round(x * 1e6) / 1e6; if (Object.is(r, -0)) r = 0; return r.toLocaleString('fr-FR', { maximumFractionDigits: d == null ? 3 : d }).replace('-', '−'); }
+  function pc(p, d) { return fmt(p * 100, d == null ? 1 : d) + NB + '%'; }
+  function mk(svg, name, attrs, text) { var e = document.createElementNS(NS, name); for (var a in attrs) e.setAttribute(a, attrs[a]); if (text != null) e.textContent = text; svg.appendChild(e); return e; }
+  function clear(el) { while (el.firstChild) el.removeChild(el.firstChild); }
+  function $(id) { return document.getElementById(id); }
+  function rint(n) { return Math.floor(Math.random() * n); }
+  function gcd(a, b) { a = Math.abs(a); b = Math.abs(b); while (b) { var t = a % b; a = b; b = t; } return a; }
+  function fracStr(n, d) { var g = gcd(n, d) || 1; n /= g; d /= g; return d === 1 ? String(n) : n + '/' + d; }
+  function parseAnswer(str) {
+    var t = String(str).replace(/\s/g, '').replace(/[−–]/g, '-').replace(/,/g, '.');
+    if (t === '') return NaN;
+    var pct = false;
+    if (t.charAt(t.length - 1) === '%') { pct = true; t = t.slice(0, -1); }
+    var m = t.match(/^(\d+(?:\.\d+)?)\/(\d+(?:\.\d+)?)$/);
+    if (m) { var a = Number(m[1]), b = Number(m[2]); if (b === 0) return NaN; return pct ? a / b / 100 : a / b; }
+    if (!/^-?(\d+\.?\d*|\.\d+)$/.test(t)) return NaN;
+    var x = Number(t);
+    return pct ? x / 100 : x;
+  }
+
+  /* ---------- Fonctions pures ---------- */
+  function otherThan(n, i) { var r = rint(n - 1); return r >= i ? r + 1 : r; }
+  function montyGame(n, change) { var car = rint(n), pick = rint(n), other = car !== pick ? car : otherThan(n, pick); return (change ? other : pick) === car; }
+  function montySim(n, change, g) { var w = 0; for (var i = 0; i < g; i++) if (montyGame(n, change)) w++; return w; }
+  function montyExact(n, change) { return change ? [n - 1, n] : [1, n]; }
+  function birthdayExact(n) { if (n > 365) return 1; var q = 1; for (var k = 0; k < n; k++) q *= (365 - k) / 365; return 1 - q; }
+  function pairs(n) { return n * (n - 1) / 2; }
+  function hasShared(a) { var seen = {}; for (var i = 0; i < a.length; i++) { if (seen[a[i]]) return true; seen[a[i]] = 1; } return false; }
+  function randomClass(n) { var a = []; for (var i = 0; i < n; i++) a.push(rint(365)); return a; }
+  function birthdaySim(n, c) { var h = 0; for (var i = 0; i < c; i++) if (hasShared(randomClass(n))) h++; return h / c; }
+  function flips(n) { var a = []; for (var i = 0; i < n; i++) a.push(Math.random() < 0.5 ? 'P' : 'F'); return a; }
+  function longestRun(a) { if (!a.length) return 0; var best = 1, cur = 1; for (var i = 1; i < a.length; i++) { cur = a[i] === a[i - 1] ? cur + 1 : 1; if (cur > best) best = cur; } return best; }
+  function afterStreakSim(k, N) {
+    var run = 0, seen = 0, face = 0;
+    for (var i = 0; i < N; i++) {
+      var pile = Math.random() < 0.5;
+      if (run >= k) { seen++; if (!pile) face++; }
+      run = pile ? run + 1 : 0;
+    }
+    return { seen: seen, face: face };
+  }
+  function childrenExact(cond) { return cond === 'atLeast' ? [1, 3] : [1, 2]; }
+  function childrenSim(cond, N) {
+    var kept = 0, ff = 0;
+    for (var i = 0; i < N; i++) {
+      var e = Math.random() < 0.5, c = Math.random() < 0.5, keep; /* true = fille ; e = aîné, c = cadet */
+      if (cond === 'atLeast') keep = e || c;
+      else if (cond === 'eldest') keep = e;
+      else keep = Math.random() < 0.5 ? e : c;
+      if (keep) { kept++; if (e && c) ff++; }
+    }
+    return { kept: kept, ff: ff };
+  }
+  function testCounts(k, e, pop) {
+    pop = pop || 1000;
+    var tpx = k * (1 - e / 100), fpx = (pop - k) * e / 100, tp = Math.round(tpx), fp = Math.round(fpx);
+    return { tp: tp, fn: k - tp, fp: fp, tn: pop - k - fp, ppv: tpx + fpx > 0 ? tpx / (tpx + fpx) : NaN };
+  }
+  var DICE3 = { A: [2, 2, 4, 4, 9, 9], B: [1, 1, 6, 6, 8, 8], C: [3, 3, 5, 5, 7, 7] };
+  var DICE4 = { A: [0, 0, 4, 4, 4, 4], B: [3, 3, 3, 3, 3, 3], C: [2, 2, 2, 2, 6, 6], D: [1, 1, 1, 5, 5, 5] };
+  function diceDuel(A, B) {
+    var w = 0, l = 0, t = 0;
+    for (var i = 0; i < A.length; i++) for (var j = 0; j < B.length; j++) { if (A[i] > B[j]) w++; else if (A[i] < B[j]) l++; else t++; }
+    return { win: w, lose: l, tie: t, total: A.length * B.length };
+  }
+  function simpson(t) {
+    var l2 = [Math.round(0.95 * (100 - t)), 100 - t], l3 = [Math.round(0.4 * t), t];
+    var o2 = [72, 80], o3 = [7, 20];
+    return { lea2: l2, lea3: l3, leaTot: [l2[0] + l3[0], 100], tom2: o2, tom3: o3, tomTot: [o2[0] + o3[0], 100] };
+  }
+  window.__par = { montyGame: montyGame, montySim: montySim, montyExact: montyExact, birthdayExact: birthdayExact, pairs: pairs, hasShared: hasShared, birthdaySim: birthdaySim, longestRun: longestRun, afterStreakSim: afterStreakSim, childrenExact: childrenExact, childrenSim: childrenSim, testCounts: testCounts, diceDuel: diceDuel, DICE3: DICE3, DICE4: DICE4, simpson: simpson, parseAnswer: parseAnswer, fracStr: fracStr, gcd: gcd };
+
+  /* ---------- Jeu des portes (3 ou 100) ---------- */
+  function mhWidget(pre, n) {
+    var st = {}, stats = { keep: [0, 0], change: [0, 0] }, doors = [];
+    var box = $(pre + 'Doors'), msg = $(pre + 'Msg'), kb = $(pre + 'Keep'), cb = $(pre + 'Change'), tb = $(pre + 'Stats');
+    for (var i = 0; i < n; i++) { var b = document.createElement('button'); b.type = 'button'; b.className = 'door'; b.setAttribute('data-i', i); box.appendChild(b); doors.push(b); }
+    box.addEventListener('click', function (e) { var t = e.target.closest('.door'); if (t) click(+t.getAttribute('data-i')); });
+    kb.addEventListener('click', function () { if (st.phase === 'decide') finish(false); });
+    cb.addEventListener('click', function () { if (st.phase === 'decide') finish(true); });
+    $(pre + 'New').addEventListener('click', reset);
+    function reset() { st = { phase: 'pick', car: rint(n), pick: -1, other: -1, final: -1 }; draw(); }
+    function click(i) {
+      if (st.phase === 'pick') { st.pick = i; st.other = st.car !== i ? st.car : otherThan(n, i); st.phase = 'decide'; draw(); }
+      else if (st.phase === 'decide') { if (i === st.pick) finish(false); else if (i === st.other) finish(true); }
+    }
+    function finish(change) {
+      st.final = change ? st.other : st.pick; st.phase = 'done'; st.changed = change;
+      var s = stats[change ? 'change' : 'keep']; s[1]++; if (st.final === st.car) s[0]++;
+      draw();
+    }
+    function draw() {
+      doors.forEach(function (b, i) {
+        var rev = st.phase === 'done' || (st.phase === 'decide' && i !== st.pick && i !== st.other), car = i === st.car;
+        b.className = 'door' + (i === st.pick ? ' picked' : '') + (rev ? (car ? ' car' : ' goat') : '') + (st.phase === 'done' && i === st.final ? ' final' : '');
+        var what = rev ? (car ? 'voiture' : 'chèvre') : 'fermée';
+        if (n === 3) b.innerHTML = '<span class="dn">porte ' + (i + 1) + '</span><span class="dc">' + (rev ? what : '?') + '</span><span></span>';
+        else b.textContent = i + 1;
+        b.setAttribute('aria-label', 'Porte ' + (i + 1) + ' : ' + what + (i === st.pick ? ' (ton choix)' : ''));
+        b.disabled = st.phase === 'decide' && rev;
+      });
+      kb.disabled = cb.disabled = st.phase !== 'decide';
+      if (st.phase === 'pick') msg.textContent = n === 3 ? 'Choisis une porte.' : 'Choisis une porte parmi les 100.';
+      else if (st.phase === 'decide') {
+        if (n === 3) { var op = [0, 1, 2].filter(function (j) { return j !== st.pick && j !== st.other; })[0]; msg.textContent = 'Tu as choisi la porte ' + (st.pick + 1) + '. Le présentateur ouvre la porte ' + (op + 1) + ' : une chèvre ! Tu gardes la porte ' + (st.pick + 1) + ' ou tu changes pour la porte ' + (st.other + 1) + ' ?'; }
+        else msg.textContent = 'Tu as choisi la porte ' + (st.pick + 1) + '. Le présentateur ouvre 98 autres portes : que des chèvres ! Il reste ta porte (' + (st.pick + 1) + ') et la porte ' + (st.other + 1) + '. Tu gardes ou tu changes ?';
+      } else {
+        var won = st.final === st.car;
+        msg.innerHTML = '<strong style="color:var(--' + (won ? 'ok' : 'red') + ')">' + (won ? 'Gagné !' : 'Perdu…') + '</strong> La voiture était derrière la porte ' + (st.car + 1) + '. Tu avais ' + (st.changed ? 'changé' : 'gardé') + '. Clique sur « Nouvelle partie ».';
+      }
+      function row(name, s) { return '<tr><th>' + name + '</th><td>' + s[1] + '</td><td>' + s[0] + '</td><td>' + (s[1] ? pc(s[0] / s[1], 0) : '—') + '</td></tr>'; }
+      tb.innerHTML = '<tr><th>Tes parties</th><th>jouées</th><th>gagnées</th><th>réussite</th></tr>' + row('Garder', stats.keep) + row('Changer', stats.change);
+    }
+    reset();
+  }
+  mhWidget('m3', 3);
+  mhWidget('m100', 100);
+
+  /* ---------- Simulation Monty Hall ---------- */
+  var simN = $('simN'), sim = null;
+  function simReset() { sim = { n: +simN.value, keep: [0, 0], change: [0, 0] }; simDraw(); }
+  function simDraw() {
+    var n = sim.n;
+    $('simNOut').textContent = n;
+    function bar(name, s, cls, ex) {
+      var p = s[1] ? s[0] / s[1] : 0;
+      return '<div class="barrow"><strong>' + name + '</strong><span class="val">' + (s[1] ? fmt(s[0]) + ' gagnées sur ' + fmt(s[1]) + ' = ' + pc(p) : 'pas encore de parties') + '</span><div class="track"><div class="fill' + cls + '" style="width:' + (p * 100) + '%"></div><div class="mark" style="left:calc(' + (ex * 100) + '% - 1px)" title="valeur exacte"></div></div></div>';
+    }
+    var ek = montyExact(n, false), ec = montyExact(n, true);
+    $('simBars').innerHTML = bar('Toujours garder', sim.keep, '', ek[0] / ek[1]) + bar('Toujours changer', sim.change, ' two', ec[0] / ec[1]);
+    $('simExact').textContent = 'Valeurs exactes (le trait noir) : garder gagne avec ' + fracStr(ek[0], ek[1]) + ' ≈ ' + pc(ek[0] / ek[1]) + ', changer gagne avec ' + fracStr(ec[0], ec[1]) + ' ≈ ' + pc(ec[0] / ec[1]) + '. Plus on joue, plus les barres s\'en approchent.';
+  }
+  simN.addEventListener('input', simReset);
+  $('simReset').addEventListener('click', simReset);
+  $('simGo').addEventListener('click', function () {
+    sim.keep[0] += montySim(sim.n, false, 1000); sim.keep[1] += 1000;
+    sim.change[0] += montySim(sim.n, true, 1000); sim.change[1] += 1000;
+    simDraw();
+  });
+  simReset();
+
+  /* ---------- Anniversaires ---------- */
+  var MONTHS = ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'], MLEN = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  function dayName(d) { var m = 0; while (d >= MLEN[m]) { d -= MLEN[m]; m++; } return (d + 1) + ' ' + MONTHS[m]; }
+  var bdN = $('bdN'), curve = $('bdCurve'), CW = 400, CH = 230, CL = 46, CB = 30, CT = 12, CR = 14;
+  function CX(n) { return CL + n / 80 * (CW - CL - CR); } function CY(p) { return CH - CB - p * (CH - CB - CT); }
+  var curveMarks = (function () {
+    for (var i = 0; i <= 4; i++) {
+      mk(curve, 'line', { x1: CX(i * 20), y1: CT, x2: CX(i * 20), y2: CH - CB, stroke: 'var(--line)' });
+      mk(curve, 'line', { x1: CL, y1: CY(i / 4), x2: CW - CR, y2: CY(i / 4), stroke: 'var(--line)' });
+      mk(curve, 'text', { x: CX(i * 20), y: CH - CB + 20, 'text-anchor': 'middle', 'font-size': 14 }, String(i * 20));
+      mk(curve, 'text', { x: CL - 6, y: CY(i / 4) + 5, 'text-anchor': 'end', 'font-size': 14 }, (i * 25) + NB + '%');
+    }
+    mk(curve, 'line', { x1: CL, y1: CY(0.5), x2: CW - CR, y2: CY(0.5), stroke: 'var(--ink-soft)', 'stroke-dasharray': '5 4' });
+    mk(curve, 'line', { x1: CL, y1: CH - CB, x2: CW - CR, y2: CH - CB, stroke: 'var(--ink)', 'stroke-width': 2 });
+    mk(curve, 'line', { x1: CL, y1: CT, x2: CL, y2: CH - CB, stroke: 'var(--ink)', 'stroke-width': 2 });
+    var d = 'M' + CX(1) + ' ' + CY(0);
+    for (var n = 2; n <= 80; n++) d += ' L' + CX(n).toFixed(1) + ' ' + CY(birthdayExact(n)).toFixed(1);
+    mk(curve, 'path', { d: d, fill: 'none', stroke: 'var(--acc)', 'stroke-width': 3 });
+    return { v: mk(curve, 'line', { stroke: 'var(--two)', 'stroke-width': 2, 'stroke-dasharray': '4 3' }), c: mk(curve, 'circle', { r: 7, fill: 'var(--two)', stroke: 'var(--card)', 'stroke-width': 2 }), t: mk(curve, 'text', { 'font-size': 15, 'font-weight': 600 }) };
+  })();
+  function bdText(p) { var s = pc(p); if (p < 1 && s.indexOf('100') === 0) return 'plus de 99,9' + NB + '%'; return (Math.abs(p * 1000 - Math.round(p * 1000)) < 1e-9 ? '' : '≈ ') + s; }
+  function bdDraw() {
+    var n = +bdN.value, p = birthdayExact(n);
+    $('bdNOut').textContent = n; $('bdN2').textContent = n;
+    $('bdP').textContent = bdText(p);
+    curveMarks.v.setAttribute('x1', CX(n)); curveMarks.v.setAttribute('x2', CX(n)); curveMarks.v.setAttribute('y1', CY(0)); curveMarks.v.setAttribute('y2', CY(p));
+    curveMarks.c.setAttribute('cx', CX(n)); curveMarks.c.setAttribute('cy', CY(p));
+    var tx = CX(n) + (n > 55 ? -10 : 10); curveMarks.t.setAttribute('x', tx); curveMarks.t.setAttribute('y', Math.max(CT + 16, CY(p) - 10) + (n > 55 ? 26 : 0)); curveMarks.t.setAttribute('text-anchor', n > 55 ? 'end' : 'start');
+    curveMarks.t.textContent = n + ' pers. : ' + pc(p, 0);
+    $('bdPairs').textContent = 'Avec ' + n + ' personnes, il y a ' + n + ' × ' + (n - 1) + ' ÷ 2 = ' + fmt(pairs(n)) + ' paires possibles. La courbe dépasse 50 % à partir de 23 personnes, et 99 % à partir de 57.';
+    $('bdChips').innerHTML = ''; $('bdMsg').textContent = '';
+  }
+  bdN.addEventListener('input', bdDraw);
+  $('bdOne').addEventListener('click', function () {
+    var n = +bdN.value, a = randomClass(n).sort(function (x, y) { return x - y; }), cnt = {};
+    a.forEach(function (d) { cnt[d] = (cnt[d] || 0) + 1; });
+    $('bdChips').innerHTML = a.map(function (d) { return '<span class="chip' + (cnt[d] > 1 ? ' same' : '') + '">' + dayName(d) + '</span>'; }).join('');
+    var dup = Object.keys(cnt).filter(function (d) { return cnt[d] > 1; });
+    $('bdMsg').innerHTML = dup.length ? '<strong style="color:var(--acc)">Oui !</strong> Anniversaire partagé : ' + dup.map(function (d) { return dayName(+d); }).join(', ') + '.' : '<strong>Pas cette fois</strong> : tous les anniversaires sont différents. Réessaie !';
+  });
+  $('bdMany').addEventListener('click', function () {
+    var n = +bdN.value, f = birthdaySim(n, 1000);
+    $('bdChips').innerHTML = '';
+    $('bdMsg').innerHTML = 'Sur 1 000 classes de ' + n + ' personnes, <strong>' + fmt(Math.round(f * 1000)) + '</strong> avaient au moins un anniversaire partagé, soit ' + pc(f) + '. Le calcul exact donne ' + bdText(birthdayExact(n)) + '.';
+  });
+  bdDraw();
+
+  /* ---------- Erreur du joueur ---------- */
+  var gfK = $('gfK');
+  gfK.addEventListener('input', function () { $('gfKOut').textContent = gfK.value; $('gfMsg').textContent = 'L\'ordinateur cherche chaque série de ' + gfK.value + ' « pile » d\'affilée et regarde le lancer juste après.'; });
+  $('gfGo').addEventListener('click', function () {
+    var k = +gfK.value, r = afterStreakSim(k, 1000000);
+    $('gfMsg').innerHTML = 'Dans 1 000 000 de lancers, l\'ordinateur a trouvé ' + fmt(r.seen) + ' fois ' + k + ' « pile » de suite. Juste après, « face » est sorti ' + fmt(r.face) + ' fois, soit <strong>' + (r.seen ? pc(r.face / r.seen) : '—') + '</strong>. C\'est toujours environ 50 % : la série passée ne change rien.';
+  });
+
+  /* ---------- Plus longue série ---------- */
+  function runInfo(a) {
+    var best = longestRun(a), cur = 1, end = 0;
+    if (best === 1) end = 0;
+    for (var i = 1; i < a.length; i++) { cur = a[i] === a[i - 1] ? cur + 1 : 1; if (cur === best) { end = i; break; } }
+    return { best: best, start: end - best + 1 };
+  }
+  function drawHist(svg, labels, counts, hiFrom) {
+    clear(svg);
+    var W = 400, H = 200, L = 8, B = 34, T = 24, nb = labels.length, bw = (W - 2 * L) / nb, max = Math.max.apply(null, counts.concat([1]));
+    for (var i = 0; i < nb; i++) {
+      var h = (H - B - T) * counts[i] / max, x = L + i * bw;
+      mk(svg, 'rect', { x: x + 3, y: H - B - h, width: bw - 6, height: h, fill: i >= hiFrom ? 'var(--acc)' : 'var(--two)', rx: 2 });
+      mk(svg, 'text', { x: x + bw / 2, y: H - B + 20, 'text-anchor': 'middle', 'font-size': 15 }, labels[i]);
+      if (counts[i] > 0) mk(svg, 'text', { x: x + bw / 2, y: H - B - h - 6, 'text-anchor': 'middle', 'font-size': 13 }, String(counts[i]));
+    }
+    mk(svg, 'line', { x1: L, y1: H - B, x2: W - L, y2: H - B, stroke: 'var(--ink)', 'stroke-width': 2 });
+  }
+  var hist = $('rnHist');
+  function emptyHist() { drawHist(hist, ['2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12+'], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 4); mk(hist, 'text', { x: 200, y: 90, 'text-anchor': 'middle', 'font-size': 15 }, 'Clique sur « 1 000 séries »'); }
+  $('rnOne').addEventListener('click', function () {
+    var a = flips(100), r = runInfo(a);
+    $('rnCoins').innerHTML = a.map(function (c, i) { return '<span class="coin ' + c + (i >= r.start && i < r.start + r.best ? ' run' : '') + '">' + c + '</span>'; }).join('');
+    var nP = a.filter(function (c) { return c === 'P'; }).length;
+    $('rnMsg').innerHTML = nP + ' pile et ' + (100 - nP) + ' face. Plus longue série : <strong>' + r.best + ' « ' + (a[r.start] === 'P' ? 'pile' : 'face') + ' » de suite</strong> (surlignée).';
+  });
+  $('rnMany').addEventListener('click', function () {
+    var c = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], six = 0;
+    for (var s = 0; s < 1000; s++) { var b = longestRun(flips(100)); if (b >= 6) six++; c[Math.min(Math.max(b, 2), 12) - 2]++; }
+    drawHist(hist, ['2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12+'], c, 4);
+    $('rnMsg').innerHTML = 'Sur 1 000 séries de 100 lancers, la plus longue série atteignait au moins 6 dans <strong>' + six + '</strong> cas (' + pc(six / 1000) + '). En rouge : les séries de 6 ou plus.';
+  });
+  emptyHist();
+
+  /* ---------- Deux enfants ---------- */
+  var chCond = 'atLeast';
+  var CH_KEEP = { atLeast: ['kept', 'kept', 'kept', 'out'], eldest: ['kept', 'kept', 'out', 'out'], seen: ['kept', 'half', 'half', 'out'] };
+  function chDraw() {
+    CH_KEEP[chCond].forEach(function (c, i) { $('ch' + i).className = 'case ' + c; });
+    Array.prototype.forEach.call($('chConds').querySelectorAll('button'), function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-c') === chCond ? 'true' : 'false'); });
+    var e = childrenExact(chCond), txt;
+    if (chCond === 'atLeast') txt = 'On barre seulement GG. Il reste 3 cas aussi probables : FF, FG, GF. Probabilité de deux filles : <strong>1/3</strong> ≈ 33,3 %.';
+    else if (chCond === 'eldest') txt = 'On barre GF et GG. Il reste 2 cas : FF et FG. Probabilité de deux filles : <strong>1/2</strong> = 50 %.';
+    else txt = 'Une famille FF montre toujours une fille ; une famille FG ou GF seulement une fois sur deux (rayures). Poids : 1 pour FF, 1/2 pour FG, 1/2 pour GF. Probabilité de deux filles : 1 ÷ (1 + 1/2 + 1/2) = <strong>1/2</strong>.';
+    $('chExact').innerHTML = txt + ' <span class="soft">(valeur exacte : ' + fracStr(e[0], e[1]) + ')</span>';
+    $('chSimOut').textContent = '';
+  }
+  $('chConds').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (b) { chCond = b.getAttribute('data-c'); chDraw(); } });
+  $('chSim').addEventListener('click', function () {
+    var r = childrenSim(chCond, 1000);
+    $('chSimOut').textContent = 'Sur 1 000 familles au hasard, ' + r.kept + ' correspondent à ce que l\'on sait. Parmi elles, ' + r.ff + ' ont deux filles, soit ' + (r.kept ? pc(r.ff / r.kept) : '—') + '.';
+  });
+  chDraw();
+
+  /* ---------- Test et faux positifs ---------- */
+  var tsK = $('tsK'), tsE = $('tsE'), grid = $('tsGrid'), cells = [], tsLast = null;
+  for (var gi = 0; gi < 1000; gi++) cells.push(mk(grid, 'rect', { x: (gi % 40) * 9 + 0.5, y: Math.floor(gi / 40) * 9 + 0.5, width: 8, height: 8, rx: 1.5 }));
+  var pickMark = mk(grid, 'rect', { width: 14, height: 14, fill: 'none', stroke: 'var(--ink)', 'stroke-width': 2.5, rx: 3, visibility: 'hidden' });
+  function tsDraw() {
+    var k = +tsK.value, e = +tsE.value, r = testCounts(k, e);
+    tsLast = r;
+    $('tsKOut').textContent = k; $('tsEOut').textContent = fmt(e, 1);
+    cells.forEach(function (c, i) {
+      var f, s = 'none';
+      if (i < r.tp) f = 'var(--acc)';
+      else if (i < k) { f = 'var(--acc-soft)'; s = 'var(--acc)'; }
+      else if (i < k + r.fp) f = 'var(--two)';
+      else f = 'var(--line)';
+      c.setAttribute('fill', f); c.setAttribute('stroke', s);
+    });
+    pickMark.setAttribute('visibility', 'hidden'); $('tsPickOut').textContent = '';
+    $('tsTable').innerHTML = '<tr><th></th><th>test positif</th><th>test négatif</th><th>total</th></tr>' +
+      '<tr><th>allergiques</th><td class="best">' + r.tp + '</td><td>' + r.fn + '</td><td>' + k + '</td></tr>' +
+      '<tr><th>pas allergiques</th><td class="best">' + r.fp + '</td><td>' + r.tn + '</td><td>' + (1000 - k) + '</td></tr>' +
+      '<tr><th>total</th><td>' + (r.tp + r.fp) + '</td><td>' + (r.fn + r.tn) + '</td><td>1 000</td></tr>';
+    var ex = 'Calcul exact : ' + fmt(k) + ' × ' + fmt(1 - e / 100, 3) + ' ÷ (' + fmt(k) + ' × ' + fmt(1 - e / 100, 3) + ' + ' + fmt(1000 - k) + ' × ' + fmt(e / 100, 3) + ') ≈ ' + pc(r.ppv) + '.';
+    $('tsMsg').innerHTML = 'Il y a environ <strong>' + (r.tp + r.fp) + '</strong> tests positifs, dont seulement <strong>' + r.tp + '</strong> vrais allergiques. Si ton test est positif, la probabilité d\'être vraiment allergique n\'est que d\'environ <strong>' + pc(r.ppv, 0) + '</strong>. <span class="soft">' + ex + '</span>';
+  }
+  tsK.addEventListener('input', tsDraw); tsE.addEventListener('input', tsDraw);
+  $('tsPick').addEventListener('click', function () {
+    var r = tsLast, npos = r.tp + r.fp;
+    if (!npos) { $('tsPickOut').textContent = 'Personne n\'est positif.'; return; }
+    var j = rint(npos), idx = j < r.tp ? j : +tsK.value + (j - r.tp);
+    pickMark.setAttribute('x', (idx % 40) * 9 - 2.5); pickMark.setAttribute('y', Math.floor(idx / 40) * 9 - 2.5); pickMark.setAttribute('visibility', 'visible');
+    $('tsPickOut').textContent = j < r.tp ? 'Cette personne (entourée) est vraiment allergique : c\'est un vrai positif.' : 'Cette personne (entourée) n\'est PAS allergique : c\'est un faux positif. Ça arrive souvent !';
+  });
+  tsDraw();
+
+  /* ---------- Dés non transitifs ---------- */
+  var dc = { set: '3', mine: 'A', them: 'B' };
+  function dset() { return dc.set === '3' ? DICE3 : DICE4; }
+  function dcBuild() {
+    var S = dset(), keys = Object.keys(S);
+    if (keys.indexOf(dc.mine) < 0) dc.mine = 'A';
+    if (keys.indexOf(dc.them) < 0) dc.them = 'B';
+    $('dcDice').innerHTML = keys.map(function (k) { return '<div class="die"><strong>Dé ' + k + '</strong><div class="faces">' + S[k].map(function (f) { return '<span class="face">' + f + '</span>'; }).join('') + '</div></div>'; }).join('');
+    ['dcMine', 'dcThem'].forEach(function (id) {
+      var row = $(id); while (row.children.length > 1) row.removeChild(row.lastChild);
+      keys.forEach(function (k) { var b = document.createElement('button'); b.type = 'button'; b.textContent = k; b.setAttribute('data-k', k); b.setAttribute('aria-label', (id === 'dcMine' ? 'Ton dé : ' : 'Dé adversaire : ') + k); row.appendChild(b); });
+    });
+    var cyc = keys.map(function (k, i) { var n = keys[(i + 1) % keys.length], d = diceDuel(S[k], S[n]); return k + ' bat ' + n + ' (' + fracStr(d.win, d.total) + ')'; });
+    $('dcCycle').textContent = 'Le cercle : ' + cyc.join(', ') + '. Chaque dé est battu par un autre !';
+    Array.prototype.forEach.call($('dcSets').querySelectorAll('button'), function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-s') === dc.set ? 'true' : 'false'); });
+    dcDraw();
+  }
+  function dcDraw() {
+    var S = dset(), A = S[dc.mine], B = S[dc.them], d = diceDuel(A, B);
+    [['dcMine', dc.mine], ['dcThem', dc.them]].forEach(function (p) { Array.prototype.forEach.call($(p[0]).querySelectorAll('button'), function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-k') === p[1] ? 'true' : 'false'); }); });
+    var h = '<tr><th>toi ↓ / lui →</th>' + B.map(function (f) { return '<th>' + f + '</th>'; }).join('') + '</tr>';
+    A.forEach(function (a) { h += '<tr><th>' + a + '</th>' + B.map(function (b) { return a > b ? '<td class="win">G</td>' : a < b ? '<td class="lose">P</td>' : '<td>=</td>'; }).join('') + '</tr>'; });
+    $('dcTable').innerHTML = h;
+    var verdict = d.win > d.lose ? 'Tu as l\'avantage !' : d.win < d.lose ? 'Ton adversaire a l\'avantage.' : 'C\'est équilibré.';
+    $('dcExact').innerHTML = 'Dé ' + dc.mine + ' contre dé ' + dc.them + ' : tu gagnes dans <strong>' + d.win + ' cas sur 36</strong>, soit ' + fracStr(d.win, d.total) + ' ≈ ' + pc(d.win / d.total) + (d.tie ? ' (et ' + d.tie + ' égalités)' : '') + '. ' + verdict + ' <span class="soft">G = gagné, P = perdu.</span>';
+    $('dcSimOut').textContent = '';
+  }
+  $('dcSets').addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) { dc.set = b.getAttribute('data-s'); dc.mine = 'A'; dc.them = 'B'; dcBuild(); } });
+  $('dcMine').addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) { dc.mine = b.getAttribute('data-k'); dcDraw(); } });
+  $('dcThem').addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) { dc.them = b.getAttribute('data-k'); dcDraw(); } });
+  $('dcOne').addEventListener('click', function () {
+    var S = dset(), a = S[dc.mine][rint(6)], b = S[dc.them][rint(6)];
+    $('dcSimOut').innerHTML = 'Tu fais <strong>' + a + '</strong>, ton adversaire fait <strong>' + b + '</strong> : ' + (a > b ? 'tu gagnes !' : a < b ? 'tu perds.' : 'égalité.');
+  });
+  $('dcMany').addEventListener('click', function () {
+    var S = dset(), w = 0, l = 0;
+    for (var i = 0; i < 1000; i++) { var a = S[dc.mine][rint(6)], b = S[dc.them][rint(6)]; if (a > b) w++; else if (a < b) l++; }
+    $('dcSimOut').innerHTML = 'Sur 1 000 duels : tu en gagnes <strong>' + w + '</strong>, ton adversaire ' + l + (1000 - w - l ? ', égalités : ' + (1000 - w - l) : '') + '. Fréquence de victoire : ' + pc(w / 1000) + '.';
+  });
+  dcBuild();
+
+  /* ---------- Simpson ---------- */
+  var spT = $('spT');
+  function spDraw() {
+    var t = +spT.value, s = simpson(t);
+    $('spTOut').textContent = t;
+    function cell(a, cmp) { if (!a[1]) return '<td>—</td>'; return '<td' + (cmp ? ' class="best"' : '') + '>' + a[0] + '/' + a[1] + ' = ' + pc(a[0] / a[1], 0) + '</td>'; }
+    function better(a, b) { return a[1] && b[1] && a[0] / a[1] > b[0] / b[1]; }
+    $('spTable').innerHTML = '<tr><th></th><th>à 2 points</th><th>à 3 points</th><th>au total</th></tr>' +
+      '<tr><th>Léa</th>' + cell(s.lea2, better(s.lea2, s.tom2)) + cell(s.lea3, better(s.lea3, s.tom3)) + cell(s.leaTot, better(s.leaTot, s.tomTot)) + '</tr>' +
+      '<tr><th>Tom</th>' + cell(s.tom2, better(s.tom2, s.lea2)) + cell(s.tom3, better(s.tom3, s.lea3)) + cell(s.tomTot, better(s.tomTot, s.leaTot)) + '</tr>';
+    var lt = s.leaTot[0], tt = s.tomTot[0], m;
+    if (lt < tt) m = '<strong>Paradoxe !</strong> Léa réussit mieux que Tom ' + (t < 100 ? 'à 2 points et ' : '') + 'à 3 points, mais au total Tom gagne : ' + tt + ' % contre ' + lt + ' %. C\'est parce que Léa tente beaucoup de tirs difficiles.';
+    else if (lt > tt) m = 'Ici, Léa est meilleure partout, y compris au total (' + lt + ' % contre ' + tt + ' %). Pas de paradoxe : elle ne tente pas assez de tirs à 3 points pour faire baisser son total.';
+    else m = 'Égalité au total : ' + lt + ' % chacun.';
+    $('spMsg').innerHTML = m + ' <span class="soft">Les cases colorées montrent le meilleur de chaque colonne.</span>';
+  }
+  spT.addEventListener('input', spDraw); spDraw();
+
+  /* ---------- Quiz ---------- */
+  function pick(a) { return a[rint(a.length)]; }
+  function rnd(a, b) { return a + rint(b - a + 1); }
+  var QGEN = [
+    function () { var n = pick([3, 4, 5, 10, 100]); return { q: 'Jeu des portes avec ' + n + ' portes : le présentateur ouvre ' + (n - 2) + ' porte' + (n - 2 > 1 ? 's' : '') + ' à chèvre. Probabilité de gagner si tu changes ?', a: (n - 1) / n, kind: 'prob', how: 'Ta porte gagne avec 1/' + n + ' ; changer gagne dans tous les autres cas : ' + (n - 1) + '/' + n + '.' }; },
+    function () { var k = rnd(3, 8); return { q: 'Une pièce équilibrée vient de tomber ' + k + ' fois de suite sur pile. Probabilité d\'avoir face au prochain lancer ?', a: 0.5, kind: 'prob', how: 'La pièce n\'a pas de mémoire : 1/2.' }; },
+    function () { var k = rnd(2, 6), d = Math.pow(2, k); return { q: 'Probabilité d\'obtenir ' + k + ' fois pile en ' + k + ' lancers d\'une pièce ?', a: 1 / d, kind: 'prob', how: '1/2 multiplié ' + k + ' fois : 1/' + d + '.' }; },
+    function () { var n = pick([5, 8, 10, 15, 23, 30, 40]); return { q: 'Combien de paires différentes de personnes peut-on former dans un groupe de ' + n + ' ?', a: pairs(n), kind: 'num', how: n + ' × ' + (n - 1) + ' ÷ 2 = ' + fmt(pairs(n)) + '.' }; },
+    function () { var g = Math.random() < 0.5, at = Math.random() < 0.5, w = g ? 'fille' : 'garçon', ws = g ? 'deux filles' : 'deux garçons'; return at ? { q: 'Une famille a deux enfants. Au moins un des deux est un' + (g ? 'e ' : ' ') + w + '. Probabilité qu\'ils soient ' + ws + ' ?', a: 1 / 3, kind: 'prob', how: 'Il reste 3 cas aussi probables, dont un seul avec ' + ws + ' : 1/3.' } : { q: 'Une famille a deux enfants. L\'aîné' + (g ? 'e' : '') + ' est un' + (g ? 'e ' : ' ') + w + '. Probabilité qu\'ils soient ' + ws + ' ?', a: 0.5, kind: 'prob', how: 'Seul le cadet compte : 1/2.' }; },
+    function () { var k = pick([100, 200, 500]), e = pick([1, 2, 5]); return { q: 'Sur 10 000 personnes, ' + k + ' ont une allergie. Le test se trompe dans ' + e + ' % des cas. Combien de personnes non allergiques auront un test positif ?', a: (10000 - k) * e / 100, kind: 'num', how: (10000 - k) + ' × ' + e + ' ÷ 100 = ' + fmt((10000 - k) * e / 100) + ' faux positifs.' }; },
+    function () {
+      var use3 = Math.random() < 0.5, S = use3 ? DICE3 : DICE4, keys = Object.keys(S), i = rint(keys.length), k = keys[i], n = keys[(i + 1) % keys.length], d = diceDuel(S[k], S[n]);
+      return { q: 'Un dé a les faces ' + S[k].join(', ') + ' ; un autre a les faces ' + S[n].join(', ') + '. Probabilité que le premier fasse plus que le second ?', a: d.win / d.total, kind: 'prob', how: 'Dans le tableau 6 × 6, le premier gagne ' + d.win + ' fois sur 36 : ' + fracStr(d.win, d.total) + '.' };
+    },
+    function () { var t = pick([20, 40, 80, 100]), r = pick([35, 40, 45, 60, 75, 90]), m = t * r / 100; return { q: 'Un joueur réussit ' + m + ' tirs sur ' + t + '. Quel est son pourcentage de réussite (en %) ?', a: r, kind: 'pct', how: m + ' ÷ ' + t + ' = ' + fmt(r / 100) + ' = ' + r + ' %.' }; }
+  ];
+  function showAns(Q) { if (Q.kind === 'prob') { var s = fmt(Q.a, 4), fr = null; for (var d = 1; d <= 100; d++) { var nn = Math.round(Q.a * d); if (Math.abs(nn / d - Q.a) < 1e-12) { fr = fracStr(nn, d); break; } } return (fr || s) + ' ≈ ' + pc(Q.a); } return Q.kind === 'pct' ? fmt(Q.a) + ' %' : fmt(Q.a); }
+  function checkAns(Q, str) {
+    if (Q.kind === 'pct') { var x = parseAnswer(String(str).replace('%', '')); return isNaN(x) ? null : Math.abs(x - Q.a) < 0.06; }
+    var y = parseAnswer(str); if (isNaN(y)) return null;
+    if (Q.kind === 'num') return Math.abs(y - Q.a) < 0.01;
+    return Math.abs(y - Q.a) <= Math.min(0.005, Math.max(0.0005, 0.1 * Q.a));
+  }
+  var quiz = $('quiz'), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ''; done = [];
+    var order = [0, 1, 2, 3, 4, 5, 6, 7];
+    for (var s = order.length - 1; s > 0; s--) { var j = rint(s + 1), tmp = order[s]; order[s] = order[j]; order[j] = tmp; }
+    for (var k = 0; k < 8; k++) {
+      var Q = QGEN[order[k]](), li = document.createElement('li');
+      li.innerHTML = '<span>' + Q.q + '</span><input type="text" id="qa' + k + '" inputmode="decimal" autocomplete="off" aria-label="Ta réponse à la question ' + (k + 1) + '"><button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+      quiz.appendChild(li);
+      (function (k, Q) {
+        function check() {
+          var fb = $('qf' + k), ok = checkAns(Q, $('qa' + k).value);
+          if (ok === null) { fb.className = 'fb'; fb.textContent = 'Écris un nombre, une fraction ou un pourcentage.'; return; }
+          if (ok) { fb.className = 'fb ok'; fb.textContent = 'Bravo, c\'est juste !'; done[k] = true; }
+          else { done[k] = false; fb.className = 'fb no'; fb.innerHTML = 'Pas tout à fait : la réponse est ' + showAns(Q) + '.<span>' + Q.how + '</span>'; }
+          $('score').textContent = done.filter(Boolean).length + ' / 8';
+        }
+        $('qb' + k).addEventListener('click', check);
+        $('qa' + k).addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+      })(k, Q);
+    }
+    $('score').textContent = '0 / 8';
+  }
+  $('newQuiz').addEventListener('click', newQuiz);
+  newQuiz();
+})();
+</script>
+</body>
+</html>

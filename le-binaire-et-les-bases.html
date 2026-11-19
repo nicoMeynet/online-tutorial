@@ -1,0 +1,1069 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Le binaire et les bases</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, encre bleu océan, marge rouge. Ampoules, doigts, cartes magiques : tout se fait en cliquant. */
+:root {
+  --paper: #f5f9fc;
+  --grid: #e1ebf2;
+  --card: #ffffff;
+  --ink: #102331;
+  --ink-soft: #4b6070;
+  --acc: #0369a1;
+  --acc-soft: #dceef9;
+  --two: #b45309;
+  --two-soft: #fdecd3;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #fff0a3;
+  --line: #d3e1ea;
+  --bulb: #fbbf24;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0b141b; --grid: #15212b; --card: #101c25; --ink: #e8f1f7; --ink-soft: #9fb4c3;
+    --acc: #7cc4ee; --acc-soft: #0f2a3d; --two: #f5b25c; --two-soft: #3d2a12;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #253744; --bulb: #facc15;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0b141b; --grid: #15212b; --card: #101c25; --ink: #e8f1f7; --ink-soft: #9fb4c3;
+  --acc: #7cc4ee; --acc-soft: #0f2a3d; --two: #f5b25c; --two-soft: #3d2a12;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #253744; --bulb: #facc15;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+@media (max-width: 420px) { .box { padding: 16px 14px; } }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+.fig svg { width: 100%; height: auto; display: block; }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 6px 12px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+button:disabled { opacity: .45; cursor: default; transform: none; box-shadow: 3px 3px 0 var(--ink); }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+input[type="text"] { font: inherit; font-family: var(--f-mono); font-size: 1.05rem; padding: 8px 10px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; }
+input[type="range"] { width: 100%; accent-color: var(--acc); }
+.param { display: flex; flex-direction: column; gap: 2px; }
+.param label { font-weight: 700; }
+.inputs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 14px; align-items: end; }
+.inputs label { font-weight: 700; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.err { color: var(--red); font-weight: 700; }
+.res { font-family: var(--f-mono); font-size: 1.05rem; overflow-wrap: anywhere; }
+.res b { color: var(--acc); }
+.big { font-family: var(--f-display); font-weight: 800; font-size: 2rem; color: var(--acc); line-height: 1.1; overflow-wrap: anywhere; }
+.scroll { overflow-x: auto; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; color: var(--acc); }
+
+.methods { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.method { border: 1.5px solid var(--line); border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; background: var(--paper); min-width: 0; }
+.method strong { font-family: var(--f-display); }
+.method .m { font-family: var(--f-mono); font-size: .95rem; overflow-wrap: anywhere; }
+.method .m b { color: var(--acc); }
+.steps { max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; }
+
+/* Tableau des places */
+.ptable { border-collapse: separate; border-spacing: 0; font-variant-numeric: tabular-nums; }
+.ptable th, .ptable td { border: 1.5px solid var(--ink); padding: 5px 8px; text-align: center; font-family: var(--f-mono); font-size: .95rem; }
+.ptable th { font-family: var(--f-display); text-align: left; background: var(--paper); white-space: nowrap; font-size: .9rem; }
+.ptable td.on { background: var(--acc-soft); color: var(--acc); font-weight: 700; }
+.ptable.full { width: 100%; }
+.ptable.full td { overflow-wrap: anywhere; }
+
+/* Billes */
+.billes { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; min-height: 40px; padding: 10px; border: 1.5px dashed var(--line); border-radius: 8px; background: var(--paper); }
+.dot { width: 10px; height: 10px; border-radius: 50%; background: var(--acc); display: inline-block; flex: none; }
+.pk { display: inline-flex; flex-wrap: wrap; gap: 3px; padding: 3px; border: 1.5px solid var(--acc); border-radius: 6px; align-items: center; max-width: 100%; }
+.pk.lv2 { border-color: var(--two); }
+.pk.lv0 { border-color: var(--ink-soft); border-width: 2px; }
+
+/* Ampoules */
+.bulbs { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 6px; }
+.bulb { padding: 4px 0 6px; display: flex; flex-direction: column; align-items: center; gap: 2px; box-shadow: 2px 2px 0 var(--ink); min-width: 0; }
+.bulb[aria-pressed="true"] { background: var(--card); color: var(--ink); }
+.bulb svg { width: 100%; max-width: 40px; height: auto; }
+.bulb .glass { fill: var(--paper); stroke: var(--ink); stroke-width: 2; }
+.bulb.on .glass { fill: var(--bulb); }
+.bulb .base { fill: var(--ink-soft); }
+.bulb .bit { font-family: var(--f-mono); font-size: 1.1rem; line-height: 1; }
+.bulb.on .bit { color: var(--acc); }
+.bulb .v { font-family: var(--f-mono); font-size: .72rem; color: var(--ink-soft); font-weight: 400; }
+
+/* Doigts */
+.hands { display: flex; justify-content: center; gap: 14px; }
+.hand { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.hand .row { display: flex; align-items: flex-end; gap: 3px; height: 120px; }
+.finger { width: 24px; height: 34px; padding: 0 0 4px; border-radius: 12px 12px 6px 6px; box-shadow: 2px 2px 0 var(--ink); display: flex; align-items: flex-end; justify-content: center; font-family: var(--f-mono); font-size: .62rem; font-weight: 600; transition: height .15s; }
+.finger[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+.finger.thumb[aria-pressed="true"] { height: 66px; }
+.finger.index[aria-pressed="true"] { height: 100px; }
+.finger.middle[aria-pressed="true"] { height: 114px; }
+.finger.ring[aria-pressed="true"] { height: 102px; }
+.finger.pinky[aria-pressed="true"] { height: 82px; }
+.hand .lbl { font-size: .8rem; color: var(--ink-soft); }
+
+/* Addition posée */
+.addt { border-collapse: collapse; font-family: var(--f-mono); font-size: 1.3rem; margin: 0 auto; font-variant-numeric: tabular-nums; }
+.addt td { width: 1.35em; text-align: center; padding: 1px 0; }
+.addt tr.place td { font-size: .58rem; color: var(--ink-soft); }
+.addt tr.carry td { color: var(--red); font-size: .85rem; font-weight: 700; }
+.addt tr.sum td { border-top: 2px solid var(--ink); color: var(--acc); font-weight: 700; }
+.addt td.cur { background: var(--hl); }
+@media (max-width: 420px) { .addt { font-size: 1.05rem; } }
+
+/* Couleurs */
+.swatch { height: 90px; border-radius: 10px; border: 2px solid var(--ink); display: flex; align-items: center; justify-content: center; }
+.swatch span { background: var(--card); color: var(--ink); font-family: var(--f-mono); font-weight: 700; font-size: 1.3rem; padding: 2px 10px; border-radius: 6px; border: 1.5px solid var(--ink); }
+.chan { display: flex; flex-direction: column; gap: 2px; }
+.chan label { font-weight: 700; display: flex; flex-wrap: wrap; gap: 4px 10px; justify-content: space-between; }
+.chan .m { font-family: var(--f-mono); font-size: .88rem; color: var(--ink-soft); font-weight: 400; }
+#cR { accent-color: #dc2626; } #cG { accent-color: #16a34a; } #cBl { accent-color: #2563eb; }
+
+/* Codes des lettres */
+.ctable { border-collapse: separate; border-spacing: 0; width: 100%; font-family: var(--f-mono); font-size: .95rem; }
+.ctable th, .ctable td { border-bottom: 1.5px solid var(--line); padding: 5px 6px; text-align: center; }
+.ctable th { font-family: var(--f-display); font-size: .85rem; color: var(--ink-soft); }
+.ctable td:first-child { font-weight: 700; color: var(--acc); font-size: 1.1rem; }
+.ctable td.x { color: var(--two); }
+
+/* Tour de magie */
+.mcard { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 4px; padding: 10px; border: 2px solid var(--ink); border-radius: 10px; background: var(--paper); }
+.mcard span { text-align: center; font-family: var(--f-mono); font-size: .95rem; padding: 4px 0; border-radius: 4px; background: var(--card); border: 1px solid var(--line); }
+.mcard span.first { background: var(--acc-soft); color: var(--acc); font-weight: 700; }
+.mini { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
+.mini div { font-family: var(--f-mono); font-size: .78rem; border: 1.5px solid var(--line); border-radius: 8px; padding: 6px 8px; overflow-wrap: anywhere; background: var(--paper); }
+.mini b { color: var(--acc); }
+
+.errs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.errs li { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--paper); }
+.errs .bad { font-family: var(--f-mono); color: var(--red); text-decoration: line-through; overflow-wrap: anywhere; }
+.errs .good { font-family: var(--f-mono); color: var(--ok); font-weight: 600; overflow-wrap: anywhere; }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 110px auto; gap: 10px; align-items: center; }
+.quiz input[type="text"] { font-size: 1rem; padding: 6px 8px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc); }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 120px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); overflow-wrap: anywhere; }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+<!--ticons--><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Tutoriels"><!--/ticons-->
+<style id="tnav-css">
+.tnav-top { display: flex; margin: 0 0 4px; }
+.tnav-home { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font-weight: 700; font-size: .95rem; text-decoration: none; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tnav-home:hover, .tnav-home:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.tnav-bottom { margin-top: 8px; display: flex; flex-direction: column; gap: 12px; }
+.tnav-bottom h2 { margin: 0; }
+.tnav-pn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tnav-pn a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--ink, #222); border-radius: 10px;
+  background: var(--card, #fff); color: var(--ink, #222); text-decoration: none; box-shadow: 3px 3px 0 var(--ink, #222); min-width: 0; }
+.tnav-pn a span { font-size: .85rem; color: var(--ink-soft, #666); }
+.tnav-pn a strong { overflow-wrap: anywhere; }
+.tnav-pn a.next { text-align: right; grid-column: 2; }
+.tnav-bottom .tnav-home { align-self: center; }
+@media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
+</style>
+</head>
+<body>
+<main class="page">
+<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="index.html">← Tous les tutoriels</a></nav><!--/tnav-->
+
+
+  <header class="hero">
+    <span class="eyebrow">Tutoriel de maths · niveau collège · curiosité</span>
+    <h1>Le binaire et les bases</h1>
+    <p class="lead">Pour écrire tous les nombres, nous utilisons dix chiffres. Un ordinateur, lui, se débrouille avec seulement deux : 0 et 1. Comment est-ce possible ? C'est une histoire de paquets.</p>
+    <div class="box fig">
+      <svg viewBox="0 0 400 128" role="img" aria-label="Le nombre 42 écrit en binaire sur huit cases : 00101010, c'est-à-dire 32 + 8 + 2">
+        <g id="heroCells"></g>
+        <text x="200" y="120" text-anchor="middle" font-size="16" font-weight="600">00101010 = 32 + 8 + 2 = 42</text>
+      </svg>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · La base 10</span>
+    <h2>Compter par paquets de dix</h2>
+    <p>Dans 347, les trois chiffres n'ont pas la même valeur. Le 7 compte pour 7 <strong>unités</strong>. Le 4 compte pour 4 <strong>dizaines</strong>, c'est-à-dire 4 paquets de 10. Le 3 compte pour 3 <strong>centaines</strong> : 3 paquets de 100, et 100, c'est un paquet de 10 paquets de 10.</p>
+    <p class="res">347 = 3 × 100 + 4 × 10 + 7 × 1</p>
+    <p>La valeur d'un chiffre dépend de sa <span class="hl">place</span> : c'est la <strong>numération de position</strong>. Chaque place vaut 10 fois celle de droite. On parle de <strong>base 10</strong> (ou base décimale), sans doute parce que nous avons dix doigts.</p>
+    <div class="box">
+      <h3>Range des billes en paquets</h3>
+      <p class="soft">Quand un paquet est plein, on le ferme. Quand on a assez de paquets, on les range dans un plus gros paquet. Change la taille des paquets : c'est changer de base.</p>
+      <div class="param">
+        <label for="bN">Nombre de billes : <span class="mono" id="bNOut">23</span></label>
+        <input id="bN" type="range" min="1" max="60" step="1" value="23">
+      </div>
+      <div class="param">
+        <label for="bB">Taille des paquets (la base) : <span class="mono" id="bBOut">10</span></label>
+        <input id="bB" type="range" min="2" max="10" step="1" value="10">
+      </div>
+      <div class="billes" id="bArea" aria-hidden="true"></div>
+      <p class="res" id="bTxt" aria-live="polite"></p>
+    </div>
+    <div class="note">
+      <span class="note-title">Pourquoi seulement les chiffres 0 à 9 ?</span>
+      <span>Dès qu'on a 10 objets, on ferme un paquet. Il ne reste donc jamais plus de 9 objets à une place. En base b, il faut de même b chiffres : de 0 à b − 1. Et le <strong>0</strong> est essentiel : il dit « aucun paquet de cette taille ». Sans lui, on ne distinguerait pas 37 et 307.</span>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · D'autres bases autour de nous</span>
+    <h2>Tu utilises déjà d'autres bases</h2>
+    <div class="cards">
+      <div class="box"><span class="tag">Base 60</span><strong>Les minutes et les degrés</strong><span class="soft">60 secondes font 1 minute, 60 minutes font 1 heure. Pour les angles aussi : 1 degré = 60 minutes d'angle. C'est un héritage des Babyloniens. 60 se divise par 2, 3, 4, 5, 6, 10, 12, 15, 20 et 30 : pratique pour partager !</span></div>
+      <div class="box"><span class="tag">Base 12 et 24</span><strong>La douzaine et les heures</strong><span class="soft">On achète des œufs à la douzaine. Une horloge fait le tour en 12 heures, une journée dure 2 × 12 = 24 heures. Il y a aussi 12 mois dans une année.</span></div>
+      <div class="box"><span class="tag">Base 20</span><strong>Quatre-vingts</strong><span class="soft">En France, 80 se dit « quatre-vingts » : 4 paquets de 20. À Paris, l'hôpital des Quinze-Vingts a été fondé pour 15 × 20 = 300 personnes aveugles. Les Mayas comptaient aussi en base 20.</span></div>
+    </div>
+    <div class="box">
+      <h3>Convertir des secondes : la base 60 en action</h3>
+      <div class="param">
+        <label for="tSec">Nombre de secondes</label>
+        <input id="tSec" type="text" inputmode="numeric" autocomplete="off" value="4000">
+      </div>
+      <div class="method"><strong>On fait des paquets de 60, puis encore de 60</strong><div class="m steps" id="tSteps"></div></div>
+      <p class="big" id="tOut" aria-live="polite"></p>
+    </div>
+    <div class="box">
+      <h3>Les nombres de 60 à 99 en français</h3>
+      <div class="param">
+        <label for="frN">Nombre : <span class="mono" id="frNOut">97</span></label>
+        <input id="frN" type="range" min="60" max="99" step="1" value="97">
+      </div>
+      <div class="methods" id="frOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Le binaire</span>
+    <h2>Pourquoi les ordinateurs comptent avec 0 et 1</h2>
+    <p>Un ordinateur contient des milliards de minuscules interrupteurs, les <strong>transistors</strong>. Chacun n'a que deux états : <strong>le courant passe</strong> (on note 1) ou <strong>il ne passe pas</strong> (on note 0). C'est beaucoup plus fiable que de reconnaître dix niveaux de courant différents : même s'il y a un peu de bruit électrique, on distingue facilement « allumé » d'« éteint ».</p>
+    <p>On compte donc en <strong>base 2</strong>, le <strong>binaire</strong>, avec des paquets de 2. Les places valent 1, 2, 4, 8, 16, 32, 64, 128… : <span class="hl">chaque place vaut le double de celle de droite</span>. Chaque chiffre 0 ou 1 s'appelle un <strong>bit</strong>.</p>
+    <div class="box">
+      <h3>Huit ampoules</h3>
+      <p class="soft">Clique sur les ampoules pour les allumer. Une ampoule allumée ajoute sa valeur.</p>
+      <div class="bulbs" id="bulbs" role="group" aria-label="Huit ampoules de valeurs 128 à 1"></div>
+      <p class="big" id="bulbNum" aria-live="polite">0</p>
+      <p class="res" id="bulbTxt"></p>
+      <div class="btns">
+        <button type="button" id="bulbPlus">+ 1</button>
+        <button type="button" id="bulbMinus">− 1</button>
+        <button type="button" id="bulbZero">Tout éteindre</button>
+        <button type="button" id="bulbCount">Compter de 0 à 255</button>
+        <button type="button" id="bulbChal">Un défi</button>
+      </div>
+      <p id="bulbMsg" aria-live="polite"></p>
+    </div>
+    <div class="note">
+      <span class="note-title">Ce qu'on remarque</span>
+      <span>Avec 8 ampoules, le plus grand nombre est 128 + 64 + 32 + 16 + 8 + 4 + 2 + 1 = <strong>255</strong>. En comptant 0, cela fait <strong>256</strong> nombres différents. Et quand tu fais + 1 sur 0111, toutes les ampoules allumées de droite s'éteignent et la suivante s'allume : 1000. C'est comme 999 + 1 = 1000 en base 10.</span>
+    </div>
+    <div class="box">
+      <h3>Compter jusqu'à 1 023 sur ses doigts</h3>
+      <p class="soft">Montre tes mains paumes vers toi. Un doigt levé = 1, un doigt baissé = 0. Le pouce droit vaut 1, l'index droit 2, le majeur droit 4… et le pouce gauche 512. Clique sur les doigts.</p>
+      <div class="hands" id="hands"></div>
+      <p class="big" id="fNum" aria-live="polite">0</p>
+      <p class="res" id="fTxt"></p>
+      <div class="btns">
+        <button type="button" id="fPlus">+ 1</button>
+        <button type="button" id="fMinus">− 1</button>
+        <button type="button" id="fZero">Poings fermés</button>
+        <button type="button" id="fCount">Compter tout seul</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · Convertir</span>
+    <h2>Du décimal au binaire, et retour</h2>
+    <p>Pour passer de la base 10 à une autre base, il y a deux méthodes.</p>
+    <p><strong>Les divisions par 2</strong> : on divise par 2, on note le reste (0 ou 1), on recommence avec le quotient jusqu'à arriver à 0. Puis on lit les restes <span class="hl">de bas en haut</span>.</p>
+    <p><strong>Les puissances de 2</strong> : on cherche la plus grande valeur de place (1, 2, 4, 8, 16…) qui rentre dans le nombre, on l'enlève, et on recommence.</p>
+    <p>La <strong>base 16</strong> (l'hexadécimal) a besoin de 16 chiffres : 0 à 9, puis <strong>A = 10, B = 11, C = 12, D = 13, E = 14, F = 15</strong>. Les informaticiens l'adorent : un chiffre hexadécimal remplace exactement 4 bits, car 16 = 2 × 2 × 2 × 2.</p>
+    <div class="box">
+      <h3>Le convertisseur</h3>
+      <div class="param">
+        <label for="cB">Base : <span class="mono" id="cBOut">2</span></label>
+        <input id="cB" type="range" min="2" max="16" step="1" value="2">
+      </div>
+      <div class="btns" id="cQuick" role="group" aria-label="Bases courantes"></div>
+      <div class="inputs">
+        <label for="cDec">En base 10<input id="cDec" type="text" inputmode="numeric" autocomplete="off" value="45"></label>
+        <label for="cBase"><span id="cBaseLbl">En base 2</span><input id="cBase" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" value=""></label>
+      </div>
+      <p class="soft">Écris dans l'une ou l'autre case : l'autre se met à jour.</p>
+      <div id="cOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Additionner</span>
+    <h2>L'addition en binaire</h2>
+    <p>On pose l'addition comme en base 10, en commençant par la droite. La seule différence : on retient dès qu'on atteint <strong>2</strong> (au lieu de 10). Il n'y a que quatre cas à connaître.</p>
+    <div class="cards">
+      <div class="box"><span class="res">0 + 0 = 0</span><span class="soft">J'écris 0.</span></div>
+      <div class="box"><span class="res">0 + 1 = 1</span><span class="soft">J'écris 1.</span></div>
+      <div class="box"><span class="res">1 + 1 = 10</span><span class="soft">Deux s'écrit 10 : j'écris 0 et je retiens 1.</span></div>
+      <div class="box"><span class="res">1 + 1 + 1 = 11</span><span class="soft">Avec la retenue, trois s'écrit 11 : j'écris 1 et je retiens 1.</span></div>
+    </div>
+    <div class="box">
+      <h3>Addition posée, colonne par colonne</h3>
+      <div class="inputs">
+        <label for="aA">Premier nombre (binaire)<input id="aA" type="text" inputmode="numeric" maxlength="10" autocomplete="off" value="1011"></label>
+        <label for="aB">Deuxième nombre (binaire)<input id="aB" type="text" inputmode="numeric" maxlength="10" autocomplete="off" value="111"></label>
+      </div>
+      <div class="scroll"><table class="addt" id="aTable" aria-label="Addition posée"></table></div>
+      <p id="aMsg" aria-live="polite"></p>
+      <div class="btns">
+        <button type="button" id="aNext">Colonne suivante</button>
+        <button type="button" id="aAll">Tout montrer</button>
+        <button type="button" id="aReset">Recommencer</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · Bits et octets</span>
+    <h2>Bits, octets, Ko, Mo, Go</h2>
+    <p>Un <strong>bit</strong> est un seul 0 ou 1. Un paquet de <strong>8 bits</strong> s'appelle un <strong>octet</strong> (en anglais <em>byte</em>). Avec un octet, on écrit 256 valeurs, de 0 à 255 : tes huit ampoules de l'étape 3 forment un octet.</p>
+    <p>Chaque bit de plus <span class="hl">double</span> le nombre de possibilités : avec n bits, on a 2 × 2 × … × 2 (n fois) = 2<sup>n</sup> valeurs.</p>
+    <div class="box">
+      <h3>Combien de valeurs avec n bits ?</h3>
+      <div class="param">
+        <label for="nb">Nombre de bits : <span class="mono" id="nbOut">8</span></label>
+        <input id="nb" type="range" min="1" max="64" step="1" value="8">
+      </div>
+      <p class="res" id="nbRes" aria-live="polite"></p>
+      <p class="soft" id="nbNote"></p>
+    </div>
+    <p>Ensuite viennent les grandes unités. Officiellement, <strong>kilo</strong> veut dire 1 000, comme dans kilomètre. Donc 1 Ko (kilooctet) = 1 000 octets, 1 Mo = 1 000 000 octets, 1 Go = 1 000 000 000 octets. Mais pour un ordinateur, les nombres « ronds » sont les puissances de 2, et 2<sup>10</sup> = <strong>1 024</strong>, presque 1 000. Pendant longtemps, beaucoup de gens ont donc appelé « kilooctet » un paquet de 1 024 octets.</p>
+    <p>Pour arrêter la confusion, on a créé vers la fin des années 1990 des noms à part : le <strong>kibioctet</strong> (Kio) = 1 024 octets, le <strong>mébioctet</strong> (Mio) = 1 024 × 1 024 octets, le <strong>gibioctet</strong> (Gio) = 1 024 × 1 024 × 1 024 octets. Ils sont encore peu utilisés, et certains logiciels écrivent « Go » en comptant des Gio.</p>
+    <div class="box">
+      <h3>Le mystère du disque qui rétrécit</h3>
+      <p class="soft">Tu achètes une clé ou un disque. Le fabricant compte en puissances de 10. L'ordinateur (Windows, par exemple) divise par 1 024. Résultat : il affiche moins !</p>
+      <div class="inputs">
+        <label for="dX">Taille annoncée<input id="dX" type="text" inputmode="decimal" autocomplete="off" value="1"></label>
+        <div class="btns" role="group" aria-label="Unité"><button type="button" id="dGo" aria-pressed="false">Go</button><button type="button" id="dTo" aria-pressed="true">To</button></div>
+      </div>
+      <div class="methods" id="dOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Tout est nombre</span>
+    <h2>Les couleurs et les lettres</h2>
+    <p>Sur un écran, chaque point (pixel) mélange trois lumières : <strong>rouge</strong>, <strong>vert</strong> et <strong>bleu</strong>. Chacune a une intensité de 0 à 255, donc un octet. On écrit souvent la couleur en hexadécimal : 2 chiffres pour le rouge, 2 pour le vert, 2 pour le bleu. Par exemple <span class="mono">#ff8800</span> : rouge à fond (ff = 255), vert à moitié (88 = 136), pas de bleu. C'est un orange.</p>
+    <div class="box">
+      <h3>Le mélangeur de couleurs</h3>
+      <div class="swatch" id="sw"><span id="swHex">#ff8800</span></div>
+      <div class="chan"><label for="cR">Rouge <span class="m" id="cRo"></span></label><input id="cR" type="range" min="0" max="255" step="1" value="255"></div>
+      <div class="chan"><label for="cG">Vert <span class="m" id="cGo"></span></label><input id="cG" type="range" min="0" max="255" step="1" value="136"></div>
+      <div class="chan"><label for="cBl">Bleu <span class="m" id="cBlo"></span></label><input id="cBl" type="range" min="0" max="255" step="1" value="0"></div>
+      <div class="param">
+        <label for="cHex">Ou écris un code hexadécimal</label>
+        <input id="cHex" type="text" autocomplete="off" spellcheck="false" value="#ff8800">
+      </div>
+      <div class="btns" id="cPre" role="group" aria-label="Exemples de couleurs"></div>
+      <p class="soft" id="cMsg" aria-live="polite"></p>
+    </div>
+    <p>Avec 256 nuances pour chacune des trois lumières, on obtient 256 × 256 × 256 = <strong>16 777 216</strong> couleurs, c'est-à-dire 2<sup>24</sup> : 24 bits par pixel.</p>
+    <p>Et le texte ? Chaque lettre reçoit un numéro. Le code <strong>ASCII</strong>, créé dans les années 1960, numérote 128 caractères : A = 65, B = 66… a = 97, l'espace = 32, le chiffre 0 = 48. Aujourd'hui, le système <strong>Unicode</strong> prolonge l'ASCII et numérote presque toutes les écritures du monde, et même les émojis.</p>
+    <div class="box">
+      <h3>Ton mot en nombres</h3>
+      <div class="param">
+        <label for="tIn">Écris un mot</label>
+        <input id="tIn" type="text" maxlength="20" autocomplete="off" spellcheck="false" value="Salut">
+      </div>
+      <div class="scroll"><table class="ctable" id="tTable"></table></div>
+      <p class="soft" id="tNote" aria-live="polite"></p>
+    </div>
+    <div class="box">
+      <h3>Décode le message secret</h3>
+      <p class="soft">Chaque groupe de bits est le code d'une lettre. Change les bits pour écrire autre chose.</p>
+      <input id="dIn" type="text" autocomplete="off" spellcheck="false" aria-label="Message en binaire" value="01000010 01110010 01100001 01110110 01101111">
+      <p class="big" id="dOutTxt" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Un tour de magie</span>
+    <h2>Je devine ton nombre</h2>
+    <p>Pense à un nombre entier entre 1 et 63, dans ta tête. Je vais te montrer six cartes. Pour chacune, dis-moi seulement si ton nombre est dessus.</p>
+    <div class="box">
+      <p id="mHead" class="res">Prêt ? Pense à ton nombre, puis clique sur « Commencer ».</p>
+      <div id="mCard"></div>
+      <div class="btns" id="mBtns">
+        <button type="button" id="mStart">Commencer</button>
+        <button type="button" id="mYes" hidden>Oui, il y est</button>
+        <button type="button" id="mNo" hidden>Non</button>
+      </div>
+      <p id="mOut" aria-live="polite"></p>
+    </div>
+    <details>
+      <summary>Le secret du tour</summary>
+      <div>
+        <span>Chaque carte correspond à une ampoule. Le premier nombre de chaque carte est une valeur de place du binaire : 1, 2, 4, 8, 16 ou 32. La carte « 8 » contient tous les nombres dont l'ampoule 8 est allumée en binaire.</span>
+        <span>Quand tu dis « oui » ou « non », tu me donnes, sans le savoir, l'écriture binaire de ton nombre ! Il suffit alors d'additionner les premiers nombres des cartes où tu as dit oui. Par exemple 42 = 101010 en binaire : il est sur les cartes 32, 8 et 2.</span>
+        <span>Les six cartes en entier :</span>
+        <div class="mini" id="mAll"></div>
+      </div>
+    </details>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Un peu d'histoire</span>
+    <h2>Des Babyloniens aux ordinateurs</h2>
+    <ol class="timeline">
+      <li><span class="when">vers −2000</span><div class="what"><strong>Les Babyloniens</strong><span>En Mésopotamie, les savants comptent en base 60, avec des petits clous et des chevrons gravés dans l'argile. Nos 60 minutes et nos 360 degrés viennent de là.</span></div></li>
+      <li><span class="when">il y a plus de 1 000 ans</span><div class="what"><strong>Les Mayas</strong><span>En Amérique centrale, ils écrivent les nombres en base 20, avec des points, des barres et un signe pour zéro (souvent dessiné comme un coquillage). Ils s'en servent pour leurs calendriers très précis.</span></div></li>
+      <li><span class="when">vers 1700</span><div class="what"><strong>Leibniz</strong><span>Le savant allemand Gottfried Wilhelm Leibniz décrit l'arithmétique binaire, avec seulement 0 et 1, dans un texte écrit en français. Il trouve cette écriture très belle, et la rapproche des figures d'un vieux livre chinois, le Yi King.</span></div></li>
+      <li><span class="when">XIX<sup>e</sup> siècle</span><div class="what"><strong>George Boole</strong><span>Le mathématicien anglais invente une algèbre de la logique, où les valeurs sont seulement « vrai » et « faux » : c'est l'<em>algèbre de Boole</em>.</span></div></li>
+      <li><span class="when">années 1930-1940</span><div class="what"><strong>Claude Shannon</strong><span>L'ingénieur américain montre que des circuits électriques avec des interrupteurs peuvent faire les calculs de Boole. Plus tard, il popularise le mot <strong>bit</strong>, abréviation de <em>binary digit</em> (« chiffre binaire »). D'après lui, le mot aurait été proposé par son collègue John Tukey.</span></div></li>
+    </ol>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · Attention</span>
+    <h2>Les erreurs fréquentes</h2>
+    <div class="box">
+      <ul class="errs">
+        <li><span class="bad">10 en binaire, c'est dix</span><span class="good">10 en binaire, c'est deux</span><span class="soft">1 paquet de 2 et 0 unité. Pour éviter la confusion, on peut écrire 10<sub>2</sub> ou dire « un, zéro ».</span></li>
+        <li><span class="bad">6 = 011 (restes lus de haut en bas)</span><span class="good">6 = 110 (restes lus de bas en haut)</span><span class="soft">Le premier reste trouvé est le chiffre des unités : il va tout à droite.</span></li>
+        <li><span class="bad">1 + 1 = 2 en binaire</span><span class="good">1 + 1 = 10 en binaire</span><span class="soft">Le chiffre 2 n'existe pas en base 2 : on écrit 0 et on retient 1.</span></li>
+        <li><span class="bad">Sur 8 bits, on va jusqu'à 256</span><span class="good">Sur 8 bits, on va de 0 à 255</span><span class="soft">Il y a bien 256 valeurs, mais la première est 0.</span></li>
+        <li><span class="bad">F en hexadécimal vaut 16</span><span class="good">F vaut 15, et 16 s'écrit 10 en hexadécimal</span><span class="soft">Comme en base 10 où le plus grand chiffre est 9, en base 16 le plus grand est F = 15.</span></li>
+        <li><span class="bad">1 Ko = 1 024 octets, toujours</span><span class="good">1 Ko = 1 000 octets ; 1 Kio = 1 024 octets</span><span class="soft">Beaucoup de logiciels mélangent encore les deux : regarde bien quelle unité est utilisée.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Réponds en décimal, en binaire ou en hexadécimal, comme demandé dans la question.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Nouvelles questions</button>
+    </div>
+  </section>
+
+  <!-- 12 -->
+  <section>
+    <span class="eyebrow">Étape 12 · À toi de jouer</span>
+    <h2>Sept exercices</h2>
+    <div class="exos">
+      <details>
+        <summary>Vers le binaire<span class="q">Écris 37 en binaire avec les divisions par 2.</span></summary>
+        <div><span>37 ÷ 2 = 18 reste 1 ; 18 ÷ 2 = 9 reste 0 ; 9 ÷ 2 = 4 reste 1 ; 4 ÷ 2 = 2 reste 0 ; 2 ÷ 2 = 1 reste 0 ; 1 ÷ 2 = 0 reste 1.</span><span>On lit les restes de bas en haut : <strong>100101</strong>. Vérification : 32 + 4 + 1 = 37.</span></div>
+      </details>
+      <details>
+        <summary>Vers le décimal<span class="q">Que vaut 11010 en décimal ?</span></summary>
+        <div><span>Les places valent 16, 8, 4, 2, 1. 11010 = 16 + 8 + 2 = <strong>26</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Addition<span class="q">Calcule 1011 + 110 en binaire.</span></summary>
+        <div><span>Colonne des 1 : 1 + 0 = 1. Colonne des 2 : 1 + 1 = 10, j'écris 0, je retiens 1. Colonne des 4 : 0 + 1 + 1 = 10, j'écris 0, je retiens 1. Colonne des 8 : 1 + 1 = 10, j'écris 0, je retiens 1, que j'écris devant.</span><span>Résultat : <strong>10001</strong>. Vérification : 11 + 6 = 17 = 16 + 1.</span></div>
+      </details>
+      <details>
+        <summary>Hexadécimal<span class="q">Que vaut 7F en décimal ? Et quelle couleur est #00ff00 ?</span></summary>
+        <div><span>7F = 7 × 16 + 15 = 112 + 15 = <strong>127</strong>.</span><span>#00ff00 : pas de rouge, vert à fond (ff = 255), pas de bleu. C'est du <strong>vert</strong> pur.</span></div>
+      </details>
+      <details>
+        <summary>Combien de bits ?<span class="q">Il faut donner un numéro différent à chacun des 1 000 élèves d'un collège. Combien de bits faut-il au minimum ?</span></summary>
+        <div><span>Avec 9 bits : 2<sup>9</sup> = 512 numéros, pas assez. Avec 10 bits : 2<sup>10</sup> = 1 024 numéros, c'est suffisant. Il faut <strong>10 bits</strong>.</span></div>
+      </details>
+      <details>
+        <summary>La base 60<span class="q">Combien de secondes y a-t-il dans 3 h 25 min 10 s ?</span></summary>
+        <div><span>3 h = 3 × 3 600 = 10 800 s. 25 min = 25 × 60 = 1 500 s. Total : 10 800 + 1 500 + 10 = <strong>12 310 s</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Pour aller plus loin<span class="q">Que se passe-t-il quand on ajoute un 0 à droite d'un nombre binaire, par exemple 101 → 1010 ?</span></summary>
+        <div><span>101 = 5 et 1010 = 10. Chaque chiffre monte d'une place, et chaque place vaut le double : le nombre est <strong>multiplié par 2</strong>. C'est comme ajouter un 0 à droite en base 10, qui multiplie par 10.</span></div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• En <strong>base 10</strong>, chaque place vaut 10 fois celle de droite : 1, 10, 100, 1 000… En <strong>base b</strong>, chaque place vaut b fois celle de droite, et on utilise les chiffres de 0 à b − 1.</span>
+      <span>• En <strong>binaire</strong> (base 2), les places valent 1, 2, 4, 8, 16, 32, 64, 128… On n'utilise que 0 et 1 : courant ou pas de courant.</span>
+      <span>• Décimal → binaire : <strong>divisions par 2</strong>, restes lus de bas en haut ; ou on enlève les plus grandes <strong>puissances de 2</strong>.</span>
+      <span>• En binaire, 1 + 1 = 10 : on retient dès qu'on atteint 2.</span>
+      <span>• 1 octet = 8 bits = 256 valeurs (de 0 à 255). Avec n bits : 2<sup>n</sup> valeurs. 1 Ko = 1 000 octets, 1 Kio = 1 024 octets.</span>
+      <span>• En <strong>hexadécimal</strong> (base 16), A = 10 … F = 15, et un chiffre remplace 4 bits. Les couleurs (#ff8800) et les codes des lettres (A = 65) sont des nombres.</span>
+    </div>
+  </section>
+
+  <!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"><a class="prev" href="la-cryptographie.html"><span>← Précédent</span><strong>La cryptographie</strong></a><a class="next" href="les-paradoxes-de-probabilite.html"><span>Suivant →</span><strong>Les paradoxes de probabilité</strong></a></div><a class="tnav-home" href="index.html">⌂ Tous les tutoriels</a></nav><!--/tnav-->
+<footer>Fiche de révision · Le binaire et les bases</footer>
+</main>
+
+<script>
+(function () {
+  /* Test hooks (window.__bin) :
+     toBase(n, b)        -> string : n (entier ≥ 0) écrit en base b (2 à 16), chiffres 0-9 puis A-F ; toBase(45, 2) = '101101', toBase(255, 16) = 'FF' ; '' si entrée invalide
+     fromBase(s, b)      -> number : valeur de s écrit en base b (majuscules ou minuscules) ; NaN si vide ou chiffre interdit ; fromBase('2a', 16) = 42
+     divSteps(n, b)      -> [{ n, q, r }] : divisions successives n = q × b + r, jusqu'à q = 0 (n = 0 donne [{ n: 0, q: 0, r: 0 }])
+     powerSum(n, b)      -> [{ digit, power, place, value }] : chiffres de n en base b, du plus fort au plus faible, place = b^power, value = digit × place
+     hexGroups(n)        -> [{ bits, hex }] : écriture binaire coupée en paquets de 4 bits (complétée à gauche), chaque paquet = 1 chiffre hexa
+     addBin(a, b)        -> { a, b, sum, steps: [{ pos, a, b, cin, total, digit, cout }], carry } | null : addition posée de deux chaînes binaires (a, b complétées par des 0)
+     secToTime(t)        -> { d, h, m, s, m0, h0 } : t secondes = d jours h heures m minutes s secondes (m0 = minutes totales, h0 = heures totales)
+     frNumber(n)         -> { fr, ch, decomp } | null : n de 60 à 99 en français de France (fr), de Suisse romande (ch), et sa décomposition
+     combos(n)           -> BigInt : 2^n, nombre de valeurs possibles avec n bits
+     toGiB(x, unit)      -> number : x Go (unit 'Go') ou x To (unit 'To') annoncés, exprimés en Gio (÷ 1 024³)
+     rgbToHex(r, g, b)   -> '#rrggbb' (minuscules) ; hexToRgb(s) -> [r, g, b] | null (accepte rgb, #rgb, rrggbb, #rrggbb)
+     textToCodes(str)    -> [{ ch, code, bin, hex, ascii }] (bin sur au moins 8 bits) ; binToText(s) -> string | null (groupes de 1 à 21 bits séparés par des espaces)
+     magicCards()        -> 6 tableaux : la carte k contient les nombres de 1 à 63 dont le bit de valeur 2^k vaut 1 (32 nombres chacune)
+     magicGuess(yes)     -> number : yes = 6 booléens (yes[k] : le nombre est sur la carte k) -> somme des 2^k
+     fingers(n)          -> 10 booléens (doigt de valeur 512 en premier, 1 en dernier) pour n de 0 à 1 023
+  */
+  var DIG = '0123456789ABCDEF';
+  function $(id) { return document.getElementById(id); }
+  function fmt(x, d) { var r = Number.isInteger(x) ? x : Math.round(x * 1e6) / 1e6; if (Object.is(r, -0)) r = 0; return r.toLocaleString('fr-FR', { maximumFractionDigits: d == null ? 3 : d }).replace('-', '−'); }
+  function num(s) { var t = String(s).replace(/\s/g, '').replace(/[−–]/g, '-').replace(',', '.'); if (t === '') return NaN; var x = Number(t); return isFinite(x) ? x : NaN; }
+  function intOf(s) { var t = String(s).replace(/\s/g, ''); if (!/^\d+$/.test(t)) return NaN; return Number(t); }
+  function pl(n, one, many) { return n > 1 ? many : one; }
+  function rnd(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+  function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  function pad(s, n) { while (s.length < n) s = '0' + s; return s; }
+
+  /* ---------- Maths ---------- */
+  function toBase(n, b) {
+    if (typeof n !== 'number' || !isFinite(n) || n < 0 || n % 1 !== 0 || b < 2 || b > 16 || b % 1 !== 0) return '';
+    if (n === 0) return '0';
+    var s = '';
+    while (n > 0) { s = DIG[n % b] + s; n = Math.floor(n / b); }
+    return s;
+  }
+  function fromBase(s, b) {
+    var t = String(s).replace(/\s/g, '').toUpperCase();
+    if (t === '' || b < 2 || b > 16) return NaN;
+    var v = 0;
+    for (var i = 0; i < t.length; i++) { var d = DIG.indexOf(t[i]); if (d < 0 || d >= b) return NaN; v = v * b + d; }
+    return v;
+  }
+  function divSteps(n, b) {
+    if (n === 0) return [{ n: 0, q: 0, r: 0 }];
+    var st = [];
+    while (n > 0) { st.push({ n: n, q: Math.floor(n / b), r: n % b }); n = Math.floor(n / b); }
+    return st;
+  }
+  function powerSum(n, b) {
+    var s = toBase(n, b), L = s.length, out = [];
+    for (var i = 0; i < L; i++) { var k = L - 1 - i, d = DIG.indexOf(s[i]), p = Math.pow(b, k); out.push({ digit: d, power: k, place: p, value: d * p }); }
+    return out;
+  }
+  function hexGroups(n) {
+    var s = toBase(n, 2); if (s === '') return [];
+    s = pad(s, Math.ceil(s.length / 4) * 4);
+    var g = [];
+    for (var i = 0; i < s.length; i += 4) { var q = s.substr(i, 4); g.push({ bits: q, hex: DIG[parseInt(q, 2)] }); }
+    return g;
+  }
+  function addBin(a, b) {
+    a = String(a).replace(/\s/g, ''); b = String(b).replace(/\s/g, '');
+    if (!/^[01]+$/.test(a) || !/^[01]+$/.test(b)) return null;
+    var L = Math.max(a.length, b.length); a = pad(a, L); b = pad(b, L);
+    var c = 0, s = '', steps = [];
+    for (var i = L - 1; i >= 0; i--) {
+      var x = +a[i], y = +b[i], t = x + y + c;
+      steps.push({ pos: L - 1 - i, a: x, b: y, cin: c, total: t, digit: t % 2, cout: t >> 1 });
+      s = (t % 2) + s; c = t >> 1;
+    }
+    if (c) s = '1' + s;
+    return { a: a, b: b, sum: s, steps: steps, carry: c };
+  }
+  function secToTime(t) {
+    t = Math.floor(t);
+    var s = t % 60, m0 = Math.floor(t / 60), m = m0 % 60, h0 = Math.floor(m0 / 60), h = h0 % 24, d = Math.floor(h0 / 24);
+    return { d: d, h: h, m: m, s: s, m0: m0, h0: h0 };
+  }
+  var W = ['zéro', 'un', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf', 'dix', 'onze', 'douze', 'treize', 'quatorze', 'quinze', 'seize', 'dix-sept', 'dix-huit', 'dix-neuf'];
+  function frNumber(n) {
+    if (typeof n !== 'number' || n < 60 || n > 99 || n % 1 !== 0) return null;
+    var fr, dec, r;
+    if (n < 80) { r = n - 60; fr = r === 0 ? 'soixante' : (r === 1 || r === 11) ? 'soixante et ' + W[r] : 'soixante-' + W[r]; dec = r === 0 ? '60' : '60 + ' + r; }
+    else { r = n - 80; fr = r === 0 ? 'quatre-vingts' : 'quatre-vingt-' + W[r]; dec = r === 0 ? '4 × 20' : '4 × 20 + ' + r; }
+    var T = { 6: 'soixante', 7: 'septante', 8: 'huitante', 9: 'nonante' }, t = Math.floor(n / 10), u = n % 10;
+    var ch = u === 0 ? T[t] : u === 1 ? T[t] + ' et un' : T[t] + '-' + W[u];
+    return { fr: fr, ch: ch, decomp: dec };
+  }
+  function combos(n) { return BigInt(2) ** BigInt(n); }
+  function toGiB(x, unit) { return x * (unit === 'To' ? 1e12 : 1e9) / 1073741824; }
+  function rgbToHex(r, g, b) { return '#' + [r, g, b].map(function (v) { return pad(toBase(Math.max(0, Math.min(255, Math.round(v))), 16), 2); }).join('').toLowerCase(); }
+  function hexToRgb(s) {
+    var t = String(s).trim().replace(/^#/, '');
+    if (/^[0-9a-f]{3}$/i.test(t)) t = t.split('').map(function (c) { return c + c; }).join('');
+    if (!/^[0-9a-f]{6}$/i.test(t)) return null;
+    return [0, 2, 4].map(function (i) { return parseInt(t.substr(i, 2), 16); });
+  }
+  function textToCodes(str) {
+    return Array.from(String(str)).map(function (ch) {
+      var c = ch.codePointAt(0);
+      return { ch: ch, code: c, bin: pad(c.toString(2), 8), hex: pad(toBase(c, 16), 2), ascii: c < 128 };
+    });
+  }
+  function binToText(s) {
+    var t = String(s).trim(); if (t === '') return '';
+    var g = t.split(/\s+/), out = '';
+    for (var i = 0; i < g.length; i++) {
+      if (!/^[01]{1,21}$/.test(g[i])) return null;
+      var c = parseInt(g[i], 2); if (c > 0x10FFFF || (c >= 0xD800 && c <= 0xDFFF)) return null;
+      out += String.fromCodePoint(c);
+    }
+    return out;
+  }
+  function magicCards() { var c = []; for (var k = 0; k < 6; k++) { var a = []; for (var n = 1; n < 64; n++) if ((n >> k) & 1) a.push(n); c.push(a); } return c; }
+  function magicGuess(yes) { var s = 0; for (var k = 0; k < 6; k++) if (yes[k]) s += 1 << k; return s; }
+  function fingers(n) { var a = []; for (var i = 9; i >= 0; i--) a.push(((n >> i) & 1) === 1); return a; }
+
+  window.__bin = { toBase: toBase, fromBase: fromBase, divSteps: divSteps, powerSum: powerSum, hexGroups: hexGroups, addBin: addBin, secToTime: secToTime, frNumber: frNumber, combos: combos, toGiB: toGiB, rgbToHex: rgbToHex, hexToRgb: hexToRgb, textToCodes: textToCodes, binToText: binToText, magicCards: magicCards, magicGuess: magicGuess, fingers: fingers };
+
+  /* ---------- Hero ---------- */
+  (function () {
+    var g = $('heroCells'), NS = 'http://www.w3.org/2000/svg', bits = '00101010';
+    function mk(name, attrs, text) { var e = document.createElementNS(NS, name); for (var a in attrs) e.setAttribute(a, attrs[a]); if (text != null) e.textContent = text; g.appendChild(e); return e; }
+    for (var i = 0; i < 8; i++) {
+      var on = bits[i] === '1', x = 10 + i * 48;
+      mk('rect', { x: x, y: 8, width: 44, height: 52, rx: 6, fill: on ? 'var(--acc)' : 'var(--paper)', stroke: 'var(--ink)', 'stroke-width': 2 });
+      mk('text', { x: x + 22, y: 43, 'text-anchor': 'middle', 'font-size': 24, 'font-weight': 700, style: on ? 'fill:var(--card)' : '' }, bits[i]);
+      mk('text', { x: x + 22, y: 84, 'text-anchor': 'middle', 'font-size': 15, style: 'fill:var(--ink-soft)' }, String(128 >> i));
+    }
+  })();
+
+  /* ---------- Billes ---------- */
+  var bN = $('bN'), bB = $('bB');
+  function box(k, b) {
+    if (k === 0) { var d = document.createElement('span'); d.className = 'dot'; return d; }
+    var e = document.createElement('span'); e.className = 'pk lv' + (k % 3);
+    for (var i = 0; i < b; i++) e.appendChild(box(k - 1, b));
+    return e;
+  }
+  function billes() {
+    var n = +bN.value, b = +bB.value, ps = powerSum(n, b), area = $('bArea');
+    $('bNOut').textContent = n; $('bBOut').textContent = b;
+    area.innerHTML = '';
+    ps.forEach(function (p) { for (var i = 0; i < p.digit; i++) area.appendChild(box(p.power, b)); });
+    var parts = ps.map(function (p) { return p.power === 0 ? p.digit + ' ' + pl(p.digit, 'bille seule', 'billes seules') : p.digit + ' ' + pl(p.digit, 'paquet', 'paquets') + ' de ' + fmt(p.place); });
+    $('bTxt').innerHTML = n + ' ' + pl(n, 'bille', 'billes') + ' = ' + parts.join(' + ') + '<br>→ en base ' + b + ', on écrit <b>' + toBase(n, b) + '</b>' + (b === 10 ? ' : c\'est notre écriture habituelle !' : '');
+  }
+  bN.addEventListener('input', billes); bB.addEventListener('input', billes); billes();
+
+  /* ---------- Secondes ---------- */
+  function timeConv() {
+    var t = intOf($('tSec').value), st = $('tSteps'), out = $('tOut');
+    if (isNaN(t) || t > 1e10) { st.innerHTML = '<span class="err">Écris un nombre entier de secondes (positif, pas trop grand).</span>'; out.textContent = ''; return; }
+    var r = secToTime(t), L = [];
+    L.push('<span>' + fmt(t) + ' ÷ 60 = ' + fmt(r.m0) + ' reste <b>' + r.s + '</b> → ' + r.s + ' s</span>');
+    if (r.m0 > 0) L.push('<span>' + fmt(r.m0) + ' ÷ 60 = ' + fmt(r.h0) + ' reste <b>' + r.m + '</b> → ' + r.m + ' min</span>');
+    if (r.h0 >= 24) L.push('<span>' + fmt(r.h0) + ' ÷ 24 = ' + fmt(r.d) + ' reste <b>' + r.h + '</b> → ' + r.h + ' h (et là, ce sont des paquets de 24)</span>');
+    else if (r.h0 > 0) L.push('<span>Il reste ' + r.h0 + ' h.</span>');
+    st.innerHTML = L.join('');
+    var p = [];
+    if (r.d) p.push(fmt(r.d) + ' ' + pl(r.d, 'jour', 'jours'));
+    if (r.d || r.h) p.push(r.h + ' h');
+    if (r.d || r.h || r.m) p.push(r.m + ' min');
+    p.push(r.s + ' s');
+    out.textContent = fmt(t) + ' s = ' + p.join(' ');
+  }
+  $('tSec').addEventListener('input', timeConv); timeConv();
+
+  /* ---------- 60 à 99 ---------- */
+  function frConv() {
+    var n = +$('frN').value, f = frNumber(n);
+    $('frNOut').textContent = n;
+    var extra = n >= 70 && n < 80 ? 'Après soixante, on continue avec dix, onze, douze… jusqu\'à dix-neuf.' : n >= 80 ? 'On compte des paquets de 20 : c\'est une trace de base 20.' : 'Jusqu\'à 69, rien de spécial.';
+    $('frOut').innerHTML = '<div class="method"><strong>En France</strong><span class="m"><b>' + f.fr + '</b></span><span class="m">= ' + f.decomp + ' = ' + n + '</span><span class="soft">' + extra + '</span></div>' +
+      '<div class="method"><strong>En Suisse romande</strong><span class="m"><b>' + f.ch + '</b></span><span class="soft">Septante (70) et nonante (90) se disent aussi en Belgique. Huitante (80) s\'emploie dans plusieurs cantons suisses ; ailleurs, on garde quatre-vingts.</span></div>';
+  }
+  $('frN').addEventListener('input', frConv); frConv();
+
+  /* ---------- Ampoules ---------- */
+  var BULB_SVG = '<svg viewBox="0 0 40 52" aria-hidden="true"><path class="glass" d="M20 3a15 15 0 0 1 9 27c-2 2-3 4-3 7H14c0-3-1-5-3-7A15 15 0 0 1 20 3z"/><rect class="base" x="14" y="39" width="12" height="9" rx="2"/></svg>';
+  var bulbBtns = [], bv = 0, bTimer = null, bTarget = null;
+  for (var i = 0; i < 8; i++) {
+    (function (i) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'bulb'; b.id = 'bulb' + i;
+      b.setAttribute('aria-label', 'Ampoule de valeur ' + (128 >> i));
+      b.innerHTML = BULB_SVG + '<span class="bit">0</span><span class="v">' + (128 >> i) + '</span>';
+      b.addEventListener('click', function () { stopBulbs(); setBulbs(bv ^ (128 >> i)); });
+      $('bulbs').appendChild(b); bulbBtns.push(b);
+    })(i);
+  }
+  function setBulbs(v) {
+    bv = ((v % 256) + 256) % 256;
+    var on = [];
+    for (var i = 0; i < 8; i++) {
+      var w = 128 >> i, lit = (bv & w) !== 0;
+      bulbBtns[i].classList.toggle('on', lit); bulbBtns[i].setAttribute('aria-pressed', lit ? 'true' : 'false');
+      bulbBtns[i].querySelector('.bit').textContent = lit ? '1' : '0';
+      if (lit) on.push(w);
+    }
+    $('bulbNum').textContent = bv;
+    $('bulbTxt').innerHTML = 'En binaire : <b>' + pad(toBase(bv, 2), 8) + '</b><br>' + (on.length ? (on.length > 1 ? on.join(' + ') + ' = ' + bv : bv + ' : une seule ampoule') : 'Tout est éteint : 0');
+    if (bTarget !== null) {
+      $('bulbMsg').innerHTML = bv === bTarget ? '<span style="color:var(--ok);font-weight:700">Bravo ! ' + bTarget + ' s\'écrit ' + pad(toBase(bTarget, 2), 8) + ' en binaire.</span>' : 'Défi : allume les bonnes ampoules pour écrire <b>' + bTarget + '</b>.';
+    }
+  }
+  function stopBulbs() { if (bTimer) { clearInterval(bTimer); bTimer = null; } $('bulbCount').textContent = 'Compter de 0 à 255'; }
+  $('bulbPlus').addEventListener('click', function () { stopBulbs(); setBulbs(bv + 1); });
+  $('bulbMinus').addEventListener('click', function () { stopBulbs(); setBulbs(bv - 1); });
+  $('bulbZero').addEventListener('click', function () { stopBulbs(); setBulbs(0); });
+  $('bulbCount').addEventListener('click', function () {
+    if (bTimer) { stopBulbs(); return; }
+    bTarget = null; $('bulbMsg').textContent = '';
+    setBulbs(0); this.textContent = 'Stop';
+    bTimer = setInterval(function () { if (bv >= 255) { stopBulbs(); return; } setBulbs(bv + 1); }, 300);
+  });
+  $('bulbChal').addEventListener('click', function () { stopBulbs(); var t; do { t = rnd(1, 255); } while (t === bv); bTarget = t; setBulbs(bv); });
+  setBulbs(0);
+
+  /* ---------- Doigts ---------- */
+  var fBtns = [], fv = 0, fTimer = null;
+  var fNames = [['thumb', 'pouce'], ['index', 'index'], ['middle', 'majeur'], ['ring', 'annulaire'], ['pinky', 'auriculaire']];
+  (function () {
+    // valeurs 512 … 1 de gauche à droite ; main gauche : pouce, index, majeur, annulaire, auriculaire ; main droite : l'inverse
+    var order = [0, 1, 2, 3, 4, 4, 3, 2, 1, 0], hands = $('hands');
+    for (var h = 0; h < 2; h++) {
+      var hand = document.createElement('div'); hand.className = 'hand';
+      var row = document.createElement('div'); row.className = 'row';
+      for (var j = 0; j < 5; j++) {
+        (function (idx) {
+          var val = 512 >> idx, nm = fNames[order[idx]];
+          var b = document.createElement('button'); b.type = 'button'; b.className = 'finger ' + nm[0]; b.id = 'finger' + idx;
+          b.setAttribute('aria-label', nm[1] + ' ' + (idx < 5 ? 'gauche' : 'droit') + ', valeur ' + val);
+          b.setAttribute('aria-pressed', 'false'); b.textContent = val;
+          b.addEventListener('click', function () { stopFingers(); setFingers(fv ^ val); });
+          row.appendChild(b); fBtns.push(b);
+        })(h * 5 + j);
+      }
+      var lbl = document.createElement('span'); lbl.className = 'lbl'; lbl.textContent = h === 0 ? 'main gauche' : 'main droite';
+      hand.appendChild(row); hand.appendChild(lbl); hands.appendChild(hand);
+    }
+  })();
+  function setFingers(v) {
+    fv = ((v % 1024) + 1024) % 1024;
+    var f = fingers(fv), on = [];
+    for (var i = 0; i < 10; i++) { fBtns[i].setAttribute('aria-pressed', f[i] ? 'true' : 'false'); if (f[i]) on.push(512 >> i); }
+    $('fNum').textContent = fmt(fv);
+    $('fTxt').innerHTML = 'En binaire : <b>' + pad(toBase(fv, 2), 10) + '</b><br>' + (on.length > 1 ? on.join(' + ') + ' = ' + fmt(fv) : on.length ? fv + ' : un seul doigt levé' : 'Aucun doigt levé : 0') + (fv === 1023 ? '<br>Tous les doigts levés : 1 023, le maximum !' : '');
+  }
+  function stopFingers() { if (fTimer) { clearInterval(fTimer); fTimer = null; } $('fCount').textContent = 'Compter tout seul'; }
+  $('fPlus').addEventListener('click', function () { stopFingers(); setFingers(fv + 1); });
+  $('fMinus').addEventListener('click', function () { stopFingers(); setFingers(fv - 1); });
+  $('fZero').addEventListener('click', function () { stopFingers(); setFingers(0); });
+  $('fCount').addEventListener('click', function () {
+    if (fTimer) { stopFingers(); return; }
+    this.textContent = 'Stop';
+    fTimer = setInterval(function () { if (fv >= 1023) { stopFingers(); return; } setFingers(fv + 1); }, 250);
+  });
+  setFingers(0);
+
+  /* ---------- Convertisseur ---------- */
+  var cDec = $('cDec'), cBase = $('cBase'), cB = $('cB'), cDir = 'dec', MAXC = 999999999999;
+  [2, 8, 10, 16].forEach(function (b) {
+    var e = document.createElement('button'); e.type = 'button'; e.id = 'cq' + b; e.textContent = b === 2 ? 'Binaire (2)' : b === 16 ? 'Hexadécimal (16)' : 'Base ' + b;
+    e.addEventListener('click', function () { cB.value = b; cDir = 'dec'; conv(); });
+    $('cQuick').appendChild(e);
+  });
+  function digitsLabel(b) { return b <= 10 ? '0 à ' + (b - 1) : '0 à 9 et A à ' + DIG[b - 1]; }
+  function conv() {
+    var b = +cB.value, out = $('cOut'), n;
+    $('cBOut').textContent = b; $('cBaseLbl').textContent = 'En base ' + b;
+    [2, 8, 10, 16].forEach(function (q) { $('cq' + q).setAttribute('aria-pressed', q === b ? 'true' : 'false'); });
+    if (cDir === 'dec') {
+      n = intOf(cDec.value);
+      if (isNaN(n)) { out.innerHTML = '<p class="err">Écris un nombre entier positif en base 10.</p>'; cBase.value = ''; return; }
+      if (n > MAXC) { out.innerHTML = '<p class="err">Ce nombre est trop grand pour ce convertisseur (maximum 999 999 999 999).</p>'; cBase.value = ''; return; }
+      cBase.value = toBase(n, b);
+    } else {
+      n = fromBase(cBase.value, b);
+      if (isNaN(n)) { out.innerHTML = '<p class="err">En base ' + b + ', on n\'utilise que les chiffres ' + digitsLabel(b) + '.</p>'; cDec.value = ''; return; }
+      if (n > MAXC) { out.innerHTML = '<p class="err">Ce nombre est trop grand pour ce convertisseur.</p>'; cDec.value = ''; return; }
+      cDec.value = String(n);
+    }
+    var s = toBase(n, b), ds = divSteps(n, b), ps = powerSum(n, b), html = '';
+    var m1 = ds.map(function (st) { return '<span>' + fmt(st.n) + ' ÷ ' + b + ' = ' + fmt(st.q) + ', reste <b>' + DIG[st.r] + '</b>' + (st.r > 9 ? ' (' + st.r + ')' : '') + '</span>'; }).join('');
+    var head = '<tr><th>Valeur de la place</th>' + ps.map(function (p) { return '<td>' + fmt(p.place) + '</td>'; }).join('') + '</tr>';
+    var row = '<tr><th>Chiffre</th>' + ps.map(function (p) { return '<td class="' + (p.digit ? 'on' : '') + '">' + DIG[p.digit] + '</td>'; }).join('') + '</tr>';
+    var nz = ps.filter(function (p) { return p.digit > 0; }), sum;
+    if (n === 0) sum = '0 s\'écrit 0 dans toutes les bases.';
+    else if (b === 2) sum = nz.map(function (p) { return fmt(p.place); }).join(' + ') + ' = <b>' + fmt(n) + '</b>';
+    else sum = nz.map(function (p) { return p.digit + ' × ' + fmt(p.place); }).join(' + ') + ' = <b>' + fmt(n) + '</b>';
+    var letters = b > 10 && /[A-F]/.test(s) ? '<span class="soft">Rappel : ' + s.split('').filter(function (c, i, a) { return /[A-F]/.test(c) && a.indexOf(c) === i; }).map(function (c) { return c + ' = ' + DIG.indexOf(c); }).join(', ') + '.</span>' : '';
+    html += '<p class="big">' + fmt(n) + ' = ' + s + '<sub style="font-size:.5em">' + b + '</sub></p>';
+    html += '<div class="methods">';
+    html += '<div class="method"><strong>Méthode 1 : les divisions par ' + b + '</strong><div class="m steps">' + m1 + '</div><span class="m">On lit les restes de bas en haut : <b>' + s + '</b></span></div>';
+    html += '<div class="method"><strong>Méthode 2 : les valeurs des places</strong><div class="scroll"><table class="ptable">' + head + row + '</table></div><span class="m">' + sum + '</span>' + letters + '</div>';
+    if (b === 16 && n > 0) {
+      var g = hexGroups(n);
+      html += '<div class="method"><strong>L\'astuce : paquets de 4 bits</strong><span class="m">En binaire : ' + toBase(n, 2) + '</span><span class="m">' + g.map(function (q) { return q.bits + ' → <b>' + q.hex + '</b>'; }).join(' · ') + '</span><span class="soft">Chaque paquet de 4 bits (de 0000 à 1111, soit 0 à 15) donne un chiffre hexadécimal.</span></div>';
+    }
+    html += '</div>';
+    out.innerHTML = html;
+  }
+  cDec.addEventListener('input', function () { cDir = 'dec'; conv(); });
+  cBase.addEventListener('input', function () { cDir = 'base'; conv(); });
+  cB.addEventListener('input', function () { cDir = 'dec'; conv(); });
+  conv();
+
+  /* ---------- Addition ---------- */
+  var aA = $('aA'), aB = $('aB'), aS = null, aK = 0, aOA = '', aOB = '';
+  function addInit() {
+    aOA = aA.value.replace(/\s/g, ''); aOB = aB.value.replace(/\s/g, '');
+    aS = addBin(aOA, aOB); aK = 0;
+    if (!aS) { $('aTable').innerHTML = ''; $('aMsg').innerHTML = '<span class="err">Écris deux nombres binaires : seulement des 0 et des 1.</span>'; $('aNext').disabled = true; $('aAll').disabled = true; return; }
+    addDraw();
+  }
+  function addDraw() {
+    var S = aS, L = S.a.length, Wd = L + 1, done = aK === L, rows = { place: '', carry: '', a: '', b: '', sum: '' };
+    for (var j = Wd - 1; j >= 0; j--) {
+      var cur = (j === aK - 1) || (done && S.carry && j === L) ? ' class="cur"' : '';
+      rows.place += '<td>' + (j < L || S.carry ? (1 << j) : '') + '</td>';
+      rows.carry += '<td>' + (j >= 1 && j - 1 < aK && S.steps[j - 1].cout ? '1' : '') + '</td>';
+      rows.a += '<td' + cur + '>' + (j < aOA.length ? aOA[aOA.length - 1 - j] : '') + '</td>';
+      rows.b += '<td' + cur + '>' + (j < aOB.length ? aOB[aOB.length - 1 - j] : '') + '</td>';
+      rows.sum += '<td' + cur + '>' + (j < aK ? S.steps[j].digit : (j === L && done && S.carry ? '1' : '')) + '</td>';
+    }
+    $('aTable').innerHTML = '<tr class="place"><td></td>' + rows.place + '</tr><tr class="carry"><td></td>' + rows.carry + '</tr><tr><td></td>' + rows.a + '</tr><tr><td>+</td>' + rows.b + '</tr><tr class="sum"><td></td>' + rows.sum + '</tr>';
+    var msg;
+    if (aK === 0) msg = 'On commence par la colonne de droite, celle des 1. Clique sur « Colonne suivante ».';
+    else {
+      var st = S.steps[aK - 1];
+      msg = 'Colonne des ' + (1 << st.pos) + ' : ' + st.a + ' + ' + st.b + (st.cin ? ' + 1 (la retenue)' : '') + ' = ' + st.total;
+      msg += st.total === 0 ? ' → j\'écris 0.' : st.total === 1 ? ' → j\'écris 1.' : st.total === 2 ? ', qui s\'écrit 10 en binaire → j\'écris 0 et je retiens 1.' : ', qui s\'écrit 11 en binaire → j\'écris 1 et je retiens 1.';
+      if (done) {
+        var x = parseInt(S.a, 2), y = parseInt(S.b, 2);
+        msg += (S.carry ? ' Il reste une retenue : on l\'écrit tout à gauche.' : '') + '<br><strong>Résultat : ' + S.sum + '</strong>. Vérification en base 10 : ' + x + ' + ' + y + ' = ' + (x + y) + ', et ' + S.sum + ' vaut bien ' + parseInt(S.sum, 2) + '.';
+      }
+    }
+    $('aMsg').innerHTML = msg;
+    $('aNext').disabled = done; $('aAll').disabled = done;
+  }
+  aA.addEventListener('input', addInit); aB.addEventListener('input', addInit);
+  $('aNext').addEventListener('click', function () { if (aS && aK < aS.a.length) { aK++; addDraw(); } });
+  $('aAll').addEventListener('click', function () { if (aS) { aK = aS.a.length; addDraw(); } });
+  $('aReset').addEventListener('click', function () { if (aS) { aK = 0; addDraw(); } });
+  addInit();
+
+  /* ---------- Bits ---------- */
+  var nbNotes = { 1: 'Un seul interrupteur : allumé ou éteint.', 2: '00, 01, 10, 11 : quatre possibilités.', 4: 'Un chiffre hexadécimal, de 0 à F.', 7: 'Le code ASCII des lettres tient sur 7 bits : 128 caractères.', 8: 'Un octet : par exemple l\'intensité du rouge d\'un pixel.', 10: 'Tes dix doigts : de 0 à 1 023.', 16: 'Deux octets.', 24: 'Une couleur d\'écran : 8 bits de rouge, 8 de vert, 8 de bleu.', 32: 'Environ 4,3 milliards : le nombre d\'adresses de l\'ancien système d\'adresses d\'Internet (IPv4).', 64: 'Les ordinateurs d\'aujourd\'hui calculent souvent avec des nombres de 64 bits.' };
+  function bitsConv() {
+    var n = +$('nb').value, c = combos(n);
+    $('nbOut').textContent = n;
+    $('nbRes').innerHTML = '2<sup>' + n + '</sup> = <b>' + c.toLocaleString('fr-FR') + '</b> valeurs, de 0 à ' + (c - BigInt(1)).toLocaleString('fr-FR');
+    $('nbNote').textContent = nbNotes[n] || 'Un bit de plus, et le nombre de valeurs double.';
+  }
+  $('nb').addEventListener('input', bitsConv); bitsConv();
+
+  var dUnit = 'To';
+  function diskConv() {
+    var x = num($('dX').value), out = $('dOut');
+    $('dGo').setAttribute('aria-pressed', dUnit === 'Go' ? 'true' : 'false'); $('dTo').setAttribute('aria-pressed', dUnit === 'To' ? 'true' : 'false');
+    if (isNaN(x) || x <= 0) { out.innerHTML = '<p class="err">Écris une taille positive.</p>'; return; }
+    var bytes = x * (dUnit === 'To' ? 1e12 : 1e9), g = toGiB(x, dUnit), loss = (1 - 1e9 / 1073741824) * 100;
+    out.innerHTML = '<div class="method"><strong>Le fabricant</strong><span class="m">' + fmt(x) + ' ' + dUnit + ' = ' + fmt(x) + ' × ' + (dUnit === 'To' ? '1 000 000 000 000' : '1 000 000 000') + '</span><span class="m">= <b>' + fmt(bytes) + '</b> octets</span></div>' +
+      '<div class="method"><strong>L\'ordinateur</strong><span class="m">' + fmt(bytes) + ' ÷ 1 073 741 824</span><span class="m">≈ <b>' + fmt(g, 2) + ' Gio</b></span><span class="soft">Il affiche souvent « ' + fmt(g, 0) + ' Go » : en réalité, ce sont des Gio.</span></div>' +
+      '<div class="method"><strong>Conclusion</strong><span class="soft">Rien n\'a disparu : c\'est la même quantité d\'octets, comptée avec deux unités différentes. Le nombre affiché est environ ' + fmt(loss, 0) + ' % plus petit.</span></div>';
+  }
+  $('dX').addEventListener('input', diskConv);
+  $('dGo').addEventListener('click', function () { dUnit = 'Go'; diskConv(); });
+  $('dTo').addEventListener('click', function () { dUnit = 'To'; diskConv(); });
+  diskConv();
+
+  /* ---------- Couleurs ---------- */
+  var cR = $('cR'), cG = $('cG'), cBl = $('cBl');
+  function chanTxt(v) { var h = pad(toBase(v, 16), 2); return v + ' = ' + Math.floor(v / 16) + ' × 16 + ' + (v % 16) + ' → ' + h + ' · ' + pad(toBase(v, 2), 8); }
+  function colour(fromHex) {
+    var r = +cR.value, g = +cG.value, b = +cBl.value, hex = rgbToHex(r, g, b);
+    $('sw').style.background = hex; $('swHex').textContent = hex;
+    $('cRo').textContent = chanTxt(r); $('cGo').textContent = chanTxt(g); $('cBlo').textContent = chanTxt(b);
+    if (!fromHex) $('cHex').value = hex;
+    $('cMsg').textContent = r === g && g === b ? 'Quand les trois lumières sont égales, on obtient du gris (ou du noir, ou du blanc).' : '';
+  }
+  [cR, cG, cBl].forEach(function (e) { e.addEventListener('input', function () { colour(false); }); });
+  $('cHex').addEventListener('input', function () {
+    var v = hexToRgb(this.value);
+    if (!v) { $('cMsg').innerHTML = '<span class="err">Un code couleur a 6 chiffres hexadécimaux (0 à 9, a à f), par exemple #ff8800.</span>'; return; }
+    cR.value = v[0]; cG.value = v[1]; cBl.value = v[2]; colour(true);
+  });
+  [['Orange', '#ff8800'], ['Rouge', '#ff0000'], ['Noir', '#000000'], ['Blanc', '#ffffff'], ['Gris', '#808080'], ['Bleu océan', '#0369a1']].forEach(function (p) {
+    var e = document.createElement('button'); e.type = 'button'; e.textContent = p[0];
+    e.addEventListener('click', function () { var v = hexToRgb(p[1]); cR.value = v[0]; cG.value = v[1]; cBl.value = v[2]; colour(false); });
+    $('cPre').appendChild(e);
+  });
+  colour(false);
+
+  /* ---------- Texte ---------- */
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  function textConv() {
+    var codes = textToCodes($('tIn').value), tb = $('tTable'), note = $('tNote');
+    if (!codes.length) { tb.innerHTML = ''; note.textContent = 'Écris au moins une lettre.'; return; }
+    tb.innerHTML = '<tr><th>Caractère</th><th>Code</th><th>Binaire</th><th>Hexa</th></tr>' + codes.map(function (c) {
+      return '<tr><td>' + (c.ch === ' ' ? '␣' : esc(c.ch)) + '</td><td class="' + (c.ascii ? '' : 'x') + '">' + fmt(c.code) + '</td><td>' + c.bin + '</td><td>' + c.hex + '</td></tr>';
+    }).join('');
+    var all = codes.every(function (c) { return c.ascii; });
+    note.textContent = all ? codes.length + ' ' + pl(codes.length, 'caractère', 'caractères') + ' → ' + codes.length + ' ' + pl(codes.length, 'octet', 'octets') + ', soit ' + (8 * codes.length) + ' bits.'
+      : 'Les codes en orange ne sont pas dans l\'ASCII (qui s\'arrête à 127) : ce sont des codes Unicode. Dans un fichier, une lettre comme é prend alors souvent 2 octets.';
+  }
+  $('tIn').addEventListener('input', textConv); textConv();
+  function decodeConv() {
+    var t = binToText($('dIn').value), o = $('dOutTxt');
+    if (t === null) { o.innerHTML = '<span class="err" style="font-size:1rem">Écris des groupes de 0 et de 1 séparés par des espaces.</span>'; return; }
+    o.textContent = t === '' ? '…' : t.replace(/[\u0000-\u001f\u007f]/g, '·');
+  }
+  $('dIn').addEventListener('input', decodeConv); decodeConv();
+
+  /* ---------- Tour de magie ---------- */
+  var CARDS = magicCards(), mOrder = [], mStep = 0, mYes = [];
+  $('mAll').innerHTML = CARDS.map(function (c) { return '<div><b>Carte ' + c[0] + '</b> : ' + c.join(' ') + '</div>'; }).join('');
+  function mShow() {
+    var k = mOrder[mStep];
+    $('mHead').textContent = 'Carte ' + (mStep + 1) + ' sur 6 : ton nombre est-il sur cette carte ?';
+    $('mCard').innerHTML = '<div class="mcard">' + CARDS[k].map(function (n, i) { return '<span class="' + (i === 0 ? 'first' : '') + '">' + n + '</span>'; }).join('') + '</div>';
+  }
+  function mAnswer(yes) {
+    mYes[mOrder[mStep]] = yes; mStep++;
+    if (mStep < 6) { mShow(); return; }
+    var n = magicGuess(mYes), firsts = [];
+    for (var k = 0; k < 6; k++) if (mYes[k]) firsts.push(1 << k);
+    $('mCard').innerHTML = ''; $('mYes').hidden = true; $('mNo').hidden = true; $('mStart').hidden = false; $('mStart').textContent = 'Rejouer';
+    if (n === 0) { $('mHead').textContent = 'Tu as répondu non à toutes les cartes…'; $('mOut').textContent = 'Ton nombre n\'était pas entre 1 et 63 ? Recommence !'; return; }
+    $('mHead').innerHTML = 'Ton nombre est… <span class="big">' + n + '</span>';
+    $('mOut').textContent = 'Tu as dit oui aux cartes qui commencent par ' + firsts.join(', ').replace(/, (\d+)$/, ' et $1') + (firsts.length > 1 ? ' : ' + firsts.join(' + ') + ' = ' + n + '.' : '.') + ' Ouvre « Le secret du tour » pour comprendre.';
+  }
+  $('mStart').addEventListener('click', function () {
+    mOrder = shuffle([0, 1, 2, 3, 4, 5]); mStep = 0; mYes = [false, false, false, false, false, false];
+    this.hidden = true; $('mYes').hidden = false; $('mNo').hidden = false; $('mOut').textContent = '';
+    mShow();
+  });
+  $('mYes').addEventListener('click', function () { mAnswer(true); });
+  $('mNo').addEventListener('click', function () { mAnswer(false); });
+
+  /* ---------- Quiz ---------- */
+  function makeQ(t) {
+    var n, s, a, b;
+    if (t === 0) { n = rnd(9, 255); s = toBase(n, 2); return { q: 'Que vaut le nombre binaire <b class="mono">' + s + '</b> en décimal ?', a: n, kind: 'dec', how: powerSum(n, 2).filter(function (p) { return p.digit; }).map(function (p) { return p.place; }).join(' + ') + ' = ' + n }; }
+    if (t === 1) { n = rnd(9, 63); s = toBase(n, 2); return { q: 'Écris ' + n + ' en binaire.', a: n, kind: 'bin', how: n + ' = ' + powerSum(n, 2).filter(function (p) { return p.digit; }).map(function (p) { return p.place; }).join(' + ') + ' → ' + s }; }
+    if (t === 2) { n = rnd(17, 255); s = toBase(n, 16); return { q: 'Que vaut <b class="mono">' + s + '</b> (hexadécimal) en décimal ?', a: n, kind: 'dec', how: s[0] + (DIG.indexOf(s[0]) > 9 ? ' (= ' + DIG.indexOf(s[0]) + ')' : '') + ' × 16 + ' + s[1] + (DIG.indexOf(s[1]) > 9 ? ' (= ' + DIG.indexOf(s[1]) + ')' : '') + ' = ' + n }; }
+    if (t === 3) { a = rnd(3, 31); b = rnd(3, 31); return { q: 'Calcule en binaire : <b class="mono">' + toBase(a, 2) + ' + ' + toBase(b, 2) + '</b> (réponds en binaire).', a: a + b, kind: 'bin', how: toBase(a, 2) + ' = ' + a + ', ' + toBase(b, 2) + ' = ' + b + ', ' + a + ' + ' + b + ' = ' + (a + b) + ' = ' + toBase(a + b, 2) + ' en binaire' }; }
+    if (t === 4) { n = rnd(2, 10); return { q: 'Combien de nombres différents peut-on écrire avec ' + n + ' bits ?', a: Math.pow(2, n), kind: 'dec', how: '2 multiplié ' + n + ' fois : 2^' + n + ' = ' + fmt(Math.pow(2, n)) + ' (de 0 à ' + fmt(Math.pow(2, n) - 1) + ')' }; }
+    n = rnd(17, 255); s = toBase(n, 16);
+    return { q: 'Écris ' + n + ' en hexadécimal.', a: n, kind: 'hex', how: n + ' = ' + Math.floor(n / 16) + ' × 16 + ' + (n % 16) + ' → ' + s + (n % 16 > 9 || Math.floor(n / 16) > 9 ? ' (A = 10, B = 11, … F = 15)' : '') };
+  }
+  function parseAns(v, kind) {
+    var t = String(v).replace(/\s/g, '').toUpperCase();
+    if (kind === 'dec') return /^\d+$/.test(t) ? Number(t) : NaN;
+    if (kind === 'hex') { t = t.replace(/^#/, '').replace(/^0X/, ''); return /^[0-9A-F]+$/.test(t) ? parseInt(t, 16) : NaN; }
+    return /^[01]+$/.test(t) ? parseInt(t, 2) : NaN;
+  }
+  var KIND_MSG = { dec: 'Écris un nombre entier en base 10.', bin: 'Écris un nombre binaire : seulement des 0 et des 1.', hex: 'Écris un nombre hexadécimal : chiffres 0 à 9 et lettres A à F.' };
+  var quiz = $('quiz'), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ''; done = [];
+    var types = shuffle([0, 1, 2, 3, 4, 5, 0, 1]);
+    for (var k = 0; k < 8; k++) {
+      var Q = makeQ(types[k]), li = document.createElement('li');
+      li.innerHTML = '<span>' + Q.q + '</span><input type="text" id="qa' + k + '" autocomplete="off" spellcheck="false" ' + (Q.kind === 'hex' ? '' : 'inputmode="numeric" ') + 'aria-label="Ta réponse à la question ' + (k + 1) + '"><button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+      quiz.appendChild(li);
+      (function (k, Q) {
+        function check() {
+          var fb = $('qf' + k), x = parseAns($('qa' + k).value, Q.kind);
+          if (isNaN(x)) { fb.className = 'fb'; fb.textContent = KIND_MSG[Q.kind]; return; }
+          if (x === Q.a) { fb.className = 'fb ok'; fb.textContent = 'Bravo, c\'est juste !'; done[k] = true; }
+          else { done[k] = false; fb.className = 'fb no'; fb.innerHTML = 'Pas tout à fait : la réponse est ' + (Q.kind === 'bin' ? toBase(Q.a, 2) : Q.kind === 'hex' ? toBase(Q.a, 16) : fmt(Q.a)) + '.<span>' + Q.how + '</span>'; }
+          $('score').textContent = done.filter(Boolean).length + ' / 8';
+        }
+        $('qb' + k).addEventListener('click', check);
+        $('qa' + k).addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+      })(k, Q);
+    }
+    $('score').textContent = '0 / 8';
+  }
+  $('newQuiz').addEventListener('click', newQuiz);
+  newQuiz();
+})();
+</script>
+</body>
+</html>

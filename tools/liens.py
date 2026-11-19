@@ -16,6 +16,13 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 
 TOPICS = [
+    ("la cryptographie", "la-cryptographie.html"),
+    ("le binaire et les bases", "le-binaire-et-les-bases.html"),
+    ("le binaire", "le-binaire-et-les-bases.html"),
+    ("les paradoxes de probabilité", "les-paradoxes-de-probabilite.html"),
+    ("les fractales", "les-fractales.html"),
+    ("les jeux de stratégie", "les-jeux-de-strategie.html"),
+    ("les maths et la musique", "les-maths-et-la-musique.html"),
     ("la sphère et la boule", "la-sphere-et-la-boule.html"),
     ("la sphère", "la-sphere-et-la-boule.html"),
     ("les droites remarquables", "les-droites-remarquables.html"),
@@ -72,6 +79,11 @@ T = "|".join(re.escape(n) for n, _ in sorted(TOPICS, key=lambda t: -len(t[0]))) 
 MENTION = re.compile(r"(tutoriels? sur )(" + T + r")(?!\w)(\s*\([^)<]*\))?(?:(\s+et sur )(" + T + r")(?!\w))?")
 FILE = dict(TOPICS)
 
+ICONS = ('<!--ticons--><link rel="icon" href="icon.svg" type="image/svg+xml">'
+         '<link rel="apple-touch-icon" href="apple-touch-icon.png">'
+         '<link rel="manifest" href="manifest.webmanifest">'
+         '<meta name="apple-mobile-web-app-title" content="Tutoriels"><!--/ticons-->\n')
+
 CSS = """<style id="tnav-css">
 .tnav-top { display: flex; margin: 0 0 4px; }
 .tnav-home { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--ink, #222); border-radius: 999px;
@@ -118,6 +130,7 @@ def linkify(text, self_name):
 def process(path, order):
     src = path.read_text(encoding="utf-8")
     src = re.sub(r'<style id="tnav-css">.*?</style>\n', "", src, flags=re.S)
+    src = re.sub(r"<!--ticons-->.*?<!--/ticons-->\n", "", src, flags=re.S)
     # exact inverse of the insertions below, so reruns don't add blank lines
     src = re.sub(r'\n<!--tnav--><nav class="tnav-top".*?<!--/tnav-->\n', "", src, flags=re.S)
     src = re.sub(r'<!--tnav--><nav class="tnav-bottom".*?<!--/tnav-->\n', "", src, flags=re.S)
@@ -150,7 +163,7 @@ def process(path, order):
     foot = src.rfind("<footer", 0, end)
     at = foot if foot > src.index('<main class="page">') else end
     src = src[:at] + bottom + src[at:]
-    src = src.replace("</head>", CSS + "</head>", 1)
+    src = src.replace("</head>", ICONS + CSS + "</head>", 1)
     path.write_text(src, encoding="utf-8", newline="\n")
 
 
