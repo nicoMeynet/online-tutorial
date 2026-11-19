@@ -1,0 +1,580 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Le nombre e</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que le tutoriel π, avec une encre verte pour e et une marge rouge. */
+:root {
+  --paper: #f5f9f7;
+  --grid: #dfeae5;
+  --card: #ffffff;
+  --ink: #18302a;
+  --ink-soft: #4b6159;
+  --acc: #0d7a5a;
+  --acc-soft: #d7efe6;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #fff0a3;
+  --line: #cddcd5;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0e1714; --grid: #17241f; --card: #13201b; --ink: #e5f0eb; --ink-soft: #a3b8af;
+    --acc: #5fd3a8; --acc-soft: #173a2e; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #26392f;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0e1714; --grid: #17241f; --card: #13201b; --ink: #e5f0eb; --ink-soft: #a3b8af;
+  --acc: #5fd3a8; --acc-soft: #173a2e; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #26392f;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) {
+  .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; }
+}
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+
+section { display: flex; flex-direction: column; gap: 18px; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero-top { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+.big-e { font-family: var(--f-display); font-weight: 800; color: var(--acc); font-size: clamp(6rem, 22vw, 10rem); line-height: .8; transform: rotate(-4deg); font-style: italic; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+.ticker {
+  overflow: hidden; border-block: 2px solid var(--ink); padding-block: 8px;
+  font-family: var(--f-mono); font-size: 1.05rem; white-space: nowrap;
+  mask-image: linear-gradient(90deg, #000 85%, transparent); -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent);
+}
+.ticker span { display: inline-block; animation: run 60s linear infinite; }
+@keyframes run { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+
+.figure { overflow-x: auto; }
+.figure svg { display: block; width: 100%; height: auto; }
+svg text { font-family: var(--f-mono); fill: var(--ink-soft); }
+
+button {
+  font: inherit; font-family: var(--f-display); font-weight: 700;
+  background: var(--card); color: var(--ink); border: 2px solid var(--ink);
+  border-radius: 8px; padding: 6px 12px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink);
+}
+button.main { background: var(--acc); color: var(--card); }
+button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; }
+
+.results { display: flex; flex-direction: column; gap: 8px; font-variant-numeric: tabular-nums; }
+.res { border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 12px; display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; align-items: baseline; }
+.res-name { font-family: var(--f-display); font-weight: 700; }
+.res-val { font-family: var(--f-mono); font-weight: 600; color: var(--acc); font-size: 1.05rem; white-space: nowrap; }
+.res-val.r { color: var(--red); }
+.res-calc { grid-column: 1 / -1; font-family: var(--f-mono); font-size: .85rem; color: var(--ink-soft); overflow-wrap: anywhere; }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 112px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.timeline .val { font-family: var(--f-mono); color: var(--acc); font-size: .95rem; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.formula { font-family: var(--f-display); font-weight: 800; font-size: 1.6rem; color: var(--acc); overflow-wrap: anywhere; }
+.terms { font-family: var(--f-mono); font-size: .95rem; line-height: 2; overflow-wrap: anywhere; }
+.terms .t { padding: 2px 6px; border-radius: 6px; background: var(--acc-soft); white-space: nowrap; }
+.digits { font-family: var(--f-mono); font-size: 1rem; line-height: 1.9; word-spacing: .3em; overflow-wrap: anywhere; }
+.rep { color: var(--red); font-weight: 600; text-decoration: underline wavy var(--red); text-underline-offset: 4px; }
+.good { color: var(--acc); font-weight: 600; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+
+.poem { display: flex; flex-wrap: wrap; gap: 10px 14px; font-family: var(--f-display); font-size: 1.35rem; font-weight: 700; }
+.poem span { display: inline-flex; flex-direction: column; align-items: center; }
+.poem small { font-family: var(--f-mono); font-size: .85rem; color: var(--red); font-weight: 600; }
+
+input[type="text"] { font: inherit; font-family: var(--f-mono); font-size: 1.1rem; padding: 10px 12px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+
+@media (prefers-reduced-motion: reduce) { .ticker span { animation: none; } }
+</style>
+
+</head>
+<body>
+<main class="page">
+
+  <header class="hero">
+    <div class="hero-top">
+      <div class="big-e" aria-hidden="true">e</div>
+      <div style="display:flex;flex-direction:column;gap:10px;min-width:0;flex:1 1 280px">
+        <span class="eyebrow">Tutoriel de maths · niveau collège</span>
+        <h1>Le nombre e</h1>
+        <p class="lead">Le cousin moins connu de π. On l'a découvert en parlant d'argent, et on le retrouve partout où quelque chose grandit ou diminue.</p>
+      </div>
+    </div>
+    <div class="ticker" aria-label="Les premières décimales de e">
+      <span>2,7182818284590452353602874713526624977572470936999595749669676277240766303535475945713821785251664274 · 2,7182818284590452353602874713526624977572470936999595749669676277240766303535475945713821785251664274 · </span>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · C'est quoi, e ?</span>
+    <h2>Une histoire de banque</h2>
+    <p>Imagine une banque très (trop) généreuse. Tu déposes <strong>100 €</strong> et elle te promet <strong>100 % d'intérêts par an</strong>. Au bout d'un an, elle te rend tes 100 € plus 100 € : tu as <strong>200 €</strong>.</p>
+    <p>Maintenant, tu demandes : « Et si vous me versiez la moitié des intérêts tous les 6 mois ? » Après 6 mois, tu as 150 €. Pour les 6 mois suivants, les intérêts se calculent sur 150 €, pas sur 100 €. Tu finis l'année avec <strong>225 €</strong>. Tu as gagné plus !</p>
+    <p>Alors, si on découpe l'année en morceaux de plus en plus petits (chaque mois, chaque jour, chaque minute…), est-ce qu'on devient infiniment riche ? <span class="hl"><strong>Non !</strong></span> L'argent s'approche d'une limite : <strong>271,83 €</strong>. Et ce nombre magique, 2,71828…, c'est <strong>e</strong>.</p>
+
+    <div class="box">
+      <h3>Essaie : combien de fois par an la banque te paie ?</h3>
+      <div class="btns" id="freqBtns" role="group" aria-label="Nombre de versements par an"></div>
+      <div class="results">
+        <div class="res">
+          <span class="res-name">Ton argent après 1 an</span>
+          <span class="res-val"><span id="moneyOut">225,00</span> €</span>
+          <span class="res-calc">100 × (1 + 1/<span id="nOut1">2</span>)<sup id="nOut2">2</sup></span>
+        </div>
+        <div class="res">
+          <span class="res-name">Le nombre (1 + 1/n)<sup>n</sup></span>
+          <span class="res-val r" id="valOut">2,250000</span>
+          <span class="res-calc">e = 2,718282… : plus n est grand, plus on s'en approche.</span>
+        </div>
+      </div>
+      <div class="figure">
+        <svg id="chart" viewBox="0 0 640 260" role="img" aria-label="Graphique : la valeur de (1 + 1/n) puissance n s'approche de e quand n grandit"></svg>
+      </div>
+      <p class="soft">Même en te payant chaque minute (525 600 fois par an), tu ne dépasses jamais 271,83 €. La ligne pointillée, c'est e.</p>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · D'où vient e ?</span>
+    <h2>De la banque jusqu'à Euler</h2>
+    <p>π est connu depuis 4 000 ans. e est beaucoup plus jeune : il a environ 350 ans. Voici son histoire.</p>
+    <ol class="timeline">
+      <li>
+        <span class="when">1614</span>
+        <div class="what">
+          <strong>John Napier, en Écosse</strong>
+          <span>Il invente les logarithmes, des tables pour faire les multiplications plus vite. Le nombre e s'y cache déjà, mais personne ne le remarque.</span>
+        </div>
+      </li>
+      <li>
+        <span class="when">1683</span>
+        <div class="what">
+          <strong>Jacob Bernoulli, en Suisse</strong>
+          <span>Il se pose exactement la question de la banque de l'étape 1. Il trouve que la réponse est entre 2 et 3. C'est la vraie naissance de e.</span>
+          <span class="val">2 &lt; e &lt; 3</span>
+        </div>
+      </li>
+      <li>
+        <span class="when">1690</span>
+        <div class="what">
+          <strong>Gottfried Leibniz, en Allemagne</strong>
+          <span>Il parle de ce nombre dans ses lettres, mais il l'appelle « b ».</span>
+        </div>
+      </li>
+      <li>
+        <span class="when">1731</span>
+        <div class="what">
+          <strong>Leonhard Euler choisit la lettre e</strong>
+          <span>Le grand mathématicien suisse (le même qui a rendu le symbole π célèbre !) écrit « e » dans une lettre. Le nom reste pour toujours.</span>
+        </div>
+      </li>
+      <li>
+        <span class="when">1737</span>
+        <div class="what">
+          <strong>Euler prouve que e est irrationnel</strong>
+          <span>Ses décimales ne s'arrêtent jamais et ne se répètent jamais en boucle, comme π.</span>
+        </div>
+      </li>
+      <li>
+        <span class="when">1748</span>
+        <div class="what">
+          <strong>Euler calcule 23 décimales, à la main</strong>
+          <span>Avec la « recette des fractions » que tu vas voir à l'étape 3.</span>
+          <span class="val">e ≈ 2,71828182845904523536028</span>
+        </div>
+      </li>
+      <li>
+        <span class="when">Aujourd'hui</span>
+        <div class="what">
+          <strong>Les ordinateurs s'y mettent</strong>
+          <span>On connaît des milliers de milliards de décimales de e.</span>
+        </div>
+      </li>
+    </ol>
+    <div class="note">
+      <span class="note-title">Pourquoi la lettre « e » ?</span>
+      <span>Personne ne le sait vraiment. Peut-être pour « exponentielle ». Peut-être parce que la lettre « a » était déjà prise dans ses calculs. Euler était modeste, donc ce n'est sans doute pas pour son nom… mais aujourd'hui, beaucoup l'appellent quand même « le nombre d'Euler ».</span>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Une autre recette</span>
+    <h2>e en additionnant des fractions</h2>
+    <p>Il existe une deuxième façon de fabriquer e, encore plus jolie. Il faut d'abord connaître la <strong>factorielle</strong>, qu'on écrit avec un point d'exclamation :</p>
+    <div class="note">
+      <span><span class="mono">3! = 3 × 2 × 1 = 6</span></span>
+      <span><span class="mono">4! = 4 × 3 × 2 × 1 = 24</span></span>
+      <span><span class="mono">5! = 5 × 4 × 3 × 2 × 1 = 120</span></span>
+    </div>
+    <p>Et voici la recette : on additionne 1, puis 1 divisé par chaque factorielle.</p>
+    <div class="formula">e = 1 + 1/1! + 1/2! + 1/3! + 1/4! + …</div>
+    <p class="soft">Les fractions deviennent très vite minuscules, donc on s'approche de e très rapidement.</p>
+
+    <div class="box">
+      <h3>Ajoute les fractions une par une</h3>
+      <div class="btns">
+        <button id="addTerm" class="main" type="button">Ajouter une fraction</button>
+        <button id="resetTerms" type="button">Recommencer</button>
+      </div>
+      <p class="terms" id="termsOut"></p>
+      <div class="results">
+        <div class="res">
+          <span class="res-name">Total</span>
+          <span class="res-val" id="sumOut">1</span>
+          <span class="res-calc" id="sumNote">En vert : les chiffres déjà justes.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · Son profil</span>
+    <h2>Irrationnel, comme π</h2>
+    <p>Comme π, e est un nombre <span class="hl"><strong>irrationnel</strong></span> : ses décimales ne s'arrêtent jamais, et elles ne forment jamais un motif qui se répète en boucle. On ne peut donc pas l'écrire exactement avec une fraction.</p>
+
+    <div class="note red">
+      <span class="note-title">Le piège de e</span>
+      <span>Regarde le début : <span class="mono">2,7 <span class="rep">1828</span> <span class="rep">1828</span> 45 90 45…</span> On dirait que « 1828 » se répète ! Mais non : après deux fois, le motif s'arrête. C'est juste une coïncidence. Ça aide bien à retenir le début, par contre.</span>
+    </div>
+
+    <div class="box">
+      <h3>Les 100 premières décimales</h3>
+      <p class="digits">2,<br>7182818284 5904523536 0287471352 6624977572 4709369995<br>9574966967 6277240766 3035354759 4571382178 5251664274</p>
+    </div>
+
+    <div class="cards">
+      <div class="box">
+        <strong>π ≈ 3,14159</strong>
+        <span class="soft">Vient des cercles. Connu depuis 4 000 ans.</span>
+      </div>
+      <div class="box">
+        <strong style="color:var(--acc)">e ≈ 2,71828</strong>
+        <span class="soft">Vient de la croissance. Connu depuis 350 ans.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Où se cache e ?</span>
+    <h2>Partout où ça grandit ou ça diminue</h2>
+    <p>e apparaît chaque fois qu'une chose change <strong>en fonction de sa propre taille</strong>. Plus il y en a, plus ça grandit vite. On appelle ça la croissance <strong>exponentielle</strong>.</p>
+    <div class="cards">
+      <div class="box">
+        <strong>Les bactéries</strong>
+        <span class="soft">Chaque bactérie se divise en deux. Plus il y a de bactéries, plus il en naît. Leur nombre explose.</span>
+      </div>
+      <div class="box">
+        <strong>Le chocolat chaud</strong>
+        <span class="soft">Il refroidit vite au début, puis de plus en plus lentement. Les scientifiques le calculent avec e.</span>
+      </div>
+      <div class="box">
+        <strong>Les fossiles</strong>
+        <span class="soft">Pour savoir l'âge d'un os ancien, on mesure le carbone 14 qui disparaît petit à petit. Encore e !</span>
+      </div>
+      <div class="box">
+        <strong>Le Père Noël secret</strong>
+        <span class="soft">Quand on tire les noms au sort, la chance que personne ne se pioche soi-même est d'environ 1 ÷ e, soit 37 %.</span>
+      </div>
+    </div>
+
+    <div class="box">
+      <h3>Expérience : le Père Noël secret</h3>
+      <p>Avec 10 amis, chacun pioche un nom au hasard. Si quelqu'un tire son propre nom, il faut tout recommencer. Simule 1 000 tirages pour voir combien de fois ça marche du premier coup.</p>
+      <button id="santaBtn" class="main" type="button" style="align-self:flex-start">Faire 1 000 tirages</button>
+      <div class="results">
+        <div class="res">
+          <span class="res-name">Tirages réussis du premier coup</span>
+          <span class="res-val" id="santaOut">—</span>
+          <span class="res-calc" id="santaNote">Clique sur le bouton pour lancer les tirages. Valeur prévue : 1 ÷ e ≈ 36,8 %.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="note">
+      <span class="note-title">La plus belle formule des maths</span>
+      <span>Euler a découvert une formule qui relie e, π, le nombre i (que tu verras au lycée), 1 et 0 :</span>
+      <span class="formula" style="font-size:1.4rem">e<sup>iπ</sup> + 1 = 0</span>
+      <span>Beaucoup de mathématiciens la trouvent magnifique. Tu la comprendras plus tard, mais tu peux déjà la reconnaître !</span>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · À toi de jouer</span>
+    <h2>Quatre petits exercices</h2>
+    <p>Prends une calculatrice. Clique sur un exercice pour voir la réponse quand tu as trouvé.</p>
+    <div class="exos">
+      <details>
+        <summary>La factorielle<span class="q">Combien vaut 6! ?</span></summary>
+        <div>
+          <span>6! = 6 × 5 × 4 × 3 × 2 × 1 = <strong>720</strong>.</span>
+          <span>Astuce : 6! = 6 × 5!, et on sait déjà que 5! = 120. Donc 6 × 120 = 720.</span>
+        </div>
+      </details>
+      <details>
+        <summary>La banque, 4 fois par an<span class="q">Tu places 100 € à 100 % par an, mais la banque te verse un quart des intérêts tous les 3 mois. Combien as-tu après un an ?</span></summary>
+        <div>
+          <span>Tous les 3 mois, ton argent est multiplié par 1 + 1/4 = 1,25.</span>
+          <span>100 × 1,25 × 1,25 × 1,25 × 1,25 ≈ <strong>244,14 €</strong>.</span>
+          <span>C'est plus que 225 € (2 fois par an), mais toujours moins que 271,83 €.</span>
+        </div>
+      </details>
+      <details>
+        <summary>La recette<span class="q">Calcule 1 + 1/1! + 1/2! + 1/3!. Combien de chiffres justes de e as-tu ?</span></summary>
+        <div>
+          <span>1 + 1 + 1/2 + 1/6 = 2 + 0,5 + 0,1667 ≈ <strong>2,667</strong>.</span>
+          <span>Seul le 2 est juste. Il faut ajouter plus de fractions : avec 1/4! et 1/5!, on arrive à 2,7167.</span>
+        </div>
+      </details>
+      <details>
+        <summary>Le piège de 1828<span class="q">Écris les 9 premières décimales de e sans regarder. Indice : 2,7 puis « 1828 » deux fois.</span></summary>
+        <div>
+          <span>e ≈ <strong>2,718281828</strong>.</span>
+          <span>Et la suite, c'est 45, 90, 45 : comme les angles d'un triangle rectangle qui a deux côtés égaux.</span>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- Bonus -->
+  <section>
+    <span class="eyebrow">Bonus · Pour s'en souvenir</span>
+    <h2>Une phrase pour retenir e</h2>
+    <p>Comme pour π, compte les lettres de chaque mot : tu obtiens les premiers chiffres de e.</p>
+    <div class="box">
+      <div class="poem" aria-label="Tu aideras à rappeler ta quantité à beaucoup de docteurs amis : 2,7182818284">
+        <span>Tu<small>2</small></span>
+        <span>aideras<small>7</small></span>
+        <span>à<small>1</small></span>
+        <span>rappeler<small>8</small></span>
+        <span>ta<small>2</small></span>
+        <span>quantité<small>8</small></span>
+        <span>à<small>1</small></span>
+        <span>beaucoup<small>8</small></span>
+        <span>de<small>2</small></span>
+        <span>docteurs<small>8</small></span>
+        <span>amis<small>4</small></span>
+      </div>
+      <p class="mono" style="color:var(--acc);font-weight:600">→ 2,7182818284</p>
+    </div>
+
+    <div class="box">
+      <h3>Et toi, combien en connais-tu ?</h3>
+      <p>Tape les chiffres de e que tu connais (sans regarder plus haut !). La page compte combien sont justes.</p>
+      <label for="memo" style="font-weight:700">Tes chiffres :</label>
+      <input id="memo" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="2,718…">
+      <p id="memoOut" class="mono soft" aria-live="polite">Commence par 2,718…</p>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• <strong>e ≈ 2,718</strong> : la limite de l'argent de la banque, quand on découpe l'année en morceaux de plus en plus petits.</span>
+      <span>• Découvert par Jacob Bernoulli en 1683, nommé « e » par Euler.</span>
+      <span>• Deux recettes : <strong>(1 + 1/n)<sup>n</sup></strong> avec n très grand, ou <strong>1 + 1/1! + 1/2! + 1/3! + …</strong></span>
+      <span>• e est <strong>irrationnel</strong>, comme π : ses décimales ne s'arrêtent jamais et ne se répètent jamais en boucle.</span>
+      <span>• On le trouve partout où quelque chose grandit ou diminue en fonction de sa propre taille.</span>
+    </div>
+  </section>
+
+  <footer>Fiche de révision · Le nombre e</footer>
+</main>
+
+<script>
+(function () {
+  var fr = function (x, d) { return x.toLocaleString('fr-FR', { minimumFractionDigits: d, maximumFractionDigits: d }); };
+  var NS = 'http://www.w3.org/2000/svg';
+  var E = Math.E;
+  var E_STR = '27182818284590452353602874713526624977572470936999595749669676277240766303535475945713821785251664274';
+
+  /* --- Banque --- */
+  var freqs = [
+    { n: 1, label: '1 fois', name: 'une fois par an' },
+    { n: 2, label: '2 fois', name: 'tous les 6 mois' },
+    { n: 4, label: '4 fois', name: 'tous les 3 mois' },
+    { n: 12, label: 'Chaque mois', name: 'chaque mois' },
+    { n: 52, label: 'Chaque semaine', name: 'chaque semaine' },
+    { n: 365, label: 'Chaque jour', name: 'chaque jour' },
+    { n: 8760, label: 'Chaque heure', name: 'chaque heure' },
+    { n: 525600, label: 'Chaque minute', name: 'chaque minute' }
+  ];
+  var val = function (n) { return Math.pow(1 + 1 / n, n); };
+  var btnBox = document.getElementById('freqBtns');
+  var current = 1;
+  freqs.forEach(function (f, i) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.id = 'freq' + f.n; b.textContent = f.label;
+    b.addEventListener('click', function () { current = i; bank(); });
+    btnBox.appendChild(b);
+  });
+
+  var svg = document.getElementById('chart');
+  var W = 640, H = 280, L = 56, Rm = 16, T = 40, B = 62;
+  var yMin = 1.9, yMax = 2.8;
+  var y = function (v) { return T + (yMax - v) / (yMax - yMin) * (H - T - B); };
+  var x = function (i) { return L + (i + .5) * (W - L - Rm) / freqs.length; };
+  function el(name, attrs, text) {
+    var e = document.createElementNS(NS, name);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    if (text != null) e.textContent = text;
+    svg.appendChild(e); return e;
+  }
+  function chart() {
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    [2.0, 2.2, 2.4, 2.6, 2.8].forEach(function (v) {
+      el('line', { x1: L, x2: W - Rm, y1: y(v), y2: y(v), stroke: 'var(--line)', 'stroke-width': 1 });
+      el('text', { x: L - 8, y: y(v) + 6, 'text-anchor': 'end', 'font-size': 17 }, fr(v, 1));
+    });
+    el('line', { x1: L, x2: W - Rm, y1: y(E), y2: y(E), stroke: 'var(--red)', 'stroke-width': 2, 'stroke-dasharray': '6 5' });
+    el('text', { x: L + 6, y: y(E) - 10, 'text-anchor': 'start', 'font-size': 17, style: 'fill:var(--red);font-weight:600' }, 'e ≈ 2,718');
+    var pts = freqs.map(function (f, i) { return x(i) + ',' + y(val(f.n)); }).join(' ');
+    el('polyline', { points: pts, fill: 'none', stroke: 'var(--acc)', 'stroke-width': 2 });
+    freqs.forEach(function (f, i) {
+      var on = i === current;
+      el('circle', { cx: x(i), cy: y(val(f.n)), r: on ? 8 : 5, fill: on ? 'var(--acc)' : 'var(--card)', stroke: 'var(--acc)', 'stroke-width': 2.5 });
+      el('text', { x: x(i), y: H - B + 26, 'text-anchor': 'middle', 'font-size': f.n >= 100000 ? 14 : 16, style: on ? 'fill:var(--ink);font-weight:600' : '' }, f.n >= 1000 ? fr(f.n, 0) : String(f.n));
+    });
+    var cv = val(freqs[current].n), lx = Math.min(Math.max(x(current), L + 30), W - Rm - 30);
+    el('text', { x: lx, y: y(cv) + (cv > 2.6 ? 30 : -16), 'text-anchor': 'middle', 'font-size': 18, style: 'fill:var(--ink);font-weight:600' }, fr(cv, 3));
+    el('text', { x: (L + W - Rm) / 2, y: H - 6, 'text-anchor': 'middle', 'font-size': 16 }, 'n = nombre de versements par an');
+  }
+  function bank() {
+    var f = freqs[current], v = val(f.n);
+    freqs.forEach(function (g, i) { document.getElementById('freq' + g.n).setAttribute('aria-pressed', i === current ? 'true' : 'false'); });
+    var ns = f.n >= 1000 ? fr(f.n, 0) : String(f.n);
+    document.getElementById('nOut1').textContent = ns;
+    document.getElementById('nOut2').textContent = ns;
+    document.getElementById('moneyOut').textContent = fr(100 * v, 2);
+    document.getElementById('valOut').textContent = fr(v, 6);
+    chart();
+  }
+  bank();
+
+  /* --- Somme des fractions --- */
+  var facts = [1, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880, 3628800, 39916800, 479001600];
+  var nTerms = 1;
+  function showSum() {
+    var parts = [], s = 0;
+    for (var k = 0; k < nTerms; k++) {
+      s += 1 / facts[k];
+      parts.push(k === 0 ? '<span class="t">1</span>' : '<span class="t">1/' + k + '! = 1/' + facts[k].toLocaleString('fr-FR') + '</span>');
+    }
+    document.getElementById('termsOut').innerHTML = parts.join(' + ');
+    var str = s.toFixed(9).replace('.', '');
+    var good = 0;
+    while (good < str.length && str[good] === E_STR[good]) good++;
+    var shown = s.toFixed(9).replace('.', ',');
+    var html = '', count = 0;
+    for (var i = 0; i < shown.length; i++) {
+      var c = shown[i];
+      if (c === ',') { html += ','; continue; }
+      html += count < good ? '<span class="good">' + c + '</span>' : c;
+      count++;
+    }
+    document.getElementById('sumOut').innerHTML = html;
+    var dec = Math.max(0, good - 1);
+    document.getElementById('sumNote').textContent = nTerms + ' fraction' + (nTerms > 1 ? 's' : '') + ' additionnée' + (nTerms > 1 ? 's' : '') + ' · ' + dec + ' décimale' + (dec > 1 ? 's' : '') + ' juste' + (dec > 1 ? 's' : '') + ' (en vert).';
+    document.getElementById('addTerm').disabled = nTerms >= facts.length;
+  }
+  document.getElementById('addTerm').addEventListener('click', function () { if (nTerms < facts.length) { nTerms++; showSum(); } });
+  document.getElementById('resetTerms').addEventListener('click', function () { nTerms = 1; showSum(); });
+  nTerms = 4; showSum();
+
+  /* --- Père Noël secret --- */
+  document.getElementById('santaBtn').addEventListener('click', function () {
+    var ok = 0, N = 1000, people = 10;
+    for (var t = 0; t < N; t++) {
+      var a = []; for (var i = 0; i < people; i++) a.push(i);
+      for (var j = people - 1; j > 0; j--) { var r = Math.floor(Math.random() * (j + 1)); var tmp = a[j]; a[j] = a[r]; a[r] = tmp; }
+      var good = true; for (var k = 0; k < people; k++) if (a[k] === k) { good = false; break; }
+      if (good) ok++;
+    }
+    document.getElementById('santaOut').textContent = fr(ok / N * 100, 1) + ' %';
+    document.getElementById('santaNote').textContent = ok + ' tirages réussis sur 1 000. Valeur prévue : 1 ÷ e ≈ 36,8 %. Relance pour voir : on tombe toujours tout près !';
+  });
+
+  /* --- Défi mémoire --- */
+  var memo = document.getElementById('memo'), memoOut = document.getElementById('memoOut');
+  memo.addEventListener('input', function () {
+    var typed = memo.value.replace(/[^0-9]/g, '');
+    if (!typed) { memoOut.textContent = 'Commence par 2,718…'; memoOut.style.color = 'var(--ink-soft)'; return; }
+    var ok = 0;
+    while (ok < typed.length && ok < E_STR.length && typed[ok] === E_STR[ok]) ok++;
+    var dec = Math.max(0, ok - 1);
+    var s = dec > 1 ? 's' : '';
+    if (ok === typed.length) {
+      memoOut.style.color = 'var(--acc)';
+      memoOut.textContent = ok >= E_STR.length ? 'Bravo ! Les 100 décimales sont justes !' : 'Tout est juste : ' + dec + ' décimale' + s + '. Continue !';
+    } else {
+      memoOut.style.color = 'var(--red)';
+      memoOut.textContent = 'Erreur au chiffre n°' + (ok + 1) + ' (il fallait un ' + E_STR[ok] + '). Tu avais ' + dec + ' décimale' + s + ' juste' + s + '.';
+    }
+  });
+})();
+</script>
+</body>
+</html>

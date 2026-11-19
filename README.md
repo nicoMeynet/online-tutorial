@@ -9,6 +9,7 @@ Chaque tutoriel est une seule page HTML, sans installation. Il suffit de l'ouvri
 | Tutoriel | Sujet |
 |---|---|
 | [Le nombre π](le-nombre-pi.html) | D'où vient π, pourquoi il est irrationnel, le périmètre, l'aire et les arcs de cercle, des exercices et les records de mémorisation. |
+| [Le nombre e](le-nombre-e.html) | La banque de Bernoulli, la recette des factorielles, pourquoi e est irrationnel, où on le trouve (croissance, refroidissement, Père Noël secret), des exercices. |
 
 ## Ajouter un tutoriel
 
