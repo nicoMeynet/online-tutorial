@@ -1,0 +1,883 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Les probabilités</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, encre vert émeraude (comme le tapis d'une table de jeu), marge rouge. Les boules de l'urne sont rouges, bleues et jaunes. */
+:root {
+  --paper: #f3f8f5;
+  --grid: #dbe9e1;
+  --card: #ffffff;
+  --ink: #12291f;
+  --ink-soft: #4a6458;
+  --acc: #047857;
+  --acc-soft: #d3f0e3;
+  --ok: #047857;
+  --ok-soft: #d3f0e3;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --ball-r: #cf3a52;
+  --ball-b: #1c64c8;
+  --ball-y: #ca8a04;
+  --hl: #fff0a3;
+  --line: #cde0d5;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0b1510; --grid: #14231b; --card: #101c16; --ink: #e4f2ea; --ink-soft: #9fbcae;
+    --acc: #34d399; --acc-soft: #12382a; --ok: #6fd39f; --ok-soft: #173a29;
+    --red: #ff7d92; --red-soft: #3a1c27; --ball-r: #ff6b81; --ball-b: #6fa8ff; --ball-y: #facc15;
+    --hl: #4b4318; --line: #22382d;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0b1510; --grid: #14231b; --card: #101c16; --ink: #e4f2ea; --ink-soft: #9fbcae;
+  --acc: #34d399; --acc-soft: #12382a; --ok: #6fd39f; --ok-soft: #173a29;
+  --red: #ff7d92; --red-soft: #3a1c27; --ball-r: #ff6b81; --ball-b: #6fa8ff; --ball-y: #facc15;
+  --hl: #4b4318; --line: #22382d;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+.box.hero-box { flex-direction: row; align-items: center; flex-wrap: wrap; gap: 20px; }
+.hero-box svg { width: 84px; height: 84px; flex: 0 0 auto; }
+.hero-box .big { font-family: var(--f-mono); font-weight: 600; font-size: 1.15rem; color: var(--acc); overflow-wrap: anywhere; }
+.hero-box > div { display: flex; flex-direction: column; gap: 4px; min-width: 0; flex: 1 1 220px; }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+svg text.acc { fill: var(--acc); }
+svg text.soft { fill: var(--ink-soft); }
+svg text.b { font-weight: 600; }
+svg.fig { width: 100%; height: auto; display: block; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 6px 12px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button.main, button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+input[type="text"] { font: inherit; font-family: var(--f-mono); font-size: 1.05rem; padding: 8px 10px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; }
+
+/* Formule */
+.formula { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 14px; font-family: var(--f-display); font-weight: 700; font-size: 1.15rem; }
+.frac { display: inline-flex; flex-direction: column; text-align: center; line-height: 1.3; }
+.frac span:first-child { border-bottom: 2px solid var(--ink); padding-bottom: 2px; }
+.frac span:last-child { padding-top: 2px; }
+
+/* Urne */
+.urn-ctrl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 600px) { .urn-ctrl { grid-template-columns: 1fr; } }
+.stepper { display: flex; align-items: center; justify-content: space-between; gap: 8px; border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 10px; min-width: 0; }
+.stepper .lab { display: flex; align-items: center; gap: 8px; font-family: var(--f-display); font-weight: 700; }
+.stepper .ctl { display: flex; align-items: center; gap: 8px; }
+.stepper button { padding: 0 10px; min-width: 2.2em; font-size: 1.15rem; line-height: 1.6; }
+.stepper output { font-family: var(--f-mono); font-weight: 600; min-width: 2ch; text-align: center; }
+.dot { width: 14px; height: 14px; border-radius: 50%; display: inline-block; vertical-align: -1px; flex: 0 0 auto; }
+.dot.r { background: var(--ball-r); }
+.dot.b { background: var(--ball-b); }
+.dot.y { background: var(--ball-y); }
+
+.results { display: flex; flex-direction: column; gap: 8px; font-variant-numeric: tabular-nums; }
+.res { border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 12px; display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; align-items: baseline; }
+.res-name { font-family: var(--f-display); font-weight: 700; }
+.res-val { font-family: var(--f-mono); font-weight: 600; color: var(--acc); font-size: 1.05rem; white-space: nowrap; }
+.res-calc { grid-column: 1 / -1; font-family: var(--f-mono); font-size: .85rem; color: var(--ink-soft); overflow-wrap: anywhere; }
+.steps { display: flex; flex-direction: column; gap: 6px; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; padding: 12px 14px; font-family: var(--f-mono); font-size: .98rem; overflow-wrap: anywhere; }
+.steps b { color: var(--acc); }
+.steps .why { font-family: var(--f-body); font-size: .9rem; color: var(--ink-soft); }
+.steps .err, .err { color: var(--red); font-family: var(--f-body); font-weight: 700; }
+.verdict { border-radius: 8px; padding: 12px 14px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; background: var(--ok-soft); color: var(--ok); }
+.verdict span { color: var(--ink); font-weight: 400; }
+
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: .95rem; color: var(--ink-soft); }
+.key { display: inline-flex; align-items: center; gap: 6px; }
+.sw { display: inline-block; width: 18px; height: 12px; border-radius: 3px; flex: 0 0 auto; }
+.sw.th { background: var(--acc-soft); border: 2px solid var(--acc); }
+.sw.sim { background: var(--acc); }
+.sw.line { width: 26px; height: 0; border-top: 3px dashed var(--ink); border-radius: 0; }
+
+table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+th, td { padding: 7px 8px; border-bottom: 1px dashed var(--line); text-align: center; font-family: var(--f-mono); }
+thead th { border-bottom: 2px solid var(--ink); font-family: var(--f-display); }
+.scroll { overflow-x: auto; }
+
+/* Tableau des 36 issues */
+.sumt { border-collapse: separate; border-spacing: 4px; max-width: 440px; margin: 0 auto; }
+.sumt th, .sumt td { border: 0; padding: 6px 4px; border-radius: 6px; font-weight: 600; min-width: 2.2em; }
+.sumt th { font-family: var(--f-display); color: var(--ink-soft); }
+.sumt td.s7 { outline: 2.5px solid var(--acc); outline-offset: -2.5px; }
+.k1 { background: color-mix(in srgb, var(--acc) 8%, var(--card)); }
+.k2 { background: color-mix(in srgb, var(--acc) 16%, var(--card)); }
+.k3 { background: color-mix(in srgb, var(--acc) 24%, var(--card)); }
+.k4 { background: color-mix(in srgb, var(--acc) 32%, var(--card)); }
+.k5 { background: color-mix(in srgb, var(--acc) 41%, var(--card)); }
+.k6 { background: color-mix(in srgb, var(--acc) 50%, var(--card)); }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; color: var(--acc); }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 120px auto; gap: 10px; align-items: center; }
+.quiz .q { font-size: 1rem; }
+.quiz input[type="text"] { font-size: 1rem; padding: 6px 8px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz .q { grid-column: 1 / -1; } }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc); }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 120px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+
+.pop { transform-box: fill-box; transform-origin: center; animation: pop .35s ease-out; }
+@keyframes pop { from { transform: scale(.3); } to { transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) { .pop { animation: none; } button:hover, button:active { transform: none; } }
+</style>
+
+</head>
+<body>
+<main class="page">
+
+  <header class="hero">
+    <span class="eyebrow">Tutoriel de maths · niveau 5<sup>e</sup>–3<sup>e</sup></span>
+    <h1>Les probabilités</h1>
+    <p class="lead">Vais-je obtenir un 6 ? Va-t-il pleuvoir demain ? On ne peut pas le savoir à l'avance. Mais on peut mesurer les chances qu'un événement arrive, avec un nombre entre 0 et 1 : sa probabilité.</p>
+    <div class="box hero-box">
+      <svg id="heroDie" viewBox="0 0 100 100" role="img" aria-label="Une face de dé montrant 6"></svg>
+      <div>
+        <span class="big">P(obtenir un 6) = 1/6 ≈ 0,167 ≈ 16,7 %</span>
+        <span class="soft">Une chance sur six : en moyenne, un lancer sur six donne un 6.</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · Le vocabulaire</span>
+    <h2>Expérience, issues, événement</h2>
+    <p>Avant de calculer, il faut parler la même langue. Prenons un exemple : tu lances un dé à 6 faces.</p>
+    <div class="cards">
+      <div class="box"><span class="tag">Expérience aléatoire</span><strong>On ne connaît pas le résultat à l'avance</strong><span class="soft">Lancer un dé, lancer une pièce, tirer une carte : le hasard décide.</span></div>
+      <div class="box"><span class="tag">Issues</span><strong>Tous les résultats possibles</strong><span class="soft">Pour un dé : 1, 2, 3, 4, 5 et 6. Il y a 6 issues.</span></div>
+      <div class="box"><span class="tag">Événement</span><strong>Une phrase qui peut être vraie ou fausse</strong><span class="soft">« Obtenir un nombre pair » est un événement. Il regroupe les issues {2 ; 4 ; 6}.</span></div>
+      <div class="box"><span class="tag">Issues favorables</span><strong>Les issues qui réalisent l'événement</strong><span class="soft">Pour « obtenir un nombre pair », les issues favorables sont 2, 4 et 6. Il y en a 3.</span></div>
+    </div>
+    <div class="box">
+      <h3>Choisis un événement</h3>
+      <div class="btns" id="events" role="group" aria-label="Événements pour un lancer de dé"></div>
+      <svg id="dice" class="fig" viewBox="0 0 640 140" role="img" aria-label="Les six faces du dé, les issues favorables sont en vert"></svg>
+      <div class="steps" id="evOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · Calculer une probabilité</span>
+    <h2>Favorables sur possibles</h2>
+    <p>Quand toutes les issues ont la même chance d'arriver, on dit qu'elles sont <strong>équiprobables</strong>. C'est le cas avec un dé bien équilibré, une pièce normale ou une urne bien mélangée. Alors :</p>
+    <div class="box">
+      <div class="formula">
+        <span>P(événement) =</span>
+        <span class="frac"><span>nombre d'issues favorables</span><span>nombre d'issues possibles</span></span>
+      </div>
+      <p>Pour « obtenir un nombre pair » : 3 issues favorables sur 6 possibles, donc P = 3/6 = 1/2. On peut l'écrire de trois façons : <span class="hl">1/2 = 0,5 = 50 %</span>.</p>
+    </div>
+    <p>Une probabilité est toujours entre <strong>0</strong> et <strong>1</strong>. 0 veut dire <strong>impossible</strong>, 1 veut dire <strong>certain</strong>. Plus le nombre est grand, plus l'événement a de chances d'arriver.</p>
+    <div class="box">
+      <h3>L'échelle des probabilités</h3>
+      <svg id="scale" class="fig" viewBox="0 0 640 225" role="img" aria-label="Échelle de 0 à 1 avec des exemples placés"></svg>
+      <div class="steps" id="evProb" aria-live="polite"></div>
+      <p class="soft">Le point vert, c'est l'événement choisi à l'étape 1. Change-le pour le voir bouger.</p>
+    </div>
+    <div class="note">
+      <span class="note-title">L'événement contraire</span>
+      <span>Le contraire de A, c'est « A ne se produit pas ». On le note « non A ». Ses issues sont toutes celles qui ne sont pas dans A. Comme A ou non A arrive forcément :</span>
+      <span class="mono"><strong>P(non A) = 1 − P(A)</strong></span>
+      <span>Exemple : P(obtenir un 6) = 1/6, donc P(ne pas obtenir un 6) = 1 − 1/6 = 5/6.</span>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · L'urne</span>
+    <h2>Tirer une boule au hasard</h2>
+    <p>Une urne est une boîte fermée remplie de boules. On en tire une sans regarder. Chaque boule a la même chance d'être tirée. Donc P(rouge) = nombre de boules rouges ÷ nombre total de boules.</p>
+    <div class="box">
+      <div class="urn-ctrl">
+        <div class="stepper"><span class="lab"><span class="dot r"></span>Rouges</span><span class="ctl"><button type="button" id="rMinus" aria-label="Une boule rouge de moins">−</button><output id="rCount">3</output><button type="button" id="rPlus" aria-label="Une boule rouge de plus">+</button></span></div>
+        <div class="stepper"><span class="lab"><span class="dot b"></span>Bleues</span><span class="ctl"><button type="button" id="bMinus" aria-label="Une boule bleue de moins">−</button><output id="bCount">5</output><button type="button" id="bPlus" aria-label="Une boule bleue de plus">+</button></span></div>
+        <div class="stepper"><span class="lab"><span class="dot y"></span>Jaunes</span><span class="ctl"><button type="button" id="yMinus" aria-label="Une boule jaune de moins">−</button><output id="yCount">2</output><button type="button" id="yPlus" aria-label="Une boule jaune de plus">+</button></span></div>
+      </div>
+      <svg id="urnSvg" class="fig" viewBox="0 0 640 320" role="img" aria-label="L'urne et ses boules"></svg>
+      <div class="results" id="urnRes" aria-live="polite"></div>
+      <div class="steps" id="urnSum"></div>
+      <div class="btns">
+        <button type="button" class="main" id="drawOne">Tirer une boule</button>
+        <button type="button" id="draw1000">Tirer 1&nbsp;000 fois</button>
+      </div>
+      <div class="steps" id="drawOut" aria-live="polite"><span class="why">Clique sur « Tirer une boule ». La boule est remise dans l'urne après chaque tirage.</span></div>
+      <div class="scroll" id="simOut"></div>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · La loi des grands nombres</span>
+    <h2>Fréquence et probabilité</h2>
+    <p>Si tu lances un dé 6 fois, tu n'obtiendras pas forcément un seul 6. La <strong>fréquence</strong> d'une issue, c'est le nombre de fois où elle sort, divisé par le nombre de lancers. Elle change à chaque série de lancers.</p>
+    <p>Mais plus on fait de lancers, plus les fréquences se rapprochent des probabilités. C'est la <strong>loi des grands nombres</strong>. Essaie !</p>
+    <div class="box">
+      <div class="btns" role="group" aria-label="Objet lancé">
+        <button type="button" id="mDie">Dé à 6 faces</button>
+        <button type="button" id="mCoin">Pièce</button>
+      </div>
+      <div class="btns" id="nBtns" role="group" aria-label="Nombre de lancers"></div>
+      <svg id="lgnBars" class="fig" viewBox="0 0 640 300" role="img" aria-label="Diagramme en barres des fréquences obtenues"></svg>
+      <div class="legend"><span class="key"><span class="sw sim"></span>fréquence observée</span><span class="key"><span class="sw line"></span><span id="lgnLegend">probabilité 1/6 ≈ 16,7 %</span></span></div>
+      <div class="scroll"><table id="lgnTable"></table></div>
+      <h3 id="convTitle">Fréquence du 6 au fil des lancers</h3>
+      <svg id="lgnConv" class="fig" viewBox="0 0 640 266" role="img" aria-label="Évolution de la fréquence au fil des lancers"></svg>
+      <div class="steps" id="lgnOut" aria-live="polite"></div>
+      <p class="soft">Clique plusieurs fois sur le même bouton : les résultats changent à chaque fois, surtout avec peu de lancers.</p>
+    </div>
+    <div class="note">
+      <span class="note-title">À ne pas confondre</span>
+      <span>La <strong>probabilité</strong> se calcule avant l'expérience et ne change pas. La <strong>fréquence</strong> se mesure après l'expérience et change d'une série à l'autre. Avec beaucoup de lancers, les deux nombres sont proches.</span>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Deux épreuves</span>
+    <h2>L'arbre et le tableau</h2>
+    <p>On lance une pièce deux fois. P veut dire Pile, F veut dire Face. Pour ne rien oublier, on dessine un <strong>arbre</strong>. Sur chaque branche, on écrit la probabilité.</p>
+    <div class="box">
+      <svg class="fig" viewBox="0 0 640 350" role="img" aria-label="Arbre des deux lancers : PP, PF, FP et FF, chacun avec la probabilité 1/4">
+        <text x="200" y="26" text-anchor="middle" font-size="16" class="soft">1er lancer</text>
+        <text x="380" y="26" text-anchor="middle" font-size="16" class="soft">2e lancer</text>
+        <g stroke="var(--ink)" stroke-width="2.5">
+          <line x1="40" y1="190" x2="200" y2="110"/>
+          <line x1="40" y1="190" x2="200" y2="270"/>
+          <line x1="200" y1="110" x2="380" y2="60"/>
+          <line x1="200" y1="110" x2="380" y2="150"/>
+          <line x1="200" y1="270" x2="380" y2="230"/>
+          <line x1="200" y1="270" x2="380" y2="320"/>
+        </g>
+        <text x="105" y="138" text-anchor="middle" font-size="16">1/2</text>
+        <text x="105" y="248" text-anchor="middle" font-size="16">1/2</text>
+        <text x="282" y="72" text-anchor="middle" font-size="16">1/2</text>
+        <text x="290" y="152" text-anchor="middle" font-size="16">1/2</text>
+        <text x="282" y="236" text-anchor="middle" font-size="16">1/2</text>
+        <text x="290" y="317" text-anchor="middle" font-size="16">1/2</text>
+        <circle cx="40" cy="190" r="7" fill="var(--ink)"/>
+        <g fill="var(--card)" stroke="var(--ink)" stroke-width="2.5">
+          <circle cx="200" cy="110" r="20"/><circle cx="200" cy="270" r="20"/>
+          <circle cx="380" cy="60" r="20"/><circle cx="380" cy="150" r="20"/><circle cx="380" cy="230" r="20"/><circle cx="380" cy="320" r="20"/>
+        </g>
+        <g font-size="18" text-anchor="middle" class="b">
+          <text x="200" y="116" class="b">P</text><text x="200" y="276" class="b">F</text>
+          <text x="380" y="66" class="b">P</text><text x="380" y="156" class="b">F</text><text x="380" y="236" class="b">P</text><text x="380" y="326" class="b">F</text>
+        </g>
+        <text x="418" y="66" font-size="16" class="acc b">PP : 1/2 × 1/2 = 1/4</text>
+        <text x="418" y="156" font-size="16" class="acc b">PF : 1/2 × 1/2 = 1/4</text>
+        <text x="418" y="236" font-size="16" class="acc b">FP : 1/2 × 1/2 = 1/4</text>
+        <text x="418" y="326" font-size="16" class="soft">FF : 1/2 × 1/2 = 1/4</text>
+      </svg>
+      <p>Il y a <strong>4 issues équiprobables</strong> : PP, PF, FP et FF. Pour un chemin, on <strong>multiplie</strong> les probabilités des branches : 1/2 × 1/2 = 1/4.</p>
+      <div class="verdict">P(au moins un pile) = 3/4 = 0,75 = 75 %<span>En vert : PP, PF et FP, soit 3 issues sur 4. Autre méthode avec le contraire : « aucun pile », c'est FF. Donc P = 1 − 1/4 = 3/4.</span></div>
+    </div>
+
+    <h3>La somme de deux dés</h3>
+    <p>On lance deux dés et on additionne. Les sommes vont de 2 à 12. Attention : ces 11 sommes ne sont <strong>pas</strong> équiprobables ! Imagine un dé rouge et un dé bleu : (1 ; 6) et (6 ; 1) sont deux issues différentes. Le tableau montre les <strong>36 issues</strong>, qui elles sont équiprobables.</p>
+    <div class="box">
+      <p class="soft">Lignes : dé rouge. Colonnes : dé bleu. Plus la case est foncée, plus sa somme est fréquente.</p>
+      <div class="scroll"><table class="sumt" id="sumTable" aria-label="Tableau des 36 sommes de deux dés"></table></div>
+      <p>La somme <strong>7</strong> apparaît dans 6 cases (entourées) : <span class="hl">P(7) = 6/36 = 1/6</span>. C'est la somme la plus probable. Les sommes 2 et 12 n'apparaissent qu'une fois : P(2) = P(12) = 1/36.</p>
+      <svg id="sumChart" class="fig" viewBox="0 0 640 300" role="img" aria-label="Probabilité de chaque somme de 2 à 12, et fréquences simulées"></svg>
+      <div class="legend"><span class="key"><span class="sw th"></span>probabilité (sur 36)</span><span class="key"><span class="sw sim"></span>fréquence observée</span></div>
+      <div class="btns">
+        <button type="button" class="main" id="sum1000">Lancer 1&nbsp;000 fois les deux dés</button>
+        <button type="button" id="sum10000">10&nbsp;000 fois</button>
+      </div>
+      <div class="steps" id="sumOut" aria-live="polite"><span class="why">Lance les dés pour comparer les fréquences avec les probabilités.</span></div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · Les pièges</span>
+    <h2>Le hasard joue des tours</h2>
+    <div class="cards">
+      <div class="box"><strong>Le dé n'a pas de mémoire</strong><span class="soft">Tu viens d'obtenir cinq 6 d'affilée. Au lancer suivant, la probabilité d'avoir un 6 est toujours 1/6. Le dé ne sait pas ce qui s'est passé avant.</span></div>
+      <div class="box"><strong>Les issues ne se valent pas toujours</strong><span class="soft">Avec deux dés, il y a 11 sommes possibles. Pourtant P(7) = 1/6 et P(12) = 1/36. Dire « 1 chance sur 11 » est faux.</span></div>
+      <div class="box"><strong>« Une chance sur deux » n'est pas automatique</strong><span class="soft">Au loto, soit on gagne, soit on perd : 2 issues. Elles ne sont pas équiprobables, donc la probabilité de gagner n'est pas 1/2 !</span></div>
+    </div>
+    <div class="box">
+      <h3>Vérifions que le dé n'a pas de mémoire</h3>
+      <p>L'ordinateur lance un dé des millions de fois. Chaque fois qu'il voit cinq 6 de suite, il regarde le lancer suivant.</p>
+      <div class="btns"><button type="button" class="main" id="memRun">Lancer 6 millions de dés</button></div>
+      <div class="steps" id="memOut" aria-live="polite"><span class="why">Clique sur le bouton : le calcul prend moins d'une seconde.</span></div>
+    </div>
+    <div class="box">
+      <h3>Le Loto : 1 chance sur 19&nbsp;068&nbsp;840</h3>
+      <p>Pour gagner le gros lot du Loto, il faut trouver les <strong>5 bons numéros parmi 49</strong> et le bon <strong>numéro chance parmi 10</strong>.</p>
+      <div class="steps">
+        <span>5 numéros parmi 49 : 49 × 48 × 47 × 46 × 45 ÷ (5 × 4 × 3 × 2 × 1) = <b>1&nbsp;906&nbsp;884</b></span>
+        <span class="why">On divise par 5 × 4 × 3 × 2 × 1 = 120, car l'ordre des 5 numéros ne compte pas.</span>
+        <span>Avec le numéro chance : 1&nbsp;906&nbsp;884 × 10 = <b>19&nbsp;068&nbsp;840</b> combinaisons</span>
+        <span>P(gros lot) = 1/19&nbsp;068&nbsp;840 ≈ 0,000&nbsp;005 %</span>
+      </div>
+      <p>Si tu jouais une grille par jour, il faudrait attendre en moyenne plus de 52&nbsp;000 ans pour trouver la bonne combinaison.</p>
+    </div>
+    <div class="note red">
+      <span class="note-title">Le bon réflexe</span>
+      <span>Avant d'utiliser « favorables ÷ possibles », demande-toi : « Est-ce que toutes les issues ont vraiment la même chance d'arriver ? » Si la réponse est non, cherche des issues plus petites qui, elles, sont équiprobables (comme les 36 cases des deux dés).</span>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Réponds avec une fraction (1/2), un nombre décimal (0,5) ou un pourcentage (50 %). Les trois sont acceptés.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Nouvelles questions</button>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Un peu d'histoire</span>
+    <h2>Des jeux de hasard à la science</h2>
+    <ol class="timeline">
+      <li><span class="when">XVIe siècle</span><div class="what"><strong>Jérôme Cardan</strong><span>Ce médecin et mathématicien italien, grand joueur, écrit un livre sur les jeux de dés. Il compte les façons d'obtenir chaque résultat. Son livre ne sera publié qu'en 1663, longtemps après sa mort.</span></div></li>
+      <li><span class="when">1654</span><div class="what"><strong>Blaise Pascal et Pierre de Fermat</strong><span>Le chevalier de Méré, un joueur, pose un problème à Pascal : comment partager l'argent des mises quand une partie s'arrête avant la fin ? C'est le « problème des partis ». Pascal et Fermat en discutent par lettres. Leurs échanges marquent la naissance du calcul des probabilités.</span></div></li>
+      <li><span class="when">1657</span><div class="what"><strong>Christiaan Huygens</strong><span>Ce savant néerlandais publie l'un des premiers livres sur le calcul des chances aux jeux.</span></div></li>
+      <li><span class="when">1713</span><div class="what"><strong>Jacques Bernoulli</strong><span>Son livre <em>L'Art de conjecturer</em>, publié après sa mort, démontre la loi des grands nombres de l'étape 4.</span></div></li>
+      <li><span class="when">Aujourd'hui</span><div class="what"><strong>Partout autour de nous</strong><span>La météo (« 70 % de risque de pluie »), les assurances, la médecine (l'efficacité d'un médicament) : les probabilités aident à décider quand on ne peut pas tout savoir.</span></div></li>
+    </ol>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · À toi de jouer</span>
+    <h2>Six problèmes</h2>
+    <div class="exos">
+      <details>
+        <summary>Le dé<span class="q">On lance un dé à 6 faces. Quelle est la probabilité d'obtenir un nombre strictement inférieur à 3 ?</span></summary>
+        <div><span>Issues favorables : {1 ; 2}, soit 2 sur 6. P = 2/6 = <strong>1/3 ≈ 0,33 ≈ 33 %</strong>.</span></div>
+      </details>
+      <details>
+        <summary>L'urne<span class="q">Une urne contient 4 boules rouges, 6 bleues et 10 jaunes. Quelle est la probabilité de tirer une boule bleue ? Et une boule qui n'est pas jaune ?</span></summary>
+        <div><span>Il y a 4 + 6 + 10 = 20 boules. P(bleue) = 6/20 = <strong>3/10 = 0,3 = 30 %</strong>.</span><span>P(jaune) = 10/20 = 1/2, donc P(pas jaune) = 1 − 1/2 = <strong>1/2</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Le contraire<span class="q">À un jeu, la probabilité de gagner est 0,15. Quelle est la probabilité de perdre ?</span></summary>
+        <div><span>Perdre est l'événement contraire de gagner : 1 − 0,15 = <strong>0,85 = 85 %</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Les cartes<span class="q">On tire une carte dans un jeu de 32 cartes (4 couleurs, 8 cartes par couleur). Quelle est la probabilité de tirer un roi ?</span></summary>
+        <div><span>Il y a 4 rois sur 32 cartes : P = 4/32 = <strong>1/8 = 0,125 = 12,5 %</strong>.</span></div>
+      </details>
+      <details>
+        <summary>La fréquence<span class="q">On lance un dé 600 fois. Combien de 6 peut-on s'attendre à obtenir, environ ?</span></summary>
+        <div><span>600 × 1/6 = <strong>100</strong>. On obtiendra environ 100 fois le 6, mais pas forcément exactement 100.</span></div>
+      </details>
+      <details>
+        <summary>Deux dés<span class="q">On lance deux dés et on additionne. Quelle est la probabilité d'obtenir 10 ?</span></summary>
+        <div><span>Les cases qui donnent 10 : (4 ; 6), (5 ; 5) et (6 ; 4), soit 3 cases sur 36. P = 3/36 = <strong>1/12 ≈ 0,083 ≈ 8,3 %</strong>.</span></div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• Une <strong>probabilité</strong> est un nombre entre <strong>0</strong> (impossible) et <strong>1</strong> (certain). On l'écrit en fraction, en décimal ou en pourcentage.</span>
+      <span>• Si les issues sont <strong>équiprobables</strong> : P = nombre d'issues favorables ÷ nombre d'issues possibles.</span>
+      <span>• <strong>Événement contraire</strong> : P(non A) = 1 − P(A). La somme des probabilités de toutes les issues vaut 1.</span>
+      <span>• Pour deux épreuves, un <strong>arbre</strong> ou un <strong>tableau</strong> aide à compter. Sur un chemin de l'arbre, on multiplie.</span>
+      <span>• Avec beaucoup d'essais, la <strong>fréquence</strong> se rapproche de la probabilité : c'est la loi des grands nombres. Le hasard n'a pas de mémoire.</span>
+    </div>
+  </section>
+
+  <footer>Fiche de révision · Les probabilités</footer>
+</main>
+
+<script>
+(function () {
+  var NS = "http://www.w3.org/2000/svg";
+  function $(id) { return document.getElementById(id); }
+  function fmt(x, d) { var r = Math.round(x * 1e6) / 1e6; if (Object.is(r, -0)) r = 0; return r.toLocaleString("fr-FR", { maximumFractionDigits: d == null ? 3 : d }).replace("-", "−"); }
+  function mk(svg, name, attrs, text) { var e = document.createElementNS(NS, name); for (var a in attrs) e.setAttribute(a, attrs[a]); if (text != null) e.textContent = text; svg.appendChild(e); return e; }
+  function clear(svg) { while (svg.firstChild) svg.removeChild(svg.firstChild); }
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  function rnd(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+  function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  function nb(n, sing, plur) { return n + " " + (n > 1 ? plur : sing); }
+  var PCT = " %";
+
+  /* ---------- Fonctions pures ---------- */
+  function gcd(a, b) { a = Math.abs(a); b = Math.abs(b); while (b) { var t = a % b; a = b; b = t; } return a; }
+  function simplify(n, d) { if (d === 0) return null; var g = gcd(n, d) || 1; return [n / g, d / g]; }
+  function fracStr(n, d) { var s = simplify(n, d); return s[1] === 1 ? String(s[0]) : s[0] + "/" + s[1]; }
+  function probText(n, d) {
+    var s = simplify(n, d), p = n / d, out = n + "/" + d;
+    if (s[1] === 1) return out + " = " + s[0] + " = " + (s[0] * 100) + PCT;
+    if (s[1] !== d) out += " = " + s[0] + "/" + s[1];
+    var sign = Math.abs(p * 1000 - Math.round(p * 1000)) < 1e-9 ? "= " : "≈ ";
+    return out + " " + sign + fmt(p, 3) + " " + sign + fmt(p * 100, 1) + PCT;
+  }
+  function urnProb(r, b, y, c) {
+    var t = r + b + y, f = c === "rouge" ? r : c === "bleu" ? b : c === "jaune" ? y : 0;
+    if (t === 0) return null;
+    var s = simplify(f, t);
+    return { fav: f, total: t, n: s[0], d: s[1], p: f / t };
+  }
+  function sumDist() { var d = []; for (var s = 0; s <= 12; s++) d.push(0); for (var a = 1; a <= 6; a++) for (var b = 1; b <= 6; b++) d[a + b]++; return d; }
+  function parseAnswer(str) {
+    var t = String(str).replace(/\s/g, "").replace(/[−–]/g, "-").replace(/,/g, ".");
+    if (t === "") return NaN;
+    var pct = false;
+    if (t.charAt(t.length - 1) === "%") { pct = true; t = t.slice(0, -1); }
+    var m = t.match(/^(\d+(?:\.\d+)?)\/(\d+(?:\.\d+)?)$/);
+    if (m) { var a = Number(m[1]), b = Number(m[2]); if (b === 0) return NaN; return pct ? a / b / 100 : a / b; }
+    if (!/^-?(\d+\.?\d*|\.\d+)$/.test(t)) return NaN;
+    var x = Number(t);
+    return pct ? x / 100 : x;
+  }
+  function comb(n, k) { var r = 1; for (var i = 1; i <= k; i++) r = r * (n - k + i) / i; return Math.round(r); }
+  function lotoCombos() { return comb(49, 5) * 10; }
+  window.__proba = { gcd: gcd, simplify: simplify, fracStr: fracStr, probText: probText, urnProb: urnProb, sumDist: sumDist, parseAnswer: parseAnswer, comb: comb, lotoCombos: lotoCombos };
+
+  /* ---------- Faces de dé ---------- */
+  var PIPS = { 1: [[.5, .5]], 2: [[.25, .25], [.75, .75]], 3: [[.25, .25], [.5, .5], [.75, .75]], 4: [[.25, .25], [.75, .25], [.25, .75], [.75, .75]], 5: [[.25, .25], [.75, .25], [.5, .5], [.25, .75], [.75, .75]], 6: [[.25, .25], [.75, .25], [.25, .5], [.75, .5], [.25, .75], [.75, .75]] };
+  function drawFace(svg, x, y, size, v, on) {
+    mk(svg, "rect", { x: x, y: y, width: size, height: size, rx: size * 0.16, fill: on ? "var(--acc-soft)" : "var(--card)", stroke: on ? "var(--acc)" : "var(--ink)", "stroke-width": on ? 5 : 3 });
+    PIPS[v].forEach(function (q) { mk(svg, "circle", { cx: x + q[0] * size, cy: y + q[1] * size, r: size * 0.09, fill: on ? "var(--acc)" : "var(--ink)" }); });
+  }
+  drawFace($("heroDie"), 6, 6, 88, 6, true);
+
+  /* ---------- Étapes 1 et 2 : événements ---------- */
+  var events = [
+    { name: "Nombre pair", txt: "obtenir un nombre pair", set: [2, 4, 6] },
+    { name: "Nombre impair", txt: "obtenir un nombre impair", set: [1, 3, 5] },
+    { name: "Multiple de 3", txt: "obtenir un multiple de 3", set: [3, 6] },
+    { name: "Plus que 4", txt: "obtenir un nombre strictement supérieur à 4", set: [5, 6] },
+    { name: "Obtenir un 6", txt: "obtenir un 6", set: [6] },
+    { name: "Obtenir un 7", txt: "obtenir un 7", set: [] },
+    { name: "Entre 1 et 6", txt: "obtenir un nombre entre 1 et 6", set: [1, 2, 3, 4, 5, 6] }
+  ];
+  events.forEach(function (e, i) {
+    var b = document.createElement("button"); b.type = "button"; b.id = "ev" + i; b.textContent = e.name;
+    b.addEventListener("click", function () { chooseEvent(i); });
+    $("events").appendChild(b);
+  });
+  function chooseEvent(i) {
+    var e = events[i], k = e.set.length, svg = $("dice");
+    events.forEach(function (q, j) { $("ev" + j).setAttribute("aria-pressed", j === i ? "true" : "false"); });
+    clear(svg);
+    for (var v = 1; v <= 6; v++) {
+      var on = e.set.indexOf(v) >= 0, x = 11 + (v - 1) * 106;
+      drawFace(svg, x, 8, 88, v, on);
+      mk(svg, "text", { x: x + 44, y: 126, "text-anchor": "middle", "font-size": 18, "class": on ? "acc b" : "soft" }, String(v));
+    }
+    var fav = k === 0 ? "aucune. C'est un événement impossible." : "{" + e.set.join(" ; ") + "}, soit <b>" + nb(k, "issue", "issues") + "</b>.";
+    $("evOut").innerHTML = "<span>Expérience : lancer un dé à 6 faces.</span>" +
+      "<span>Issues possibles : {1 ; 2 ; 3 ; 4 ; 5 ; 6}, soit <b>6 issues</b>.</span>" +
+      "<span>Événement : « " + e.txt + " ».</span>" +
+      "<span>Issues favorables : " + fav + "</span>";
+    var why = k === 0 ? "Événement impossible : sa probabilité est 0." : k === 6 ? "Événement certain : sa probabilité est 1." : "Contraire : P(ne pas " + e.txt + ") = 1 − " + fracStr(k, 6) + " = " + fracStr(6 - k, 6) + ".";
+    $("evProb").innerHTML = "<span>P(" + e.txt + ") = " + k + " ÷ 6</span><span><b>" + probText(k, 6) + "</b></span><span class='why'>" + why + "</span>";
+    drawScale(k / 6, fracStr(k, 6));
+  }
+  function drawScale(p, label) {
+    var svg = $("scale"); clear(svg);
+    function X(v) { return 40 + v * 560; }
+    var ex = [
+      { v: 0, t: "Dé : obtenir 7", y: 30, a: "start" },
+      { v: 1 / 6, t: "Dé : obtenir 6", y: 62, a: "start" },
+      { v: 0.5, t: "Pièce : pile", y: 30, a: "middle" },
+      { v: 1, t: "Dé : 1 à 6", y: 30, a: "end" }
+    ];
+    ex.forEach(function (e) {
+      mk(svg, "line", { x1: X(e.v), y1: e.y + 6, x2: X(e.v), y2: 104, stroke: "var(--ink-soft)", "stroke-width": 1.5, "stroke-dasharray": "3 4" });
+      mk(svg, "text", { x: X(e.v), y: e.y, "text-anchor": e.a, "font-size": 16 }, e.t);
+    });
+    mk(svg, "line", { x1: X(0), y1: 110, x2: X(1), y2: 110, stroke: "var(--ink)", "stroke-width": 4, "stroke-linecap": "round" });
+    [[0, "0"], [1 / 6, "1/6"], [0.5, "1/2"], [1, "1"]].forEach(function (t) {
+      mk(svg, "circle", { cx: X(t[0]), cy: 110, r: 6, fill: "var(--ink)" });
+      mk(svg, "text", { x: X(t[0]), y: 140, "text-anchor": "middle", "font-size": 16, "class": "b" }, t[1]);
+    });
+    mk(svg, "text", { x: X(0), y: 168, "text-anchor": "start", "font-size": 16, "class": "soft" }, "impossible");
+    mk(svg, "text", { x: X(0.5), y: 168, "text-anchor": "middle", "font-size": 16, "class": "soft" }, "une chance sur deux");
+    mk(svg, "text", { x: X(1), y: 168, "text-anchor": "end", "font-size": 16, "class": "soft" }, "certain");
+    var x = X(p), lx = Math.min(Math.max(x, 130), 510);
+    mk(svg, "circle", { cx: x, cy: 110, r: 10, fill: "var(--acc)", stroke: "var(--card)", "stroke-width": 3 });
+    mk(svg, "path", { d: "M" + x + " 180 L" + (x - 8) + " 192 L" + (x + 8) + " 192 Z", fill: "var(--acc)" });
+    mk(svg, "text", { x: lx, y: 214, "text-anchor": "middle", "font-size": 16, "class": "acc b" }, "Ton événement : " + label);
+  }
+  chooseEvent(0);
+
+  /* ---------- Étape 3 : l'urne ---------- */
+  var COLS = [
+    { k: "r", name: "rouge", adj: "rouge", adjPl: "rouges", fill: "var(--ball-r)" },
+    { k: "b", name: "bleu", adj: "bleue", adjPl: "bleues", fill: "var(--ball-b)" },
+    { k: "y", name: "jaune", adj: "jaune", adjPl: "jaunes", fill: "var(--ball-y)" }
+  ];
+  var urn = { r: 3, b: 5, y: 2 }, drawn = -1;
+  function total() { return urn.r + urn.b + urn.y; }
+  function colorOf(i) { return i < urn.r ? 0 : i < urn.r + urn.b ? 1 : 2; }
+  function drawUrn() {
+    var svg = $("urnSvg"), t = total(); clear(svg);
+    mk(svg, "path", { d: "M130 40 L150 40 L150 280 Q150 306 176 306 L464 306 Q490 306 490 280 L490 40 L510 40", fill: "var(--card)", stroke: "var(--ink)", "stroke-width": 4, "stroke-linejoin": "round", "stroke-linecap": "round" });
+    if (t === 0) { mk(svg, "text", { x: 320, y: 180, "text-anchor": "middle", "font-size": 20, "class": "soft" }, "L'urne est vide"); return; }
+    for (var i = 0; i < t; i++) {
+      var row = Math.floor(i / 11), col = i % 11;
+      mk(svg, "circle", { cx: 170 + col * 30, cy: 282 - row * 30, r: 13, fill: COLS[colorOf(i)].fill, stroke: "var(--card)", "stroke-width": 1.5 });
+    }
+    if (drawn >= 0 && drawn < t) {
+      var dr = Math.floor(drawn / 11), dc = drawn % 11;
+      mk(svg, "circle", { cx: 170 + dc * 30, cy: 282 - dr * 30, r: 18, fill: "none", stroke: "var(--ink)", "stroke-width": 4 });
+      mk(svg, "circle", { cx: 578, cy: 170, r: 26, fill: COLS[colorOf(drawn)].fill, stroke: "var(--ink)", "stroke-width": 3, "class": "pop" });
+      mk(svg, "text", { x: 578, y: 226, "text-anchor": "middle", "font-size": 16 }, "tirée");
+    }
+  }
+  function updateUrn() {
+    COLS.forEach(function (c) { $(c.k + "Count").textContent = urn[c.k]; });
+    drawUrn();
+    var t = total(), res = $("urnRes"), sum = $("urnSum");
+    if (t === 0) { res.innerHTML = "<p class='err'>L'urne est vide : ajoute des boules.</p>"; sum.innerHTML = "<span class='why'>Sans boule, on ne peut rien tirer.</span>"; return; }
+    res.innerHTML = COLS.map(function (c) {
+      var f = urn[c.k];
+      return "<div class='res'><span class='res-name'><span class='dot " + c.k + "'></span> P(" + c.name + ")</span><span class='res-val'>" + fracStr(f, t) + "</span><span class='res-calc'>" + probText(f, t) + " · " + nb(f, "boule " + c.adj, "boules " + c.adjPl) + " sur " + t + "</span></div>";
+    }).join("");
+    sum.innerHTML = "<span>P(rouge) + P(bleu) + P(jaune) = " + urn.r + "/" + t + " + " + urn.b + "/" + t + " + " + urn.y + "/" + t + " = " + t + "/" + t + " = <b>1</b></span><span class='why'>La somme des probabilités de toutes les issues vaut toujours 1.</span>";
+  }
+  COLS.forEach(function (c) {
+    $(c.k + "Minus").addEventListener("click", function () { if (urn[c.k] > 0) { urn[c.k]--; resetDraw(); } });
+    $(c.k + "Plus").addEventListener("click", function () { if (urn[c.k] < 20) { urn[c.k]++; resetDraw(); } });
+  });
+  function resetDraw() {
+    drawn = -1;
+    $("drawOut").innerHTML = "<span class='why'>Clique sur « Tirer une boule ». La boule est remise dans l'urne après chaque tirage.</span>";
+    $("simOut").innerHTML = "";
+    updateUrn();
+  }
+  $("drawOne").addEventListener("click", function () {
+    var t = total();
+    if (!t) { $("drawOut").innerHTML = "<span class='err'>L'urne est vide : ajoute des boules.</span>"; return; }
+    drawn = Math.floor(Math.random() * t); drawUrn();
+    var c = COLS[colorOf(drawn)];
+    $("drawOut").innerHTML = "<span>Tu as tiré une boule <b>" + c.adj + "</b>.</span><span class='why'>Elle avait une probabilité de " + probText(urn[c.k], t) + " d'être tirée. On la remet dans l'urne avant le tirage suivant.</span>";
+  });
+  $("draw1000").addEventListener("click", function () {
+    var t = total();
+    if (!t) { $("drawOut").innerHTML = "<span class='err'>L'urne est vide : ajoute des boules.</span>"; return; }
+    var N = 1000, cnt = [0, 0, 0];
+    for (var i = 0; i < N; i++) cnt[colorOf(Math.floor(Math.random() * t))]++;
+    var rows = COLS.map(function (c, j) {
+      var p = urn[c.k] / t;
+      return "<tr><td style='text-align:left'><span class='dot " + c.k + "'></span> " + c.adj.charAt(0).toUpperCase() + c.adj.slice(1) + "</td><td>" + fmt(cnt[j]) + "</td><td>" + fmt(cnt[j] / N * 100, 1) + PCT + "</td><td>" + fmt(p * 100, 1) + PCT + "</td></tr>";
+    }).join("");
+    $("simOut").innerHTML = "<table><thead><tr><th style='text-align:left'>Couleur</th><th>Tirages</th><th>Fréquence</th><th>Probabilité</th></tr></thead><tbody>" + rows + "</tbody></table>";
+    $("drawOut").innerHTML = "<span>Sur <b>" + fmt(N) + "</b> tirages avec remise :</span><span class='why'>Les fréquences sont proches des probabilités, sans être exactement égales. Recommence : elles changent un peu à chaque fois.</span>";
+  });
+  updateUrn();
+
+  /* ---------- Étape 4 : loi des grands nombres ---------- */
+  var lgn = { mode: "de", n: 100 }, NS_LIST = [10, 100, 1000, 10000];
+  NS_LIST.forEach(function (n) {
+    var b = document.createElement("button"); b.type = "button"; b.id = "n" + n; b.textContent = fmt(n) + " lancers";
+    b.addEventListener("click", function () { lgn.n = n; runLgn(); });
+    $("nBtns").appendChild(b);
+  });
+  $("mDie").addEventListener("click", function () { lgn.mode = "de"; runLgn(); });
+  $("mCoin").addEventListener("click", function () { lgn.mode = "piece"; runLgn(); });
+  function runLgn() {
+    var die = lgn.mode === "de", k = die ? 6 : 2, n = lgn.n, focus = die ? 5 : 0;
+    var counts = [], pts = [], hits = 0, S = Math.min(n, 200), j = 1, next = Math.ceil(n / S), i;
+    for (i = 0; i < k; i++) counts.push(0);
+    for (i = 0; i < n; i++) {
+      var r = Math.floor(Math.random() * k);
+      counts[r]++;
+      if (r === focus) hits++;
+      while (j <= S && i + 1 >= next) { pts.push([i + 1, hits / (i + 1)]); j++; next = Math.ceil(n * j / S); }
+    }
+    var labels = die ? ["1", "2", "3", "4", "5", "6"] : ["Pile", "Face"], p = 1 / k;
+    var freqs = counts.map(function (c) { return c / n; });
+    $("mDie").setAttribute("aria-pressed", die ? "true" : "false");
+    $("mCoin").setAttribute("aria-pressed", die ? "false" : "true");
+    NS_LIST.forEach(function (m) { $("n" + m).setAttribute("aria-pressed", m === n ? "true" : "false"); });
+    $("lgnLegend").textContent = die ? "probabilité 1/6 ≈ 16,7 %" : "probabilité 1/2 = 50 %";
+    $("convTitle").textContent = die ? "Fréquence du 6 au fil des lancers" : "Fréquence de Pile au fil des lancers";
+    drawLgnBars(labels, freqs, p);
+    drawConv(pts, n, p, die);
+    var pText = die ? "1/6 ≈ 16,7" + PCT : "1/2 = 50" + PCT;
+    $("lgnTable").innerHTML = "<thead><tr><th>Issue</th><th>Effectif</th><th>Fréquence</th><th>Probabilité</th></tr></thead><tbody>" + labels.map(function (l, q) {
+      return "<tr><td>" + l + "</td><td>" + fmt(counts[q]) + "</td><td>" + fmt(freqs[q] * 100, 1) + PCT + "</td><td>" + pText + "</td></tr>";
+    }).join("") + "</tbody>";
+    var gap = 0; freqs.forEach(function (f) { gap = Math.max(gap, Math.abs(f - p)); });
+    var msg = n === 10 ? "Avec 10 lancers, le hasard domine : les fréquences peuvent être très loin de la probabilité."
+      : n === 100 ? "Avec 100 lancers, on commence à voir la probabilité, mais les écarts restent visibles."
+      : n === 1000 ? "Avec 1 000 lancers, les barres sont déjà proches de la ligne."
+      : "Avec 10 000 lancers, les fréquences sont très proches de la probabilité : c'est la loi des grands nombres.";
+    $("lgnOut").innerHTML = "<span>Plus grand écart entre une fréquence et la probabilité : <b>" + fmt(gap * 100, 1) + " point" + (gap * 100 >= 2 ? "s" : "") + "</b> de pourcentage.</span><span class='why'>" + msg + "</span>";
+  }
+  function drawLgnBars(labels, freqs, p) {
+    var svg = $("lgnBars"); clear(svg);
+    var W = 640, H = 300, L = 64, R = 16, T = 30, B = 40, k = labels.length;
+    var maxf = Math.max.apply(null, freqs), step = k === 6 ? 0.1 : 0.25;
+    var ymax = k === 6 ? Math.max(0.3, Math.ceil(maxf / 0.1 - 1e-9) * 0.1) : 1;
+    function Y(v) { return H - B - v / ymax * (H - B - T); }
+    for (var gi = 0; gi * step <= ymax + 1e-9; gi++) {
+      var g = gi * step;
+      mk(svg, "line", { x1: L, y1: Y(g), x2: W - R, y2: Y(g), stroke: "var(--line)", "stroke-width": 1 });
+      mk(svg, "text", { x: L - 8, y: Y(g) + 5, "text-anchor": "end", "font-size": 16, "class": "soft" }, fmt(g * 100, 1) + PCT);
+    }
+    var slot = (W - L - R) / k, bw = slot * 0.6;
+    freqs.forEach(function (f, i) {
+      var cx = L + (i + 0.5) * slot;
+      mk(svg, "rect", { x: cx - bw / 2, y: Y(f), width: bw, height: Y(0) - Y(f), fill: "var(--acc)", rx: 3 });
+      mk(svg, "text", { x: cx, y: Y(f) - 8, "text-anchor": "middle", "font-size": 16 }, fmt(f * 100, 1) + PCT);
+      mk(svg, "text", { x: cx, y: H - B + 26, "text-anchor": "middle", "font-size": 18, "class": "b" }, labels[i]);
+    });
+    mk(svg, "line", { x1: L, y1: Y(p), x2: W - R, y2: Y(p), stroke: "var(--ink)", "stroke-width": 2.5, "stroke-dasharray": "8 6" });
+    mk(svg, "line", { x1: L, y1: Y(0), x2: W - R, y2: Y(0), stroke: "var(--ink)", "stroke-width": 2 });
+  }
+  function drawConv(pts, n, p, die) {
+    var svg = $("lgnConv"); clear(svg);
+    var W = 640, H = 266, L = 64, R = 20, T = 20, B = 50, ymax = die ? 0.5 : 1, step = die ? 0.1 : 0.25;
+    function X(v) { return L + v / n * (W - L - R); }
+    function Y(v) { return H - B - Math.min(v, ymax) / ymax * (H - B - T); }
+    for (var gi = 0; gi * step <= ymax + 1e-9; gi++) {
+      var g = gi * step;
+      mk(svg, "line", { x1: L, y1: Y(g), x2: W - R, y2: Y(g), stroke: "var(--line)", "stroke-width": 1 });
+      mk(svg, "text", { x: L - 8, y: Y(g) + 5, "text-anchor": "end", "font-size": 16, "class": "soft" }, fmt(g * 100, 1) + PCT);
+    }
+    mk(svg, "line", { x1: L, y1: Y(p), x2: W - R, y2: Y(p), stroke: "var(--ink)", "stroke-width": 2.5, "stroke-dasharray": "8 6" });
+    var d = pts.map(function (q) { return X(q[0]).toFixed(1) + "," + Y(q[1]).toFixed(1); }).join(" ");
+    mk(svg, "polyline", { points: d, fill: "none", stroke: "var(--acc)", "stroke-width": 3, "stroke-linejoin": "round" });
+    mk(svg, "line", { x1: L, y1: Y(0), x2: W - R, y2: Y(0), stroke: "var(--ink)", "stroke-width": 2 });
+    mk(svg, "text", { x: L, y: H - B + 22, "text-anchor": "middle", "font-size": 16 }, "0");
+    mk(svg, "text", { x: W - R, y: H - B + 22, "text-anchor": "end", "font-size": 16 }, fmt(n));
+    mk(svg, "text", { x: (L + W - R) / 2, y: H - 8, "text-anchor": "middle", "font-size": 16, "class": "soft" }, "nombre de lancers");
+  }
+  runLgn();
+
+  /* ---------- Étape 5 : deux dés ---------- */
+  var DIST = sumDist();
+  (function () {
+    var h = "<thead><tr><th scope='col'>+</th>", i, j;
+    for (j = 1; j <= 6; j++) h += "<th scope='col'>" + j + "</th>";
+    h += "</tr></thead><tbody>";
+    for (i = 1; i <= 6; i++) {
+      h += "<tr><th scope='row'>" + i + "</th>";
+      for (j = 1; j <= 6; j++) { var s = i + j, k = 6 - Math.abs(s - 7); h += "<td class='k" + k + (s === 7 ? " s7" : "") + "'>" + s + "</td>"; }
+      h += "</tr>";
+    }
+    $("sumTable").innerHTML = h + "</tbody>";
+  })();
+  function drawSum(freq) {
+    var svg = $("sumChart"); clear(svg);
+    var W = 640, H = 300, L = 64, R = 12, T = 34, B = 40, maxf = 0, s;
+    if (freq) for (s = 2; s <= 12; s++) maxf = Math.max(maxf, freq[s]);
+    var ymax = Math.max(0.2, Math.ceil(maxf / 0.05 - 1e-9) * 0.05);
+    function Y(v) { return H - B - v / ymax * (H - B - T); }
+    for (var gi = 0; gi * 0.05 <= ymax + 1e-9; gi++) {
+      var g = gi * 0.05;
+      mk(svg, "line", { x1: L, y1: Y(g), x2: W - R, y2: Y(g), stroke: "var(--line)", "stroke-width": 1 });
+      mk(svg, "text", { x: L - 8, y: Y(g) + 5, "text-anchor": "end", "font-size": 16, "class": "soft" }, fmt(g * 100, 1) + PCT);
+    }
+    var slot = (W - L - R) / 11;
+    for (s = 2; s <= 12; s++) {
+      var cx = L + (s - 1.5) * slot, th = DIST[s] / 36, top = th;
+      if (freq) {
+        mk(svg, "rect", { x: cx - 19, y: Y(th), width: 18, height: Y(0) - Y(th), fill: "var(--acc-soft)", stroke: "var(--acc)", "stroke-width": 2 });
+        mk(svg, "rect", { x: cx + 1, y: Y(freq[s]), width: 18, height: Y(0) - Y(freq[s]), fill: "var(--acc)" });
+        top = Math.max(th, freq[s]);
+      } else {
+        mk(svg, "rect", { x: cx - 15, y: Y(th), width: 30, height: Y(0) - Y(th), fill: "var(--acc-soft)", stroke: "var(--acc)", "stroke-width": 2 });
+      }
+      mk(svg, "text", { x: cx, y: Y(top) - 8, "text-anchor": "middle", "font-size": 16 }, DIST[s] + "/36");
+      mk(svg, "text", { x: cx, y: H - B + 26, "text-anchor": "middle", "font-size": 17, "class": s === 7 ? "acc b" : "b" }, String(s));
+    }
+    mk(svg, "line", { x1: L, y1: Y(0), x2: W - R, y2: Y(0), stroke: "var(--ink)", "stroke-width": 2 });
+  }
+  function runSum(n) {
+    var c = [], s, i;
+    for (s = 0; s <= 12; s++) c.push(0);
+    for (i = 0; i < n; i++) c[2 + Math.floor(Math.random() * 6) + Math.floor(Math.random() * 6)]++;
+    var freq = c.map(function (v) { return v / n; });
+    drawSum(freq);
+    function line(v) { return "<span>Somme " + v + " : " + fmt(c[v]) + " fois, fréquence " + fmt(freq[v] * 100, 1) + PCT + ". Probabilité " + probText(DIST[v], 36) + ".</span>"; }
+    $("sumOut").innerHTML = "<span>Sur <b>" + fmt(n) + "</b> doubles lancers :</span>" + line(7) + line(2) + line(12) +
+      "<span class='why'>Le 7 sort bien plus souvent que le 2 ou le 12, comme le prévoit le tableau des 36 cases.</span>";
+  }
+  $("sum1000").addEventListener("click", function () { runSum(1000); });
+  $("sum10000").addEventListener("click", function () { runSum(10000); });
+  drawSum(null);
+
+  /* ---------- Étape 6 : le dé sans mémoire ---------- */
+  $("memRun").addEventListener("click", function () {
+    var N = 6000000, run = 0, cases = 0, six = 0, p6 = 1 / 6;
+    for (var i = 0; i < N; i++) {
+      var isSix = Math.random() < p6;
+      if (run >= 5) { cases++; if (isSix) six++; }
+      run = isSix ? run + 1 : 0;
+    }
+    var f = cases ? six / cases : 0;
+    $("memOut").innerHTML = "<span>Sur " + fmt(N) + " lancers, il y a eu <b>" + fmt(cases) + "</b> fois cinq 6 de suite.</span>" +
+      "<span>Juste après, le 6 est sorti <b>" + fmt(six) + "</b> fois : fréquence ≈ <b>" + fmt(f * 100, 1) + PCT + "</b>.</span>" +
+      "<span class='why'>C'est proche de 1/6 ≈ 16,7 %. Après cinq 6, le 6 ne devient ni plus rare ni plus fréquent : le dé ne se souvient de rien.</span>";
+  });
+
+  /* ---------- Étape 7 : quiz ---------- */
+  function de(s) { return (/^[aeiouyéèêh]/i.test(s) ? "d'" : "de ") + s; }
+  var dieEvents = [
+    ["obtenir un nombre pair", [2, 4, 6]],
+    ["obtenir un nombre impair", [1, 3, 5]],
+    ["obtenir un multiple de 3", [3, 6]],
+    ["obtenir un nombre strictement supérieur à 4", [5, 6]],
+    ["obtenir un nombre inférieur ou égal à 2", [1, 2]],
+    ["obtenir un nombre premier", [2, 3, 5]],
+    ["obtenir un diviseur de 6", [1, 2, 3, 6]],
+    ["obtenir un 5", [5]]
+  ];
+  var coinEvents = [
+    ["obtenir deux fois Pile", 1, "seulement PP"],
+    ["obtenir au moins une fois Pile", 3, "PP, PF et FP"],
+    ["obtenir exactement une fois Pile", 2, "PF et FP"],
+    ["ne jamais obtenir Pile", 1, "seulement FF"],
+    ["obtenir deux fois la même face", 2, "PP et FF"]
+  ];
+  var cardEvents = [
+    ["un cœur", 13, "13 cœurs, de l'as au roi"],
+    ["un as", 4, "4 as, un par couleur"],
+    ["une figure (valet, dame ou roi)", 12, "3 figures × 4 couleurs"],
+    ["une carte rouge", 26, "les cœurs et les carreaux, 2 × 13"],
+    ["le roi de pique", 1, "une seule carte"],
+    ["un roi ou une dame", 8, "4 rois + 4 dames"]
+  ];
+  function makeQ(t) {
+    if (t === 0) {
+      var e = pick(dieEvents), k = e[1].length;
+      return { q: "On lance un dé à 6 faces. Quelle est la probabilité " + de(e[0]) + " ?", n: k, d: 6, how: "Issues favorables : {" + e[1].join(" ; ") + "}, soit " + k + " sur 6. P = " + probText(k, 6) };
+    }
+    if (t === 1) {
+      var r = rnd(1, 9), b = rnd(1, 9), y = rnd(1, 6), c = pick(COLS), tot = r + b + y, f = c.k === "r" ? r : c.k === "b" ? b : y;
+      return { q: "Une urne contient " + nb(r, "boule rouge", "boules rouges") + ", " + nb(b, "boule bleue", "boules bleues") + " et " + nb(y, "boule jaune", "boules jaunes") + ". On tire une boule au hasard. Quelle est la probabilité qu'elle soit " + c.adj + " ?", n: f, d: tot, how: nb(f, "boule " + c.adj, "boules " + c.adjPl) + " sur " + tot + " boules : P = " + probText(f, tot) };
+    }
+    if (t === 2) {
+      if (Math.random() < 0.5) {
+        var p = pick([10, 15, 20, 25, 30, 35, 40, 60, 65, 70, 80, 85, 90]);
+        return { q: "La météo annonce " + p + PCT + " de risque de pluie demain. Quelle est la probabilité qu'il ne pleuve pas ?", n: 100 - p, d: 100, how: "Événement contraire : 1 − " + fmt(p / 100, 2) + " = " + fmt((100 - p) / 100, 2) + ", soit " + (100 - p) + PCT };
+      }
+      var e2 = pick(dieEvents), k2 = e2[1].length;
+      return { q: "On lance un dé à 6 faces. Quelle est la probabilité de ne pas " + e2[0] + " ?", n: 6 - k2, d: 6, how: "P(" + e2[0] + ") = " + fracStr(k2, 6) + ", donc P(contraire) = 1 − " + fracStr(k2, 6) + ". P = " + probText(6 - k2, 6) };
+    }
+    if (t === 3) {
+      var ce = pick(coinEvents);
+      return { q: "On lance deux fois une pièce. Quelle est la probabilité " + de(ce[0]) + " ?", n: ce[1], d: 4, how: "4 issues équiprobables : PP, PF, FP, FF. Favorables : " + ce[2] + ". P = " + probText(ce[1], 4) };
+    }
+    if (t === 4) {
+      var v = rnd(0, 2);
+      if (v === 0) {
+        var s = rnd(2, 12), pairs = [];
+        for (var a = Math.max(1, s - 6); a <= Math.min(6, s - 1); a++) pairs.push("(" + a + " ; " + (s - a) + ")");
+        return { q: "On lance deux dés et on additionne les résultats. Quelle est la probabilité d'obtenir une somme égale à " + s + " ?", n: DIST[s], d: 36, how: pairs.join(", ") + " : " + nb(DIST[s], "case", "cases") + " sur 36. P = " + probText(DIST[s], 36) };
+      }
+      if (v === 1) return { q: "On lance deux dés. Quelle est la probabilité d'obtenir un double (deux fois le même nombre) ?", n: 6, d: 36, how: "(1 ; 1), (2 ; 2), …, (6 ; 6) : 6 cases sur 36. P = " + probText(6, 36) };
+      var th = rnd(8, 10), cnt = 0, sums = [];
+      for (var s2 = th + 1; s2 <= 12; s2++) { cnt += DIST[s2]; sums.push(s2 + " (" + nb(DIST[s2], "case", "cases") + ")"); }
+      return { q: "On lance deux dés et on additionne. Quelle est la probabilité d'obtenir une somme strictement supérieure à " + th + " ?", n: cnt, d: 36, how: "Sommes " + sums.join(", ") + " : " + cnt + " cases sur 36. P = " + probText(cnt, 36) };
+    }
+    var ca = pick(cardEvents);
+    return { q: "On tire une carte au hasard dans un jeu de 52 cartes. Quelle est la probabilité de tirer " + ca[0] + " ?", n: ca[1], d: 52, how: ca[2] + " : " + nb(ca[1], "carte", "cartes") + " sur 52. P = " + probText(ca[1], 52) };
+  }
+  var quiz = $("quiz"), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ""; done = [];
+    var types = shuffle([0, 0, 1, 1, 2, 3, 4, 5]);
+    for (var k = 0; k < 8; k++) {
+      var Q = makeQ(types[k]), li = document.createElement("li");
+      li.innerHTML = "<span class='q'>" + Q.q + "</span><input type='text' id='qa" + k + "' autocomplete='off' aria-label='Ta réponse à la question " + (k + 1) + "'><button type='button' id='qb" + k + "'>Vérifier</button><span class='fb' id='qf" + k + "' aria-live='polite'></span>";
+      quiz.appendChild(li);
+      (function (k, Q) {
+        function check() {
+          var fb = $("qf" + k), raw = $("qa" + k).value, x = parseAnswer(raw), a = Q.n / Q.d;
+          if (isNaN(x)) { fb.className = "fb"; fb.textContent = "Écris une fraction (1/2), un nombre décimal (0,5) ou un pourcentage (50 %)."; return; }
+          var ok = raw.indexOf("/") >= 0 ? Math.abs(x - a) < 1e-9 : Math.abs(x - a) < 0.005;
+          if (ok) { done[k] = true; fb.className = "fb ok"; fb.innerHTML = "Bravo, c'est juste !<span>" + Q.how + "</span>"; }
+          else {
+            done[k] = false; fb.className = "fb no";
+            fb.innerHTML = (x < 0 || x > 1 ? "Attention : une probabilité est toujours entre 0 et 1. " : "Pas tout à fait. ") + "La réponse est " + fracStr(Q.n, Q.d) + ".<span>" + Q.how + "</span>";
+          }
+          $("score").textContent = done.filter(Boolean).length + " / 8";
+        }
+        $("qb" + k).addEventListener("click", check);
+        $("qa" + k).addEventListener("keydown", function (e) { if (e.key === "Enter") check(); });
+      })(k, Q);
+    }
+    $("score").textContent = "0 / 8";
+  }
+  $("newQuiz").addEventListener("click", newQuiz);
+  newQuiz();
+})();
+</script>
+</body>
+</html>

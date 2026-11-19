@@ -1,0 +1,928 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Les statistiques</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, encre orange brûlé (la moyenne), bleu pour la médiane, marge rouge. */
+:root {
+  --paper: #fbf7f3;
+  --grid: #efe3d8;
+  --card: #ffffff;
+  --ink: #2a1a10;
+  --ink-soft: #6b5446;
+  --acc: #c2410c;
+  --acc-soft: #fde4d4;
+  --two: #1c64c8;
+  --two-soft: #dbe8fa;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --blk: #3a3532;
+  --yel: #d9a400;
+  --hl: #fff0a3;
+  --line: #e6d6c8;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #16100b; --grid: #241911; --card: #1d150f; --ink: #f6ece4; --ink-soft: #c6ad9b;
+    --acc: #fb923c; --acc-soft: #46261a; --two: #7fb0ff; --two-soft: #1a2a45;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27;
+    --blk: #a8a29e; --yel: #f5c542; --hl: #4b4318; --line: #3a2a1f;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #16100b; --grid: #241911; --card: #1d150f; --ink: #f6ece4; --ink-soft: #c6ad9b;
+  --acc: #fb923c; --acc-soft: #46261a; --two: #7fb0ff; --two-soft: #1a2a45;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27;
+  --blk: #a8a29e; --yel: #f5c542; --hl: #4b4318; --line: #3a2a1f;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+.blue { color: var(--two); }
+section { display: flex; flex-direction: column; gap: 18px; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note.blue { border-left-color: var(--two); background: var(--two-soft); color: var(--ink); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 6px 12px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+input[type="text"], textarea { font: inherit; font-family: var(--f-mono); font-size: 1.05rem; padding: 8px 10px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; }
+textarea { resize: vertical; min-height: 4.5em; line-height: 1.5; }
+input[type="range"] { width: 100%; accent-color: var(--acc); }
+input[type="range"]:disabled { opacity: .4; }
+.param { display: flex; flex-direction: column; gap: 2px; }
+.param label, .lab { font-weight: 700; }
+.err { color: var(--red); font-weight: 700; }
+.err:empty { display: none; }
+
+.results { display: flex; flex-direction: column; gap: 8px; font-variant-numeric: tabular-nums; }
+.results.trio { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.results.pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (max-width: 600px) { .results.trio, .results.pair { grid-template-columns: 1fr; } }
+.res { border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 12px; display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; align-items: baseline; min-width: 0; }
+.res-name { font-family: var(--f-display); font-weight: 700; }
+.res-val { font-family: var(--f-mono); font-weight: 600; color: var(--acc); font-size: 1.05rem; white-space: nowrap; }
+.res-val.blue { color: var(--two); }
+.res-calc { grid-column: 1 / -1; font-family: var(--f-mono); font-size: .85rem; color: var(--ink-soft); overflow-wrap: anywhere; }
+.steps { display: flex; flex-direction: column; gap: 6px; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; padding: 12px 14px; font-family: var(--f-mono); font-size: .98rem; overflow-wrap: anywhere; }
+.steps b { color: var(--acc); }
+.steps b.blue { color: var(--two); }
+.steps .why { font-family: var(--f-body); font-size: .9rem; color: var(--ink-soft); }
+.steps .err { font-family: var(--f-body); }
+
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-family: var(--f-mono); font-variant-numeric: tabular-nums; border: 1.5px solid var(--line); border-radius: 6px; padding: 2px 9px; background: var(--paper); }
+.chip.mid { background: var(--two-soft); border-color: var(--two); color: var(--two); font-weight: 600; }
+.chip.far { background: var(--red-soft); border-color: var(--red); color: var(--red); font-weight: 600; }
+.swatch { display: inline-block; width: 14px; height: 14px; border-radius: 3px; margin-right: 8px; vertical-align: -2px; border: 1px solid var(--line); }
+
+.graph svg { width: 100%; height: auto; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; display: block; }
+.duo { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.duo > div { min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+@media (max-width: 600px) { .duo { grid-template-columns: 1fr; } }
+.verdict { border-radius: 8px; padding: 12px 14px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+.verdict.yes { background: var(--ok-soft); color: var(--ok); }
+.verdict.no { background: var(--red-soft); color: var(--red); }
+.verdict span { font-weight: 400; color: var(--ink); }
+
+table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+th, td { padding: 7px 8px; border-bottom: 1px dashed var(--line); text-align: center; font-family: var(--f-mono); }
+thead th { border-bottom: 2px solid var(--ink); font-family: var(--f-display); white-space: nowrap; }
+tbody th { font-family: var(--f-display); text-align: left; white-space: nowrap; }
+tfoot th, tfoot td { border-top: 2px solid var(--ink); border-bottom: 0; font-weight: 700; }
+td.in { padding: 3px 4px; }
+td.in input[type="text"] { font-size: 1rem; padding: 4px 6px; min-width: 4.5em; text-align: center; border-width: 1.5px; }
+.scroll { overflow-x: auto; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
+.tag.ok { color: var(--ok); }
+.tag.no { color: var(--red); }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 110px auto; gap: 10px; align-items: center; }
+.quiz .q { font-size: 1rem; min-width: 0; }
+.quiz input[type="text"] { font-size: 1rem; padding: 6px 8px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz .q { grid-column: 1 / -1; } }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc); }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 120px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+</head>
+<body>
+<main class="page">
+
+  <header class="hero">
+    <span class="eyebrow">Tutoriel de maths · niveau 5<sup>e</sup>–3<sup>e</sup></span>
+    <h1>Les statistiques</h1>
+    <p class="lead">Une classe de 25 élèves, c'est 25 notes. Pour savoir vite si le contrôle s'est bien passé, on résume toute la liste avec quelques valeurs bien choisies : la moyenne, la médiane, l'étendue. C'est le travail des statistiques.</p>
+    <div class="box">
+      <strong>Les notes de Lina ce trimestre</strong>
+      <div class="chips"><span class="chip">11</span><span class="chip">14</span><span class="chip">9</span><span class="chip">16</span><span class="chip">15</span></div>
+      <div class="results trio">
+        <div class="res"><span class="res-name">Moyenne</span><span class="res-val">13</span><span class="res-calc">65 ÷ 5</span></div>
+        <div class="res"><span class="res-name">Médiane</span><span class="res-val blue">14</span><span class="res-calc">9 ; 11 ; 14 ; 15 ; 16</span></div>
+        <div class="res"><span class="res-name">Étendue</span><span class="res-val">7</span><span class="res-calc">16 − 9</span></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · Le vocabulaire</span>
+    <h2>Les mots des statistiques</h2>
+    <p>Une <strong>série statistique</strong>, c'est une liste de données récoltées sur un sujet : les notes d'un contrôle, la taille des élèves, la couleur préférée de chacun.</p>
+    <div class="cards">
+      <div class="box"><strong>Valeur</strong><span class="soft">Une réponse possible. Pour les notes : 12, 15, 8… Pour les couleurs : bleu, rouge…</span></div>
+      <div class="box"><strong>Effectif</strong><span class="soft">Le nombre de fois qu'une valeur apparaît. « 8 élèves préfèrent le bleu » : l'effectif du bleu est 8.</span></div>
+      <div class="box"><strong>Effectif total</strong><span class="soft">Le nombre total de données. On l'obtient en additionnant tous les effectifs.</span></div>
+      <div class="box"><strong>Fréquence</strong><span class="soft">La part d'une valeur dans le total : effectif ÷ effectif total. On l'écrit en fraction, en nombre décimal ou en pourcentage.</span></div>
+    </div>
+    <div class="box">
+      <h3>Exemple : les couleurs préférées des 25 élèves d'une classe</h3>
+      <div class="scroll">
+        <table aria-label="Couleurs préférées : effectifs et fréquences">
+          <thead><tr><th>Couleur</th><th>Effectif</th><th>Fraction</th><th>Décimal</th><th>Pourcentage</th></tr></thead>
+          <tbody>
+            <tr><th><span class="swatch" style="background:var(--two)"></span>Bleu</th><td>8</td><td>8/25</td><td>0,32</td><td>32 %</td></tr>
+            <tr><th><span class="swatch" style="background:var(--red)"></span>Rouge</th><td>5</td><td>5/25</td><td>0,2</td><td>20 %</td></tr>
+            <tr><th><span class="swatch" style="background:var(--ok)"></span>Vert</th><td>6</td><td>6/25</td><td>0,24</td><td>24 %</td></tr>
+            <tr><th><span class="swatch" style="background:var(--blk)"></span>Noir</th><td>4</td><td>4/25</td><td>0,16</td><td>16 %</td></tr>
+            <tr><th><span class="swatch" style="background:var(--yel)"></span>Jaune</th><td>2</td><td>2/25</td><td>0,08</td><td>8 %</td></tr>
+          </tbody>
+          <tfoot><tr><th>Total</th><td>25</td><td>25/25</td><td>1</td><td>100 %</td></tr></tfoot>
+        </table>
+      </div>
+      <p class="mono">Fréquence du bleu = 8 ÷ 25 = 0,32 = 32 %</p>
+    </div>
+    <div class="note">
+      <span class="note-title">Deux choses à savoir</span>
+      <span>La somme de toutes les fréquences fait toujours 1, c'est-à-dire 100 %.</span>
+      <span>Avec des couleurs, on peut compter les effectifs. On ne peut pas calculer de moyenne : la moyenne de « bleu » et de « rouge » n'a aucun sens. Moyenne, médiane et étendue servent pour les séries de <strong>nombres</strong>.</span>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · L'atelier des données</span>
+    <h2>Ta série, analysée en direct</h2>
+    <p>Écris des nombres séparés par des espaces, des points-virgules ou des retours à la ligne. Pour un nombre à virgule, écris 12,5 ou 12.5. Tu peux aussi choisir un exemple. Les étapes 3, 4 et 5 utilisent cette série.</p>
+    <div class="box">
+      <div class="btns" id="presets" role="group" aria-label="Exemples de séries"></div>
+      <label for="data" class="lab" id="dataLabel">Ta série</label>
+      <textarea id="data" rows="3" spellcheck="false" autocomplete="off"></textarea>
+      <p class="err" id="dataMsg" aria-live="polite"></p>
+      <div class="results trio" id="summary" aria-live="polite"></div>
+      <h3>La série rangée dans l'ordre croissant</h3>
+      <div class="chips" id="sortedList"></div>
+      <h3>Effectifs et fréquences</h3>
+      <div class="scroll">
+        <table aria-label="Effectif et fréquence de chaque valeur">
+          <thead><tr><th>Valeur</th><th>Effectif</th><th>Fraction</th><th>Décimal</th><th>Pourcentage</th></tr></thead>
+          <tbody id="freqBody"></tbody>
+          <tfoot id="freqFoot"></tfoot>
+        </table>
+      </div>
+      <h3>Diagramme en barres des effectifs</h3>
+      <div class="graph"><svg id="countChart" viewBox="0 0 640 320" role="img" aria-label="Diagramme en barres : l'effectif de chaque valeur de la série"></svg></div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · La moyenne</span>
+    <h2>Partager équitablement</h2>
+    <p>Pour calculer la <strong>moyenne</strong>, on additionne toutes les valeurs, puis on divise par l'effectif total.</p>
+    <div class="box"><p class="mono" style="font-size:1.15rem">moyenne = somme des valeurs ÷ effectif total</p></div>
+    <p>Imagine que toute la classe met ses points en commun, puis les partage en parts égales. <span class="hl">La moyenne, c'est la note de chacun si tout le monde avait la même note.</span> Sur le dessin, certaines barres dépassent le trait de la moyenne et d'autres n'y arrivent pas : ce qui dépasse comble exactement ce qui manque.</p>
+    <div class="box">
+      <h3>Avec ta série de l'atelier</h3>
+      <div class="graph"><svg id="meanChart" viewBox="0 0 640 300" role="img" aria-label="Chaque valeur de la série en barre, avec un trait pour la moyenne"></svg></div>
+      <div class="steps" id="meanSteps" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Avec des bonbons</span>
+      <span>Trois amis ont 2, 5 et 8 bonbons. Ensemble, ils en ont 2 + 5 + 8 = 15. Partagés en 3 parts égales : 15 ÷ 3 = 5. La moyenne est de 5 bonbons par personne.</span>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · La médiane</span>
+    <h2>La valeur du milieu</h2>
+    <p>La <strong>médiane</strong> coupe la série rangée en deux moitiés. Voici la recette :</p>
+    <div class="box">
+      <span>1. On <strong>range</strong> les valeurs dans l'ordre croissant.</span>
+      <span>2. Si l'effectif total est <strong>impair</strong>, la médiane est la valeur du milieu.</span>
+      <span>3. Si l'effectif total est <strong>pair</strong>, il y a deux valeurs au milieu. La médiane est leur moyenne : on les additionne et on divise par 2.</span>
+    </div>
+    <div class="box">
+      <h3>Avec ta série de l'atelier</h3>
+      <div class="chips" id="medList"></div>
+      <div class="steps" id="medSteps" aria-live="polite"></div>
+    </div>
+    <div class="note blue">
+      <span class="note-title">Ce que dit la médiane</span>
+      <span>Au moins la moitié des valeurs sont inférieures ou égales à la médiane. Au moins la moitié sont supérieures ou égales. Si la médiane d'un contrôle vaut 12, au moins la moitié de la classe a 12 ou moins, et au moins la moitié a 12 ou plus.</span>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · L'étendue</span>
+    <h2>Des valeurs serrées ou dispersées ?</h2>
+    <p>L'<strong>étendue</strong> est la différence entre la plus grande et la plus petite valeur. Elle mesure à quel point les valeurs sont <strong>dispersées</strong>.</p>
+    <div class="box"><p class="mono" style="font-size:1.15rem">étendue = plus grande valeur − plus petite valeur</p></div>
+    <div class="box">
+      <h3>Avec ta série de l'atelier</h3>
+      <div class="steps" id="rangeSteps" aria-live="polite"></div>
+    </div>
+    <div class="cards">
+      <div class="box"><strong>Classe A : 9 ; 10 ; 10 ; 11</strong><span class="soft">Moyenne 10. Étendue 11 − 9 = 2. Tout le monde a à peu près la même note.</span></div>
+      <div class="box"><strong>Classe B : 2 ; 8 ; 12 ; 18</strong><span class="soft">Moyenne 10 aussi. Étendue 18 − 2 = 16. Les notes sont très différentes.</span></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Même moyenne, séries différentes</span>
+      <span>Une moyenne seule ne raconte pas tout. L'étendue complète l'information : elle dit si les valeurs sont proches les unes des autres ou très éloignées.</span>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · Moyenne ou médiane ?</span>
+    <h2>Le piège des valeurs extrêmes</h2>
+    <p>Une petite entreprise a 5 employés. Leurs salaires par mois : 1 800 €, 1 900 €, 2 000 €, 2 100 € et 2 200 €. Ajoute maintenant le salaire du patron, beaucoup plus élevé, et regarde ce qui bouge.</p>
+    <div class="box">
+      <div class="btns"><button id="bossBtn" type="button" aria-pressed="false">Ajouter le salaire du patron</button></div>
+      <div class="param">
+        <label for="bossVal">Salaire du patron : <span class="mono" id="bossOut">20 000 €</span></label>
+        <input id="bossVal" type="range" min="3000" max="50000" step="1000" value="20000">
+      </div>
+      <div class="chips" id="salList"></div>
+      <div class="results pair" id="salRes" aria-live="polite"></div>
+      <div class="graph"><svg id="salChart" viewBox="0 0 640 240" role="img" aria-label="Les salaires sur une droite graduée, avec la moyenne et la médiane"></svg></div>
+      <div class="verdict" id="salOut" aria-live="polite"></div>
+    </div>
+    <div class="note red">
+      <span class="note-title">La leçon</span>
+      <span>Une seule valeur très grande, ou très petite, peut tirer la moyenne loin des autres valeurs. La médiane regarde seulement le milieu de la série rangée : elle bouge très peu. Quand une série contient une valeur extrême, la médiane décrit souvent mieux une valeur « typique ».</span>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · La moyenne pondérée</span>
+    <h2>Les coefficients du bulletin</h2>
+    <p>Sur un bulletin, certaines notes comptent plus que d'autres. Une note de coefficient 3 compte comme si tu l'avais eue <strong>trois fois</strong>. On multiplie chaque note par son coefficient, on additionne, puis on divise par la <strong>somme des coefficients</strong>.</p>
+    <div class="box"><p class="mono" style="font-size:1.05rem">moyenne pondérée = (note × coef + note × coef + …) ÷ (somme des coefficients)</p></div>
+    <div class="box">
+      <h3>Calculatrice de bulletin</h3>
+      <div class="scroll">
+        <table aria-label="Notes et coefficients">
+          <thead><tr><th>Matière</th><th>Note</th><th>Coefficient</th><th>Note × coef</th></tr></thead>
+          <tbody id="wBody"></tbody>
+          <tfoot><tr><th>Total</th><td></td><td id="wSc"></td><td id="wSp"></td></tr></tfoot>
+        </table>
+      </div>
+      <div class="steps" id="wOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Les graphiques</span>
+    <h2>Barres ou camembert ?</h2>
+    <p>Reprenons les couleurs préférées de l'étape 1. Dans un <strong>diagramme en barres</strong>, la hauteur de chaque barre est l'effectif. Dans un <strong>diagramme circulaire</strong>, chaque part du disque a un angle proportionnel à la fréquence. Le disque entier fait 360°.</p>
+    <div class="box"><p class="mono" style="font-size:1.15rem">angle = fréquence × 360°</p></div>
+    <div class="box">
+      <h3>Change les effectifs</h3>
+      <div class="scroll">
+        <table aria-label="Effectifs, fréquences et angles">
+          <thead><tr><th>Couleur</th><th>Effectif</th><th>Fréquence</th><th>Angle</th></tr></thead>
+          <tbody id="pieBody"></tbody>
+          <tfoot id="pieFoot"></tfoot>
+        </table>
+      </div>
+      <p class="err" id="pieMsg" aria-live="polite"></p>
+      <div class="duo">
+        <div><strong>Diagramme en barres</strong><div class="graph"><svg id="pieBars" viewBox="0 0 360 300" role="img" aria-label="Diagramme en barres des couleurs préférées"></svg></div></div>
+        <div><strong>Diagramme circulaire</strong><div class="graph"><svg id="pieChart" viewBox="0 0 360 300" role="img" aria-label="Diagramme circulaire des couleurs préférées, avec l'angle de chaque part"></svg></div></div>
+      </div>
+      <div class="steps" id="pieSteps" aria-live="polite"></div>
+    </div>
+    <p>Le diagramme en barres montre bien les <strong>effectifs</strong>. Le diagramme circulaire montre bien la <strong>part de chaque valeur dans le total</strong>.</p>
+
+    <div class="note red">
+      <span class="note-title">Attention aux graphiques trompeurs</span>
+      <span>L'équipe A a marqué 52 points dans la saison, l'équipe B 55 points. Voici deux dessins des mêmes nombres. À gauche, l'axe commence à 50 : la barre de B paraît 2,5 fois plus haute que celle de A. À droite, l'axe commence à 0 : on voit que les deux équipes sont presque à égalité.</span>
+    </div>
+    <div class="box">
+      <div class="duo">
+        <div><span class="tag no">Trompeur</span><strong>L'axe commence à 50</strong><div class="graph"><svg id="fakeChart" viewBox="0 0 320 300" role="img" aria-label="Diagramme en barres dont l'axe commence à 50 : 52 points pour A, 55 points pour B"></svg></div></div>
+        <div><span class="tag ok">Honnête</span><strong>L'axe commence à 0</strong><div class="graph"><svg id="trueChart" viewBox="0 0 320 300" role="img" aria-label="Diagramme en barres dont l'axe commence à 0 : 52 points pour A, 55 points pour B"></svg></div></div>
+      </div>
+      <p class="soft">Devant un graphique, regarde toujours où commence l'axe et lis les nombres écrits dessus.</p>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Calcule la moyenne, la médiane, l'étendue ou une fréquence. Pour un nombre à virgule, écris 12,5 ou 12.5.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Nouvelles questions</button>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · Un peu d'histoire</span>
+    <h2>Compter pour comprendre</h2>
+    <ol class="timeline">
+      <li><span class="when">Antiquité</span><div class="what"><strong>L'Égypte des pharaons</strong><span>Les scribes comptent la population, les terres et les troupeaux. Ces listes servent à fixer les impôts et à organiser les grands chantiers.</span></div></li>
+      <li><span class="when">Rome antique</span><div class="what"><strong>Le <em>census</em></strong><span>En principe tous les cinq ans, des magistrats appelés censeurs enregistrent chaque citoyen, sa famille et ses biens. Notre mot « recensement » vient du latin.</span></div></li>
+      <li><span class="when">1858</span><div class="what"><strong>Florence Nightingale</strong><span>Infirmière anglaise pendant la guerre de Crimée, elle invente un diagramme en forme de rose. Il montre que les soldats mouraient surtout de maladies dues au manque d'hygiène, bien plus que de leurs blessures. Son graphique aide à faire améliorer l'hygiène des hôpitaux militaires.</span></div></li>
+      <li><span class="when">Aujourd'hui</span><div class="what"><strong>Partout autour de toi</strong><span>Sondages avant les élections, prévisions météo, statistiques des joueurs en sport, moyennes au brevet : les statistiques aident à résumer de grandes quantités de données.</span></div></li>
+    </ol>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · À toi de jouer</span>
+    <h2>Six exercices</h2>
+    <div class="exos">
+      <details>
+        <summary>La moyenne<span class="q">Tom a eu 12, 9, 15 et 14 à ses contrôles. Quelle est sa moyenne ?</span></summary>
+        <div><span>Somme : 12 + 9 + 15 + 14 = 50. Effectif : 4. Moyenne : 50 ÷ 4 = <strong>12,5</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Médiane, effectif impair<span class="q">Trouve la médiane de la série : 7 ; 3 ; 9 ; 5 ; 11.</span></summary>
+        <div><span>Rangée : 3 ; 5 ; 7 ; 9 ; 11. Il y a 5 valeurs, la 3<sup>e</sup> est au milieu : médiane = <strong>7</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Médiane, effectif pair<span class="q">Temps de trajet en minutes : 4 ; 10 ; 6 ; 8 ; 2 ; 12. Quelle est la médiane ?</span></summary>
+        <div><span>Rangée : 2 ; 4 ; 6 ; 8 ; 10 ; 12. Il y a 6 valeurs : les deux du milieu sont 6 et 8. Médiane = (6 + 8) ÷ 2 = <strong>7 minutes</strong>.</span></div>
+      </details>
+      <details>
+        <summary>L'étendue<span class="q">Températures du matin : −4 °C ; 3 °C ; 7 °C ; −1 °C ; 5 °C. Quelle est l'étendue ?</span></summary>
+        <div><span>Plus grande : 7. Plus petite : −4. Étendue = 7 − (−4) = 7 + 4 = <strong>11 °C</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Fréquence et angle<span class="q">Dans une classe de 30 élèves, 12 viennent en bus. Quelle est la fréquence en % ? Quel angle dans un diagramme circulaire ?</span></summary>
+        <div><span>Fréquence : 12 ÷ 30 = 0,4 = <strong>40 %</strong>. Angle : 0,4 × 360° = <strong>144°</strong>.</span></div>
+      </details>
+      <details>
+        <summary>La moyenne pondérée<span class="q">Une élève a 15 (coefficient 2), 10 (coefficient 1) et 12 (coefficient 3). Quelle est sa moyenne ?</span></summary>
+        <div><span>Produits : 15 × 2 = 30 ; 10 × 1 = 10 ; 12 × 3 = 36. Somme : 76. Coefficients : 2 + 1 + 3 = 6. Moyenne : 76 ÷ 6 ≈ <strong>12,67</strong>.</span></div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• L'<strong>effectif</strong> d'une valeur, c'est son nombre d'apparitions. Sa <strong>fréquence</strong> = effectif ÷ effectif total (en fraction, en décimal ou en %).</span>
+      <span>• <strong>Moyenne</strong> = somme des valeurs ÷ effectif total. C'est le partage équitable.</span>
+      <span>• <strong>Médiane</strong> : on range la série, puis on prend la valeur du milieu (ou la moyenne des deux valeurs du milieu si l'effectif est pair).</span>
+      <span>• <strong>Étendue</strong> = plus grande valeur − plus petite valeur. Elle mesure la dispersion.</span>
+      <span>• Une valeur extrême fait bouger la moyenne, beaucoup moins la médiane.</span>
+      <span>• <strong>Moyenne pondérée</strong> = somme des (note × coefficient) ÷ somme des coefficients. Dans un diagramme circulaire, angle = fréquence × 360°.</span>
+    </div>
+  </section>
+
+  <footer>Fiche de révision · Les statistiques</footer>
+</main>
+
+<script>
+(function () {
+  var NS = "http://www.w3.org/2000/svg";
+
+  /* ---------- Outils ---------- */
+  function fmt(x, d) {
+    if (d == null) d = 3;
+    var p = Math.pow(10, d), r = Math.round(Math.round(x * 1e9) / 1e9 * p) / p;
+    if (r === 0) r = 0;
+    return r.toLocaleString("fr-FR", { maximumFractionDigits: d }).replace("-", "−");
+  }
+  function isExact(x, d) { var p = Math.pow(10, d); return Math.abs(x * p - Math.round(x * p)) < 1e-6; }
+  function eqs(x, d) { return isExact(x, d) ? "= " : "≈ "; }
+  function about(x, d) { return (isExact(x, d) ? "" : "≈ ") + fmt(x, d); }
+  function par(x, d) { return x < 0 ? "(" + fmt(x, d) + ")" : fmt(x, d); }
+  function ord(k) { return k === 1 ? "1<sup>re</sup>" : k + "<sup>e</sup>"; }
+  function num(s) { var t = String(s).replace(/\s/g, "").replace(/[−–]/g, "-").replace(",", "."); if (t === "") return NaN; var x = Number(t); return isFinite(x) ? x : NaN; }
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+  function mk(svg, name, attrs, text) { var e = document.createElementNS(NS, name); for (var a in attrs) e.setAttribute(a, attrs[a]); if (text != null) e.textContent = text; svg.appendChild(e); return e; }
+  function clear(svg) { while (svg.firstChild) svg.removeChild(svg.firstChild); }
+  function niceStep(raw) { if (!(raw > 0)) return 1; var p = Math.pow(10, Math.floor(Math.log10(raw))), n = raw / p; return (n <= 1 ? 1 : n <= 2 ? 2 : n <= 5 ? 5 : 10) * p; }
+  function clamp(x, a, b) { return Math.max(a, Math.min(b, x)); }
+  function halo(attrs) { attrs.stroke = "var(--paper)"; attrs["stroke-width"] = 5; attrs["paint-order"] = "stroke"; attrs["stroke-linejoin"] = "round"; return attrs; }
+
+  /* ---------- Fonctions statistiques (pures) ---------- */
+  function parseList(str) {
+    var toks = String(str).replace(/[−–]/g, "-").split(/[\s;]+/).filter(function (t) { return t !== ""; });
+    var values = [], bad = [];
+    toks.forEach(function (t) { var x = num(t); if (isNaN(x)) bad.push(t); else values.push(x); });
+    return { values: values, bad: bad };
+  }
+  function sum(a) { var s = 0; for (var i = 0; i < a.length; i++) s += a[i]; return s; }
+  function mean(a) { return a.length ? sum(a) / a.length : NaN; }
+  function sorted(a) { return a.slice().sort(function (x, y) { return x - y; }); }
+  function median(a) {
+    if (!a.length) return NaN;
+    var s = sorted(a), n = s.length, h = Math.floor(n / 2);
+    return n % 2 ? s[h] : (s[h - 1] + s[h]) / 2;
+  }
+  function range(a) { if (!a.length) return NaN; var s = sorted(a); return s[s.length - 1] - s[0]; }
+  function counts(a) {
+    var out = [];
+    sorted(a).forEach(function (v) { var last = out[out.length - 1]; if (last && last.value === v) last.count++; else out.push({ value: v, count: 1 }); });
+    return out;
+  }
+  function frequency(a, v) { if (!a.length) return NaN; var k = 0; a.forEach(function (x) { if (x === v) k++; }); return k / a.length; }
+  function weightedMean(notes, coefs) {
+    var sp = 0, sc = 0;
+    for (var i = 0; i < notes.length; i++) { sp += notes[i] * coefs[i]; sc += coefs[i]; }
+    return sc > 0 ? sp / sc : NaN;
+  }
+  window.__stats = { parseList: parseList, sum: sum, mean: mean, sorted: sorted, median: median, range: range, counts: counts, frequency: frequency, weightedMean: weightedMean, fmt: fmt };
+
+  function sumExpr(v) {
+    if (v.length > 30) return "somme des " + v.length + " valeurs";
+    return v.map(function (x, i) { return i ? par(x) : fmt(x); }).join(" + ");
+  }
+  function chips(arr, cls) {
+    return arr.map(function (x, i) { return "<span class='chip" + (cls && cls[i] ? " " + cls[i] : "") + "'>" + fmt(x) + "</span>"; }).join("");
+  }
+  function res(name, val, calc, cls) {
+    return "<div class='res'><span class='res-name'>" + name + "</span><span class='res-val" + (cls ? " " + cls : "") + "'>" + val + "</span>" + (calc ? "<span class='res-calc'>" + calc + "</span>" : "") + "</div>";
+  }
+  function emptyMsg(svg, W, H) { mk(svg, "text", { x: W / 2, y: H / 2, "text-anchor": "middle", "font-size": 18 }, "Pas encore de valeurs"); }
+
+  /* ---------- Atelier ---------- */
+  var presets = [
+    { name: "Notes", unit: "", label: "Notes d'un contrôle (sur 20)", data: "12 15 8 14 10 15 17 9 13 15 11 6" },
+    { name: "Tailles (cm)", unit: " cm", label: "Tailles de 9 élèves (en cm)", data: "152 160 148 155 163 158 150 171 155" },
+    { name: "Températures", unit: " °C", label: "Températures à 8 h, du lundi au dimanche (en °C)", data: "−3 −1 2 4 1 −2 0" },
+    { name: "Valeur extrême", unit: " min", label: "Temps de trajet de la semaine (en minutes) : un jour, le bus est tombé en panne", data: "10 12 11 9 13 12 55" }
+  ];
+  var dataIn = document.getElementById("data"), unit = "";
+  presets.forEach(function (p, i) {
+    var b = document.createElement("button"); b.type = "button"; b.id = "pre" + i; b.textContent = p.name;
+    b.addEventListener("click", function () { loadPreset(i); });
+    document.getElementById("presets").appendChild(b);
+  });
+  function setPressed(i) { presets.forEach(function (q, j) { document.getElementById("pre" + j).setAttribute("aria-pressed", j === i ? "true" : "false"); }); }
+  function loadPreset(i) {
+    var p = presets[i];
+    dataIn.value = p.data; unit = p.unit;
+    document.getElementById("dataLabel").textContent = p.label;
+    setPressed(i); analyse();
+  }
+  dataIn.addEventListener("input", function () {
+    setPressed(-1); unit = "";
+    document.getElementById("dataLabel").textContent = "Ta série";
+    analyse();
+  });
+
+  function analyse() {
+    var p = parseList(dataIn.value), v = p.values, msg = "";
+    if (p.bad.length) msg = "Je ne comprends pas : « " + p.bad.slice(0, 4).join(" ") + " ». Écris seulement des nombres.";
+    if (v.length > 500) { v = v.slice(0, 500); msg += " Seules les 500 premières valeurs sont utilisées."; }
+    document.getElementById("dataMsg").textContent = msg;
+    renderSummary(v); renderTable(v); drawCounts(document.getElementById("countChart"), v);
+    renderMean(v); renderMedian(v); renderRange(v);
+  }
+
+  function renderSummary(v) {
+    var el = document.getElementById("summary"), list = document.getElementById("sortedList");
+    if (!v.length) { el.innerHTML = "<p class='soft'>Écris au moins un nombre pour voir les résultats.</p>"; list.innerHTML = ""; return; }
+    var s = sorted(v);
+    list.innerHTML = chips(s);
+    el.innerHTML = res("Effectif total", String(v.length), "") +
+      res("Plus petite valeur", fmt(s[0]) + unit, "") +
+      res("Plus grande valeur", fmt(s[s.length - 1]) + unit, "") +
+      res("Moyenne", about(mean(v), 2) + unit, "étape 3") +
+      res("Médiane", fmt(median(v)) + unit, "étape 4", "blue") +
+      res("Étendue", fmt(range(v)) + unit, "étape 5");
+  }
+
+  function renderTable(v) {
+    var tb = document.getElementById("freqBody"), tf = document.getElementById("freqFoot");
+    if (!v.length) { tb.innerHTML = ""; tf.innerHTML = ""; return; }
+    var N = v.length;
+    tb.innerHTML = counts(v).map(function (o) {
+      var f = o.count / N;
+      return "<tr><td>" + fmt(o.value) + "</td><td>" + o.count + "</td><td>" + o.count + "/" + N + "</td><td>" + about(f, 3) + "</td><td>" + about(f * 100, 1) + " %</td></tr>";
+    }).join("");
+    tf.innerHTML = "<tr><th>Total</th><td>" + N + "</td><td>" + N + "/" + N + "</td><td>1</td><td>100 %</td></tr>";
+  }
+
+  function drawCounts(svg, v) {
+    clear(svg);
+    var W = 640, H = 320, L = 52, R = 14, T = 34, B = 44;
+    if (!v.length) { emptyMsg(svg, W, H); return; }
+    var c = counts(v), mx = 0, maxLen = 0;
+    c.forEach(function (o) { if (o.count > mx) mx = o.count; maxLen = Math.max(maxLen, fmt(o.value).length); });
+    var step = Math.max(1, niceStep(mx / 5)), top = Math.ceil(mx / step) * step;
+    function Y(k) { return H - B - k / top * (H - B - T); }
+    for (var i = 0; i * step <= top; i++) {
+      var k = i * step;
+      mk(svg, "line", { x1: L, y1: Y(k), x2: W - R, y2: Y(k), stroke: "var(--line)", "stroke-width": 1 });
+      mk(svg, "text", { x: L - 8, y: Y(k) + 6, "text-anchor": "end", "font-size": 16 }, fmt(k));
+    }
+    mk(svg, "text", { x: 6, y: 20, "text-anchor": "start", "font-size": 16, style: "fill:var(--ink-soft)" }, "effectif");
+    var d = c.length, slot = (W - L - R) / d, bw = Math.min(56, slot * 0.72);
+    var every = Math.max(1, Math.ceil((maxLen * 10 + 10) / slot));
+    c.forEach(function (o, j) {
+      var cx = L + slot * (j + 0.5);
+      mk(svg, "rect", { x: cx - bw / 2, y: Y(o.count), width: bw, height: Y(0) - Y(o.count), fill: "var(--acc)", rx: 2 });
+      if (slot >= 22) mk(svg, "text", { x: cx, y: Y(o.count) - 7, "text-anchor": "middle", "font-size": 16, "font-weight": 600 }, String(o.count));
+      if (j % every === 0) mk(svg, "text", { x: cx, y: H - B + 24, "text-anchor": "middle", "font-size": 16 }, fmt(o.value));
+    });
+    mk(svg, "line", { x1: L, y1: Y(0), x2: W - R, y2: Y(0), stroke: "var(--ink)", "stroke-width": 2 });
+    mk(svg, "line", { x1: L, y1: T - 6, x2: L, y2: Y(0), stroke: "var(--ink)", "stroke-width": 2 });
+  }
+
+  function drawValues(svg, v) {
+    clear(svg);
+    var W = 640, H = 300, L = 52, R = 14, T = 28, B = 26;
+    if (!v.length) { emptyMsg(svg, W, H); return; }
+    var lo = Math.min(0, Math.min.apply(null, v)), hi = Math.max(0, Math.max.apply(null, v));
+    if (hi === lo) hi = lo + 1;
+    var step = niceStep((hi - lo) / 5);
+    lo = Math.floor(lo / step + 1e-9) * step; hi = Math.ceil(hi / step - 1e-9) * step;
+    function Y(x) { return T + (hi - x) / (hi - lo) * (H - T - B); }
+    var nT = Math.round((hi - lo) / step);
+    for (var i = 0; i <= nT; i++) {
+      var t = lo + i * step;
+      mk(svg, "line", { x1: L, y1: Y(t), x2: W - R, y2: Y(t), stroke: "var(--line)", "stroke-width": 1 });
+      mk(svg, "text", { x: L - 8, y: Y(t) + 6, "text-anchor": "end", "font-size": 16 }, fmt(t));
+    }
+    var n = v.length, slot = (W - L - R) / n, bw = Math.min(44, slot * 0.7), m = mean(v);
+    v.forEach(function (x, j) {
+      var cx = L + slot * (j + 0.5), y1 = Y(Math.max(x, 0)), y2 = Y(Math.min(x, 0));
+      mk(svg, "rect", { x: cx - bw / 2, y: y1, width: bw, height: Math.max(1, y2 - y1), fill: "var(--acc-soft)", stroke: "var(--acc)", "stroke-width": 1.5, rx: 2 });
+      if (slot >= 34) mk(svg, "text", { x: cx, y: x >= 0 ? y1 - 6 : y2 + 18, "text-anchor": "middle", "font-size": 16 }, fmt(x, 1));
+    });
+    mk(svg, "line", { x1: L, y1: Y(0), x2: W - R, y2: Y(0), stroke: "var(--ink)", "stroke-width": 2 });
+    mk(svg, "line", { x1: L, y1: T - 6, x2: L, y2: H - B, stroke: "var(--ink)", "stroke-width": 2 });
+    var ym = Y(m);
+    mk(svg, "line", { x1: L, y1: ym, x2: W - R, y2: ym, stroke: "var(--acc)", "stroke-width": 3, "stroke-dasharray": "9 6" });
+    var ly = ym - 9 < T + 4 ? ym + 24 : ym - 9;
+    mk(svg, "text", halo({ x: W - R - 4, y: ly, "text-anchor": "end", "font-size": 17, "font-weight": 600, style: "fill:var(--acc)" }), "moyenne " + eqs(m, 2) + fmt(m, 2));
+  }
+
+  function renderMean(v) {
+    var el = document.getElementById("meanSteps");
+    drawValues(document.getElementById("meanChart"), v);
+    if (!v.length) { el.innerHTML = "<span class='err'>Écris au moins un nombre dans l'atelier (étape 2).</span>"; return; }
+    var S = sum(v), n = v.length, m = S / n;
+    el.innerHTML = "<span>1. On additionne toutes les valeurs : " + sumExpr(v) + " = <b>" + fmt(S) + "</b></span>" +
+      "<span>2. On compte les valeurs : effectif total = <b>" + n + "</b></span>" +
+      "<span>3. On divise : " + fmt(S) + " ÷ " + n + " " + eqs(m, 2) + "<b>" + fmt(m, 2) + unit + "</b></span>" +
+      "<span class='why'>" + (n === 1 ? "Une seule valeur : la moyenne est cette valeur." : "Si les " + n + " valeurs étaient toutes égales, avec le même total, chacune vaudrait " + about(m, 2) + unit + ".") + "</span>";
+  }
+
+  function renderMedian(v) {
+    var list = document.getElementById("medList"), el = document.getElementById("medSteps");
+    if (!v.length) { list.innerHTML = ""; el.innerHTML = "<span class='err'>Écris au moins un nombre dans l'atelier (étape 2).</span>"; return; }
+    var s = sorted(v), n = s.length, md = median(v), h = Math.floor(n / 2), cls = [], html;
+    if (n % 2) {
+      cls[h] = "mid";
+      html = "<span>2. Effectif total : " + n + ", c'est impair. La valeur du milieu est la (" + n + " + 1) ÷ 2 = " + ord(h + 1) + " valeur.</span>" +
+        "<span>3. Médiane = <b class='blue'>" + fmt(md) + unit + "</b></span>";
+    } else {
+      cls[h - 1] = "mid"; cls[h] = "mid";
+      html = "<span>2. Effectif total : " + n + ", c'est pair. Les deux valeurs du milieu sont la " + ord(h) + " et la " + ord(h + 1) + ".</span>" +
+        "<span>3. Médiane = (" + fmt(s[h - 1]) + " + " + par(s[h]) + ") ÷ 2 = <b class='blue'>" + fmt(md) + unit + "</b></span>";
+    }
+    var below = 0, above = 0;
+    s.forEach(function (x) { if (x <= md) below++; if (x >= md) above++; });
+    list.innerHTML = chips(s, cls);
+    el.innerHTML = "<span>1. On range les " + n + " valeurs dans l'ordre croissant (ci-dessus, le milieu est en bleu).</span>" + html +
+      "<span class='why'>" + below + (below > 1 ? " valeurs sont inférieures ou égales" : " valeur est inférieure ou égale") + " à " + fmt(md) + ", et " + above + (above > 1 ? " sont supérieures ou égales" : " est supérieure ou égale") + ". Il y a bien au moins la moitié des valeurs de chaque côté.</span>";
+  }
+
+  function renderRange(v) {
+    var el = document.getElementById("rangeSteps");
+    if (!v.length) { el.innerHTML = "<span class='err'>Écris au moins un nombre dans l'atelier (étape 2).</span>"; return; }
+    var s = sorted(v), mn = s[0], mx = s[s.length - 1], e = mx - mn;
+    el.innerHTML = "<span>1. Plus grande valeur : " + fmt(mx) + unit + " ; plus petite valeur : " + fmt(mn) + unit + "</span>" +
+      "<span>2. Étendue = " + fmt(mx) + " − " + par(mn) + " = <b>" + fmt(e) + unit + "</b></span>" +
+      "<span class='why'>" + (e === 0 ? "Toutes les valeurs sont égales : l'étendue vaut 0, aucune dispersion." : "Toutes les valeurs tiennent entre " + fmt(mn) + " et " + fmt(mx) + ", sur un écart de " + fmt(e) + unit + ".") + "</span>";
+  }
+
+  /* ---------- Valeur extrême ---------- */
+  var base = [1800, 1900, 2000, 2100, 2200], boss = false;
+  var bossBtn = document.getElementById("bossBtn"), bossVal = document.getElementById("bossVal");
+  function euro(x) { return about(x, 2) + " €"; }
+  function extreme() {
+    var val = Number(bossVal.value), arr = boss ? base.concat([val]) : base.slice();
+    document.getElementById("bossOut").textContent = fmt(val) + " €";
+    bossVal.disabled = !boss;
+    bossBtn.setAttribute("aria-pressed", boss ? "true" : "false");
+    bossBtn.textContent = boss ? "Retirer le salaire du patron" : "Ajouter le salaire du patron";
+    var m = mean(arr), md = median(arr), m0 = mean(base), md0 = median(base);
+    var cls = []; if (boss) cls[5] = "far";
+    document.getElementById("salList").innerHTML = chips(arr, cls);
+    document.getElementById("salRes").innerHTML =
+      res("Moyenne", euro(m), sumExpr(arr) + " = " + fmt(sum(arr)) + " ; ÷ " + arr.length) +
+      res("Médiane", euro(md), boss ? "(2 000 + 2 100) ÷ 2, au milieu des 6 salaires rangés" : "la 3<sup>e</sup> des 5 valeurs rangées", "blue");
+    var out = document.getElementById("salOut");
+    if (!boss) {
+      out.className = "verdict yes";
+      out.innerHTML = "Sans le patron, la moyenne et la médiane valent toutes les deux 2 000 €.<span>Clique sur le bouton pour ajouter une valeur extrême.</span>";
+    } else {
+      var under = arr.filter(function (x) { return x < m; }).length;
+      out.className = "verdict no";
+      out.innerHTML = "La moyenne fait un bond : de " + euro(m0) + " à " + euro(m) + " (+ " + about(m - m0, 2) + " €).<span>La médiane bouge à peine : de " + euro(md0) + " à " + euro(md) + " (+ " + about(md - md0, 2) + " €). Ici, " + under + " personnes sur " + arr.length + " gagnent moins que la moyenne. La médiane décrit mieux le salaire habituel dans cette entreprise.</span>";
+    }
+    drawSal(document.getElementById("salChart"), arr, m, md);
+  }
+  function drawSal(svg, arr, m, md) {
+    clear(svg);
+    var W = 640, H = 240, L = 40, R = 40, axisY = 192, dotY = 112;
+    var mx = Math.max.apply(null, arr), step = niceStep(mx / 4), top = Math.ceil(mx * 1.05 / step) * step;
+    function X(x) { return L + x / top * (W - L - R); }
+    for (var i = 0; i * step <= top + 1e-9; i++) {
+      var t = i * step;
+      mk(svg, "line", { x1: X(t), y1: 30, x2: X(t), y2: axisY, stroke: "var(--line)", "stroke-width": 1 });
+      mk(svg, "text", { x: X(t), y: axisY + 28, "text-anchor": "middle", "font-size": 16 }, fmt(t));
+    }
+    mk(svg, "line", { x1: L, y1: axisY, x2: W - R, y2: axisY, stroke: "var(--ink)", "stroke-width": 2 });
+    arr.forEach(function (x, j) {
+      mk(svg, "circle", { cx: X(x), cy: dotY, r: 8, fill: j === 5 ? "var(--red)" : "var(--ink-soft)", "fill-opacity": 0.8, stroke: "var(--card)", "stroke-width": 1.5 });
+    });
+    var xm = X(m), xd = X(md);
+    mk(svg, "path", { d: "M" + xm.toFixed(2) + " " + (dotY - 14) + " l-9 -16 l18 0 Z", fill: "var(--acc)" });
+    mk(svg, "text", halo({ x: clamp(xm, 100, W - 100), y: dotY - 42, "text-anchor": "middle", "font-size": 17, "font-weight": 600, style: "fill:var(--acc)" }), "moyenne : " + euro(m));
+    mk(svg, "path", { d: "M" + xd.toFixed(2) + " " + (dotY + 14) + " l-9 16 l18 0 Z", fill: "var(--two)" });
+    mk(svg, "text", halo({ x: clamp(xd, 100, W - 100), y: dotY + 56, "text-anchor": "middle", "font-size": 17, "font-weight": 600, style: "fill:var(--two)" }), "médiane : " + euro(md));
+  }
+  bossBtn.addEventListener("click", function () { boss = !boss; extreme(); });
+  bossVal.addEventListener("input", extreme);
+  extreme();
+
+  /* ---------- Moyenne pondérée ---------- */
+  var wrows = [["Maths", 14, 4], ["Français", 11, 3], ["Anglais", 16, 2], ["Sport", 18, 1]];
+  document.getElementById("wBody").innerHTML = wrows.map(function (r, i) {
+    return "<tr><th>" + r[0] + "</th>" +
+      "<td class='in'><input type='text' id='wn" + i + "' inputmode='decimal' autocomplete='off' value='" + r[1] + "' aria-label='Note en " + r[0] + "'></td>" +
+      "<td class='in'><input type='text' id='wc" + i + "' inputmode='decimal' autocomplete='off' value='" + r[2] + "' aria-label='Coefficient en " + r[0] + "'></td>" +
+      "<td id='wp" + i + "'></td></tr>";
+  }).join("");
+  function weighted() {
+    var notes = [], coefs = [], prods = [], err = "", out = document.getElementById("wOut");
+    wrows.forEach(function (r, i) {
+      var a = document.getElementById("wn" + i).value, b = document.getElementById("wc" + i).value, pc = document.getElementById("wp" + i);
+      var n = num(a), c = num(b);
+      if (a.trim() === "" && b.trim() === "") { pc.textContent = "–"; return; }
+      if (isNaN(n) || isNaN(c) || c < 0) { pc.textContent = "?"; if (!err) err = "Ligne « " + r[0] + " » : écris une note et un coefficient positif ou nul."; return; }
+      notes.push(n); coefs.push(c); prods.push(n * c); pc.textContent = fmt(n * c, 2);
+    });
+    var sp = sum(prods), sc = sum(coefs);
+    document.getElementById("wSc").textContent = notes.length ? fmt(sc, 2) : "";
+    document.getElementById("wSp").textContent = notes.length ? fmt(sp, 2) : "";
+    if (err) { out.innerHTML = "<span class='err'>" + esc(err) + "</span>"; return; }
+    if (!notes.length) { out.innerHTML = "<span class='err'>Remplis au moins une ligne.</span>"; return; }
+    if (!(sc > 0)) { out.innerHTML = "<span class='err'>La somme des coefficients doit être plus grande que 0.</span>"; return; }
+    var w = weightedMean(notes, coefs), simple = mean(notes);
+    out.innerHTML = "<span>1. On multiplie chaque note par son coefficient : " + notes.map(function (n, i) { return fmt(n, 2) + " × " + fmt(coefs[i], 2) + " = " + fmt(prods[i], 2); }).join(" ; ") + "</span>" +
+      "<span>2. On additionne les produits : " + prods.map(function (p, i) { return i ? par(p, 2) : fmt(p, 2); }).join(" + ") + " = <b>" + fmt(sp, 2) + "</b></span>" +
+      "<span>3. On additionne les coefficients : " + coefs.map(function (c) { return fmt(c, 2); }).join(" + ") + " = <b>" + fmt(sc, 2) + "</b></span>" +
+      "<span>4. On divise : " + fmt(sp, 2) + " ÷ " + fmt(sc, 2) + " " + eqs(w, 2) + "<b>" + fmt(w, 2) + "</b></span>" +
+      "<span class='why'>Sans les coefficients, la moyenne serait " + sumExpr(notes) + " ÷ " + notes.length + " " + eqs(simple, 2) + fmt(simple, 2) + ". Les notes avec un gros coefficient pèsent plus lourd.</span>";
+  }
+  for (var wi = 0; wi < wrows.length; wi++) {
+    document.getElementById("wn" + wi).addEventListener("input", weighted);
+    document.getElementById("wc" + wi).addEventListener("input", weighted);
+  }
+  weighted();
+
+  /* ---------- Graphiques ---------- */
+  var colors = [["Bleu", "var(--two)", 8], ["Rouge", "var(--red)", 5], ["Vert", "var(--ok)", 6], ["Noir", "var(--blk)", 4], ["Jaune", "var(--yel)", 2]];
+  document.getElementById("pieBody").innerHTML = colors.map(function (c, i) {
+    return "<tr><th><span class='swatch' style='background:" + c[1] + "'></span>" + c[0] + "</th>" +
+      "<td class='in'><input type='text' id='pie" + i + "' inputmode='decimal' autocomplete='off' value='" + c[2] + "' aria-label='Effectif " + c[0] + "'></td>" +
+      "<td id='pf" + i + "'></td><td id='pa" + i + "'></td></tr>";
+  }).join("");
+  function pie() {
+    var vals = colors.map(function (c, i) { var x = num(document.getElementById("pie" + i).value); return isNaN(x) || x < 0 ? NaN : x; });
+    var msg = document.getElementById("pieMsg"), steps = document.getElementById("pieSteps"), foot = document.getElementById("pieFoot");
+    var bars = document.getElementById("pieBars"), disc = document.getElementById("pieChart");
+    var bad = vals.some(function (x) { return isNaN(x); }), tot = bad ? 0 : sum(vals);
+    if (bad || !(tot > 0)) {
+      msg.textContent = bad ? "Écris un effectif positif ou nul sur chaque ligne." : "Il faut au moins un effectif plus grand que 0.";
+      colors.forEach(function (c, i) { document.getElementById("pf" + i).textContent = ""; document.getElementById("pa" + i).textContent = ""; });
+      foot.innerHTML = ""; steps.innerHTML = ""; clear(bars); clear(disc); emptyMsg(bars, 360, 300); emptyMsg(disc, 360, 300);
+      return;
+    }
+    msg.textContent = "";
+    var lines = [];
+    colors.forEach(function (c, i) {
+      var f = vals[i] / tot, a = f * 360;
+      document.getElementById("pf" + i).textContent = about(f, 3) + " (" + about(f * 100, 1) + " %)";
+      document.getElementById("pa" + i).textContent = about(a, 1) + "°";
+      lines.push("<span>" + c[0] + " : " + fmt(vals[i]) + " ÷ " + fmt(tot) + " × 360° " + eqs(a, 1) + "<b>" + fmt(a, 1) + "°</b></span>");
+    });
+    lines.push("<span class='why'>Total des angles : 360°, le tour complet du disque.</span>");
+    steps.innerHTML = lines.join("");
+    foot.innerHTML = "<tr><th>Total</th><td>" + fmt(tot) + "</td><td>1 (100 %)</td><td>360°</td></tr>";
+    drawColorBars(bars, vals);
+    drawPie(disc, vals, tot);
+  }
+  function drawColorBars(svg, vals) {
+    clear(svg);
+    var W = 360, H = 300, L = 44, R = 10, T = 32, B = 40;
+    var mx = Math.max.apply(null, vals), step = Math.max(1, niceStep(mx / 5)), top = Math.max(step, Math.ceil(mx / step) * step);
+    function Y(k) { return H - B - k / top * (H - B - T); }
+    for (var i = 0; i * step <= top; i++) {
+      var k = i * step;
+      mk(svg, "line", { x1: L, y1: Y(k), x2: W - R, y2: Y(k), stroke: "var(--line)", "stroke-width": 1 });
+      mk(svg, "text", { x: L - 8, y: Y(k) + 6, "text-anchor": "end", "font-size": 16 }, fmt(k));
+    }
+    var slot = (W - L - R) / vals.length, bw = slot * 0.66;
+    vals.forEach(function (x, j) {
+      var cx = L + slot * (j + 0.5);
+      mk(svg, "rect", { x: cx - bw / 2, y: Y(x), width: bw, height: Y(0) - Y(x), fill: colors[j][1], rx: 2 });
+      mk(svg, "text", { x: cx, y: Y(x) - 7, "text-anchor": "middle", "font-size": 16, "font-weight": 600 }, fmt(x));
+      mk(svg, "text", { x: cx, y: H - B + 24, "text-anchor": "middle", "font-size": 16 }, colors[j][0]);
+    });
+    mk(svg, "line", { x1: L, y1: Y(0), x2: W - R, y2: Y(0), stroke: "var(--ink)", "stroke-width": 2 });
+    mk(svg, "line", { x1: L, y1: T - 6, x2: L, y2: Y(0), stroke: "var(--ink)", "stroke-width": 2 });
+  }
+  function drawPie(svg, vals, tot) {
+    clear(svg);
+    var cx = 180, cy = 150, r = 95, a0 = -Math.PI / 2;
+    vals.forEach(function (x, i) {
+      if (!(x > 0)) return;
+      var sw = x / tot * 2 * Math.PI, a1 = a0 + sw;
+      if (x === tot) {
+        mk(svg, "circle", { cx: cx, cy: cy, r: r, fill: colors[i][1], stroke: "var(--card)", "stroke-width": 2 });
+      } else {
+        var x1 = cx + r * Math.cos(a0), y1 = cy + r * Math.sin(a0), x2 = cx + r * Math.cos(a1), y2 = cy + r * Math.sin(a1);
+        mk(svg, "path", { d: "M" + cx + " " + cy + " L" + x1.toFixed(2) + " " + y1.toFixed(2) + " A" + r + " " + r + " 0 " + (sw > Math.PI ? 1 : 0) + " 1 " + x2.toFixed(2) + " " + y2.toFixed(2) + " Z", fill: colors[i][1], stroke: "var(--card)", "stroke-width": 2 });
+      }
+      if (sw >= 0.12) {
+        var am = a0 + sw / 2, ca = Math.cos(am), lx = cx + (r + 14) * ca, ly = cy + (r + 14) * Math.sin(am) + 6;
+        mk(svg, "text", { x: lx.toFixed(2), y: ly.toFixed(2), "text-anchor": ca > 0.3 ? "start" : ca < -0.3 ? "end" : "middle", "font-size": 16 }, fmt(x / tot * 360, 1) + "°");
+      }
+      a0 = a1;
+    });
+  }
+  for (var pi = 0; pi < colors.length; pi++) document.getElementById("pie" + pi).addEventListener("input", pie);
+  pie();
+
+  var teams = [["Équipe A", 52, "var(--two)"], ["Équipe B", 55, "var(--acc)"]];
+  function drawTeams(svg, lo, hi, step) {
+    clear(svg);
+    var W = 320, H = 300, L = 46, R = 10, T = 32, B = 40;
+    function Y(x) { return T + (hi - x) / (hi - lo) * (H - T - B); }
+    for (var i = 0; lo + i * step <= hi; i++) {
+      var t = lo + i * step;
+      mk(svg, "line", { x1: L, y1: Y(t), x2: W - R, y2: Y(t), stroke: "var(--line)", "stroke-width": 1 });
+      mk(svg, "text", { x: L - 8, y: Y(t) + 6, "text-anchor": "end", "font-size": 16 }, fmt(t));
+    }
+    var slot = (W - L - R) / teams.length, bw = slot * 0.5;
+    teams.forEach(function (tm, j) {
+      var cx = L + slot * (j + 0.5);
+      mk(svg, "rect", { x: cx - bw / 2, y: Y(tm[1]), width: bw, height: Y(lo) - Y(tm[1]), fill: tm[2], rx: 2 });
+      mk(svg, "text", { x: cx, y: Y(tm[1]) - 7, "text-anchor": "middle", "font-size": 16, "font-weight": 600 }, String(tm[1]));
+      mk(svg, "text", { x: cx, y: H - B + 24, "text-anchor": "middle", "font-size": 16 }, tm[0]);
+    });
+    mk(svg, "line", { x1: L, y1: Y(lo), x2: W - R, y2: Y(lo), stroke: "var(--ink)", "stroke-width": 2 });
+    mk(svg, "line", { x1: L, y1: T - 6, x2: L, y2: Y(lo), stroke: "var(--ink)", "stroke-width": 2 });
+  }
+  drawTeams(document.getElementById("fakeChart"), 50, 56, 1);
+  drawTeams(document.getElementById("trueChart"), 0, 60, 10);
+
+  /* ---------- Quiz ---------- */
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  function rnd(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+  function series(n, lo, hi) { var s = []; for (var i = 0; i < n; i++) s.push(rnd(lo, hi)); return s; }
+  function list(s) { return s.map(function (x) { return fmt(x); }).join(" ; "); }
+  function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  var ctxs = [
+    { t: "Notes d'un élève sur 20", lo: 4, hi: 20 },
+    { t: "Buts marqués à chaque match", lo: 0, hi: 6 },
+    { t: "Temps de trajet en minutes", lo: 8, hi: 35 },
+    { t: "Températures à midi en °C", lo: -6, hi: 12 },
+    { t: "Tailles de plants de tomates en cm", lo: 20, hi: 60 }
+  ];
+  function makeQ(type) {
+    var c = pick(ctxs), n = rnd(5, 9), s = series(n, c.lo, c.hi);
+    if (type === "mean") {
+      if (Math.random() < 0.6) { for (var tries = 0; tries < 80 && sum(s) % n !== 0; tries++) s = series(n, c.lo, c.hi); }
+      var m = mean(s), ok2 = isExact(m, 2);
+      return { q: c.t + " : " + list(s) + ". Calcule la moyenne" + (ok2 ? "." : " (arrondie au centième)."), a: m,
+        how: "Somme : " + sumExpr(s) + " = " + fmt(sum(s)) + ". Puis " + fmt(sum(s)) + " ÷ " + n + " " + eqs(m, 2) + fmt(m, 2) + "." };
+    }
+    if (type === "median") {
+      var sm = sorted(s), md = median(s), h = Math.floor(n / 2);
+      return { q: c.t + " : " + list(s) + ". Quelle est la médiane ?", a: md,
+        how: "Rangée : " + list(sm) + ". " + (n % 2 ? n + " valeurs : la médiane est la " + ord(h + 1) + " valeur, " + fmt(md) + "." : n + " valeurs : (" + fmt(sm[h - 1]) + " + " + par(sm[h]) + ") ÷ 2 = " + fmt(md) + ".") };
+    }
+    if (type === "range") {
+      var sr = sorted(s), e = sr[n - 1] - sr[0];
+      return { q: c.t + " : " + list(s) + ". Quelle est l'étendue ?", a: e,
+        how: "Plus grande : " + fmt(sr[n - 1]) + ", plus petite : " + fmt(sr[0]) + ". Étendue = " + fmt(sr[n - 1]) + " − " + par(sr[0]) + " = " + fmt(e) + "." };
+    }
+    var nf = pick([5, 8]), sf = series(nf, 0, 3), val = pick(sf), k = sf.filter(function (x) { return x === val; }).length, f = k / nf, inPct = Math.random() < 0.5;
+    return { q: "Nombre de frères et sœurs de " + nf + " élèves : " + list(sf) + ". Quelle est la fréquence de la valeur " + val + (inPct ? ", en % ?" : ", en nombre décimal ?"), a: inPct ? f * 100 : f,
+      how: "La valeur " + val + " apparaît " + k + " fois sur " + nf + " : " + k + " ÷ " + nf + " = " + fmt(f, 3) + " = " + fmt(f * 100, 1) + " %." };
+  }
+  var quiz = document.getElementById("quiz"), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ""; done = [];
+    var types = shuffle(["mean", "mean", "median", "median", "range", "range", "freq", "freq"]);
+    for (var k = 0; k < 8; k++) {
+      var Q = makeQ(types[k]), li = document.createElement("li");
+      li.innerHTML = "<span class='q'>" + Q.q + "</span><input type='text' id='qa" + k + "' inputmode='decimal' autocomplete='off' aria-label='Ta réponse à la question " + (k + 1) + "'><button type='button' id='qb" + k + "'>Vérifier</button><span class='fb' id='qf" + k + "' aria-live='polite'></span>";
+      quiz.appendChild(li);
+      (function (k, Q) {
+        function check() {
+          var fb = document.getElementById("qf" + k), x = num(document.getElementById("qa" + k).value.replace("%", ""));
+          if (isNaN(x)) { fb.className = "fb"; fb.textContent = "Écris un nombre."; return; }
+          if (Math.abs(x - Q.a) <= 0.01 + 1e-9) { fb.className = "fb ok"; fb.innerHTML = "Bravo, c'est juste !<span>" + Q.how + "</span>"; done[k] = true; }
+          else { done[k] = false; fb.className = "fb no"; fb.innerHTML = "Pas tout à fait : la réponse est " + about(Q.a, 2) + ".<span>" + Q.how + "</span>"; }
+          document.getElementById("score").textContent = done.filter(Boolean).length + " / 8";
+        }
+        document.getElementById("qb" + k).addEventListener("click", check);
+        document.getElementById("qa" + k).addEventListener("keydown", function (e) { if (e.key === "Enter") check(); });
+      })(k, Q);
+    }
+    document.getElementById("score").textContent = "0 / 8";
+  }
+  document.getElementById("newQuiz").addEventListener("click", newQuiz);
+  newQuiz();
+
+  loadPreset(0);
+})();
+</script>
+</body>
+</html>

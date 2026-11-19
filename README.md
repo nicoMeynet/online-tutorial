@@ -20,6 +20,12 @@ Chaque tutoriel est une seule page HTML, sans installation. Il suffit de l'ouvri
 | [Les nombres relatifs](les-nombres-relatifs.html) | Positifs et négatifs avec un thermomètre, comparer sur la droite graduée, additionner et soustraire en sauts, la règle des signes pour × et ÷, un quiz, l'histoire et des problèmes. |
 | [Les ensembles de nombres](les-ensembles-de-nombres.html) | ℕ, ℤ, 𝔻, ℚ, ℝ (et ℂ en bonus) : des poupées russes interactives, un classeur qui trouve la famille d'un nombre, le développement décimal des fractions, √2, un quiz et l'histoire. |
 | [La proportionnalité](la-proportionnalite.html) | Le coefficient de proportionnalité, un détecteur avec tableau et graphique, la quatrième proportionnelle (coefficient, passage à l'unité, produit en croix), une recette à adapter, les échelles, les pièges et un quiz. |
+| [Les puissances](les-puissances.html) | aⁿ, les puissances de 10 et le zoom de l'atome à l'univers, la notation scientifique dans les deux sens, les règles de calcul, la légende de l'échiquier, un quiz. |
+| [Le calcul littéral](le-calcul-litteral.html) | Substituer, réduire avec des tuiles, développer (simple et double distributivité), les identités remarquables, factoriser, prouver avec des lettres, un quiz. |
+| [Les fonctions](les-fonctions.html) | La machine à nombres, image et antécédent, tableau de valeurs et courbe, fonctions linéaires et affines, comparer deux forfaits, un quiz. |
+| [Les statistiques](les-statistiques.html) | Effectifs et fréquences, moyenne, médiane, étendue, moyenne pondérée, valeurs extrêmes, graphiques et graphiques trompeurs, un quiz. |
+| [Les probabilités](les-probabilites.html) | Vocabulaire, l'urne, la loi des grands nombres simulée, deux épreuves (arbre, somme de deux dés), les pièges, le Loto, un quiz. |
+| [Les angles et les triangles](les-angles-et-triangles.html) | Le rapporteur virtuel, la somme des angles d'un triangle, les triangles particuliers, l'inégalité triangulaire, les parallèles, les polygones, un quiz. |
 
 ## Ajouter un tutoriel
 

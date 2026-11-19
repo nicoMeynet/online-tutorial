@@ -1,0 +1,969 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Le calcul littéral</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, encre framboise, marge rouge. Trois couleurs de tuiles : framboise pour x², bleu pour x, vert pour 1. */
+:root {
+  --paper: #fbf7f8;
+  --grid: #efe3e8;
+  --card: #ffffff;
+  --ink: #2a1520;
+  --ink-soft: #6b4f5c;
+  --acc: #9d174d;
+  --acc-soft: #fce7f3;
+  --two: #1c64c8;
+  --two-soft: #dbe8fa;
+  --ok: #15803d;
+  --ok-soft: #dcfce7;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #fff0a3;
+  --line: #e6d4dc;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #150d11; --grid: #22161c; --card: #1c1217; --ink: #f6ecf0; --ink-soft: #c4a8b5;
+    --acc: #f472b6; --acc-soft: #4a1830; --two: #7fb0ff; --two-soft: #1a2a45;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #3a2630;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #150d11; --grid: #22161c; --card: #1c1217; --ink: #f6ecf0; --ink-soft: #c4a8b5;
+  --acc: #f472b6; --acc-soft: #4a1830; --two: #7fb0ff; --two-soft: #1a2a45;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #3a2630;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+.x { color: var(--acc); font-weight: 700; font-style: italic; }
+section { display: flex; flex-direction: column; gap: 18px; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+.big-eq { font-family: var(--f-mono); font-weight: 600; font-size: clamp(1.5rem, 6.5vw, 2.3rem); overflow-wrap: anywhere; }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+.fig svg { width: 100%; height: auto; display: block; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; }
+.fig.narrow svg { max-width: 440px; margin: 0 auto; }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 6px 12px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button.ex { font-family: var(--f-mono); font-weight: 600; font-size: .92rem; }
+button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+input[type="text"] { font: inherit; font-family: var(--f-mono); font-size: 1.05rem; padding: 8px 10px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; }
+input[type="range"] { width: 100%; accent-color: var(--acc); }
+.param { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.param label { font-weight: 700; }
+.sliders { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 18px; }
+.sliders.four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.sliders.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (max-width: 600px) { .sliders, .sliders.four, .sliders.two { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px 14px; align-items: end; }
+.inputs label { font-weight: 700; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+
+/* Tableaux de valeurs */
+.ptable { border-collapse: separate; border-spacing: 0; width: 100%; font-variant-numeric: tabular-nums; }
+.ptable th, .ptable td { border: 1.5px solid var(--ink); padding: 8px 10px; text-align: center; font-family: var(--f-mono); font-size: 1rem; }
+.ptable th { font-family: var(--f-display); text-align: left; background: var(--paper); white-space: nowrap; }
+.ptable td { background: var(--card); }
+.ptable td.on { background: var(--acc-soft); font-weight: 700; color: var(--acc); }
+.ptable thead th { text-align: center; }
+.scroll { overflow-x: auto; }
+
+.results { display: flex; flex-direction: column; gap: 8px; font-variant-numeric: tabular-nums; }
+.res { border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 12px; display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; align-items: baseline; }
+.res-name { font-family: var(--f-display); font-weight: 700; }
+.res-val { font-family: var(--f-mono); font-weight: 600; color: var(--acc); font-size: 1.05rem; white-space: nowrap; }
+.res-calc { grid-column: 1 / -1; font-family: var(--f-mono); font-size: .88rem; color: var(--ink-soft); overflow-wrap: anywhere; }
+.steps { display: flex; flex-direction: column; gap: 6px; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; padding: 12px 14px; font-family: var(--f-mono); font-size: 1rem; overflow-wrap: anywhere; }
+.steps b { color: var(--acc); font-size: 1.1rem; }
+.steps .why { font-family: var(--f-body); font-size: .9rem; color: var(--ink-soft); margin-bottom: 4px; }
+.err { color: var(--red); font-weight: 700; font-family: var(--f-body); }
+.c2 { color: var(--acc); font-weight: 700; }
+.c1 { color: var(--two); font-weight: 700; }
+.c0 { color: var(--ok); font-weight: 700; }
+
+.verdict { border-radius: 8px; padding: 12px 14px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+.verdict.yes { background: var(--ok-soft); color: var(--ok); }
+.verdict.no { background: var(--red-soft); color: var(--red); }
+.verdict span { font-weight: 400; color: var(--ink); overflow-wrap: anywhere; }
+
+.legend { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: .95rem; align-items: center; }
+.legend span { display: inline-flex; align-items: center; gap: 8px; }
+.chip { display: inline-block; border-radius: 3px; flex: none; }
+.chip.t2 { width: 26px; height: 26px; background: var(--acc); }
+.chip.t1 { width: 10px; height: 26px; background: var(--two); }
+.chip.t0 { width: 10px; height: 10px; background: var(--ok); }
+.chip.neg { background: transparent; border: 2px dashed var(--ink-soft); width: 14px; height: 14px; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.cards .m { font-family: var(--f-mono); font-size: .95rem; overflow-wrap: anywhere; }
+.cards .m b { color: var(--acc); }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
+.tag.ok { color: var(--ok); }
+.tag.no { color: var(--red); }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 110px auto; gap: 10px; align-items: center; }
+.quiz .q { font-family: var(--f-mono); font-size: 1.02rem; font-weight: 600; overflow-wrap: anywhere; }
+.quiz input[type="text"] { font-size: 1rem; padding: 6px 8px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz .q { grid-column: 1 / -1; } }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc); }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 120px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); overflow-wrap: anywhere; }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+</head>
+<body>
+<main class="page">
+
+  <header class="hero">
+    <span class="eyebrow">Tutoriel de maths · niveau 4<sup>e</sup>–3<sup>e</sup></span>
+    <h1>Le calcul littéral</h1>
+    <p class="lead">On met des lettres à la place des nombres. Avec une lettre, on écrit une règle une seule fois, et elle marche pour tous les nombres.</p>
+    <div class="box">
+      <div class="big-eq">P = 2 × (<span class="x">L</span> + <span class="x">l</span>)</div>
+      <span class="soft">Une seule formule pour le périmètre de tous les rectangles du monde. <span class="x">L</span> est la longueur, <span class="x">l</span> la largeur.</span>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · Pourquoi des lettres</span>
+    <h2>Une formule, c'est une recette</h2>
+    <p>Pour le périmètre d'un rectangle, tu ajoutes la longueur et la largeur, puis tu multiplies par 2. Au lieu de le dire avec des phrases, on l'écrit avec des lettres : <span class="mono">2 × (L + l)</span>. Ensuite, il suffit de remplacer les lettres par les vrais nombres.</p>
+    <div class="box">
+      <div class="scroll">
+        <table class="ptable" aria-label="Périmètre de trois rectangles">
+          <thead><tr><th>L</th><th>l</th><th>2 × (L + l)</th></tr></thead>
+          <tbody>
+            <tr><td>5</td><td>3</td><td>2 × (5 + 3) = 16</td></tr>
+            <tr><td>10</td><td>4</td><td>2 × (10 + 4) = 28</td></tr>
+            <tr><td>7,5</td><td>2</td><td>2 × (7,5 + 2) = 19</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <span class="soft">La recette ne change pas. Seuls les ingrédients (les nombres) changent.</span>
+    </div>
+    <h3>Les règles d'écriture</h3>
+    <div class="cards">
+      <div class="box"><strong>On n'écrit pas le × devant une lettre</strong><span class="m">3 × x s'écrit <b>3x</b></span><span class="m">2 × (x + 1) s'écrit <b>2(x + 1)</b></span></div>
+      <div class="box"><strong>x fois lui-même</strong><span class="m">x × x s'écrit <b>x²</b> (« x au carré »)</span><span class="m">x × x × x s'écrit <b>x³</b></span></div>
+      <div class="box"><strong>Le 1 est invisible</strong><span class="m">1x s'écrit <b>x</b></span><span class="m">−1x s'écrit <b>−x</b></span></div>
+      <div class="box"><strong>Entre deux nombres, on garde le ×</strong><span class="m">3 × 5 reste <b>3 × 5</b></span><span class="soft">Sinon, 35 serait confondu avec trente-cinq !</span></div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · Remplacer la lettre</span>
+    <h2>Calculer une expression pour une valeur</h2>
+    <p>Calculer une expression pour x = 4, c'est <strong>remplacer chaque x par 4</strong>, puis calculer en respectant les priorités : les puissances d'abord, puis les multiplications, puis les additions et soustractions. Si le nombre est négatif, on le met <span class="hl">entre parenthèses</span>.</p>
+    <div class="box">
+      <div class="btns" id="subPresets" role="group" aria-label="Choisir une expression"></div>
+      <div class="sliders two">
+        <div class="param">
+          <label for="subX">Valeur de x</label>
+          <input id="subX" type="text" inputmode="decimal" autocomplete="off" value="−3">
+        </div>
+        <div class="param">
+          <label for="subXr">ou fais glisser</label>
+          <input id="subXr" type="range" min="-5" max="5" step="0.5" value="-3">
+        </div>
+      </div>
+      <div class="steps" id="subOut" aria-live="polite"></div>
+      <h3>Tableau de valeurs</h3>
+      <div class="scroll"><table class="ptable" id="subTable"></table></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Pourquoi les parenthèses ?</span>
+      <span>Pour x = −3, x² vaut (−3)² = (−3) × (−3) = 9. Sans parenthèses, on lirait −3² = −(3 × 3) = −9. Ce n'est pas le même nombre !</span>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Réduire</span>
+    <h2>Ranger les termes par famille</h2>
+    <p>Réduire une expression, c'est l'écrire avec le moins de termes possible. On ne peut additionner que des termes de la <strong>même famille</strong> : les x avec les x, les x² avec les x², les nombres avec les nombres.</p>
+    <div class="cards">
+      <div class="box"><span class="tag ok">On peut réduire</span><span class="m">x + x = <b>2x</b></span><span class="m">3x + 2x = <b>5x</b></span><span class="m">4x² − x² = <b>3x²</b></span></div>
+      <div class="box"><span class="tag ok">C'est une multiplication</span><span class="m">x × x = <b>x²</b></span><span class="m">3x × 2 = <b>6x</b></span><span class="soft">Multiplier, ce n'est pas additionner : x × x n'est pas 2x.</span></div>
+      <div class="box"><span class="tag no">On ne peut pas réduire</span><span class="m">x + x² reste <b>x + x²</b></span><span class="m">3 + 2x reste <b>3 + 2x</b></span><span class="soft">Ce sont des familles différentes.</span></div>
+    </div>
+    <div class="box">
+      <h3>Le réducteur à tuiles</h3>
+      <div class="legend">
+        <span><i class="chip t2"></i>x² (un carré)</span>
+        <span><i class="chip t1"></i>x (une barre)</span>
+        <span><i class="chip t0"></i>1 (un petit carré)</span>
+        <span><i class="chip neg"></i>tuile en pointillés : on l'enlève (−)</span>
+      </div>
+      <div class="btns" id="redPresets" role="group" aria-label="Exemples à réduire"></div>
+      <label for="redIn" style="font-weight:700">Ton expression (sans parenthèses)</label>
+      <input id="redIn" type="text" autocomplete="off" spellcheck="false" value="3x + 2 + 2x − 5 + x²">
+      <span class="soft" style="font-size:.9rem">Pour écrire x², tape <span class="mono">x²</span> ou <span class="mono">x^2</span>.</span>
+      <div class="fig"><svg id="redSvg" viewBox="0 0 640 260" role="img" aria-label="Tuiles de l'expression avant et après regroupement"></svg></div>
+      <p class="soft" id="redNote"></p>
+      <div class="steps" id="redOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · Développer</span>
+    <h2>La distributivité</h2>
+    <p>Développer, c'est transformer un <strong>produit</strong> en <strong>somme</strong>. Le nombre devant la parenthèse multiplie <strong>chaque</strong> terme à l'intérieur :</p>
+    <div class="box">
+      <div class="big-eq" style="text-align:center">k(a + b) = ka + kb</div>
+      <p>Regarde l'aire d'un rectangle de hauteur k et de largeur a + b. On peut la calculer d'un coup, ou en deux morceaux. On trouve forcément la même chose.</p>
+      <div class="sliders">
+        <div class="param"><label for="dk">k = <span class="mono" id="dkOut">3</span></label><input id="dk" type="range" min="1" max="6" step="1" value="3"></div>
+        <div class="param"><label for="da">a = <span class="mono" id="daOut">4</span></label><input id="da" type="range" min="1" max="8" step="1" value="4"></div>
+        <div class="param"><label for="db">b = <span class="mono" id="dbOut">2</span></label><input id="db" type="range" min="1" max="8" step="1" value="2"></div>
+      </div>
+      <div class="fig"><svg id="distSvg" viewBox="0 0 640 300" role="img" aria-label="Rectangle de hauteur k coupé en deux morceaux de largeurs a et b"></svg></div>
+      <div class="results" id="distRes" aria-live="polite"></div>
+    </div>
+
+    <h3>La double distributivité</h3>
+    <p>Pour multiplier deux parenthèses, <strong>chaque terme de la première</strong> multiplie <strong>chaque terme de la deuxième</strong>. Cela fait 4 produits, comme les 4 morceaux du rectangle :</p>
+    <div class="box">
+      <div class="big-eq" style="text-align:center;font-size:clamp(1.2rem,5vw,1.9rem)">(a + b)(c + d) = ac + ad + bc + bd</div>
+      <div class="sliders four">
+        <div class="param"><label for="d2a">a = <span class="mono" id="d2aOut">3</span></label><input id="d2a" type="range" min="1" max="6" step="1" value="3"></div>
+        <div class="param"><label for="d2b">b = <span class="mono" id="d2bOut">2</span></label><input id="d2b" type="range" min="1" max="6" step="1" value="2"></div>
+        <div class="param"><label for="d2c">c = <span class="mono" id="d2cOut">2</span></label><input id="d2c" type="range" min="1" max="6" step="1" value="2"></div>
+        <div class="param"><label for="d2d">d = <span class="mono" id="d2dOut">1</span></label><input id="d2d" type="range" min="1" max="6" step="1" value="1"></div>
+      </div>
+      <div class="fig"><svg id="dist2Svg" viewBox="0 0 640 340" role="img" aria-label="Rectangle de largeur a + b et de hauteur c + d coupé en quatre morceaux"></svg></div>
+      <div class="results" id="dist2Res" aria-live="polite"></div>
+    </div>
+
+    <div class="box">
+      <h3>Le développeur</h3>
+      <div class="btns" role="group" aria-label="Type d'expression">
+        <button type="button" class="ex" id="exM0" aria-pressed="false">k(px + q)</button>
+        <button type="button" class="ex" id="exM1" aria-pressed="true">(px + q)(rx + s)</button>
+      </div>
+      <div class="inputs">
+        <label for="exK" id="exLk">k<input id="exK" type="text" inputmode="numeric" autocomplete="off" value="3"></label>
+        <label for="exP">p<input id="exP" type="text" inputmode="numeric" autocomplete="off" value="2"></label>
+        <label for="exQ">q<input id="exQ" type="text" inputmode="numeric" autocomplete="off" value="3"></label>
+        <label for="exR" id="exLr">r<input id="exR" type="text" inputmode="numeric" autocomplete="off" value="1"></label>
+        <label for="exS" id="exLs">s<input id="exS" type="text" inputmode="numeric" autocomplete="off" value="−4"></label>
+      </div>
+      <div class="steps" id="exOut" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">La règle des signes</span>
+      <span>Plus fois plus donne plus. Moins fois moins donne plus. Plus fois moins donne moins. Par exemple : 3 × (−4) = −12 et (−2x) × (−5) = 10x.</span>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Les identités remarquables</span>
+    <h2>Trois formules à connaître par cœur</h2>
+    <p>Certains produits reviennent tout le temps. On les développe une fois pour toutes :</p>
+    <div class="cards">
+      <div class="box"><strong>Carré d'une somme</strong><span class="m"><b>(a + b)² = a² + 2ab + b²</b></span><span class="m soft">(x + 3)² = x² + 6x + 9</span></div>
+      <div class="box"><strong>Carré d'une différence</strong><span class="m"><b>(a − b)² = a² − 2ab + b²</b></span><span class="m soft">(x − 5)² = x² − 10x + 25</span></div>
+      <div class="box"><strong>Somme fois différence</strong><span class="m"><b>(a + b)(a − b) = a² − b²</b></span><span class="m soft">(x + 4)(x − 4) = x² − 16</span></div>
+    </div>
+    <div class="box">
+      <h3>Pourquoi 2ab ? Regarde le carré</h3>
+      <p>Un carré de côté a + b se coupe en 4 morceaux : un carré a², un carré b², et <strong>deux</strong> rectangles ab. Voilà pourquoi (a + b)² n'est pas a² + b² : il manque les deux rectangles.</p>
+      <div class="sliders two">
+        <div class="param"><label for="ia">a = <span class="mono" id="iaOut">5</span></label><input id="ia" type="range" min="1" max="8" step="1" value="5"></div>
+        <div class="param"><label for="ib">b = <span class="mono" id="ibOut">3</span></label><input id="ib" type="range" min="1" max="8" step="1" value="3"></div>
+      </div>
+      <div class="fig narrow"><svg id="idSvg" viewBox="0 0 380 380" role="img" aria-label="Carré de côté a + b coupé en quatre morceaux"></svg></div>
+      <div class="results" id="idRes" aria-live="polite"></div>
+    </div>
+    <h3>Le calcul mental des champions</h3>
+    <div class="cards">
+      <div class="box"><strong>101²</strong><span class="m">(100 + 1)²</span><span class="m">= 10 000 + 200 + 1</span><span class="m">= <b>10 201</b></span></div>
+      <div class="box"><strong>99 × 101</strong><span class="m">(100 − 1)(100 + 1)</span><span class="m">= 10 000 − 1</span><span class="m">= <b>9 999</b></span></div>
+      <div class="box"><strong>52²</strong><span class="m">(50 + 2)²</span><span class="m">= 2 500 + 200 + 4</span><span class="m">= <b>2 704</b></span></div>
+    </div>
+    <div class="box">
+      <h3>À toi : le carré d'un nombre proche d'une dizaine</h3>
+      <label for="mcN" style="font-weight:700">Un nombre entier entre 10 et 9 999</label>
+      <input id="mcN" type="text" inputmode="numeric" autocomplete="off" value="98">
+      <div class="steps" id="mcOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · Factoriser</span>
+    <h2>Le chemin inverse</h2>
+    <p>Factoriser, c'est transformer une <strong>somme</strong> en <strong>produit</strong>. C'est le contraire de développer : on cherche ce qui est commun à tous les termes, et on le sort devant une parenthèse.</p>
+    <div class="cards">
+      <div class="box"><strong>Un nombre en commun</strong><span class="m">6x + 9 = 3 × 2x + 3 × 3</span><span class="m">= <b>3(2x + 3)</b></span></div>
+      <div class="box"><strong>Un x en commun</strong><span class="m">x² + 5x = x × x + x × 5</span><span class="m">= <b>x(x + 5)</b></span></div>
+      <div class="box"><strong>Avec une identité</strong><span class="m">x² − 9 = x² − 3²</span><span class="m">= <b>(x − 3)(x + 3)</b></span></div>
+    </div>
+    <div class="box">
+      <h3>Le factoriseur : ax + b</h3>
+      <div class="inputs" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+        <label for="faA">a (devant x)<input id="faA" type="text" inputmode="numeric" autocomplete="off" value="12"></label>
+        <label for="faB">b (le nombre)<input id="faB" type="text" inputmode="numeric" autocomplete="off" value="18"></label>
+      </div>
+      <div class="steps" id="faOut" aria-live="polite"></div>
+    </div>
+    <div class="box">
+      <h3>Le factoriseur : x² − n²</h3>
+      <label for="fdN" style="font-weight:700">x² moins quel nombre ?</label>
+      <input id="fdN" type="text" inputmode="numeric" autocomplete="off" value="49">
+      <div class="steps" id="fdOut" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Toujours vérifier</span>
+      <span>Pour être sûr d'une factorisation, développe ton résultat. Tu dois retrouver l'expression de départ.</span>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Prouver avec des lettres</span>
+    <h2>Le tour de magie démasqué</h2>
+    <p>« Pense à un nombre. Ajoute 3. Multiplie par 2. Enlève 6. Divise par 2. Tu retrouves ton nombre ! » Essaie avec plusieurs nombres, même négatifs ou à virgule.</p>
+    <div class="box">
+      <label for="trN" style="font-weight:700">Ton nombre</label>
+      <input id="trN" type="text" inputmode="decimal" autocomplete="off" value="17">
+      <div class="scroll"><table class="ptable" id="trTable"></table></div>
+      <div class="verdict yes" id="trOut" aria-live="polite"></div>
+    </div>
+    <p>Essayer 10 nombres ne prouve rien : peut-être que le 11<sup>e</sup> ne marche pas ! Avec la lettre <span class="x">n</span>, on fait le calcul pour <strong>tous les nombres à la fois</strong>. C'est la colonne de droite : on retrouve n à la fin, donc le tour marche toujours.</p>
+
+    <h3>Trois nombres qui se suivent</h3>
+    <p>Prends trois entiers consécutifs, par exemple 7, 8 et 9. Leur somme, 24, est un multiple de 3. Est-ce toujours vrai ?</p>
+    <div class="box">
+      <label for="ciN" style="font-weight:700">Le premier des trois entiers</label>
+      <input id="ciN" type="text" inputmode="numeric" autocomplete="off" value="7">
+      <div class="steps" id="ciOut" aria-live="polite"></div>
+      <div class="steps">
+        <span>n + (n + 1) + (n + 2)</span>
+        <span>= 3n + 3</span><span class="why">On réduit : 3 fois n, et 1 + 2 = 3.</span>
+        <span>= <b>3(n + 1)</b></span><span class="why">On factorise par 3. C'est 3 fois un entier : la somme est toujours un multiple de 3. Et en plus, c'est 3 fois le nombre du milieu !</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Les pièges</span>
+    <h2>Les erreurs les plus fréquentes</h2>
+    <div class="cards">
+      <div class="box"><span class="tag no">Faux</span><span class="m"><b>(a + b)² = a² + b²</b></span><span class="soft">Avec a = 3 et b = 4 : (3 + 4)² = 7² = 49, alors que 3² + 4² = 9 + 16 = 25. Il manque 2ab = 24.</span></div>
+      <div class="box"><span class="tag ok">Vrai</span><span class="m"><b>−(a − b) = −a + b</b></span><span class="soft">Le signe moins devant une parenthèse change le signe de chaque terme : −(x − 7) = −x + 7.</span></div>
+      <div class="box"><span class="tag no">Faux</span><span class="m"><b>2x² = (2x)²</b></span><span class="soft">2x², c'est 2 × x × x. Mais (2x)² = 2x × 2x = 4x². Pour x = 3 : 2x² = 18 et (2x)² = 36.</span></div>
+      <div class="box"><span class="tag no">Faux</span><span class="m"><b>3 + 2x = 5x</b></span><span class="soft">3 et 2x ne sont pas de la même famille. Pour x = 10 : 3 + 2x = 23, mais 5x = 50.</span></div>
+    </div>
+    <div class="box">
+      <h3>Teste le premier piège avec tes nombres</h3>
+      <div class="inputs" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+        <label for="pgA">a<input id="pgA" type="text" inputmode="decimal" autocomplete="off" value="3"></label>
+        <label for="pgB">b<input id="pgB" type="text" inputmode="decimal" autocomplete="off" value="4"></label>
+      </div>
+      <div class="results" id="pgOut" aria-live="polite"></div>
+    </div>
+    <div class="note red">
+      <span class="note-title">Le test rapide</span>
+      <span>Si tu doutes d'une égalité avec des lettres, remplace les lettres par des petits nombres (2, 3, 10…). Si les deux côtés ne donnent pas le même résultat, l'égalité est fausse.</span>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Remplace le point d'interrogation par le bon nombre. Il peut être négatif.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Nouvelles questions</button>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · Un peu d'histoire</span>
+    <h2>Des mots aux lettres</h2>
+    <p>Pendant des siècles, les problèmes de maths s'écrivaient avec des phrases. Les lettres sont arrivées petit à petit.</p>
+    <ol class="timeline">
+      <li><span class="when">vers 250</span><div class="what"><strong>Diophante d'Alexandrie</strong><span>Dans ses <em>Arithmétiques</em>, il utilise des abréviations pour l'inconnue et ses puissances. C'est un premier pas vers l'écriture avec des symboles.</span></div></li>
+      <li><span class="when">vers 820</span><div class="what"><strong>Al-Khwarizmi, à Bagdad</strong><span>Il écrit un livre sur la résolution des équations. Son titre contient le mot arabe <em>al-jabr</em>, qui a donné notre mot <strong>algèbre</strong>. Mais tout est encore écrit avec des mots.</span></div></li>
+      <li><span class="when">1591</span><div class="what"><strong>François Viète</strong><span>Ce mathématicien français utilise des lettres à la fois pour les quantités inconnues (les voyelles) et pour les quantités connues (les consonnes). On peut enfin écrire des règles générales.</span></div></li>
+      <li><span class="when">1637</span><div class="what"><strong>René Descartes</strong><span>Dans <em>La Géométrie</em>, il prend les dernières lettres de l'alphabet (x, y, z) pour les inconnues, et les premières (a, b, c) pour les nombres connus. On utilise encore ses conventions aujourd'hui !</span></div></li>
+    </ol>
+    <p class="soft">Pour utiliser le calcul littéral à la recherche d'un nombre caché, voir aussi le tutoriel sur les équations.</p>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · À toi de jouer</span>
+    <h2>Six exercices</h2>
+    <div class="exos">
+      <details>
+        <summary>Remplacer<span class="q">Calcule 4x − 7 pour x = −2.</span></summary>
+        <div><span>4 × (−2) − 7 = −8 − 7 = <strong>−15</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Réduire<span class="q">Réduis 5x + 3 − 2x + 4 + x².</span></summary>
+        <div><span>Les x² : x². Les x : 5x − 2x = 3x. Les nombres : 3 + 4 = 7.</span><span>Résultat : <strong>x² + 3x + 7</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Développer<span class="q">Développe 3(2x − 5).</span></summary>
+        <div><span>3 × 2x + 3 × (−5) = <strong>6x − 15</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Double distributivité<span class="q">Développe et réduis (x + 2)(x − 6).</span></summary>
+        <div><span>x × x + x × (−6) + 2 × x + 2 × (−6) = x² − 6x + 2x − 12</span><span>= <strong>x² − 4x − 12</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Factoriser<span class="q">Factorise 12x + 18, puis x² − 25.</span></summary>
+        <div><span>12x + 18 = 6 × 2x + 6 × 3 = <strong>6(2x + 3)</strong>.</span><span>x² − 25 = x² − 5² = <strong>(x − 5)(x + 5)</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Prouver<span class="q">Prends deux entiers qui se suivent, n et n + 1. Montre que la différence de leurs carrés est toujours un nombre impair.</span></summary>
+        <div><span>(n + 1)² − n² = n² + 2n + 1 − n² = <strong>2n + 1</strong>.</span><span>2n est pair, donc 2n + 1 est impair. Exemple : 8² − 7² = 64 − 49 = 15 = 2 × 7 + 1.</span></div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• Une lettre remplace un nombre. On écrit <strong>3x</strong> pour 3 × x et <strong>x²</strong> pour x × x.</span>
+      <span>• Pour <strong>calculer</strong> une expression, on remplace la lettre par sa valeur, entre parenthèses si elle est négative.</span>
+      <span>• Pour <strong>réduire</strong>, on additionne seulement les termes de la même famille : x² avec x², x avec x, nombres avec nombres.</span>
+      <span>• <strong>Développer</strong> : k(a + b) = ka + kb et (a + b)(c + d) = ac + ad + bc + bd.</span>
+      <span>• <strong>Identités</strong> : (a + b)² = a² + 2ab + b², (a − b)² = a² − 2ab + b², (a + b)(a − b) = a² − b².</span>
+      <span>• <strong>Factoriser</strong>, c'est le contraire de développer : on sort le facteur commun devant une parenthèse.</span>
+      <span>• Avec des lettres, on peut <strong>prouver</strong> qu'une propriété est vraie pour tous les nombres.</span>
+    </div>
+  </section>
+
+  <footer>Fiche de révision · Le calcul littéral</footer>
+</main>
+
+<script>
+(function () {
+  var NS = 'http://www.w3.org/2000/svg';
+  function $(id) { return document.getElementById(id); }
+  function clean(x) { var r = Math.round(x * 1e9) / 1e9; return Object.is(r, -0) ? 0 : r; }
+  function fmt(x, d) { var r = Math.round(x * 1e6) / 1e6; if (Object.is(r, -0)) r = 0; return r.toLocaleString('fr-FR', { maximumFractionDigits: d == null ? 3 : d }).replace('-', '−'); }
+  function num(s) { var t = String(s).replace(/\s/g, '').replace(/[−–]/g, '-').replace(',', '.'); if (t === '') return NaN; var x = Number(t); return isFinite(x) ? x : NaN; }
+  function int(s) { var x = num(s); return isNaN(x) || Math.round(x) !== x ? NaN : x; }
+  function mk(svg, name, attrs, text) { var e = document.createElementNS(NS, name); for (var a in attrs) e.setAttribute(a, attrs[a]); if (text != null) e.textContent = text; svg.appendChild(e); return e; }
+  function clear(svg) { while (svg.firstChild) svg.removeChild(svg.firstChild); }
+  function gcd(a, b) { a = Math.abs(a); b = Math.abs(b); while (b) { var t = b; b = a % b; a = t; } return a; }
+  function P(x) { var r = clean(x); return r < 0 ? '(' + fmt(r) + ')' : fmt(r); }
+  function sumStr(a) { return a.map(function (v, i) { var r = clean(v); if (i === 0) return fmt(r); return (r < 0 ? ' − ' : ' + ') + fmt(Math.abs(r)); }).join(''); }
+  function signed(v) { var r = clean(v); return (r < 0 ? '− ' : '+ ') + fmt(Math.abs(r)); }
+  function res(name, val, calc) { return '<div class="res"><span class="res-name">' + name + '</span><span class="res-val">' + val + '</span>' + (calc ? '<span class="res-calc">' + calc + '</span>' : '') + '</div>'; }
+  function pressed(prefix, n, i) { for (var j = 0; j < n; j++) $(prefix + j).setAttribute('aria-pressed', j === i ? 'true' : 'false'); }
+
+  /* ---------- Monômes et polynômes : p[0] = nombre, p[1] = coefficient de x, p[2] = coefficient de x² ---------- */
+  var POW = ['', 'x', 'x²'];
+  function monoAbs(c, d) { var a = Math.abs(clean(c)); if (d === 0) return fmt(a); return (a === 1 ? '' : fmt(a)) + POW[d]; }
+  function monoStr(c, d) { return (clean(c) < 0 ? '−' : '') + monoAbs(c, d); }
+  function monoP(c, d) { return clean(c) < 0 ? '(' + monoStr(c, d) + ')' : monoStr(c, d); }
+  function joinMonos(list) {
+    var s = '';
+    list.forEach(function (m) {
+      var c = clean(m.c);
+      if (c === 0) return;
+      if (!s) s = monoStr(c, m.d); else s += (c < 0 ? ' − ' : ' + ') + monoAbs(c, m.d);
+    });
+    return s || '0';
+  }
+  function polyStr(p) { var l = []; for (var d = 2; d >= 0; d--) l.push({ c: p[d] || 0, d: d }); return joinMonos(l); }
+  function evalPoly(p, x) { return (p[0] || 0) + (p[1] || 0) * x + (p[2] || 0) * x * x; }
+  function subst(p, x) {
+    var s = '';
+    for (var d = 2; d >= 0; d--) {
+      var c = clean(p[d] || 0); if (c === 0) continue;
+      var a = Math.abs(c), t;
+      if (d === 0) t = fmt(a);
+      else t = (a === 1 ? '' : fmt(a) + ' × ') + P(x) + (d === 2 ? '²' : '');
+      if (!s) s = (c < 0 ? '−' : '') + t; else s += (c < 0 ? ' − ' : ' + ') + t;
+    }
+    return s || '0';
+  }
+
+  /* ---------- Étape 2 : remplacer x ---------- */
+  var subs = [
+    { s: '3x + 5', p: [5, 3, 0], steps: function (x) {
+      return [['3 × ' + P(x) + ' + 5', 'On remplace x par ' + fmt(x) + '.'], [sumStr([3 * x, 5]), 'On fait d\'abord la multiplication : 3 × ' + P(x) + ' = ' + fmt(3 * x) + '.']]; } },
+    { s: 'x² − 2x + 1', p: [1, -2, 1], steps: function (x) {
+      return [[P(x) + '² − 2 × ' + P(x) + ' + 1', 'On remplace chaque x par ' + fmt(x) + '.'], [sumStr([x * x, -2 * x, 1]), 'Le carré d\'abord : ' + P(x) + '² = ' + P(x) + ' × ' + P(x) + ' = ' + fmt(x * x) + '. Puis − 2 × ' + P(x) + ' donne ' + signed(-2 * x) + '.']]; } },
+    { s: '2(x − 4)', p: [-8, 2, 0], steps: function (x) {
+      return [['2 × (' + fmt(x) + ' − 4)', 'On remplace x par ' + fmt(x) + '. Le × caché réapparaît.'], ['2 × ' + P(x - 4), 'On calcule d\'abord dans la parenthèse : ' + fmt(x) + ' − 4 = ' + fmt(x - 4) + '.']]; } },
+    { s: '5 − x²', p: [5, 0, -1], steps: function (x) {
+      return [['5 − ' + P(x) + '²', 'On remplace x par ' + fmt(x) + '.'], ['5 − ' + fmt(x * x), 'Le carré se calcule avant la soustraction : ' + P(x) + '² = ' + fmt(x * x) + '.']]; } }
+  ];
+  var subI = 0, subX = $('subX'), subXr = $('subXr');
+  subs.forEach(function (E, i) {
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'ex'; b.id = 'subP' + i; b.textContent = E.s;
+    b.addEventListener('click', function () { subI = i; pressed('subP', subs.length, i); subRender(); });
+    $('subPresets').appendChild(b);
+  });
+  function subRender() {
+    var x = num(subX.value), out = $('subOut'), E = subs[subI], tb = $('subTable');
+    var head = '<tr><th>x</th>', row = '<tr><th>' + E.s + '</th>';
+    for (var v = -3; v <= 3; v++) { var on = !isNaN(x) && Math.abs(x - v) < 1e-9 ? ' class="on"' : ''; head += '<td' + on + '>' + fmt(v) + '</td>'; row += '<td' + on + '>' + fmt(evalPoly(E.p, v)) + '</td>'; }
+    tb.innerHTML = head + '</tr>' + row + '</tr>';
+    if (isNaN(x)) { out.innerHTML = '<span class="err">Écris un nombre pour x (par exemple −2 ou 1,5).</span>'; return; }
+    var st = E.steps(x), h = '<span>' + E.s + ' = ' + st[0][0] + '</span><span class="why">' + st[0][1] + '</span>';
+    for (var i = 1; i < st.length; i++) h += '<span>= ' + st[i][0] + '</span><span class="why">' + st[i][1] + '</span>';
+    h += '<span>= <b>' + fmt(evalPoly(E.p, x)) + '</b></span>';
+    out.innerHTML = h;
+  }
+  subXr.addEventListener('input', function () { subX.value = fmt(+subXr.value); subRender(); });
+  subX.addEventListener('input', function () { var x = num(subX.value); if (!isNaN(x)) subXr.value = Math.max(-5, Math.min(5, x)); subRender(); });
+  pressed('subP', subs.length, 0); subRender();
+
+  /* ---------- Étape 3 : réduire avec des tuiles ---------- */
+  function parseTerms(str) {
+    var s = String(str).replace(/[−–—]/g, '-').replace(/X/g, 'x').replace(/\^2/g, '²').replace(/,/g, '.').replace(/\s/g, '').replace(/(\d)[×·*](x)/g, '$1$2');
+    if (!s) throw new Error('Écris une expression, par exemple 3x + 2 − x.');
+    if (/[×·*]/.test(s)) throw new Error('Ici, on ne fait que des additions et des soustractions. Écris 3x au lieu de 3 × x.');
+    var re = /([+-]?)(\d+(?:\.\d+)?)?(x²|x)?/y, out = [], i = 0;
+    while (i < s.length) {
+      re.lastIndex = i;
+      var m = re.exec(s);
+      if (!m || (!m[2] && !m[3])) throw new Error('Je ne sais lire que des sommes de termes comme 3x, −x², 5 (sans parenthèses ni multiplication).');
+      if (out.length && !m[1]) throw new Error('Il manque un signe + ou − entre deux termes.');
+      var c = m[2] ? parseFloat(m[2]) : 1;
+      if (m[1] === '-') c = -c;
+      out.push({ c: c, d: m[3] === 'x²' ? 2 : (m[3] === 'x' ? 1 : 0) });
+      i += m[0].length;
+    }
+    return out;
+  }
+  function reduceTerms(terms) { var p = [0, 0, 0]; terms.forEach(function (t) { p[t.d] = clean(p[t.d] + t.c); }); return p; }
+  function reduceStr(s) { return polyStr(reduceTerms(parseTerms(s))); }
+  function coloured(terms) {
+    var s = '';
+    terms.forEach(function (t, i) {
+      var c = clean(t.c), txt = i === 0 ? monoStr(c, t.d) : monoAbs(c, t.d);
+      if (i > 0) s += c < 0 ? ' − ' : ' + ';
+      s += '<span class="c' + t.d + '">' + txt + '</span>';
+    });
+    return s;
+  }
+  var TC = ['var(--ok)', 'var(--two)', 'var(--acc)'];
+  function tile(svg, d, x, y, neg) {
+    var w = d === 2 ? 44 : 16, h = d === 0 ? 16 : 44, yy = y + 44 - h, col = TC[d];
+    var a = { x: x, y: yy, width: w, height: h, rx: 3, fill: neg ? 'var(--card)' : col, stroke: col, 'stroke-width': 2 };
+    if (neg) a['stroke-dasharray'] = '4 3';
+    mk(svg, 'rect', a);
+    if (d === 2 && !neg) mk(svg, 'text', { x: x + 22, y: y + 28, 'text-anchor': 'middle', 'font-size': 16, style: 'fill:var(--card);font-weight:700' }, 'x²');
+    if (neg) mk(svg, 'text', { x: x + w / 2, y: yy + h / 2 + 6, 'text-anchor': 'middle', 'font-size': 16, style: 'fill:' + col + ';font-weight:700' }, '−');
+    return w;
+  }
+  function drawTiles(svg, terms, p) {
+    clear(svg);
+    var W = 630, x = 10, y = 34;
+    mk(svg, 'text', { x: 10, y: 22, 'font-size': 16, style: 'font-weight:700' }, 'Avant');
+    terms.forEach(function (t, i) {
+      var n = Math.abs(t.c), w = t.d === 2 ? 44 : 16;
+      if (i > 0 && x + Math.min(n * (w + 5), 200) > W) { x = 10; y += 54; }
+      for (var j = 0; j < n; j++) { if (x + w > W) { x = 10; y += 54; } tile(svg, t.d, x, y, t.c < 0); x += w + 5; }
+      x += 16;
+    });
+    y += 54 + 26;
+    mk(svg, 'line', { x1: 10, y1: y - 22, x2: 630, y2: y - 22, stroke: 'var(--line)', 'stroke-width': 1.5 });
+    mk(svg, 'text', { x: 10, y: y, 'font-size': 16, style: 'font-weight:700' }, 'Après regroupement par famille');
+    y += 12;
+    [2, 1, 0].forEach(function (d) {
+      if (!terms.some(function (t) { return t.d === d; })) return;
+      var c = p[d], n = Math.abs(c), xx = 96;
+      mk(svg, 'text', { x: 10, y: y + 30, 'font-size': 18, style: 'fill:' + TC[d] + ';font-weight:700' }, c === 0 ? '0' : monoStr(c, d));
+      if (n === 0) mk(svg, 'text', { x: xx, y: y + 30, 'font-size': 16 }, 'les + et les − s\'annulent');
+      for (var j = 0; j < n; j++) { var w = d === 2 ? 44 : 16; if (xx + w > W) { xx = 96; y += 54; } tile(svg, d, xx, y, c < 0); xx += w + 5; }
+      y += 54;
+    });
+    svg.setAttribute('viewBox', '0 0 640 ' + (y + 6));
+  }
+  var redPresets = ['3x + 2 + 2x − 5 + x²', 'x + x + x', '4x − x + 3 − 1', '2x² + x − x² + 4x', 'x + x²', '5 − 2x + 3x − 5'];
+  var redIn = $('redIn');
+  redPresets.forEach(function (s, i) {
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'ex'; b.id = 'redP' + i; b.textContent = s;
+    b.addEventListener('click', function () { redIn.value = s; redRender(); });
+    $('redPresets').appendChild(b);
+  });
+  function redRender() {
+    var out = $('redOut'), svg = $('redSvg'), note = $('redNote'), terms;
+    redPresets.forEach(function (s, i) { $('redP' + i).setAttribute('aria-pressed', s === redIn.value ? 'true' : 'false'); });
+    try { terms = parseTerms(redIn.value); } catch (e) { out.innerHTML = '<span class="err">' + e.message + '</span>'; svg.style.display = 'none'; note.textContent = ''; return; }
+    var p = reduceTerms(terms), names = ['Les nombres', 'Les x', 'Les x²'], h = '<span>' + coloured(terms) + '</span><span class="why">On colorie chaque terme selon sa famille.</span>';
+    [2, 1, 0].forEach(function (d) {
+      var g = terms.filter(function (t) { return t.d === d; });
+      if (!g.length) return;
+      h += '<span class="c' + d + '">' + names[d] + ' : ' + joinMonos(g) + (g.length > 1 ? ' = ' + (p[d] === 0 ? '0' : monoStr(p[d], d)) : '') + '</span>';
+    });
+    var fam = p.filter(function (c) { return c !== 0; }).length;
+    h += '<span>Forme réduite : <b>' + polyStr(p) + '</b></span>';
+    h += '<span class="why">' + (fam >= 2 ? 'Il reste des familles différentes : on ne peut plus rien additionner. C\'est fini !' : 'Tout se range dans une seule famille.') + '</span>';
+    out.innerHTML = h;
+    var total = terms.reduce(function (s, t) { return s + Math.abs(t.c); }, 0);
+    var drawable = terms.every(function (t) { return Math.round(t.c) === t.c; }) && total <= 40;
+    if (drawable) { svg.style.display = ''; drawTiles(svg, terms, p); note.textContent = 'Une tuile pleine et une tuile en pointillés de la même famille s\'annulent : x − x = 0.'; }
+    else { svg.style.display = 'none'; note.textContent = 'Les tuiles ne savent dessiner que des nombres entiers (40 tuiles au maximum). Le calcul, lui, marche toujours.'; }
+  }
+  redIn.addEventListener('input', redRender); redRender();
+
+  /* ---------- Étape 4 : distributivité (aires) ---------- */
+  function areaText(svg, cx, cy, w, h, label, val) {
+    if (w >= 70 && h >= 56) { mk(svg, 'text', { x: cx, y: cy - 4, 'text-anchor': 'middle', 'font-size': 17 }, label); mk(svg, 'text', { x: cx, y: cy + 18, 'text-anchor': 'middle', 'font-size': 17, style: 'font-weight:700' }, '= ' + val); }
+    else mk(svg, 'text', { x: cx, y: cy + 6, 'text-anchor': 'middle', 'font-size': 17, style: 'font-weight:700' }, val);
+  }
+  function gridLines(svg, x0, y0, w, h, u) {
+    for (var gx = x0 + u; gx < x0 + w - 1; gx += u) mk(svg, 'line', { x1: gx, y1: y0, x2: gx, y2: y0 + h, stroke: 'var(--ink)', 'stroke-opacity': .15, 'stroke-width': 1 });
+    for (var gy = y0 + u; gy < y0 + h - 1; gy += u) mk(svg, 'line', { x1: x0, y1: gy, x2: x0 + w, y2: gy, stroke: 'var(--ink)', 'stroke-opacity': .15, 'stroke-width': 1 });
+  }
+  function dist() {
+    var k = +$('dk').value, a = +$('da').value, b = +$('db').value, svg = $('distSvg');
+    $('dkOut').textContent = k; $('daOut').textContent = a; $('dbOut').textContent = b;
+    clear(svg);
+    var u = Math.min(540 / (a + b), 220 / k), x0 = 70, y0 = 40, wa = a * u, wb = b * u, h = k * u;
+    mk(svg, 'rect', { x: x0, y: y0, width: wa, height: h, fill: 'var(--acc-soft)' });
+    mk(svg, 'rect', { x: x0 + wa, y: y0, width: wb, height: h, fill: 'var(--two-soft)' });
+    gridLines(svg, x0, y0, wa + wb, h, u);
+    mk(svg, 'rect', { x: x0, y: y0, width: wa, height: h, fill: 'none', stroke: 'var(--acc)', 'stroke-width': 2.5 });
+    mk(svg, 'rect', { x: x0 + wa, y: y0, width: wb, height: h, fill: 'none', stroke: 'var(--two)', 'stroke-width': 2.5 });
+    mk(svg, 'text', { x: x0 + wa / 2, y: y0 - 12, 'text-anchor': 'middle', 'font-size': 17, style: 'fill:var(--acc);font-weight:700' }, 'a = ' + a);
+    mk(svg, 'text', { x: x0 + wa + wb / 2, y: y0 - 12, 'text-anchor': 'middle', 'font-size': 17, style: 'fill:var(--two);font-weight:700' }, 'b = ' + b);
+    mk(svg, 'text', { x: x0 - 10, y: y0 + h / 2 + 6, 'text-anchor': 'end', 'font-size': 17, style: 'font-weight:700' }, 'k = ' + k);
+    areaText(svg, x0 + wa / 2, y0 + h / 2, wa, h, 'k × a', k * a);
+    areaText(svg, x0 + wa + wb / 2, y0 + h / 2, wb, h, 'k × b', k * b);
+    svg.setAttribute('viewBox', '0 0 640 ' + Math.round(y0 + h + 24));
+    $('distRes').innerHTML =
+      res('D\'un coup : k × (a + b)', fmt(k * (a + b)), k + ' × (' + a + ' + ' + b + ') = ' + k + ' × ' + (a + b) + ' = ' + k * (a + b)) +
+      res('En deux morceaux : k × a + k × b', fmt(k * a + k * b), k + ' × ' + a + ' + ' + k + ' × ' + b + ' = ' + k * a + ' + ' + k * b + ' = ' + (k * a + k * b));
+  }
+  ['dk', 'da', 'db'].forEach(function (id) { $(id).addEventListener('input', dist); }); dist();
+
+  function dist2() {
+    var a = +$('d2a').value, b = +$('d2b').value, c = +$('d2c').value, d = +$('d2d').value, svg = $('dist2Svg');
+    $('d2aOut').textContent = a; $('d2bOut').textContent = b; $('d2cOut').textContent = c; $('d2dOut').textContent = d;
+    clear(svg);
+    var u = Math.min(540 / (a + b), 260 / (c + d)), x0 = 70, y0 = 40, wa = a * u, wb = b * u, hc = c * u, hd = d * u;
+    var parts = [
+      [x0, y0, wa, hc, 'var(--acc-soft)', 'a × c', a * c],
+      [x0 + wa, y0, wb, hc, 'var(--two-soft)', 'b × c', b * c],
+      [x0, y0 + hc, wa, hd, 'var(--ok-soft)', 'a × d', a * d],
+      [x0 + wa, y0 + hc, wb, hd, 'var(--hl)', 'b × d', b * d]
+    ];
+    parts.forEach(function (q) { mk(svg, 'rect', { x: q[0], y: q[1], width: q[2], height: q[3], fill: q[4] }); });
+    gridLines(svg, x0, y0, wa + wb, hc + hd, u);
+    parts.forEach(function (q) {
+      mk(svg, 'rect', { x: q[0], y: q[1], width: q[2], height: q[3], fill: 'none', stroke: 'var(--ink)', 'stroke-width': 2 });
+      areaText(svg, q[0] + q[2] / 2, q[1] + q[3] / 2, q[2], q[3], q[5], q[6]);
+    });
+    mk(svg, 'text', { x: x0 + wa / 2, y: y0 - 12, 'text-anchor': 'middle', 'font-size': 17, style: 'font-weight:700' }, 'a = ' + a);
+    mk(svg, 'text', { x: x0 + wa + wb / 2, y: y0 - 12, 'text-anchor': 'middle', 'font-size': 17, style: 'font-weight:700' }, 'b = ' + b);
+    mk(svg, 'text', { x: x0 - 10, y: y0 + hc / 2 + 6, 'text-anchor': 'end', 'font-size': 17, style: 'font-weight:700' }, 'c = ' + c);
+    mk(svg, 'text', { x: x0 - 10, y: y0 + hc + hd / 2 + 6, 'text-anchor': 'end', 'font-size': 17, style: 'font-weight:700' }, 'd = ' + d);
+    svg.setAttribute('viewBox', '0 0 640 ' + Math.round(y0 + hc + hd + 24));
+    var tot = (a + b) * (c + d);
+    $('dist2Res').innerHTML =
+      res('D\'un coup : (a + b)(c + d)', fmt(tot), '(' + a + ' + ' + b + ') × (' + c + ' + ' + d + ') = ' + (a + b) + ' × ' + (c + d) + ' = ' + tot) +
+      res('Les 4 morceaux : ac + ad + bc + bd', fmt(a * c + a * d + b * c + b * d), a * c + ' + ' + a * d + ' + ' + b * c + ' + ' + b * d + ' = ' + (a * c + a * d + b * c + b * d));
+  }
+  ['d2a', 'd2b', 'd2c', 'd2d'].forEach(function (id) { $(id).addEventListener('input', dist2); }); dist2();
+
+  /* ---------- Étape 4 : le développeur ---------- */
+  function linMonos(p, q) { return [{ c: p, d: 1 }, { c: q, d: 0 }].filter(function (m) { return m.c !== 0; }); }
+  function nz(list) { return list.length ? list : [{ c: 0, d: 0 }]; }
+  function kStr(k) { return k === 1 ? '' : (k === -1 ? '−' : fmt(k)); }
+  function expandF(A, B) {
+    var prods = [], terms = [], p = [0, 0, 0];
+    A.forEach(function (m) {
+      B.forEach(function (n) {
+        prods.push(monoP(m.c, m.d) + ' × ' + monoP(n.c, n.d));
+        var t = { c: m.c * n.c, d: m.d + n.d };
+        terms.push(t); p[t.d] = clean(p[t.d] + t.c);
+      });
+    });
+    return { prods: prods, terms: terms, p: p };
+  }
+  function expand(p, q, r, s) { return polyStr(expandF(nz(linMonos(p, q)), nz(linMonos(r, s))).p); }
+  function expandK(k, p, q) { return polyStr(expandF([{ c: k, d: 0 }], nz(linMonos(p, q))).p); }
+  var exMode = 1;
+  function exRender() {
+    var out = $('exOut'), k = int($('exK').value), p = int($('exP').value), q = int($('exQ').value), r = int($('exR').value), s = int($('exS').value);
+    $('exLk').style.display = exMode === 0 ? '' : 'none';
+    $('exLr').style.display = exMode === 1 ? '' : 'none';
+    $('exLs').style.display = exMode === 1 ? '' : 'none';
+    pressed('exM', 2, exMode);
+    var need = exMode === 0 ? [k, p, q] : [p, q, r, s];
+    if (need.some(function (v) { return isNaN(v); })) { out.innerHTML = '<span class="err">Écris des nombres entiers (ils peuvent être négatifs).</span>'; return; }
+    if (need.some(function (v) { return Math.abs(v) > 99; })) { out.innerHTML = '<span class="err">Choisis des nombres entre −99 et 99.</span>'; return; }
+    var A, B, head;
+    if (exMode === 0) { A = [{ c: k, d: 0 }]; B = nz(linMonos(p, q)); head = kStr(k) + '(' + joinMonos(B) + ')'; }
+    else { A = nz(linMonos(p, q)); B = nz(linMonos(r, s)); head = '(' + joinMonos(A) + ')(' + joinMonos(B) + ')'; }
+    var R = expandF(A, B), t1 = joinMonos(R.terms), t2 = polyStr(R.p);
+    var h = '<span>' + head + '</span>';
+    h += '<span>= ' + R.prods.join(' + ') + '</span><span class="why">' + (exMode === 0 ? 'On multiplie ' + fmt(k) + ' par chaque terme de la parenthèse.' : 'Chaque terme de la 1<sup>re</sup> parenthèse multiplie chaque terme de la 2<sup>e</sup>.') + '</span>';
+    h += '<span>= ' + t1 + '</span><span class="why">On calcule chaque produit, en faisant attention aux signes.</span>';
+    if (t2 !== t1) h += '<span>= ' + t2 + '</span><span class="why">On réduit : on additionne les termes de la même famille.</span>';
+    h += '<span>Résultat : <b>' + t2 + '</b></span>';
+    if (exMode === 1) h += '<span class="why">Le raccourci : devant x², ' + fmt(p) + ' × ' + P(r) + ' = ' + fmt(p * r) + ' ; devant x, ' + fmt(p) + ' × ' + P(s) + ' + ' + fmt(q) + ' × ' + P(r) + ' = ' + fmt(p * s + q * r) + ' ; le nombre, ' + fmt(q) + ' × ' + P(s) + ' = ' + fmt(q * s) + '.</span>';
+    out.innerHTML = h;
+  }
+  $('exM0').addEventListener('click', function () { exMode = 0; exRender(); });
+  $('exM1').addEventListener('click', function () { exMode = 1; exRender(); });
+  ['exK', 'exP', 'exQ', 'exR', 'exS'].forEach(function (id) { $(id).addEventListener('input', exRender); });
+  exRender();
+
+  /* ---------- Étape 5 : identités ---------- */
+  function idDraw() {
+    var a = +$('ia').value, b = +$('ib').value, svg = $('idSvg');
+    $('iaOut').textContent = a; $('ibOut').textContent = b;
+    clear(svg);
+    var u = 300 / (a + b), x0 = 50, y0 = 40, A = a * u, B = b * u;
+    var parts = [[x0, y0, A, A, 'var(--acc-soft)', 'var(--acc)', 'a²', a * a], [x0 + A, y0, B, A, 'var(--two-soft)', 'var(--two)', 'ab', a * b], [x0, y0 + A, A, B, 'var(--two-soft)', 'var(--two)', 'ab', a * b], [x0 + A, y0 + A, B, B, 'var(--ok-soft)', 'var(--ok)', 'b²', b * b]];
+    parts.forEach(function (q) { mk(svg, 'rect', { x: q[0], y: q[1], width: q[2], height: q[3], fill: q[4], stroke: q[5], 'stroke-width': 2.5 }); });
+    parts.forEach(function (q) {
+      var cx = q[0] + q[2] / 2, cy = q[1] + q[3] / 2;
+      if (q[2] >= 44 && q[3] >= 50) { mk(svg, 'text', { x: cx, y: cy - 3, 'text-anchor': 'middle', 'font-size': 18, style: 'fill:' + q[5] + ';font-weight:700' }, q[6]); mk(svg, 'text', { x: cx, y: cy + 19, 'text-anchor': 'middle', 'font-size': 16 }, '= ' + q[7]); }
+      else if (q[2] >= 30 && q[3] >= 22) mk(svg, 'text', { x: cx, y: cy + 6, 'text-anchor': 'middle', 'font-size': 16, style: 'fill:' + q[5] + ';font-weight:700' }, q[6]);
+    });
+    mk(svg, 'text', { x: x0 + A / 2, y: y0 - 12, 'text-anchor': 'middle', 'font-size': 17, style: 'fill:var(--acc);font-weight:700' }, 'a');
+    mk(svg, 'text', { x: x0 + A + B / 2, y: y0 - 12, 'text-anchor': 'middle', 'font-size': 17, style: 'fill:var(--ok);font-weight:700' }, 'b');
+    mk(svg, 'text', { x: x0 - 14, y: y0 + A / 2 + 6, 'text-anchor': 'middle', 'font-size': 17, style: 'fill:var(--acc);font-weight:700' }, 'a');
+    mk(svg, 'text', { x: x0 - 14, y: y0 + A + B / 2 + 6, 'text-anchor': 'middle', 'font-size': 17, style: 'fill:var(--ok);font-weight:700' }, 'b');
+    var s = a + b;
+    $('idRes').innerHTML =
+      res('Le grand carré : (a + b)²', fmt(s * s), '(' + a + ' + ' + b + ')² = ' + s + '² = ' + fmt(s * s)) +
+      res('Les 4 morceaux : a² + 2ab + b²', fmt(a * a + 2 * a * b + b * b), a + '² + 2 × ' + a + ' × ' + b + ' + ' + b + '² = ' + a * a + ' + ' + 2 * a * b + ' + ' + b * b + ' = ' + fmt(a * a + 2 * a * b + b * b)) +
+      res('Le piège : a² + b²', fmt(a * a + b * b), a * a + ' + ' + b * b + ' = ' + fmt(a * a + b * b) + ' : il manque 2ab = ' + 2 * a * b);
+  }
+  ['ia', 'ib'].forEach(function (id) { $(id).addEventListener('input', idDraw); }); idDraw();
+
+  function sqTrick(n) {
+    if (isNaN(n) || Math.round(n) !== n || n < 10 || n > 9999) return null;
+    var r = Math.round(n / 10) * 10, e = n - r, ae = Math.abs(e), v = n * n;
+    if (e === 0) return { r: r, e: 0, v: v, s: fmt(n) + '² = ' + fmt(v) };
+    var sg = e > 0 ? '+' : '−';
+    return { r: r, e: e, v: v, s: '(' + fmt(r) + ' ' + sg + ' ' + ae + ')² = ' + fmt(r * r) + ' ' + sg + ' ' + fmt(2 * r * ae) + ' + ' + fmt(ae * ae) + ' = ' + fmt(v) };
+  }
+  function mcRender() {
+    var n = int($('mcN').value), out = $('mcOut'), T = sqTrick(n);
+    if (!T) { out.innerHTML = '<span class="err">Écris un nombre entier entre 10 et 9 999.</span>'; return; }
+    if (T.e === 0) { out.innerHTML = '<span>' + T.s + '</span><span class="why">C\'est déjà un nombre rond : facile !</span>'; return; }
+    var ae = Math.abs(T.e), plus = T.e > 0;
+    out.innerHTML = '<span>' + fmt(n) + ' = ' + fmt(T.r) + (plus ? ' + ' : ' − ') + ae + '</span><span class="why">On écrit le nombre à partir de la dizaine la plus proche.</span>' +
+      '<span>' + fmt(n) + '² = (' + fmt(T.r) + (plus ? ' + ' : ' − ') + ae + ')²</span>' +
+      '<span>= ' + fmt(T.r * T.r) + (plus ? ' + ' : ' − ') + fmt(2 * T.r * ae) + ' + ' + fmt(ae * ae) + '</span><span class="why">On utilise (a ' + (plus ? '+' : '−') + ' b)² = a² ' + (plus ? '+' : '−') + ' 2ab + b² avec a = ' + fmt(T.r) + ' et b = ' + ae + '.</span>' +
+      '<span>= <b>' + fmt(T.v) + '</b></span>';
+  }
+  $('mcN').addEventListener('input', mcRender); mcRender();
+
+  /* ---------- Étape 6 : factoriser ---------- */
+  function factorLin(a, b) {
+    if (isNaN(a) || isNaN(b) || a === 0 || b === 0) return null;
+    var g = gcd(a, b);
+    if (g === 1) return null;
+    return fmt(g) + '(' + joinMonos([{ c: a / g, d: 1 }, { c: b / g, d: 0 }]) + ')';
+  }
+  function factorDiff(N) {
+    if (isNaN(N) || N < 1 || Math.round(N) !== N) return null;
+    var n = Math.round(Math.sqrt(N));
+    if (n * n !== N) return null;
+    return '(x − ' + fmt(n) + ')(x + ' + fmt(n) + ')';
+  }
+  function faRender() {
+    var a = int($('faA').value), b = int($('faB').value), out = $('faOut');
+    if (isNaN(a) || isNaN(b)) { out.innerHTML = '<span class="err">Écris deux nombres entiers.</span>'; return; }
+    if (a === 0 || b === 0) { out.innerHTML = '<span class="err">Choisis deux nombres différents de 0.</span>'; return; }
+    if (Math.abs(a) > 9999 || Math.abs(b) > 9999) { out.innerHTML = '<span class="err">Choisis des nombres plus petits que 10 000.</span>'; return; }
+    var g = gcd(a, b), e = joinMonos([{ c: a, d: 1 }, { c: b, d: 0 }]);
+    if (g === 1) { out.innerHTML = '<span>' + e + '</span><span class="why">' + fmt(Math.abs(a)) + ' et ' + fmt(Math.abs(b)) + ' n\'ont pas de diviseur commun à part 1. On ne peut pas sortir de nombre entier commun.</span>'; return; }
+    var a2 = a / g, b2 = b / g, F = factorLin(a, b);
+    out.innerHTML = '<span>' + e + '</span><span class="why">Le plus grand nombre qui divise ' + fmt(Math.abs(a)) + ' et ' + fmt(Math.abs(b)) + ' est ' + fmt(g) + '.</span>' +
+      '<span>= ' + fmt(g) + ' × ' + monoP(a2, 1) + ' + ' + fmt(g) + ' × ' + P(b2) + '</span><span class="why">On fait apparaître ' + fmt(g) + ' dans chaque terme.</span>' +
+      '<span>= <b>' + F + '</b></span><span class="why">On sort le facteur commun ' + fmt(g) + ' devant la parenthèse. Vérification : ' + fmt(g) + ' × ' + monoP(a2, 1) + ' = ' + monoStr(a, 1) + ' et ' + fmt(g) + ' × ' + P(b2) + ' = ' + fmt(b) + '.</span>';
+  }
+  ['faA', 'faB'].forEach(function (id) { $(id).addEventListener('input', faRender); }); faRender();
+  function fdRender() {
+    var N = int($('fdN').value), out = $('fdOut');
+    if (isNaN(N) || N < 1) { out.innerHTML = '<span class="err">Écris un nombre entier positif.</span>'; return; }
+    if (N > 1e8) { out.innerHTML = '<span class="err">Choisis un nombre plus petit.</span>'; return; }
+    var F = factorDiff(N);
+    if (!F) { out.innerHTML = '<span>x² − ' + fmt(N) + '</span><span class="why">' + fmt(N) + ' n\'est pas un carré parfait (1, 4, 9, 16, 25, 36…). Avec des nombres entiers, on ne peut pas utiliser a² − b² ici.</span>'; return; }
+    var n = Math.round(Math.sqrt(N));
+    out.innerHTML = '<span>x² − ' + fmt(N) + '</span>' +
+      '<span>= x² − ' + fmt(n) + '²</span><span class="why">' + fmt(N) + ' = ' + fmt(n) + ' × ' + fmt(n) + ' : c\'est un carré parfait.</span>' +
+      '<span>= <b>' + F + '</b></span><span class="why">On utilise a² − b² = (a − b)(a + b) avec a = x et b = ' + fmt(n) + '.</span>';
+  }
+  $('fdN').addEventListener('input', fdRender); fdRender();
+
+  /* ---------- Étape 7 : prouver ---------- */
+  function trick(n) { var a = n + 3, b = a * 2, c = b - 6, d = c / 2; return [n, clean(a), clean(b), clean(c), clean(d)]; }
+  function consec(n) { return { sum: 3 * n + 3, middle: n + 1 }; }
+  function trRender() {
+    var n = num($('trN').value), tb = $('trTable'), out = $('trOut');
+    if (isNaN(n)) { tb.innerHTML = ''; out.className = 'verdict'; out.innerHTML = '<span class="err">Écris un nombre.</span>'; return; }
+    var v = trick(n), lab = ['Pense à un nombre', 'Ajoute 3', 'Multiplie par 2', 'Enlève 6', 'Divise par 2'];
+    var lit = ['n', 'n + 3', '2(n + 3) = 2n + 6', '2n + 6 − 6 = 2n', '2n ÷ 2 = n'];
+    var calc = [fmt(v[0]), fmt(v[0]) + ' + 3 = ' + fmt(v[1]), fmt(v[1]) + ' × 2 = ' + fmt(v[2]), fmt(v[2]) + ' − 6 = ' + fmt(v[3]), fmt(v[3]) + ' ÷ 2 = ' + fmt(v[4])];
+    var h = '<thead><tr><th>Étape</th><th>Avec ton nombre</th><th>Avec n</th></tr></thead><tbody>';
+    for (var i = 0; i < 5; i++) h += '<tr><th>' + lab[i] + '</th><td' + (i === 4 ? ' class="on"' : '') + '>' + calc[i] + '</td><td' + (i === 4 ? ' class="on"' : '') + '>' + lit[i] + '</td></tr>';
+    tb.innerHTML = h + '</tbody>';
+    out.className = 'verdict yes';
+    out.innerHTML = 'Tu retrouves ' + fmt(v[4]) + ' : ton nombre de départ !<span>Avec n, le calcul donne n à la fin. Donc ça marche pour tous les nombres.</span>';
+  }
+  $('trN').addEventListener('input', trRender); trRender();
+  function ciRender() {
+    var n = int($('ciN').value), out = $('ciOut');
+    if (isNaN(n)) { out.innerHTML = '<span class="err">Écris un nombre entier.</span>'; return; }
+    if (Math.abs(n) > 1e9) { out.innerHTML = '<span class="err">Choisis un nombre plus petit.</span>'; return; }
+    var C = consec(n);
+    out.innerHTML = '<span>' + fmt(n) + ' + ' + P(n + 1) + ' + ' + P(n + 2) + ' = <b>' + fmt(C.sum) + '</b></span>' +
+      '<span>= 3 × ' + P(C.middle) + '</span><span class="why">C\'est bien un multiple de 3 : 3 fois le nombre du milieu.</span>';
+  }
+  $('ciN').addEventListener('input', ciRender); ciRender();
+
+  /* ---------- Étape 8 : le piège (a + b)² ---------- */
+  function pgRender() {
+    var a = num($('pgA').value), b = num($('pgB').value), out = $('pgOut');
+    if (isNaN(a) || isNaN(b)) { out.innerHTML = '<p class="err">Écris deux nombres.</p>'; return; }
+    var s = a + b;
+    out.innerHTML =
+      res('(a + b)²', fmt(s * s), '(' + fmt(a) + ' + ' + P(b) + ')² = ' + P(s) + '² = ' + fmt(s * s)) +
+      res('a² + b²', fmt(a * a + b * b), P(a) + '² + ' + P(b) + '² = ' + fmt(a * a) + ' + ' + fmt(b * b) + ' = ' + fmt(a * a + b * b)) +
+      res('a² + 2ab + b²', fmt(a * a + 2 * a * b + b * b), fmt(a * a) + ' ' + signed(2 * a * b) + ' + ' + fmt(b * b) + ' = ' + fmt(a * a + 2 * a * b + b * b) + (clean(a * b) === 0 ? ' (ici 2ab = 0 : c\'est le seul cas où le piège ne se voit pas)' : ''));
+  }
+  ['pgA', 'pgB'].forEach(function (id) { $(id).addEventListener('input', pgRender); }); pgRender();
+
+  /* ---------- Quiz ---------- */
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  function rnd(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+  function rndNZ(a, b) { var v; do { v = rnd(a, b); } while (v === 0); return v; }
+  function lin1(a) { return joinMonos([{ c: 1, d: 1 }, { c: a, d: 0 }]); }
+  var makers = [
+    function () {
+      var p, x;
+      if (Math.random() < .5) { p = [rndNZ(-9, 9), rndNZ(-5, 6), 0]; x = rndNZ(-4, 5); }
+      else { p = [rnd(-5, 5), rnd(-3, 3), 1]; x = rndNZ(-4, 4); }
+      var v = evalPoly(p, x);
+      return { q: 'Calcule ' + polyStr(p) + ' pour x = ' + fmt(x), a: v, how: 'On remplace x par ' + P(x) + ' : ' + subst(p, x) + ' = ' + fmt(v) };
+    },
+    function () {
+      var a = rndNZ(-6, 9), b = rndNZ(-6, 9);
+      while (a + b === 0) b = rndNZ(-6, 9);
+      var sq = Math.random() < .3, d = sq ? 2 : 1;
+      return { q: joinMonos([{ c: a, d: d }, { c: b, d: d }]) + ' = ?' + POW[d], a: a + b, how: 'Même famille : on ajoute les nombres devant ' + POW[d] + '. ' + fmt(a) + ' + ' + P(b) + ' = ' + fmt(a + b) + ', donc ' + monoStr(a + b, d) };
+    },
+    function () {
+      if (Math.random() < .5) {
+        var k = rnd(2, 9) * (Math.random() < .3 ? -1 : 1), b = rndNZ(-9, 9);
+        return { q: fmt(k) + '(' + lin1(b) + ') = ' + monoStr(k, 1) + ' + ?', a: k * b, how: fmt(k) + ' multiplie chaque terme : ' + fmt(k) + ' × x = ' + monoStr(k, 1) + ' et ' + fmt(k) + ' × ' + P(b) + ' = ' + fmt(k * b) };
+      }
+      var a = rndNZ(-6, 7), c = rndNZ(-6, 7);
+      while (a + c === 0) c = rndNZ(-6, 7);
+      var ac = a * c;
+      return { q: '(' + lin1(a) + ')(' + lin1(c) + ') = x² + ?x ' + (ac < 0 ? '− ' + fmt(-ac) : '+ ' + fmt(ac)), a: a + c, how: 'Les termes en x : x × ' + P(c) + ' + ' + P(a) + ' × x = ' + monoStr(a + c, 1) + '. Résultat : ' + polyStr([ac, a + c, 1]) };
+    },
+    function () {
+      var a = rnd(1, 9), t = rnd(0, 3);
+      if (t === 0) return { q: '(x + ' + a + ')² = x² + ?x + ' + a * a, a: 2 * a, how: '(a + b)² = a² + 2ab + b² : 2 × x × ' + a + ' = ' + monoStr(2 * a, 1) };
+      if (t === 1) return { q: '(x + ' + a + ')² = x² + ' + monoStr(2 * a, 1) + ' + ?', a: a * a, how: '(a + b)² = a² + 2ab + b² : le dernier terme est ' + a + '² = ' + a * a };
+      if (t === 2) return { q: '(x − ' + a + ')² = x² − ?x + ' + a * a, a: 2 * a, how: '(a − b)² = a² − 2ab + b² : 2 × x × ' + a + ' = ' + monoStr(2 * a, 1) };
+      return { q: '(x − ' + a + ')(x + ' + a + ') = x² − ?', a: a * a, how: '(a − b)(a + b) = a² − b² : ' + a + '² = ' + a * a };
+    }
+  ];
+  var quiz = $('quiz'), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ''; done = [];
+    var order = [0, 0, 1, 1, 2, 2, 3, 3];
+    for (var i = order.length - 1; i > 0; i--) { var j = rnd(0, i), t = order[i]; order[i] = order[j]; order[j] = t; }
+    for (var k = 0; k < 8; k++) {
+      var Q = makers[order[k]](), li = document.createElement('li');
+      li.innerHTML = '<span class="q">' + Q.q + '</span><input type="text" id="qa' + k + '" inputmode="text" autocomplete="off" aria-label="Ta réponse à la question ' + (k + 1) + '"><button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+      quiz.appendChild(li);
+      (function (k, Q) {
+        function check() {
+          var fb = $('qf' + k), x = num($('qa' + k).value);
+          if (isNaN(x)) { fb.className = 'fb'; fb.textContent = 'Écris un nombre (tu peux mettre un signe −).'; return; }
+          if (Math.abs(x - Q.a) < 1e-6) { fb.className = 'fb ok'; fb.innerHTML = 'Bravo, c\'est juste !<span>' + Q.how + '</span>'; done[k] = true; }
+          else { done[k] = false; fb.className = 'fb no'; fb.innerHTML = 'Pas tout à fait : la réponse est ' + fmt(Q.a) + '.<span>' + Q.how + '</span>'; }
+          $('score').textContent = done.filter(Boolean).length + ' / 8';
+        }
+        $('qb' + k).addEventListener('click', check);
+        $('qa' + k).addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+      })(k, Q);
+    }
+    $('score').textContent = '0 / 8';
+  }
+  $('newQuiz').addEventListener('click', newQuiz);
+  newQuiz();
+
+  window.__litt = { fmt: fmt, polyStr: polyStr, evalPoly: evalPoly, subst: subst, parseTerms: parseTerms, reduceStr: reduceStr, expand: expand, expandK: expandK, factorLin: factorLin, factorDiff: factorDiff, sqTrick: sqTrick, trick: trick, consec: consec };
+})();
+</script>
+</body>
+</html>

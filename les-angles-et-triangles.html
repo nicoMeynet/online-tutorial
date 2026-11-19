@@ -1,0 +1,958 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Les angles et les triangles</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, encre bronze (comme un vieux rapporteur en laiton), marge rouge. Les trois angles d'un triangle ont chacun leur couleur. */
+:root {
+  --paper: #faf8f2;
+  --grid: #ece5d6;
+  --card: #ffffff;
+  --ink: #2a2112;
+  --ink-soft: #6b5c43;
+  --acc: #854d0e;
+  --acc-soft: #f8ecd4;
+  --a1: #1c64c8;
+  --a1-soft: #dbe8fa;
+  --a2: #15803d;
+  --a2-soft: #d8f1e0;
+  --a3: #be185d;
+  --a3-soft: #fbdcea;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #fff0a3;
+  --line: #e2d7c2;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #14110a; --grid: #221c12; --card: #1b170e; --ink: #f5eee0; --ink-soft: #c2b393;
+    --acc: #fbbf24; --acc-soft: #3d2d0c; --a1: #7fb0ff; --a1-soft: #1a2a45; --a2: #4ade80; --a2-soft: #143322;
+    --a3: #f472b6; --a3-soft: #3d1729; --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27;
+    --hl: #4b4318; --line: #3a3120;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #14110a; --grid: #221c12; --card: #1b170e; --ink: #f5eee0; --ink-soft: #c2b393;
+  --acc: #fbbf24; --acc-soft: #3d2d0c; --a1: #7fb0ff; --a1-soft: #1a2a45; --a2: #4ade80; --a2-soft: #143322;
+  --a3: #f472b6; --a3-soft: #3d1729; --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27;
+  --hl: #4b4318; --line: #3a3120;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero-top { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+.hero-top svg { width: 180px; height: auto; flex: none; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+
+/* Le chapeau des angles : un petit « ^ » au-dessus des lettres */
+.hat { position: relative; display: inline-block; padding-top: .3em; line-height: 1; }
+.hat::before { content: ""; position: absolute; left: 8%; right: 8%; top: 0; height: .32em;
+  background:
+    linear-gradient(to top right, transparent calc(50% - 1px), currentColor calc(50% - 1px), currentColor calc(50% + 1px), transparent calc(50% + 1px)) left / 50% 100% no-repeat,
+    linear-gradient(to top left, transparent calc(50% - 1px), currentColor calc(50% - 1px), currentColor calc(50% + 1px), transparent calc(50% + 1px)) right / 50% 100% no-repeat; }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+svg.fig { display: block; width: 100%; height: auto; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; }
+.handle { cursor: grab; }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 6px 12px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+input[type="text"] { font: inherit; font-family: var(--f-mono); font-size: 1.05rem; padding: 8px 10px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; }
+input[type="range"] { width: 100%; accent-color: var(--acc); }
+.param { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.param label { font-weight: 700; }
+.params { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 16px; }
+@media (max-width: 600px) { .params { grid-template-columns: 1fr; } }
+
+.duo { display: grid; grid-template-columns: 320px 1fr; gap: 20px; align-items: center; }
+.duo > div { min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+@media (max-width: 640px) { .duo { grid-template-columns: 1fr; } .duo > svg { max-width: 320px; margin: 0 auto; } }
+
+.bigval { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; }
+.bigval .v { font-family: var(--f-display); font-weight: 800; font-size: clamp(2rem, 7vw, 2.6rem); color: var(--a1); line-height: 1; font-variant-numeric: tabular-nums; }
+.bigval .t { font-family: var(--f-display); font-weight: 700; font-size: 1.3rem; color: var(--acc); }
+
+.inputs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 14px; align-items: end; }
+.inputs.two-col { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.inputs label { font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+.steps { font-family: var(--f-mono); font-size: .98rem; display: flex; flex-direction: column; gap: 4px; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; padding: 12px 14px; overflow-wrap: anywhere; }
+.steps b { color: var(--acc); }
+.steps .err { color: var(--red); font-family: var(--f-body); font-weight: 700; }
+.verdict { border-radius: 8px; padding: 12px 14px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+.verdict.yes { background: var(--ok-soft); color: var(--ok); }
+.verdict.no { background: var(--red-soft); color: var(--red); }
+.verdict.mid { background: var(--acc-soft); color: var(--acc); }
+.verdict span { font-weight: 400; color: var(--ink); }
+.err { color: var(--red); font-weight: 700; }
+
+.results { display: flex; flex-direction: column; gap: 8px; font-variant-numeric: tabular-nums; }
+.res { border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 12px; display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; align-items: baseline; }
+.res-name { font-family: var(--f-display); font-weight: 700; }
+.res-val { font-family: var(--f-mono); font-weight: 600; color: var(--acc); font-size: 1.05rem; white-space: nowrap; }
+.res-calc { grid-column: 1 / -1; font-family: var(--f-mono); font-size: .85rem; color: var(--ink-soft); overflow-wrap: anywhere; }
+.c1 { color: var(--a1); } .c2 { color: var(--a2); } .c3 { color: var(--a3); }
+.res-val.c1 { color: var(--a1); } .res-val.c2 { color: var(--a2); } .res-val.c3 { color: var(--a3); }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.cards .box.on { border-color: var(--acc); background: var(--acc-soft); box-shadow: 3px 3px 0 var(--acc); }
+.cards.small { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+.cards.small .box { padding: 12px 14px; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; color: var(--acc); }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 110px auto; gap: 10px; align-items: center; }
+.quiz li.ch { grid-template-columns: 1fr; }
+.quiz input[type="text"] { font-size: 1rem; padding: 6px 8px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } .quiz li.ch { grid-template-columns: 1fr; } }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc); }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 120px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+</head>
+<body>
+<main class="page">
+
+  <header class="hero">
+    <div class="hero-top">
+      <svg viewBox="0 0 200 170" aria-hidden="true">
+        <path d="M20 150 L48 150 A28 28 0 0 0 30.04 123.86 Z" fill="var(--a1-soft)" stroke="var(--a1)" stroke-width="3" stroke-linejoin="round"></path>
+        <path d="M180 150 L161.91 128.63 A28 28 0 0 0 152 150 Z" fill="var(--a2-soft)" stroke="var(--a2)" stroke-width="3" stroke-linejoin="round"></path>
+        <path d="M70 20 L61.38 42.40 A24 24 0 0 0 85.50 38.32 Z" fill="var(--a3-soft)" stroke="var(--a3)" stroke-width="3" stroke-linejoin="round"></path>
+        <path d="M20 150 L180 150 L70 20 Z" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round"></path>
+      </svg>
+      <div style="display:flex;flex-direction:column;gap:10px;min-width:0;flex:1 1 280px">
+        <span class="eyebrow">Tutoriel de maths · niveau 6<sup>e</sup>–5<sup>e</sup></span>
+        <h1>Les angles et les triangles</h1>
+        <p class="lead">Un angle, c'est l'ouverture entre deux droites qui se croisent. Ici, tu vas apprendre à le mesurer, puis découvrir la règle magique des triangles : leurs trois angles font toujours 180°.</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · L'idée</span>
+    <h2>C'est quoi, un angle ?</h2>
+    <p>Ouvre un compas, ou les deux aiguilles d'une horloge. L'écart entre les deux branches, c'est un <strong>angle</strong>. Plus on ouvre, plus l'angle est grand.</p>
+    <div class="box">
+      <div class="duo">
+        <svg class="fig" viewBox="0 0 320 200" role="img" aria-label="Un angle de 50 degrés de sommet O, entre les demi-droites Ox et Oy">
+          <path d="M40 170 L100 170 A60 60 0 0 0 78.57 124.04 Z" fill="var(--a1-soft)" stroke="none"></path>
+          <path d="M100 170 A60 60 0 0 0 78.57 124.04" fill="none" stroke="var(--a1)" stroke-width="3"></path>
+          <line x1="40" y1="170" x2="300" y2="170" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"></line>
+          <line x1="40" y1="170" x2="168.6" y2="16.8" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"></line>
+          <circle cx="40" cy="170" r="5" fill="var(--acc)"></circle>
+          <text x="20" y="192" font-size="16" font-weight="600">O</text>
+          <text x="296" y="192" font-size="16" font-weight="600">x</text>
+          <text x="176" y="22" font-size="16" font-weight="600">y</text>
+          <text x="112" y="140" font-size="16" font-weight="600" style="fill:var(--a1)">50°</text>
+          <text x="200" y="160" font-size="13" style="fill:var(--ink-soft)">un côté</text>
+          <text x="128" y="64" font-size="13" style="fill:var(--ink-soft)">un côté</text>
+          <text x="50" y="148" font-size="13" style="fill:var(--acc)">sommet</text>
+        </svg>
+        <div>
+          <p>Le point où les deux branches se rejoignent s'appelle le <strong>sommet</strong> (ici O). Les deux branches sont les <strong>côtés</strong> : ce sont des demi-droites, [Ox) et [Oy).</p>
+          <p>On écrit l'angle avec un chapeau sur le sommet : x<span class="hat">O</span>y, qu'on tape souvent xÔy. Avec trois points A, B et C, on écrit <span class="hat">ABC</span> : <span class="hl">le sommet est toujours la lettre du milieu</span>, ici B.</p>
+        </div>
+      </div>
+    </div>
+    <p>On mesure un angle en <strong>degrés</strong>, avec le symbole °. Un degré, c'est tout petit : on coupe un tour complet en 360 parts égales, et chaque part fait 1°.</p>
+    <div class="cards small">
+      <div class="box"><span class="tag">90°</span><strong>Un quart de tour</strong><span class="soft">Le coin d'une feuille, l'angle d'un carré.</span></div>
+      <div class="box"><span class="tag">180°</span><strong>Un demi-tour</strong><span class="soft">Tu fais face derrière toi. Les deux côtés forment une ligne droite.</span></div>
+      <div class="box"><span class="tag">360°</span><strong>Un tour complet</strong><span class="soft">Tu reviens face à ton point de départ.</span></div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · Mesurer</span>
+    <h2>Le rapporteur virtuel</h2>
+    <p>Pour mesurer, on pose le centre du <strong>rapporteur</strong> sur le sommet, et la ligne du 0 sur un côté. On lit la mesure là où passe l'autre côté. Bouge le curseur pour ouvrir l'angle.</p>
+    <div class="box">
+      <svg class="fig" id="proSvg" viewBox="0 0 640 480" role="img" aria-label="Rapporteur posé sur un angle dont on règle l'ouverture"></svg>
+      <div class="bigval" aria-live="polite"><span class="v" id="proVal">50°</span><span class="t" id="proType">angle aigu</span></div>
+      <div class="param">
+        <label for="angIn">Ouverture de l'angle x<span class="hat">O</span>y</label>
+        <input id="angIn" type="range" min="0" max="360" step="1" value="50">
+      </div>
+      <div class="btns" id="quickAng" role="group" aria-label="Angles tout prêts"></div>
+      <p class="soft" id="proHint"></p>
+    </div>
+    <div class="cards small" id="typeCards">
+      <div class="box" id="ty-nul"><span class="tag">0°</span><strong>Angle nul</strong><span class="soft">Les deux côtés sont l'un sur l'autre.</span></div>
+      <div class="box" id="ty-aigu"><span class="tag">moins de 90°</span><strong>Angle aigu</strong><span class="soft">Plus petit qu'un angle droit. Il « pique ».</span></div>
+      <div class="box" id="ty-droit"><span class="tag">90°</span><strong>Angle droit</strong><span class="soft">Le coin d'une feuille. On le code avec un petit carré.</span></div>
+      <div class="box" id="ty-obtus"><span class="tag">entre 90° et 180°</span><strong>Angle obtus</strong><span class="soft">Plus ouvert qu'un angle droit, mais moins qu'un angle plat.</span></div>
+      <div class="box" id="ty-plat"><span class="tag">180°</span><strong>Angle plat</strong><span class="soft">Les deux côtés forment une ligne droite.</span></div>
+      <div class="box" id="ty-rentrant"><span class="tag">plus de 180°</span><strong>Angle rentrant</strong><span class="soft">Plus qu'un demi-tour. Mange un quart de pizza : ce qui reste forme un angle rentrant de 270°.</span></div>
+      <div class="box" id="ty-plein"><span class="tag">360°</span><strong>Angle plein</strong><span class="soft">Un tour complet.</span></div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · La règle magique</span>
+    <h2>La somme des angles d'un triangle</h2>
+    <p>Dessine n'importe quel triangle et mesure ses trois angles. Additionne-les : tu trouves <span class="hl">toujours 180°</span>. Essaie : déplace les sommets avec les curseurs, ou attrape-les directement sur le dessin.</p>
+    <div class="box">
+      <div class="btns" id="triPresets" role="group" aria-label="Triangles tout prêts"></div>
+      <svg class="fig" id="triSvg" viewBox="0 0 640 400" role="img" aria-label="Triangle ABC dont les trois angles sont colorés et mesurés"></svg>
+      <div class="params">
+        <div class="param"><label for="cxIn">Sommet C : gauche ou droite</label><input id="cxIn" type="range" min="30" max="610" step="1" value="220"></div>
+        <div class="param"><label for="cyIn">Sommet C : haut ou bas</label><input id="cyIn" type="range" min="30" max="370" step="1" value="80"></div>
+        <div class="param"><label for="bxIn">Sommet B : gauche ou droite</label><input id="bxIn" type="range" min="30" max="610" step="1" value="540"></div>
+      </div>
+      <div class="results" id="triOut" aria-live="polite"></div>
+    </div>
+
+    <h3>Pourquoi 180° ? Découpe et recolle</h3>
+    <p>Dessine un triangle sur une feuille et découpe-le. Déchire les trois coins, puis recolle-les côte à côte, pointes au même endroit. Les trois coins forment une ligne droite : un <strong>angle plat</strong>, donc 180°. Le dessin le fait avec ton triangle du dessus.</p>
+    <div class="box">
+      <svg class="fig" id="proofSvg" viewBox="0 0 640 280" role="img" aria-label="Les trois coins du triangle recollés côte à côte forment un angle plat"></svg>
+      <p class="mono" id="proofOut"></p>
+    </div>
+
+    <div class="box">
+      <h3>Calculatrice : le troisième angle</h3>
+      <p class="soft">Tu connais deux angles d'un triangle ? Le troisième, c'est ce qui manque pour arriver à 180°.</p>
+      <div class="inputs two-col">
+        <label for="ta">Premier angle (°)<input id="ta" type="text" inputmode="decimal" autocomplete="off" value="65"></label>
+        <label for="tb">Deuxième angle (°)<input id="tb" type="text" inputmode="decimal" autocomplete="off" value="72"></label>
+      </div>
+      <div class="steps" id="thirdOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · Des triangles spéciaux</span>
+    <h2>Les triangles particuliers</h2>
+    <p>Certains triangles ont des angles qui se ressemblent. Avec la règle des 180°, on peut tout deviner. Clique sur un bouton pour charger le triangle dans le dessin de l'étape 3.</p>
+    <div class="cards">
+      <div class="box"><strong>Le triangle isocèle</strong><span class="soft">Deux côtés de même longueur. Ses deux <strong>angles à la base</strong> sont égaux. Si le sommet fait 80°, il reste 100° pour les deux autres : 50° chacun.</span><div class="btns"><button type="button" id="load-iso">Voir l'isocèle</button></div></div>
+      <div class="box"><strong>Le triangle équilatéral</strong><span class="soft">Trois côtés égaux, donc trois angles égaux : 180 ÷ 3 = <strong>60°</strong> chacun. Toujours, quelle que soit sa taille.</span><div class="btns"><button type="button" id="load-equi">Voir l'équilatéral</button></div></div>
+      <div class="box"><strong>Le triangle rectangle</strong><span class="soft">Un angle droit de 90°. Les deux autres angles font <strong>90° à eux deux</strong>. Ils sont donc forcément aigus.</span><div class="btns"><button type="button" id="load-rect">Voir le rectangle</button></div></div>
+      <div class="box"><strong>Le triangle isocèle rectangle</strong><span class="soft">Un angle droit et deux angles égaux : 90 ÷ 2 = <strong>45°</strong>. C'est la moitié d'un carré coupé par sa diagonale.</span><div class="btns"><button type="button" id="load-isorect">Voir l'isocèle rectangle</button></div></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Un seul angle droit, au maximum</span>
+      <span>Un triangle ne peut pas avoir deux angles droits : 90 + 90 = 180, il ne resterait rien pour le troisième angle. Pareil, un triangle a au plus un angle obtus.</span>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Construire</span>
+    <h2>Peut-on construire ce triangle ?</h2>
+    <p>Avec trois bâtons, on ne fait pas toujours un triangle. Si un bâton est trop long, les deux autres ne se rejoignent pas. La règle s'appelle l'<strong>inégalité triangulaire</strong> : <span class="hl">chaque côté doit être plus petit que la somme des deux autres</span>.</p>
+    <p class="soft">En pratique, il suffit de vérifier le plus grand côté : s'il est plus petit que la somme des deux autres, c'est gagné.</p>
+    <div class="box">
+      <h3>Le vérificateur</h3>
+      <div class="inputs">
+        <label for="l1">Côté 1 (cm)<input id="l1" type="text" inputmode="decimal" autocomplete="off" value="5"></label>
+        <label for="l2">Côté 2 (cm)<input id="l2" type="text" inputmode="decimal" autocomplete="off" value="6"></label>
+        <label for="l3">Côté 3 (cm)<input id="l3" type="text" inputmode="decimal" autocomplete="off" value="8"></label>
+      </div>
+      <div class="steps" id="conSteps"></div>
+      <div class="verdict" id="conVerdict" aria-live="polite"></div>
+      <svg class="fig" id="conSvg" viewBox="0 0 640 300" role="img" aria-label="Dessin du triangle avec les trois longueurs choisies"></svg>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · Les parallèles</span>
+    <h2>Les angles et les droites parallèles</h2>
+    <p>Deux droites parallèles (d) et (d') sont coupées par une troisième droite, la <strong>sécante</strong> (s). Ça fait deux croisements, avec quatre angles chacun. Certains angles sont toujours égaux. Tourne la sécante et choisis ce que tu veux voir.</p>
+    <div class="box">
+      <div class="btns" role="group" aria-label="Choisir les angles à montrer">
+        <button type="button" id="modeAlt" aria-pressed="true">Alternes-internes</button>
+        <button type="button" id="modeCor" aria-pressed="false">Correspondants</button>
+        <button type="button" id="modeOpp" aria-pressed="false">Opposés par le sommet</button>
+      </div>
+      <svg class="fig" id="parSvg" viewBox="0 0 640 360" role="img" aria-label="Deux droites parallèles coupées par une sécante, avec des angles égaux colorés"></svg>
+      <div class="param">
+        <label for="secIn">Angle de la sécante : <span class="mono" id="secOut">60°</span></label>
+        <input id="secIn" type="range" min="30" max="150" step="1" value="60">
+      </div>
+      <p id="parText"></p>
+      <div class="results" id="parOut" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Et dans l'autre sens</span>
+      <span>Si deux droites coupées par une sécante font des angles alternes-internes égaux, alors elles sont parallèles. C'est un moyen de prouver que deux droites sont parallèles.</span>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Plus de côtés</span>
+    <h2>Les polygones</h2>
+    <p>Un polygone à <strong>n</strong> côtés se découpe en triangles en partant d'un seul sommet. On obtient toujours <strong>n − 2 triangles</strong>. Chaque triangle apporte 180°, donc :</p>
+    <div class="box">
+      <p class="mono" style="font-size:1.15rem;font-weight:600;color:var(--acc)">Somme des angles = (n − 2) × 180°</p>
+      <svg class="fig" id="polySvg" viewBox="0 0 640 400" role="img" aria-label="Polygone régulier découpé en triangles depuis un sommet"></svg>
+      <div class="param">
+        <label for="nIn">Nombre de côtés : <span class="mono" id="nOut">6</span></label>
+        <input id="nIn" type="range" min="3" max="12" step="1" value="6">
+      </div>
+      <div class="results" id="polyOut" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Les abeilles et les hexagones</span>
+      <span>Dans un hexagone régulier, chaque angle fait 720 ÷ 6 = <strong>120°</strong>. Trois hexagones autour d'un point : 3 × 120 = 360°, un tour complet. Ils s'emboîtent sans laisser de trou ! C'est la forme des alvéoles dans les ruches. Parmi les polygones réguliers, seuls le triangle équilatéral (6 × 60°), le carré (4 × 90°) et l'hexagone peuvent ainsi carreler un sol tout seuls.</span>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Les pièges</span>
+    <h2>Attention aux erreurs classiques</h2>
+    <div class="box">
+      <svg class="fig" id="trapSvg" viewBox="0 0 640 220" role="img" aria-label="Deux angles de 40 degrés, l'un avec des côtés courts, l'autre avec des côtés longs"></svg>
+      <p class="soft">Ces deux angles sont égaux : 40° chacun. Le grand dessin n'a pas un plus grand angle.</p>
+    </div>
+    <div class="cards">
+      <div class="box"><strong>Grand dessin, grand angle ?</strong><span class="soft">Non ! Un angle mesure l'<strong>ouverture</strong>, pas la longueur des côtés. Si tu prolonges les côtés, l'angle ne change pas.</span></div>
+      <div class="box"><strong>La mauvaise échelle</strong><span class="soft">Un rapporteur a deux rangées de nombres. Lis sur celle qui part du <strong>0 posé sur un côté</strong>. Sinon, un angle de 50° devient 130°. Astuce : regarde d'abord à l'œil si l'angle est aigu ou obtus.</span></div>
+      <div class="box"><strong>Obtus, jusqu'où ?</strong><span class="soft">Un angle obtus est plus grand que 90°, mais il s'arrête à 180°. Au-delà, ce n'est plus obtus : c'est un angle rentrant.</span></div>
+      <div class="box"><strong>Le sommet au milieu</strong><span class="soft">Dans <span class="hat">ABC</span>, le sommet est B, la lettre du milieu. <span class="hat">BAC</span> est un autre angle, de sommet A.</span></div>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Écris ta réponse en degrés (juste le nombre), ou clique sur le bon bouton.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Nouvelles questions</button>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · Un peu d'histoire</span>
+    <h2>Pourquoi 360 ?</h2>
+    <ol class="timeline">
+      <li><span class="when">vers −2000</span><div class="what"><strong>Les Babyloniens comptent par 60</strong><span>En Mésopotamie (l'Irak actuel), on compte en base 60. On pense que le partage du cercle en 360 degrés vient de leurs astronomes. 360 = 6 × 60, et 360 se divise très bien : par 2, 3, 4, 5, 6, 8, 9, 10, 12… C'est aussi pour ça qu'une heure fait 60 minutes.</span></div></li>
+      <li><span class="when">vers −600</span><div class="what"><strong>Thalès de Milet</strong><span>Les auteurs grecs plus tardifs lui attribuent les premières démonstrations sur les angles : les angles opposés par le sommet sont égaux, et les angles à la base d'un triangle isocèle aussi.</span></div></li>
+      <li><span class="when">vers −300</span><div class="what"><strong>Euclide et les Éléments</strong><span>Dans son grand livre de géométrie, Euclide démontre que la somme des angles d'un triangle vaut <strong>deux angles droits</strong>, donc 180°. Sa preuve utilise une droite parallèle à un côté, comme à l'étape 6.</span></div></li>
+    </ol>
+    <p class="soft">Voir aussi les tutoriels sur le théorème de Pythagore (les triangles rectangles) et sur le théorème de Thalès (les droites parallèles dans un triangle).</p>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · À toi de jouer</span>
+    <h2>Six exercices</h2>
+    <div class="exos">
+      <details>
+        <summary>Le troisième angle<span class="q">Un triangle a deux angles de 47° et 68°. Combien mesure le troisième ?</span></summary>
+        <div><span>47 + 68 = 115. Puis 180 − 115 = <strong>65°</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Le toit isocèle<span class="q">Un triangle isocèle a un angle au sommet de 36°. Combien mesurent les angles à la base ?</span></summary>
+        <div><span>Il reste 180 − 36 = 144° pour les deux angles à la base, qui sont égaux : 144 ÷ 2 = <strong>72°</strong> chacun.</span></div>
+      </details>
+      <details>
+        <summary>L'équerre<span class="q">Un triangle rectangle a un angle de 28°. Combien mesure le dernier angle ?</span></summary>
+        <div><span>Les deux angles aigus font 90° à eux deux : 90 − 28 = <strong>62°</strong>. Vérification : 90 + 28 + 62 = 180.</span></div>
+      </details>
+      <details>
+        <summary>Trois bâtons<span class="q">Peut-on construire un triangle avec 3 cm, 4 cm et 8 cm ? Et avec 4 cm, 5 cm et 9 cm ?</span></summary>
+        <div><span>3 + 4 = 7, plus petit que 8 : <strong>impossible</strong>, les deux petits côtés ne se rejoignent pas.</span><span>4 + 5 = 9, exactement le grand côté : le triangle est <strong>aplati</strong>, les trois points sont alignés.</span></div>
+      </details>
+      <details>
+        <summary>Le panneau stop<span class="q">Un panneau stop est un octogone régulier (8 côtés). Combien mesure chacun de ses angles ?</span></summary>
+        <div><span>Somme : (8 − 2) × 180 = 6 × 180 = 1 080°. Chaque angle : 1 080 ÷ 8 = <strong>135°</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Les rails<span class="q">Deux rails parallèles sont coupés par une route qui fait un angle de 65° avec le premier rail. Combien mesure l'angle alterne-interne sur le second rail ? Et l'angle juste à côté ?</span></summary>
+        <div><span>Les angles alternes-internes sont égaux : <strong>65°</strong>.</span><span>L'angle voisin forme avec lui un angle plat : 180 − 65 = <strong>115°</strong>.</span></div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• Un angle mesure l'<strong>ouverture</strong> entre deux côtés, en <strong>degrés</strong>. Un tour complet = 360°, un angle plat = 180°, un angle droit = 90°.</span>
+      <span>• <strong>Aigu</strong> : moins de 90°. <strong>Obtus</strong> : entre 90° et 180°. Au-delà de 180° : <strong>rentrant</strong>.</span>
+      <span>• Dans un triangle, la somme des trois angles vaut toujours <strong>180°</strong>. Le troisième angle = 180° − les deux autres.</span>
+      <span>• Isocèle : deux angles égaux. Équilatéral : trois angles de 60°. Rectangle : les deux angles aigus font 90° à eux deux.</span>
+      <span>• On peut construire un triangle si le plus grand côté est <strong>plus petit que la somme des deux autres</strong>.</span>
+      <span>• Avec deux parallèles et une sécante : les angles <strong>alternes-internes</strong> et <strong>correspondants</strong> sont égaux.</span>
+      <span>• Somme des angles d'un polygone à n côtés : <strong>(n − 2) × 180°</strong>.</span>
+    </div>
+  </section>
+
+  <footer>Fiche de révision · Les angles et les triangles</footer>
+</main>
+
+<script>
+(function () {
+  var NS = "http://www.w3.org/2000/svg";
+  var RAD = Math.PI / 180;
+  var COLS = ["var(--a1)", "var(--a2)", "var(--a3)"], SOFTS = ["var(--a1-soft)", "var(--a2-soft)", "var(--a3-soft)"];
+  function $(id) { return document.getElementById(id); }
+  function fmt(x, d) { var r = Math.round(x * 1e6) / 1e6; if (Object.is(r, -0)) r = 0; return r.toLocaleString("fr-FR", { maximumFractionDigits: d == null ? 2 : d }).replace("-", "−"); }
+  function num(s) { var t = String(s).replace(/\s/g, "").replace(/[−–]/g, "-").replace(",", "."); if (t === "") return NaN; var x = Number(t); return isFinite(x) ? x : NaN; }
+  function mk(svg, name, attrs, text) { var e = document.createElementNS(NS, name); for (var a in attrs) e.setAttribute(a, attrs[a]); if (text != null) e.textContent = text; svg.appendChild(e); return e; }
+  function clear(svg) { while (svg.firstChild) svg.removeChild(svg.firstChild); }
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+  function f2(v) { return (Math.round(v * 100) / 100).toString(); }
+
+  /* ---------- Fonctions pures (testables) ---------- */
+  function classify(deg) {
+    if (typeof deg !== "number" || !isFinite(deg) || deg < 0 || deg > 360) return null;
+    if (deg === 0) return "nul";
+    if (deg < 90) return "aigu";
+    if (deg === 90) return "droit";
+    if (deg < 180) return "obtus";
+    if (deg === 180) return "plat";
+    if (deg < 360) return "rentrant";
+    return "plein";
+  }
+  function angleAt(V, P, Q) {
+    var ux = P[0] - V[0], uy = P[1] - V[1], vx = Q[0] - V[0], vy = Q[1] - V[1];
+    return Math.abs(Math.atan2(ux * vy - uy * vx, ux * vx + uy * vy)) / RAD;
+  }
+  /* Arrondit trois angles à l'unité en gardant une somme de 180 (plus grands restes). */
+  function roundTo180(ex) {
+    var fl = ex.map(Math.floor), s = fl[0] + fl[1] + fl[2];
+    var idx = [0, 1, 2].sort(function (i, j) { return (ex[j] - fl[j]) - (ex[i] - fl[i]); });
+    for (var k = 0; k < 180 - s && k < 3; k++) fl[idx[k]]++;
+    return fl;
+  }
+  function triangleAngles(A, B, C) {
+    var area2 = (B[0] - A[0]) * (C[1] - A[1]) - (B[1] - A[1]) * (C[0] - A[0]);
+    var m = Math.max(Math.hypot(B[0] - A[0], B[1] - A[1]), Math.hypot(C[0] - B[0], C[1] - B[1]), Math.hypot(A[0] - C[0], A[1] - C[1]));
+    if (!(m > 0) || Math.abs(area2) / (m * m) < 1e-9) return null;
+    var ex = [angleAt(A, B, C), angleAt(B, C, A), angleAt(C, A, B)];
+    return { exact: ex, deg: roundTo180(ex) };
+  }
+  function constructible(a, b, c) {
+    var ok = [a, b, c].every(function (x) { return typeof x === "number" && isFinite(x) && x > 0; });
+    if (!ok) return null;
+    var m = Math.max(a, b, c), s = a + b + c - m, eps = 1e-9 * Math.max(1, m);
+    if (m < s - eps) return "constructible";
+    if (Math.abs(m - s) <= eps) return "plat";
+    return "impossible";
+  }
+  function polygonAngleSum(n) { if (!Number.isInteger(n) || n < 3) return null; return (n - 2) * 180; }
+  function regularAngle(n) { var s = polygonAngleSum(n); return s === null ? null : s / n; }
+  function thirdAngle(a, b) { if (!(a > 0) || !(b > 0) || a + b >= 180) return null; return 180 - a - b; }
+  /* A = (0 ; 0), B = (c ; 0), BC = a, AC = b : renvoie C (y vers le haut). */
+  function thirdVertex(a, b, c) { var x = (b * b + c * c - a * a) / (2 * c); return [x, Math.sqrt(Math.max(0, b * b - x * x))]; }
+
+  window.__angles = { classify: classify, triangleAngles: triangleAngles, roundTo180: roundTo180, constructible: constructible, polygonAngleSum: polygonAngleSum, regularAngle: regularAngle, thirdAngle: thirdAngle, thirdVertex: thirdVertex };
+
+  /* ---------- Outils de dessin (angles en degrés, sens inverse des aiguilles d'une montre) ---------- */
+  function pt(cx, cy, r, a) { return [cx + r * Math.cos(a * RAD), cy - r * Math.sin(a * RAD)]; }
+  function sector(cx, cy, r, a1, a2, closed) {
+    var span = a2 - a1;
+    if (span <= 0) return "";
+    if (span >= 359.999) {
+      return "M " + f2(cx + r) + " " + f2(cy) + " A " + r + " " + r + " 0 1 0 " + f2(cx - r) + " " + f2(cy) + " A " + r + " " + r + " 0 1 0 " + f2(cx + r) + " " + f2(cy) + (closed ? " Z" : "");
+    }
+    var p1 = pt(cx, cy, r, a1), p2 = pt(cx, cy, r, a2), large = span > 180 ? 1 : 0;
+    var arc = "A " + r + " " + r + " 0 " + large + " 0 " + f2(p2[0]) + " " + f2(p2[1]);
+    if (closed) return "M " + f2(cx) + " " + f2(cy) + " L " + f2(p1[0]) + " " + f2(p1[1]) + " " + arc + " Z";
+    return "M " + f2(p1[0]) + " " + f2(p1[1]) + " " + arc;
+  }
+  function dirDeg(V, P) { return Math.atan2(-(P[1] - V[1]), P[0] - V[0]) / RAD; }
+  function interior(V, P, Q) {
+    var a = dirDeg(V, P), b = dirDeg(V, Q), d = b - a;
+    while (d > 180) d -= 360;
+    while (d <= -180) d += 360;
+    return d >= 0 ? [a, a + d] : [b, b - d];
+  }
+  function wedge(svg, cx, cy, r, a1, a2, i) {
+    mk(svg, "path", { d: sector(cx, cy, r, a1, a2, true), fill: SOFTS[i], stroke: "none" });
+    mk(svg, "path", { d: sector(cx, cy, r, a1, a2, false), fill: "none", stroke: COLS[i], "stroke-width": 3 });
+  }
+  /* Dessine un triangle (coordonnées SVG) avec ses angles colorés. Renvoie le résultat de triangleAngles. */
+  function drawTri(svg, P, names, opts) {
+    var pts = P.map(function (p) { return f2(p[0]) + "," + f2(p[1]); }).join(" ");
+    mk(svg, "polygon", { points: pts, fill: "var(--card)", stroke: "none" });
+    var res = triangleAngles(P[0], P[1], P[2]);
+    var G = [(P[0][0] + P[1][0] + P[2][0]) / 3, (P[0][1] + P[1][1] + P[2][1]) / 3];
+    if (res) {
+      for (var i = 0; i < 3; i++) {
+        var V = P[i], Pn = P[(i + 1) % 3], Pp = P[(i + 2) % 3];
+        var l1 = Math.hypot(Pn[0] - V[0], Pn[1] - V[1]), l2 = Math.hypot(Pp[0] - V[0], Pp[1] - V[1]);
+        var r = Math.max(12, Math.min(opts.r || 38, 0.38 * Math.min(l1, l2)));
+        var iv = interior(V, Pn, Pp), mid = (iv[0] + iv[1]) / 2;
+        if (res.deg[i] === 90 && Math.abs(res.exact[i] - 90) < 0.5) {
+          var s = r * 0.6, u = [(Pn[0] - V[0]) / l1, (Pn[1] - V[1]) / l1], w = [(Pp[0] - V[0]) / l2, (Pp[1] - V[1]) / l2];
+          mk(svg, "path", { d: "M " + f2(V[0]) + " " + f2(V[1]) + " L " + f2(V[0] + u[0] * s) + " " + f2(V[1] + u[1] * s) + " L " + f2(V[0] + (u[0] + w[0]) * s) + " " + f2(V[1] + (u[1] + w[1]) * s) + " L " + f2(V[0] + w[0] * s) + " " + f2(V[1] + w[1] * s) + " Z", fill: SOFTS[i], stroke: COLS[i], "stroke-width": 2.5 });
+        } else {
+          wedge(svg, V[0], V[1], r, iv[0], iv[1], i);
+        }
+        if (opts.values) {
+          var tp = pt(V[0], V[1], r + 24, mid);
+          mk(svg, "text", { x: f2(clamp(tp[0], 24, opts.W - 24)), y: f2(clamp(tp[1] + 6, 20, opts.H - 6)), "text-anchor": "middle", "font-size": 17, "font-weight": 600, style: "fill:" + COLS[i] }, res.deg[i] + "°");
+        }
+      }
+    }
+    mk(svg, "polygon", { points: pts, fill: "none", stroke: "var(--ink)", "stroke-width": 3, "stroke-linejoin": "round" });
+    if (names) {
+      for (var j = 0; j < 3; j++) {
+        var dx = P[j][0] - G[0], dy = P[j][1] - G[1], dl = Math.hypot(dx, dy) || 1;
+        mk(svg, "text", { x: f2(clamp(P[j][0] + dx / dl * 22, 12, opts.W - 12)), y: f2(clamp(P[j][1] + dy / dl * 22 + 6, 18, opts.H - 6)), "text-anchor": "middle", "font-size": 18, "font-weight": 600 }, names[j]);
+      }
+    }
+    return res;
+  }
+
+  /* ---------- Étape 2 : le rapporteur ---------- */
+  var proSvg = $("proSvg"), angIn = $("angIn"), PC = [320, 240], PR = 210;
+  var TYPE_TXT = { nul: "angle nul", aigu: "angle aigu", droit: "angle droit", obtus: "angle obtus", plat: "angle plat", rentrant: "angle rentrant", plein: "angle plein" };
+  function renderPro() {
+    var t = parseInt(angIn.value, 10), g;
+    clear(proSvg);
+    mk(proSvg, "path", { d: sector(PC[0], PC[1], PR, 0, 180, true), fill: "var(--acc-soft)", stroke: "var(--acc)", "stroke-width": 2 });
+    for (g = 0; g <= 180; g += 10) {
+      var lg = g % 30 === 0, q1 = pt(PC[0], PC[1], PR, g), q2 = pt(PC[0], PC[1], PR - (lg ? 22 : 12), g);
+      mk(proSvg, "line", { x1: f2(q1[0]), y1: f2(q1[1]), x2: f2(q2[0]), y2: f2(q2[1]), stroke: "var(--acc)", "stroke-width": lg ? 2.5 : 1.5 });
+    }
+    for (g = 0; g <= 180; g += 30) {
+      var dy = (g === 0 || g === 180) ? -8 : 6, o = pt(PC[0], PC[1], PR - 42, g), n = pt(PC[0], PC[1], PR - 76, g);
+      mk(proSvg, "text", { x: f2(o[0]), y: f2(o[1] + dy), "text-anchor": "middle", "font-size": 17, "font-weight": 600, style: "fill:var(--acc)" }, String(g));
+      mk(proSvg, "text", { x: f2(n[0]), y: f2(n[1] + dy), "text-anchor": "middle", "font-size": 16, style: "fill:var(--ink-soft)" }, String(180 - g));
+    }
+    if (t > 0) wedge(proSvg, PC[0], PC[1], 70, 0, t, 0);
+    var e = pt(PC[0], PC[1], 230, t);
+    mk(proSvg, "line", { x1: PC[0], y1: PC[1], x2: PC[0] + 230, y2: PC[1], stroke: "var(--ink)", "stroke-width": 4, "stroke-linecap": "round" });
+    mk(proSvg, "line", { x1: PC[0], y1: PC[1], x2: f2(e[0]), y2: f2(e[1]), stroke: "var(--a1)", "stroke-width": 4, "stroke-linecap": "round" });
+    mk(proSvg, "circle", { cx: PC[0], cy: PC[1], r: 6, fill: "var(--ink)" });
+    var oL = pt(PC[0], PC[1], 26, t / 2 + 180);
+    mk(proSvg, "text", { x: f2(oL[0]), y: f2(oL[1] + 6), "text-anchor": "middle", "font-size": 18, "font-weight": 600 }, "O");
+    mk(proSvg, "text", { x: PC[0] + 236, y: PC[1] + 26, "text-anchor": "middle", "font-size": 18, "font-weight": 600 }, "x");
+    var yL = pt(PC[0], PC[1], 250, t);
+    mk(proSvg, "text", { x: f2(clamp(yL[0], 14, 626)), y: f2(clamp(yL[1] + 6, 20, 474)), "text-anchor": "middle", "font-size": 18, "font-weight": 600, style: "fill:var(--a1)" }, "y");
+    var mL = pt(PC[0], PC[1], 100, t / 2);
+    mk(proSvg, "text", { x: f2(mL[0]), y: f2(mL[1] + (t === 0 ? -10 : 7)), "text-anchor": "middle", "font-size": 20, "font-weight": 600, style: "fill:var(--a1)" }, t + "°");
+
+    var ty = classify(t);
+    $("proVal").textContent = t + "°";
+    $("proType").textContent = TYPE_TXT[ty];
+    ["nul", "aigu", "droit", "obtus", "plat", "rentrant", "plein"].forEach(function (k) { $("ty-" + k).classList.toggle("on", k === ty); });
+    var hint;
+    if (t <= 180) hint = "Le côté [Ox) passe par le 0 de l'échelle extérieure (la rangée colorée) : on lit " + t + " sur cette échelle. Sur l'autre échelle, on lirait " + (180 - t) + ", ce serait faux" + (t === 90 ? " (sauf pour 90°, où les deux échelles sont d'accord)." : ".");
+    else if (t < 360) hint = "Plus de 180° : le rapporteur ne suffit pas. On mesure l'angle qui reste de l'autre côté, " + (360 - t) + "°, puis on calcule 360 − " + (360 - t) + " = " + t + "°.";
+    else hint = "Un tour complet : le côté [Oy) est revenu sur [Ox).";
+    $("proHint").textContent = hint;
+  }
+  angIn.addEventListener("input", renderPro);
+  [0, 30, 90, 135, 180, 250, 360].forEach(function (v, i) {
+    var b = document.createElement("button"); b.type = "button"; b.id = "qv" + i; b.textContent = v + "°";
+    b.addEventListener("click", function () { angIn.value = v; renderPro(); });
+    $("quickAng").appendChild(b);
+  });
+  renderPro();
+
+  /* ---------- Étape 3 : le triangle interactif ---------- */
+  var triSvg = $("triSvg"), cxIn = $("cxIn"), cyIn = $("cyIn"), bxIn = $("bxIn");
+  var PRESETS = [
+    { id: "quel", name: "Quelconque", P: [[90, 330], [540, 330], [220, 80]] },
+    { id: "iso", name: "Isocèle", P: [[170, 330], [470, 330], [320, 330 - 150 * Math.tan(50 * RAD)]] },
+    { id: "equi", name: "Équilatéral", P: [[170, 340], [470, 340], [320, 340 - 150 * Math.sqrt(3)]] },
+    { id: "rect", name: "Rectangle", P: [[140, 330], [500, 330], [140, 90]] },
+    { id: "isorect", name: "Isocèle rectangle", P: [[170, 340], [470, 340], [320, 190]] },
+    { id: "obt", name: "Avec un angle obtus", P: [[60, 330], [560, 330], [150, 230]] }
+  ];
+  var T = { P: PRESETS[0].P.map(function (p) { return p.slice(); }) }, drag = -1;
+  PRESETS.forEach(function (p, i) {
+    var b = document.createElement("button"); b.type = "button"; b.id = "pq-" + p.id; b.textContent = p.name;
+    b.addEventListener("click", function () { loadPreset(i); });
+    $("triPresets").appendChild(b);
+  });
+  function setPressed(i) { PRESETS.forEach(function (p, j) { $("pq-" + p.id).setAttribute("aria-pressed", j === i ? "true" : "false"); }); }
+  function syncSliders() { cxIn.value = Math.round(T.P[2][0]); cyIn.value = Math.round(T.P[2][1]); bxIn.value = Math.round(T.P[1][0]); }
+  function loadPreset(i) { T.P = PRESETS[i].P.map(function (p) { return p.slice(); }); setPressed(i); syncSliders(); renderTri(); }
+  function triType(d) {
+    var r = d.indexOf(90) >= 0, eq = d[0] === d[1] || d[1] === d[2] || d[0] === d[2];
+    if (d[0] === 60 && d[1] === 60 && d[2] === 60) return "équilatéral (trois angles de 60°)";
+    if (r && eq) return "isocèle rectangle (45°, 45° et 90°)";
+    if (r) return "rectangle (un angle droit)";
+    if (eq) return "isocèle (deux angles égaux)";
+    if (d[0] > 90 || d[1] > 90 || d[2] > 90) return "quelconque, avec un angle obtus";
+    return "quelconque, avec trois angles aigus";
+  }
+  function renderTri() {
+    clear(triSvg);
+    var res = drawTri(triSvg, T.P, ["A", "B", "C"], { values: true, W: 640, H: 400, r: 44 });
+    T.P.forEach(function (p, i) {
+      mk(triSvg, "circle", { cx: f2(p[0]), cy: f2(p[1]), r: 7, fill: "var(--ink)" });
+      mk(triSvg, "circle", { cx: f2(p[0]), cy: f2(p[1]), r: 26, fill: "transparent", class: "handle", "data-i": i });
+    });
+    var out = $("triOut");
+    if (!res) {
+      out.innerHTML = "<div class='verdict no'>Les trois sommets sont alignés.<span>Ce n'est plus un vrai triangle : déplace un sommet.</span></div>";
+    } else {
+      var d = res.deg;
+      out.innerHTML =
+        "<div class='res'><span class='res-name'>Angle en A</span><span class='res-val c1'>" + d[0] + "°</span></div>" +
+        "<div class='res'><span class='res-name'>Angle en B</span><span class='res-val c2'>" + d[1] + "°</span></div>" +
+        "<div class='res'><span class='res-name'>Angle en C</span><span class='res-val c3'>" + d[2] + "°</span></div>" +
+        "<div class='res'><span class='res-name'>Somme</span><span class='res-val'>180°</span><span class='res-calc'>" + d[0] + " + " + d[1] + " + " + d[2] + " = " + (d[0] + d[1] + d[2]) + " · Triangle " + triType(d) + "</span></div>" +
+        "<p class='soft' style='font-size:.9rem'>Angles arrondis au degré près.</p>";
+    }
+    drawProof(res);
+  }
+  function svgPt(svg, e) { var r = svg.getBoundingClientRect(), vb = svg.viewBox.baseVal; return [(e.clientX - r.left) / r.width * vb.width, (e.clientY - r.top) / r.height * vb.height]; }
+  triSvg.addEventListener("pointerdown", function (e) {
+    var t = e.target;
+    if (!t || !t.getAttribute || t.getAttribute("data-i") === null) return;
+    drag = parseInt(t.getAttribute("data-i"), 10);
+    try { triSvg.setPointerCapture(e.pointerId); } catch (err) {}
+    e.preventDefault();
+  });
+  triSvg.addEventListener("pointermove", function (e) {
+    if (drag < 0) return;
+    var p = svgPt(triSvg, e);
+    T.P[drag] = [clamp(p[0], 30, 610), clamp(p[1], 30, 370)];
+    setPressed(-1); syncSliders(); renderTri();
+  });
+  function endDrag(e) { if (drag >= 0) { drag = -1; try { triSvg.releasePointerCapture(e.pointerId); } catch (err) {} } }
+  triSvg.addEventListener("pointerup", endDrag);
+  triSvg.addEventListener("pointercancel", endDrag);
+  triSvg.addEventListener("touchstart", function (e) { var t = e.target; if (t && t.getAttribute && t.getAttribute("data-i") !== null) e.preventDefault(); }, { passive: false });
+  cxIn.addEventListener("input", function () { T.P[2][0] = parseInt(cxIn.value, 10); setPressed(-1); renderTri(); });
+  cyIn.addEventListener("input", function () { T.P[2][1] = parseInt(cyIn.value, 10); setPressed(-1); renderTri(); });
+  bxIn.addEventListener("input", function () { T.P[1][0] = parseInt(bxIn.value, 10); setPressed(-1); renderTri(); });
+
+  /* La preuve : les trois coins recollés */
+  function drawProof(res) {
+    var svg = $("proofSvg"), out = $("proofOut");
+    clear(svg);
+    if (!res) { out.textContent = "Il faut un vrai triangle pour découper ses coins."; return; }
+    var xs = T.P.map(function (p) { return p[0]; }), ys = T.P.map(function (p) { return p[1]; });
+    var x0 = Math.min.apply(null, xs), x1 = Math.max.apply(null, xs), y0 = Math.min.apply(null, ys), y1 = Math.max.apply(null, ys);
+    var sc = Math.min(250 / Math.max(x1 - x0, 1), 200 / Math.max(y1 - y0, 1));
+    var ox = 25 + (250 - (x1 - x0) * sc) / 2, oy = 40 + (200 - (y1 - y0) * sc) / 2;
+    var small = T.P.map(function (p) { return [ox + (p[0] - x0) * sc, oy + (p[1] - y0) * sc]; });
+    drawTri(svg, small, ["A", "B", "C"], { values: false, W: 640, H: 280, r: 30 });
+    mk(svg, "text", { x: 312, y: 150, "text-anchor": "middle", "font-size": 30, "font-weight": 600, style: "fill:var(--acc)" }, "→");
+    var O = [480, 220], e = res.exact, start = 0;
+    mk(svg, "line", { x1: 340, y1: O[1], x2: 620, y2: O[1], stroke: "var(--ink)", "stroke-width": 3, "stroke-linecap": "round" });
+    for (var i = 0; i < 3; i++) {
+      wedge(svg, O[0], O[1], 105, start, start + e[i], i);
+      var lp = pt(O[0], O[1], 132, start + e[i] / 2);
+      mk(svg, "text", { x: f2(lp[0]), y: f2(lp[1] + 6), "text-anchor": "middle", "font-size": 17, "font-weight": 600, style: "fill:" + COLS[i] }, res.deg[i] + "°");
+      start += e[i];
+    }
+    mk(svg, "circle", { cx: O[0], cy: O[1], r: 5, fill: "var(--ink)" });
+    mk(svg, "text", { x: O[0], y: O[1] + 32, "text-anchor": "middle", "font-size": 16, style: "fill:var(--ink-soft)" }, "angle plat : 180°");
+    out.textContent = res.deg[0] + "° + " + res.deg[1] + "° + " + res.deg[2] + "° = 180° : les trois coins forment une ligne droite.";
+  }
+  loadPreset(0);
+
+  /* Calculatrice du troisième angle */
+  var ta = $("ta"), tb = $("tb");
+  function calcThird() {
+    var a = num(ta.value), b = num(tb.value), out = $("thirdOut");
+    if (isNaN(a) || isNaN(b)) { out.innerHTML = "<span class='err'>Écris deux angles.</span>"; return; }
+    if (a <= 0 || b <= 0) { out.innerHTML = "<span class='err'>Un angle de triangle est toujours plus grand que 0°.</span>"; return; }
+    var s = a + b, c = thirdAngle(a, b);
+    if (c === null) {
+      out.innerHTML = "<span>" + fmt(a) + "° + " + fmt(b) + "° = " + fmt(s) + "°</span><span class='err'>Impossible : les deux angles font déjà " + fmt(s) + "°, il ne reste rien (ou moins que rien) pour le troisième. Il faut que leur somme soit plus petite que 180°.</span>";
+      return;
+    }
+    out.innerHTML = "<span>Les deux angles connus : " + fmt(a) + "° + " + fmt(b) + "° = " + fmt(s) + "°</span>" +
+      "<span>Le troisième : 180° − " + fmt(s) + "° = <b>" + fmt(c) + "°</b></span>" +
+      "<span class='soft'>Vérification : " + fmt(a) + " + " + fmt(b) + " + " + fmt(c) + " = 180 · c'est un angle " + classify(Math.round(c * 1e6) / 1e6) + "</span>";
+  }
+  ta.addEventListener("input", calcThird); tb.addEventListener("input", calcThird); calcThird();
+
+  /* ---------- Étape 4 : boutons des triangles particuliers ---------- */
+  ["iso", "equi", "rect", "isorect"].forEach(function (id) {
+    $("load-" + id).addEventListener("click", function () {
+      for (var i = 0; i < PRESETS.length; i++) if (PRESETS[i].id === id) loadPreset(i);
+      triSvg.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+  });
+
+  /* ---------- Étape 5 : l'inégalité triangulaire ---------- */
+  var l1 = $("l1"), l2 = $("l2"), l3 = $("l3");
+  function sideLabel(svg, P, Q, G, txt) {
+    var m = [(P[0] + Q[0]) / 2, (P[1] + Q[1]) / 2], dx = m[0] - G[0], dy = m[1] - G[1], dl = Math.hypot(dx, dy) || 1;
+    mk(svg, "text", { x: f2(clamp(m[0] + dx / dl * 22, 30, 610)), y: f2(clamp(m[1] + dy / dl * 22 + 6, 20, 294)), "text-anchor": "middle", "font-size": 17, "font-weight": 600, style: "fill:var(--acc)" }, txt);
+  }
+  function checkCon() {
+    var v = [num(l1.value), num(l2.value), num(l3.value)], st = $("conSteps"), vd = $("conVerdict"), svg = $("conSvg");
+    clear(svg);
+    var kind = constructible(v[0], v[1], v[2]);
+    if (kind === null) { st.innerHTML = "<span class='err'>Écris trois longueurs plus grandes que 0.</span>"; vd.className = "verdict"; vd.innerHTML = ""; return; }
+    var lines = [];
+    for (var i = 0; i < 3; i++) {
+      var o = v[(i + 1) % 3] + v[(i + 2) % 3], okI = v[i] < o - 1e-9 * Math.max(1, v[i]);
+      lines.push("<span>" + fmt(v[i]) + (okI ? " &lt; " : " ≥ ") + fmt(v[(i + 1) % 3]) + " + " + fmt(v[(i + 2) % 3]) + " = " + fmt(o) + (okI ? " : oui" : " : <b>non</b>") + "</span>");
+    }
+    st.innerHTML = lines.join("");
+    var order = [0, 1, 2].sort(function (i, j) { return v[j] - v[i]; });
+    var c = v[order[0]], b = v[order[1]], a = v[order[2]];
+    if (kind === "constructible") {
+      vd.className = "verdict yes";
+      vd.innerHTML = "Oui, le triangle est constructible !<span>Le plus grand côté (" + fmt(c) + ") est plus petit que la somme des deux autres (" + fmt(a + b) + ").</span>";
+      var V = thirdVertex(a, b, c), s = Math.min(540 / c, 200 / Math.max(V[1], 1e-9));
+      var ox = (640 - c * s) / 2, oy = 250, A = [ox, oy], B = [ox + c * s, oy], C = [ox + V[0] * s, oy - V[1] * s];
+      drawTri(svg, [A, B, C], null, { values: true, W: 640, H: 300, r: 34 });
+      var G = [(A[0] + B[0] + C[0]) / 3, (A[1] + B[1] + C[1]) / 3];
+      sideLabel(svg, A, B, G, fmt(c));
+      sideLabel(svg, A, C, G, fmt(b));
+      sideLabel(svg, B, C, G, fmt(a));
+    } else if (kind === "plat") {
+      vd.className = "verdict mid";
+      vd.innerHTML = "Triangle aplati !<span>" + fmt(a) + " + " + fmt(b) + " = " + fmt(c) + " pile. Les deux petits côtés se couchent sur le grand : les trois sommets sont alignés. C'est un triangle tout plat, sans vraie surface.</span>";
+      var s2 = 540 / c, x0 = 50, y = 180, xm = x0 + b * s2;
+      mk(svg, "line", { x1: x0, y1: y, x2: f2(x0 + c * s2), y2: y, stroke: "var(--ink)", "stroke-width": 4, "stroke-linecap": "round" });
+      mk(svg, "line", { x1: x0, y1: y - 16, x2: f2(xm), y2: y - 16, stroke: "var(--a1)", "stroke-width": 4, "stroke-linecap": "round" });
+      mk(svg, "line", { x1: f2(xm), y1: y - 16, x2: f2(x0 + c * s2), y2: y - 16, stroke: "var(--a2)", "stroke-width": 4, "stroke-linecap": "round" });
+      mk(svg, "circle", { cx: f2(xm), cy: y, r: 7, fill: "var(--acc)" });
+      mk(svg, "text", { x: f2((x0 + xm) / 2), y: y - 28, "text-anchor": "middle", "font-size": 17, "font-weight": 600, style: "fill:var(--a1)" }, fmt(b));
+      mk(svg, "text", { x: f2((xm + x0 + c * s2) / 2), y: y - 28, "text-anchor": "middle", "font-size": 17, "font-weight": 600, style: "fill:var(--a2)" }, fmt(a));
+      mk(svg, "text", { x: 320, y: y + 36, "text-anchor": "middle", "font-size": 17, "font-weight": 600, style: "fill:var(--acc)" }, fmt(c));
+      mk(svg, "text", { x: f2(clamp(xm, 80, 560)), y: y + 70, "text-anchor": "middle", "font-size": 16, style: "fill:var(--ink-soft)" }, "le sommet tombe sur le côté");
+    } else {
+      vd.className = "verdict no";
+      vd.innerHTML = "Impossible !<span>Le plus grand côté (" + fmt(c) + ") est plus long que les deux autres réunis (" + fmt(a + b) + "). Il manque " + fmt(c - a - b) + " pour qu'ils se rejoignent.</span>";
+      var s3 = 540 / c, x3 = 50, y3 = 200, xb = x3 + b * s3, xa = x3 + (c - a) * s3, xe = x3 + c * s3;
+      mk(svg, "line", { x1: x3, y1: y3, x2: f2(xe), y2: y3, stroke: "var(--ink)", "stroke-width": 4, "stroke-linecap": "round" });
+      mk(svg, "line", { x1: x3, y1: y3 - 40, x2: f2(xb), y2: y3 - 40, stroke: "var(--a1)", "stroke-width": 4, "stroke-linecap": "round" });
+      mk(svg, "line", { x1: f2(xa), y1: y3 - 80, x2: f2(xe), y2: y3 - 80, stroke: "var(--a2)", "stroke-width": 4, "stroke-linecap": "round" });
+      mk(svg, "line", { x1: f2(xb), y1: y3 + 14, x2: f2(xa), y2: y3 + 14, stroke: "var(--red)", "stroke-width": 4, "stroke-dasharray": "6 5" });
+      mk(svg, "text", { x: f2((x3 + xb) / 2), y: y3 - 52, "text-anchor": "middle", "font-size": 17, "font-weight": 600, style: "fill:var(--a1)" }, fmt(b));
+      mk(svg, "text", { x: f2((xa + xe) / 2), y: y3 - 92, "text-anchor": "middle", "font-size": 17, "font-weight": 600, style: "fill:var(--a2)" }, fmt(a));
+      mk(svg, "text", { x: 320, y: y3 - 10, "text-anchor": "middle", "font-size": 17, "font-weight": 600, style: "fill:var(--acc)" }, fmt(c));
+      mk(svg, "text", { x: f2(clamp((xb + xa) / 2, 120, 520)), y: y3 + 44, "text-anchor": "middle", "font-size": 16, "font-weight": 600, style: "fill:var(--red)" }, "il manque " + fmt(c - a - b));
+    }
+  }
+  [l1, l2, l3].forEach(function (e) { e.addEventListener("input", checkCon); }); checkCon();
+
+  /* ---------- Étape 6 : parallèles et sécante ---------- */
+  var parSvg = $("parSvg"), secIn = $("secIn"), parMode = "alt";
+  var PAR_TXT = {
+    alt: "Les angles <strong>alternes-internes</strong> sont entre les deux parallèles (internes), de chaque côté de la sécante (alternes). Ils forment un Z. Quand les droites sont parallèles, ils sont égaux.",
+    cor: "Les angles <strong>correspondants</strong> sont à la même place aux deux croisements, par exemple tous les deux en haut à droite. Ils forment un F. Quand les droites sont parallèles, ils sont égaux.",
+    opp: "Deux angles <strong>opposés par le sommet</strong> ont le même sommet, et leurs côtés se prolongent l'un l'autre, comme un X. Ils sont toujours égaux, même sans parallèles."
+  };
+  /* secteurs : 0 en haut à droite, 1 en haut à gauche, 2 en bas à gauche, 3 en bas à droite */
+  var PAR_HL = {
+    alt: [[0, 2, 0], [1, 0, 0], [0, 3, 2], [1, 1, 2]],
+    cor: [[0, 0, 0], [1, 0, 0], [0, 1, 2], [1, 1, 2]],
+    opp: [[0, 0, 0], [0, 2, 0], [0, 1, 2], [0, 3, 2]]
+  };
+  function renderPar() {
+    var th = parseInt(secIn.value, 10), y1 = 120, y2 = 250, M = [320, 185];
+    var d = [Math.cos(th * RAD), -Math.sin(th * RAD)], k = 65 / Math.sin(th * RAD), L = 180 / Math.sin(th * RAD);
+    var I = [[M[0] + d[0] * k, M[1] + d[1] * k], [M[0] - d[0] * k, M[1] - d[1] * k]];
+    var secs = [[0, th], [th, 180], [180, 180 + th], [180 + th, 360]];
+    clear(parSvg);
+    PAR_HL[parMode].forEach(function (h) {
+      var P = I[h[0]], s = secs[h[1]];
+      wedge(parSvg, P[0], P[1], 40, s[0], s[1], h[2]);
+      var lp = pt(P[0], P[1], 66, (s[0] + s[1]) / 2);
+      mk(parSvg, "text", { x: f2(lp[0]), y: f2(lp[1] + 6), "text-anchor": "middle", "font-size": 17, "font-weight": 600, style: "fill:" + COLS[h[2]] }, (s[1] - s[0]) + "°");
+    });
+    [y1, y2].forEach(function (y, i) {
+      mk(parSvg, "line", { x1: 20, y1: y, x2: 620, y2: y, stroke: "var(--ink)", "stroke-width": 3 });
+      mk(parSvg, "path", { d: "M 70 " + (y - 7) + " L 80 " + y + " L 70 " + (y + 7) + " M 80 " + (y - 7) + " L 90 " + y + " L 80 " + (y + 7), fill: "none", stroke: "var(--ink)", "stroke-width": 2 });
+      mk(parSvg, "text", { x: 600, y: y - 10, "text-anchor": "end", "font-size": 17, "font-weight": 600 }, i === 0 ? "(d)" : "(d')");
+    });
+    mk(parSvg, "line", { x1: f2(M[0] - d[0] * L), y1: f2(M[1] - d[1] * L), x2: f2(M[0] + d[0] * L), y2: f2(M[1] + d[1] * L), stroke: "var(--acc)", "stroke-width": 3 });
+    var sL = [M[0] + d[0] * (k + 95), M[1] + d[1] * (k + 95)];
+    mk(parSvg, "text", { x: f2(clamp(sL[0] + (th <= 90 ? 30 : -30), 30, 610)), y: f2(clamp(sL[1], 20, 350)), "text-anchor": "middle", "font-size": 17, "font-weight": 600, style: "fill:var(--acc)" }, "(s)");
+    I.forEach(function (P) { mk(parSvg, "circle", { cx: f2(P[0]), cy: f2(P[1]), r: 5, fill: "var(--ink)" }); });
+    $("secOut").textContent = th + "°";
+    $("parText").innerHTML = PAR_TXT[parMode];
+    var other = 180 - th;
+    $("parOut").innerHTML =
+      "<div class='res'><span class='res-name'>Paire bleue</span><span class='res-val c1'>" + th + "° = " + th + "°</span></div>" +
+      "<div class='res'><span class='res-name'>Paire rose</span><span class='res-val c3'>" + other + "° = " + other + "°</span></div>" +
+      "<div class='res'><span class='res-name'>Un bleu et un rose voisins</span><span class='res-val'>180°</span><span class='res-calc'>" + th + " + " + other + " = 180 : ensemble, ils forment un angle plat.</span></div>";
+  }
+  [["modeAlt", "alt"], ["modeCor", "cor"], ["modeOpp", "opp"]].forEach(function (m) {
+    $(m[0]).addEventListener("click", function () {
+      parMode = m[1];
+      ["modeAlt", "modeCor", "modeOpp"].forEach(function (id) { $(id).setAttribute("aria-pressed", id === m[0] ? "true" : "false"); });
+      renderPar();
+    });
+  });
+  secIn.addEventListener("input", renderPar); renderPar();
+
+  /* ---------- Étape 7 : polygones ---------- */
+  var nIn = $("nIn"), polySvg = $("polySvg");
+  var PNAMES = { 3: "triangle", 4: "quadrilatère", 5: "pentagone", 6: "hexagone", 7: "heptagone", 8: "octogone", 9: "ennéagone", 10: "décagone", 11: "hendécagone", 12: "dodécagone" };
+  function renderPoly() {
+    var n = parseInt(nIn.value, 10), R = 175, cx = 320, cy = 205, V = [], k;
+    for (k = 0; k < n; k++) { V.push(pt(cx, cy, R, 270 - 180 / n - 360 * k / n)); }
+    clear(polySvg);
+    for (k = 1; k <= n - 2; k++) {
+      var tri = [V[0], V[k], V[k + 1]];
+      mk(polySvg, "polygon", { points: tri.map(function (p) { return f2(p[0]) + "," + f2(p[1]); }).join(" "), fill: SOFTS[(k - 1) % 3], stroke: "none" });
+      if (n <= 9) {
+        var g = [(tri[0][0] + tri[1][0] + tri[2][0]) / 3, (tri[0][1] + tri[1][1] + tri[2][1]) / 3];
+        mk(polySvg, "text", { x: f2(g[0]), y: f2(g[1] + 6), "text-anchor": "middle", "font-size": 17, "font-weight": 600, style: "fill:" + COLS[(k - 1) % 3] }, String(k));
+      }
+    }
+    for (k = 2; k <= n - 2; k++) mk(polySvg, "line", { x1: f2(V[0][0]), y1: f2(V[0][1]), x2: f2(V[k][0]), y2: f2(V[k][1]), stroke: "var(--ink-soft)", "stroke-width": 2, "stroke-dasharray": "7 5" });
+    mk(polySvg, "polygon", { points: V.map(function (p) { return f2(p[0]) + "," + f2(p[1]); }).join(" "), fill: "none", stroke: "var(--ink)", "stroke-width": 3, "stroke-linejoin": "round" });
+    mk(polySvg, "circle", { cx: f2(V[0][0]), cy: f2(V[0][1]), r: 8, fill: "var(--acc)" });
+    var sum = polygonAngleSum(n), each = regularAngle(n), exact = Math.abs(each - Math.round(each)) < 1e-9;
+    $("nOut").textContent = n;
+    $("polyOut").innerHTML =
+      "<div class='res'><span class='res-name'>Polygone</span><span class='res-val'>" + PNAMES[n] + "</span><span class='res-calc'>" + n + " côtés, " + n + " angles</span></div>" +
+      "<div class='res'><span class='res-name'>Triangles depuis le gros point</span><span class='res-val'>" + (n - 2) + "</span><span class='res-calc'>" + n + " − 2 = " + (n - 2) + "</span></div>" +
+      "<div class='res'><span class='res-name'>Somme des angles</span><span class='res-val'>" + fmt(sum) + "°</span><span class='res-calc'>(" + n + " − 2) × 180 = " + (n - 2) + " × 180 = " + fmt(sum) + "</span></div>" +
+      "<div class='res'><span class='res-name'>Chaque angle (polygone régulier)</span><span class='res-val'>" + (exact ? "" : "≈ ") + fmt(each) + "°</span><span class='res-calc'>" + fmt(sum) + " ÷ " + n + (exact ? " = " : " ≈ ") + fmt(each) + "</span></div>";
+  }
+  nIn.addEventListener("input", renderPoly); renderPoly();
+
+  /* ---------- Étape 8 : le piège des grands dessins ---------- */
+  (function () {
+    var svg = $("trapSvg");
+    [[60, 190, 100], [300, 190, 230]].forEach(function (a) {
+      var e = pt(a[0], a[1], a[2], 40);
+      wedge(svg, a[0], a[1], 44, 0, 40, 0);
+      mk(svg, "line", { x1: a[0], y1: a[1], x2: a[0] + a[2], y2: a[1], stroke: "var(--ink)", "stroke-width": 3, "stroke-linecap": "round" });
+      mk(svg, "line", { x1: a[0], y1: a[1], x2: f2(e[0]), y2: f2(e[1]), stroke: "var(--ink)", "stroke-width": 3, "stroke-linecap": "round" });
+      var lp = pt(a[0], a[1], 70, 20);
+      mk(svg, "text", { x: f2(lp[0]), y: f2(lp[1] + 6), "text-anchor": "middle", "font-size": 17, "font-weight": 600, style: "fill:var(--a1)" }, "40°");
+    });
+  })();
+
+  /* ---------- Étape 9 : quiz ---------- */
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  function rnd(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+  function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  var QNAMES = { 3: "triangle équilatéral", 4: "carré", 5: "pentagone régulier", 6: "hexagone régulier", 8: "octogone régulier", 9: "ennéagone régulier", 10: "décagone régulier", 12: "dodécagone régulier" };
+  var GEN = [
+    function () { var a = rnd(25, 95), b = rnd(20, 150 - a), c = 180 - a - b; return { q: "Dans un triangle, deux angles mesurent " + a + "° et " + b + "°. Combien mesure le troisième ?", a: c, how: "180 − " + a + " − " + b + " = " + c + "°" }; },
+    function () { var t = 2 * rnd(10, 70), b = (180 - t) / 2; return { q: "Un triangle isocèle a un angle au sommet de " + t + "°. Combien mesure chaque angle à la base ?", a: b, how: "(180 − " + t + ") ÷ 2 = " + (180 - t) + " ÷ 2 = " + b + "°" }; },
+    function () { var b = rnd(25, 80), t = 180 - 2 * b; return { q: "Un triangle isocèle a deux angles à la base de " + b + "°. Combien mesure l'angle au sommet ?", a: t, how: "180 − 2 × " + b + " = 180 − " + (2 * b) + " = " + t + "°" }; },
+    function () { var n = pick([3, 4, 5, 6, 8, 9, 10, 12]), s = (n - 2) * 180; return { q: "Combien mesure chaque angle d'un " + QNAMES[n] + " (" + n + " côtés) ?", a: s / n, how: "Somme : (" + n + " − 2) × 180 = " + fmt(s) + "°, puis " + fmt(s) + " ÷ " + n + " = " + fmt(s / n) + "°" }; },
+    function () { var a = rnd(10, 170); return { q: "Deux angles côte à côte forment un angle plat. L'un mesure " + a + "°. Combien mesure l'autre ?", a: 180 - a, how: "Un angle plat fait 180° : 180 − " + a + " = " + (180 - a) + "°" }; },
+    function () { var n = rnd(4, 10), s = (n - 2) * 180; return { q: "Quelle est la somme des angles d'un polygone à " + n + " côtés ?", a: s, how: "(" + n + " − 2) × 180 = " + (n - 2) + " × 180 = " + fmt(s) + "°" }; },
+    function () { var a = rnd(15, 75); return { q: "Un triangle rectangle a un angle aigu de " + a + "°. Combien mesure l'autre angle aigu ?", a: 90 - a, how: "Les deux angles aigus font 90° à eux deux : 90 − " + a + " = " + (90 - a) + "°" }; },
+    function () {
+      var kind = rnd(0, 3), v = [rnd(10, 85), 90, rnd(95, 175), 180][kind];
+      return { q: "Un angle mesure " + v + "°. Quel est son type ?", choices: ["aigu", "droit", "obtus", "plat"], a: classify(v), how: "Aigu : moins de 90°. Droit : 90°. Obtus : entre 90° et 180°. Plat : 180°." };
+    },
+    function () {
+      var a = rnd(2, 9), b = rnd(2, 9), c = Math.random() < 0.5 ? rnd(Math.abs(a - b) + 1, a + b - 1) : a + b + rnd(1, 4);
+      var s = shuffle([a, b, c]), kind = constructible(s[0], s[1], s[2]), m = Math.max(a, b, c), o = a + b + c - m;
+      return { q: "Peut-on construire un triangle avec des côtés de " + s[0] + " cm, " + s[1] + " cm et " + s[2] + " cm ?", choices: ["Oui", "Non"], a: kind === "constructible" ? "Oui" : "Non",
+        how: "Le plus grand côté mesure " + m + " cm, les deux autres font " + o + " cm ensemble. " + (m < o ? m + " < " + o + " : c'est possible." : m + " ≥ " + o + " : c'est impossible.") };
+    }
+  ];
+  var quiz = $("quiz"), done = [];
+  function updScore() { $("score").textContent = done.filter(Boolean).length + " / 8"; }
+  function newQuiz() {
+    quiz.innerHTML = ""; done = [];
+    var types = shuffle([0, 1, 2, 3, 4, 5, 6, 7, 8]).slice(0, 8);
+    types.forEach(function (t, k) {
+      var Q = GEN[t](), li = document.createElement("li");
+      if (Q.choices) {
+        li.className = "ch";
+        li.innerHTML = "<span>" + Q.q + "</span><div class='btns' role='group' aria-label='Choix pour la question " + (k + 1) + "'>" +
+          Q.choices.map(function (c, j) { return "<button type='button' id='qc" + k + "_" + j + "' aria-pressed='false'>" + c + "</button>"; }).join("") +
+          "</div><span class='fb' id='qf" + k + "' aria-live='polite'></span>";
+        quiz.appendChild(li);
+        Q.choices.forEach(function (c, j) {
+          $("qc" + k + "_" + j).addEventListener("click", function () {
+            Q.choices.forEach(function (c2, j2) { $("qc" + k + "_" + j2).setAttribute("aria-pressed", j2 === j ? "true" : "false"); });
+            var fb = $("qf" + k);
+            if (c === Q.a) { fb.className = "fb ok"; fb.textContent = "Bravo, c'est juste !"; done[k] = true; }
+            else { done[k] = false; fb.className = "fb no"; fb.innerHTML = "Pas tout à fait : la réponse est « " + Q.a + " ».<span>" + Q.how + "</span>"; }
+            updScore();
+          });
+        });
+      } else {
+        li.innerHTML = "<span>" + Q.q + "</span><input type='text' id='qa" + k + "' inputmode='decimal' autocomplete='off' aria-label='Ta réponse à la question " + (k + 1) + ", en degrés'><button type='button' id='qb" + k + "'>Vérifier</button><span class='fb' id='qf" + k + "' aria-live='polite'></span>";
+        quiz.appendChild(li);
+        var check = function () {
+          var fb = $("qf" + k), x = num($("qa" + k).value.replace("°", ""));
+          if (isNaN(x)) { fb.className = "fb"; fb.textContent = "Écris un nombre."; return; }
+          if (Math.abs(x - Q.a) < 0.006) { fb.className = "fb ok"; fb.textContent = "Bravo, c'est juste !"; done[k] = true; }
+          else { done[k] = false; fb.className = "fb no"; fb.innerHTML = "Pas tout à fait : la réponse est " + fmt(Q.a) + "°.<span>" + Q.how + "</span>"; }
+          updScore();
+        };
+        $("qb" + k).addEventListener("click", check);
+        $("qa" + k).addEventListener("keydown", function (e) { if (e.key === "Enter") check(); });
+      }
+    });
+    updScore();
+  }
+  $("newQuiz").addEventListener("click", newQuiz);
+  newQuiz();
+})();
+</script>
+</body>
+</html>
