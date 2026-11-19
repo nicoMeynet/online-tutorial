@@ -58,9 +58,19 @@ Chaque tutoriel est une seule page HTML, sans installation. Il suffit de l'ouvri
 | [Les jeux de stratégie](les-jeux-de-strategie.html) | Allumettes, course à 20, Nim et la somme de Nim, morpion contre l'ordinateur, raisonner à rebours, le dilemme du prisonnier, un quiz. |
 | [Les maths et la musique](les-maths-et-la-musique.html) | Fréquences et ondes, l'octave, la corde de Pythagore, les intervalles, la gamme tempérée et un mini-piano, les rythmes en fractions, un quiz. |
 
+## Pour réviser
+
+| Page | Contenu |
+|---|---|
+| [Quiz brevet mélangé](revisions-brevet.html) | 60 types de questions tirées au hasard dans tous les thèmes du collège, mode entraînement ou examen, score par thème et tutoriels à revoir. |
+| [Fiches à imprimer](fiches.html) | L'essentiel de chaque tutoriel (sa partie « À retenir »), une catégorie par feuille. Générée par `python tools/fiches.py`. |
+| [Glossaire](glossaire.html) | Plus de 360 mots de maths expliqués simplement, avec un exemple et un lien vers le bon tutoriel. Lien direct vers un mot : `glossaire.html#hypotenuse`. |
+
+La **progression** (tutoriels ouverts, meilleur score à chaque quiz) est enregistrée par [progress.js](progress.js) dans le navigateur de l'élève, sans compte ni serveur. Elle s'affiche sur l'accueil.
+
 ## Ajouter un tutoriel
 
 1. Ajouter un fichier `nom-du-tutoriel.html` à la racine.
 2. Ajouter une ligne dans le tableau ci-dessus.
 3. Ajouter une carte dans `index.html`, dans la bonne catégorie.
-4. Lancer `python tools/liens.py` : il ajoute le logo (icône d'onglet et d'écran d'accueil), le retour à l'accueil, les liens « précédent / suivant » (dans l'ordre de `index.html`) et transforme les mentions « le tutoriel sur … » en liens. On peut le relancer sans risque.
+4. Lancer `python tools/fiches.py`, puis `python tools/liens.py` : il ajoute le logo (icône d'onglet et d'écran d'accueil), le retour à l'accueil, les liens « précédent / suivant » (dans l'ordre de `index.html`) et transforme les mentions « le tutoriel sur … » en liens. On peut le relancer sans risque.

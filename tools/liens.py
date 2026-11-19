@@ -82,7 +82,8 @@ FILE = dict(TOPICS)
 ICONS = ('<!--ticons--><link rel="icon" href="icon.svg" type="image/svg+xml">'
          '<link rel="apple-touch-icon" href="apple-touch-icon.png">'
          '<link rel="manifest" href="manifest.webmanifest">'
-         '<meta name="apple-mobile-web-app-title" content="Tutoriels"><!--/ticons-->\n')
+         '<meta name="apple-mobile-web-app-title" content="Tutoriels">'
+         '<script src="progress.js" defer></script><!--/ticons-->\n')
 
 CSS = """<style id="tnav-css">
 .tnav-top { display: flex; margin: 0 0 4px; }
