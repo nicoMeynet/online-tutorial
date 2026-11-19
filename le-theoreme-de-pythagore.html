@@ -1,0 +1,649 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Le théorème de Pythagore</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, encre ambre, marge rouge. Les trois carrés ont chacun leur couleur. */
+:root {
+  --paper: #fbf8f3;
+  --grid: #efe6d8;
+  --card: #ffffff;
+  --ink: #2e2416;
+  --ink-soft: #6a5a44;
+  --acc: #b45309;
+  --acc-soft: #fbe7cf;
+  --sq-b: #dbe7f7;
+  --sq-b-ink: #2f5b9a;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --hl: #fff0a3;
+  --line: #e2d6c3;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #17130d; --grid: #231d14; --card: #1e1912; --ink: #f2ebe0; --ink-soft: #bfae95;
+    --acc: #f5a35c; --acc-soft: #46301a; --sq-b: #1c2b44; --sq-b-ink: #8fb5ef;
+    --red: #ff7d92; --red-soft: #3a1c27; --ok: #6fd39f; --ok-soft: #173a29; --hl: #4b4318; --line: #3a3021;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #17130d; --grid: #231d14; --card: #1e1912; --ink: #f2ebe0; --ink-soft: #bfae95;
+  --acc: #f5a35c; --acc-soft: #46301a; --sq-b: #1c2b44; --sq-b-ink: #8fb5ef;
+  --red: #ff7d92; --red-soft: #3a1c27; --ok: #6fd39f; --ok-soft: #173a29; --hl: #4b4318; --line: #3a3021;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero-top { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+.hero-top svg { width: 170px; height: auto; flex: none; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+.big-formula { font-family: var(--f-display); font-weight: 800; font-size: clamp(2.2rem, 9vw, 3.6rem); color: var(--acc); letter-spacing: .01em; }
+.big-formula sup { font-size: .55em; }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 6px 12px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button.main, button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; }
+
+.two { display: grid; grid-template-columns: 300px 1fr; gap: 20px; align-items: start; }
+.two > svg { width: 100%; max-width: 300px; height: auto; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; }
+.two > div { min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+@media (max-width: 620px) { .two { grid-template-columns: 1fr; } .two > svg { margin: 0 auto; } }
+
+.param { display: flex; flex-direction: column; gap: 2px; }
+.param label { font-weight: 700; }
+input[type="range"] { width: 100%; accent-color: var(--acc); }
+.inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
+.inputs label { font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+input[type="text"] { font: inherit; font-family: var(--f-mono); font-size: 1.1rem; padding: 8px 10px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; }
+
+.results { display: flex; flex-direction: column; gap: 8px; font-variant-numeric: tabular-nums; }
+.res { border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 12px; display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; align-items: baseline; }
+.res-name { font-family: var(--f-display); font-weight: 700; }
+.res-val { font-family: var(--f-mono); font-weight: 600; color: var(--acc); font-size: 1.05rem; white-space: nowrap; }
+.res-calc { grid-column: 1 / -1; font-family: var(--f-mono); font-size: .85rem; color: var(--ink-soft); overflow-wrap: anywhere; }
+.steps { font-family: var(--f-mono); font-size: .98rem; display: flex; flex-direction: column; gap: 4px; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; padding: 12px 14px; overflow-wrap: anywhere; }
+.steps b { color: var(--acc); }
+.verdict { border-radius: 8px; padding: 12px 14px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+.verdict.yes { background: var(--ok-soft); color: var(--ok); }
+.verdict.no { background: var(--red-soft); color: var(--red); }
+.verdict span { font-weight: 400; color: var(--ink); }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 120px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+
+table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+th, td { padding: 7px 8px; border-bottom: 1px dashed var(--line); text-align: center; font-family: var(--f-mono); }
+thead th { border-bottom: 2px solid var(--ink); font-family: var(--f-display); }
+.scroll { overflow-x: auto; }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+</head>
+<body>
+<main class="page">
+
+  <header class="hero">
+    <div class="hero-top">
+      <svg id="heroFig" viewBox="0 0 320 320" aria-hidden="true"></svg>
+      <div style="display:flex;flex-direction:column;gap:10px;min-width:0;flex:1 1 280px">
+        <span class="eyebrow">Tutoriel de maths · niveau 4<sup>e</sup></span>
+        <h1>Le théorème de Pythagore</h1>
+        <p class="lead">La règle la plus célèbre de la géométrie. Elle relie les trois côtés d'un triangle rectangle, et elle sert aux maçons, aux écrans de télé et aux cartes.</p>
+      </div>
+    </div>
+    <div class="big-formula" aria-label="a au carré plus b au carré égale c au carré">a<sup>2</sup> + b<sup>2</sup> = c<sup>2</sup></div>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · Les mots à connaître</span>
+    <h2>Le triangle rectangle</h2>
+    <p>Pythagore ne marche que pour un <strong>triangle rectangle</strong> : un triangle qui a un <strong>angle droit</strong> (comme le coin d'une feuille). On le repère avec un petit carré dans le coin.</p>
+    <div class="two">
+      <svg viewBox="0 0 300 220" role="img" aria-label="Un triangle rectangle avec son angle droit, ses deux côtés a et b et son hypoténuse c">
+        <path d="M50 180 L250 180 L50 40 Z" fill="var(--acc-soft)" stroke="var(--acc)" stroke-width="3" stroke-linejoin="round"></path>
+        <path d="M50 162 L68 162 L68 180" fill="none" stroke="var(--ink)" stroke-width="2"></path>
+        <text x="150" y="204" text-anchor="middle" font-size="16" style="font-weight:600">a</text>
+        <text x="32" y="115" text-anchor="middle" font-size="16" style="font-weight:600">b</text>
+        <text x="162" y="100" text-anchor="middle" font-size="16" style="font-weight:600;fill:var(--acc)">c</text>
+        <text x="186" y="120" font-size="12" style="fill:var(--ink-soft)">hypoténuse</text>
+      </svg>
+      <div>
+        <div class="note">
+          <span class="note-title">L'hypoténuse (c)</span>
+          <span>C'est le côté <strong>en face de l'angle droit</strong>. C'est toujours le <strong>plus long</strong> des trois côtés.</span>
+        </div>
+        <p>Les deux autres côtés, <span class="mono">a</span> et <span class="mono">b</span>, sont ceux qui forment l'angle droit. On peut les échanger : ça ne change rien.</p>
+        <p class="soft">Le mot « hypoténuse » vient du grec et veut dire « qui se tend dessous », comme une corde tendue entre les deux bouts.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · Le théorème</span>
+    <h2>Trois carrés qui s'emboîtent</h2>
+    <p>Dessine un carré sur chaque côté du triangle. Le théorème dit que <span class="hl"><strong>les deux petits carrés ensemble ont exactement la même aire que le grand</strong></span>.</p>
+    <div class="big-formula" style="font-size:clamp(1.8rem,7vw,2.6rem)">a<sup>2</sup> + b<sup>2</sup> = c<sup>2</sup></div>
+    <p class="soft"><span class="mono">a²</span> se lit « a au carré » et veut dire <span class="mono">a × a</span>. C'est l'aire du carré de côté a.</p>
+
+    <div class="box">
+      <h3>Essaie : change les deux côtés de l'angle droit</h3>
+      <div class="two">
+        <svg id="fig" viewBox="0 0 320 320" role="img" aria-label="Triangle rectangle avec un carré sur chaque côté"></svg>
+        <div>
+          <div class="param">
+            <label for="sa">Côté a : <span class="mono" id="saOut">3</span> cm</label>
+            <input id="sa" type="range" min="1" max="10" step="0.5" value="3">
+          </div>
+          <div class="param">
+            <label for="sb">Côté b : <span class="mono" id="sbOut">4</span> cm</label>
+            <input id="sb" type="range" min="1" max="10" step="0.5" value="4">
+          </div>
+          <div class="results">
+            <div class="res"><span class="res-name">Carré sur a</span><span class="res-val" id="aaOut">9 cm²</span><span class="res-calc" id="aaCalc">a² = 3 × 3</span></div>
+            <div class="res"><span class="res-name">Carré sur b</span><span class="res-val" id="bbOut" style="color:var(--sq-b-ink)">16 cm²</span><span class="res-calc" id="bbCalc">b² = 4 × 4</span></div>
+            <div class="res"><span class="res-name">Carré sur c</span><span class="res-val" id="ccOut" style="color:var(--red)">25 cm²</span><span class="res-calc" id="ccCalc">a² + b² = 9 + 16</span></div>
+          </div>
+          <p class="soft" id="figNote">Avec 3 et 4, compte les petits carreaux : 9 + 16 = 25. Et l'hypoténuse mesure exactement 5 cm.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Pourquoi c'est vrai ?</span>
+    <h2>La preuve du puzzle</h2>
+    <p>Prends un grand carré et 4 triangles rectangles tous pareils. Range-les de deux façons différentes. Le grand carré ne change pas, les 4 triangles non plus. Donc <strong>la place qui reste libre est la même</strong> dans les deux cas.</p>
+    <div class="box">
+      <div class="two">
+        <svg id="puzzle" viewBox="0 0 300 300" role="img" aria-label="Preuve du puzzle : quatre triangles dans un grand carré, rangés de deux façons"></svg>
+        <div>
+          <button id="puzzleBtn" class="main" type="button" style="align-self:flex-start">Ranger autrement</button>
+          <div class="note" id="puzzleText">
+            <span class="note-title">Rangement 1</span>
+            <span>Les triangles sont dans les coins. La place libre au milieu est un carré penché : le carré de l'hypoténuse, <strong>c²</strong>.</span>
+          </div>
+          <p class="soft">Clique sur le bouton pour déplacer les triangles. Dans le rangement 2, la place libre forme deux carrés : <strong>a²</strong> et <strong>b²</strong>. Même place libre, donc <strong>c² = a² + b²</strong>.</p>
+        </div>
+      </div>
+    </div>
+    <p class="soft">On connaît aujourd'hui plus de 350 façons différentes de démontrer ce théorème. L'une d'elles a même été trouvée en 1876 par James Garfield, qui est devenu ensuite président des États-Unis.</p>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · D'où vient-il ?</span>
+    <h2>Pythagore n'était pas le premier</h2>
+    <ol class="timeline">
+      <li>
+        <span class="when">vers −1800</span>
+        <div class="what">
+          <strong>Les Babyloniens</strong>
+          <span>Une tablette d'argile (appelée Plimpton 322) contient une liste de nombres qui marchent avec la règle, comme 3, 4 et 5. Ils connaissaient donc l'idée, plus de 1 000 ans avant Pythagore.</span>
+        </div>
+      </li>
+      <li>
+        <span class="when">Égypte</span>
+        <div class="what">
+          <strong>La corde à 13 nœuds</strong>
+          <span>On raconte que les arpenteurs égyptiens utilisaient une corde avec 12 intervalles égaux. En la tendant en triangle de côtés 3, 4 et 5, ils obtenaient un angle droit parfait pour tracer les champs.</span>
+        </div>
+      </li>
+      <li>
+        <span class="when">vers −570 à −495</span>
+        <div class="what">
+          <strong>Pythagore</strong>
+          <span>Né sur l'île grecque de Samos, il fonde une école à Crotone, en Italie. Ses élèves, les pythagoriciens, pensaient que « tout est nombre ». On lui attribue la première démonstration du théorème, mais on n'en est pas sûr.</span>
+        </div>
+      </li>
+      <li>
+        <span class="when">vers −300</span>
+        <div class="what">
+          <strong>Euclide</strong>
+          <span>Dans son grand livre de géométrie, les <em>Éléments</em>, il écrit une démonstration complète. Ce livre a servi à apprendre les maths pendant plus de 2 000 ans.</span>
+        </div>
+      </li>
+      <li>
+        <span class="when">Chine ancienne</span>
+        <div class="what">
+          <strong>Le théorème « gou-gu »</strong>
+          <span>Un vieux livre chinois de mathématiques explique la même règle avec un dessin de carrés, sans rien savoir des Grecs.</span>
+        </div>
+      </li>
+    </ol>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Calculer une longueur</span>
+    <h2>Trouver le côté qui manque</h2>
+    <p>Le théorème donne c², mais on veut souvent c. Il faut alors la <strong>racine carrée</strong>, avec la touche <span class="mono">√</span> de la calculatrice. La racine carrée de 25, c'est le nombre qui, multiplié par lui-même, donne 25 : <span class="mono">√25 = 5</span>, car <span class="mono">5 × 5 = 25</span>.</p>
+    <div class="box">
+      <h3>Calculatrice de Pythagore</h3>
+      <div class="btns" role="group" aria-label="Ce que tu cherches">
+        <button id="modeHyp" type="button" aria-pressed="true">Je cherche l'hypoténuse</button>
+        <button id="modeSide" type="button" aria-pressed="false">Je cherche un autre côté</button>
+      </div>
+      <div class="inputs">
+        <label id="lblX" for="inX"><span id="lblXt">Côté a</span><input id="inX" type="text" inputmode="decimal" value="6" autocomplete="off"></label>
+        <label id="lblY" for="inY"><span id="lblYt">Côté b</span><input id="inY" type="text" inputmode="decimal" value="8" autocomplete="off"></label>
+      </div>
+      <div class="steps" id="calcSteps" aria-live="polite"></div>
+      <p class="soft">Tu peux écrire des nombres à virgule, comme 2,5.</p>
+    </div>
+    <div class="note red">
+      <span class="note-title">L'erreur classique</span>
+      <span>On ne peut pas écrire <span class="mono">c = a + b</span> ! Avec 3 et 4, on trouverait 7, alors que l'hypoténuse mesure 5. Il faut d'abord mettre au carré, additionner, puis prendre la racine.</span>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · La réciproque</span>
+    <h2>Est-ce que mon triangle est rectangle ?</h2>
+    <p>Le théorème marche aussi dans l'autre sens. Si tu connais les 3 côtés d'un triangle, compare le carré du plus grand côté avec la somme des carrés des deux autres :</p>
+    <div class="note">
+      <span>Si c'est <strong>égal</strong>, le triangle est rectangle. L'angle droit est en face du plus grand côté.</span>
+      <span>Si ce n'est <strong>pas égal</strong>, le triangle n'est pas rectangle.</span>
+    </div>
+    <div class="box">
+      <h3>Vérificateur de triangle</h3>
+      <div class="btns" id="presets" role="group" aria-label="Exemples de triangles"></div>
+      <div class="inputs">
+        <label for="t1">Côté 1<input id="t1" type="text" inputmode="decimal" value="5" autocomplete="off"></label>
+        <label for="t2">Côté 2<input id="t2" type="text" inputmode="decimal" value="12" autocomplete="off"></label>
+        <label for="t3">Côté 3<input id="t3" type="text" inputmode="decimal" value="13" autocomplete="off"></label>
+      </div>
+      <div class="steps" id="recSteps"></div>
+      <div class="verdict yes" id="recVerdict" aria-live="polite"></div>
+    </div>
+
+    <h3 style="font-size:1.4rem;margin-top:8px">Les triplets magiques</h3>
+    <p>Certains triangles rectangles ont trois côtés entiers. On les appelle des <strong>triplets pythagoriciens</strong>. Si tu multiplies un triplet par le même nombre, tu en obtiens un autre : 3-4-5 donne 6-8-10, puis 9-12-15…</p>
+    <div class="box">
+      <div class="scroll">
+        <table>
+          <thead><tr><th>a</th><th>b</th><th>c</th><th>a² + b²</th><th>c²</th></tr></thead>
+          <tbody id="triples"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Dans la vraie vie</span>
+    <h2>Pythagore est partout</h2>
+    <div class="cards">
+      <div class="box">
+        <strong>Le maçon et son angle droit</strong>
+        <span class="soft">Pour vérifier qu'un mur est bien d'équerre, le maçon mesure 60 cm d'un côté, 80 cm de l'autre, et vérifie que la diagonale fait 100 cm. C'est 3-4-5, multiplié par 20.</span>
+      </div>
+      <div class="box">
+        <strong>La taille des écrans</strong>
+        <span class="soft">Une télé « de 55 pouces » mesure 55 pouces en <strong>diagonale</strong>, pas en largeur. On la calcule avec Pythagore à partir de la largeur et de la hauteur.</span>
+      </div>
+      <div class="box">
+        <strong>Le raccourci</strong>
+        <span class="soft">Traverser un parc en diagonale est plus court que d'en faire le tour par deux côtés. Pythagore dit de combien.</span>
+      </div>
+      <div class="box">
+        <strong>Les cartes et les jeux vidéo</strong>
+        <span class="soft">Pour calculer la distance « à vol d'oiseau » entre deux points d'une carte, ou entre deux personnages d'un jeu, l'ordinateur utilise Pythagore des milliers de fois par seconde.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · À toi de jouer</span>
+    <h2>Six petits exercices</h2>
+    <p>Prends une calculatrice (avec la touche √). Commence toujours par repérer l'angle droit et l'hypoténuse.</p>
+    <div class="exos">
+      <details>
+        <summary>L'échelle<span class="q">Une échelle de 5 m est posée contre un mur. Son pied est à 3 m du mur. À quelle hauteur touche-t-elle le mur ?</span></summary>
+        <div>
+          <span>L'angle droit est entre le mur et le sol. L'échelle est l'hypoténuse : c = 5.</span>
+          <span>h² = 5² − 3² = 25 − 9 = 16, donc h = √16 = <strong>4 m</strong>.</span>
+        </div>
+      </details>
+      <details>
+        <summary>Le raccourci du parc<span class="q">Un parc rectangulaire mesure 40 m sur 30 m. Combien de mètres gagnes-tu en le traversant en diagonale plutôt qu'en longeant deux côtés ?</span></summary>
+        <div>
+          <span>Diagonale² = 40² + 30² = 1 600 + 900 = 2 500, donc diagonale = √2 500 = 50 m.</span>
+          <span>En longeant les côtés : 40 + 30 = 70 m. Tu gagnes <strong>20 m</strong>.</span>
+        </div>
+      </details>
+      <details>
+        <summary>L'écran de télé<span class="q">Un écran mesure 80 cm de large et 45 cm de haut. Quelle est sa diagonale ? (1 pouce = 2,54 cm)</span></summary>
+        <div>
+          <span>d² = 80² + 45² = 6 400 + 2 025 = 8 425, donc d = √8 425 ≈ <strong>91,8 cm</strong>.</span>
+          <span>91,8 ÷ 2,54 ≈ 36 : c'est une télé de 36 pouces.</span>
+        </div>
+      </details>
+      <details>
+        <summary>Le côté qui manque<span class="q">Un triangle rectangle a une hypoténuse de 13 cm et un côté de 5 cm. Combien mesure le troisième côté ?</span></summary>
+        <div>
+          <span>b² = 13² − 5² = 169 − 25 = 144, donc b = √144 = <strong>12 cm</strong>.</span>
+          <span>C'est le triplet 5-12-13.</span>
+        </div>
+      </details>
+      <details>
+        <summary>Rectangle ou pas ? (1)<span class="q">Un triangle a des côtés de 6 cm, 8 cm et 10 cm. Est-il rectangle ?</span></summary>
+        <div>
+          <span>Le plus grand côté est 10 : 10² = 100. Les deux autres : 6² + 8² = 36 + 64 = 100.</span>
+          <span>C'est égal, donc <strong>oui, il est rectangle</strong>.</span>
+        </div>
+      </details>
+      <details>
+        <summary>Rectangle ou pas ? (2)<span class="q">Un triangle a des côtés de 4 cm, 5 cm et 6 cm. Est-il rectangle ?</span></summary>
+        <div>
+          <span>Le plus grand côté est 6 : 6² = 36. Les deux autres : 4² + 5² = 16 + 25 = 41.</span>
+          <span>36 n'est pas égal à 41, donc <strong>non, il n'est pas rectangle</strong>.</span>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- Bonus -->
+  <section>
+    <span class="eyebrow">Bonus · Les pythagoriciens</span>
+    <h2>Une drôle d'école</h2>
+    <div class="cards">
+      <div class="box">
+        <strong>Les maths de la musique</strong>
+        <span class="soft">Les pythagoriciens ont découvert qu'une corde deux fois plus courte sonne une octave plus haut. Les belles notes ensemble correspondent à des fractions simples, comme 1/2 ou 2/3.</span>
+      </div>
+      <div class="box">
+        <strong>Le nombre qui fâche</strong>
+        <span class="soft">Un carré de côté 1 a une diagonale de √2 ≈ 1,414… Ce nombre ne s'écrit pas avec une fraction : il est irrationnel, comme π et e ! La légende dit que cette découverte a beaucoup dérangé l'école.</span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• Pythagore ne marche que dans un <strong>triangle rectangle</strong>.</span>
+      <span>• L'<strong>hypoténuse c</strong> est en face de l'angle droit. C'est le plus grand côté.</span>
+      <span>• <strong>a² + b² = c²</strong> : pour trouver c, on calcule a² + b², puis la racine carrée.</span>
+      <span>• Pour trouver un autre côté : <strong>b² = c² − a²</strong>, puis la racine carrée.</span>
+      <span>• La <strong>réciproque</strong> : si le carré du plus grand côté est égal à la somme des carrés des deux autres, le triangle est rectangle.</span>
+    </div>
+  </section>
+
+  <footer>Fiche de révision · Le théorème de Pythagore</footer>
+</main>
+
+<script>
+(function () {
+  var NS = 'http://www.w3.org/2000/svg';
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function fmt(x, d) { return x.toLocaleString('fr-FR', { maximumFractionDigits: d == null ? 2 : d }); }
+  function isRound(x, d) { var m = Math.pow(10, d == null ? 2 : d); return Math.abs(x * m - Math.round(x * m)) < 1e-6; }
+  function num(s) { var x = parseFloat(String(s).replace(/\s/g, '').replace(',', '.')); return isFinite(x) ? x : NaN; }
+  function mk(svg, name, attrs, text) { var e = document.createElementNS(NS, name); for (var a in attrs) e.setAttribute(a, attrs[a]); if (text != null) e.textContent = text; svg.appendChild(e); return e; }
+
+  /* ---------- Figure des trois carrés ---------- */
+  function figure(svg, a, b, opts) {
+    opts = opts || {};
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    var c = Math.sqrt(a * a + b * b);
+    var x0 = -b, x1 = a + b, y0 = -a, y1 = a + b;
+    var W = 320, pad = opts.pad || 14;
+    var k = (W - 2 * pad) / Math.max(x1 - x0, y1 - y0);
+    var tx = W / 2 - k * (x0 + x1) / 2, ty = W / 2 + k * (y0 + y1) / 2;
+    function S(p) { return [tx + k * p[0], ty - k * p[1]]; }
+    var squares = [
+      { O: [0, 0], u: [1, 0], v: [0, -1], s: a, fill: 'var(--acc-soft)', ink: 'var(--acc)', lbl: 'a²' },
+      { O: [0, 0], u: [0, 1], v: [-1, 0], s: b, fill: 'var(--sq-b)', ink: 'var(--sq-b-ink)', lbl: 'b²' },
+      { O: [a, 0], u: [-a / c, b / c], v: [b / c, a / c], s: c, fill: 'var(--red-soft)', ink: 'var(--red)', lbl: 'c²' }
+    ];
+    squares.forEach(function (q) {
+      function P(i, j) { return S([q.O[0] + i * q.u[0] + j * q.v[0], q.O[1] + i * q.u[1] + j * q.v[1]]); }
+      var pts = [P(0, 0), P(q.s, 0), P(q.s, q.s), P(0, q.s)];
+      mk(svg, 'polygon', { points: pts.map(function (p) { return p.join(','); }).join(' '), fill: q.fill, stroke: q.ink, 'stroke-width': 2.5, 'stroke-linejoin': 'round' });
+      if (opts.grid && k >= 6) {
+        for (var i = 1; i < q.s - 1e-9; i++) {
+          var p1 = P(i, 0), p2 = P(i, q.s), p3 = P(0, i), p4 = P(q.s, i);
+          mk(svg, 'line', { x1: p1[0], y1: p1[1], x2: p2[0], y2: p2[1], stroke: q.ink, 'stroke-width': .8, 'stroke-opacity': .45 });
+          mk(svg, 'line', { x1: p3[0], y1: p3[1], x2: p4[0], y2: p4[1], stroke: q.ink, 'stroke-width': .8, 'stroke-opacity': .45 });
+        }
+      }
+      if (opts.labels) {
+        var m = P(q.s / 2, q.s / 2);
+        var area = q.s * q.s;
+        mk(svg, 'text', { x: m[0], y: m[1] + 6, 'text-anchor': 'middle', 'font-size': 17, style: 'font-weight:600;fill:' + q.ink }, q.lbl + ' = ' + fmt(area, 2));
+      }
+    });
+    var A = S([0, 0]), B = S([a, 0]), C = S([0, b]);
+    mk(svg, 'polygon', { points: [A, B, C].map(function (p) { return p.join(','); }).join(' '), fill: 'var(--card)', stroke: 'var(--ink)', 'stroke-width': 2.5, 'stroke-linejoin': 'round' });
+    var r = Math.min(12, k * Math.min(a, b) * .3);
+    mk(svg, 'path', { d: 'M' + (A[0]) + ' ' + (A[1] - r) + ' h' + r + ' v' + r, fill: 'none', stroke: 'var(--ink)', 'stroke-width': 1.8 });
+  }
+  figure(document.getElementById('heroFig'), 3, 4, { grid: true, pad: 8 });
+
+  var sa = document.getElementById('sa'), sb = document.getElementById('sb');
+  function updateFig() {
+    var a = parseFloat(sa.value), b = parseFloat(sb.value), cc = a * a + b * b, c = Math.sqrt(cc);
+    document.getElementById('saOut').textContent = fmt(a);
+    document.getElementById('sbOut').textContent = fmt(b);
+    document.getElementById('aaOut').textContent = fmt(a * a) + ' cm²';
+    document.getElementById('aaCalc').textContent = 'a² = ' + fmt(a) + ' × ' + fmt(a);
+    document.getElementById('bbOut').textContent = fmt(b * b) + ' cm²';
+    document.getElementById('bbCalc').textContent = 'b² = ' + fmt(b) + ' × ' + fmt(b);
+    document.getElementById('ccOut').textContent = fmt(cc) + ' cm²';
+    document.getElementById('ccCalc').textContent = 'c² = a² + b² = ' + fmt(a * a) + ' + ' + fmt(b * b);
+    var cTxt = isRound(c) ? '= ' + fmt(c) : '≈ ' + fmt(c);
+    document.getElementById('figNote').textContent = 'L\'hypoténuse mesure c = √' + fmt(cc) + ' ' + cTxt + ' cm.' + (Number.isInteger(a) && Number.isInteger(b) ? ' Compte les petits carreaux : ' + fmt(a * a) + ' + ' + fmt(b * b) + ' = ' + fmt(cc) + '.' : '');
+    figure(document.getElementById('fig'), a, b, { grid: true, labels: true });
+  }
+  sa.addEventListener('input', updateFig); sb.addEventListener('input', updateFig); updateFig();
+
+  /* ---------- Preuve du puzzle ---------- */
+  var pa = 2.2, pb = 3.8, N = pa + pb;
+  /* Chaque triangle : [angle droit, bout du côté a, bout du côté b] */
+  var state1 = [
+    [[0, 0], [pa, 0], [0, pb]],
+    [[N, 0], [N, pa], [pa, 0]],
+    [[N, N], [pb, N], [N, pa]],
+    [[0, N], [0, pb], [pb, N]]
+  ];
+  var state2 = [
+    [[pa, pa], [pa, 0], [N, pa]],
+    [[N, 0], [N, pa], [pa, 0]],
+    [[pa, pa], [0, pa], [pa, N]],
+    [[0, N], [pa, N], [0, pa]]
+  ];
+  var psvg = document.getElementById('puzzle');
+  var pk = 270 / N, po = 15;
+  function PS(p) { return [po + pk * p[0], po + pk * (N - p[1])]; }
+  var tri = [];
+  var labels = {};
+  function puzzleBase() {
+    mk(psvg, 'rect', { x: po, y: po, width: pk * N, height: pk * N, fill: 'var(--paper)', stroke: 'var(--ink)', 'stroke-width': 2.5 });
+    labels.zc = mk(psvg, 'polygon', { points: [[pa, 0], [N, pa], [pb, N], [0, pb]].map(function (p) { return PS(p).join(','); }).join(' '), fill: 'var(--red-soft)' });
+    var a0 = PS([0, pa]), b0 = PS([pa, N]);
+    labels.za = mk(psvg, 'rect', { x: a0[0], y: a0[1], width: pk * pa, height: pk * pa, fill: 'var(--acc-soft)' });
+    labels.zb = mk(psvg, 'rect', { x: b0[0], y: b0[1], width: pk * pb, height: pk * pb, fill: 'var(--sq-b)' });
+    for (var i = 0; i < 4; i++) tri.push(mk(psvg, 'polygon', { fill: 'var(--card)', stroke: 'var(--ink)', 'stroke-width': 2, 'stroke-linejoin': 'round' }));
+  }
+  function puzzleLabels() {
+    var m1 = PS([N / 2, N / 2]);
+    labels.c = mk(psvg, 'text', { x: m1[0], y: m1[1] + 8, 'text-anchor': 'middle', 'font-size': 26, style: 'font-weight:700;fill:var(--red)' }, 'c²');
+    var ma = PS([pa / 2, pa / 2]), mb = PS([pa + pb / 2, pa + pb / 2]);
+    labels.a = mk(psvg, 'text', { x: ma[0], y: ma[1] + 7, 'text-anchor': 'middle', 'font-size': 22, style: 'font-weight:700;fill:var(--acc)' }, 'a²');
+    labels.b = mk(psvg, 'text', { x: mb[0], y: mb[1] + 8, 'text-anchor': 'middle', 'font-size': 26, style: 'font-weight:700;fill:var(--sq-b-ink)' }, 'b²');
+  }
+  function puzzleDraw(t) {
+    tri.forEach(function (poly, i) {
+      var pts = [0, 1, 2].map(function (j) {
+        var p = [state1[i][j][0] + (state2[i][j][0] - state1[i][j][0]) * t, state1[i][j][1] + (state2[i][j][1] - state1[i][j][1]) * t];
+        return PS(p).join(',');
+      });
+      poly.setAttribute('points', pts.join(' '));
+    });
+    labels.zc.setAttribute('opacity', t < .05 ? 1 : 0);
+    labels.za.setAttribute('opacity', t > .95 ? 1 : 0);
+    labels.zb.setAttribute('opacity', t > .95 ? 1 : 0);
+    labels.c.setAttribute('opacity', t < .05 ? 1 : 0);
+    labels.a.setAttribute('opacity', t > .95 ? 1 : 0);
+    labels.b.setAttribute('opacity', t > .95 ? 1 : 0);
+  }
+  puzzleBase(); puzzleLabels(); puzzleDraw(0);
+  var pState = 0, anim = null;
+  document.getElementById('puzzleBtn').addEventListener('click', function () {
+    var from = pState, to = 1 - pState; pState = to;
+    var box = document.getElementById('puzzleText');
+    box.innerHTML = to === 1
+      ? '<span class="note-title">Rangement 2</span><span>Les triangles sont rangés deux par deux en rectangles. La place libre forme deux carrés : <strong>a²</strong> et <strong>b²</strong>.</span>'
+      : '<span class="note-title">Rangement 1</span><span>Les triangles sont dans les coins. La place libre au milieu est un carré penché : le carré de l\'hypoténuse, <strong>c²</strong>.</span>';
+    if (anim) cancelAnimationFrame(anim);
+    if (reduce) { puzzleDraw(to); return; }
+    var start = null, dur = 1400;
+    function step(ts) {
+      if (!start) start = ts;
+      var u = Math.min(1, (ts - start) / dur), e = u < .5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
+      puzzleDraw(from + (to - from) * e);
+      if (u < 1) anim = requestAnimationFrame(step);
+    }
+    anim = requestAnimationFrame(step);
+  });
+
+  /* ---------- Calculatrice ---------- */
+  var mode = 'hyp';
+  var inX = document.getElementById('inX'), inY = document.getElementById('inY');
+  function setMode(m) {
+    mode = m;
+    document.getElementById('modeHyp').setAttribute('aria-pressed', m === 'hyp' ? 'true' : 'false');
+    document.getElementById('modeSide').setAttribute('aria-pressed', m === 'side' ? 'true' : 'false');
+    document.getElementById('lblXt').textContent = m === 'hyp' ? 'Côté a' : 'Hypoténuse c';
+    document.getElementById('lblYt').textContent = m === 'hyp' ? 'Côté b' : 'Côté a';
+    if (m === 'side') { inX.value = '13'; inY.value = '5'; } else { inX.value = '6'; inY.value = '8'; }
+    calc();
+  }
+  function sq(x) { return fmt(x, 4); }
+  function calc() {
+    var x = num(inX.value), y = num(inY.value), out = document.getElementById('calcSteps');
+    if (!(x > 0) || !(y > 0)) { out.innerHTML = '<span>Écris deux longueurs plus grandes que 0.</span>'; return; }
+    var lines;
+    if (mode === 'hyp') {
+      var cc = x * x + y * y, c = Math.sqrt(cc);
+      lines = ['c² = a² + b²',
+        'c² = ' + fmt(x, 4) + '² + ' + fmt(y, 4) + '² = ' + sq(x * x) + ' + ' + sq(y * y) + ' = ' + sq(cc),
+        'c = √' + sq(cc) + ' <b>' + (isRound(c) ? '= ' : '≈ ') + fmt(c) + '</b>'];
+    } else {
+      if (y >= x) { out.innerHTML = '<span style="color:var(--red)">L\'hypoténuse est toujours le plus grand côté. Le côté a (' + fmt(y, 4) + ') doit donc être plus petit que l\'hypoténuse c (' + fmt(x, 4) + ').</span>'; return; }
+      var bb = x * x - y * y, b = Math.sqrt(bb);
+      lines = ['b² = c² − a²',
+        'b² = ' + fmt(x, 4) + '² − ' + fmt(y, 4) + '² = ' + sq(x * x) + ' − ' + sq(y * y) + ' = ' + sq(bb),
+        'b = √' + sq(bb) + ' <b>' + (isRound(b) ? '= ' : '≈ ') + fmt(b) + '</b>'];
+    }
+    out.innerHTML = lines.map(function (l) { return '<span>' + l + '</span>'; }).join('');
+  }
+  document.getElementById('modeHyp').addEventListener('click', function () { setMode('hyp'); });
+  document.getElementById('modeSide').addEventListener('click', function () { setMode('side'); });
+  inX.addEventListener('input', calc); inY.addEventListener('input', calc); calc();
+
+  /* ---------- Réciproque ---------- */
+  var t1 = document.getElementById('t1'), t2 = document.getElementById('t2'), t3 = document.getElementById('t3');
+  [[3, 4, 5], [5, 12, 13], [4, 5, 6], [60, 80, 100], [2, 3, 7]].forEach(function (p) {
+    var b = document.createElement('button'); b.type = 'button'; b.id = 'pre-' + p.join('-');
+    b.textContent = p.join(' · ');
+    b.addEventListener('click', function () { t1.value = p[0]; t2.value = p[1]; t3.value = p[2]; rec(); });
+    document.getElementById('presets').appendChild(b);
+  });
+  function rec() {
+    var s = [num(t1.value), num(t2.value), num(t3.value)], steps = document.getElementById('recSteps'), v = document.getElementById('recVerdict');
+    if (s.some(function (x) { return !(x > 0); })) { steps.innerHTML = '<span>Écris trois longueurs plus grandes que 0.</span>'; v.hidden = true; return; }
+    v.hidden = false;
+    var sorted = s.slice().sort(function (p, q) { return p - q; });
+    var x = sorted[0], y = sorted[1], z = sorted[2];
+    if (x + y <= z) {
+      steps.innerHTML = '<span>' + fmt(x, 4) + ' + ' + fmt(y, 4) + ' = ' + fmt(x + y, 4) + ', ce n\'est pas plus grand que ' + fmt(z, 4) + '.</span>';
+      v.className = 'verdict no'; v.innerHTML = 'Ce n\'est même pas un triangle !<span>Les deux petits côtés sont trop courts pour se rejoindre.</span>';
+      return;
+    }
+    var zz = z * z, sum = x * x + y * y;
+    steps.innerHTML = '<span>Le plus grand côté : ' + fmt(z, 4) + '</span><span>' + fmt(z, 4) + '² = <b>' + sq(zz) + '</b></span><span>' + fmt(x, 4) + '² + ' + fmt(y, 4) + '² = ' + sq(x * x) + ' + ' + sq(y * y) + ' = <b>' + sq(sum) + '</b></span>';
+    if (Math.abs(zz - sum) <= 1e-9 * zz) {
+      v.className = 'verdict yes';
+      v.innerHTML = 'C\'est égal : le triangle est rectangle.<span>L\'angle droit est en face du côté de ' + fmt(z, 4) + ' (l\'hypoténuse).</span>';
+    } else {
+      v.className = 'verdict no';
+      v.innerHTML = 'Ce n\'est pas égal : le triangle n\'est pas rectangle.<span>' + sq(zz) + ' ≠ ' + sq(sum) + '</span>';
+    }
+  }
+  [t1, t2, t3].forEach(function (el) { el.addEventListener('input', rec); }); rec();
+
+  /* ---------- Triplets ---------- */
+  var tb = document.getElementById('triples');
+  [[3, 4, 5], [6, 8, 10], [5, 12, 13], [8, 15, 17], [7, 24, 25], [20, 21, 29]].forEach(function (t) {
+    var tr = document.createElement('tr');
+    tr.innerHTML = '<td>' + t[0] + '</td><td>' + t[1] + '</td><td><b>' + t[2] + '</b></td><td>' + fmt(t[0] * t[0]) + ' + ' + fmt(t[1] * t[1]) + ' = ' + fmt(t[0] * t[0] + t[1] * t[1]) + '</td><td>' + fmt(t[2] * t[2]) + '</td>';
+    tb.appendChild(tr);
+  });
+})();
+</script>
+</body>
+</html>
