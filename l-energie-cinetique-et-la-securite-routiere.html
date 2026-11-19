@@ -1,0 +1,848 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>L'énergie cinétique et la sécurité routière</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, encre rouge (comme un panneau de limitation de vitesse), marge rouge. La route et les barres d'énergie sont au centre. */
+:root {
+  --paper: #faf7f6;
+  --grid: #ede3e1;
+  --card: #ffffff;
+  --ink: #2a1615;
+  --ink-soft: #6c5250;
+  --acc: #b91c1c;
+  --acc-soft: #fde2e2;
+  --two: #1c64c8;
+  --two-soft: #dbe8fa;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #fff0a3;
+  --line: #e6d6d4;
+  --road: #6b6f76;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #150e0d; --grid: #231716; --card: #1d1312; --ink: #f6ebea; --ink-soft: #c4a9a6;
+    --acc: #f87171; --acc-soft: #431a1a; --two: #7fb0ff; --two-soft: #1a2a45;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #3a2826; --road: #4a4e55;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #150e0d; --grid: #231716; --card: #1d1312; --ink: #f6ebea; --ink-soft: #c4a9a6;
+  --acc: #f87171; --acc-soft: #431a1a; --two: #7fb0ff; --two-soft: #1a2a45;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #3a2826; --road: #4a4e55;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.blue { border-left-color: var(--two); background: var(--two-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 6px 12px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); min-height: 40px; }
+button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+input[type="text"] { font: inherit; font-family: var(--f-mono); font-size: 1.05rem; padding: 8px 10px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; }
+input[type="range"] { width: 100%; accent-color: var(--acc); }
+.param { display: flex; flex-direction: column; gap: 2px; }
+.param label { font-weight: 700; }
+.params { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px 18px; }
+.grp { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.grp > span { font-weight: 700; }
+
+.inputs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 14px; align-items: end; }
+.inputs label { font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+.methods { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.method { border: 1.5px solid var(--line); border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; background: var(--paper); min-width: 0; }
+.method strong { font-family: var(--f-display); }
+.method .m { font-family: var(--f-mono); font-size: .95rem; overflow-wrap: anywhere; }
+.method .m b { color: var(--acc); }
+.err { color: var(--red); font-weight: 700; }
+
+.sim svg { width: 100%; height: auto; display: block; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: .92rem; }
+.legend i { display: inline-block; width: 14px; height: 14px; border-radius: 3px; margin-right: 6px; vertical-align: -2px; border: 1px solid var(--ink); }
+.verdict { border-radius: 8px; padding: 12px 14px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+.verdict.yes { background: var(--ok-soft); color: var(--ok); }
+.verdict.no { background: var(--acc-soft); color: var(--acc); }
+.verdict span { font-weight: 400; color: var(--ink); }
+.big { font-family: var(--f-display); font-weight: 800; font-size: 1.5rem; color: var(--acc); }
+.status { font-family: var(--f-mono); font-size: .92rem; color: var(--ink-soft); overflow-wrap: anywhere; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
+.tag.acc { color: var(--acc); }
+.tag.two { color: var(--two); }
+.tag.ok { color: var(--ok); }
+
+.formula { font-family: var(--f-mono); font-size: 1.25rem; font-weight: 600; text-align: center; padding: 12px; border: 2px dashed var(--acc); border-radius: 10px; background: var(--paper); overflow-wrap: anywhere; }
+.formula b { color: var(--acc); }
+
+.errs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.errs li { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--paper); }
+.errs .bad { color: var(--red); text-decoration: line-through; overflow-wrap: anywhere; }
+.errs .good { color: var(--ok); font-weight: 700; overflow-wrap: anywhere; }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 110px auto; gap: 10px; align-items: center; }
+.quiz input[type="text"] { font-size: 1rem; padding: 6px 8px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc); }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 120px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+<!--ticons--><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Tutoriels"><script src="progress.js" defer></script><!--/ticons-->
+<style id="tnav-css">
+.tnav-top { display: flex; margin: 0 0 4px; }
+.tnav-home { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font-weight: 700; font-size: .95rem; text-decoration: none; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tnav-home:hover, .tnav-home:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.tnav-bottom { margin-top: 8px; display: flex; flex-direction: column; gap: 12px; }
+.tnav-bottom h2 { margin: 0; }
+.tnav-pn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tnav-pn a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--ink, #222); border-radius: 10px;
+  background: var(--card, #fff); color: var(--ink, #222); text-decoration: none; box-shadow: 3px 3px 0 var(--ink, #222); min-width: 0; }
+.tnav-pn a span { font-size: .85rem; color: var(--ink-soft, #666); }
+.tnav-pn a strong { overflow-wrap: anywhere; }
+.tnav-pn a.next { text-align: right; grid-column: 2; }
+.tnav-bottom .tnav-home { align-self: center; }
+@media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
+</style>
+</head>
+<body>
+<main class="page">
+<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="physique.html">← Tous les tutoriels de physique</a></nav><!--/tnav-->
+
+
+  <header class="hero">
+    <span class="eyebrow">Tutoriel de physique-chimie · niveau 3<sup>e</sup></span>
+    <h1>L'énergie cinétique et la sécurité routière</h1>
+    <p class="lead">Tout ce qui roule emporte de l'énergie avec lui. Pour s'arrêter, il faut s'en débarrasser, et ça prend de la place. Avec une seule formule, on comprend pourquoi la vitesse compte autant sur la route.</p>
+    <div class="box">
+      <svg viewBox="0 0 400 130" role="img" aria-label="Une voiture roule vers la droite avec une flèche de vitesse ; formule Ec égale un demi de m fois v au carré" style="width:100%;height:auto">
+        <rect x="0" y="92" width="400" height="30" fill="var(--road)"></rect>
+        <line x1="0" y1="107" x2="400" y2="107" stroke="#fff" stroke-width="2" stroke-dasharray="18 14"></line>
+        <rect x="40" y="62" width="96" height="26" rx="6" fill="var(--two)"></rect>
+        <path d="M58 62 L72 44 L112 44 L124 62 Z" fill="var(--two)"></path>
+        <path d="M76 48 L90 48 L90 61 L66 61 Z M95 48 L110 48 L119 61 L95 61 Z" fill="var(--paper)"></path>
+        <circle cx="64" cy="90" r="10" fill="var(--ink)"></circle><circle cx="114" cy="90" r="10" fill="var(--ink)"></circle>
+        <line x1="148" y1="66" x2="214" y2="66" stroke="var(--acc)" stroke-width="4"></line>
+        <path d="M214 58 L230 66 L214 74 Z" fill="var(--acc)"></path>
+        <text x="180" y="56" text-anchor="middle" font-size="16" font-weight="600" fill="var(--acc)">v</text>
+        <text x="320" y="44" text-anchor="middle" font-size="20" font-weight="600">Ec = ½ × m × v²</text>
+        <text x="320" y="70" text-anchor="middle" font-size="13" fill="var(--ink-soft)">kg · m/s → joules</text>
+      </svg>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · L'idée et les unités</span>
+    <h2>L'énergie du mouvement</h2>
+    <p>Un objet qui bouge possède de l'<strong>énergie cinétique</strong>, notée <strong>E<sub>c</sub></strong>. Tu l'as déjà croisée dans le tutoriel sur <a class="tlink" href="les-formes-d-energie.html">les formes d'énergie</a>, avec le skateur dans sa rampe. Ici, on la calcule pour de vrai, et on regarde ce qu'elle change sur la route.</p>
+    <div class="formula">E<sub>c</sub> = ½ × <b>m</b> × <b>v</b>²</div>
+    <p>Avec <strong>m</strong> la masse en <strong>kilogrammes (kg)</strong> et <strong>v</strong> la vitesse en <strong>mètres par seconde (m/s)</strong>, on obtient E<sub>c</sub> en <strong>joules (J)</strong>. Si tu mets la vitesse en km/h, le résultat est faux : <span class="hl">il faut d'abord convertir</span>.</p>
+    <div class="note">
+      <span class="note-title">Pourquoi diviser par 3,6 ?</span>
+      <span>50 km/h, c'est 50 km en 1 heure, donc 50 000 m en 3 600 s. En 1 seconde : 50 000 ÷ 3 600 ≈ 13,9 m. Diviser par 3 600 puis multiplier par 1 000, c'est diviser par 3,6. Donc <strong>km/h ÷ 3,6 = m/s</strong> et <strong>m/s × 3,6 = km/h</strong>. Le tutoriel sur <a class="tlink" href="les-conversions.html">les conversions</a> et le tutoriel sur <a class="tlink" href="la-vitesse.html">la vitesse</a> détaillent ces passages.</span>
+    </div>
+    <div class="box">
+      <h3>Le convertisseur</h3>
+      <div class="inputs">
+        <label for="cvK">Vitesse en km/h<input id="cvK" type="text" inputmode="decimal" autocomplete="off" value="50"></label>
+        <label for="cvM">Vitesse en m/s<input id="cvM" type="text" inputmode="decimal" autocomplete="off" value=""></label>
+      </div>
+      <p class="mono" id="cvOut" aria-live="polite" style="overflow-wrap:anywhere"></p>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · Le calcul pas à pas</span>
+    <h2>Combien d'énergie emporte chacun ?</h2>
+    <p>Choisis un exemple ou écris tes propres valeurs. La page fait le calcul dans le bon ordre : conversion, carré, puis multiplication. Les masses sont des ordres de grandeur (passager et véhicule compris).</p>
+    <div class="box">
+      <div class="btns" id="ecPresets" role="group" aria-label="Exemples de véhicules"></div>
+      <div class="inputs">
+        <label for="ecM">Masse m (kg)<input id="ecM" type="text" inputmode="decimal" autocomplete="off" value="1200"></label>
+        <label for="ecV">Vitesse (km/h)<input id="ecV" type="text" inputmode="decimal" autocomplete="off" value="50"></label>
+      </div>
+      <div class="methods" id="ecSteps" aria-live="polite"></div>
+      <p class="soft" id="ecCmp"></p>
+    </div>
+    <div class="note blue">
+      <span class="note-title">Les ordres de grandeur</span>
+      <span>Un piéton qui marche : quelques dizaines de joules. Un vélo : environ un millier de joules (1 kJ). Une voiture en ville : une centaine de kilojoules. Une voiture sur l'autoroute : presque un million de joules. Un camion : plusieurs millions de joules (des mégajoules, MJ). Il y a un facteur de plus de 10 000 entre le piéton et la voiture sur l'autoroute.</span>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · L'effet du carré</span>
+    <h2>Deux fois plus vite, quatre fois plus d'énergie</h2>
+    <p>La masse compte une fois : deux fois plus lourd, deux fois plus d'énergie. Mais la vitesse est <strong>au carré</strong>. Si la vitesse est multipliée par 2, v² est multiplié par 2 × 2 = <strong>4</strong>. Par 3, il est multiplié par 9. Bouge le curseur pour une voiture de 1 200 kg.</p>
+    <div class="box">
+      <div class="params">
+        <div class="param">
+          <label for="sqV">Vitesse de départ : <span class="mono" id="sqVOut">30</span> km/h</label>
+          <input id="sqV" type="range" min="10" max="65" step="5" value="30">
+        </div>
+        <div class="grp">
+          <span>Vitesse multipliée par</span>
+          <div class="btns" id="sqK" role="group" aria-label="Facteur de vitesse"></div>
+        </div>
+      </div>
+      <div class="sim"><svg id="sqBars" viewBox="0 0 400 200" role="img" aria-label="Deux barres comparent l'énergie cinétique aux deux vitesses"></svg></div>
+      <p class="mono" id="sqOut" aria-live="polite" style="overflow-wrap:anywhere"></p>
+      <div class="sim"><svg id="sqCurve" viewBox="0 0 400 230" role="img" aria-label="Courbe de l'énergie cinétique en fonction de la vitesse : une parabole"></svg></div>
+      <p class="soft">La courbe n'est pas une droite : E<sub>c</sub> n'est <strong>pas proportionnelle</strong> à la vitesse. C'est une parabole, la courbe de la fonction carré (voir le tutoriel sur <a class="tlink" href="les-fonctions.html">les fonctions</a> et le tutoriel sur <a class="tlink" href="les-puissances.html">les puissances</a>).</p>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · La chute équivalente</span>
+    <h2>Un choc à 50 km/h, c'est comme tomber de 10 m</h2>
+    <p>Un objet qui tombe de la hauteur h arrive en bas avec la même énergie cinétique que s'il roulait à une certaine vitesse. Comme E<sub>p</sub> = m × g × h devient ½ × m × v², la masse se simplifie et on trouve la <strong>hauteur équivalente</strong> :</p>
+    <div class="formula">h = <b>v</b>² ÷ (2 × g) <span class="soft" style="font-size:.9rem">avec g ≈ 9,8 N/kg</span></div>
+    <p>Sans frottement de l'air, bien sûr : c'est un modèle. Mais l'ordre de grandeur est juste. Et comme m a disparu, c'est vrai pour une voiture, un vélo ou un passager.</p>
+    <div class="box">
+      <div class="param">
+        <label for="hV">Vitesse au moment du choc : <span class="mono" id="hVOut">50</span> km/h</label>
+        <input id="hV" type="range" min="10" max="130" step="5" value="50">
+      </div>
+      <div class="sim"><svg id="hSvg" viewBox="0 0 400 330" role="img" aria-label="Un immeuble avec une ligne à la hauteur de chute équivalente"></svg></div>
+      <p id="hOut" class="mono" aria-live="polite" style="overflow-wrap:anywhere"></p>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · La distance d'arrêt</span>
+    <h2>Réagir, puis freiner</h2>
+    <p>Quand un obstacle apparaît, la voiture ne s'arrête pas sur place. Il y a deux morceaux :</p>
+    <div class="cards">
+      <div class="box"><span class="tag two">Réaction</span><strong>Le temps de voir et d'appuyer</strong><span class="soft">Le cerveau voit, décide, le pied passe sur la pédale. Environ <strong>1 s</strong> pour quelqu'un d'attentif. Pendant ce temps, la voiture roule à pleine vitesse : d<sub>R</sub> = v × t<sub>R</sub>. Fatigue, téléphone ou alcool allongent ce temps.</span></div>
+      <div class="box"><span class="tag acc">Freinage</span><strong>Le temps de perdre l'énergie</strong><span class="soft">Les freins changent l'énergie cinétique en chaleur (les disques chauffent). Comme E<sub>c</sub> dépend de v², la distance de freinage aussi : 2 fois plus vite, environ <strong>4 fois plus long</strong>.</span></div>
+    </div>
+    <div class="formula">d<sub>A</sub> = <b>v × t<sub>R</sub></b> + <b>v² ÷ (2 × a)</b></div>
+    <p class="soft">Ici, <strong>a</strong> dit à quel point la voiture ralentit vite (en m/s², une décélération). <strong>Modèle simplifié, valeurs environ</strong> : a ≈ 8 m/s² sur route sèche, 5 sur route mouillée, 1 sur du verglas. Les vraies valeurs dépendent des pneus, des freins et de la route.</p>
+    <div class="box">
+      <div class="params">
+        <div class="grp"><span>État de la route</span><div class="btns" id="daRoad" role="group" aria-label="État de la route"></div></div>
+        <div class="param">
+          <label for="daT">Temps de réaction : <span class="mono" id="daTOut">1</span> s</label>
+          <input id="daT" type="range" min="0.5" max="3" step="0.1" value="1">
+        </div>
+      </div>
+      <div class="legend"><span><i style="background:var(--two)"></i>distance de réaction</span><span><i style="background:var(--acc)"></i>distance de freinage</span></div>
+      <div class="sim"><svg id="daSvg" viewBox="0 0 400 240" role="img" aria-label="Barres de distance d'arrêt pour plusieurs vitesses"></svg></div>
+      <p class="soft" id="daOut" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · La simulation</span>
+    <h2>S'arrêtera-t-elle à temps ?</h2>
+    <p>Un enfant traverse sur un passage piéton. Le conducteur le voit quand il est à une certaine distance devant lui. Règle la vitesse, la route et le temps de réaction : le résultat s'affiche tout de suite. L'animation est en bonus.</p>
+    <div class="box">
+      <div class="params">
+        <div class="param">
+          <label for="simV">Vitesse : <span class="mono" id="simVOut">50</span> km/h</label>
+          <input id="simV" type="range" min="10" max="130" step="5" value="50">
+        </div>
+        <div class="param">
+          <label for="simD">Enfant vu à : <span class="mono" id="simDOut">30</span> m</label>
+          <input id="simD" type="range" min="5" max="150" step="1" value="30">
+        </div>
+        <div class="grp"><span>Route</span><div class="btns" id="simRoad" role="group" aria-label="État de la route"></div></div>
+        <div class="grp"><span>Conducteur</span><div class="btns" id="simDriver" role="group" aria-label="État du conducteur"></div></div>
+      </div>
+      <div class="sim"><svg id="simSvg" viewBox="0 0 400 170" role="img" aria-label="Une route vue de côté avec la voiture, les zones de réaction et de freinage et l'enfant"></svg></div>
+      <div class="verdict" id="simOut" aria-live="polite"></div>
+      <div class="btns">
+        <button type="button" id="simPlay">▶ Animation</button>
+        <button type="button" id="simStep">Pas à pas</button>
+        <button type="button" id="simReset">↺ Début</button>
+      </div>
+      <p class="status" id="simStatus"></p>
+    </div>
+    <p class="soft">Temps de réaction des boutons « conducteur » : des exemples, valeurs environ. Le téléphone, la fatigue ou l'alcool ne font pas que rallonger ce temps : on peut aussi ne pas voir l'enfant du tout.</p>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · En ville</span>
+    <h2>30 ou 50 km/h ?</h2>
+    <p>Beaucoup de villes passent des rues à 30 km/h. Comparons deux voitures identiques, sur route sèche, conducteurs attentifs (1 s). Un enfant surgit à la même distance devant elles.</p>
+    <div class="box">
+      <div class="param">
+        <label for="cmpD">Enfant à : <span class="mono" id="cmpDOut">14</span> m</label>
+        <input id="cmpD" type="range" min="5" max="40" step="1" value="14">
+      </div>
+      <div class="sim"><svg id="cmpSvg" viewBox="0 0 400 200" role="img" aria-label="Deux voies : une voiture à 30 km/h et une à 50 km/h"></svg></div>
+      <div class="methods" id="cmpOut" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Ce qu'il faut voir</span>
+      <span>À 30 km/h, la voiture s'arrête en environ 13 m. À 50 km/h, en 13 m, le conducteur n'a même pas encore commencé à freiner : la distance de réaction seule fait déjà presque 14 m. Et l'énergie cinétique est (50 ÷ 30)² ≈ 2,8 fois plus grande.</span>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Se protéger</span>
+    <h2>Où va l'énergie pendant un choc ?</h2>
+    <p>L'énergie ne disparaît jamais. Lors d'un choc, l'énergie cinétique devient surtout de la <strong>déformation</strong> (la tôle se plie, la mousse s'écrase) et de la <strong>chaleur</strong>, avec un peu de son. Toutes les protections font la même chose : <span class="hl">étaler l'arrêt sur une plus grande distance</span>, pour que l'effort sur le corps soit plus petit.</p>
+    <div class="cards">
+      <div class="box"><span class="tag acc">Voiture</span><strong>La zone de déformation</strong><span class="soft">L'avant de la voiture est fait pour s'écraser comme un accordéon. La partie où sont assis les passagers, elle, reste rigide.</span></div>
+      <div class="box"><span class="tag two">Passager</span><strong>La ceinture et l'airbag</strong><span class="soft">La ceinture garde le passager attaché à la voiture, qui s'arrête en douceur grâce à sa zone de déformation. Elle s'étire un peu. L'airbag amortit la tête.</span></div>
+      <div class="box"><span class="tag ok">Deux-roues</span><strong>Le casque</strong><span class="soft">Sous la coque, une mousse (souvent du polystyrène) s'écrase de quelques centimètres et absorbe l'énergie. Un casque qui a subi un choc doit être changé.</span></div>
+    </div>
+    <div class="box">
+      <h3>Même énergie, distance différente</h3>
+      <p class="soft">Un passager de 70 kg, à 50 km/h. L'effort moyen pour l'arrêter est environ E<sub>c</sub> ÷ distance d'arrêt du choc (modèle simplifié).</p>
+      <div class="param">
+        <label for="crD">Distance sur laquelle il s'arrête : <span class="mono" id="crDOut">50</span> cm</label>
+        <input id="crD" type="range" min="5" max="100" step="5" value="50">
+      </div>
+      <div class="sim"><svg id="crSvg" viewBox="0 0 400 90" role="img" aria-label="Barre de l'effort moyen"></svg></div>
+      <p class="mono" id="crOut" aria-live="polite" style="overflow-wrap:anywhere"></p>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Un peu d'histoire</span>
+    <h2>De la « force vive » aux limitations de vitesse</h2>
+    <ol class="timeline">
+      <li><span class="when">fin du XVII<sup>e</sup> s.</span><div class="what"><strong>Leibniz et la « vis viva »</strong><span>Le savant allemand Leibniz propose qu'un corps en mouvement possède une « force vive » proportionnelle à m × v². Il s'oppose à ceux qui pensaient plutôt à m × v. Le débat dure des décennies.</span></div></li>
+      <li><span class="when">XVIII<sup>e</sup> s.</span><div class="what"><strong>Émilie du Châtelet</strong><span>Elle défend l'idée du v², en s'appuyant notamment sur des expériences de billes lâchées dans de l'argile : une bille deux fois plus rapide s'enfonce environ quatre fois plus.</span></div></li>
+      <li><span class="when">vers 1830</span><div class="what"><strong>Coriolis et le ½</strong><span>L'ingénieur français Gaspard-Gustave Coriolis, entre autres, met en avant la quantité ½ × m × v² et la relie au « travail » des forces. Le nom « énergie cinétique » s'impose plus tard, au XIX<sup>e</sup> siècle.</span></div></li>
+      <li><span class="when">fin des années 1950</span><div class="what"><strong>La ceinture à trois points</strong><span>La ceinture qui passe sur l'épaule et le bassin apparaît dans les voitures. Elle devient ensuite obligatoire dans de nombreux pays.</span></div></li>
+      <li><span class="when">années 1970</span><div class="what"><strong>Limitations et ceinture en France</strong><span>La France généralise les limitations de vitesse sur les routes et les autoroutes et rend la ceinture obligatoire à l'avant. Le nombre de morts sur les routes commence à baisser nettement.</span></div></li>
+      <li><span class="when">depuis les années 2000</span><div class="what"><strong>Radars, contrôles, zones 30</strong><span>Radars automatiques, contrôles d'alcool, casque obligatoire à vélo pour les jeunes enfants, puis des villes entières à 30 km/h : toutes ces mesures visent l'énergie au moment du choc.</span></div></li>
+    </ol>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · Attention</span>
+    <h2>Les erreurs fréquentes</h2>
+    <div class="box">
+      <ul class="errs">
+        <li><span class="bad">« Ec = ½ × 1 200 × 50² » pour une voiture à 50 km/h.</span><span class="good">On convertit d'abord : 50 km/h ÷ 3,6 ≈ 13,9 m/s. Avec des km/h, le résultat est environ 13 fois trop grand.</span></li>
+        <li><span class="bad">« Pour passer des km/h aux m/s, je multiplie par 3,6. »</span><span class="good">Une vitesse en m/s est un nombre plus petit : km/h ÷ 3,6 = m/s. On multiplie dans l'autre sens.</span></li>
+        <li><span class="bad">« 2 fois plus vite, 2 fois plus d'énergie. »</span><span class="good">La vitesse est au carré : 2 fois plus vite, c'est 4 fois plus d'énergie et une distance de freinage environ 4 fois plus longue.</span></li>
+        <li><span class="bad">« Ec = ½ × (m × v)². »</span><span class="good">Seule la vitesse est au carré : ½ × m × v². On calcule v² d'abord (priorités de calcul).</span></li>
+        <li><span class="bad">« La distance d'arrêt, c'est la distance de freinage. »</span><span class="good">Il faut ajouter la distance de réaction, parcourue à pleine vitesse avant même de freiner.</span></li>
+        <li><span class="bad">« Un camion à 50 km/h, c'est comme tomber de plus haut qu'une voiture à 50 km/h. »</span><span class="good">La hauteur équivalente h = v² ÷ (2 × g) ne dépend pas de la masse. Mais l'énergie du camion, elle, est bien plus grande.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Prends g = 9,8 N/kg. Écris tes réponses avec une virgule si besoin ; l'arrondi demandé est indiqué.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Nouvelles questions</button>
+    </div>
+  </section>
+
+  <!-- 12 -->
+  <section>
+    <span class="eyebrow">Étape 12 · À toi de jouer</span>
+    <h2>Sept problèmes</h2>
+    <div class="exos">
+      <details>
+        <summary>Les conversions<span class="q">Convertis 90 km/h en m/s, puis 15 m/s en km/h.</span></summary>
+        <div><span>90 ÷ 3,6 = <strong>25 m/s</strong>. Et 15 × 3,6 = <strong>54 km/h</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Le cycliste<span class="q">Un cycliste et son vélo pèsent 80 kg et roulent à 18 km/h. Calcule leur énergie cinétique.</span></summary>
+        <div><span>v = 18 ÷ 3,6 = 5 m/s. E<sub>c</sub> = ½ × 80 × 5² = 40 × 25 = <strong>1 000 J</strong>, soit 1 kJ.</span></div>
+      </details>
+      <details>
+        <summary>La voiture qui ralentit<span class="q">Une voiture de 1 000 kg roule à 72 km/h, puis à 36 km/h. Calcule E<sub>c</sub> dans les deux cas. Que remarques-tu ?</span></summary>
+        <div><span>72 km/h = 20 m/s : E<sub>c</sub> = ½ × 1 000 × 400 = <strong>200 000 J = 200 kJ</strong>. 36 km/h = 10 m/s : E<sub>c</sub> = ½ × 1 000 × 100 = <strong>50 kJ</strong>. La vitesse est divisée par 2, l'énergie par <strong>4</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Le téléphone<span class="q">À 90 km/h, quelle distance parcourt-on pendant le temps de réaction, avec t<sub>R</sub> = 1 s ? Et avec 2 s, en lisant un message ?</span></summary>
+        <div><span>v = 25 m/s. Avec 1 s : 25 × 1 = <strong>25 m</strong>. Avec 2 s : <strong>50 m</strong>, la longueur d'une piscine olympique, sans freiner du tout.</span></div>
+      </details>
+      <details>
+        <summary>Sèche ou mouillée ?<span class="q">Avec le modèle d<sub>F</sub> = v² ÷ (2 × a), calcule la distance de freinage à 90 km/h sur route sèche (a = 8 m/s²) puis mouillée (a = 5 m/s²). Puis la distance d'arrêt sur route sèche, avec 1 s de réaction.</span></summary>
+        <div><span>v = 25 m/s, v² = 625. Sèche : 625 ÷ 16 ≈ <strong>39 m</strong>. Mouillée : 625 ÷ 10 = <strong>62,5 m</strong>. Distance d'arrêt sur route sèche : 25 + 39 ≈ <strong>64 m</strong>.</span></div>
+      </details>
+      <details>
+        <summary>La hauteur équivalente<span class="q">Un choc à 72 km/h correspond à une chute de quelle hauteur ? À quel étage environ (un étage ≈ 3 m) ?</span></summary>
+        <div><span>v = 20 m/s. h = 20² ÷ (2 × 9,8) = 400 ÷ 19,6 ≈ <strong>20 m</strong>, soit environ le <strong>7<sup>e</sup> étage</strong>.</span></div>
+      </details>
+      <details>
+        <summary>À l'envers (défi)<span class="q">Un scooter avec son conducteur (160 kg) a une énergie cinétique de 10 000 J. À quelle vitesse roule-t-il, en km/h ?</span></summary>
+        <div><span>½ × 160 × v² = 10 000, donc 80 × v² = 10 000 et v² = 125. v = √125 ≈ <strong>11,2 m/s</strong>, et 11,2 × 3,6 ≈ <strong>40 km/h</strong>. La racine carrée est expliquée dans le tutoriel sur <a class="tlink" href="les-racines-carrees.html">les racines carrées</a>.</span></div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• <strong>E<sub>c</sub> = ½ × m × v²</strong>, avec m en kg, v en m/s et E<sub>c</sub> en joules (J).</span>
+      <span>• Conversion : <strong>km/h ÷ 3,6 = m/s</strong> ; m/s × 3,6 = km/h. 50 km/h ≈ 13,9 m/s.</span>
+      <span>• La vitesse est au carré : <strong>2 fois plus vite → 4 fois plus d'énergie</strong> (3 fois → 9 fois).</span>
+      <span>• Hauteur équivalente : h = v² ÷ (2 × g). Un choc à 50 km/h ≈ une chute d'environ 10 m (3<sup>e</sup> étage).</span>
+      <span>• <strong>Distance d'arrêt = distance de réaction + distance de freinage</strong>. Réaction : v × t<sub>R</sub> (t<sub>R</sub> ≈ 1 s, plus avec téléphone, fatigue, alcool). Freinage : proportionnelle à v², bien plus longue sur route mouillée ou verglacée.</span>
+      <span>• Lors d'un choc, l'énergie cinétique devient déformation et chaleur. Ceinture, casque et zone de déformation étalent l'arrêt sur une plus grande distance.</span>
+    </div>
+  </section>
+
+  <!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"><a class="prev" href="les-formes-d-energie.html"><span>← Précédent</span><strong>Les formes d&#x27;énergie</strong></a><a class="next" href="les-circuits-electriques.html"><span>Suivant →</span><strong>Les circuits électriques</strong></a></div><a class="tnav-home" href="physique.html">⌂ Tous les tutoriels de physique</a></nav><!--/tnav-->
+<footer>Fiche de révision · L'énergie cinétique et la sécurité routière</footer>
+</main>
+
+<script>
+(function () {
+  /* Fonctions exposées sur window.__ec (unités SI : kg, m, s, J) :
+     kmhToMs(kmh) → m/s (÷ 3,6) ; msToKmh(ms) → km/h (× 3,6)
+     ec(m, v) → ½ × m × v² en J (v en m/s) ; ecKmh(m, kmh) → idem avec v en km/h
+     heightEquiv(v [, g]) → v² ÷ (2g) en m (g = 9,8 par défaut)
+     reactionDist(v, tR) → v × tR ; brakingDist(v, a) → v² ÷ (2a) ; stopDist(v, tR, a) → somme
+     ROADS → { seche: 8, mouillee: 5, verglas: 1 } (décélérations en m/s², modèle simplifié)
+     crossing(kmh, a, tR, D) → { v, dr, df, d, stops, margin, vImpact, vImpactKmh, tEnd }
+       la voiture voit l'enfant à D m ; stops = true si elle s'arrête avant (d ≤ D) ; sinon vitesse au choc
+     motion(v, a, tR, t) → { s, v } position (m) et vitesse (m/s) à l'instant t
+     crushForce(E, dMetres) → effort moyen E ÷ d en N */
+  var NS = 'http://www.w3.org/2000/svg', G = 9.8;
+  var ROADS = { seche: 8, mouillee: 5, verglas: 1 };
+  function fmt(x, d) { var r = Math.round(x * 1e6) / 1e6; if (Object.is(r, -0)) r = 0; return r.toLocaleString('fr-FR', { maximumFractionDigits: d == null ? 3 : d }).replace('-', '−'); }
+  function num(s) { var t = String(s).replace(/\s/g, '').replace(/[−–]/g, '-').replace(',', '.'); if (t === '') return NaN; var x = Number(t); return isFinite(x) ? x : NaN; }
+  function mk(svg, name, attrs, text) { var e = document.createElementNS(NS, name); for (var a in attrs) e.setAttribute(a, attrs[a]); if (text != null) e.textContent = text; svg.appendChild(e); return e; }
+  function clear(svg) { while (svg.firstChild) svg.removeChild(svg.firstChild); }
+  function exact(x, d) { var p = Math.pow(10, d); return Math.abs(x * p - Math.round(x * p)) < 1e-6; }
+  function eq(x, d) { return exact(x, d) ? '= ' : '≈ '; }
+  function $(id) { return document.getElementById(id); }
+
+  function kmhToMs(k) { return k / 3.6; }
+  function msToKmh(v) { return v * 3.6; }
+  function ec(m, v) { return 0.5 * m * v * v; }
+  function ecKmh(m, k) { return ec(m, kmhToMs(k)); }
+  function heightEquiv(v, g) { return v * v / (2 * (g || G)); }
+  function reactionDist(v, t) { return v * t; }
+  function brakingDist(v, a) { return v * v / (2 * a); }
+  function stopDist(v, t, a) { return reactionDist(v, t) + brakingDist(v, a); }
+  function crossing(kmh, a, tR, D) {
+    var v = kmhToMs(kmh), dr = reactionDist(v, tR), df = brakingDist(v, a), d = dr + df, r = { v: v, dr: dr, df: df, d: d };
+    if (d <= D + 1e-9) { r.stops = true; r.margin = D - d; r.vImpact = 0; r.vImpactKmh = 0; r.tEnd = tR + v / a; return r; }
+    r.stops = false; r.margin = 0;
+    if (D <= dr) { r.vImpact = v; r.tEnd = D / v; }
+    else { var vi = Math.sqrt(Math.max(0, v * v - 2 * a * (D - dr))); r.vImpact = vi; r.tEnd = tR + (v - vi) / a; }
+    r.vImpactKmh = msToKmh(r.vImpact);
+    return r;
+  }
+  function motion(v, a, tR, t) {
+    if (t <= tR) return { s: v * t, v: v };
+    var tb = Math.min(t - tR, v / a);
+    return { s: v * tR + v * tb - 0.5 * a * tb * tb, v: v - a * tb };
+  }
+  function crushForce(E, d) { return E / d; }
+  function fmtE(J) {
+    if (J < 1000) return fmt(J, 0) + ' J';
+    if (J < 1e6) return fmt(J / 1000, 1) + ' kJ';
+    return fmt(J / 1e6, 2) + ' MJ';
+  }
+  window.__ec = { kmhToMs: kmhToMs, msToKmh: msToKmh, ec: ec, ecKmh: ecKmh, heightEquiv: heightEquiv, reactionDist: reactionDist, brakingDist: brakingDist, stopDist: stopDist, ROADS: ROADS, crossing: crossing, motion: motion, crushForce: crushForce };
+
+  function toggleGroup(container, items, onPick, initial) {
+    var btns = [];
+    items.forEach(function (it, i) {
+      var b = document.createElement('button'); b.type = 'button'; b.textContent = it.label;
+      b.setAttribute('aria-pressed', i === initial ? 'true' : 'false');
+      b.addEventListener('click', function () { btns.forEach(function (x, j) { x.setAttribute('aria-pressed', j === i ? 'true' : 'false'); }); onPick(it, i); });
+      container.appendChild(b); btns.push(b);
+    });
+    return btns;
+  }
+  var roadItems = [{ label: 'Sèche', a: ROADS.seche, name: 'sèche' }, { label: 'Mouillée', a: ROADS.mouillee, name: 'mouillée' }, { label: 'Verglas', a: ROADS.verglas, name: 'verglacée' }];
+
+  /* ---------- Étape 1 : convertisseur ---------- */
+  var cvK = $('cvK'), cvM = $('cvM');
+  function convFromK() {
+    var k = num(cvK.value), out = $('cvOut');
+    if (isNaN(k) || k < 0) { out.innerHTML = '<span class="err">Écris une vitesse positive.</span>'; cvM.value = ''; return; }
+    var v = kmhToMs(k); cvM.value = fmt(v, 2);
+    out.textContent = fmt(k) + ' km/h = ' + fmt(k * 1000) + ' m en 3 600 s → ' + fmt(k) + ' ÷ 3,6 ' + eq(v, 2) + fmt(v, 2) + ' m/s';
+  }
+  function convFromM() {
+    var v = num(cvM.value), out = $('cvOut');
+    if (isNaN(v) || v < 0) { out.innerHTML = '<span class="err">Écris une vitesse positive.</span>'; cvK.value = ''; return; }
+    var k = msToKmh(v); cvK.value = fmt(k, 2);
+    out.textContent = fmt(v) + ' m/s × 3,6 ' + eq(k, 2) + fmt(k, 2) + ' km/h (en 1 h = 3 600 s, on fait ' + fmt(v * 3600) + ' m)';
+  }
+  cvK.addEventListener('input', convFromK); cvM.addEventListener('input', convFromM); convFromK();
+
+  /* ---------- Étape 2 : calculatrice ---------- */
+  var ecPresets = [
+    { label: 'Piéton', m: 70, k: 5 }, { label: 'Vélo', m: 85, k: 20 }, { label: 'Scooter', m: 170, k: 45 },
+    { label: 'Voiture 30', m: 1200, k: 30 }, { label: 'Voiture 50', m: 1200, k: 50 }, { label: 'Voiture 80', m: 1200, k: 80 },
+    { label: 'Voiture 130', m: 1200, k: 130 }, { label: 'Camion', m: 38000, k: 80 }
+  ];
+  var ecM = $('ecM'), ecV = $('ecV');
+  var ecBtns = toggleGroup($('ecPresets'), ecPresets, function (p) { ecM.value = fmt(p.m); ecV.value = fmt(p.k); calcEc(true); }, 4);
+  function calcEc(fromPreset) {
+    if (!fromPreset) ecBtns.forEach(function (b) { b.setAttribute('aria-pressed', 'false'); });
+    var m = num(ecM.value), k = num(ecV.value), out = $('ecSteps'), cmp = $('ecCmp');
+    if (isNaN(m) || isNaN(k) || m <= 0 || k < 0) { out.innerHTML = '<p class="err">Écris une masse strictement positive et une vitesse positive.</p>'; cmp.textContent = ''; return; }
+    var v = kmhToMs(k), v2 = v * v, E = ec(m, v), ref = ecKmh(1200, 50);
+    out.innerHTML =
+      '<div class="method"><strong>1. Convertir</strong><span class="m">v = ' + fmt(k) + ' ÷ 3,6 ' + eq(v, 2) + fmt(v, 2) + ' m/s</span></div>' +
+      '<div class="method"><strong>2. Le carré</strong><span class="m">v² ' + eq(v2, 1) + fmt(v2, 1) + ' m²/s²</span></div>' +
+      '<div class="method"><strong>3. Multiplier</strong><span class="m">E<sub>c</sub> = ½ × ' + fmt(m) + ' × ' + fmt(v2, 1) + '</span><span class="m"><b>' + eq(E, 0) + fmt(E, 0) + ' J</b></span>' + (E >= 1000 ? '<span class="m">soit ' + fmtE(E) + '</span>' : '') + '</div>';
+    var r = E / ref, txt;
+    if (E === 0) txt = 'À l\'arrêt, il n\'y a pas d\'énergie cinétique.';
+    else if (Math.abs(r - 1) < 1e-9) txt = 'C\'est la référence : une voiture de 1 200 kg à 50 km/h.';
+    else if (r >= 1) txt = 'Environ ' + fmt(r, r < 10 ? 1 : 0) + ' fois l\'énergie d\'une voiture de 1 200 kg à 50 km/h.';
+    else txt = 'Environ ' + fmt(1 / r, 1 / r < 10 ? 1 : 0) + ' fois moins que l\'énergie d\'une voiture de 1 200 kg à 50 km/h.';
+    cmp.textContent = txt + ' Hauteur de chute équivalente : environ ' + fmt(heightEquiv(v), 1) + ' m.';
+  }
+  ecM.addEventListener('input', function () { calcEc(false); }); ecV.addEventListener('input', function () { calcEc(false); }); calcEc(true);
+
+  /* ---------- Étape 3 : l'effet du carré ---------- */
+  var sqV = $('sqV'), sqFactor = 2;
+  toggleGroup($('sqK'), [{ label: '× 1,5', k: 1.5 }, { label: '× 2', k: 2 }, { label: '× 3', k: 3 }], function (it) { sqFactor = it.k; drawSq(); }, 1);
+  function drawSq() {
+    var k1 = parseInt(sqV.value, 10), k2 = k1 * sqFactor, m = 1200, E1 = ecKmh(m, k1), E2 = ecKmh(m, k2), ratio = sqFactor * sqFactor;
+    $('sqVOut').textContent = k1;
+    var svg = $('sqBars'); clear(svg);
+    var base = 170, top = 26, Hmax = base - top, w = 90, x1 = 80, x2 = 230, h1 = Hmax * E1 / E2;
+    mk(svg, 'line', { x1: 40, y1: base, x2: 370, y2: base, stroke: 'var(--ink)', 'stroke-width': 2 });
+    mk(svg, 'rect', { x: x1, y: base - h1, width: w, height: h1, fill: 'var(--two)' });
+    mk(svg, 'rect', { x: x2, y: top, width: w, height: Hmax, fill: 'var(--acc)' });
+    for (var i = 1; i * E1 < E2 - 1e-6; i++) {
+      var y = base - Hmax * i * E1 / E2;
+      mk(svg, 'line', { x1: x2, y1: y, x2: x2 + w, y2: y, stroke: 'var(--card)', 'stroke-width': 2, 'stroke-dasharray': '5 4' });
+    }
+    mk(svg, 'text', { x: x1 + w / 2, y: base + 20, 'text-anchor': 'middle', 'font-size': 14 }, k1 + ' km/h');
+    mk(svg, 'text', { x: x2 + w / 2, y: base + 20, 'text-anchor': 'middle', 'font-size': 14 }, fmt(k2) + ' km/h');
+    mk(svg, 'text', { x: x1 + w / 2, y: base - h1 - 8, 'text-anchor': 'middle', 'font-size': 14 }, fmtE(E1));
+    mk(svg, 'text', { x: x2 + w / 2, y: top - 8, 'text-anchor': 'middle', 'font-size': 14 }, fmtE(E2));
+    mk(svg, 'text', { x: x2 + w + 8, y: base - Hmax / 2, 'font-size': 16, 'font-weight': 600, fill: 'var(--acc)' }, '× ' + fmt(ratio, 2));
+    $('sqOut').textContent = 'Vitesse × ' + fmt(sqFactor) + ' → v² × ' + fmt(sqFactor) + ' × ' + fmt(sqFactor) + ' = × ' + fmt(ratio, 2) + '. ' + fmtE(E1) + ' × ' + fmt(ratio, 2) + ' ≈ ' + fmtE(E2) + '. Les pointillés découpent la grande barre en morceaux de la taille de la petite.';
+    // courbe
+    var c = $('sqCurve'); clear(c);
+    var L = 52, R = 14, T = 14, B = 34, W = 400, H = 230, vmax = Math.max(140, Math.ceil(k2 / 20) * 20), Emax = ecKmh(m, vmax);
+    function X(k) { return L + k / vmax * (W - L - R); } function Y(E) { return H - B - E / Emax * (H - B - T); }
+    var stepK = vmax <= 140 ? 20 : 40;
+    for (var g = 0; g <= vmax; g += stepK) {
+      mk(c, 'line', { x1: X(g), y1: T, x2: X(g), y2: H - B, stroke: 'var(--line)' });
+      mk(c, 'text', { x: X(g), y: H - B + 18, 'text-anchor': 'middle', 'font-size': 12 }, g);
+    }
+    var eStep = Emax > 2e6 ? 500000 : 200000;
+    for (var e = 0; e <= Emax; e += eStep) {
+      mk(c, 'line', { x1: L, y1: Y(e), x2: W - R, y2: Y(e), stroke: 'var(--line)' });
+      mk(c, 'text', { x: L - 5, y: Y(e) + 4, 'text-anchor': 'end', 'font-size': 12 }, fmt(e / 1000));
+    }
+    mk(c, 'text', { x: W - R, y: H - 4, 'text-anchor': 'end', 'font-size': 12, fill: 'var(--ink-soft)' }, 'vitesse (km/h)');
+    mk(c, 'text', { x: L + 4, y: T + 12, 'font-size': 12, fill: 'var(--ink-soft)' }, 'Ec (kJ)');
+    mk(c, 'line', { x1: L, y1: H - B, x2: W - R, y2: H - B, stroke: 'var(--ink)', 'stroke-width': 2 });
+    mk(c, 'line', { x1: L, y1: T, x2: L, y2: H - B, stroke: 'var(--ink)', 'stroke-width': 2 });
+    var d = '';
+    for (var s = 0; s <= 60; s++) { var kk = vmax * s / 60; d += (s ? 'L' : 'M') + X(kk).toFixed(1) + ' ' + Y(ecKmh(m, kk)).toFixed(1); }
+    mk(c, 'path', { d: d, fill: 'none', stroke: 'var(--ink)', 'stroke-width': 2.5 });
+    [[k1, E1, 'var(--two)'], [k2, E2, 'var(--acc)']].forEach(function (p) {
+      mk(c, 'line', { x1: X(p[0]), y1: H - B, x2: X(p[0]), y2: Y(p[1]), stroke: p[2], 'stroke-dasharray': '4 4', 'stroke-width': 1.5 });
+      mk(c, 'line', { x1: L, y1: Y(p[1]), x2: X(p[0]), y2: Y(p[1]), stroke: p[2], 'stroke-dasharray': '4 4', 'stroke-width': 1.5 });
+      mk(c, 'circle', { cx: X(p[0]), cy: Y(p[1]), r: 6, fill: p[2], stroke: 'var(--card)', 'stroke-width': 2 });
+    });
+  }
+  sqV.addEventListener('input', drawSq); drawSq();
+
+  /* ---------- Étape 4 : l'immeuble ---------- */
+  var hV = $('hV');
+  function drawH() {
+    var k = parseInt(hV.value, 10), v = kmhToMs(k), h = heightEquiv(v), floor = Math.round(h / 3);
+    $('hVOut').textContent = k;
+    var svg = $('hSvg'); clear(svg);
+    var ground = 310, ppm = 4, floors = 23, bx = 150, bw = 100;
+    mk(svg, 'rect', { x: 0, y: ground, width: 400, height: 20, fill: 'var(--road)' });
+    mk(svg, 'rect', { x: bx, y: ground - floors * 3 * ppm, width: bw, height: floors * 3 * ppm, fill: 'var(--card)', stroke: 'var(--ink)', 'stroke-width': 2 });
+    for (var f = 0; f < floors; f++) {
+      var fy = ground - (f + 1) * 3 * ppm;
+      if (f > 0) mk(svg, 'line', { x1: bx, y1: ground - f * 3 * ppm, x2: bx + bw, y2: ground - f * 3 * ppm, stroke: 'var(--line)' });
+      for (var wdw = 0; wdw < 4; wdw++) mk(svg, 'rect', { x: bx + 10 + wdw * 22, y: fy + 3, width: 14, height: 6, fill: 'var(--two-soft)' });
+      if (f > 0 && f % 5 === 0) mk(svg, 'text', { x: bx + bw + 8, y: ground - f * 3 * ppm + 4, 'font-size': 11, fill: 'var(--ink-soft)' }, f + 'ᵉ ét.');
+    }
+    mk(svg, 'text', { x: bx + bw + 8, y: ground - 2, 'font-size': 12, fill: 'var(--ink-soft)' }, 'RDC');
+    // échelle en mètres à gauche
+    for (var mm = 0; mm <= 60; mm += 20) {
+      mk(svg, 'line', { x1: 52, y1: ground - mm * ppm, x2: 60, y2: ground - mm * ppm, stroke: 'var(--ink)' });
+      mk(svg, 'text', { x: 48, y: ground - mm * ppm + 4, 'text-anchor': 'end', 'font-size': 12 }, mm + ' m');
+    }
+    mk(svg, 'line', { x1: 60, y1: ground, x2: 60, y2: ground - 66 * ppm, stroke: 'var(--ink)' });
+    var y = ground - Math.min(h, 72) * ppm;
+    mk(svg, 'rect', { x: 64, y: y, width: 22, height: ground - y, fill: 'var(--acc-soft)' });
+    mk(svg, 'line', { x1: 60, y1: y, x2: 304, y2: y, stroke: 'var(--acc)', 'stroke-width': 3 });
+    mk(svg, 'circle', { cx: 75, cy: y, r: 6, fill: 'var(--acc)' });
+    var ty = y + 5;
+    mk(svg, 'text', { x: 396, y: ty, 'text-anchor': 'end', 'font-size': 14, 'font-weight': 600, fill: 'var(--acc)' }, 'h ≈ ' + fmt(h, 1) + ' m');
+    var where = h < 1.5 ? 'moins d\'un étage (≈ ' + fmt(h * 100, 0) + ' cm)' : floor <= 0 ? 'moins d\'un étage' : floor === 1 ? 'environ le 1er étage' : 'environ le ' + floor + 'ᵉ étage';
+    $('hOut').textContent = 'v = ' + k + ' ÷ 3,6 ≈ ' + fmt(v, 2) + ' m/s → h = ' + fmt(v, 2) + '² ÷ (2 × 9,8) ≈ ' + fmt(h, 1) + ' m : ' + where + ' (un étage ≈ 3 m).';
+  }
+  hV.addEventListener('input', drawH); drawH();
+
+  /* ---------- Étape 5 : distances d'arrêt ---------- */
+  var daA = ROADS.seche, daT = $('daT'), daName = 'sèche';
+  toggleGroup($('daRoad'), roadItems, function (it) { daA = it.a; daName = it.name; drawDa(); }, 0);
+  function drawDa() {
+    var tR = parseFloat(daT.value), speeds = [30, 50, 80, 90, 110, 130], svg = $('daSvg'); clear(svg);
+    $('daTOut').textContent = fmt(tR, 1);
+    var rows = speeds.map(function (k) { var v = kmhToMs(k); return { k: k, dr: reactionDist(v, tR), df: brakingDist(v, daA) }; });
+    var maxD = Math.max.apply(null, rows.map(function (r) { return r.dr + r.df; }));
+    var L = 74, Rx = 330, rowH = 36, top = 12;
+    rows.forEach(function (r, i) {
+      var y = top + i * rowH, wr = (Rx - L) * r.dr / maxD, wf = (Rx - L) * r.df / maxD;
+      mk(svg, 'text', { x: L - 8, y: y + 19, 'text-anchor': 'end', 'font-size': 13 }, r.k + ' km/h');
+      mk(svg, 'rect', { x: L, y: y + 4, width: wr, height: 22, fill: 'var(--two)' });
+      mk(svg, 'rect', { x: L + wr, y: y + 4, width: wf, height: 22, fill: 'var(--acc)' });
+      mk(svg, 'text', { x: 396, y: y + 19, 'text-anchor': 'end', 'font-size': 13, 'font-weight': 600 }, fmt(r.dr + r.df, 0) + ' m');
+    });
+    var r50 = rows[1];
+    $('daOut').textContent = 'Route ' + daName + ', réaction ' + fmt(tR, 1) + ' s. À 50 km/h : ' + fmt(r50.dr, 1) + ' m de réaction + ' + fmt(r50.df, 1) + ' m de freinage = ' + fmt(r50.dr + r50.df, 1) + ' m. À 130 km/h : ' + fmt(rows[5].dr + rows[5].df, 0) + ' m (la barre la plus longue fait toute la largeur ; l\'échelle change avec la route).';
+  }
+  daT.addEventListener('input', drawDa); drawDa();
+
+  /* ---------- Étape 6 : simulation ---------- */
+  var simV = $('simV'), simD = $('simD'), simA = ROADS.seche, simT = 1, simRes = null, simTime = 0, raf = null, lastTs = null;
+  toggleGroup($('simRoad'), roadItems, function (it) { simA = it.a; simUpdate(); }, 0);
+  toggleGroup($('simDriver'), [{ label: 'Attentif · 1 s', t: 1 }, { label: 'Fatigué · 1,5 s', t: 1.5 }, { label: 'Téléphone · 2 s', t: 2 }, { label: 'Alcool · 2 s', t: 2 }], function (it) { simT = it.t; simUpdate(); }, 0);
+  function stopAnim() { if (raf) cancelAnimationFrame(raf); raf = null; lastTs = null; $('simPlay').textContent = '▶ Animation'; }
+  function simUpdate() {
+    stopAnim(); simTime = 0;
+    var k = parseInt(simV.value, 10), D = parseInt(simD.value, 10);
+    $('simVOut').textContent = k; $('simDOut').textContent = D;
+    simRes = crossing(k, simA, simT, D); simRes.k = k; simRes.D = D;
+    var r = simRes, out = $('simOut');
+    var detail = '<span class="mono">Réaction : ' + fmt(r.v, 2) + ' × ' + fmt(simT, 1) + ' ≈ ' + fmt(r.dr, 1) + ' m · Freinage : ' + fmt(r.v, 2) + '² ÷ (2 × ' + simA + ') ≈ ' + fmt(r.df, 1) + ' m · Arrêt : ' + fmt(r.d, 1) + ' m</span>';
+    if (r.stops) {
+      out.className = 'verdict yes';
+      out.innerHTML = 'La voiture s\'arrête à temps, ' + fmt(r.margin, 1) + ' m avant le passage.' + detail;
+    } else if (r.D <= r.dr) {
+      out.className = 'verdict no';
+      out.innerHTML = 'Elle ne s\'arrête pas : le conducteur n\'a pas encore commencé à freiner quand elle arrive au passage, toujours à ' + k + ' km/h.' + detail + '<span>Il aurait fallu voir l\'enfant au moins ' + fmt(r.d, 1) + ' m avant.</span>';
+    } else {
+      out.className = 'verdict no';
+      out.innerHTML = 'Elle ne s\'arrête pas à temps : elle arrive au passage à environ ' + fmt(r.vImpactKmh, 0) + ' km/h.' + detail + '<span>Il aurait fallu voir l\'enfant au moins ' + fmt(r.d, 1) + ' m avant.</span>';
+    }
+    drawSim();
+  }
+  function drawSim() {
+    var r = simRes, svg = $('simSvg'); clear(svg);
+    var Lm = Math.max(r.D, r.d) * 1.12 + 3, x0 = 44, x1 = 390;
+    function X(s) { return x0 + s / Lm * (x1 - x0); }
+    var roadTop = 78, roadH = 44;
+    mk(svg, 'rect', { x: 0, y: roadTop, width: 400, height: roadH, fill: 'var(--road)' });
+    mk(svg, 'rect', { x: X(0), y: roadTop + roadH + 4, width: Math.max(0, X(Math.min(r.dr, Lm)) - X(0)), height: 10, fill: 'var(--two)' });
+    mk(svg, 'rect', { x: X(r.dr), y: roadTop + roadH + 4, width: Math.max(0, X(Math.min(r.d, Lm)) - X(r.dr)), height: 10, fill: 'var(--acc)' });
+    // graduations
+    var steps = [5, 10, 20, 25, 50, 100, 200], st = 5;
+    for (var i = 0; i < steps.length; i++) { if (Lm / steps[i] <= 7) { st = steps[i]; break; } st = steps[i]; }
+    for (var g = 0; g <= Lm; g += st) {
+      mk(svg, 'line', { x1: X(g), y1: roadTop + roadH + 16, x2: X(g), y2: roadTop + roadH + 22, stroke: 'var(--ink)' });
+      mk(svg, 'text', { x: X(g), y: roadTop + roadH + 36, 'text-anchor': 'middle', 'font-size': 12 }, g + ' m');
+    }
+    // passage piéton
+    for (var z = 0; z < 5; z++) mk(svg, 'rect', { x: X(r.D) - 2, y: roadTop + 3 + z * 8.4, width: 12, height: 5, fill: '#fff' });
+    // enfant
+    var cx = X(r.D) + 4;
+    mk(svg, 'circle', { cx: cx, cy: roadTop - 40, r: 6, fill: 'var(--ok)' });
+    mk(svg, 'line', { x1: cx, y1: roadTop - 34, x2: cx, y2: roadTop - 16, stroke: 'var(--ok)', 'stroke-width': 4 });
+    mk(svg, 'line', { x1: cx, y1: roadTop - 16, x2: cx - 5, y2: roadTop - 4, stroke: 'var(--ok)', 'stroke-width': 3 });
+    mk(svg, 'line', { x1: cx, y1: roadTop - 16, x2: cx + 5, y2: roadTop - 4, stroke: 'var(--ok)', 'stroke-width': 3 });
+    mk(svg, 'line', { x1: cx - 7, y1: roadTop - 28, x2: cx + 7, y2: roadTop - 24, stroke: 'var(--ok)', 'stroke-width': 3 });
+    // marque d'arrêt
+    if (r.d <= Lm) {
+      mk(svg, 'line', { x1: X(r.d), y1: 14, x2: X(r.d), y2: roadTop + roadH, stroke: 'var(--acc)', 'stroke-dasharray': '4 4', 'stroke-width': 2 });
+      var anchor = X(r.d) > 300 ? 'end' : 'start';
+      mk(svg, 'text', { x: X(r.d) + (anchor === 'end' ? -4 : 4), y: 14, 'text-anchor': anchor, 'font-size': 12, fill: 'var(--acc)' }, 'arrêt ' + fmt(r.d, 0) + ' m');
+    }
+    // voiture
+    var t = Math.min(simTime, r.tEnd), mo = motion(r.v, simA, simT, t), s = Math.min(mo.s, r.stops ? r.d : r.D);
+    var cxr = X(s);
+    mk(svg, 'rect', { x: cxr - 34, y: roadTop - 4, width: 34, height: 14, rx: 4, fill: 'var(--two)' });
+    mk(svg, 'path', { d: 'M' + (cxr - 28) + ' ' + (roadTop - 4) + ' L' + (cxr - 22) + ' ' + (roadTop - 14) + ' L' + (cxr - 10) + ' ' + (roadTop - 14) + ' L' + (cxr - 4) + ' ' + (roadTop - 4) + ' Z', fill: 'var(--two)' });
+    mk(svg, 'circle', { cx: cxr - 26, cy: roadTop + 11, r: 5, fill: 'var(--ink)' });
+    mk(svg, 'circle', { cx: cxr - 8, cy: roadTop + 11, r: 5, fill: 'var(--ink)' });
+    var phase = simTime === 0 ? 'prêt' : (t < simT ? 'réaction (pas encore de freinage)' : (t >= r.tEnd - 1e-9 ? (r.stops ? 'arrêtée' : 'arrivée au passage') : 'freinage'));
+    var shownV = t >= r.tEnd - 1e-9 ? (r.stops ? 0 : r.vImpact) : mo.v;
+    $('simStatus').textContent = 't = ' + fmt(t, 2) + ' s · vitesse ' + fmt(msToKmh(shownV), 0) + ' km/h · parcouru ' + fmt(s, 1) + ' m · ' + phase;
+  }
+  function frame(ts) {
+    if (lastTs === null) lastTs = ts;
+    var rate = Math.max(1, simRes.tEnd / 4);
+    simTime += (ts - lastTs) / 1000 * rate; lastTs = ts;
+    if (simTime >= simRes.tEnd) { simTime = simRes.tEnd; drawSim(); stopAnim(); return; }
+    drawSim(); raf = requestAnimationFrame(frame);
+  }
+  $('simPlay').addEventListener('click', function () {
+    if (raf) { stopAnim(); return; }
+    if (simTime >= simRes.tEnd) simTime = 0;
+    $('simPlay').textContent = '⏸ Pause'; raf = requestAnimationFrame(frame);
+  });
+  $('simStep').addEventListener('click', function () {
+    stopAnim();
+    if (simTime >= simRes.tEnd) simTime = 0;
+    var dt = simRes.tEnd > 6 ? simRes.tEnd / 12 : 0.25;
+    simTime = Math.min(simRes.tEnd, simTime + dt); drawSim();
+  });
+  $('simReset').addEventListener('click', function () { stopAnim(); simTime = 0; drawSim(); });
+  simV.addEventListener('input', simUpdate); simD.addEventListener('input', simUpdate); simUpdate();
+
+  /* ---------- Étape 7 : 30 ou 50 ---------- */
+  var cmpD = $('cmpD');
+  function drawCmp() {
+    var D = parseInt(cmpD.value, 10), svg = $('cmpSvg'); clear(svg);
+    $('cmpDOut').textContent = D;
+    var Lm = 45, x0 = 44, x1 = 390;
+    function X(s) { return x0 + s / Lm * (x1 - x0); }
+    var html = '';
+    [30, 50].forEach(function (k, i) {
+      var r = crossing(k, ROADS.seche, 1, D), y = 30 + i * 80;
+      mk(svg, 'rect', { x: 0, y: y, width: 400, height: 40, fill: 'var(--road)' });
+      mk(svg, 'text', { x: 6, y: y - 8, 'font-size': 13, 'font-weight': 600 }, k + ' km/h');
+      mk(svg, 'rect', { x: X(0), y: y + 42, width: X(Math.min(r.dr, Lm)) - X(0), height: 6, fill: 'var(--two)' });
+      mk(svg, 'rect', { x: X(r.dr), y: y + 42, width: Math.max(0, X(Math.min(r.d, Lm)) - X(r.dr)), height: 6, fill: 'var(--acc)' });
+      for (var z = 0; z < 5; z++) mk(svg, 'rect', { x: X(D) - 2, y: y + 3 + z * 7.6, width: 10, height: 4, fill: '#fff' });
+      mk(svg, 'circle', { cx: X(D) + 3, cy: y - 12, r: 5, fill: 'var(--ok)' });
+      mk(svg, 'line', { x1: X(D) + 3, y1: y - 7, x2: X(D) + 3, y2: y + 2, stroke: 'var(--ok)', 'stroke-width': 4 });
+      var s = r.stops ? r.d : D, cx = X(s);
+      mk(svg, 'rect', { x: cx - 30, y: y + 14, width: 30, height: 14, rx: 4, fill: r.stops ? 'var(--two)' : 'var(--acc)' });
+      mk(svg, 'circle', { cx: cx - 23, cy: y + 29, r: 4, fill: 'var(--ink)' }); mk(svg, 'circle', { cx: cx - 7, cy: y + 29, r: 4, fill: 'var(--ink)' });
+      var res = r.stops ? 'S\'arrête en ' + fmt(r.d, 1) + ' m : <b>' + fmt(r.margin, 1) + ' m de marge</b>.' : (D <= r.dr ? 'Arrive au passage <b>sans avoir freiné</b>, à ' + k + ' km/h.' : 'Arrive au passage à environ <b>' + fmt(r.vImpactKmh, 0) + ' km/h</b>.');
+      html += '<div class="method"><strong>À ' + k + ' km/h</strong><span class="m">réaction ' + fmt(r.dr, 1) + ' m + freinage ' + fmt(r.df, 1) + ' m</span><span class="m">' + res + '</span><span class="m">E<sub>c</sub> de la voiture (1 200 kg) : ' + fmtE(ecKmh(1200, k)) + '</span></div>';
+    });
+    for (var g = 0; g <= Lm; g += 10) mk(svg, 'text', { x: X(g), y: 196, 'text-anchor': 'middle', 'font-size': 12 }, g + ' m');
+    $('cmpOut').innerHTML = html;
+  }
+  cmpD.addEventListener('input', drawCmp); drawCmp();
+
+  /* ---------- Étape 8 : distance d'écrasement ---------- */
+  var crD = $('crD'), crE = ecKmh(70, 50);
+  function drawCr() {
+    var cm = parseInt(crD.value, 10), d = cm / 100, F = crushForce(crE, d), fMax = crushForce(crE, 0.05), times = F / (70 * G);
+    $('crDOut').textContent = cm;
+    var svg = $('crSvg'); clear(svg);
+    var w = 360 * F / fMax;
+    mk(svg, 'rect', { x: 20, y: 20, width: 360, height: 30, fill: 'var(--paper)', stroke: 'var(--line)' });
+    mk(svg, 'rect', { x: 20, y: 20, width: Math.max(2, w), height: 30, fill: 'var(--acc)' });
+    mk(svg, 'text', { x: 20, y: 72, 'font-size': 13 }, 'effort moyen (la barre pleine = arrêt sur 5 cm)');
+    $('crOut').textContent = 'Ec = ½ × 70 × 13,89² ≈ ' + fmt(crE, 0) + ' J. Effort ≈ ' + fmt(crE, 0) + ' ÷ ' + fmt(d, 2) + ' ≈ ' + fmt(F, 0) + ' N, environ ' + fmt(times, 0) + ' fois le poids du passager. Arrêt 2 fois plus long → effort 2 fois plus petit.';
+  }
+  crD.addEventListener('input', drawCr); drawCr();
+
+  /* ---------- Quiz ---------- */
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  var makers = [
+    function () { var k = pick([18, 36, 54, 72, 90, 108]); return { q: 'Convertis ' + k + ' km/h en m/s.', a: k / 3.6, tol: 0.01, how: k + ' ÷ 3,6 = ' + fmt(k / 3.6) + ' m/s' }; },
+    function () { var v = pick([5, 10, 15, 20, 25, 30]); return { q: 'Convertis ' + v + ' m/s en km/h.', a: v * 3.6, tol: 0.01, how: v + ' × 3,6 = ' + fmt(v * 3.6) + ' km/h' }; },
+    function () { var m = pick([40, 60, 80, 100]), v = pick([2, 3, 4, 5, 10]); return { q: 'Un objet de ' + m + ' kg roule à ' + v + ' m/s. Son énergie cinétique (en J) ?', a: ec(m, v), tol: 0.5, how: '½ × ' + m + ' × ' + v + '² = ' + fmt(m / 2) + ' × ' + fmt(v * v) + ' = ' + fmt(ec(m, v)) + ' J' }; },
+    function () { var m = pick([1000, 1200, 1500]), k = pick([36, 54, 72, 90]), v = k / 3.6, E = ec(m, v) / 1000; return { q: 'Une voiture de ' + fmt(m) + ' kg roule à ' + k + ' km/h. Son énergie cinétique en kJ ?', a: E, tol: 0.05, how: k + ' ÷ 3,6 = ' + fmt(v) + ' m/s ; ½ × ' + fmt(m) + ' × ' + fmt(v * v) + ' = ' + fmt(E * 1000) + ' J = ' + fmt(E) + ' kJ' }; },
+    function () { var k = pick([2, 3, 4]); return { q: 'La vitesse d\'une voiture est multipliée par ' + k + '. Son énergie cinétique est multipliée par… ?', a: k * k, tol: 0.01, how: 'v est au carré : ' + k + ' × ' + k + ' = ' + (k * k) }; },
+    function () { var k = pick([36, 54, 72, 90, 108]), t = pick([1, 1.5, 2]), v = k / 3.6; return { q: 'À ' + k + ' km/h, avec un temps de réaction de ' + fmt(t) + ' s, quelle est la distance de réaction (en m) ?', a: v * t, tol: 0.06, how: k + ' ÷ 3,6 = ' + fmt(v) + ' m/s ; ' + fmt(v) + ' × ' + fmt(t) + ' = ' + fmt(v * t) + ' m' }; },
+    function () { var k = pick([36, 72, 90, 108]), a = pick([8, 5]), v = k / 3.6, df = v * v / (2 * a); return { q: 'Distance de freinage à ' + k + ' km/h avec a = ' + a + ' m/s², modèle d = v² ÷ (2 × a) (en m, au dixième) ?', a: df, tol: 0.06, how: 'v = ' + fmt(v) + ' m/s ; ' + fmt(v * v) + ' ÷ ' + (2 * a) + ' ' + eq(df, 2) + fmt(df, 2) + ' m' }; },
+    function () { var k = pick([36, 54, 72, 90]), v = k / 3.6, h = heightEquiv(v); return { q: 'Un choc à ' + k + ' km/h équivaut à une chute de quelle hauteur (en m, à l\'unité) ?', a: h, tol: 0.51, how: 'v = ' + fmt(v) + ' m/s ; ' + fmt(v * v) + ' ÷ 19,6 ≈ ' + fmt(h, 1) + ' m' }; }
+  ];
+  var quiz = $('quiz'), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ''; done = [];
+    var order = makers.slice().sort(function () { return Math.random() - 0.5; });
+    for (var k = 0; k < 8; k++) {
+      var Q = order[k](), li = document.createElement('li');
+      li.innerHTML = '<span>' + Q.q + '</span><input type="text" id="qa' + k + '" inputmode="decimal" autocomplete="off" aria-label="Ta réponse à la question ' + (k + 1) + '"><button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+      quiz.appendChild(li);
+      (function (k, Q) {
+        function check() {
+          var fb = $('qf' + k), x = num($('qa' + k).value);
+          if (isNaN(x)) { fb.className = 'fb'; fb.textContent = 'Écris un nombre.'; return; }
+          if (Math.abs(x - Q.a) <= Q.tol) { fb.className = 'fb ok'; fb.textContent = 'Bravo, c\'est juste !'; done[k] = true; }
+          else { done[k] = false; fb.className = 'fb no'; fb.innerHTML = 'Pas tout à fait : la réponse est ' + (exact(Q.a, 2) ? '' : 'environ ') + fmt(Q.a, 2) + '.<span>' + Q.how + '</span>'; }
+          $('score').textContent = done.filter(Boolean).length + ' / 8';
+        }
+        $('qb' + k).addEventListener('click', check);
+        $('qa' + k).addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+      })(k, Q);
+    }
+    $('score').textContent = '0 / 8';
+  }
+  $('newQuiz').addEventListener('click', newQuiz);
+  newQuiz();
+})();
+</script>
+</body>
+</html>

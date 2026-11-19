@@ -1,0 +1,817 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>La puissance et l'énergie électrique</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, encre orange brûlé (comme un fil qui chauffe), marge rouge. Les étiquettes des appareils, les watts et les kilowattheures sont au centre. */
+:root {
+  --paper: #fbf8f5;
+  --grid: #ede3da;
+  --card: #ffffff;
+  --ink: #24170f;
+  --ink-soft: #6a5446;
+  --acc: #c2410c;
+  --acc-soft: #fde4d3;
+  --two: #1c64c8;
+  --two-soft: #dbe8fa;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #fff0a3;
+  --line: #e5d7cb;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #15100c; --grid: #221a14; --card: #1c1510; --ink: #f4ece5; --ink-soft: #c0aa9a;
+    --acc: #fb923c; --acc-soft: #45230f; --two: #7fb0ff; --two-soft: #1a2a45;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #382a20;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #15100c; --grid: #221a14; --card: #1c1510; --ink: #f4ece5; --ink-soft: #c0aa9a;
+  --acc: #fb923c; --acc-soft: #45230f; --two: #7fb0ff; --two-soft: #1a2a45;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #382a20;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+.big { font-family: var(--f-mono); font-weight: 600; font-size: 1.15rem; color: var(--acc); overflow-wrap: anywhere; }
+section { display: flex; flex-direction: column; gap: 18px; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+@media (max-width: 420px) { .box { padding: 16px 14px; } }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 6px 12px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); min-height: 40px; }
+button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+button:disabled { opacity: .45; cursor: not-allowed; transform: none; box-shadow: 3px 3px 0 var(--ink); }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+input[type="text"], select { font: inherit; font-family: var(--f-mono); font-size: 1.05rem; padding: 8px 10px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; }
+input[type="range"] { width: 100%; accent-color: var(--acc); }
+.param { display: flex; flex-direction: column; gap: 2px; }
+.param label { font-weight: 700; }
+
+.ptable { border-collapse: separate; border-spacing: 0; width: 100%; font-variant-numeric: tabular-nums; }
+.ptable th, .ptable td { border: 1.5px solid var(--ink); padding: 8px 10px; text-align: center; font-family: var(--f-mono); font-size: 1rem; }
+.ptable th { font-family: var(--f-display); text-align: left; background: var(--paper); }
+.ptable thead th { text-align: center; }
+.ptable td.win { background: var(--ok-soft); color: var(--ok); font-weight: 600; }
+.scroll { overflow-x: auto; }
+
+.verdict { border-radius: 8px; padding: 12px 14px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+.verdict.yes { background: var(--ok-soft); color: var(--ok); }
+.verdict.no { background: var(--red-soft); color: var(--red); }
+.verdict.mid { background: var(--acc-soft); color: var(--acc); }
+.verdict span { font-weight: 400; color: var(--ink); }
+
+.inputs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 14px; align-items: end; }
+.inputs.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.inputs label { font-weight: 700; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+@media (max-width: 520px) { .inputs { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.methods { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
+.method { border: 1.5px solid var(--line); border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; background: var(--paper); min-width: 0; }
+.method strong { font-family: var(--f-display); }
+.method .m { font-family: var(--f-mono); font-size: .95rem; overflow-wrap: anywhere; }
+.method .m b { color: var(--acc); }
+.err { color: var(--red); font-weight: 700; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
+.tag.ok { color: var(--ok); }
+.tag.no { color: var(--red); }
+.tag.acc { color: var(--acc); }
+.tag.two { color: var(--two); }
+
+/* Étiquette (plaque signalétique) */
+.plate svg { width: 100%; max-width: 420px; height: auto; display: block; margin: 0 auto; }
+.plate .pl-bg { fill: var(--paper); stroke: var(--ink); stroke-width: 2.5; }
+.plate .pl-title { font-family: var(--f-display); font-weight: 700; }
+.plate .pl-big { fill: var(--acc); font-weight: 600; }
+.plate .pl-soft { fill: var(--ink-soft); }
+.plate .pl-screw { fill: var(--line); stroke: var(--ink); stroke-width: 1.5; }
+
+/* Barres (puissances, énergies) */
+.ebars { display: flex; flex-direction: column; gap: 8px; }
+.ebar { display: grid; grid-template-columns: 8.5em minmax(0, 1fr) 5.6em; gap: 8px; align-items: center; font-size: .95rem; }
+.ebar .lb { font-weight: 700; overflow-wrap: anywhere; }
+.ebar .tr { height: 20px; border: 1.5px solid var(--ink); border-radius: 5px; background: var(--paper); overflow: hidden; display: flex; }
+.ebar .fi { height: 100%; min-width: 0; transition: width .3s; }
+.ebar .fi.p { background: var(--acc); }
+.ebar .fi.t { background: var(--red); opacity: .75; }
+.ebar .fi.l { background: var(--hl); border-right: 1.5px solid var(--ink); }
+.ebar .v { font-family: var(--f-mono); font-size: .88rem; text-align: right; font-variant-numeric: tabular-nums; }
+@media (max-width: 420px) { .ebar { grid-template-columns: 6.6em minmax(0, 1fr) 4.8em; font-size: .88rem; } }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: .9rem; }
+.legend i { display: inline-block; width: 14px; height: 14px; border: 1.5px solid var(--ink); border-radius: 3px; vertical-align: -2px; margin-right: 6px; }
+
+/* Interrupteurs d'appareils */
+.sw { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.sw button { text-align: left; display: flex; flex-direction: column; gap: 0; line-height: 1.25; padding: 8px 10px; }
+.sw button small { font-family: var(--f-mono); font-weight: 400; font-size: .85rem; }
+
+/* Jauge d'intensité */
+.gauge { position: relative; height: 30px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); overflow: hidden; }
+.gauge .fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: var(--ok); transition: width .3s, background-color .3s; }
+.gauge .fill.warm { background: var(--acc); }
+.gauge .fill.hot { background: var(--red); }
+.gauge .lim { position: absolute; top: -2px; bottom: -2px; width: 3px; background: var(--ink); }
+.gscale { position: relative; height: 1.4em; font-family: var(--f-mono); font-size: .85rem; color: var(--ink-soft); }
+.gscale span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
+.cable { height: 16px; border-radius: 8px; border: 2px solid var(--ink); background: var(--two-soft); transition: background-color .3s; }
+.cable.warm { background: var(--acc-soft); }
+.cable.hot { background: var(--acc); }
+.cable.danger { background: var(--red); }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+.stat { border: 1.5px solid var(--line); border-radius: 10px; padding: 10px 12px; background: var(--paper); display: flex; flex-direction: column; min-width: 0; }
+.stat b { font-family: var(--f-mono); font-size: 1.25rem; color: var(--acc); overflow-wrap: anywhere; }
+.stat span { font-size: .9rem; color: var(--ink-soft); }
+
+/* Compteur */
+.meter { align-self: flex-start; display: flex; flex-direction: column; gap: 6px; background: var(--ink); color: var(--paper); border-radius: 10px; padding: 10px 14px; max-width: 100%; }
+.meter .digits { display: flex; gap: 4px; flex-wrap: wrap; }
+.meter .digits span { font-family: var(--f-mono); font-weight: 600; font-size: 1.5rem; background: var(--paper); color: var(--ink); border-radius: 4px; padding: 0 7px; min-width: 1.3em; text-align: center; }
+.meter .digits span.u { background: transparent; color: var(--paper); font-size: 1.1rem; align-self: flex-end; }
+.meter small { font-family: var(--f-mono); font-size: .8rem; opacity: .85; }
+
+.errs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.errs li { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--paper); }
+.errs .bad { color: var(--red); text-decoration: line-through; overflow-wrap: anywhere; }
+.errs .good { color: var(--ok); font-weight: 700; overflow-wrap: anywhere; }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 110px auto; gap: 10px; align-items: center; }
+.quiz input[type="text"] { font-size: 1rem; padding: 6px 8px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc); }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 120px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+<!--ticons--><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Tutoriels"><script src="progress.js" defer></script><!--/ticons-->
+<style id="tnav-css">
+.tnav-top { display: flex; margin: 0 0 4px; }
+.tnav-home { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font-weight: 700; font-size: .95rem; text-decoration: none; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tnav-home:hover, .tnav-home:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.tnav-bottom { margin-top: 8px; display: flex; flex-direction: column; gap: 12px; }
+.tnav-bottom h2 { margin: 0; }
+.tnav-pn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tnav-pn a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--ink, #222); border-radius: 10px;
+  background: var(--card, #fff); color: var(--ink, #222); text-decoration: none; box-shadow: 3px 3px 0 var(--ink, #222); min-width: 0; }
+.tnav-pn a span { font-size: .85rem; color: var(--ink-soft, #666); }
+.tnav-pn a strong { overflow-wrap: anywhere; }
+.tnav-pn a.next { text-align: right; grid-column: 2; }
+.tnav-bottom .tnav-home { align-self: center; }
+@media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
+</style>
+</head>
+<body>
+<main class="page">
+<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="physique.html">← Tous les tutoriels de physique</a></nav><!--/tnav-->
+
+
+  <header class="hero">
+    <span class="eyebrow">Tutoriel de physique-chimie · niveau 3<sup>e</sup></span>
+    <h1>La puissance et l'énergie électrique</h1>
+    <p class="lead">Sous chaque bouilloire, derrière chaque télé, il y a une petite étiquette avec un nombre suivi de « W ». C'est la puissance de l'appareil. Avec elle, tu vas comprendre pourquoi une multiprise peut faire sauter le disjoncteur, ce que compte le compteur électrique, et combien coûtent les appareils qui dorment en veille.</p>
+    <div class="box plate">
+      <svg viewBox="0 0 340 180" role="img" aria-label="Étiquette d'une bouilloire : 230 V, 50 Hz, 2 000 W">
+        <rect class="pl-bg" x="4" y="4" width="332" height="172" rx="14"/>
+        <circle class="pl-screw" cx="22" cy="22" r="5"/><circle class="pl-screw" cx="318" cy="22" r="5"/>
+        <circle class="pl-screw" cx="22" cy="158" r="5"/><circle class="pl-screw" cx="318" cy="158" r="5"/>
+        <text class="pl-title" x="170" y="44" text-anchor="middle" font-size="17">BOUILLOIRE · 1,7 L</text>
+        <text x="170" y="76" text-anchor="middle" font-size="16">230 V ~ 50 Hz</text>
+        <text class="pl-big" x="170" y="120" text-anchor="middle" font-size="36">2 000 W</text>
+        <text class="pl-soft" x="170" y="152" text-anchor="middle" font-size="14">tension · fréquence · puissance</text>
+      </svg>
+      <span class="soft">Sur la prise : 230 volts. Dans la bouilloire : 2 000 watts. Le courant qui passe dans le fil : environ 8,7 ampères. À la fin de cette page, tu sauras faire ce calcul.</span>
+    </div>
+    <div class="note red">
+      <span class="note-title">Le 230 V peut tuer</span>
+      <span>Dans ce tutoriel, on lit des étiquettes et on calcule : aucune expérience sur les prises de la maison. Ne touche jamais l'intérieur d'une prise ou d'un appareil, même débranché depuis peu. En classe, les expériences se font avec des piles ou des générateurs de quelques volts.</span>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · La puissance nominale</span>
+    <h2>Lis l'étiquette</h2>
+    <p>La <strong>puissance</strong> dit à quelle vitesse un appareil reçoit de l'énergie électrique (et la transforme en chaleur, en lumière ou en mouvement). Elle se mesure en <strong>watts</strong> (symbole <strong>W</strong>). Pour les gros appareils, on utilise le <strong>kilowatt</strong> : <span class="hl">1 kW = 1 000 W</span>.</p>
+    <p>La puissance écrite sur l'étiquette s'appelle la <strong>puissance nominale</strong> : c'est la puissance de l'appareil quand il fonctionne normalement, branché sur la tension prévue (ici 230 V). Attention, l'étiquette contient d'autres nombres : la tension en volts (V), la fréquence en hertz (Hz)… Seul le nombre suivi de W ou kW est la puissance.</p>
+    <div class="box">
+      <h3>Le jeu des étiquettes</h3>
+      <p class="soft" id="lgCount">Appareil 1 sur 7 · 0 trouvé</p>
+      <div class="plate"><svg id="lgPlate" viewBox="0 0 340 180" role="img" aria-label="Étiquette d'un appareil"></svg></div>
+      <div class="inputs two">
+        <label for="lgIn">Puissance nominale (en W)<input id="lgIn" type="text" inputmode="decimal" autocomplete="off"></label>
+        <div class="btns"><button type="button" id="lgCheck">Vérifier</button><button type="button" id="lgNext">Appareil suivant</button></div>
+      </div>
+      <div class="verdict" id="lgOut" aria-live="polite"><span>Lis l'étiquette et écris la puissance en watts.</span></div>
+      <h3>Tes appareils, du plus puissant au moins puissant</h3>
+      <div class="ebars" id="lgBars"></div>
+      <p class="soft">Les valeurs sont des ordres de grandeur : selon le modèle, une bouilloire fait environ 1 500 à 3 000 W, un chargeur de téléphone environ 5 à 30 W.</p>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · P = U × I</span>
+    <h2>Tension, intensité et puissance</h2>
+    <p>Tu connais déjà la <strong>tension</strong> U (en volts, V) et l'<strong>intensité</strong> I du courant (en ampères, A), vues dans le tutoriel sur <a class="tlink" href="les-circuits-electriques.html">les circuits électriques</a>. La puissance les relie :</p>
+    <p class="big">P = U × I &nbsp;&nbsp; (P en W, U en V, I en A)</p>
+    <p>Et donc, pour trouver l'intensité : <strong>I = P ÷ U</strong>. Pour une bouilloire de 2 000 W sur 230 V : I = 2 000 ÷ 230 ≈ <strong>8,7 A</strong>. Plus un appareil est puissant, plus le courant qui le traverse est intense.</p>
+    <div class="box">
+      <h3>Quel courant pour cet appareil ?</h3>
+      <div class="btns" id="uBtns" role="group" aria-label="Choisir la tension"></div>
+      <div class="param">
+        <label for="pSl">Puissance de l'appareil : <span class="mono" id="pSlOut">2 000 W</span></label>
+        <input id="pSl" type="range" min="0" max="3000" step="10" value="2000">
+      </div>
+      <div class="verdict mid" id="iOut" aria-live="polite"></div>
+    </div>
+    <div class="box">
+      <h3>Dans l'autre sens : P = U × I</h3>
+      <div class="inputs two">
+        <label for="cU">Tension U (V)<input id="cU" type="text" inputmode="decimal" autocomplete="off" value="5"></label>
+        <label for="cI">Intensité I (A)<input id="cI" type="text" inputmode="decimal" autocomplete="off" value="2"></label>
+      </div>
+      <div class="methods" id="cOut" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Une petite précision</span>
+      <span>Le courant de la prise est <strong>alternatif</strong> : il change de sens 50 fois par seconde (50 Hz). Les 230 V et les ampères des étiquettes sont des valeurs « efficaces », faites exprès pour que P = U × I marche. La formule est exacte pour les appareils qui chauffent (bouilloire, radiateur, four) ; pour les autres, c'est une très bonne estimation.</span>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · La multiprise et le disjoncteur</span>
+    <h2>Pourquoi ça disjoncte ?</h2>
+    <p>Sur une multiprise, les appareils sont branchés <strong>en dérivation</strong> : chacun reçoit 230 V, et leurs intensités <strong>s'additionnent</strong> dans le câble commun. Les puissances aussi : P totale = P₁ + P₂ + … Le câble et la prise du mur sont prévus pour une intensité maximale, souvent <strong>16 A</strong>. Au-delà, un <strong>disjoncteur</strong>, dans le tableau électrique de la maison, coupe le courant.</p>
+    <div class="box">
+      <h3>Allume des appareils sur la même prise</h3>
+      <div class="sw" id="mpSw"></div>
+      <div class="stats">
+        <div class="stat"><b id="mpP">0 W</b><span>puissance totale</span></div>
+        <div class="stat"><b id="mpI">0 A</b><span>intensité dans le câble (÷ 230 V)</span></div>
+      </div>
+      <div class="gauge" aria-hidden="true"><div class="fill" id="mpFill"></div><div class="lim" style="left:66.67%"></div></div>
+      <div class="gscale" aria-hidden="true"><span style="left:0;transform:none">0 A</span><span style="left:33.33%">8 A</span><span style="left:66.67%">16 A (limite)</span></div>
+      <div class="param"><span><strong>Le câble :</strong> <span id="mpHeat">froid</span></span><div class="cable" id="mpCable" aria-hidden="true"></div></div>
+      <div class="verdict yes" id="mpOut" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="mpReset">Tout éteindre et réarmer</button></div>
+    </div>
+    <p>Pourquoi limiter le courant ? Quand un courant traverse un fil, le fil <strong>chauffe</strong> (c'est l'effet Joule, celui qui fait marcher la bouilloire). Et la chaleur grandit très vite : avec <span class="hl">deux fois plus de courant, le fil chauffe environ quatre fois plus</span>. Un fil trop chauffé peut faire fondre sa gaine en plastique et provoquer un incendie. Le disjoncteur coupe avant. Dans le simulateur, il coupe tout de suite ; un vrai disjoncteur coupe d'autant plus vite que la surcharge est grande.</p>
+    <div class="note red">
+      <span class="note-title">Sécurité électrique</span>
+      <span>• Ne branche jamais une multiprise sur une autre multiprise. • Pas de bouilloire, de radiateur et de sèche-cheveux ensemble sur la même multiprise. • Une multiprise ou une prise qui chauffe, qui sent le brûlé ou qui grésille : on débranche si c'est sans danger et on prévient un adulte. • Un disjoncteur qui saute protège la maison : on ne le bloque jamais. • Pas d'appareil électrique près de l'eau. Dans le tableau, un autre appareil, le <strong>disjoncteur différentiel</strong>, coupe le courant s'il « fuit » ailleurs que dans les fils (par exemple à travers une personne) : il protège les gens, mais il ne rend pas le 230 V inoffensif.</span>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · L'énergie</span>
+    <h2>E = P × t</h2>
+    <p>La puissance dit à quelle <strong>vitesse</strong> l'énergie passe ; l'énergie, c'est la <strong>quantité totale</strong>. C'est comme un robinet : la puissance ressemble au débit, l'énergie à la quantité d'eau dans la baignoire. Plus l'appareil est puissant et plus il marche longtemps, plus il consomme d'énergie :</p>
+    <p class="big">E = P × t</p>
+    <div class="cards">
+      <div class="box"><span class="tag acc">Unité du physicien</span><strong>Le joule (J)</strong><span class="mono">E (J) = P (W) × t (s)</span><span class="soft">Un watt, c'est un joule par seconde. Une bouilloire de 2 000 W reçoit 2 000 J chaque seconde.</span></div>
+      <div class="box"><span class="tag two">Unité de la facture</span><strong>Le kilowattheure (kWh)</strong><span class="mono">E (kWh) = P (kW) × t (h)</span><span class="soft">Un appareil de 1 kW qui marche 1 h consomme 1 kWh. C'est bien kW <strong>fois</strong> heures.</span></div>
+    </div>
+    <p>Les deux sont liés : 1 kWh = 1 000 W × 3 600 s = <strong>3 600 000 J</strong>. Les conversions d'heures en secondes sont dans le tutoriel sur <a class="tlink" href="les-conversions.html">les conversions</a>.</p>
+    <div class="box">
+      <h3>Calculatrice d'énergie, par les deux chemins</h3>
+      <div class="btns" id="ePre" role="group" aria-label="Exemples"></div>
+      <div class="inputs">
+        <label for="eP">Puissance P (W)<input id="eP" type="text" inputmode="decimal" autocomplete="off" value="2000"></label>
+        <label for="eT">Durée t<input id="eT" type="text" inputmode="decimal" autocomplete="off" value="3"></label>
+        <label for="eU">Unité<select id="eU"><option value="s">secondes</option><option value="min" selected>minutes</option><option value="h">heures</option><option value="j">jours</option></select></label>
+      </div>
+      <div class="methods" id="eOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Le compteur et la veille</span>
+    <h2>Les appareils qui ne dorment jamais vraiment</h2>
+    <p>Le <strong>compteur électrique</strong> de la maison additionne toute l'énergie consommée, en kWh. Il affiche un nombre qui ne fait qu'augmenter : l'<strong>index</strong>. Pour connaître la consommation d'un mois, on fait une soustraction : si l'index passe de 12 480 kWh à 12 790 kWh, on a consommé 12 790 − 12 480 = <strong>310 kWh</strong>. Une famille consomme souvent de l'ordre de 2 000 à 5 000 kWh par an, beaucoup plus si la maison est chauffée à l'électricité.</p>
+    <p>Le calcul d'une facture appareil par appareil est fait dans le tutoriel sur <a class="tlink" href="les-grandeurs-composees.html">les grandeurs composées</a>. Ici, on s'intéresse à un « voleur » discret : la <strong>veille</strong>. Une télé éteinte avec la télécommande, une box, un décodeur continuent de consommer quelques watts, jour et nuit. Peu de watts, mais beaucoup d'heures.</p>
+    <div class="box">
+      <h3>Le compteur de la veille</h3>
+      <p class="soft">Choisis les appareils qui restent en veille chez toi.</p>
+      <div class="sw" id="sbSw"></div>
+      <div class="inputs two">
+        <div class="param"><label for="sbH">En veille par jour : <span class="mono" id="sbHOut">20 h</span></label><input id="sbH" type="range" min="0" max="24" step="1" value="20"></div>
+        <label for="sbPrice">Prix d'un kWh (€)<input id="sbPrice" type="text" inputmode="decimal" autocomplete="off" value="0,25"></label>
+      </div>
+      <div class="meter" aria-hidden="true"><small>Compteur · kWh dus à la veille en un an</small><div class="digits" id="sbDigits"></div></div>
+      <div class="methods" id="sbOut" aria-live="polite"></div>
+      <p class="soft">Puissances de veille : ordres de grandeur, très variables selon les modèles (les appareils récents consomment souvent moins). Mets le prix de ta facture si tu le connais : il est souvent d'environ 0,20 € à 0,30 € par kWh.</p>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · Comparer des lampes</span>
+    <h2>60 W contre 8 W, pour la même lumière</h2>
+    <p>Une ancienne lampe à <strong>incandescence</strong> de 60 W et une lampe à <strong>DEL</strong> d'environ 8 W éclairent à peu près autant. La différence ? Le <strong>rendement</strong>, vu dans le tutoriel sur <a class="tlink" href="les-formes-d-energie.html">les formes d'énergie</a> : l'ancienne lampe transforme environ 5 % de l'énergie reçue en lumière, et tout le reste en chaleur. C'est pour cela qu'elle brûlait les doigts.</p>
+    <div class="box">
+      <h3>Une année d'éclairage</h3>
+      <div class="inputs">
+        <div class="param"><label for="lN">Lampes : <span class="mono" id="lNOut">8</span></label><input id="lN" type="range" min="1" max="20" step="1" value="8"></div>
+        <div class="param"><label for="lH">Allumées : <span class="mono" id="lHOut">4 h/jour</span></label><input id="lH" type="range" min="0" max="12" step="0.5" value="4"></div>
+        <label for="lPrice">Prix du kWh (€)<input id="lPrice" type="text" inputmode="decimal" autocomplete="off" value="0,25"></label>
+      </div>
+      <div class="scroll"><table class="ptable" id="lTable"></table></div>
+      <div class="verdict yes" id="lOut" aria-live="polite"></div>
+      <h3>Où va l'énergie d'une seule lampe ?</h3>
+      <div class="ebars">
+        <div class="ebar"><span class="lb">Incandescence</span><span class="tr"><span class="fi l" style="width:5%"></span><span class="fi t" style="width:95%"></span></span><span class="v">60 W</span></div>
+        <div class="ebar"><span class="lb">DEL</span><span class="tr"><span class="fi l" style="width:5%"></span><span class="fi t" style="width:8.33%"></span></span><span class="v">8 W</span></div>
+      </div>
+      <div class="legend"><span><i style="background:var(--hl)"></i>lumière (utile) : environ 3 W pour les deux</span><span><i style="background:var(--red);opacity:.75"></i>chaleur (perdue)</span></div>
+      <p class="soft">Rendement : 3 ÷ 60 = 5 % pour l'ancienne lampe, 3 ÷ 8 ≈ 38 % pour la DEL. Les lampes à incandescence ont été retirées peu à peu de la vente en Europe à partir de la fin des années 2000. Une DEL dure aussi beaucoup plus longtemps : de l'ordre de 15 000 heures, contre environ 1 000 heures.</p>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · D'où vient l'électricité ?</span>
+    <h2>Des kilowatts aux gigawatts</h2>
+    <p>L'électricité de la prise est produite dans des <strong>centrales</strong>. Dans la plupart d'entre elles, quelque chose fait tourner une turbine reliée à un <strong>alternateur</strong>, qui produit le courant : de la vapeur chauffée par l'uranium (centrale nucléaire), par le gaz ou le charbon, l'eau d'un barrage, ou le vent pour une éolienne. Les panneaux solaires, eux, transforment directement la lumière en électricité. Le courant voyage ensuite sur des lignes à très haute tension (jusqu'à 400 000 V en France), puis des transformateurs le ramènent à 230 V près de chez toi.</p>
+    <p>Pour les grosses puissances, on utilise les préfixes du tutoriel sur <a class="tlink" href="les-puissances.html">les puissances</a> : <strong>1 kW = 10³ W</strong>, <strong>1 MW (mégawatt) = 10⁶ W</strong>, <strong>1 GW (gigawatt) = 10⁹ W</strong>.</p>
+    <div class="box">
+      <h3>Combien d'appareils à la fois ?</h3>
+      <p class="soft">Un producteur :</p>
+      <div class="btns" id="srcBtns" role="group" aria-label="Choisir un producteur"></div>
+      <p class="soft">Un consommateur :</p>
+      <div class="btns" id="appBtns" role="group" aria-label="Choisir un appareil"></div>
+      <div class="verdict mid" id="srcOut" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Au maximum… pas tout le temps</span>
+      <span>Ces puissances sont des maximums, à peu près. Une éolienne ne produit sa pleine puissance que lorsque le vent souffle bien, et un panneau solaire rien du tout la nuit. Sur une année, une éolienne produit en moyenne bien moins que sa puissance maximale. C'est pour cela qu'on mélange plusieurs sources et qu'on cherche à stocker l'électricité.</span>
+    </div>
+    <h3>Économiser l'énergie, au quotidien</h3>
+    <div class="cards">
+      <div class="box"><span class="tag ok">Veille</span><span class="soft">Une multiprise à interrupteur éteint la télé, la console et le décodeur d'un seul geste.</span></div>
+      <div class="box"><span class="tag ok">Lumière</span><span class="soft">Des lampes à DEL, et on éteint en quittant une pièce.</span></div>
+      <div class="box"><span class="tag ok">Bouilloire</span><span class="soft">Ne chauffe que l'eau dont tu as besoin : chauffer 1 litre au lieu de 1,7 litre, c'est environ 40 % d'énergie en moins.</span></div>
+      <div class="box"><span class="tag ok">Cuisine</span><span class="soft">Un couvercle sur la casserole : l'eau bout plus vite, avec moins d'énergie.</span></div>
+      <div class="box"><span class="tag ok">Froid</span><span class="soft">Un frigo réglé vers +4 °C suffit ; on ne laisse pas la porte ouverte.</span></div>
+      <div class="box"><span class="tag ok">Linge</span><span class="soft">Laver à 30 °C et sécher le linge à l'air plutôt qu'au sèche-linge.</span></div>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Un peu d'histoire</span>
+    <h2>Le watt et la guerre des courants</h2>
+    <ol class="timeline">
+      <li><span class="when">fin du XVIII<sup>e</sup> siècle</span><div class="what"><strong>James Watt</strong><span>L'ingénieur écossais améliore la machine à vapeur et compare sa puissance à celle des chevaux (le « cheval-vapeur », environ 736 W). Bien plus tard, au XIX<sup>e</sup> siècle, les savants donnent son nom à l'unité de puissance : le <strong>watt</strong>.</span></div></li>
+      <li><span class="when">années 1880</span><div class="what"><strong>Edison et le courant continu</strong><span>Aux États-Unis, Thomas Edison améliore la lampe à incandescence et installe parmi les premières centrales électriques pour éclairer des quartiers. Son réseau utilise du courant <strong>continu</strong>, qui perd beaucoup d'énergie en chaleur dans les fils : il faut une centrale tous les quelques kilomètres.</span></div></li>
+      <li><span class="when">fin des années 1880</span><div class="what"><strong>La « guerre des courants »</strong><span>L'industriel George Westinghouse, qui utilise des inventions de Nikola Tesla, mise sur le courant <strong>alternatif</strong>. Avec un transformateur, on peut monter sa tension très haut pour le transporter loin avec peu de pertes, puis la redescendre. Le camp d'Edison mène une campagne pour faire peur avec l'alternatif. Mais l'alternatif finit par l'emporter, en partie grâce à une grande centrale aux chutes du Niagara, dans les années 1890.</span></div></li>
+      <li><span class="when">aujourd'hui</span><div class="what"><strong>230 V, 50 Hz</strong><span>En Europe, les prises donnent du 230 V alternatif à 50 Hz ; en Amérique du Nord, environ 120 V à 60 Hz. Le courant continu revient pour certaines très longues lignes, parfois sous la mer, et dans tous nos appareils électroniques, grâce aux chargeurs.</span></div></li>
+    </ol>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Attention</span>
+    <h2>Les erreurs fréquentes</h2>
+    <div class="box">
+      <ul class="errs">
+        <li><span class="bad">« Le watt mesure l'énergie consommée. »</span><span class="good">Le watt mesure une puissance (des joules par seconde). L'énergie se mesure en joules (J) ou en kilowattheures (kWh).</span></li>
+        <li><span class="bad">« I = U × P » ou « P = U ÷ I »</span><span class="good">P = U × I, donc I = P ÷ U. Vérifie avec la bouilloire : 2 000 ÷ 230 ≈ 8,7 A.</span></li>
+        <li><span class="bad">« 100 W × 2 h = 200 J »</span><span class="good">100 W × 2 h = 200 Wh = 0,2 kWh. Pour avoir des joules, il faut des secondes : 100 × 7 200 = 720 000 J.</span></li>
+        <li><span class="bad">« Ma multiprise a 6 prises : je peux y brancher 6 appareils, n'importe lesquels. »</span><span class="good">Ce qui compte, c'est l'intensité totale : souvent 16 A au maximum, soit 16 × 230 = 3 680 W en tout.</span></li>
+        <li><span class="bad">« En veille, un appareil ne consomme rien. »</span><span class="good">Il consomme quelques watts, jour et nuit. Sur une année, cela peut faire des dizaines de kWh.</span></li>
+        <li><span class="bad">« Ma lampe DEL fait 60 W, c'est écrit sur la boîte. »</span><span class="good">« Équivalent 60 W » veut dire : elle éclaire comme une ancienne lampe de 60 W. Sa vraie puissance est d'environ 8 W.</span></li>
+        <li><span class="bad">« Le disjoncteur saute tout le temps : il est cassé, je le bloque. »</span><span class="good">Jamais ! Il protège les fils de la surchauffe. On débranche des appareils, et si ça continue, on appelle un électricien.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Réponds par un nombre (tu peux écrire 3600000 sans espaces). La tension du secteur est 230 V.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Nouvelles questions</button>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · À toi de jouer</span>
+    <h2>Six problèmes</h2>
+    <div class="exos">
+      <details>
+        <summary>Le grille-pain<span class="q">Un grille-pain de 900 W est branché sur 230 V. Quelle est l'intensité du courant qui le traverse ?</span></summary>
+        <div><span>I = P ÷ U = 900 ÷ 230 ≈ <strong>3,9 A</strong>.</span></div>
+      </details>
+      <details>
+        <summary>La multiprise<span class="q">On branche une bouilloire de 2 000 W et un four de 2,5 kW sur la même prise, protégée par un disjoncteur de 16 A. Que se passe-t-il ?</span></summary>
+        <div><span>P totale = 2 000 + 2 500 = 4 500 W. I = 4 500 ÷ 230 ≈ 19,6 A. C'est plus que 16 A : <strong>le disjoncteur coupe</strong>. Il faut brancher ces deux appareils sur des circuits différents, ou ne pas les faire marcher en même temps.</span></div>
+      </details>
+      <details>
+        <summary>En joules<span class="q">Un sèche-cheveux de 1 800 W fonctionne 5 minutes. Calcule l'énergie en joules, puis en kWh.</span></summary>
+        <div><span>5 min = 300 s. E = 1 800 × 300 = <strong>540 000 J</strong>.</span><span>En kWh : 1,8 kW × (5 ÷ 60) h = <strong>0,15 kWh</strong>. Vérification : 540 000 ÷ 3 600 000 = 0,15.</span></div>
+      </details>
+      <details>
+        <summary>Le radiateur<span class="q">Un radiateur de 1,5 kW marche 6 h par jour pendant 30 jours. Le kWh coûte 0,25 €. Combien coûte-t-il ?</span></summary>
+        <div><span>Par jour : 1,5 × 6 = 9 kWh. En 30 jours : 9 × 30 = 270 kWh. Coût : 270 × 0,25 = <strong>67,50 €</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Le compteur<span class="q">Le 1er du mois, l'index du compteur est 24 512 kWh. Le mois suivant, il est 24 839 kWh. Le kWh coûte 0,22 €. Combien a-t-on consommé, et pour quel prix ?</span></summary>
+        <div><span>24 839 − 24 512 = <strong>327 kWh</strong>. Coût : 327 × 0,22 = <strong>71,94 €</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Les éoliennes<span class="q">Un réacteur nucléaire a une puissance d'environ 1 GW, une éolienne d'environ 2,5 MW. Combien d'éoliennes à pleine puissance faut-il pour égaler un réacteur ?</span></summary>
+        <div><span>1 GW = 1 000 000 000 W et 2,5 MW = 2 500 000 W. 1 000 000 000 ÷ 2 500 000 = <strong>400 éoliennes</strong>. Mais comme elles ne tournent pas toujours à pleine puissance, il en faudrait bien plus pour produire la même énergie sur une année.</span></div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• La <strong>puissance</strong> se mesure en <strong>watts (W)</strong> ; 1 kW = 1 000 W. La puissance nominale est écrite sur l'étiquette de l'appareil.</span>
+      <span>• <strong>P = U × I</strong> (W, V, A), donc <strong>I = P ÷ U</strong>. Sur le secteur, U = 230 V : une bouilloire de 2 000 W est traversée par environ 8,7 A.</span>
+      <span>• Sur une multiprise, les intensités <strong>s'additionnent</strong>. Le <strong>disjoncteur</strong> coupe le courant quand l'intensité dépasse la limite (souvent 16 A) pour éviter que les fils surchauffent.</span>
+      <span>• <strong>E = P × t</strong> : en joules avec des W et des s, en kWh avec des kW et des h. <strong>1 kWh = 3 600 000 J</strong>.</span>
+      <span>• Le compteur mesure l'énergie en kWh ; facture = kWh × prix du kWh. La veille consomme peu, mais tout le temps.</span>
+      <span>• Une lampe DEL de 8 W éclaire comme une lampe à incandescence de 60 W : meilleur rendement, environ 7 fois moins d'énergie.</span>
+      <span>• Le 230 V est <strong>dangereux, voire mortel</strong> : on ne touche jamais l'intérieur d'une prise ou d'un appareil.</span>
+    </div>
+  </section>
+
+  <!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"><a class="prev" href="la-loi-d-ohm.html"><span>← Précédent</span><strong>Tension, intensité et loi d&#x27;Ohm</strong></a><a class="next" href="la-lumiere.html"><span>Suivant →</span><strong>La lumière</strong></a></div><a class="tnav-home" href="physique.html">⌂ Tous les tutoriels de physique</a></nav><!--/tnav-->
+<footer>Fiche de révision · La puissance et l'énergie électrique</footer>
+</main>
+
+<script>
+(function () {
+  /*
+   * Test hooks : window.__pui
+   *   current(P, U)              → I = P ÷ U en A (NaN si U ≤ 0)
+   *   power(U, I)                → P = U × I en W
+   *   energyJ(P_W, t_s)          → énergie en J
+   *   energyKWh(P_W, t_h)        → énergie en kWh (P en W converti en kW)
+   *   kWhToJ(kwh), jToKWh(j)     → conversions (1 kWh = 3 600 000 J)
+   *   totalCurrent(watts[], U)   → intensité totale en A (U = 230 par défaut)
+   *   trips(watts[], limitA, U)  → true si l'intensité totale dépasse la limite (16 A et 230 V par défaut)
+   *   standbyYear(W, hPerDay)    → kWh par an (365 jours)
+   *   cost(kwh, price)           → coût en €
+   *   lampYear(P_W, hPerDay, n)  → kWh par an pour n lampes (n = 1 par défaut)
+   *   howMany(sourceW, appW)     → nombre d'appareils alimentés en même temps (quotient, non arrondi)
+   */
+  var NS = 'http://www.w3.org/2000/svg';
+  function fmt(x, d) { var r = Math.round(x * 1e6) / 1e6; if (Object.is(r, -0)) r = 0; return r.toLocaleString('fr-FR', { maximumFractionDigits: d == null ? 3 : d }).replace('-', '−'); }
+  function num(s) { var t = String(s).replace(/\s/g, '').replace(/[−–]/g, '-').replace(',', '.'); if (t === '') return NaN; var x = Number(t); return isFinite(x) ? x : NaN; }
+  function mk(svg, name, attrs, text) { var e = document.createElementNS(NS, name); for (var a in attrs) e.setAttribute(a, attrs[a]); if (text != null) e.textContent = text; svg.appendChild(e); return e; }
+  function eq(x, d) { var f = Math.pow(10, d == null ? 3 : d); return Math.abs(x * f - Math.round(x * f)) < 1e-6 ? '= ' : '≈ '; }
+  var SUP = { '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '-': '⁻' };
+  function sci(x) { if (!(x > 0)) return fmt(x); var n = Math.floor(Math.log10(x) + 1e-12), m = x / Math.pow(10, n); return fmt(m, 2) + ' × 10' + String(n).split('').map(function (c) { return SUP[c]; }).join(''); }
+  function pw(w) { if (w >= 1e9) return fmt(w / 1e9, 2) + ' GW'; if (w >= 1e6) return fmt(w / 1e6, 2) + ' MW'; if (w >= 1e3) return fmt(w / 1e3, 2) + ' kW'; return fmt(w, 2) + ' W'; }
+  function $(id) { return document.getElementById(id); }
+
+  /* ---------- Physique ---------- */
+  var U0 = 230;
+  function current(P, U) { return U > 0 ? P / U : NaN; }
+  function power(U, I) { return U * I; }
+  function energyJ(P, ts) { return P * ts; }
+  function energyKWh(P, th) { return P / 1000 * th; }
+  function kWhToJ(k) { return k * 3600000; }
+  function jToKWh(j) { return j / 3600000; }
+  function sum(a) { return a.reduce(function (s, v) { return s + v; }, 0); }
+  function totalCurrent(ws, U) { return current(sum(ws), U == null ? U0 : U); }
+  function trips(ws, lim, U) { return totalCurrent(ws, U) > (lim == null ? 16 : lim) + 1e-9; }
+  function standbyYear(W, h) { return W * h * 365 / 1000; }
+  function cost(k, p) { return k * p; }
+  function lampYear(P, h, n) { return P * h * 365 * (n == null ? 1 : n) / 1000; }
+  function howMany(s, a) { return a > 0 ? s / a : NaN; }
+  window.__pui = { current: current, power: power, energyJ: energyJ, energyKWh: energyKWh, kWhToJ: kWhToJ, jToKWh: jToKWh, totalCurrent: totalCurrent, trips: trips, standbyYear: standbyYear, cost: cost, lampYear: lampYear, howMany: howMany };
+
+  /* ---------- Étape 1 : le jeu des étiquettes ---------- */
+  var VOLT = "230 V est la tension de la prise, et 50 Hz la fréquence. La puissance, c'est le nombre suivi de W ou kW.";
+  var APPS = [
+    { n: 'Lampe à DEL', w: 8, lines: ['LAMPE À DEL · culot E27', '220–240 V ~ 50 Hz', '8 W', '806 lm · « équivalent 60 W »'], big: 2, traps: { 60: "« Équivalent 60 W » veut dire qu'elle éclaire comme une ancienne lampe de 60 W. Sa vraie puissance est plus petite." } },
+    { n: 'Bouilloire', w: 2000, lines: ['BOUILLOIRE · 1,7 L', '230 V ~ 50 Hz', '2 000 W', 'Ne pas immerger'], big: 2, traps: { 1.7: '1,7 L est la contenance (un volume), pas une puissance.' } },
+    { n: 'Four', w: 2500, lines: ['FOUR ÉLECTRIQUE', '230 V ~ 50 Hz', '2,5 kW', 'Classe I'], big: 2, traps: { 2.5: "Attention, c'est en kilowatts ! 1 kW = 1 000 W. Combien de watts font 2,5 kW ?" } },
+    { n: 'Chargeur', w: 10, lines: ['CHARGEUR DE TÉLÉPHONE', 'Entrée : 100–240 V ~ 50/60 Hz', 'Sortie : 5 V (continu) 2 A', '10 W'], big: 3, traps: { 5: '5 V est une tension. Regarde le nombre suivi de W.', 2: "2 A est une intensité. Remarque : 5 V × 2 A donne justement la puissance !", 100: '100–240 V : ce sont les tensions acceptées en entrée.', 240: '100–240 V : ce sont les tensions acceptées en entrée.' } },
+    { n: 'Réfrigérateur', w: 120, lines: ['RÉFRIGÉRATEUR', '230 V ~ 50 Hz', '120 W', 'Consommation : 150 kWh/an'], big: 2, traps: { 150: "150 kWh/an est une énergie (consommée en un an), pas une puissance. La puissance est en W." } },
+    { n: 'Sèche-cheveux', w: 1800, lines: ['SÈCHE-CHEVEUX', '230 V ~ 50 Hz', '1 800 W', 'Ne pas utiliser près de l\'eau'], big: 2, traps: { 1.8: "Bonne idée, mais il faut répondre en watts, et l'étiquette est déjà en W." } },
+    { n: 'Télévision', w: 100, lines: ['TÉLÉVISEUR 43 pouces', '230 V ~ 50 Hz', '100 W', 'En veille : 0,5 W'], big: 2, traps: { 0.5: "0,5 W, c'est la puissance en veille. On cherche la puissance quand la télé marche.", 43: '43 pouces, c\'est la taille de l\'écran.' } }
+  ];
+  var order = APPS.map(function (a, i) { return i; }), cur = 0, found = {};
+  for (var s = order.length - 1; s > 0; s--) { var r = Math.floor(Math.random() * (s + 1)), tmp = order[s]; order[s] = order[r]; order[r] = tmp; }
+  function drawPlate(svg, A) {
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    mk(svg, 'rect', { 'class': 'pl-bg', x: 4, y: 4, width: 332, height: 172, rx: 14 });
+    [[22, 22], [318, 22], [22, 158], [318, 158]].forEach(function (p) { mk(svg, 'circle', { 'class': 'pl-screw', cx: p[0], cy: p[1], r: 5 }); });
+    var y = 18;
+    A.lines.forEach(function (t, i) {
+      var isBig = i === A.big, first = i === 0;
+      y += isBig ? 44 : (first ? 26 : 30);
+      mk(svg, 'text', { x: 170, y: y, 'text-anchor': 'middle', 'font-size': isBig ? 32 : (first ? 16 : 14), 'class': isBig ? 'pl-big' : (first ? 'pl-title' : '') }, t);
+      if (isBig) y += 4;
+    });
+    svg.setAttribute('aria-label', 'Étiquette : ' + A.lines.join(', '));
+  }
+  function lgShow() {
+    var A = APPS[order[cur]];
+    drawPlate($('lgPlate'), A);
+    $('lgIn').value = '';
+    var o = $('lgOut');
+    if (found[order[cur]]) { o.className = 'verdict yes'; o.innerHTML = 'Déjà trouvé : ' + fmt(A.w) + ' W.<span>Passe à l\'appareil suivant.</span>'; }
+    else { o.className = 'verdict'; o.innerHTML = '<span>' + A.n + ' : lis l\'étiquette et écris la puissance en watts.</span>'; }
+    lgCount();
+  }
+  function lgCount() { var k = Object.keys(found).length; $('lgCount').textContent = 'Appareil ' + (cur + 1) + ' sur ' + APPS.length + ' · ' + k + (k > 1 ? ' trouvés' : ' trouvé'); }
+  function lgCheck() {
+    var A = APPS[order[cur]], x = num($('lgIn').value), o = $('lgOut');
+    if (isNaN(x)) { o.className = 'verdict'; o.innerHTML = '<span>Écris un nombre (en watts).</span>'; return; }
+    if (Math.abs(x - A.w) < 1e-9) {
+      found[order[cur]] = true;
+      o.className = 'verdict yes';
+      o.innerHTML = 'Bravo : ' + A.n + ', ' + fmt(A.w) + ' W !<span>' + (A.w >= 1000 ? 'Soit ' + fmt(A.w / 1000) + ' kW. ' : '') + 'Sur 230 V, le courant est d\'environ ' + fmt(A.w / U0, 2) + ' A (on verra pourquoi à l\'étape 2).</span>';
+      lgBars(); lgCount(); return;
+    }
+    var key = Object.keys(A.traps).filter(function (k) { return Math.abs(Number(k) - x) < 1e-9; })[0];
+    var msg = key != null ? A.traps[key] : ([230, 220, 50, 60].indexOf(x) >= 0 ? VOLT : 'Ce n\'est pas ça. Cherche le nombre suivi de W ou de kW, et donne-le en watts.');
+    o.className = 'verdict no'; o.innerHTML = 'Pas tout à fait.<span>' + msg + '</span>';
+  }
+  function lgBars() {
+    var list = Object.keys(found).map(function (i) { return APPS[i]; }).sort(function (a, b) { return b.w - a.w; });
+    $('lgBars').innerHTML = list.length ? list.map(function (A) {
+      return '<div class="ebar"><span class="lb">' + A.n + '</span><span class="tr"><span class="fi p" style="width:' + Math.max(0.6, A.w / 2500 * 100) + '%"></span></span><span class="v">' + fmt(A.w) + ' W</span></div>';
+    }).join('') : '<p class="soft">Les appareils trouvés apparaîtront ici.</p>';
+  }
+  $('lgCheck').addEventListener('click', lgCheck);
+  $('lgIn').addEventListener('keydown', function (e) { if (e.key === 'Enter') lgCheck(); });
+  $('lgNext').addEventListener('click', function () { cur = (cur + 1) % APPS.length; lgShow(); });
+  lgShow(); lgBars();
+
+  /* ---------- Étape 2 : I = P ÷ U ---------- */
+  var VOLTS = [[4.5, 'Pile 4,5 V'], [12, 'Batterie 12 V'], [230, 'Prise 230 V']], uSel = 230;
+  VOLTS.forEach(function (v, i) {
+    var b = document.createElement('button'); b.type = 'button'; b.id = 'u' + i; b.textContent = v[1];
+    b.addEventListener('click', function () { uSel = v[0]; iCalc(); });
+    $('uBtns').appendChild(b);
+  });
+  function iCalc() {
+    var P = parseFloat($('pSl').value), I = current(P, uSel), o = $('iOut');
+    VOLTS.forEach(function (v, i) { $('u' + i).setAttribute('aria-pressed', v[0] === uSel ? 'true' : 'false'); });
+    $('pSlOut').textContent = fmt(P) + ' W';
+    var line = 'I = P ÷ U = ' + fmt(P) + ' ÷ ' + fmt(uSel) + ' ' + eq(I, 1) + fmt(I, 1) + ' A';
+    var why;
+    if (P === 0) why = 'Un appareil qui ne consomme rien n\'est traversé par aucun courant.';
+    else if (I > 16) why = 'Énorme ! Avec une tension aussi faible, il faudrait un courant gigantesque : les fils chaufferaient énormément, et une pile ne peut pas fournir ça. C\'est pour cela que les appareils puissants sont branchés sur le secteur : à 230 V, le même appareil n\'aurait besoin que de ' + fmt(P / U0, 1) + ' A.';
+    else if (uSel === 230) why = 'Pour la même puissance, plus la tension est grande, plus l\'intensité est petite. Essaie la pile !';
+    else why = 'Avec une petite tension, il faut plus de courant pour la même puissance.';
+    o.className = 'verdict ' + (I > 16 ? 'no' : 'mid');
+    o.innerHTML = '<span class="mono">' + line + '</span>' + '<span>' + why + '</span>';
+  }
+  $('pSl').addEventListener('input', iCalc); iCalc();
+  function pCalc() {
+    var U = num($('cU').value), I = num($('cI').value), o = $('cOut');
+    if (isNaN(U) || isNaN(I) || U < 0 || I < 0) { o.innerHTML = '<p class="err">Écris une tension et une intensité positives.</p>'; return; }
+    var P = power(U, I);
+    o.innerHTML = '<div class="method"><strong>La puissance</strong><span class="m">P = U × I = ' + fmt(U) + ' × ' + fmt(I) + ' <b>' + eq(P) + fmt(P) + ' W</b></span>' + (P >= 1000 ? '<span class="m">soit ' + fmt(P / 1000) + ' kW</span>' : '') + '</div>' +
+      '<div class="method"><strong>Ça ressemble à…</strong><span class="soft">' + (P === 0 ? 'Rien du tout : pas de courant, pas de puissance.' : P < 20 ? 'Un chargeur de téléphone ou une lampe à DEL.' : P < 300 ? 'Une télévision, un ordinateur ou un frigo.' : P < 1200 ? 'Un aspirateur, un grille-pain ou un micro-ondes.' : P <= 3680 ? 'Une bouilloire, un sèche-cheveux ou un four.' : 'Plus que ce qu\'une prise de 16 A peut donner (3 680 W) !') + '</span></div>';
+  }
+  $('cU').addEventListener('input', pCalc); $('cI').addEventListener('input', pCalc); pCalc();
+
+  /* ---------- Étape 3 : multiprise et disjoncteur ---------- */
+  var MP = [['Bouilloire', 2000], ['Sèche-cheveux', 1800], ["Radiateur d'appoint", 1500], ['Grille-pain', 900], ['Aspirateur', 800], ['Console de jeux', 150], ['Télévision', 100], ['Ordinateur portable', 60], ['Chargeur', 10], ['Lampe à DEL', 8]];
+  var mpOn = MP.map(function () { return false; }), tripped = false, tripI = 0;
+  MP.forEach(function (a, i) {
+    var b = document.createElement('button'); b.type = 'button'; b.id = 'mp' + i; b.setAttribute('aria-pressed', 'false');
+    b.innerHTML = a[0] + '<small>' + fmt(a[1]) + ' W</small>';
+    b.addEventListener('click', function () { if (tripped) return; mpOn[i] = !mpOn[i]; mpRender(); });
+    $('mpSw').appendChild(b);
+  });
+  function mpRender() {
+    var ws = MP.filter(function (a, i) { return mpOn[i]; }).map(function (a) { return a[1]; });
+    var P = sum(ws), I = totalCurrent(ws);
+    if (!tripped && trips(ws)) { tripped = true; tripI = I; }
+    var o = $('mpOut'), fill = $('mpFill'), cab = $('mpCable');
+    MP.forEach(function (a, i) { var b = $('mp' + i); b.setAttribute('aria-pressed', mpOn[i] && !tripped ? 'true' : 'false'); b.disabled = tripped; });
+    if (tripped) {
+      $('mpP').textContent = '0 W'; $('mpI').textContent = '0 A';
+      fill.style.width = '0%'; fill.className = 'fill'; cab.className = 'cable'; $('mpHeat').textContent = 'il refroidit, le courant est coupé';
+      o.className = 'verdict no';
+      o.innerHTML = 'Clac ! Le disjoncteur a coupé le courant.<span>Avec ces appareils, il aurait fallu ' + fmt(P) + ' W, soit ' + fmt(P) + ' ÷ 230 ' + eq(tripI, 1) + fmt(tripI, 1) + ' A : plus que les 16 A prévus. Les fils auraient trop chauffé. Éteins tout, réarme, et répartis les gros appareils sur d\'autres prises (d\'autres circuits) ou fais-les marcher l\'un après l\'autre.</span>';
+      return;
+    }
+    $('mpP').textContent = fmt(P) + ' W';
+    $('mpI').textContent = (P ? eq(I, 1).replace('= ', '') : '') + fmt(I, 1) + ' A';
+    var h = Math.pow(I / 16, 2), cls = h < 0.25 ? '' : h < 0.6 ? 'warm' : 'hot';
+    fill.style.width = Math.min(100, I / 24 * 100) + '%';
+    fill.className = 'fill' + (I / 16 < 0.6 ? '' : I / 16 < 0.9 ? ' warm' : ' hot');
+    cab.className = 'cable' + (cls ? ' ' + cls : '');
+    $('mpHeat').textContent = P === 0 ? 'froid' : h < 0.25 ? 'il chauffe à peine' : h < 0.6 ? 'il tiédit' : 'il chauffe, mais il est prévu pour';
+    o.className = 'verdict ' + (I / 16 < 0.9 ? 'yes' : 'mid');
+    o.innerHTML = P === 0 ? 'Rien n\'est allumé.<span>Clique sur des appareils pour les allumer.</span>' :
+      (I / 16 < 0.9 ? 'Tout va bien.' : 'Attention, on approche de la limite !') + '<span>' + fmt(P) + ' W ÷ 230 V ' + eq(I, 1) + fmt(I, 1) + ' A, sur 16 A possibles. Il reste environ ' + fmt(Math.max(0, 3680 - P)) + ' W avant que le disjoncteur coupe.</span>';
+  }
+  $('mpReset').addEventListener('click', function () { mpOn = MP.map(function () { return false; }); tripped = false; mpRender(); });
+  mpRender();
+
+  /* ---------- Étape 4 : E = P × t ---------- */
+  var TF = { s: 1, min: 60, h: 3600, j: 86400 }, TN = { s: 's', min: 'min', h: 'h', j: 'jours' };
+  var EPRE = [['Bouilloire, 3 min', 2000, 3, 'min'], ['Lampe DEL, 5 h', 8, 5, 'h'], ['Four, 1 h', 2500, 1, 'h'], ['Chargeur, 2 h', 10, 2, 'h'], ['Frigo, 1 jour', 120, 1, 'j']];
+  EPRE.forEach(function (p, i) {
+    var b = document.createElement('button'); b.type = 'button'; b.textContent = p[0];
+    b.addEventListener('click', function () { $('eP').value = fmt(p[1]); $('eT').value = fmt(p[2]); $('eU').value = p[3]; eCalc(); });
+    $('ePre').appendChild(b);
+  });
+  function eCalc() {
+    var P = num($('eP').value), t = num($('eT').value), u = $('eU').value, o = $('eOut');
+    if (isNaN(P) || isNaN(t) || P < 0 || t < 0) { o.innerHTML = '<p class="err">Écris une puissance et une durée positives.</p>'; return; }
+    var ts = t * TF[u], th = ts / 3600, EJ = energyJ(P, ts), EK = energyKWh(P, th);
+    var tsLine = u === 's' ? '' : '<span class="m">t = ' + fmt(t) + ' ' + TN[u] + ' = ' + fmt(ts) + ' s</span>';
+    var thLine = u === 'h' ? '' : '<span class="m">t = ' + fmt(t) + ' ' + TN[u] + ' ' + eq(th) + fmt(th) + ' h</span>';
+    o.innerHTML =
+      '<div class="method"><strong>En joules</strong>' + tsLine + '<span class="m">E = ' + fmt(P) + ' W × ' + fmt(ts) + ' s</span><span class="m"><b>= ' + fmt(EJ) + ' J</b></span>' + (EJ >= 1e6 ? '<span class="m">≈ ' + sci(EJ) + ' J</span>' : '') + '</div>' +
+      '<div class="method"><strong>En kilowattheures</strong>' + thLine + '<span class="m">E = ' + fmt(P / 1000) + ' kW × ' + fmt(th) + ' h</span><span class="m"><b>' + eq(EK, 4) + fmt(EK, 4) + ' kWh</b></span></div>' +
+      '<div class="method"><strong>Les deux sont d\'accord</strong><span class="m">' + fmt(EJ) + ' ÷ 3 600 000 ' + eq(jToKWh(EJ), 4) + fmt(jToKWh(EJ), 4) + ' kWh</span><span class="soft">' + (EK >= 1 ? 'Plus d\'un kWh : ça se voit sur la facture.' : EJ > 0 ? 'Moins d\'un kWh : il en faudrait ' + fmt(1 / EK, 0) + ' fois plus environ pour 1 kWh.' : 'Pas de puissance ou pas de temps : pas d\'énergie.') + '</span></div>';
+  }
+  ['eP', 'eT'].forEach(function (id) { $(id).addEventListener('input', eCalc); }); $('eU').addEventListener('change', eCalc); eCalc();
+
+  /* ---------- Étape 5 : la veille ---------- */
+  var SB = [['Box internet (jour et nuit)', 10, true], ['Décodeur TV en veille', 10, true], ['Console « démarrage rapide »', 10, false], ['Télévision en veille', 0.5, true], ['Ordinateur en veille', 2, false], ['Imprimante en veille', 3, false], ['Micro-ondes (horloge)', 2, true], ['Enceinte connectée', 3, false], ['Chargeur sans téléphone', 0.3, true]];
+  var sbOn = SB.map(function (a) { return a[2]; });
+  SB.forEach(function (a, i) {
+    var b = document.createElement('button'); b.type = 'button'; b.id = 'sb' + i;
+    b.innerHTML = a[0] + '<small>≈ ' + fmt(a[1]) + ' W</small>';
+    b.addEventListener('click', function () { sbOn[i] = !sbOn[i]; sbCalc(); });
+    $('sbSw').appendChild(b);
+  });
+  function sbCalc() {
+    SB.forEach(function (a, i) { $('sb' + i).setAttribute('aria-pressed', sbOn[i] ? 'true' : 'false'); });
+    var W = sum(SB.filter(function (a, i) { return sbOn[i]; }).map(function (a) { return a[1]; })), h = parseFloat($('sbH').value), price = num($('sbPrice').value);
+    $('sbHOut').textContent = h + ' h';
+    var k = standbyYear(W, h), o = $('sbOut');
+    var digits = String(Math.round(k)); while (digits.length < 5) digits = '0' + digits;
+    $('sbDigits').innerHTML = digits.split('').map(function (c) { return '<span>' + c + '</span>'; }).join('') + '<span class="u">kWh</span>';
+    var costCard = (isNaN(price) || price < 0) ? '<div class="method"><strong>Le coût</strong><span class="err">Écris un prix positif.</span></div>' :
+      '<div class="method"><strong>Le coût par an</strong><span class="m">' + fmt(k, 1) + ' kWh × ' + fmt(price, 3) + ' € <b>' + eq(cost(k, price), 2) + fmt(cost(k, price), 2) + ' €</b></span></div>';
+    o.innerHTML =
+      '<div class="method"><strong>En veille, ensemble</strong><span class="m">P = <b>' + fmt(W, 1) + ' W</b></span><span class="m">soit ' + fmt(W / 1000, 4) + ' kW</span></div>' +
+      '<div class="method"><strong>Sur une année</strong><span class="m">' + fmt(W / 1000, 4) + ' kW × ' + h + ' h × 365</span><span class="m"><b>' + eq(k, 1) + fmt(k, 1) + ' kWh</b></span></div>' + costCard +
+      '<div class="method"><strong>Pour comparer</strong><span class="soft">' + (k > 0 ? 'C\'est autant qu\'une bouilloire de 2 000 W allumée pendant environ ' + fmt(k / 2, 0) + ' heures. Et rien de tout cela ne sert pendant que tu dors !' : 'Zéro veille : bravo, rien ne consomme en cachette.') + '</span></div>';
+  }
+  $('sbH').addEventListener('input', sbCalc); $('sbPrice').addEventListener('input', sbCalc); sbCalc();
+
+  /* ---------- Étape 6 : les lampes ---------- */
+  function lCalc() {
+    var n = parseInt($('lN').value, 10), h = parseFloat($('lH').value), price = num($('lPrice').value);
+    $('lNOut').textContent = n; $('lHOut').textContent = fmt(h) + ' h/jour';
+    var ki = lampYear(60, h, n), kd = lampYear(8, h, n), okP = !isNaN(price) && price >= 0;
+    function c(k) { return okP ? fmt(cost(k, price), 2) + ' €' : '—'; }
+    $('lTable').innerHTML = '<thead><tr><th></th><th>Incandescence</th><th>DEL</th></tr></thead><tbody>' +
+      '<tr><th>Puissance d\'une lampe</th><td>60 W</td><td class="win">8 W</td></tr>' +
+      '<tr><th>Énergie par an</th><td>' + fmt(ki, 1) + ' kWh</td><td class="win">' + fmt(kd, 1) + ' kWh</td></tr>' +
+      '<tr><th>Coût par an</th><td>' + c(ki) + '</td><td class="win">' + c(kd) + '</td></tr></tbody>';
+    var o = $('lOut');
+    if (h === 0) { o.className = 'verdict'; o.innerHTML = '<span>Lampes jamais allumées : aucune énergie, quelle que soit la lampe.</span>'; return; }
+    o.className = 'verdict yes';
+    o.innerHTML = 'Économie : ' + fmt(ki - kd, 1) + ' kWh par an' + (okP ? ', soit ' + fmt(cost(ki - kd, price), 2) + ' €' : '') + '.<span>Calcul pour une lampe à DEL : 8 W × ' + fmt(h) + ' h × 365 = ' + fmt(8 * h * 365) + ' Wh ' + eq(lampYear(8, h), 2) + fmt(lampYear(8, h), 2) + ' kWh. La DEL consomme 60 ÷ 8 = 7,5 fois moins d\'énergie pour la même lumière.</span>' + (okP ? '' : '<span class="err">Écris un prix positif pour voir les coûts.</span>');
+  }
+  ['lN', 'lH'].forEach(function (id) { $(id).addEventListener('input', lCalc); }); $('lPrice').addEventListener('input', lCalc); lCalc();
+
+  /* ---------- Étape 7 : producteurs et consommateurs ---------- */
+  var SRC = [['Cycliste qui pédale fort', 150, 'cyclistes'], ['Panneau solaire en plein soleil', 400, 'panneaux solaires'], ['Éolienne', 2.5e6, 'éoliennes'], ['Réacteur nucléaire', 1e9, 'réacteurs']];
+  var CONS = [['Lampe à DEL', 8, 'lampes à DEL', 'lampe à DEL'], ['Télévision', 100, 'télévisions', 'télévision'], ['Bouilloire', 2000, 'bouilloires', 'bouilloire'], ['Maison (moyenne sur l\'année)', 500, 'maisons', 'maison']];
+  var si = 2, ci = 2;
+  function mkBtns(list, box, pre, set) {
+    list.forEach(function (a, i) {
+      var b = document.createElement('button'); b.type = 'button'; b.id = pre + i; b.innerHTML = a[0] + ' <small class="mono">≈ ' + pw(a[1]) + '</small>';
+      b.addEventListener('click', function () { set(i); srcCalc(); });
+      $(box).appendChild(b);
+    });
+  }
+  mkBtns(SRC, 'srcBtns', 'src', function (i) { si = i; });
+  mkBtns(CONS, 'appBtns', 'app', function (i) { ci = i; });
+  function srcCalc() {
+    SRC.forEach(function (a, i) { $('src' + i).setAttribute('aria-pressed', i === si ? 'true' : 'false'); });
+    CONS.forEach(function (a, i) { $('app' + i).setAttribute('aria-pressed', i === ci ? 'true' : 'false'); });
+    var S = SRC[si], C = CONS[ci], q = howMany(S[1], C[1]), o = $('srcOut');
+    var line = '<span class="mono">' + pw(S[1]) + ' ÷ ' + pw(C[1]) + ' = ' + fmt(S[1]) + ' W ÷ ' + fmt(C[1]) + ' W ' + eq(q, 2) + fmt(q, 2) + '</span>';
+    if (q >= 1) {
+      var n = Math.floor(q + 1e-9);
+      o.innerHTML = 'Environ ' + fmt(n) + ' ' + (n > 1 ? C[2] : C[3]) + ' en même temps.' + line + (n >= 1e6 ? '<span>Soit environ ' + sci(n) + '. Les préfixes M et G évitent d\'écrire tous ces zéros.</span>' : '');
+    } else {
+      var need = Math.ceil(1 / q - 1e-9);
+      o.innerHTML = 'Pas assez pour une seule ' + C[3] + ' !' + line + '<span>Il faut environ ' + need + ' ' + S[2] + ' pour faire marcher une ' + C[3] + '.</span>';
+    }
+  }
+  srcCalc();
+
+  /* ---------- Quiz ---------- */
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  function r1(x) { return Math.round(x * 10) / 10; }
+  var GEN = [
+    function () { var P = pick([460, 920, 1150, 1380, 2000, 900, 1800, 60]); var I = r1(P / 230); return { q: 'Un appareil de ' + fmt(P) + ' W est branché sur 230 V. Quelle est l\'intensité, en A ? (arrondis au dixième)', a: I, tol: 0.051, how: 'I = P ÷ U = ' + fmt(P) + ' ÷ 230 ' + eq(P / 230, 1) + fmt(I, 1) + ' A' }; },
+    function () { var c = pick([[230, 0.5], [230, 4], [230, 10], [5, 2], [12, 3], [9, 0.2]]); var P = c[0] * c[1]; return { q: 'Un appareil alimenté sous ' + fmt(c[0]) + ' V est traversé par ' + fmt(c[1]) + ' A. Quelle est sa puissance, en W ?', a: P, how: 'P = U × I = ' + fmt(c[0]) + ' × ' + fmt(c[1]) + ' = ' + fmt(P) + ' W' }; },
+    function () { var P = pick([500, 1000, 1500, 2000, 2500]), t = pick([0.5, 2, 3, 4]); var E = energyKWh(P, t); return { q: 'Un appareil de ' + fmt(P) + ' W fonctionne ' + fmt(t) + ' h. Quelle énergie consomme-t-il, en kWh ?', a: E, how: fmt(P) + ' W = ' + fmt(P / 1000) + ' kW, donc E = ' + fmt(P / 1000) + ' × ' + fmt(t) + ' = ' + fmt(E) + ' kWh' }; },
+    function () { var P = pick([5, 10, 60, 100, 1000]), t = pick([10, 30, 60, 120]); var E = energyJ(P, t); return { q: 'Un appareil de ' + fmt(P) + ' W fonctionne pendant ' + t + ' secondes. Quelle énergie reçoit-il, en J ?', a: E, how: 'E = P × t = ' + fmt(P) + ' × ' + t + ' = ' + fmt(E) + ' J' }; },
+    function () { var k = pick([100, 200, 300, 350, 400]), p = pick([0.2, 0.25, 0.3]); var C = cost(k, p); return { q: 'Ce mois-ci, le compteur a tourné de ' + k + ' kWh. Le kWh coûte ' + fmt(p, 2) + ' €. Combien coûte ce mois, en € ?', a: C, how: fmt(k) + ' × ' + fmt(p, 2) + ' = ' + fmt(C, 2) + ' €' }; },
+    function () { var L = pick([10, 16, 20]); return { q: 'Une prise est protégée par un disjoncteur de ' + L + ' A, sous 230 V. Quelle puissance totale maximale peut-on y brancher, en W ?', a: L * 230, how: 'P = U × I = 230 × ' + L + ' = ' + fmt(L * 230) + ' W' }; },
+    function () { var k = pick([0.5, 2, 5, 10]); return { q: 'Combien de joules y a-t-il dans ' + fmt(k) + ' kWh ?', a: kWhToJ(k), how: fmt(k) + ' × 3 600 000 = ' + fmt(kWhToJ(k)) + ' J' }; },
+    function () { var W = pick([2, 5, 10, 20]); var k = r1(standbyYear(W, 24)); return { q: 'Un appareil consomme ' + W + ' W en veille, 24 h sur 24, pendant 365 jours. Combien de kWh par an ? (arrondis au dixième)', a: k, tol: 0.051, how: fmt(W / 1000, 3) + ' kW × 24 × 365 ' + eq(standbyYear(W, 24), 1) + fmt(k, 1) + ' kWh' }; }
+  ];
+  var quiz = $('quiz'), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ''; done = [];
+    var types = GEN.map(function (g, i) { return i; });
+    for (var s = types.length - 1; s > 0; s--) { var r = Math.floor(Math.random() * (s + 1)), t = types[s]; types[s] = types[r]; types[r] = t; }
+    for (var k = 0; k < 8; k++) {
+      var Q = GEN[types[k]](), li = document.createElement('li');
+      li.innerHTML = '<span>' + Q.q + '</span><input type="text" id="qa' + k + '" inputmode="decimal" autocomplete="off" aria-label="Ta réponse à la question ' + (k + 1) + '"><button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+      quiz.appendChild(li);
+      (function (k, Q) {
+        function check() {
+          var fb = $('qf' + k), x = num($('qa' + k).value), tol = Q.tol || Math.max(0.006, Math.abs(Q.a) * 1e-9);
+          if (isNaN(x)) { fb.className = 'fb'; fb.textContent = 'Écris un nombre.'; return; }
+          if (Math.abs(x - Q.a) <= tol) { fb.className = 'fb ok'; fb.textContent = 'Bravo, c\'est juste !'; done[k] = true; }
+          else { done[k] = false; fb.className = 'fb no'; fb.innerHTML = 'Pas tout à fait : la réponse est ' + fmt(Q.a, 2) + '.<span>' + Q.how + '</span>'; }
+          $('score').textContent = done.filter(Boolean).length + ' / 8';
+        }
+        $('qb' + k).addEventListener('click', check);
+        $('qa' + k).addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+      })(k, Q);
+    }
+    $('score').textContent = '0 / 8';
+  }
+  $('newQuiz').addEventListener('click', newQuiz);
+  newQuiz();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1139 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Les signaux et la communication</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, encre bleu nuit, accent cyan-sarcelle (comme la lumière dans une fibre), marge rouge. */
+:root {
+  --paper: #f5fafb;
+  --grid: #dcebee;
+  --card: #ffffff;
+  --ink: #0f2329;
+  --ink-soft: #4b666e;
+  --acc: #0e7490;
+  --acc-soft: #d6f1f6;
+  --two: #1c64c8;
+  --two-soft: #dbe8fa;
+  --lamp: #f2b705;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #fff0a3;
+  --line: #cfe2e6;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0b1518; --grid: #14242a; --card: #0f1d21; --ink: #e5f3f6; --ink-soft: #9dbac2;
+    --acc: #5fd0e6; --acc-soft: #12343c; --two: #7fb0ff; --two-soft: #1a2a45; --lamp: #ffd24a;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #22393f;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0b1518; --grid: #14242a; --card: #0f1d21; --ink: #e5f3f6; --ink-soft: #9dbac2;
+  --acc: #5fd0e6; --acc-soft: #12343c; --two: #7fb0ff; --two-soft: #1a2a45; --lamp: #ffd24a;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #22393f;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+.fig svg, .box svg { width: 100%; height: auto; display: block; }
+.stage { background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 8px 12px; min-height: 44px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+button:disabled { opacity: .5; cursor: default; transform: none; }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+input[type="text"], select { font: inherit; font-family: var(--f-mono); font-size: 1.05rem; padding: 8px 10px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; }
+select { font-family: var(--f-body); font-size: 1rem; min-height: 44px; }
+input[type="range"] { width: 100%; accent-color: var(--acc); min-height: 32px; }
+.param { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.param label { font-weight: 700; }
+.inputs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 14px; align-items: end; }
+.inputs label { font-weight: 700; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+@media (max-width: 480px) { .inputs { grid-template-columns: 1fr; } }
+.row2 { display: grid; grid-template-columns: minmax(0, 1fr) 120px; gap: 8px; }
+
+.out { font-family: var(--f-mono); font-size: .98rem; overflow-wrap: anywhere; display: flex; flex-direction: column; gap: 4px; }
+.out b { color: var(--acc); }
+.err { color: var(--red); font-weight: 700; }
+.verdict { border-radius: 8px; padding: 12px 14px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; background: var(--paper); border: 1.5px solid var(--line); }
+.verdict.yes { background: var(--ok-soft); color: var(--ok); border-color: transparent; }
+.verdict.no { background: var(--red-soft); color: var(--red); border-color: transparent; }
+.verdict.warn { background: var(--hl); color: var(--ink); border-color: transparent; }
+.verdict span { font-weight: 400; color: var(--ink); }
+.scroll { overflow-x: auto; }
+
+/* Chaîne de transmission */
+.chain { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1.2fr) auto minmax(0, 1fr); gap: 8px; align-items: stretch; }
+.chain .cell { border: 2px solid var(--ink); border-radius: 10px; padding: 10px 12px; background: var(--paper); display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.chain .cell.sig { border-style: dashed; border-color: var(--acc); background: var(--acc-soft); }
+.chain .cell .k { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .1em; text-transform: uppercase; color: var(--acc); font-weight: 600; }
+.chain .cell .v { font-family: var(--f-display); font-weight: 700; overflow-wrap: anywhere; }
+.chain .cell .c { font-size: .9rem; color: var(--ink-soft); }
+.chain .arr { align-self: center; font-size: 1.6rem; color: var(--acc); font-weight: 700; }
+@media (max-width: 620px) { .chain { grid-template-columns: 1fr; } .chain .arr { justify-self: center; transform: rotate(90deg); line-height: 1; } }
+.pickers { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 14px; }
+.pickers label { font-weight: 700; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+@media (max-width: 620px) { .pickers { grid-template-columns: 1fr; } }
+.mark { font-size: .9rem; font-weight: 700; }
+.mark.ok { color: var(--ok); }
+.mark.no { color: var(--red); }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; color: var(--acc); }
+.tag.ok { color: var(--ok); }
+.tag.no { color: var(--red); }
+
+.dtable { border-collapse: separate; border-spacing: 0; width: 100%; font-variant-numeric: tabular-nums; }
+.dtable th, .dtable td { border-bottom: 1.5px solid var(--line); padding: 6px 8px; text-align: left; font-size: .95rem; vertical-align: top; }
+.dtable th { font-family: var(--f-display); }
+.dtable td { font-family: var(--f-mono); }
+
+/* Barres de temps */
+.bars { display: flex; flex-direction: column; gap: 10px; }
+.bar { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 4px 10px; align-items: center; }
+.bar .lbl { font-weight: 700; }
+.bar .track { height: 18px; border: 2px solid var(--ink); border-radius: 999px; overflow: hidden; background: var(--paper); }
+.bar .track > i { display: block; height: 100%; width: 0; background: var(--acc); }
+.bar .track.snd > i { background: var(--red); }
+.bar .val { grid-column: 2; font-family: var(--f-mono); font-size: .92rem; }
+@media (max-width: 420px) { .bar { grid-template-columns: 1fr; } .bar .val { grid-column: 1; } }
+
+/* Lampe et code */
+.lampwrap { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+.lamp { width: 64px; height: 64px; border-radius: 50%; border: 3px solid var(--ink); background: var(--paper); flex: none; transition: background .04s; }
+.lamp.on { background: var(--lamp); box-shadow: 0 0 22px 6px var(--lamp); }
+.lampinfo { flex: 1 1 180px; min-width: 0; font-family: var(--f-mono); font-size: .95rem; }
+.morse { font-family: var(--f-mono); font-size: 1.15rem; letter-spacing: .06em; overflow-wrap: anywhere; line-height: 1.8; }
+.morse .cur { background: var(--hl); border-radius: 4px; }
+.mtable { display: grid; grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); gap: 6px; }
+.mtable span { border: 1.5px solid var(--line); border-radius: 6px; padding: 2px 6px; font-family: var(--f-mono); font-size: .92rem; display: flex; justify-content: space-between; gap: 4px; }
+.mtable b { font-family: var(--f-display); }
+.strip svg { min-width: 100%; height: 46px; width: auto; display: block; }
+.strip { overflow-x: auto; border: 1.5px solid var(--line); border-radius: 8px; background: var(--paper); }
+
+.ctable { border-collapse: separate; border-spacing: 0; width: 100%; font-variant-numeric: tabular-nums; }
+.ctable th, .ctable td { border: 1.5px solid var(--ink); padding: 6px 8px; text-align: center; font-family: var(--f-mono); font-size: .98rem; }
+.ctable th { font-family: var(--f-display); background: var(--paper); }
+
+.bitrow { display: flex; flex-wrap: wrap; gap: 6px; }
+.bitrow button { width: 46px; min-width: 46px; padding: 6px 0; font-family: var(--f-mono); font-size: 1.2rem; }
+.bitrow button.par { border-color: var(--acc); box-shadow: 3px 3px 0 var(--acc); }
+.bitrow button.flip { background: var(--red-soft); color: var(--red); }
+@media (max-width: 420px) { .bitrow { gap: 4px; } .bitrow button { width: 32px; min-width: 32px; font-size: 1.05rem; } }
+
+.handle { cursor: grab; touch-action: none; }
+.bands { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
+.bands button { width: 100%; text-align: left; font-size: .95rem; display: flex; flex-direction: column; gap: 0; }
+.bands button small { font-family: var(--f-mono); font-weight: 400; font-size: .82rem; }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 150px auto; gap: 10px; align-items: center; }
+.quiz input[type="text"] { font-size: 1rem; padding: 6px 8px; }
+.quiz select { font-size: .95rem; padding: 6px 6px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc); }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 120px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+<!--ticons--><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Tutoriels"><script src="progress.js" defer></script><!--/ticons-->
+<style id="tnav-css">
+.tnav-top { display: flex; margin: 0 0 4px; }
+.tnav-home { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font-weight: 700; font-size: .95rem; text-decoration: none; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tnav-home:hover, .tnav-home:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.tnav-bottom { margin-top: 8px; display: flex; flex-direction: column; gap: 12px; }
+.tnav-bottom h2 { margin: 0; }
+.tnav-pn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tnav-pn a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--ink, #222); border-radius: 10px;
+  background: var(--card, #fff); color: var(--ink, #222); text-decoration: none; box-shadow: 3px 3px 0 var(--ink, #222); min-width: 0; }
+.tnav-pn a span { font-size: .85rem; color: var(--ink-soft, #666); }
+.tnav-pn a strong { overflow-wrap: anywhere; }
+.tnav-pn a.next { text-align: right; grid-column: 2; }
+.tnav-bottom .tnav-home { align-self: center; }
+@media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
+</style>
+</head>
+<body>
+<main class="page">
+<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="physique.html">← Tous les tutoriels de physique</a></nav><!--/tnav-->
+
+
+  <header class="hero">
+    <span class="eyebrow">Tutoriel de physique-chimie · niveau 4<sup>e</sup>–3<sup>e</sup></span>
+    <h1>Les signaux et la communication</h1>
+    <p class="lead">Un coup de sifflet, l'éclat d'un phare, un message sur ton téléphone : à chaque fois, une information voyage d'un endroit à un autre. Pour la transporter, on utilise un <strong>signal</strong> : du son, de la lumière, un courant électrique ou une onde radio.</p>
+    <div class="box fig">
+      <svg viewBox="0 0 400 130" role="img" aria-label="Un émetteur envoie un signal à travers un canal jusqu'à un récepteur">
+        <rect x="6" y="40" width="96" height="50" rx="8" fill="var(--paper)" stroke="var(--ink)" stroke-width="2"/>
+        <text x="54" y="71" text-anchor="middle" font-size="15" font-weight="600">émetteur</text>
+        <rect x="298" y="40" width="96" height="50" rx="8" fill="var(--paper)" stroke="var(--ink)" stroke-width="2"/>
+        <text x="346" y="71" text-anchor="middle" font-size="15" font-weight="600">récepteur</text>
+        <path d="M120 65 q 10 -18 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0 t 20 0" fill="none" stroke="var(--acc)" stroke-width="3"/>
+        <path d="M276 57 l 12 8 l -12 8" fill="none" stroke="var(--acc)" stroke-width="3"/>
+        <text x="200" y="30" text-anchor="middle" font-size="15" fill="var(--acc)" style="fill:var(--acc)">signal</text>
+        <text x="200" y="112" text-anchor="middle" font-size="13" class="soft" style="fill:var(--ink-soft)">canal : air, fil, fibre, vide…</text>
+      </svg>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · La chaîne de transmission</span>
+    <h2>Émetteur, signal, récepteur</h2>
+    <p>Pour communiquer, il faut toujours trois choses. Un <strong>émetteur</strong> produit le signal. Le <strong>signal</strong> transporte l'information. Un <strong>récepteur</strong> le capte. Entre les deux, le signal traverse un milieu : on l'appelle le <strong>canal</strong> (l'air, un fil de cuivre, une fibre de verre, ou même le vide de l'espace).</p>
+    <p>Quand tu parles à un ami, ta bouche (tes cordes vocales) est l'émetteur, le son est le signal, l'air est le canal et son oreille est le récepteur.</p>
+    <div class="box">
+      <h3>À toi d'identifier la chaîne</h3>
+      <div class="btns" id="sitBtns" role="group" aria-label="Choisis une situation"></div>
+      <p id="sitText"></p>
+      <div class="pickers">
+        <label for="pkE">Émetteur<select id="pkE"></select><span class="mark" id="mkE" aria-live="polite"></span></label>
+        <label for="pkS">Signal<select id="pkS"></select><span class="mark" id="mkS" aria-live="polite"></span></label>
+        <label for="pkR">Récepteur<select id="pkR"></select><span class="mark" id="mkR" aria-live="polite"></span></label>
+      </div>
+      <div class="btns">
+        <button type="button" id="sitCheck">Vérifier</button>
+        <button type="button" id="sitShow">Montrer la réponse</button>
+      </div>
+      <div class="chain" id="chain" aria-live="polite"></div>
+      <p class="soft" id="sitInfo"></p>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · Quatre familles de signaux</span>
+    <h2>Son, lumière, électricité, ondes radio</h2>
+    <div class="cards">
+      <div class="box"><span class="tag">Sonore</span><strong>Une vibration de la matière</strong><span class="soft">Sifflet, sirène, voix. Il a besoin d'un milieu matériel (air, eau, solide) : <strong>pas de son dans le vide</strong>. Dans l'air : environ <strong>340 m/s</strong>. Tout est expliqué dans le tutoriel sur <a class="tlink" href="le-son.html">le son</a>.</span></div>
+      <div class="box"><span class="tag">Lumineux</span><strong>De la lumière, visible ou non</strong><span class="soft">Phare, feu tricolore, télécommande (lumière <strong>infrarouge</strong>, invisible pour nos yeux), fibre optique. Elle traverse le vide. Dans l'air ou le vide : environ <strong>300 000 km/s</strong>. Voir le tutoriel sur <a class="tlink" href="la-lumiere.html">la lumière</a>.</span></div>
+      <div class="box"><span class="tag">Électrique</span><strong>Une tension qui varie dans un fil</strong><span class="soft">Ancien téléphone fixe, câble Ethernet, câble d'écouteurs. Le signal se propage dans le câble à environ <strong>200 000 km/s</strong>, même si les électrons, eux, avancent très lentement.</span></div>
+      <div class="box"><span class="tag">Onde radio</span><strong>De la même famille que la lumière</strong><span class="soft">Radio, téléphone portable, Wi-Fi, Bluetooth, GPS. Invisible, elle traverse les murs (en partie) et le vide. Vitesse : environ <strong>300 000 km/s</strong>, comme la lumière.</span></div>
+    </div>
+    <p>La lumière, l'infrarouge et les ondes radio sont des <strong>ondes électromagnétiques</strong> : la même famille, avec des fréquences différentes. Le son, lui, est d'une autre nature : c'est la matière qui vibre. Il va environ <span class="hl">un million de fois moins vite</span> que la lumière.</p>
+    <div class="box">
+      <h3>Au stade : pourquoi la radio arrive avant le son ?</h3>
+      <p>Tu es dans les tribunes, loin de l'arbitre. Ton ami écoute le match à la radio, chez lui. Le micro du commentateur est tout près du terrain. Qui entend le coup de sifflet en premier ?</p>
+      <div class="param">
+        <label for="stD">Ta distance à l'arbitre : <span class="mono" id="stDo"></span></label>
+        <input id="stD" type="range" min="10" max="300" step="5" value="170">
+      </div>
+      <div class="inputs">
+        <label for="stH">Distance du stade à la maison de ton ami (km)<input id="stH" type="text" inputmode="decimal" autocomplete="off" value="100"></label>
+        <div class="btns" role="group" aria-label="Distances rapides">
+          <button type="button" data-km="20">20 km</button>
+          <button type="button" data-km="900">900 km</button>
+          <button type="button" data-km="72000">Satellite</button>
+        </div>
+      </div>
+      <div class="bars">
+        <div class="bar"><span class="lbl">Toi (son)</span><div class="track snd"><i id="stBarS"></i></div><span class="val" id="stValS"></span></div>
+        <div class="bar"><span class="lbl">Ton ami (radio)</span><div class="track"><i id="stBarR"></i></div><span class="val" id="stValR"></span></div>
+      </div>
+      <div class="verdict" id="stOut" aria-live="polite"></div>
+      <p class="soft">« Satellite » : le signal monte vers un satellite à environ 36 000 km d'altitude et redescend, soit environ 72 000 km. Attention : la radio numérique et Internet ajoutent des retards de traitement (souvent plusieurs secondes). Le calcul vaut pour une radio FM classique.</p>
+    </div>
+    <p class="soft">Le calcul utilise la formule de la vitesse, t = d ÷ v (voir le tutoriel sur <a class="tlink" href="la-vitesse.html">la vitesse</a>). Pense à mettre les distances dans la même unité : 300 000 km/s = 300 000 000 m/s.</p>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Analogique ou numérique</span>
+    <h2>Une courbe lisse ou une suite de nombres</h2>
+    <p>Quand tu parles dans un micro, il produit une tension électrique qui suit exactement la forme de ta voix : elle varie de façon continue, sans sauts. C'est un <strong>signal analogique</strong> (« analogue » à la voix).</p>
+    <p>Un ordinateur ne sait manipuler que des nombres. On mesure donc le signal à intervalles réguliers : c'est l'<strong>échantillonnage</strong>. Chaque mesure est arrondie à un niveau, puis écrite en binaire avec des 0 et des 1. On obtient un <strong>signal numérique</strong>. Pour les 0 et les 1, vois le tutoriel sur <a class="tlink" href="le-binaire-et-les-bases.html">le binaire et les bases</a>.</p>
+    <div class="box">
+      <h3>Échantillonne la courbe</h3>
+      <div class="param">
+        <label for="smN">Fréquence d'échantillonnage : <span class="mono" id="smNo"></span></label>
+        <input id="smN" type="range" min="2" max="60" step="1" value="12">
+      </div>
+      <div class="param">
+        <label for="smB">Bits par mesure : <span class="mono" id="smBo"></span></label>
+        <input id="smB" type="range" min="1" max="6" step="1" value="3">
+      </div>
+      <div class="stage"><svg id="smSvg" viewBox="0 0 400 230" role="img" aria-label="Courbe analogique, ses échantillons et le signal numérique en escalier"></svg></div>
+      <p class="soft"><span style="color:var(--two);font-weight:700">Courbe bleue</span> : le signal analogique. <span style="color:var(--acc);font-weight:700">Escalier</span> : ce que l'on retrouve avec les nombres.</p>
+      <div class="out" id="smOut" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Pourquoi le numérique ?</span>
+      <span>Une suite de 0 et de 1 se copie sans s'abîmer, se compresse, se protège contre les erreurs. Un CD audio prend environ 44 100 mesures par seconde, chacune sur 16 bits : à l'oreille, l'escalier est si fin qu'on ne l'entend pas.</span>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · Coder un message</span>
+    <h2>Le code Morse : des brèves et des longues</h2>
+    <p>Pour envoyer un texte avec une lampe ou un fil électrique, il faut un <strong>code</strong> que l'émetteur et le récepteur connaissent tous les deux. Dans le <strong>code Morse</strong>, chaque lettre est une suite de signaux courts (les points ·) et longs (les traits −).</p>
+    <p>Le rythme compte : un trait dure 3 points, on laisse 1 point de silence entre deux signaux d'une même lettre, 3 points entre deux lettres et 7 points entre deux mots.</p>
+    <div class="box">
+      <h3>Encodeur et décodeur Morse</h3>
+      <div class="param">
+        <label for="moT">Texte (lettres et chiffres)</label>
+        <input id="moT" type="text" maxlength="30" autocomplete="off" spellcheck="false" value="SOS">
+      </div>
+      <div class="param">
+        <label for="moC">Morse (points, traits, une espace entre les lettres, « / » entre les mots)</label>
+        <input id="moC" type="text" autocomplete="off" spellcheck="false">
+      </div>
+      <p class="err" id="moErr" aria-live="polite"></p>
+      <div class="strip" id="moStrip" aria-hidden="true"></div>
+      <div class="lampwrap">
+        <div class="lamp" id="lamp" aria-hidden="true"></div>
+        <div class="lampinfo" id="lampInfo" aria-live="polite">La lampe est éteinte.</div>
+      </div>
+      <div class="btns">
+        <button type="button" id="moPlay">Envoyer en lumière</button>
+        <button type="button" id="moStep">Pas à pas</button>
+        <button type="button" id="moStop">Stop</button>
+        <button type="button" id="beep" aria-pressed="false">Bips : non</button>
+        <button type="button" id="mute" aria-pressed="false">Couper le son</button>
+      </div>
+      <p class="soft">Les bips sont désactivés au départ. Si tu les actives, le son reste faible ; le bouton « Couper le son » l'arrête tout de suite.</p>
+      <details>
+        <summary>Le tableau du code Morse</summary>
+        <div><div class="mtable" id="moTable"></div></div>
+      </details>
+    </div>
+    <p>Les lettres les plus fréquentes en anglais ont les codes les plus courts : E = ·, T = −. Le célèbre appel au secours <strong>SOS</strong> (· · · − − − · · ·) a été choisi parce qu'il est simple à reconnaître, pas parce qu'il voudrait dire quelque chose.</p>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Le binaire et le bruit</span>
+    <h2>Des lettres aux impulsions de lumière</h2>
+    <p>Aujourd'hui, on code tout en <strong>binaire</strong>. Chaque lettre reçoit un numéro (le code <strong>ASCII</strong> : A = 65, B = 66…), écrit sur 8 bits, c'est-à-dire un <strong>octet</strong>. Dans une fibre optique, un 1 peut être une impulsion de lumière et un 0 l'absence de lumière.</p>
+    <div class="box">
+      <h3>Ton mot en impulsions</h3>
+      <div class="param">
+        <label for="biT">Écris un mot (6 caractères au plus, sans accents)</label>
+        <input id="biT" type="text" maxlength="6" autocomplete="off" spellcheck="false" value="Hi">
+      </div>
+      <div class="scroll"><table class="ctable" id="biTable"></table></div>
+      <div class="strip" id="biStrip" aria-hidden="true"></div>
+      <div class="btns">
+        <button type="button" id="biPlay">Envoyer en lumière</button>
+        <button type="button" id="biStep">Pas à pas</button>
+        <button type="button" id="biStop">Stop</button>
+        <span class="soft" id="biCount"></span>
+      </div>
+      <div class="lampwrap">
+        <div class="lamp" id="lamp2" aria-hidden="true"></div>
+        <div class="lampinfo" id="lampInfo2" aria-live="polite">La lampe est éteinte.</div>
+      </div>
+      <p class="soft">Les bips suivent le réglage de l'étape 4. Deux 1 de suite donnent une lumière allumée deux fois plus longtemps : le récepteur doit connaître le <strong>rythme</strong> (on parle d'horloge) pour compter les bits.</p>
+    </div>
+    <p>Sur le trajet, un signal peut être abîmé : un orage, un moteur, une autre onde… On appelle cela le <strong>bruit</strong>. Un 0 peut devenir un 1. En fait, l'ASCII n'utilise que 7 bits (128 caractères) : le 8<sup>e</sup> bit peut servir de contrôle. Pour se rendre compte d'une erreur, on ajoute un <strong>bit de parité</strong> : on le choisit pour que le nombre total de 1 soit <strong>pair</strong>.</p>
+    <div class="box">
+      <h3>Le bit de parité</h3>
+      <div class="btns" id="paLetters" role="group" aria-label="Choisis une lettre à envoyer"></div>
+      <p>Lettre envoyée : <strong id="paSent"></strong>. Les 7 premiers bits sont la lettre, le dernier (encadré en couleur) est le bit de parité. <strong>Clique sur un bit</strong> pour l'abîmer.</p>
+      <div class="bitrow" id="paBits" role="group" aria-label="Les 8 bits reçus"></div>
+      <div class="btns">
+        <button type="button" id="paN1">Bruit sur 1 bit</button>
+        <button type="button" id="paN2">Bruit sur 2 bits</button>
+        <button type="button" id="paReset">Renvoyer proprement</button>
+      </div>
+      <div class="verdict" id="paOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · La fibre optique</span>
+    <h2>La lumière prisonnière d'un fil de verre</h2>
+    <p>Une fibre optique est un fil de verre très pur, plus fin qu'un cheveu épais. La lumière y avance en rebondissant sur les parois. Quand un rayon frappe la paroi <strong>en rasant</strong>, il ne peut pas sortir : il est entièrement renvoyé à l'intérieur. C'est la <strong>réflexion totale</strong>. S'il arrive <strong>trop droit</strong> sur la paroi, il s'échappe en grande partie.</p>
+    <div class="box">
+      <h3>Guide le rayon</h3>
+      <p class="soft">Fais glisser le laser (le rond à gauche) ou utilise les curseurs. Change la courbure de la fibre.</p>
+      <div class="stage"><svg id="fiSvg" viewBox="0 0 400 280" role="img" aria-label="Rayon de lumière dans une fibre optique courbée"></svg></div>
+      <div class="param">
+        <label for="fiA">Angle du laser : <span class="mono" id="fiAo"></span></label>
+        <input id="fiA" type="range" min="-70" max="70" step="1" value="25">
+      </div>
+      <div class="param">
+        <label for="fiR">Rayon de courbure de la fibre : <span class="mono" id="fiRo"></span></label>
+        <input id="fiR" type="range" min="30" max="200" step="1" value="140">
+      </div>
+      <div class="verdict" id="fiOut" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Ce que dit le modèle</span>
+      <span>Ici, on modélise du verre dans l'air : le rayon reste dans la fibre si l'angle entre le rayon et la perpendiculaire à la paroi dépasse environ 42°. Dans une fibre droite, c'est toujours le cas, quel que soit l'angle d'entrée. Mais si on plie trop la fibre, la lumière peut s'échapper, surtout pour les rayons qui entrent très penchés. Les vraies fibres ont une gaine de verre un peu différent autour du cœur, et la lumière y avance à environ 200 000 km/s.</span>
+    </div>
+    <div class="note red">
+      <span class="note-title">Sécurité</span>
+      <span>Ne regarde jamais un faisceau laser, ni directement, ni le bout d'une fibre en fonctionnement : la lumière y est souvent infrarouge, donc invisible, et peut abîmer l'œil.</span>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Les ondes radio</span>
+    <h2>Radio, Wi-Fi, Bluetooth, GPS : une question de fréquence</h2>
+    <p>Comme pour le son, la <strong>fréquence</strong> d'une onde est le nombre d'oscillations par seconde, en hertz (Hz) : vois le tutoriel sur <a class="tlink" href="le-son.html">le son</a>. Mais les ondes radio oscillent beaucoup plus vite. On compte en <strong>mégahertz</strong> (1 MHz = 1 000 000 Hz) et en <strong>gigahertz</strong> (1 GHz = 1 000 MHz = 10<sup>9</sup> Hz). Chaque usage a sa bande de fréquences, pour que les signaux ne se mélangent pas.</p>
+    <div class="box">
+      <h3>Le spectre radio</h3>
+      <div class="param">
+        <label for="raF">Fréquence : <span class="mono" id="raFo"></span></label>
+        <input id="raF" type="range" min="0" max="400" step="1" value="339">
+      </div>
+      <div class="stage"><svg id="raSvg" viewBox="0 0 400 130" role="img" aria-label="Échelle des fréquences radio de 1 MHz à 10 GHz"></svg></div>
+      <div class="out" id="raOut" aria-live="polite"></div>
+      <ul class="bands" id="raBands"></ul>
+      <p class="soft">L'échelle est logarithmique : chaque graduation est 10 fois plus grande que la précédente (vois le tutoriel sur <a class="tlink" href="les-puissances.html">les puissances</a>). Les valeurs sont approchées.</p>
+    </div>
+    <p>Le <strong>GPS</strong> est particulier : ton téléphone ne fait que <em>recevoir</em>. Des satellites à environ 20 000 km d'altitude envoient l'heure exacte. Le signal met environ 0,07 s pour arriver. En comparant les retards de plusieurs satellites, le téléphone calcule sa position.</p>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Le débit</span>
+    <h2>Combien de bits par seconde ?</h2>
+    <p>Le <strong>débit</strong> d'une connexion est le nombre de bits transmis chaque seconde, en <strong>bit/s</strong>. On utilise souvent le kilobit par seconde (1 kbit/s = 1 000 bit/s), le mégabit par seconde (1 Mbit/s = 1 000 000 bit/s) et le gigabit par seconde (Gbit/s).</p>
+    <p>Piège : la taille des fichiers s'écrit en <strong>octets</strong> (Ko, Mo, Go), et <span class="hl">1 octet = 8 bits</span>. Il faut donc <strong>multiplier par 8</strong> avant de diviser par le débit. Pour les préfixes kilo, méga, giga, vois le tutoriel sur <a class="tlink" href="les-conversions.html">les conversions</a>.</p>
+    <div class="box">
+      <h3>Calculateur de téléchargement</h3>
+      <div class="inputs">
+        <label for="dbS">Taille du fichier<span class="row2"><input id="dbS" type="text" inputmode="decimal" autocomplete="off" value="4"><select id="dbSU" aria-label="Unité de taille"><option value="1e3">Ko</option><option value="1e6" selected>Mo</option><option value="1e9">Go</option></select></span></label>
+        <label for="dbR">Débit<span class="row2"><input id="dbR" type="text" inputmode="decimal" autocomplete="off" value="30"><select id="dbRU" aria-label="Unité de débit"><option value="1e3">kbit/s</option><option value="1e6" selected>Mbit/s</option><option value="1e9">Gbit/s</option></select></span></label>
+      </div>
+      <div class="btns" id="dbFiles" role="group" aria-label="Exemples de fichiers"></div>
+      <div class="btns" id="dbLinks" role="group" aria-label="Exemples de connexions"></div>
+      <div class="out" id="dbOut" aria-live="polite"></div>
+      <p class="soft">Débits typiques, très variables selon les lieux et les heures. En vrai, le téléchargement est souvent un peu plus lent que le calcul.</p>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Les erreurs fréquentes</span>
+    <h2>Six idées fausses</h2>
+    <div class="cards">
+      <div class="box"><span class="tag no">Faux</span><strong>« Le son traverse l'espace »</strong><span class="soft">Non : le son a besoin de matière. Les astronautes se parlent par radio, car les ondes radio, elles, traversent le vide.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« Les ondes radio, c'est du son »</strong><span class="soft">Non : on ne les entend pas. Le poste de radio capte l'onde radio et la transforme en son grâce à son haut-parleur.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« 100 Mbit/s, c'est 100 Mo par seconde »</strong><span class="soft">Non : 100 Mbit/s ÷ 8 = 12,5 Mo par seconde. Bit (b) et octet (o) ne sont pas la même chose.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« Les électrons foncent dans le fil à 200 000 km/s »</strong><span class="soft">Non : c'est le signal qui se propage très vite. Les électrons, eux, avancent de quelques millimètres par seconde, voire moins.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« La télécommande n'envoie rien, on ne voit rien »</strong><span class="soft">Elle envoie de la lumière infrarouge, invisible pour nous. L'appareil photo d'un téléphone la voit souvent, comme une petite lueur.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« Numérique veut dire sans fil »</strong><span class="soft">Non : numérique veut dire codé en nombres. Un signal numérique peut passer par un câble, une fibre ou une onde radio.</span></div>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · Un peu d'histoire</span>
+    <h2>Des feux sur les collines à Internet</h2>
+    <ol class="timeline">
+      <li><span class="when">Antiquité</span><div class="what"><strong>Fumées, feux et tambours</strong><span>Dans beaucoup de civilisations, on allume des feux sur les hauteurs ou on fait de la fumée pour prévenir d'un danger, de colline en colline. Le message est très simple : oui ou non.</span></div></li>
+      <li><span class="when">1794</span><div class="what"><strong>Le télégraphe Chappe</strong><span>En France, Claude Chappe fait construire des tours équipées de grands bras articulés. Chaque position des bras est un signe. Des guetteurs les observent à la longue-vue et les recopient de tour en tour : un message traverse Paris–Lille bien plus vite qu'un cheval.</span></div></li>
+      <li><span class="when">années 1830–1840</span><div class="what"><strong>Le télégraphe électrique et le Morse</strong><span>Samuel Morse et Alfred Vail, aux États-Unis, mettent au point un télégraphe électrique et le code de points et de traits qui porte son nom. Le signal électrique voyage dans un fil, presque instantanément.</span></div></li>
+      <li><span class="when">vers 1900</span><div class="what"><strong>Marconi et la radio</strong><span>Guglielmo Marconi réussit à transmettre des messages sans fil, avec des ondes radio, jusqu'à traverser l'Atlantique au début du XX<sup>e</sup> siècle. D'autres chercheurs avaient préparé le terrain, comme Heinrich Hertz qui avait produit ces ondes en laboratoire.</span></div></li>
+      <li><span class="when">années 1970–1990</span><div class="what"><strong>Fibre optique et Internet</strong><span>On fabrique des fibres de verre assez transparentes pour guider la lumière sur des kilomètres. Des câbles sous-marins relient les continents. En même temps, les réseaux d'ordinateurs se relient entre eux : c'est Internet, puis le Web, inventé au CERN près de Genève vers 1990.</span></div></li>
+    </ol>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · Quiz</span>
+    <h2>Huit questions sur les signaux</h2>
+    <p>Pour les nombres, tu peux écrire une virgule. Pour le Morse, écris une lettre.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Nouvelles questions</button>
+    </div>
+  </section>
+
+  <!-- 12 -->
+  <section>
+    <span class="eyebrow">Étape 12 · À toi de jouer</span>
+    <h2>Six problèmes</h2>
+    <div class="exos">
+      <details>
+        <summary>Le feu tricolore<span class="q">Pour un feu tricolore, donne l'émetteur, le signal et le récepteur.</span></summary>
+        <div><span>Émetteur : les lampes du feu. Signal : <strong>lumineux</strong> (visible). Canal : l'air. Récepteur : l'œil du conducteur (ou du piéton).</span></div>
+      </details>
+      <details>
+        <summary>Le coup de feu du départ<span class="q">Au départ d'un 100 m, un chronométreur est à l'arrivée, à 100 m du pistolet. S'il démarrait son chrono au bruit, quel retard aurait-il ?</span></summary>
+        <div><span>t = d ÷ v = 100 ÷ 340 ≈ <strong>0,29 s</strong>. C'est énorme pour une course qui se joue au centième ! On utilise donc un signal électrique ou lumineux, presque instantané.</span></div>
+      </details>
+      <details>
+        <summary>La Lune<span class="q">La Lune est à environ 384 000 km. Combien de temps met un message radio pour y aller ?</span></summary>
+        <div><span>t = 384 000 ÷ 300 000 = <strong>1,28 s</strong>. Un aller-retour prend donc environ 2,6 s.</span></div>
+      </details>
+      <details>
+        <summary>Décoder<span class="q">Décode ce message de deux lettres : « − − − » puis « · · · · ». Ensuite, explique pourquoi « · · · · · · » sans aucun silence pose problème.</span></summary>
+        <div><span>− − − = O et · · · · = H : <strong>OH</strong>. Attention : sans les silences, · · · · · · pourrait être HI (···· ··), SS (··· ···), IH… C'est pour cela que les <strong>silences</strong> entre les lettres font partie du code.</span></div>
+      </details>
+      <details>
+        <summary>La parité<span class="q">On reçoit les 8 bits 1 0 0 0 0 1 1 1 avec une parité paire. Le message est-il sûrement correct ?</span></summary>
+        <div><span>Il y a quatre 1 : c'est pair, le test passe. Mais ce n'est <strong>pas sûr</strong> : si deux bits ont été abîmés, la parité reste paire. Le bit de parité détecte une erreur sur un bit, pas sur deux.</span></div>
+      </details>
+      <details>
+        <summary>Le film<span class="q">Un film fait 2 Go. Combien de temps pour le télécharger à 50 Mbit/s ? Et à 8 Mbit/s ?</span></summary>
+        <div><span>2 Go = 2 000 Mo = 16 000 Mbit. À 50 Mbit/s : 16 000 ÷ 50 = <strong>320 s</strong>, soit 5 min 20 s. À 8 Mbit/s : 16 000 ÷ 8 = 2 000 s, soit environ <strong>33 min</strong>.</span></div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• Une <strong>chaîne de transmission</strong> : un <strong>émetteur</strong> envoie un <strong>signal</strong> qui transporte l'information à travers un <strong>canal</strong> jusqu'à un <strong>récepteur</strong>.</span>
+      <span>• Signaux <strong>sonores</strong> (besoin de matière, ≈ 340 m/s dans l'air), <strong>lumineux</strong> et <strong>ondes radio</strong> (traversent le vide, ≈ 300 000 km/s), <strong>électriques</strong> (dans un fil).</span>
+      <span>• Un signal <strong>analogique</strong> varie de façon continue ; un signal <strong>numérique</strong> est une suite de nombres, écrits en binaire (0 et 1), obtenus par échantillonnage.</span>
+      <span>• Un <strong>code</strong> (Morse, ASCII) est connu de l'émetteur et du récepteur. Le <strong>bit de parité</strong> permet de détecter une erreur sur un bit.</span>
+      <span>• Fibre optique : la lumière est guidée par <strong>réflexion totale</strong> sur les parois.</span>
+      <span>• Fréquences radio en MHz et GHz : radio FM ≈ 100 MHz, Wi-Fi et Bluetooth ≈ 2,4 GHz, GPS ≈ 1,6 GHz.</span>
+      <span>• <strong>Débit</strong> en bit/s. Temps = taille en bits ÷ débit, avec <strong>1 octet = 8 bits</strong>.</span>
+    </div>
+  </section>
+
+  <!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"><a class="prev" href="le-son.html"><span>← Précédent</span><strong>Le son</strong></a></div><a class="tnav-home" href="physique.html">⌂ Tous les tutoriels de physique</a></nav><!--/tnav-->
+<footer>Fiche de révision · Les signaux et la communication</footer>
+</main>
+
+<script>
+/*
+  Fonctions de test exposées sur window.__sig :
+  - chain(id)                 → { e, s:[types acceptés], r, c } pour une situation : 'phare', 'tel', 'ir', 'wifi', 'fibre', 'sifflet'
+  - travelTime(d_m, v_mps)    → temps en s (d ÷ v)
+  - stadium(dSpect_m, dHome_km) → { tSound, tRadio, first: 'radio' | 'son' } (son 340 m/s, radio 3e8 m/s)
+  - sample(n, bits)           → tableau des n codes entiers (0 … 2^bits − 1) de la courbe échantillonnée sur 1 s
+  - curve(t)                  → valeur de la courbe analogique (entre 0 et 1) à l'instant t (s)
+  - toMorse(text)             → chaîne Morse avec « . » et « - », lettres séparées par une espace, mots par « / »
+  - fromMorse(code)           → { text, bad: [symboles inconnus] }
+  - morseUnits(text)          → [{ on: bool, u: unités }] ; point 1, trait 3, silences 1 / 3 / 7
+  - toBits(text)              → tableau de chaînes de 8 bits (ASCII)
+  - parityBit(bits7)          → '0' ou '1' (parité paire) ; checkParity(bits8) → true si le nombre de 1 est pair
+  - traceFibre(aDeg, R)       → { ok, bounces, escapeAngle, inAngle, path } (modèle verre n = 1,5 dans l'air, angle limite ≈ 41,8°)
+  - wavelength(fHz)           → longueur d'onde en m (3e8 ÷ f)
+  - bandsAt(fHz)              → noms des usages dont la bande contient f
+  - downloadTime(sizeBytes, rateBps) → temps en s = 8 × taille ÷ débit
+  - fmtDuration(s)            → texte « 2 min 30 s »…
+*/
+(function () {
+  var NS = 'http://www.w3.org/2000/svg';
+  function $(id) { return document.getElementById(id); }
+  function fmt(x, d) { var r = Math.round(x * 1e9) / 1e9; if (Object.is(r, -0)) r = 0; return r.toLocaleString('fr-FR', { maximumFractionDigits: d == null ? 3 : d }).replace('-', '−'); }
+  function num(s) { var t = String(s).replace(/\s/g, '').replace(/[−–]/g, '-').replace(',', '.'); if (t === '') return NaN; var x = Number(t); return isFinite(x) ? x : NaN; }
+  function mk(svg, name, attrs, text) { var e = document.createElementNS(NS, name); for (var a in attrs) e.setAttribute(a, attrs[a]); if (text != null) e.textContent = text; svg.appendChild(e); return e; }
+  function clear(el) { while (el.firstChild) el.removeChild(el.firstChild); }
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  function rnd(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  function sig3(x) { if (x === 0) return '0'; var d = Math.max(0, 2 - Math.floor(Math.log10(Math.abs(x)))); return fmt(x, Math.min(d, 9)); }
+  function fmtTime(s) { if (s < 1e-3) return sig3(s * 1e6) + ' µs'; if (s < 1) return sig3(s * 1000) + ' ms'; return fmt(s, 2) + ' s'; }
+
+  /* ---------- 1. Chaîne de transmission ---------- */
+  var SIGNALS = { son: 'Signal sonore', lum: 'Signal lumineux (visible)', ir: 'Signal lumineux infrarouge (invisible)', radio: 'Onde radio', elec: 'Signal électrique' };
+  var SIT = {
+    phare: { name: 'Le phare', txt: 'La nuit, un phare envoie des éclats de lumière. Chaque phare a son propre rythme : le marin sait où il est.', e: 'La lampe du phare', s: ['lum'], r: 'L\'œil du marin', c: 'L\'air', info: 'Le rythme des éclats est le code : il dit quel phare on voit.' },
+    tel: { name: 'Le téléphone portable', txt: 'Tu envoies un message depuis ton téléphone. Il part vers l\'antenne relais la plus proche.', e: 'Le téléphone (son antenne)', s: ['radio'], r: 'L\'antenne relais', c: 'L\'air (les ondes radio passent aussi dans le vide)', info: 'Ensuite, l\'antenne relais envoie le message plus loin, souvent par fibre optique : il y a plusieurs chaînes à la suite.' },
+    ir: { name: 'La télécommande', txt: 'Tu appuies sur le bouton « chaîne + » de la télécommande de la télévision.', e: 'La diode de la télécommande', s: ['ir'], r: 'Le capteur de la télévision', c: 'L\'air', info: 'La lumière infrarouge est invisible pour nos yeux. La diode clignote très vite, selon un code propre à chaque bouton.' },
+    wifi: { name: 'Le Wi-Fi', txt: 'Une vidéo arrive sur ta tablette, depuis la box Internet de la maison.', e: 'La box Internet', s: ['radio'], r: 'La tablette', c: 'L\'air', info: 'Le Wi-Fi utilise des ondes radio vers 2,4 GHz ou 5 GHz. Dans l\'autre sens, la tablette devient émetteur et la box récepteur.' },
+    fibre: { name: 'La fibre optique', txt: 'Les données Internet arrivent jusqu\'à la box par une fibre optique.', e: 'Le laser du central', s: ['ir', 'lum'], r: 'Le capteur de lumière de la box', c: 'Une fibre de verre', info: 'Dans les fibres, on utilise surtout de la lumière infrarouge, invisible. Le capteur de la box la transforme en signal électrique.' },
+    sifflet: { name: 'Le sifflet', txt: 'L\'arbitre siffle une faute sur le terrain.', e: 'Le sifflet de l\'arbitre', s: ['son'], r: 'L\'oreille du joueur', c: 'L\'air', info: 'Le son a besoin de l\'air pour se propager. Il arrive au joueur avec un petit retard : environ 0,1 s à 34 m.' }
+  };
+  var SITK = Object.keys(SIT), curSit = 'phare';
+  var PEOPLE = [];
+  SITK.forEach(function (k) { PEOPLE.push(SIT[k].e); PEOPLE.push(SIT[k].r); });
+  PEOPLE.sort(function (a, b) { return a.localeCompare(b, 'fr'); });
+  function fillSel(sel, opts) { sel.innerHTML = '<option value="">…</option>' + opts.map(function (o) { return '<option value="' + esc(o[0]) + '">' + esc(o[1]) + '</option>'; }).join(''); }
+  fillSel($('pkE'), PEOPLE.map(function (p) { return [p, p]; }));
+  fillSel($('pkR'), PEOPLE.map(function (p) { return [p, p]; }));
+  fillSel($('pkS'), Object.keys(SIGNALS).map(function (k) { return [k, SIGNALS[k]]; }));
+  SITK.forEach(function (k) {
+    var b = document.createElement('button'); b.type = 'button'; b.id = 'sit-' + k; b.textContent = SIT[k].name;
+    b.addEventListener('click', function () { setSit(k); });
+    $('sitBtns').appendChild(b);
+  });
+  function drawChain(show) {
+    var S = SIT[curSit], q = '?';
+    $('chain').innerHTML =
+      '<div class="cell"><span class="k">Émetteur</span><span class="v">' + (show ? esc(S.e) : q) + '</span></div><span class="arr">→</span>' +
+      '<div class="cell sig"><span class="k">Signal</span><span class="v">' + (show ? esc(SIGNALS[S.s[0]]) : q) + '</span><span class="c">Canal : ' + (show ? esc(S.c) : q) + '</span></div><span class="arr">→</span>' +
+      '<div class="cell"><span class="k">Récepteur</span><span class="v">' + (show ? esc(S.r) : q) + '</span></div>';
+    $('sitInfo').textContent = show ? S.info : '';
+  }
+  function setSit(k) {
+    curSit = k;
+    SITK.forEach(function (j) { $('sit-' + j).setAttribute('aria-pressed', j === k ? 'true' : 'false'); });
+    $('sitText').textContent = SIT[k].txt;
+    ['pkE', 'pkS', 'pkR'].forEach(function (id) { $(id).value = ''; });
+    ['mkE', 'mkS', 'mkR'].forEach(function (id) { $(id).textContent = ''; $(id).className = 'mark'; });
+    drawChain(false);
+  }
+  function setMark(id, ok, msg) { var m = $(id); m.className = 'mark ' + (ok ? 'ok' : 'no'); m.textContent = msg; }
+  $('sitCheck').addEventListener('click', function () {
+    var S = SIT[curSit], e = $('pkE').value, s = $('pkS').value, r = $('pkR').value, n = 0;
+    if (e === S.e) { setMark('mkE', true, 'Juste'); n++; } else setMark('mkE', false, e === S.r ? 'Non : lui, il reçoit.' : (e ? 'Non' : 'Choisis'));
+    if (S.s.indexOf(s) >= 0) { setMark('mkS', true, s === S.s[0] ? 'Juste' : 'Oui, même si elle est surtout invisible'); n++; } else setMark('mkS', false, s ? 'Non' : 'Choisis');
+    if (r === S.r) { setMark('mkR', true, 'Juste'); n++; } else setMark('mkR', false, r === S.e ? 'Non : lui, il émet.' : (r ? 'Non' : 'Choisis'));
+    drawChain(n === 3);
+  });
+  $('sitShow').addEventListener('click', function () {
+    var S = SIT[curSit]; $('pkE').value = S.e; $('pkS').value = S.s[0]; $('pkR').value = S.r;
+    ['mkE', 'mkS', 'mkR'].forEach(function (id) { $(id).textContent = ''; });
+    drawChain(true);
+  });
+  setSit('phare');
+
+  /* ---------- 2. Stade ---------- */
+  var V_SOUND = 340, C = 3e8;
+  function travelTime(d, v) { return d / v; }
+  function stadium(dS, dKm) { var ts = dS / V_SOUND, tr = dKm * 1000 / C; return { tSound: ts, tRadio: tr, first: tr < ts ? 'radio' : 'son' }; }
+  function stad() {
+    var d = parseInt($('stD').value, 10), km = num($('stH').value), out = $('stOut');
+    $('stDo').textContent = fmt(d) + ' m';
+    if (isNaN(km) || km < 0) { out.className = 'verdict no'; out.innerHTML = 'Écris une distance positive en kilomètres.'; return; }
+    var r = stadium(d, km), mx = Math.max(r.tSound, r.tRadio);
+    $('stBarS').style.width = (r.tSound / mx * 100) + '%';
+    $('stBarR').style.width = Math.max(r.tRadio / mx * 100, r.tRadio > 0 ? 0.6 : 0) + '%';
+    $('stValS').textContent = 't = ' + fmt(d) + ' ÷ 340 ≈ ' + fmtTime(r.tSound);
+    $('stValR').textContent = 't = ' + fmt(km * 1000) + ' ÷ 300 000 000 ≈ ' + fmtTime(r.tRadio);
+    if (r.first === 'radio') {
+      out.className = 'verdict yes';
+      out.innerHTML = 'Ton ami entend le sifflet avant toi !<span>Il est pourtant ' + (km * 1000 > d ? 'beaucoup plus loin' : 'à une distance comparable') + ', mais l\'onde radio va environ un million de fois plus vite que le son. Écart : ' + fmtTime(r.tSound - r.tRadio) + '.</span>';
+    } else {
+      out.className = 'verdict warn';
+      out.innerHTML = 'Cette fois, tu entends le sifflet en premier.<span>Écart : ' + fmtTime(r.tRadio - r.tSound) + '. Il faut que ton ami soit très loin pour que la radio perde.</span>';
+    }
+  }
+  $('stD').addEventListener('input', stad); $('stH').addEventListener('input', stad);
+  Array.prototype.forEach.call(document.querySelectorAll('[data-km]'), function (b) { b.addEventListener('click', function () { $('stH').value = fmt(+b.getAttribute('data-km')); stad(); }); });
+  stad();
+
+  /* ---------- 3. Échantillonnage ---------- */
+  function curve(t) { return 0.5 + 0.3 * Math.sin(2 * Math.PI * t) + 0.14 * Math.sin(2 * Math.PI * 3 * t + 1); }
+  function sample(n, bits) { var L = Math.pow(2, bits), a = []; for (var k = 0; k < n; k++) a.push(Math.max(0, Math.min(L - 1, Math.round(curve(k / n) * (L - 1))))); return a; }
+  function toBin(v, b) { var s = v.toString(2); while (s.length < b) s = '0' + s; return s; }
+  function samp() {
+    var n = parseInt($('smN').value, 10), b = parseInt($('smB').value, 10), L = Math.pow(2, b), svg = $('smSvg');
+    $('smNo').textContent = n + ' mesures par seconde';
+    $('smBo').textContent = b + (b > 1 ? ' bits' : ' bit') + ' (' + L + ' niveaux)';
+    clear(svg);
+    var X0 = 36, X1 = 390, Y0 = 200, Y1 = 14;
+    function X(t) { return X0 + t * (X1 - X0); } function Y(v) { return Y0 - v * (Y0 - Y1); }
+    if (L <= 32) for (var j = 0; j < L; j++) mk(svg, 'line', { x1: X0, x2: X1, y1: Y(j / (L - 1)), y2: Y(j / (L - 1)), stroke: 'var(--line)', 'stroke-width': 1 });
+    mk(svg, 'line', { x1: X0, x2: X1, y1: Y0, y2: Y0, stroke: 'var(--ink)', 'stroke-width': 1.5 });
+    mk(svg, 'line', { x1: X0, x2: X0, y1: Y0, y2: Y1, stroke: 'var(--ink)', 'stroke-width': 1.5 });
+    mk(svg, 'text', { x: X0, y: 222, 'font-size': 13, 'text-anchor': 'middle' }, '0 s');
+    mk(svg, 'text', { x: X1, y: 222, 'font-size': 13, 'text-anchor': 'end' }, '1 s');
+    mk(svg, 'text', { x: (X0 + X1) / 2, y: 222, 'font-size': 13, 'text-anchor': 'middle' }, 'temps');
+    var d = '';
+    for (var i = 0; i <= 200; i++) { var t = i / 200; d += (i ? 'L' : 'M') + X(t).toFixed(1) + ' ' + Y(curve(t)).toFixed(1); }
+    mk(svg, 'path', { d: d, fill: 'none', stroke: 'var(--two)', 'stroke-width': 2.5 });
+    var codes = sample(n, b), st = '';
+    codes.forEach(function (c, k) { var y = Y(c / (L - 1)); st += (k ? 'L' : 'M') + X(k / n).toFixed(1) + ' ' + y.toFixed(1) + 'L' + X((k + 1) / n).toFixed(1) + ' ' + y.toFixed(1); });
+    mk(svg, 'path', { d: st, fill: 'none', stroke: 'var(--acc)', 'stroke-width': 3, 'stroke-linejoin': 'round' });
+    codes.forEach(function (c, k) {
+      mk(svg, 'line', { x1: X(k / n), x2: X(k / n), y1: Y0, y2: Y(curve(k / n)), stroke: 'var(--acc)', 'stroke-width': 1, 'stroke-dasharray': '2 3' });
+      mk(svg, 'circle', { cx: X(k / n), cy: Y(curve(k / n)), r: n > 30 ? 2.5 : 4, fill: 'var(--acc)' });
+    });
+    var shown = codes.slice(0, 8);
+    $('smOut').innerHTML = '<span>Nombres : ' + shown.join(' ; ') + (codes.length > 8 ? ' ; …' : '') + '</span>' +
+      '<span>En binaire : ' + shown.map(function (c) { return toBin(c, b); }).join(' ') + (codes.length > 8 ? ' …' : '') + '</span>' +
+      '<span>Pour 1 seconde : ' + n + ' × ' + b + ' = <b>' + (n * b) + ' bits</b></span>' +
+      '<span style="font-family:var(--f-body)">' + (n < 6 ? 'Trop peu de mesures : la forme de la courbe est perdue.' : b < 3 ? 'Trop peu de niveaux : l\'escalier est grossier.' : n >= 30 && b >= 5 ? 'L\'escalier colle presque à la courbe, mais il faut beaucoup de bits.' : 'Plus de mesures et plus de bits : plus fidèle, mais plus de bits à transmettre.') + '</span>';
+  }
+  $('smN').addEventListener('input', samp); $('smB').addEventListener('input', samp); samp();
+
+  /* ---------- Son (créé seulement au clic, volume faible) ---------- */
+  var AC = null, master = null, beepOn = false, muted = false, BEEP_HZ = 600, VOL = 0.06;
+  function audio() {
+    if (!beepOn || muted) return null;
+    if (!AC) {
+      var Ctor = window.AudioContext || window.webkitAudioContext;
+      if (!Ctor) return null;
+      try { AC = new Ctor(); master = AC.createGain(); master.gain.value = VOL; master.connect(AC.destination); } catch (e) { AC = null; return null; }
+    }
+    if (AC.state === 'suspended' && AC.resume) AC.resume();
+    return AC;
+  }
+  function beep(ms) {
+    var ac = audio(); if (!ac) return;
+    try {
+      var o = ac.createOscillator(), g = ac.createGain(), t = ac.currentTime + 0.005, dur = ms / 1000;
+      o.type = 'sine'; o.frequency.value = BEEP_HZ;
+      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(1, t + 0.008);
+      g.gain.setValueAtTime(1, t + Math.max(0.01, dur - 0.012)); g.gain.linearRampToValueAtTime(0, t + dur);
+      o.connect(g); g.connect(master); o.start(t); o.stop(t + dur + 0.02);
+    } catch (e) {}
+  }
+  $('beep').addEventListener('click', function () {
+    beepOn = !beepOn; this.setAttribute('aria-pressed', beepOn ? 'true' : 'false'); this.textContent = beepOn ? 'Bips : oui' : 'Bips : non';
+    if (beepOn) { muted = false; updMute(); audio(); }
+  });
+  function updMute() { var b = $('mute'); b.setAttribute('aria-pressed', muted ? 'true' : 'false'); b.textContent = muted ? 'Remettre le son' : 'Couper le son'; if (master) master.gain.value = muted ? 0 : VOL; }
+  $('mute').addEventListener('click', function () { muted = !muted; updMute(); if (muted && AC && AC.suspend) AC.suspend(); });
+
+  /* ---------- Lampe (setTimeout, pas de requestAnimationFrame) ---------- */
+  var LAMPS = { m: { lamp: $('lamp'), info: $('lampInfo') }, b: { lamp: $('lamp2'), info: $('lampInfo2') } };
+  var cur = LAMPS.m, lamp = cur.lamp, lampInfo = cur.info, timer = null, queue = [], qi = 0, onDone = null;
+  function lampSet(on) { lamp.className = on ? 'lamp on' : 'lamp'; }
+  function stopPlay() { if (timer) clearTimeout(timer); timer = null; lampSet(false); }
+  function useLamp(k) { stopPlay(); cur = LAMPS[k]; lamp = cur.lamp; lampInfo = cur.info; }
+  function runEvent(ev) { lampSet(ev.on); if (ev.on) beep(ev.ms); if (ev.label != null) lampInfo.textContent = ev.label; }
+  function play(events, done) {
+    stopPlay(); queue = events; qi = 0; onDone = done || null;
+    (function next() {
+      if (qi >= queue.length) { timer = null; lampSet(false); lampInfo.textContent = 'Message envoyé. La lampe est éteinte.'; if (onDone) onDone(); return; }
+      var ev = queue[qi++]; runEvent(ev); timer = setTimeout(next, ev.ms);
+    })();
+  }
+  /* pas à pas : un événement « allumé » par clic */
+  var stepQ = null, stepI = 0, stepKey = '';
+  function stepPlay(key, build) {
+    stopPlay();
+    if (stepKey !== key || !stepQ) { stepQ = build().filter(function (e) { return e.on; }); stepI = 0; stepKey = key; }
+    if (stepI >= stepQ.length) { lampSet(false); lampInfo.textContent = 'Fin du message. Clique encore pour recommencer.'; stepQ = null; return; }
+    var ev = stepQ[stepI++]; lampSet(true); lampInfo.textContent = ev.stepLabel || ev.label; beep(Math.min(ev.ms, 450));
+  }
+  $('moStop').addEventListener('click', function () { useLamp('m'); stepQ = null; lampInfo.textContent = 'Arrêté. La lampe est éteinte.'; });
+
+  /* ---------- 4. Morse ---------- */
+  var MORSE = { A: '.-', B: '-...', C: '-.-.', D: '-..', E: '.', F: '..-.', G: '--.', H: '....', I: '..', J: '.---', K: '-.-', L: '.-..', M: '--', N: '-.', O: '---', P: '.--.', Q: '--.-', R: '.-.', S: '...', T: '-', U: '..-', V: '...-', W: '.--', X: '-..-', Y: '-.--', Z: '--..',
+    '0': '-----', '1': '.----', '2': '..---', '3': '...--', '4': '....-', '5': '.....', '6': '-....', '7': '--...', '8': '---..', '9': '----.' };
+  var DEMORSE = {}; Object.keys(MORSE).forEach(function (k) { DEMORSE[MORSE[k]] = k; });
+  function clean(text) { return String(text).normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase(); }
+  function toMorse(text) {
+    return clean(text).trim().split(/\s+/).filter(Boolean).map(function (w) {
+      return w.split('').filter(function (ch) { return MORSE[ch]; }).map(function (ch) { return MORSE[ch]; }).join(' ');
+    }).filter(Boolean).join(' / ');
+  }
+  function normCode(code) { return String(code).replace(/[·•∙*]/g, '.').replace(/[−–—_]/g, '-'); }
+  function fromMorse(code) {
+    var bad = [], text = normCode(code).trim().split(/\s*\/\s*|\s{3,}/).map(function (w) {
+      return w.trim().split(/\s+/).filter(Boolean).map(function (s) { if (DEMORSE[s]) return DEMORSE[s]; bad.push(s); return '?'; }).join('');
+    }).join(' ').trim();
+    return { text: text, bad: bad };
+  }
+  function morseUnits(text) {
+    var out = [], words = toMorse(text).split(' / ').filter(Boolean);
+    words.forEach(function (w, wi) {
+      if (wi) out.push({ on: false, u: 7 });
+      w.split(' ').forEach(function (l, li) {
+        if (li) out.push({ on: false, u: 3 });
+        l.split('').forEach(function (s, si) { if (si) out.push({ on: false, u: 1 }); out.push({ on: true, u: s === '.' ? 1 : 3 }); });
+      });
+    });
+    return out;
+  }
+  function pretty(code) { return code.replace(/\./g, '·').replace(/-/g, '−'); }
+  function drawStrip(el, segs, unitPx, labels) {
+    var tot = segs.reduce(function (s, e) { return s + e.u; }, 0), W = Math.max(40, tot * unitPx + 8);
+    el.innerHTML = '';
+    if (!tot) return;
+    var svg = document.createElementNS(NS, 'svg'); svg.setAttribute('viewBox', '0 0 ' + W + ' 46'); svg.setAttribute('width', W); svg.setAttribute('height', 46);
+    var x = 4;
+    mk(svg, 'line', { x1: 0, x2: W, y1: 34, y2: 34, stroke: 'var(--line)', 'stroke-width': 1.5 });
+    segs.forEach(function (e, i) {
+      if (e.on) mk(svg, 'rect', { x: x, y: 8, width: e.u * unitPx, height: 26, fill: 'var(--lamp)', stroke: 'var(--ink)', 'stroke-width': 1 });
+      if (labels && labels[i] != null) mk(svg, 'text', { x: x + e.u * unitPx / 2, y: 44, 'font-size': 10, 'text-anchor': 'middle' }, labels[i]);
+      x += e.u * unitPx;
+    });
+    el.appendChild(svg);
+  }
+  var UNIT_MS = 200;
+  var moT = $('moT'), moC = $('moC');
+  function morseEvents() {
+    var words = toMorse(moT.value).split(' / ').filter(Boolean), ev = [], cleanText = clean(moT.value).replace(/[^A-Z0-9\s]/g, '').trim().split(/\s+/).filter(Boolean);
+    words.forEach(function (w, wi) {
+      if (wi) ev.push({ on: false, ms: 7 * UNIT_MS });
+      w.split(' ').forEach(function (l, li) {
+        var ch = (cleanText[wi] || '')[li] || '?';
+        if (li) ev.push({ on: false, ms: 3 * UNIT_MS });
+        l.split('').forEach(function (s, si) {
+          if (si) ev.push({ on: false, ms: UNIT_MS });
+          ev.push({ on: true, ms: (s === '.' ? 1 : 3) * UNIT_MS, label: 'Lettre ' + ch + ' : ' + pretty(l), stepLabel: 'Lettre ' + ch + ' (' + pretty(l) + ') : ' + (s === '.' ? 'un point (court)' : 'un trait (long, 3 fois plus)') });
+        });
+      });
+    });
+    return ev;
+  }
+  function fromText() {
+    var code = toMorse(moT.value); moC.value = pretty(code);
+    var dropped = clean(moT.value).replace(/[A-Z0-9\s]/g, '');
+    $('moErr').textContent = dropped ? 'Ignoré (pas dans ce tableau Morse) : ' + dropped : '';
+    drawStrip($('moStrip'), morseUnits(moT.value), 6);
+    stepQ = null;
+  }
+  function fromCode() {
+    var r = fromMorse(moC.value); moT.value = r.text;
+    $('moErr').textContent = r.bad.length ? 'Code inconnu : ' + r.bad.map(pretty).join(', ') + ' (affiché « ? »)' : '';
+    drawStrip($('moStrip'), morseUnits(r.text.replace(/\?/g, '')), 6);
+    stepQ = null;
+  }
+  moT.addEventListener('input', fromText); moC.addEventListener('input', fromCode);
+  $('moPlay').addEventListener('click', function () { useLamp('m'); var ev = morseEvents(); if (!ev.length) { lampInfo.textContent = 'Écris d\'abord un message.'; return; } stepQ = null; play(ev); });
+  $('moStep').addEventListener('click', function () { useLamp('m'); stepPlay('m:' + moT.value, morseEvents); });
+  $('moTable').innerHTML = Object.keys(MORSE).map(function (k) { return '<span><b>' + k + '</b>' + pretty(MORSE[k]) + '</span>'; }).join('');
+  fromText();
+
+  /* ---------- 5. Binaire ---------- */
+  function toBits(text) { return cleanKeepCase(text).split('').filter(function (ch) { var c = ch.charCodeAt(0); return c >= 32 && c < 127; }).map(function (ch) { return toBin(ch.charCodeAt(0), 8); }); }
+  function cleanKeepCase(text) { return String(text).normalize('NFD').replace(/[̀-ͯ]/g, '').split('').filter(function (ch) { var c = ch.charCodeAt(0); return c >= 32 && c < 127; }).join(''); }
+  var biT = $('biT');
+  function asciiBits(text) { return cleanKeepCase(text).split('').map(function (ch) { return { ch: ch, code: ch.charCodeAt(0), bits: toBin(ch.charCodeAt(0), 8) }; }); }
+  function bina() {
+    var rows = asciiBits(biT.value), t = $('biTable');
+    if (!rows.length) { t.innerHTML = '<tr><td>Écris au moins une lettre.</td></tr>'; $('biStrip').innerHTML = ''; $('biCount').textContent = ''; return; }
+    t.innerHTML = '<tr><th>Caractère</th><th>Code ASCII</th><th>8 bits</th></tr>' + rows.map(function (r) { return '<tr><td>' + (r.ch === ' ' ? '(espace)' : esc(r.ch)) + '</td><td>' + r.code + '</td><td>' + r.bits + '</td></tr>'; }).join('');
+    var segs = [], labels = [];
+    rows.forEach(function (r) { r.bits.split('').forEach(function (b) { segs.push({ on: b === '1', u: 1 }); labels.push(b); }); });
+    drawStrip($('biStrip'), segs, 16, labels);
+    $('biCount').textContent = rows.length + ' × 8 = ' + (rows.length * 8) + ' bits';
+    stepQ = null;
+  }
+  var BIT_MS = 320;
+  function bitEvents() {
+    var ev = [];
+    asciiBits(biT.value).forEach(function (r) { r.bits.split('').forEach(function (b, i) { ev.push({ on: b === '1', ms: BIT_MS, label: 'Caractère ' + r.ch + ', bit ' + (i + 1) + ' sur 8 : ' + b + (b === '1' ? ' (lumière)' : ' (noir)') }); }); });
+    return ev;
+  }
+  biT.addEventListener('input', bina);
+  $('biPlay').addEventListener('click', function () { useLamp('b'); var ev = bitEvents(); if (!ev.length) return; stepQ = null; play(ev); });
+  $('biStop').addEventListener('click', function () { useLamp('b'); stepQ = null; lampInfo.textContent = 'Arrêté. La lampe est éteinte.'; });
+  $('biStep').addEventListener('click', function () {
+    /* pas à pas : un bit par clic, allumé ou non */
+    useLamp('b');
+    var key = 'b:' + biT.value;
+    if (stepKey !== key || !stepQ) { stepQ = bitEvents(); stepI = 0; stepKey = key; }
+    if (stepI >= stepQ.length) { lampSet(false); lampInfo.textContent = 'Fin du message. Clique encore pour recommencer.'; stepQ = null; return; }
+    var ev = stepQ[stepI++]; lampSet(ev.on); lampInfo.textContent = ev.label; if (ev.on) beep(250);
+  });
+  bina();
+
+  /* Parité */
+  function parityBit(b7) { var n = String(b7).split('').filter(function (c) { return c === '1'; }).length; return n % 2 === 0 ? '0' : '1'; }
+  function checkParity(b8) { return String(b8).split('').filter(function (c) { return c === '1'; }).length % 2 === 0; }
+  var paLetter = 'A', paSent = '', paRecv = [];
+  ['A', 'C', 'G', 'K', 'O', 'S', 'Z'].forEach(function (L) {
+    var b = document.createElement('button'); b.type = 'button'; b.id = 'pal-' + L; b.textContent = L;
+    b.addEventListener('click', function () { setPa(L); }); $('paLetters').appendChild(b);
+  });
+  function setPa(L) {
+    paLetter = L;
+    ['A', 'C', 'G', 'K', 'O', 'S', 'Z'].forEach(function (x) { $('pal-' + x).setAttribute('aria-pressed', x === L ? 'true' : 'false'); });
+    var b7 = toBin(L.charCodeAt(0), 7); paSent = b7 + parityBit(b7); paRecv = paSent.split('');
+    $('paSent').textContent = L + ' = ' + L.charCodeAt(0) + ' = ' + b7 + ', parité ' + parityBit(b7);
+    drawPa();
+  }
+  function drawPa() {
+    var row = $('paBits'); row.innerHTML = '';
+    paRecv.forEach(function (b, i) {
+      var btn = document.createElement('button'); btn.type = 'button'; btn.textContent = b;
+      btn.className = (i === 7 ? 'par' : '') + (b !== paSent[i] ? ' flip' : '');
+      btn.setAttribute('aria-label', (i === 7 ? 'Bit de parité' : 'Bit ' + (i + 1)) + ' : ' + b + (b !== paSent[i] ? ', abîmé' : '') + '. Clique pour l\'inverser.');
+      btn.addEventListener('click', function () { paRecv[i] = paRecv[i] === '1' ? '0' : '1'; drawPa(); });
+      row.appendChild(btn);
+    });
+    var recv = paRecv.join(''), ones = recv.split('').filter(function (c) { return c === '1'; }).length, errs = recv.split('').filter(function (c, i) { return c !== paSent[i]; }).length;
+    var code = parseInt(recv.slice(0, 7), 2), ch = code >= 33 && code < 127 ? String.fromCharCode(code) : (code === 32 ? '(espace)' : '(caractère spécial)');
+    var out = $('paOut');
+    if (!checkParity(recv)) { out.className = 'verdict no'; out.innerHTML = 'Erreur détectée : ' + ones + ' bits à 1, c\'est impair.<span>Le récepteur sait que le message est abîmé (sans savoir quel bit). Il demande de le renvoyer.</span>'; }
+    else if (errs === 0) { out.className = 'verdict yes'; out.innerHTML = 'Parité correcte : ' + ones + ' bits à 1, c\'est pair.<span>Le récepteur lit la lettre ' + esc(ch) + '.</span>'; }
+    else { out.className = 'verdict warn'; out.innerHTML = 'Le test passe (' + ones + ' bits à 1, pair)… mais ' + errs + ' bits sont abîmés !<span>Le récepteur lit ' + esc(ch) + ' au lieu de ' + paLetter + '. Avec un nombre pair d\'erreurs, la parité ne voit rien. On utilise alors des codes plus malins.</span>'; }
+  }
+  function noise(k) {
+    paRecv = paSent.split('');
+    var idx = [0, 1, 2, 3, 4, 5, 6, 7];
+    for (var i = 0; i < k; i++) { var j = rnd(i, 7), tmp = idx[i]; idx[i] = idx[j]; idx[j] = tmp; paRecv[idx[i]] = paRecv[idx[i]] === '1' ? '0' : '1'; }
+    drawPa();
+  }
+  $('paN1').addEventListener('click', function () { noise(1); });
+  $('paN2').addEventListener('click', function () { noise(2); });
+  $('paReset').addEventListener('click', function () { paRecv = paSent.split(''); drawPa(); });
+  setPa('A');
+
+  /* ---------- 6. Fibre optique ---------- */
+  var N_GLASS = 1.5, CRIT = Math.asin(1 / N_GLASS) * 180 / Math.PI, FX = 80, FY = 70, FW = 14;
+  function fibreGeom(R) {
+    var c = [], i;
+    c.push({ x: FX, y: FY, tx: 1, ty: 0 }); c.push({ x: FX + 80, y: FY, tx: 1, ty: 0 });
+    var cx = FX + 80, cy = FY + R, sw = 75 * Math.PI / 180, N = 48;
+    for (i = 1; i <= N; i++) { var ph = -Math.PI / 2 + sw * i / N; c.push({ x: cx + R * Math.cos(ph), y: cy + R * Math.sin(ph), tx: -Math.sin(ph), ty: Math.cos(ph) }); }
+    var l = c[c.length - 1], L = Math.max(30, (262 - l.y) / l.ty);
+    c.push({ x: l.x + L * l.tx, y: l.y + L * l.ty, tx: l.tx, ty: l.ty });
+    var inner = c.map(function (p) { return { x: p.x - FW * p.ty, y: p.y + FW * p.tx }; }), outer = c.map(function (p) { return { x: p.x + FW * p.ty, y: p.y - FW * p.tx }; });
+    var segs = [];
+    for (i = 0; i < c.length - 1; i++) { segs.push({ a: inner[i], b: inner[i + 1], kind: 'wall' }); segs.push({ a: outer[i], b: outer[i + 1], kind: 'wall' }); }
+    segs.push({ a: inner[c.length - 1], b: outer[c.length - 1], kind: 'exit' });
+    segs.push({ a: inner[0], b: outer[0], kind: 'entry' });
+    return { center: c, inner: inner, outer: outer, segs: segs };
+  }
+  function hit(p, d, s) {
+    var ex = s.b.x - s.a.x, ey = s.b.y - s.a.y, den = d.x * ey - d.y * ex;
+    if (Math.abs(den) < 1e-12) return null;
+    var wx = s.a.x - p.x, wy = s.a.y - p.y, t = (wx * ey - wy * ex) / den, u = (wx * d.y - wy * d.x) / den;
+    if (t > 1e-6 && u >= -1e-9 && u <= 1 + 1e-9) return t;
+    return null;
+  }
+  function traceFibre(aDeg, R, geom) {
+    var g = geom || fibreGeom(R), a = aDeg * Math.PI / 180, b = Math.asin(Math.sin(a) / N_GLASS);
+    var p = { x: FX, y: FY }, d = { x: Math.cos(b), y: Math.sin(b) }, path = [{ x: p.x, y: p.y }], bounces = 0, minInc = 90;
+    for (var it = 0; it < 400; it++) {
+      var best = null, bt = Infinity;
+      g.segs.forEach(function (s) { var t = hit(p, d, s); if (t !== null && t < bt) { bt = t; best = s; } });
+      if (!best) return { ok: false, bounces: bounces, path: path, lost: true, inAngle: b * 180 / Math.PI, minInc: minInc };
+      p = { x: p.x + bt * d.x, y: p.y + bt * d.y }; path.push(p);
+      if (best.kind === 'exit') return { ok: true, bounces: bounces, path: path, inAngle: b * 180 / Math.PI, minInc: minInc };
+      if (best.kind === 'entry') return { ok: false, back: true, bounces: bounces, path: path, inAngle: b * 180 / Math.PI, minInc: minInc };
+      var ex = best.b.x - best.a.x, ey = best.b.y - best.a.y, ln = Math.hypot(ex, ey), n = { x: -ey / ln, y: ex / ln }, dn = d.x * n.x + d.y * n.y;
+      if (dn > 0) { n = { x: -n.x, y: -n.y }; dn = -dn; } /* n opposé au rayon */
+      var inc = Math.acos(Math.min(1, -dn)) * 180 / Math.PI;
+      minInc = Math.min(minInc, inc);
+      if (inc > CRIT) { d = { x: d.x - 2 * dn * n.x, y: d.y - 2 * dn * n.y }; bounces++; }
+      else {
+        var ci = -dn, k = 1 - N_GLASS * N_GLASS * (1 - ci * ci), ct = Math.sqrt(Math.max(0, k));
+        var t = { x: N_GLASS * d.x + (N_GLASS * ci - ct) * n.x, y: N_GLASS * d.y + (N_GLASS * ci - ct) * n.y };
+        return { ok: false, bounces: bounces, path: path, escapeAngle: inc, escapeDir: t, partial: { x: d.x - 2 * dn * n.x, y: d.y - 2 * dn * n.y }, inAngle: b * 180 / Math.PI, minInc: minInc };
+      }
+    }
+    return { ok: false, bounces: bounces, path: path, lost: true, inAngle: b * 180 / Math.PI, minInc: minInc };
+  }
+  var fiSvg = $('fiSvg'), fiA = $('fiA'), fiR = $('fiR');
+  function poly(pts) { return pts.map(function (q, i) { return (i ? 'L' : 'M') + q.x.toFixed(1) + ' ' + q.y.toFixed(1); }).join(''); }
+  function fibre() {
+    var a = parseInt(fiA.value, 10), R = parseInt(fiR.value, 10), g = fibreGeom(R), r = traceFibre(a, R, g);
+    $('fiAo').textContent = fmt(a) + '°'; $('fiRo').textContent = R < 60 ? R + ' (très pliée)' : R < 110 ? R + ' (pliée)' : R + ' (douce)';
+    clear(fiSvg);
+    var shape = poly(g.outer) + poly(g.inner.slice().reverse()).replace(/^M/, 'L') + 'Z';
+    mk(fiSvg, 'path', { d: shape, fill: 'var(--acc-soft)', stroke: 'none' });
+    mk(fiSvg, 'path', { d: poly(g.outer), fill: 'none', stroke: 'var(--acc)', 'stroke-width': 2.5 });
+    mk(fiSvg, 'path', { d: poly(g.inner), fill: 'none', stroke: 'var(--acc)', 'stroke-width': 2.5 });
+    mk(fiSvg, 'line', { x1: g.inner[0].x, y1: g.inner[0].y, x2: g.outer[0].x, y2: g.outer[0].y, stroke: 'var(--acc)', 'stroke-width': 2.5 });
+    var la = a * Math.PI / 180, hx = FX - 52 * Math.cos(la), hy = FY - 52 * Math.sin(la);
+    mk(fiSvg, 'line', { x1: hx, y1: hy, x2: FX, y2: FY, stroke: 'var(--red)', 'stroke-width': 3 });
+    mk(fiSvg, 'path', { d: poly(r.path), fill: 'none', stroke: 'var(--red)', 'stroke-width': 3, 'stroke-linejoin': 'round' });
+    var last = r.path[r.path.length - 1];
+    if (r.escapeDir) {
+      mk(fiSvg, 'line', { x1: last.x, y1: last.y, x2: last.x + 70 * r.escapeDir.x, y2: last.y + 70 * r.escapeDir.y, stroke: 'var(--red)', 'stroke-width': 3, 'stroke-dasharray': '6 4' });
+      mk(fiSvg, 'line', { x1: last.x, y1: last.y, x2: last.x + 30 * r.partial.x, y2: last.y + 30 * r.partial.y, stroke: 'var(--red)', 'stroke-width': 1.5, opacity: 0.45 });
+      mk(fiSvg, 'circle', { cx: last.x, cy: last.y, r: 7, fill: 'none', stroke: 'var(--red)', 'stroke-width': 2 });
+    }
+    if (r.ok) mk(fiSvg, 'circle', { cx: last.x, cy: last.y, r: 8, fill: 'var(--lamp)', stroke: 'var(--ink)', 'stroke-width': 1.5 });
+    mk(fiSvg, 'text', { x: g.center[1].x - 10, y: FY - FW - 8, 'font-size': 13, 'text-anchor': 'middle' }, 'fibre de verre');
+    var lh = mk(fiSvg, 'g', { 'class': 'handle' });
+    mk(lh, 'circle', { cx: hx, cy: hy, r: 22, fill: 'transparent' });
+    mk(lh, 'circle', { cx: hx, cy: hy, r: 11, fill: 'var(--red)', stroke: 'var(--ink)', 'stroke-width': 2 });
+    mk(fiSvg, 'text', { x: 8, y: 270, 'font-size': 13 }, 'laser');
+    lh.addEventListener('pointerdown', startDrag);
+    var out = $('fiOut');
+    if (r.ok) { out.className = 'verdict yes'; out.innerHTML = 'La lumière arrive au bout !<span>' + r.bounces + ' réflexion' + (r.bounces > 1 ? 's' : '') + ' totale' + (r.bounces > 1 ? 's' : '') + '. Le plus petit angle avec la perpendiculaire à la paroi : ' + fmt(r.minInc, 0) + '°, plus que l\'angle limite (' + fmt(CRIT, 0) + '°).</span>'; }
+    else if (r.escapeDir) { out.className = 'verdict no'; out.innerHTML = 'La lumière s\'échappe (cercle rouge).<span>Après ' + r.bounces + ' réflexion' + (r.bounces > 1 ? 's' : '') + ', le rayon arrive sur la paroi avec seulement ' + fmt(r.escapeAngle, 0) + '° par rapport à la perpendiculaire, moins que l\'angle limite (' + fmt(CRIT, 0) + '°). Il sort presque entièrement ; seule une petite partie est réfléchie (trait pâle).</span>'; }
+    else { out.className = 'verdict warn'; out.innerHTML = 'Le rayon repart en arrière.<span>Essaie un autre angle.</span>'; }
+  }
+  var dragging = false;
+  function svgPt(e) { var m = fiSvg.getScreenCTM(); if (!m) return null; var pt = fiSvg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY; return pt.matrixTransform(m.inverse()); }
+  function startDrag(e) { dragging = true; try { fiSvg.setPointerCapture(e.pointerId); } catch (x) {} e.preventDefault(); }
+  fiSvg.addEventListener('pointermove', function (e) {
+    if (!dragging) return; var p = svgPt(e); if (!p) return;
+    var dx = FX - p.x, dy = FY - p.y; if (dx < 1) dx = 1;
+    var a = Math.round(Math.atan2(dy, dx) * 180 / Math.PI); a = Math.max(-70, Math.min(70, a));
+    if (String(a) !== fiA.value) { fiA.value = a; fibre(); }
+  });
+  function endDrag() { dragging = false; }
+  fiSvg.addEventListener('pointerup', endDrag); fiSvg.addEventListener('pointercancel', endDrag);
+  fiA.addEventListener('input', fibre); fiR.addEventListener('input', fibre);
+  fibre();
+
+  /* ---------- 7. Spectre radio ---------- */
+  var BANDS = [
+    { n: 'Carte sans contact, badge (NFC)', r: [[13.56e6, 13.56e6]], t: '13,56 MHz' },
+    { n: 'Radio FM', r: [[87.5e6, 108e6]], t: '87,5 à 108 MHz' },
+    { n: 'Télévision (TNT)', r: [[470e6, 694e6]], t: 'environ 470 à 694 MHz' },
+    { n: 'Téléphone mobile (4G, 5G)', r: [[700e6, 3.8e9]], t: 'environ 0,7 à 3,8 GHz' },
+    { n: 'GPS', r: [[1.57542e9, 1.57542e9]], t: 'environ 1 575 MHz' },
+    { n: 'Bluetooth', r: [[2.4e9, 2.4835e9]], t: '2,4 GHz' },
+    { n: 'Wi-Fi', r: [[2.4e9, 2.4835e9], [5.15e9, 5.875e9]], t: '2,4 GHz et 5 GHz' },
+    { n: 'Four à micro-ondes (pas un signal)', r: [[2.45e9, 2.45e9]], t: 'environ 2,45 GHz' }
+  ];
+  function wavelength(f) { return C / f; }
+  function bandsAt(f) { return BANDS.filter(function (b) { return b.r.some(function (r) { return f >= r[0] / 1.03 && f <= r[1] * 1.03; }); }).map(function (b) { return b.n; }); }
+  function fHz(v) { return Math.pow(10, 6 + v / 100); }
+  function fmtF(f) { if (f >= 1e9) return fmt(f / 1e9, f >= 1e10 ? 1 : 2) + ' GHz'; if (f >= 1e6) return fmt(f / 1e6, f >= 1e8 ? 0 : f >= 1e7 ? 1 : 2) + ' MHz'; return fmt(f / 1e3, 0) + ' kHz'; }
+  function fmtL(l) { return l >= 1 ? fmt(l, l >= 10 ? 0 : 1) + ' m' : fmt(l * 100, l * 100 >= 10 ? 0 : 1) + ' cm'; }
+  var raF = $('raF'), raSvg = $('raSvg');
+  function RX(f) { return 20 + (Math.log10(f) - 6) / 4 * 360; }
+  BANDS.forEach(function (b, i) {
+    var li = document.createElement('li'), btn = document.createElement('button'); btn.type = 'button'; btn.id = 'band' + i;
+    btn.innerHTML = b.n + '<small>' + b.t + '</small>';
+    btn.addEventListener('click', function () { var r = b.r[0], f = Math.sqrt(r[0] * r[1]); raF.value = Math.round((Math.log10(f) - 6) * 100); radio(); });
+    li.appendChild(btn); $('raBands').appendChild(li);
+  });
+  function radio() {
+    var f = fHz(parseInt(raF.value, 10)), hits = bandsAt(f);
+    $('raFo').textContent = fmtF(f);
+    clear(raSvg);
+    BANDS.forEach(function (b, i) {
+      var on = hits.indexOf(b.n) >= 0, y = 10 + i * 9;
+      b.r.forEach(function (r) { var x1 = RX(r[0]), x2 = RX(r[1]); if (x2 - x1 < 4) { x1 -= 2; x2 += 2; } mk(raSvg, 'rect', { x: x1, y: y, width: x2 - x1, height: 7, rx: 2, fill: on ? 'var(--acc)' : 'var(--line)' }); });
+      $('band' + i).setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    mk(raSvg, 'line', { x1: 20, x2: 380, y1: 92, y2: 92, stroke: 'var(--ink)', 'stroke-width': 2 });
+    ['1 MHz', '10 MHz', '100 MHz', '1 GHz', '10 GHz'].forEach(function (t, k) {
+      var x = 20 + k * 90; mk(raSvg, 'line', { x1: x, x2: x, y1: 88, y2: 97, stroke: 'var(--ink)', 'stroke-width': 2 });
+      mk(raSvg, 'text', { x: x, y: 115, 'font-size': 13, 'text-anchor': k === 0 ? 'start' : k === 4 ? 'end' : 'middle' }, t);
+    });
+    var cx = RX(f); mk(raSvg, 'line', { x1: cx, x2: cx, y1: 4, y2: 97, stroke: 'var(--red)', 'stroke-width': 2.5 });
+    $('raOut').innerHTML = '<span>f = ' + fmtF(f) + ' ≈ ' + fmt(Number(f.toPrecision(3)), 0) + ' Hz</span><span>Longueur d\'onde : λ = 300 000 000 ÷ f ≈ <b>' + fmtL(wavelength(f)) + '</b></span><span style="font-family:var(--f-body)">' + (hits.length ? 'Ici : ' + hits.join(', ') + '.' : 'Pas d\'usage courant de cette liste à cette fréquence (d\'autres existent : radars, radioamateurs, avions…).') + '</span>';
+  }
+  raF.addEventListener('input', radio); radio();
+
+  /* ---------- 8. Débit ---------- */
+  function downloadTime(bytes, bps) { return bytes * 8 / bps; }
+  function fmtDuration(s) {
+    if (!isFinite(s)) return '—';
+    if (s < 60) return fmt(s, s < 10 ? 2 : 1) + ' s';
+    var t = Math.round(s);
+    if (t < 3600) return Math.floor(t / 60) + ' min ' + (t % 60) + ' s';
+    if (t < 86400) return Math.floor(t / 3600) + ' h ' + Math.floor((t % 3600) / 60) + ' min';
+    return Math.floor(t / 86400) + ' j ' + Math.floor((t % 86400) / 3600) + ' h';
+  }
+  var FILES = [['Une photo', 3, '1e6'], ['Une chanson', 4, '1e6'], ['Un épisode de série', 500, '1e6'], ['Un film HD', 4, '1e9'], ['Un gros jeu vidéo', 80, '1e9']];
+  var LINKS = [['ADSL', 8, '1e6'], ['4G', 30, '1e6'], ['Fibre', 500, '1e6']];
+  function presetBtns(host, list, inp, unit) {
+    list.forEach(function (p) {
+      var b = document.createElement('button'); b.type = 'button'; b.textContent = p[0] + ' (' + fmt(p[1]) + ' ' + (host === 'dbFiles' ? { '1e3': 'Ko', '1e6': 'Mo', '1e9': 'Go' }[p[2]] : { '1e3': 'kbit/s', '1e6': 'Mbit/s', '1e9': 'Gbit/s' }[p[2]]) + ')';
+      b.addEventListener('click', function () { $(inp).value = fmt(p[1]); $(unit).value = p[2]; deb(); });
+      $(host).appendChild(b);
+    });
+  }
+  presetBtns('dbFiles', FILES, 'dbS', 'dbSU'); presetBtns('dbLinks', LINKS, 'dbR', 'dbRU');
+  function deb() {
+    var s = num($('dbS').value), su = +$('dbSU').value, r = num($('dbR').value), ru = +$('dbRU').value, out = $('dbOut');
+    if (isNaN(s) || isNaN(r) || s < 0) { out.innerHTML = '<span class="err">Écris deux nombres positifs.</span>'; return; }
+    if (r <= 0) { out.innerHTML = '<span class="err">Avec un débit nul, le fichier n\'arrive jamais !</span>'; return; }
+    var bytes = s * su, bits = bytes * 8, bps = r * ru, t = downloadTime(bytes, bps), sName = $('dbSU').options[$('dbSU').selectedIndex].text, rName = $('dbRU').options[$('dbRU').selectedIndex].text;
+    var bitName = { '1000': 'kbit', '1000000': 'Mbit', '1000000000': 'Gbit' }[String(su)];
+    var sameUnit = su === ru;
+    out.innerHTML = '<span>Taille : ' + fmt(s) + ' ' + sName + ' × 8 = ' + fmt(s * 8) + ' ' + bitName + ' (' + fmt(bits, 0) + ' bits)</span>' +
+      '<span>Temps = ' + (sameUnit ? fmt(s * 8) + ' ' + bitName + ' ÷ ' + fmt(r) + ' ' + rName : fmt(bits, 0) + ' bits ÷ ' + fmt(bps, 0) + ' bit/s') + ' = ' + fmt(t, 3) + ' s</span>' +
+      '<span>Soit environ <b>' + fmtDuration(t) + '</b></span>' +
+      '<span style="font-family:var(--f-body)" class="soft">Sans le × 8, on trouverait ' + fmtDuration(t / 8) + ' : 8 fois trop peu.</span>';
+  }
+  ['dbS', 'dbR'].forEach(function (id) { $(id).addEventListener('input', deb); });
+  ['dbSU', 'dbRU'].forEach(function (id) { $(id).addEventListener('change', deb); });
+  deb();
+
+  /* ---------- 11. Quiz ---------- */
+  var MQ = ['E', 'T', 'S', 'O', 'A', 'N', 'M', 'I', 'R', 'K', 'U', 'D'];
+  var makers = [
+    function () { var k = pick(SITK), S = SIT[k]; return { q: S.name + ' : ' + S.txt + ' Quel est le type de signal ?', type: 'sel', opts: Object.keys(SIGNALS).map(function (x) { return [x, SIGNALS[x]]; }), a: S.s, show: SIGNALS[S.s[0]], how: 'Émetteur : ' + S.e.toLowerCase() + ' → récepteur : ' + S.r.toLowerCase() }; },
+    function () { var d = pick([68, 170, 340, 510, 680, 1020, 1700]); return { q: 'Tu es à ' + fmt(d) + ' m d\'un feu d\'artifice. Combien de secondes met le son de l\'explosion pour t\'arriver (v = 340 m/s) ?', type: 'num', a: d / 340, tol: 0.011, show: fmt(d / 340, 2) + ' s', how: 't = d ÷ v = ' + fmt(d) + ' ÷ 340 = ' + fmt(d / 340, 2) + ' s' }; },
+    function () { var D = pick([300, 600, 1500, 3000, 6000, 36000]); return { q: 'Une onde radio parcourt ' + fmt(D) + ' km (v = 300 000 km/s). Combien de millisecondes (ms) lui faut-il ?', type: 'num', a: D / 300, tol: 0.011, show: fmt(D / 300) + ' ms', how: 't = ' + fmt(D) + ' ÷ 300 000 = ' + fmt(D / 300000, 4) + ' s = ' + fmt(D / 300) + ' ms' }; },
+    function () { var L = pick(MQ); return { q: 'Quelle lettre s\'écrit ' + pretty(MORSE[L]).split('').join(' ') + ' en Morse ?', type: 'txt', a: L, show: L, how: L + ' = ' + pretty(MORSE[L]) }; },
+    function () { var n = rnd(3, 9); return { q: 'Un mot de ' + n + ' lettres est codé en ASCII, un octet par lettre. Combien de bits sont envoyés ?', type: 'num', a: 8 * n, tol: 0.01, show: String(8 * n), how: n + ' lettres × 8 bits = ' + (8 * n) + ' bits' }; },
+    function () { var b = ''; for (var i = 0; i < 7; i++) b += rnd(0, 1); var p = parityBit(b), ones = b.split('').filter(function (c) { return c === '1'; }).length; return { q: 'On veut envoyer les 7 bits ' + b.split('').join(' ') + ' avec un bit de parité paire. Que vaut le bit de parité (0 ou 1) ?', type: 'num', a: +p, tol: 0.01, show: p, how: ones + ' bits à 1 : ' + (ones % 2 ? 'impair, on ajoute un 1 pour rendre le total pair' : 'déjà pair, on ajoute un 0') }; },
+    function () { var s = pick([5, 10, 20, 25, 50, 100, 200]), r = pick([8, 10, 20, 40, 50, 100]); var t = s * 8 / r; return { q: 'Un fichier de ' + s + ' Mo est téléchargé à ' + r + ' Mbit/s. Combien de secondes faut-il ?', type: 'num', a: t, tol: Math.max(0.011, t * 0.005), show: fmt(t, 2) + ' s', how: s + ' Mo × 8 = ' + (s * 8) + ' Mbit ; ' + (s * 8) + ' ÷ ' + r + ' = ' + fmt(t, 2) + ' s' }; },
+    function () { var c = pick([['Un signal qui ne prend que deux valeurs, 0 ou 1.', 'num'], ['La tension d\'un micro qui suit exactement la forme de la voix.', 'ana'], ['Une suite de nombres écrits en binaire.', 'num'], ['Un signal qui varie de façon continue, sans sauts.', 'ana'], ['Le sillon gravé d\'un disque vinyle, qui a la forme du son.', 'ana'], ['Les impulsions de lumière dans une fibre Internet.', 'num']]); return { q: c[0] + ' Analogique ou numérique ?', type: 'sel', opts: [['ana', 'Analogique'], ['num', 'Numérique']], a: [c[1]], show: c[1] === 'ana' ? 'analogique' : 'numérique', how: c[1] === 'ana' ? 'Analogique : la grandeur varie de façon continue, comme le phénomène.' : 'Numérique : une suite de nombres (0 et 1).' }; }
+  ];
+  var quiz = $('quiz'), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ''; done = [];
+    for (var k = 0; k < 8; k++) {
+      var Q = makers[k](), li = document.createElement('li'), field;
+      if (Q.type === 'sel') field = '<select id="qa' + k + '" aria-label="Ta réponse à la question ' + (k + 1) + '"><option value="">…</option>' + Q.opts.map(function (o) { return '<option value="' + o[0] + '">' + o[1] + '</option>'; }).join('') + '</select>';
+      else field = '<input type="text" id="qa' + k + '" ' + (Q.type === 'num' ? 'inputmode="decimal" ' : '') + 'autocomplete="off" spellcheck="false" aria-label="Ta réponse à la question ' + (k + 1) + '">';
+      li.innerHTML = '<span>' + Q.q + '</span>' + field + '<button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+      quiz.appendChild(li);
+      (function (k, Q) {
+        function check() {
+          var fb = $('qf' + k), v = $('qa' + k).value, ok;
+          if (Q.type === 'sel') { if (v === '') { fb.className = 'fb'; fb.textContent = 'Choisis une réponse.'; return; } ok = Q.a.indexOf(v) >= 0; }
+          else if (Q.type === 'txt') { var w = clean(v).trim(); if (w === '') { fb.className = 'fb'; fb.textContent = 'Écris une lettre.'; return; } ok = w === Q.a; }
+          else { var x = num(v); if (isNaN(x)) { fb.className = 'fb'; fb.textContent = 'Écris un nombre.'; return; } ok = Math.abs(x - Q.a) <= Q.tol; }
+          if (ok) { fb.className = 'fb ok'; fb.textContent = 'Bravo, c\'est juste !'; done[k] = true; }
+          else { done[k] = false; fb.className = 'fb no'; fb.innerHTML = 'Pas tout à fait : la réponse est ' + Q.show + '.<span>' + Q.how + '</span>'; }
+          $('score').textContent = done.filter(Boolean).length + ' / 8';
+        }
+        $('qb' + k).addEventListener('click', check);
+        $('qa' + k).addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+      })(k, Q);
+    }
+    $('score').textContent = '0 / 8';
+  }
+  $('newQuiz').addEventListener('click', newQuiz);
+  newQuiz();
+
+  window.__sig = {
+    chain: function (id) { var S = SIT[id]; return S ? { e: S.e, s: S.s.slice(), r: S.r, c: S.c } : null; },
+    travelTime: travelTime, stadium: stadium, sample: sample, curve: curve,
+    toMorse: toMorse, fromMorse: fromMorse, morseUnits: morseUnits, toBits: toBits,
+    parityBit: parityBit, checkParity: checkParity,
+    traceFibre: function (a, R) { var r = traceFibre(a, R); return { ok: r.ok, bounces: r.bounces, escapeAngle: r.escapeAngle, inAngle: r.inAngle, path: r.path }; },
+    wavelength: wavelength, bandsAt: bandsAt, downloadTime: downloadTime, fmtDuration: fmtDuration
+  };
+})();
+</script>
+</body>
+</html>

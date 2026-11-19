@@ -1,0 +1,943 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>La gravitation</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, encre violet nuit (comme le ciel où tournent les planètes), marge rouge. La Terre est en bleu, les forces et les trajectoires en violet. */
+:root {
+  --paper: #f9f8fc;
+  --grid: #e7e2f1;
+  --card: #ffffff;
+  --ink: #1e1533;
+  --ink-soft: #5d5472;
+  --acc: #4c1d95;
+  --acc-soft: #ece5fa;
+  --two: #1c64c8;
+  --two-soft: #dbe8fa;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #fff0a3;
+  --line: #ddd6ea;
+  --moon: #9a94a8;
+  --sun: #e8a317;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #110d1a; --grid: #1e1729; --card: #18122a; --ink: #efeaf8; --ink-soft: #b7accb;
+    --acc: #c4b5fd; --acc-soft: #2e2150; --two: #7fb0ff; --two-soft: #1a2a45;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #30283f;
+    --moon: #b9b3c6; --sun: #f5c04a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #110d1a; --grid: #1e1729; --card: #18122a; --ink: #efeaf8; --ink-soft: #b7accb;
+  --acc: #c4b5fd; --acc-soft: #2e2150; --two: #7fb0ff; --two-soft: #1a2a45;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #30283f;
+  --moon: #b9b3c6; --sun: #f5c04a;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+@media (max-width: 520px) { .box { padding: 14px; } }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+.fig svg, .graph svg { width: 100%; height: auto; display: block; }
+.graph svg { background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 6px 12px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); min-height: 40px; }
+button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+button:disabled { opacity: .45; cursor: default; transform: none; box-shadow: 3px 3px 0 var(--ink); }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+input[type="text"] { font: inherit; font-family: var(--f-mono); font-size: 1.05rem; padding: 8px 10px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; }
+input[type="range"] { width: 100%; accent-color: var(--acc); }
+.param { display: flex; flex-direction: column; gap: 2px; }
+.param label { font-weight: 700; }
+.params { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px 18px; }
+
+.methods { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
+.method { border: 1.5px solid var(--line); border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; background: var(--paper); min-width: 0; }
+.method strong { font-family: var(--f-display); }
+.method .m { font-family: var(--f-mono); font-size: .95rem; overflow-wrap: anywhere; }
+.method .m b { color: var(--acc); }
+.err { color: var(--red); font-weight: 700; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; color: var(--acc); }
+
+/* La formule */
+.formula { font-family: var(--f-mono); font-size: clamp(1.2rem, 4.6vw, 1.7rem); font-weight: 600; text-align: center; color: var(--acc); overflow-wrap: anywhere; }
+.legend { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px 16px; }
+.legend li { display: flex; gap: 8px; align-items: baseline; min-width: 0; }
+.legend b { font-family: var(--f-mono); color: var(--acc); min-width: 2.4em; }
+
+/* Calculatrice en notation scientifique */
+.qrow { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
+.qrow .ql { font-weight: 700; flex: 1 1 100%; }
+.qrow input[type="text"] { width: 6.2em; flex: 0 0 auto; }
+.qrow input.ex { width: 4em; }
+.qrow .x { font-family: var(--f-mono); }
+.big { font-family: var(--f-mono); font-weight: 600; font-size: 1.5rem; color: var(--acc); overflow-wrap: anywhere; }
+
+/* Lectures */
+.readouts { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+.read { border: 1.5px solid var(--line); border-radius: 10px; padding: 10px 14px; background: var(--paper); display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.read .k { font-family: var(--f-display); font-weight: 700; font-size: .95rem; }
+.read .v { font-family: var(--f-mono); font-weight: 600; font-size: 1.3rem; color: var(--acc); overflow-wrap: anywhere; }
+.read .s { font-size: .9rem; color: var(--ink-soft); }
+
+/* Barre de force */
+.bar { height: 30px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); overflow: hidden; }
+.bar > div { height: 100%; background: var(--acc); width: 100%; }
+.bar.ref > div { background: var(--ink-soft); }
+.barlab { font-family: var(--f-mono); font-size: .95rem; }
+
+.verdict { border-radius: 8px; padding: 12px 14px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; background: var(--acc-soft); color: var(--acc); }
+.verdict.fall { background: var(--red-soft); color: var(--red); }
+.verdict.orbit { background: var(--ok-soft); color: var(--ok); }
+.verdict span { font-weight: 400; color: var(--ink); }
+
+.errs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.errs li { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--paper); }
+.errs .bad { font-family: var(--f-mono); color: var(--red); text-decoration: line-through; overflow-wrap: anywhere; }
+.errs .good { font-family: var(--f-mono); color: var(--ok); font-weight: 600; overflow-wrap: anywhere; }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 110px auto; gap: 10px; align-items: center; }
+.quiz input[type="text"] { font-size: 1rem; padding: 6px 8px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc); }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 120px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+<!--ticons--><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Tutoriels"><script src="progress.js" defer></script><!--/ticons-->
+<style id="tnav-css">
+.tnav-top { display: flex; margin: 0 0 4px; }
+.tnav-home { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font-weight: 700; font-size: .95rem; text-decoration: none; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tnav-home:hover, .tnav-home:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.tnav-bottom { margin-top: 8px; display: flex; flex-direction: column; gap: 12px; }
+.tnav-bottom h2 { margin: 0; }
+.tnav-pn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tnav-pn a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--ink, #222); border-radius: 10px;
+  background: var(--card, #fff); color: var(--ink, #222); text-decoration: none; box-shadow: 3px 3px 0 var(--ink, #222); min-width: 0; }
+.tnav-pn a span { font-size: .85rem; color: var(--ink-soft, #666); }
+.tnav-pn a strong { overflow-wrap: anywhere; }
+.tnav-pn a.next { text-align: right; grid-column: 2; }
+.tnav-bottom .tnav-home { align-self: center; }
+@media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
+</style>
+</head>
+<body>
+<main class="page">
+<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="physique.html">← Tous les tutoriels de physique</a></nav><!--/tnav-->
+
+
+  <header class="hero">
+    <span class="eyebrow">Tutoriel de physique-chimie · niveau 3<sup>e</sup></span>
+    <h1>La gravitation</h1>
+    <p class="lead">Une pomme tombe de l'arbre. La Lune tourne autour de la Terre. La Terre tourne autour du Soleil. Derrière ces trois mouvements, il y a une seule et même force : la gravitation. Tout ce qui a une masse attire tout le reste.</p>
+    <div class="box fig">
+      <svg viewBox="0 0 400 150" role="img" aria-label="La Terre et la Lune s'attirent avec deux forces de même valeur, en sens opposés">
+        <defs>
+          <marker id="hArr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--acc)"/></marker>
+        </defs>
+        <circle cx="80" cy="75" r="46" style="fill:var(--two-soft);stroke:var(--two)" stroke-width="3"/>
+        <text x="80" y="80" text-anchor="middle" font-size="15" font-weight="600">Terre</text>
+        <circle cx="330" cy="75" r="14" style="fill:var(--moon)"/>
+        <text x="330" y="118" text-anchor="middle" font-size="15" font-weight="600">Lune</text>
+        <line x1="80" y1="75" x2="192" y2="75" style="stroke:var(--acc)" stroke-width="4" marker-end="url(#hArr)"/>
+        <line x1="330" y1="75" x2="218" y2="75" style="stroke:var(--acc)" stroke-width="4" marker-end="url(#hArr)"/>
+        <text x="150" y="60" text-anchor="middle" font-size="13">Lune sur Terre</text>
+        <text x="262" y="60" text-anchor="middle" font-size="13">Terre sur Lune</text>
+      </svg>
+      <span class="soft">Deux flèches de même longueur : la Terre attire la Lune exactement autant que la Lune attire la Terre.</span>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · L'idée</span>
+    <h2>Tout ce qui a une masse s'attire</h2>
+    <p>Deux objets qui ont une masse s'attirent toujours l'un l'autre : c'est l'<strong>interaction gravitationnelle</strong>. Toi et ton voisin de classe, vous vous attirez. Mais la force est si faible qu'on ne la sent pas. Elle devient énorme quand un des objets est très massif, comme une planète ou une étoile.</p>
+    <div class="cards">
+      <div class="box"><span class="tag">À distance</span><strong>Pas besoin de se toucher</strong><span class="soft">La gravitation agit à travers le vide : le Soleil attire la Terre à 150 millions de kilomètres.</span></div>
+      <div class="box"><span class="tag">Attractive</span><strong>Elle attire, toujours</strong><span class="soft">Jamais la gravitation ne repousse. (L'électricité et les aimants, eux, peuvent attirer ou repousser.)</span></div>
+      <div class="box"><span class="tag">Mutuelle</span><strong>Dans les deux sens</strong><span class="soft">Si A attire B, alors B attire A avec une force de <strong>même valeur</strong>, en sens opposé. On le voit dans le tutoriel sur <a class="tlink" href="les-forces.html">les forces</a>.</span></div>
+      <div class="box"><span class="tag">Masses et distance</span><strong>Elle dépend de deux choses</strong><span class="soft">Plus les masses sont grandes, plus la force est grande. Plus les objets sont loin, plus elle est faible.</span></div>
+    </div>
+    <div class="box">
+      <h3>Le jeu des deux flèches</h3>
+      <p class="soft">Change les masses et la distance. Les deux forces changent ensemble, mais elles restent toujours égales. (Ici les masses sont en « unités » pour voir les flèches.)</p>
+      <div class="params">
+        <div class="param"><label for="mA">Masse de A : <span class="mono" id="mAOut">3</span> unités</label><input id="mA" type="range" min="1" max="5" step="1" value="3"></div>
+        <div class="param"><label for="mB">Masse de B : <span class="mono" id="mBOut">1</span> unité</label><input id="mB" type="range" min="1" max="5" step="1" value="1"></div>
+        <div class="param"><label for="dAB">Distance : <span class="mono" id="dABOut">2</span> unités</label><input id="dAB" type="range" min="1" max="3" step="0.1" value="2"></div>
+      </div>
+      <div class="fig"><svg id="pairSvg" viewBox="0 0 400 170" role="img" aria-label="Deux boules A et B et les deux forces d'attraction"></svg></div>
+      <p class="mono" id="pairOut" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · La formule</span>
+    <h2>F = G × m<sub>A</sub> × m<sub>B</sub> ÷ d²</h2>
+    <p>En 1687, Isaac Newton écrit la loi qui donne la valeur de cette force. Deux objets A et B, de masses m<sub>A</sub> et m<sub>B</sub>, dont les centres sont à la distance d, s'attirent avec une force :</p>
+    <div class="box">
+      <p class="formula">F = G × m<sub>A</sub> × m<sub>B</sub> ÷ d²</p>
+      <ul class="legend">
+        <li><b>F</b><span>la force, en newtons (N)</span></li>
+        <li><b>m<sub>A</sub>, m<sub>B</sub></b><span>les masses, en kilogrammes (kg)</span></li>
+        <li><b>d</b><span>la distance entre les <strong>centres</strong>, en <strong>mètres</strong> (m)</span></li>
+        <li><b>G</b><span>la constante de gravitation : G = 6,67 × 10<sup>−11</sup> (unités SI : N·m²/kg²)</span></li>
+      </ul>
+    </div>
+    <p>G est un nombre minuscule : 6,67 × 10<sup>−11</sup> = 0,000 000 000 066 7. C'est pour ça que la gravitation entre deux objets ordinaires est imperceptible. Pour écrire des nombres aussi petits ou aussi grands, on utilise la <strong>notation scientifique</strong> (revois le tutoriel sur <a class="tlink" href="les-puissances.html">les puissances</a>).</p>
+    <div class="box">
+      <h3>La calculatrice de gravitation</h3>
+      <div class="btns" id="calcPresets" role="group" aria-label="Exemples"></div>
+      <div class="qrow"><span class="ql">Masse m<sub>A</sub> <span class="soft" id="nameA"></span></span><input id="mAm" type="text" inputmode="decimal" autocomplete="off" aria-label="Masse A, nombre devant la puissance de 10"><span class="x">× 10^</span><input id="mAe" class="ex" type="text" inputmode="numeric" autocomplete="off" aria-label="Masse A, exposant"><span class="x">kg</span></div>
+      <div class="qrow"><span class="ql">Masse m<sub>B</sub> <span class="soft" id="nameB"></span></span><input id="mBm" type="text" inputmode="decimal" autocomplete="off" aria-label="Masse B, nombre devant la puissance de 10"><span class="x">× 10^</span><input id="mBe" class="ex" type="text" inputmode="numeric" autocomplete="off" aria-label="Masse B, exposant"><span class="x">kg</span></div>
+      <div class="qrow"><span class="ql">Distance d <span class="soft" id="nameD"></span></span><input id="dm" type="text" inputmode="decimal" autocomplete="off" aria-label="Distance, nombre devant la puissance de 10"><span class="x">× 10^</span><input id="de" class="ex" type="text" inputmode="numeric" autocomplete="off" aria-label="Distance, exposant"><span class="x">m</span></div>
+      <div id="calcOut" aria-live="polite" style="display:flex;flex-direction:column;gap:12px"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Ce qu'il faut voir</span>
+      <span>Entre deux élèves à 1 m : environ 10<sup>−7</sup> N, le poids d'un grain de poussière. Entre la Terre et un élève : quelques centaines de newtons, c'est son poids ! Entre le Soleil et la Terre : environ 3,5 × 10<sup>22</sup> N. Même formule, mais des résultats qui vont de minuscule à gigantesque.</span>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Le rôle de la distance</span>
+    <h2>Deux fois plus loin, quatre fois moins fort</h2>
+    <p>Dans la formule, la distance est <strong>au carré</strong> et <strong>en dessous</strong> de la fraction. Si la distance est multipliée par 2, d² est multiplié par 2² = 4, donc la force est <strong>divisée par 4</strong>. Distance × 3 : force ÷ 9. Distance × 10 : force ÷ 100.</p>
+    <div class="box">
+      <div class="param"><label for="kd">La distance est multipliée par <span class="mono" id="kdOut">2</span></label><input id="kd" type="range" min="1" max="10" step="0.5" value="2"></div>
+      <span class="barlab">Force au départ (distance d)</span>
+      <div class="bar ref"><div></div></div>
+      <span class="barlab" id="kdLab"></span>
+      <div class="bar" aria-hidden="true"><div id="kdBar"></div></div>
+      <div class="graph"><svg id="kdSvg" viewBox="0 0 400 230" role="img" aria-label="Courbe de la force en fonction de la distance"></svg></div>
+      <p class="mono" id="kdOut2" aria-live="polite"></p>
+    </div>
+    <div class="cards">
+      <div class="box"><strong>Une masse × 2</strong><span class="soft">La force est multipliée par 2 (elle est proportionnelle à chaque masse).</span></div>
+      <div class="box"><strong>Les deux masses × 2</strong><span class="soft">La force est multipliée par 2 × 2 = 4.</span></div>
+      <div class="box"><strong>Distance × 2</strong><span class="soft">La force est divisée par 2² = 4. Ce n'est <strong>pas</strong> une situation de proportionnalité.</span></div>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · Gravitation et poids</span>
+    <h2>Le poids, c'est la gravitation de la planète</h2>
+    <p>Dans le tutoriel sur <a class="tlink" href="le-poids-et-la-masse.html">le poids et la masse</a>, on a vu que <strong>P = m × g</strong>, avec g ≈ 9,8 N/kg sur Terre. D'où vient ce 9,8 ? Le poids d'un objet posé sur une planète est l'attraction gravitationnelle de la planète. La distance entre les centres est alors le <strong>rayon R</strong> de la planète :</p>
+    <div class="box">
+      <p class="formula">P = G × M × m ÷ R² = m × g</p>
+      <p class="formula" style="font-size:clamp(1.1rem,4vw,1.4rem)">donc g = G × M ÷ R²</p>
+      <p class="soft">M est la masse de la planète, R son rayon (en mètres), m la masse de l'objet. g ne dépend que de la planète, pas de l'objet.</p>
+    </div>
+    <div class="box">
+      <h3>Calcule g toi-même</h3>
+      <div class="btns" id="astroBtns" role="group" aria-label="Choisis un astre"></div>
+      <div class="methods" id="astroOut" aria-live="polite"></div>
+    </div>
+    <div class="box">
+      <h3>Une planète imaginaire</h3>
+      <p class="soft">Invente une planète : choisis sa masse et son rayon par rapport à la Terre. g est multiplié par la masse, et divisé par le rayon au carré.</p>
+      <div class="params">
+        <div class="param"><label for="pM">Masse : <span class="mono" id="pMOut">1</span> × celle de la Terre</label><input id="pM" type="range" min="0.1" max="10" step="0.1" value="2"></div>
+        <div class="param"><label for="pR">Rayon : <span class="mono" id="pROut">1</span> × celui de la Terre</label><input id="pR" type="range" min="0.2" max="3" step="0.1" value="1"></div>
+      </div>
+      <div class="readouts" id="planetOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Pourquoi la Lune ne tombe pas ?</span>
+    <h2>Le canon de Newton</h2>
+    <p>La Terre attire la Lune. Alors pourquoi la Lune ne nous tombe-t-elle pas dessus ? Newton a imaginé une expérience de pensée. Sur une montagne très haute (50 km, bien plus que l'Everest) et <strong>sans air</strong>, on tire un boulet de canon à l'horizontale. Plus il va vite, plus il retombe loin… Et s'il va assez vite, le sol « se dérobe » sous lui à cause de la courbure de la Terre : il tombe, mais ne touche jamais le sol. Il est <strong>en orbite</strong>.</p>
+    <div class="box">
+      <div class="param"><label for="vC">Vitesse du boulet : <span class="mono" id="vCOut">5</span> km/s</label><input id="vC" type="range" min="0" max="12" step="0.1" value="5"></div>
+      <div class="btns" id="vPresets" role="group" aria-label="Vitesses toutes prêtes"></div>
+      <div class="fig"><svg id="canonSvg" viewBox="0 0 400 400" role="img" aria-label="La Terre, la montagne et la trajectoire du boulet"></svg></div>
+      <div class="btns">
+        <button type="button" id="cGo">Lancer</button>
+        <button type="button" id="cStep">Pas à pas (+5 min)</button>
+        <button type="button" id="cAll">Trajectoire complète</button>
+        <button type="button" id="cZoom" aria-pressed="false">Vue large</button>
+      </div>
+      <div class="readouts" id="cRead"></div>
+      <div class="verdict" id="cVerdict" aria-live="polite"></div>
+      <p class="soft">La simulation calcule la trajectoire petit à petit : à chaque instant, la Terre tire le boulet vers son centre et change un peu sa vitesse. Le dessin exagère la hauteur de la montagne.</p>
+    </div>
+    <div class="note">
+      <span class="note-title">Les deux vitesses magiques (sans air, près du sol)</span>
+      <span>Vers <strong>7,9 km/s</strong> (environ 28 000 km/h), le boulet fait le tour de la Terre : c'est la vitesse d'une orbite basse. Vers <strong>11,2 km/s</strong> depuis le sol, il s'échappe pour toujours : c'est la <strong>vitesse de libération</strong>. Ces valeurs sont arrondies, et en vrai l'air freinerait énormément le boulet : les fusées montent d'abord au-dessus de l'atmosphère.</span>
+    </div>
+    <p>La Lune fait exactement ça : elle va à environ 1 km/s, sur le côté, à 384 000 km de nous. Elle <strong>tombe en permanence</strong> vers la Terre, mais comme elle avance en même temps, elle la rate toujours. La gravitation courbe sa trajectoire en un cercle (presque).</p>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · Le système solaire</span>
+    <h2>Le Soleil tient les planètes</h2>
+    <p>Le Soleil contient plus de 99 % de la masse du système solaire. Sa gravitation retient les huit planètes, qui tombent toutes vers lui sans jamais l'atteindre, comme le boulet de Newton. Plus une planète est loin, plus l'attraction du Soleil est faible, et plus elle va lentement. (Les orbites sont en fait des ellipses presque circulaires, voir le tutoriel sur <a class="tlink" href="l-univers-et-le-systeme-solaire.html">l'Univers et le système solaire</a>.)</p>
+    <div class="box">
+      <h3>Choisis une planète</h3>
+      <div class="btns" id="planBtns" role="group" aria-label="Choisis une planète"></div>
+      <div class="readouts" id="planOut" aria-live="polite"></div>
+      <div class="fig"><svg id="planSvg" viewBox="0 0 400 270" role="img" aria-label="Vitesse calculée de chaque planète autour du Soleil"></svg></div>
+      <p class="soft">Vitesse calculée avec v = √(G × M<sub>Soleil</sub> ÷ d) pour une orbite circulaire (formule de lycée, juste pour voir). Le résultat est très proche des vitesses moyennes mesurées. Et la durée d'un tour donne bien 1 an pour la Terre !</p>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Les marées</span>
+    <h2>La Lune tire sur les océans</h2>
+    <p>La Lune attire un peu plus fort l'eau du côté de la Terre qui est le plus proche d'elle, et un peu moins fort l'eau du côté opposé (elle est plus loin). Résultat, en simplifiant : l'océan forme <strong>deux bourrelets</strong>, un vers la Lune et un à l'opposé. En tournant sur elle-même, la Terre passe sous ces bourrelets : en beaucoup d'endroits, il y a environ <strong>deux marées hautes par jour</strong>.</p>
+    <div class="box">
+      <div class="btns" id="tideBtns" role="group" aria-label="Position du Soleil">
+        <button type="button" id="tAlign" aria-pressed="true">Soleil et Lune alignés</button>
+        <button type="button" id="tCross" aria-pressed="false">À angle droit</button>
+      </div>
+      <div class="fig"><svg id="tideSvg" viewBox="0 0 400 230" role="img" aria-label="La Terre, ses bourrelets d'océan, la Lune et le Soleil"></svg></div>
+      <p id="tideOut" aria-live="polite"></p>
+    </div>
+    <div class="note">
+      <span class="note-title">Une explication simplifiée</span>
+      <span>Le dessin exagère énormément les bourrelets : en pleine mer, la marée ne fait que quelques dizaines de centimètres. Près des côtes, la forme du fond et des baies peut l'amplifier beaucoup (plus de 10 m au Mont-Saint-Michel). Les vraies marées sont plus compliquées que ce modèle.</span>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Les astronautes</span>
+    <h2>L'ISS tombe… en permanence</h2>
+    <p>Dans la Station spatiale internationale (ISS), à environ 400 km d'altitude, la gravitation de la Terre est encore presque aussi forte qu'au sol (g ≈ 8,7 N/kg). Les astronautes flottent parce que la station et eux <strong>tombent ensemble</strong>, comme le boulet de Newton : c'est la <strong>chute libre</strong>, comme dans l'ascenseur du tutoriel sur <a class="tlink" href="le-poids-et-la-masse.html">le poids et la masse</a>. Plus un satellite est haut, moins il va vite et plus un tour est long.</p>
+    <div class="box">
+      <div class="param"><label for="hO">Altitude de l'orbite : <span class="mono" id="hOOut">400</span> km</label><input id="hO" type="range" min="0" max="1000" step="1" value="500"></div>
+      <div class="btns" id="orbBtns" role="group" aria-label="Exemples d'orbites"></div>
+      <div class="fig"><svg id="orbSvg" viewBox="0 0 400 240" role="img" aria-label="La Terre et l'orbite choisie, à l'échelle"></svg></div>
+      <div class="readouts" id="orbOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Attention</span>
+    <h2>Les erreurs fréquentes</h2>
+    <div class="box">
+      <ul class="errs">
+        <li><span class="bad">Dans l'espace, il n'y a pas de gravité.</span><span class="good">La gravitation agit partout, elle diminue avec la distance.</span><span class="soft">Sinon, la Lune partirait tout droit et la Terre quitterait le Soleil.</span></li>
+        <li><span class="bad">La Terre attire la Lune plus fort que la Lune n'attire la Terre.</span><span class="good">Les deux forces ont la même valeur.</span><span class="soft">Ce qui change, c'est l'effet : la Terre, bien plus massive, bouge beaucoup moins.</span></li>
+        <li><span class="bad">Distance × 2 → force ÷ 2</span><span class="good">Distance × 2 → force ÷ 4</span><span class="soft">La distance est au carré : ÷ 2² = ÷ 4.</span></li>
+        <li><span class="bad">d = 384 000 dans la formule</span><span class="good">d = 384 000 km = 3,84 × 10<sup>8</sup> m</span><span class="soft">Dans F = G × m<sub>A</sub> × m<sub>B</sub> ÷ d², les masses sont en kg et la distance en mètres.</span></li>
+        <li><span class="bad">G et g, c'est la même chose.</span><span class="good">G = 6,67 × 10<sup>−11</sup> partout ; g ≈ 9,8 N/kg sur Terre.</span><span class="soft">G est une constante universelle. g dépend de l'astre : g = G × M ÷ R².</span></li>
+        <li><span class="bad">Les astronautes de l'ISS flottent car il n'y a plus de gravitation.</span><span class="good">Ils flottent parce qu'ils tombent avec la station.</span><span class="soft">Là-haut, g ≈ 8,7 N/kg : presque comme au sol.</span></li>
+        <li><span class="bad">Sans air, un objet lourd tombe plus vite qu'un léger.</span><span class="good">Sans air, tous les objets tombent de la même façon.</span><span class="soft">Deux fois plus de masse, deux fois plus de force, mais aussi deux fois plus dur à mettre en mouvement : les deux effets se compensent.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · Un peu d'histoire</span>
+    <h2>De la pomme à la balance de Cavendish</h2>
+    <ol class="timeline">
+      <li><span class="when">vers 1600</span><div class="what"><strong>Galilée, en Italie</strong><span>Il étudie la chute des corps, surtout avec des billes sur des plans inclinés, et comprend que sans air tous les objets tomberaient de la même façon. L'histoire des boulets lâchés du haut de la tour de Pise est peut-être une légende.</span></div></li>
+      <li><span class="when">début du XVII<sup>e</sup> siècle</span><div class="what"><strong>Kepler, en Allemagne</strong><span>À partir de mesures très précises, il montre que les planètes tournent autour du Soleil sur des ellipses, et plus lentement quand elles sont loin.</span></div></li>
+      <li><span class="when">1687</span><div class="what"><strong>Isaac Newton, en Angleterre</strong><span>Dans les <em>Principia</em>, il explique que la force qui fait tomber une pomme est la même que celle qui retient la Lune et les planètes : c'est la gravitation <strong>universelle</strong>, qui diminue comme 1 ÷ d². L'histoire de la pomme est une <strong>légende</strong> en partie : Newton l'aurait racontée lui-même à la fin de sa vie, mais la pomme ne lui est sans doute jamais tombée sur la tête.</span></div></li>
+      <li><span class="when">1798</span><div class="what"><strong>Henry Cavendish, en Angleterre</strong><span>Avec une balance très sensible (une tige suspendue à un fil, avec des boules de plomb), il mesure l'attraction minuscule entre des boules. On en déduit la masse de la Terre (« peser la Terre ») et une valeur de G proche de celle d'aujourd'hui.</span></div></li>
+      <li><span class="when">1846</span><div class="what"><strong>Le Verrier, en France</strong><span>Uranus ne suit pas tout à fait le chemin prévu. Avec la loi de Newton, Le Verrier calcule où doit se trouver une planète inconnue qui la tire. On la trouve presque à l'endroit annoncé : c'est Neptune.</span></div></li>
+      <li><span class="when">1915</span><div class="what"><strong>Albert Einstein</strong><span>Sa relativité générale décrit la gravitation autrement, comme une courbure de l'espace et du temps. Pour presque tous les calculs de tous les jours, la loi de Newton reste excellente.</span></div></li>
+    </ol>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Réponds avec un nombre (virgule ou point acceptés, un signe moins si besoin).</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Nouvelles questions</button>
+    </div>
+  </section>
+
+  <!-- 12 -->
+  <section>
+    <span class="eyebrow">Étape 12 · À toi de jouer</span>
+    <h2>Six exercices</h2>
+    <p class="soft">Prends G = 6,67 × 10<sup>−11</sup> SI et, sur Terre, g ≈ 9,8 N/kg.</p>
+    <div class="exos">
+      <details>
+        <summary>Deux camions<span class="q">Deux camions de 10 000 kg chacun sont garés à 10 m l'un de l'autre (entre leurs centres). Calcule la force d'attraction entre eux.</span></summary>
+        <div><span>m<sub>A</sub> × m<sub>B</sub> = 10<sup>4</sup> × 10<sup>4</sup> = 10<sup>8</sup> kg² ; d² = 10² = 100 m².</span><span>F = 6,67 × 10<sup>−11</sup> × 10<sup>8</sup> ÷ 10<sup>2</sup> = <strong>6,67 × 10<sup>−5</sup> N</strong>. Beaucoup trop faible pour les faire bouger : les frottements des pneus sont bien plus forts.</span></div>
+      </details>
+      <details>
+        <summary>Le poids par la formule<span class="q">Calcule la force exercée par la Terre (M = 5,97 × 10<sup>24</sup> kg, R = 6,37 × 10<sup>6</sup> m) sur un élève de 50 kg. Compare avec P = m × g.</span></summary>
+        <div><span>F = 6,67 × 10<sup>−11</sup> × 5,97 × 10<sup>24</sup> × 50 ÷ (6,37 × 10<sup>6</sup>)² ≈ <strong>491 N</strong>.</span><span>Avec P = m × g = 50 × 9,8 = 490 N : c'est la même chose ! Le poids est bien la force de gravitation de la Terre.</span></div>
+      </details>
+      <details>
+        <summary>La Lune tire sur la Terre<span class="q">La Terre attire la Lune avec une force d'environ 2 × 10<sup>20</sup> N. Quelle force la Lune exerce-t-elle sur la Terre ?</span></summary>
+        <div><span>L'interaction est mutuelle : <strong>2 × 10<sup>20</sup> N</strong> aussi, dirigée vers la Lune. C'est cette force qui fait les marées.</span></div>
+      </details>
+      <details>
+        <summary>Un satellite qui s'éloigne<span class="q">Un satellite passe d'une distance d à une distance 3 × d du centre de la Terre. Que devient la force d'attraction ?</span></summary>
+        <div><span>La distance est multipliée par 3, donc la force est divisée par 3² = <strong>9</strong>.</span></div>
+      </details>
+      <details>
+        <summary>La planète imaginaire<span class="q">Une planète a une masse 2 fois plus grande que la Terre et un rayon 2 fois plus grand. Quelle est la valeur de g à sa surface ?</span></summary>
+        <div><span>g est multiplié par 2 (la masse) et divisé par 2² = 4 (le rayon) : g ≈ 9,8 × 2 ÷ 4 = <strong>4,9 N/kg</strong>. Plus grosse, mais on y pèserait deux fois moins !</span></div>
+      </details>
+      <details>
+        <summary>Le tour de l'ISS<span class="q">L'ISS tourne à environ 6 770 km du centre de la Terre, à environ 7,7 km/s. Combien de temps dure un tour ? Combien de tours par jour ?</span></summary>
+        <div><span>Longueur d'un tour : 2 × π × 6 770 ≈ 42 500 km.</span><span>Durée : 42 500 ÷ 7,7 ≈ 5 500 s, soit environ <strong>92 minutes</strong>. En un jour (1 440 min) : 1 440 ÷ 92 ≈ <strong>15 à 16 tours</strong>. Les astronautes voient environ 16 levers de Soleil par jour !</span></div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• Deux objets qui ont une masse s'attirent : c'est l'<strong>interaction gravitationnelle</strong>. Elle agit <strong>à distance</strong>, elle est toujours <strong>attractive</strong> et <strong>mutuelle</strong> (même valeur dans les deux sens).</span>
+      <span>• <strong>F = G × m<sub>A</sub> × m<sub>B</sub> ÷ d²</strong>, avec F en N, les masses en kg, d en m (entre les centres) et G = 6,67 × 10<sup>−11</sup> SI.</span>
+      <span>• La force est proportionnelle à chaque masse. Distance × 2 → force <strong>÷ 4</strong> ; distance × 3 → force ÷ 9.</span>
+      <span>• Le poids est l'attraction de la planète : P = m × g avec <strong>g = G × M ÷ R²</strong> (≈ 9,8 N/kg sur Terre, ≈ 1,6 sur la Lune, ≈ 3,7 sur Mars).</span>
+      <span>• La Lune, les satellites et les planètes <strong>tombent en permanence</strong> sans toucher le sol : ils sont en orbite. Les astronautes flottent car ils sont en <strong>chute libre</strong>.</span>
+      <span>• Newton (1687) : la même gravitation pour la pomme et la Lune. Cavendish (1798) : mesure de l'attraction entre des boules, d'où G et la masse de la Terre.</span>
+    </div>
+  </section>
+
+  <!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"><a class="prev" href="le-poids-et-la-masse.html"><span>← Précédent</span><strong>Le poids et la masse</strong></a><a class="next" href="les-formes-d-energie.html"><span>Suivant →</span><strong>Les formes d&#x27;énergie</strong></a></div><a class="tnav-home" href="physique.html">⌂ Tous les tutoriels de physique</a></nav><!--/tnav-->
+<footer>Fiche de révision · La gravitation</footer>
+</main>
+
+<script>
+/*
+  Fonctions exposées sur window.__grav (unités SI : kg, m, s, N) :
+    G                          -> 6.67e-11
+    force(mA, mB, d)           -> number : G × mA × mB ÷ d² (N), ex. force(50, 50, 1) ≈ 1,67e-7
+    distFactor(k)              -> number : facteur de la force quand la distance est × k, soit 1 ÷ k² (ex. 2 -> 0,25)
+    gSurface(M, R)             -> number : g = G × M ÷ R² (N/kg), ex. Terre (5.97e24, 6.37e6) ≈ 9,81
+    sci(x, sig)                -> string : notation scientifique en texte, ex. sci(1.985e20) -> "1,99 × 10²⁰"
+    vCirc(r) / vEsc(r)         -> number : vitesse d'orbite circulaire √(GM/r) et de libération √(2GM/r) autour de la Terre (m/s), r depuis le centre
+    simulate(vKms)             -> { outcome: 'retombe' | 'orbite' | 'echappe', v0, tEnd (s), groundKm, period (s ou null), apogeeKm (ou null), points: [[t, x, y, v], …] }
+                                  canon de Newton tiré à l'horizontale depuis 50 km d'altitude, intégration de Verlet (dt adaptatif)
+    cannon.set(vKms), cannon.step(), cannon.instant(), cannon.state() -> pilote le widget sans requestAnimationFrame
+    orbitAt(hKm)               -> { g (N/kg), v (m/s), T (s) } pour une orbite circulaire à l'altitude h
+    sunPull(d)                 -> { g (N/kg), v (m/s), T (s) } attraction du Soleil par kg et orbite circulaire à la distance d (m)
+*/
+(function () {
+  var NS = 'http://www.w3.org/2000/svg';
+  function $(id) { return document.getElementById(id); }
+  function fmt(x, d) { var r = Math.round(x * 1e6) / 1e6; if (Object.is(r, -0)) r = 0; return r.toLocaleString('fr-FR', { maximumFractionDigits: d == null ? 3 : d }).replace('-', '−'); }
+  function num(s) { var t = String(s).replace(/\s/g, '').replace(/[−–]/g, '-').replace(',', '.'); if (t === '') return NaN; var x = Number(t); return isFinite(x) ? x : NaN; }
+  function mk(svg, name, attrs, text) { var e = document.createElementNS(NS, name); for (var a in attrs) e.setAttribute(a, attrs[a]); if (text != null) e.textContent = text; svg.appendChild(e); return e; }
+  function clear(svg) { while (svg.firstChild) svg.removeChild(svg.firstChild); }
+
+  /* ---------- Notation scientifique ---------- */
+  function sciParts(x, sig) {
+    if (x === 0 || !isFinite(x)) return { m: 0, e: 0 };
+    var e = Math.floor(Math.log10(Math.abs(x))), p = Math.pow(10, sig - 1), m = Math.round(x / Math.pow(10, e) * p) / p;
+    if (Math.abs(m) >= 10) { m = m / 10; e += 1; }
+    return { m: m, e: e };
+  }
+  function expTxt(e) { return e < 0 ? '−' + (-e) : String(e); }
+  function sci(x, sig) { /* HTML */
+    sig = sig == null ? 3 : sig; var s = sciParts(x, sig);
+    if (s.m === 0) return '0';
+    if (s.e === 0) return fmt(s.m, sig - 1);
+    return fmt(s.m, sig - 1) + ' × 10<sup>' + expTxt(s.e) + '</sup>';
+  }
+  var SUP = { '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '−': '⁻' };
+  function sciTxt(x, sig) {
+    sig = sig == null ? 3 : sig; var s = sciParts(x, sig);
+    if (s.m === 0) return '0';
+    if (s.e === 0) return fmt(s.m, sig - 1);
+    return fmt(s.m, sig - 1) + ' × 10' + expTxt(s.e).split('').map(function (c) { return SUP[c]; }).join('');
+  }
+  /* un nombre lisible : écriture ordinaire si raisonnable, sinon notation scientifique */
+  function nice(x, sig) { var a = Math.abs(x); if (a >= 0.01 && a < 1e6) return fmt(x, a >= 100 ? 0 : a >= 10 ? 1 : 2); return sci(x, sig); }
+
+  /* ---------- Physique ---------- */
+  var G = 6.67e-11, MT = 5.97e24, RT = 6.37e6, GM = G * MT, MS = 1.99e30;
+  function force(mA, mB, d) { return G * mA * mB / (d * d); }
+  function distFactor(k) { return 1 / (k * k); }
+  function gSurface(M, R) { return G * M / (R * R); }
+  function vCirc(r) { return Math.sqrt(GM / r); }
+  function vEsc(r) { return Math.sqrt(2 * GM / r); }
+  var gT = gSurface(MT, RT);
+
+  /* ---------- Étape 1 : les deux flèches ---------- */
+  var pairSvg = $('pairSvg');
+  function arrow(svg, x1, y, x2, color) {
+    var dir = x2 > x1 ? 1 : -1, len = Math.abs(x2 - x1), head = Math.min(10, len);
+    mk(svg, 'line', { x1: x1, y1: y, x2: x2 - dir * head * 0.8, y2: y, style: 'stroke:' + color, 'stroke-width': 4 });
+    mk(svg, 'path', { d: 'M' + x2 + ',' + y + ' L' + (x2 - dir * head) + ',' + (y - 6) + ' L' + (x2 - dir * head) + ',' + (y + 6) + ' z', style: 'fill:' + color });
+  }
+  function pair() {
+    var a = +$('mA').value, b = +$('mB').value, d = +$('dAB').value, F = a * b / (d * d);
+    $('mAOut').textContent = a; $('mBOut').textContent = b; $('dABOut').textContent = fmt(d, 1);
+    $('mA').previousElementSibling.lastChild.textContent = a > 1 ? ' unités' : ' unité';
+    $('mB').previousElementSibling.lastChild.textContent = b > 1 ? ' unités' : ' unité';
+    clear(pairSvg);
+    var xa = 200 - d * 55, xb = 200 + d * 55, ra = 8 + 4 * Math.cbrt(a) * 2, rb = 8 + 4 * Math.cbrt(b) * 2, L = Math.min(150, 6 * F + 4);
+    mk(pairSvg, 'line', { x1: xa, y1: 85, x2: xb, y2: 85, style: 'stroke:var(--line)', 'stroke-width': 2, 'stroke-dasharray': '5 5' });
+    mk(pairSvg, 'circle', { cx: xa, cy: 85, r: ra, style: 'fill:var(--two-soft);stroke:var(--two)', 'stroke-width': 2.5 });
+    mk(pairSvg, 'circle', { cx: xb, cy: 85, r: rb, style: 'fill:var(--two-soft);stroke:var(--two)', 'stroke-width': 2.5 });
+    mk(pairSvg, 'text', { x: xa, y: 90, 'text-anchor': 'middle', 'font-size': 15, 'font-weight': 600 }, 'A');
+    mk(pairSvg, 'text', { x: xb, y: 90, 'text-anchor': 'middle', 'font-size': 15, 'font-weight': 600 }, 'B');
+    arrow(pairSvg, xa, 40, xa + L, 'var(--acc)');
+    arrow(pairSvg, xb, 132, xb - L, 'var(--acc)');
+    mk(pairSvg, 'text', { x: Math.max(8, xa - 4), y: 24, 'font-size': 13 }, 'B attire A');
+    mk(pairSvg, 'text', { x: Math.min(392, xb + 4), y: 160, 'text-anchor': 'end', 'font-size': 13 }, 'A attire B');
+    $('pairOut').innerHTML = 'Force = ' + a + ' × ' + b + ' ÷ ' + fmt(d, 1) + '² ' + (Math.abs(F * 1000 - Math.round(F * 1000)) < 1e-6 ? '= ' : '≈ ') + fmt(F, 2) + ' (unités de force)<br>A attire B : ' + fmt(F, 2) + ' · B attire A : ' + fmt(F, 2) + ' → toujours égales !';
+  }
+  ['mA', 'mB', 'dAB'].forEach(function (id) { $(id).addEventListener('input', pair); }); pair();
+
+  /* ---------- Étape 2 : calculatrice ---------- */
+  var calcP = [
+    { name: 'Deux élèves à 1 m', a: [5, 1], b: [5, 1], d: [1, 0], na: '(élève 1)', nb: '(élève 2)', nd: '' },
+    { name: 'Terre et élève', a: [5.97, 24], b: [5, 1], d: [6.37, 6], na: '(Terre)', nb: '(élève)', nd: '(rayon de la Terre)' },
+    { name: 'Terre et Lune', a: [5.97, 24], b: [7.35, 22], d: [3.84, 8], na: '(Terre)', nb: '(Lune)', nd: '(Terre–Lune)' },
+    { name: 'Soleil et Terre', a: [1.99, 30], b: [5.97, 24], d: [1.5, 11], na: '(Soleil)', nb: '(Terre)', nd: '(Soleil–Terre)' }
+  ];
+  var calcIds = ['mAm', 'mAe', 'mBm', 'mBe', 'dm', 'de'];
+  calcP.forEach(function (p, i) {
+    var b = document.createElement('button'); b.type = 'button'; b.id = 'cp' + i; b.textContent = p.name;
+    b.addEventListener('click', function () { loadCalc(i); });
+    $('calcPresets').appendChild(b);
+  });
+  function loadCalc(i) {
+    var p = calcP[i];
+    $('mAm').value = fmt(p.a[0]); $('mAe').value = p.a[1]; $('mBm').value = fmt(p.b[0]); $('mBe').value = p.b[1]; $('dm').value = fmt(p.d[0]); $('de').value = p.d[1];
+    $('nameA').textContent = p.na; $('nameB').textContent = p.nb; $('nameD').textContent = p.nd;
+    calcP.forEach(function (q, j) { $('cp' + j).setAttribute('aria-pressed', j === i ? 'true' : 'false'); });
+    calc();
+  }
+  function equiv(F) {
+    var m = F / 9.8;
+    if (m >= 1e6) return sci(m / 1000) + ' tonnes';
+    if (m >= 1000) return fmt(m / 1000, 1) + ' tonnes';
+    if (m >= 1) return fmt(m, 1) + ' kg';
+    if (m >= 1e-3) return fmt(m * 1000, 1) + ' g';
+    if (m * 1e6 >= 1e-3) return fmt(m * 1e6, 3) + ' mg';
+    return sci(m * 1e6) + ' mg';
+  }
+  function calc() {
+    var v = calcIds.map(function (id) { return num($(id).value); }), out = $('calcOut');
+    if (v.some(isNaN)) { out.innerHTML = '<p class="err">Écris un nombre dans chaque case (par exemple 5,97 et 24).</p>'; return; }
+    if (v[1] % 1 || v[3] % 1 || v[5] % 1) { out.innerHTML = '<p class="err">Les exposants doivent être des nombres entiers.</p>'; return; }
+    var mA = v[0] * Math.pow(10, v[1]), mB = v[2] * Math.pow(10, v[3]), d = v[4] * Math.pow(10, v[5]);
+    if (mA <= 0 || mB <= 0) { out.innerHTML = '<p class="err">Les masses doivent être positives.</p>'; return; }
+    if (d <= 0) { out.innerHTML = '<p class="err">La distance doit être positive (on ne peut pas diviser par 0).</p>'; return; }
+    var F = force(mA, mB, d);
+    out.innerHTML =
+      '<div class="methods">' +
+      '<div class="method"><strong>Les masses</strong><span class="m">m<sub>A</sub> × m<sub>B</sub> ≈ ' + sci(mA * mB) + ' kg²</span></div>' +
+      '<div class="method"><strong>La distance au carré</strong><span class="m">d² ≈ ' + sci(d * d) + ' m²</span></div>' +
+      '<div class="method"><strong>La force</strong><span class="m">F = 6,67 × 10<sup>−11</sup> × ' + sci(mA * mB) + ' ÷ ' + sci(d * d) + '</span></div>' +
+      '</div>' +
+      '<div><span class="big">F ≈ ' + sci(F) + ' N</span>' + (F >= 0.01 && F < 1e6 ? '<span class="soft"> (soit environ ' + nice(F) + ' N)</span>' : '') + '</div>' +
+      '<p class="soft">C\'est à peu près le poids, sur Terre, d\'une masse de ' + equiv(F) + '.</p>';
+  }
+  calcIds.forEach(function (id) { $(id).addEventListener('input', function () { calcP.forEach(function (q, j) { $('cp' + j).setAttribute('aria-pressed', 'false'); }); calc(); }); });
+  loadCalc(0);
+
+  /* ---------- Étape 3 : distance ---------- */
+  var kdSvg = $('kdSvg');
+  function kdist() {
+    var k = +$('kd').value, f = distFactor(k);
+    $('kdOut').textContent = fmt(k, 1);
+    $('kdBar').style.width = (f * 100) + '%';
+    $('kdLab').textContent = 'Force à la distance ' + fmt(k, 1) + ' × d : ' + fmt(f * 100, 2) + ' %';
+    $('kdOut2').innerHTML = 'Distance × ' + fmt(k, 1) + ' → force ÷ ' + fmt(k, 1) + '² = ÷ ' + fmt(k * k, 2) + (k === 1 ? ' (rien ne change)' : '');
+    clear(kdSvg);
+    var L = 46, R = 14, T = 14, B = 34, W = 400, H = 230;
+    function X(v) { return L + (v - 1) / 9 * (W - L - R); } function Y(v) { return H - B - v * (H - B - T); }
+    for (var i = 1; i <= 10; i++) {
+      mk(kdSvg, 'line', { x1: X(i), y1: T, x2: X(i), y2: H - B, style: 'stroke:var(--line)', 'stroke-width': 1 });
+      mk(kdSvg, 'text', { x: X(i), y: H - B + 18, 'text-anchor': 'middle', 'font-size': 13 }, '×' + i);
+    }
+    [0, 0.25, 0.5, 0.75, 1].forEach(function (g) {
+      mk(kdSvg, 'line', { x1: L, y1: Y(g), x2: W - R, y2: Y(g), style: 'stroke:var(--line)', 'stroke-width': 1 });
+      mk(kdSvg, 'text', { x: L - 6, y: Y(g) + 5, 'text-anchor': 'end', 'font-size': 13 }, (g * 100) + '%');
+    });
+    mk(kdSvg, 'line', { x1: L, y1: H - B, x2: W - R, y2: H - B, style: 'stroke:var(--ink)', 'stroke-width': 2 });
+    mk(kdSvg, 'line', { x1: L, y1: T, x2: L, y2: H - B, style: 'stroke:var(--ink)', 'stroke-width': 2 });
+    var pts = [];
+    for (var s = 1; s <= 10.001; s += 0.05) pts.push(X(s).toFixed(1) + ',' + Y(1 / (s * s)).toFixed(1));
+    mk(kdSvg, 'polyline', { points: pts.join(' '), fill: 'none', style: 'stroke:var(--acc)', 'stroke-width': 3 });
+    mk(kdSvg, 'line', { x1: X(k), y1: Y(f), x2: X(k), y2: H - B, style: 'stroke:var(--red)', 'stroke-width': 1.5, 'stroke-dasharray': '4 4' });
+    mk(kdSvg, 'circle', { cx: X(k), cy: Y(f), r: 7, style: 'fill:var(--red);stroke:var(--card)', 'stroke-width': 2 });
+    mk(kdSvg, 'text', { x: W - R, y: H - 4, 'text-anchor': 'end', 'font-size': 12 }, 'distance');
+  }
+  $('kd').addEventListener('input', kdist); kdist();
+
+  /* ---------- Étape 4 : g sur les astres ---------- */
+  var ASTRES = [
+    { id: 'terre', name: 'la Terre', short: 'Terre', M: [5.97, 24], R: [6.37, 6], ref: 9.8 },
+    { id: 'lune', name: 'la Lune', short: 'Lune', M: [7.35, 22], R: [1.74, 6], ref: 1.6 },
+    { id: 'mars', name: 'Mars', short: 'Mars', M: [6.42, 23], R: [3.39, 6], ref: 3.7 },
+    { id: 'venus', name: 'Vénus', short: 'Vénus', M: [4.87, 24], R: [6.05, 6], ref: 8.9 },
+    { id: 'jupiter', name: 'Jupiter', short: 'Jupiter', M: [1.9, 27], R: [7.15, 7], ref: 24.8 }
+  ];
+  function val(p) { return p[0] * Math.pow(10, p[1]); }
+  function pw(p) { return fmt(p[0], 2) + ' × 10<sup>' + p[1] + '</sup>'; }
+  ASTRES.forEach(function (a, i) {
+    var b = document.createElement('button'); b.type = 'button'; b.id = 'as' + i; b.textContent = a.short;
+    b.addEventListener('click', function () { astro(i); });
+    $('astroBtns').appendChild(b);
+  });
+  function astro(i) {
+    var a = ASTRES[i], g = gSurface(val(a.M), val(a.R));
+    ASTRES.forEach(function (q, j) { $('as' + j).setAttribute('aria-pressed', j === i ? 'true' : 'false'); });
+    $('astroOut').innerHTML =
+      '<div class="method"><strong>Les données</strong><span class="m">M = ' + pw(a.M) + ' kg</span><span class="m">R = ' + pw(a.R) + ' m</span></div>' +
+      '<div class="method"><strong>Le calcul</strong><span class="m">g = 6,67 × 10<sup>−11</sup> × ' + pw(a.M) + ' ÷ (' + pw(a.R) + ')²</span><span class="m"><b>g ≈ ' + fmt(g, 2) + ' N/kg</b></span></div>' +
+      '<div class="method"><strong>On compare</strong><span class="m">Tutoriel sur le poids et la masse : g ≈ ' + fmt(a.ref) + ' N/kg ✓</span><span class="m">Élève de 50 kg : P ≈ 50 × ' + fmt(g, 2) + ' ≈ ' + fmt(50 * g, 0) + ' N</span></div>';
+  }
+  astro(0);
+  function planet() {
+    var M = +$('pM').value, R = +$('pR').value, g = gT * M / (R * R);
+    $('pMOut').textContent = fmt(M, 1); $('pROut').textContent = fmt(R, 1);
+    $('planetOut').innerHTML =
+      '<div class="read"><span class="k">g sur cette planète</span><span class="v">' + fmt(g, 2) + ' N/kg</span><span class="s">9,81 × ' + fmt(M, 1) + ' ÷ ' + fmt(R, 1) + '²</span></div>' +
+      '<div class="read"><span class="k">Comparé à la Terre</span><span class="v">× ' + fmt(g / gT, 2) + '</span><span class="s">' + (g > gT * 1.005 ? 'tu y serais plus lourd' : g < gT * 0.995 ? 'tu y serais plus léger' : 'comme chez nous') + '</span></div>' +
+      '<div class="read"><span class="k">Poids d\'un élève de 50 kg</span><span class="v">' + fmt(50 * g, 0) + ' N</span><span class="s">sa masse reste 50 kg</span></div>';
+  }
+  $('pM').addEventListener('input', planet); $('pR').addEventListener('input', planet); planet();
+
+  /* ---------- Étape 5 : canon de Newton ---------- */
+  var H0 = 50e3, R0 = RT + H0;
+  function simulate(vKms) {
+    var v0 = vKms * 1000, x = 0, y = R0, vx = v0, vy = 0, t = 0, r = R0;
+    var E = v0 * v0 / 2 - GM / R0, a = E < 0 ? -GM / (2 * E) : null;
+    var ax = 0, ay = -GM / (R0 * R0), sweep = 0, prev = 0, pts = [[0, x, y, v0]], outcome = null, n = 0;
+    while (n < 300000) {
+      var dt = 2 * Math.pow(r / RT, 1.5);
+      vx += ax * dt / 2; vy += ay * dt / 2;
+      x += vx * dt; y += vy * dt;
+      r = Math.sqrt(x * x + y * y);
+      var r3 = r * r * r; ax = -GM * x / r3; ay = -GM * y / r3;
+      vx += ax * dt / 2; vy += ay * dt / 2;
+      t += dt; n++;
+      var ang = Math.atan2(x, y), dA = ang - prev;
+      if (dA > Math.PI) dA -= 2 * Math.PI; if (dA < -Math.PI) dA += 2 * Math.PI;
+      sweep += dA; prev = ang;
+      if (r <= RT) { x *= RT / r; y *= RT / r; r = RT; pts.push([t, x, y, Math.sqrt(vx * vx + vy * vy)]); outcome = 'retombe'; break; }
+      if (sweep >= 2 * Math.PI) { pts.push([t, 0, R0, Math.sqrt(vx * vx + vy * vy)]); outcome = 'orbite'; break; }
+      if (r > 60 * RT) { pts.push([t, x, y, Math.sqrt(vx * vx + vy * vy)]); break; }
+      if (n % 4 === 0) pts.push([t, x, y, Math.sqrt(vx * vx + vy * vy)]);
+    }
+    if (!outcome) outcome = E >= 0 ? 'echappe' : 'orbite';
+    var period = a ? 2 * Math.PI * Math.sqrt(a * a * a / GM) : null;
+    var apo = a ? Math.max(R0, 2 * a - R0) : null;
+    return { outcome: outcome, v0: v0, tEnd: t, groundKm: outcome === 'retombe' ? RT * sweep / 1000 : null, period: outcome === 'orbite' ? period : null, apogeeKm: outcome === 'orbite' ? (apo - RT) / 1000 : null, points: pts };
+  }
+  var cSvg = $('canonSvg'), C = { v: 5, sim: null, i: 0, wide: false, anim: 0 };
+  var vPre = [[0, '0'], [4, '4'], [7, '7'], [7.9, '7,9'], [10, '10'], [11.5, '11,5']];
+  vPre.forEach(function (p) {
+    var b = document.createElement('button'); b.type = 'button'; b.textContent = p[1] + ' km/s';
+    b.addEventListener('click', function () { $('vC').value = p[0]; cannonSet(p[0]); });
+    $('vPresets').appendChild(b);
+  });
+  function scale() { return (C.wide ? 18 : 70) / RT; }
+  function toSvg(x, y) {
+    var r = Math.sqrt(x * x + y * y), s = scale(), off = 6 * Math.max(0, Math.min(1, (r - RT) / H0));
+    var rd = r * s + off, k = r > 0 ? rd / r : 0;
+    return [200 + x * k, 200 - y * k];
+  }
+  function cDraw() {
+    clear(cSvg);
+    var s = scale(), Rp = RT * s;
+    mk(cSvg, 'circle', { cx: 200, cy: 200, r: Rp, style: 'fill:var(--two-soft);stroke:var(--two)', 'stroke-width': 3 });
+    mk(cSvg, 'text', { x: 200, y: 206, 'text-anchor': 'middle', 'font-size': C.wide ? 11 : 16, 'font-weight': 600 }, 'Terre');
+    mk(cSvg, 'path', { d: 'M' + (200 - 12) + ',' + (200 - Rp + 2) + ' L200,' + (200 - Rp - 6) + ' L' + (200 + 12) + ',' + (200 - Rp + 2) + ' z', style: 'fill:var(--ink-soft)' });
+    if (C.wide) {
+      var rm = 3.84e8 * s;
+      mk(cSvg, 'text', { x: 200, y: 20, 'text-anchor': 'middle', 'font-size': 12, style: 'fill:var(--ink-soft)' }, 'Vue large : environ 11 fois le rayon de la Terre');
+      if (rm < 200) mk(cSvg, 'circle', { cx: 200, cy: 200, r: rm, fill: 'none', style: 'stroke:var(--moon)', 'stroke-dasharray': '3 5' });
+    } else {
+      mk(cSvg, 'text', { x: 214, y: 200 - Rp - 12, 'font-size': 12, style: 'fill:var(--ink-soft)' }, 'montagne (50 km)');
+    }
+    var sim = C.sim; if (!sim) return;
+    var col = sim.outcome === 'retombe' ? 'var(--red)' : sim.outcome === 'orbite' ? 'var(--ok)' : 'var(--acc)';
+    var P = [];
+    for (var j = 0; j <= C.i; j++) { var q = toSvg(sim.points[j][1], sim.points[j][2]); P.push(q[0].toFixed(1) + ',' + q[1].toFixed(1)); }
+    mk(cSvg, 'polyline', { points: P.join(' '), fill: 'none', style: 'stroke:' + col, 'stroke-width': 3, 'stroke-linejoin': 'round' });
+    var b = toSvg(sim.points[C.i][1], sim.points[C.i][2]);
+    mk(cSvg, 'circle', { cx: b[0], cy: b[1], r: 6, style: 'fill:var(--ink);stroke:var(--card)', 'stroke-width': 2 });
+  }
+  function cRead() {
+    var sim = C.sim, p = sim.points[C.i], r = Math.sqrt(p[1] * p[1] + p[2] * p[2]);
+    $('cRead').innerHTML =
+      '<div class="read"><span class="k">Temps</span><span class="v">' + fmt(p[0] / 60, 0) + ' min</span></div>' +
+      '<div class="read"><span class="k">Altitude</span><span class="v">' + fmt(Math.max(0, (r - RT) / 1000), 0) + ' km</span></div>' +
+      '<div class="read"><span class="k">Vitesse</span><span class="v">' + fmt(p[3] / 1000, 1) + ' km/s</span></div>';
+    var end = C.i >= sim.points.length - 1, v = $('cVerdict');
+    $('cStep').disabled = end; $('cGo').disabled = end;
+    if (!end) { v.className = 'verdict'; v.innerHTML = C.i === 0 ? 'Prêt à tirer.<span>Appuie sur « Lancer », « Pas à pas » ou « Trajectoire complète ».</span>' : 'Le boulet est en vol…<span>Continue pour voir où il va.</span>'; return; }
+    if (sim.outcome === 'retombe') {
+      v.className = 'verdict fall';
+      v.innerHTML = 'Il retombe sur la Terre.<span>' + (sim.groundKm < 1 ? 'Sans vitesse, il tombe tout droit au pied de la montagne' : 'Il touche le sol à environ ' + fmt(sim.groundKm, 0) + ' km du canon (le long de la surface)') + ', après ' + fmt(sim.tEnd / 60, 1) + ' min. Il faut aller plus vite !</span>';
+    } else if (sim.outcome === 'orbite') {
+      v.className = 'verdict orbit';
+      var far = sim.apogeeKm > 1000;
+      v.innerHTML = 'Il est en orbite !<span>Il fait le tour de la Terre et revient au canon en ' + (sim.period < 7200 ? 'environ ' + fmt(sim.period / 60, 0) + ' min' : sim.period < 172800 ? 'environ ' + fmt(sim.period / 3600, 1) + ' h' : 'environ ' + fmt(sim.period / 86400, 1) + ' jours') + '. ' + (far ? 'Son orbite est une ellipse allongée : il monte jusqu\'à environ ' + (sim.apogeeKm >= 1e5 ? fmt(Math.round(sim.apogeeKm / 1000) * 1000, 0) : fmt(sim.apogeeKm, 0)) + ' km d\'altitude.' + (sim.apogeeKm > 13000 && !C.wide ? ' Essaie la vue large.' : '') : 'Son orbite est presque un cercle.') + '</span>';
+    } else {
+      v.className = 'verdict';
+      v.innerHTML = 'Il s\'échappe !<span>Il va assez vite pour quitter la Terre pour toujours : il dépasse la vitesse de libération (≈ ' + fmt(vEsc(R0) / 1000, 1) + ' km/s depuis cette montagne).</span>';
+    }
+  }
+  function cStop() { if (C.anim) { clearTimeout(C.anim); C.anim = 0; } }
+  function cannonSet(v) {
+    cStop(); C.v = +v; $('vCOut').textContent = fmt(C.v, 1); C.sim = simulate(C.v); C.i = 0; cDraw(); cRead();
+  }
+  function cAdvance(dtSim) {
+    var pts = C.sim.points, t = pts[C.i][0] + dtSim;
+    while (C.i < pts.length - 1 && pts[C.i + 1][0] <= t) C.i++;
+    if (C.i < pts.length - 1 && pts[C.i][0] < t) C.i++;
+  }
+  function cStep() { cStop(); cAdvance(300); cDraw(); cRead(); }
+  function cInstant() { cStop(); C.i = C.sim.points.length - 1; cDraw(); cRead(); }
+  function cGo() {
+    cStop();
+    var per = C.sim.period || 5000;
+    var chunk = Math.max(20, Math.min(400, per / 200));
+    (function tick() {
+      var p = C.sim.points[C.i], r = Math.sqrt(p[1] * p[1] + p[2] * p[2]);
+      cAdvance(chunk * Math.pow(r / RT, 1.5)); cDraw(); cRead();
+      if (C.i < C.sim.points.length - 1) C.anim = setTimeout(tick, 30); else C.anim = 0;
+    })();
+  }
+  $('vC').addEventListener('input', function () { cannonSet($('vC').value); });
+  $('cGo').addEventListener('click', cGo);
+  $('cStep').addEventListener('click', cStep);
+  $('cAll').addEventListener('click', cInstant);
+  $('cZoom').addEventListener('click', function () { C.wide = !C.wide; this.setAttribute('aria-pressed', C.wide ? 'true' : 'false'); cDraw(); });
+  cannonSet(5);
+
+  /* ---------- Étape 6 : les planètes ---------- */
+  var UA = 1.496e11, GMS = G * MS;
+  var PLAN = [['Mercure', 5.79e10], ['Vénus', 1.082e11], ['Terre', 1.496e11], ['Mars', 2.279e11], ['Jupiter', 7.785e11], ['Saturne', 1.434e12], ['Uranus', 2.871e12], ['Neptune', 4.495e12]];
+  function sunPull(d) { var v = Math.sqrt(GMS / d); return { g: GMS / (d * d), v: v, T: 2 * Math.PI * d / v }; }
+  PLAN.forEach(function (p, i) {
+    var b = document.createElement('button'); b.type = 'button'; b.id = 'pl' + i; b.textContent = p[0];
+    b.addEventListener('click', function () { plan(i); });
+    $('planBtns').appendChild(b);
+  });
+  function plan(i) {
+    var p = PLAN[i], s = sunPull(p[1]), yrs = s.T / (365.25 * 86400), svg = $('planSvg');
+    PLAN.forEach(function (q, j) { $('pl' + j).setAttribute('aria-pressed', j === i ? 'true' : 'false'); });
+    $('planOut').innerHTML =
+      '<div class="read"><span class="k">Distance au Soleil</span><span class="v">' + fmt(p[1] / UA, 2) + ' UA</span><span class="s">≈ ' + sci(p[1]) + ' m</span></div>' +
+      '<div class="read"><span class="k">Attraction du Soleil sur 1 kg</span><span class="v">' + sci(s.g, 2) + ' N</span><span class="s">' + (i === 2 ? 'très faible, mais sur toute la Terre !' : '× ' + fmt(s.g / sunPull(UA).g, 3) + ' par rapport à la Terre') + '</span></div>' +
+      '<div class="read"><span class="k">Vitesse sur son orbite</span><span class="v">' + fmt(s.v / 1000, 1) + ' km/s</span><span class="s">calculée</span></div>' +
+      '<div class="read"><span class="k">Durée d\'un tour</span><span class="v">' + (yrs < 2 ? fmt(s.T / 86400, 0) + ' jours' : fmt(yrs, 1) + ' ans') + '</span><span class="s">2π × d ÷ v</span></div>';
+    clear(svg);
+    var vmax = 50, L = 92, Wb = 400 - L - 70;
+    PLAN.forEach(function (q, j) {
+      var v = sunPull(q[1]).v / 1000, y = 14 + j * 31, w = v / vmax * Wb, on = j === i;
+      mk(svg, 'text', { x: L - 8, y: y + 17, 'text-anchor': 'end', 'font-size': 14, 'font-weight': on ? 700 : 400 }, q[0]);
+      mk(svg, 'rect', { x: L, y: y, width: w, height: 22, rx: 4, style: 'fill:' + (on ? 'var(--acc)' : 'var(--acc-soft)') + ';stroke:var(--acc)', 'stroke-width': 1.5 });
+      mk(svg, 'text', { x: L + w + 6, y: y + 17, 'font-size': 13 }, fmt(v, 1) + ' km/s');
+    });
+  }
+  plan(2);
+
+  /* ---------- Étape 7 : marées ---------- */
+  var tideAlign = true;
+  function tides() {
+    var svg = $('tideSvg'); clear(svg);
+    $('tAlign').setAttribute('aria-pressed', tideAlign ? 'true' : 'false'); $('tCross').setAttribute('aria-pressed', tideAlign ? 'false' : 'true');
+    var cx = 160, cy = 120, rx = tideAlign ? 86 : 72, ry = tideAlign ? 52 : 60;
+    mk(svg, 'ellipse', { cx: cx, cy: cy, rx: rx, ry: ry, style: 'fill:var(--two);opacity:.35' });
+    mk(svg, 'circle', { cx: cx, cy: cy, r: 50, style: 'fill:var(--ok-soft);stroke:var(--ok)', 'stroke-width': 2.5 });
+    mk(svg, 'text', { x: cx, y: cy + 5, 'text-anchor': 'middle', 'font-size': 15, 'font-weight': 600 }, 'Terre');
+    mk(svg, 'circle', { cx: 350, cy: cy, r: 13, style: 'fill:var(--moon)' });
+    mk(svg, 'text', { x: 350, y: cy + 34, 'text-anchor': 'middle', 'font-size': 14 }, 'Lune');
+    mk(svg, 'text', { x: cx + rx + 4, y: cy - 24, 'font-size': 12 }, 'marée');
+    mk(svg, 'text', { x: cx + rx + 4, y: cy - 10, 'font-size': 12 }, 'haute');
+    if (tideAlign) {
+      mk(svg, 'circle', { cx: 18, cy: cy, r: 12, style: 'fill:var(--sun)' });
+      mk(svg, 'text', { x: 18, y: cy + 32, 'text-anchor': 'middle', 'font-size': 13 }, 'Soleil');
+      mk(svg, 'text', { x: 6, y: cy - 22, 'font-size': 11, style: 'fill:var(--ink-soft)' }, '(très loin)');
+    } else {
+      mk(svg, 'circle', { cx: cx, cy: 22, r: 12, style: 'fill:var(--sun)' });
+      mk(svg, 'text', { x: cx + 20, y: 27, 'font-size': 13 }, 'Soleil (très loin)');
+    }
+    $('tideOut').innerHTML = tideAlign
+      ? '<strong>Vives-eaux</strong> (à la nouvelle Lune et à la pleine Lune) : le Soleil, lui aussi, crée de petits bourrelets dans la même direction. Les effets s\'ajoutent : les marées sont plus fortes.'
+      : '<strong>Mortes-eaux</strong> (aux quartiers de Lune) : les bourrelets du Soleil sont « en travers » de ceux de la Lune. Les effets se contrarient en partie : les marées sont plus faibles. L\'effet du Soleil est environ deux fois plus petit que celui de la Lune, car il est beaucoup plus loin.';
+  }
+  $('tAlign').addEventListener('click', function () { tideAlign = true; tides(); });
+  $('tCross').addEventListener('click', function () { tideAlign = false; tides(); });
+  tides();
+
+  /* ---------- Étape 8 : orbites ---------- */
+  var HMIN = 200, HMAX = 36000, LR = Math.log(HMAX / HMIN);
+  function orbitAt(hKm) { var r = RT + hKm * 1000, v = vCirc(r); return { g: GM / (r * r), v: v, T: 2 * Math.PI * r / v }; }
+  function sToH(s) { return HMIN * Math.exp(s / 1000 * LR); }
+  function hToS(h) { return Math.round(Math.log(h / HMIN) / LR * 1000); }
+  var orbForced = null;
+  [['ISS', 400], ['Satellite GPS', 20200], ['Géostationnaire', 35786]].forEach(function (o) {
+    var b = document.createElement('button'); b.type = 'button'; b.textContent = o[0] + ' (' + fmt(o[1]) + ' km)';
+    b.addEventListener('click', function () { $('hO').value = hToS(o[1]); orbForced = o[1]; orbit(); });
+    $('orbBtns').appendChild(b);
+  });
+  function orbit() {
+    var raw = sToH(+$('hO').value), h = orbForced != null ? orbForced : (raw < 1000 ? Math.round(raw / 10) * 10 : Math.round(raw / 100) * 100);
+    orbForced = null;
+    var o = orbitAt(h), hrs = Math.floor(o.T / 3600), mins = Math.round((o.T - hrs * 3600) / 60);
+    if (mins === 60) { hrs++; mins = 0; }
+    $('hOOut').textContent = fmt(h, 0);
+    $('orbOut').innerHTML =
+      '<div class="read"><span class="k">g à cette altitude</span><span class="v">' + fmt(o.g, 2) + ' N/kg</span><span class="s">au sol : ' + fmt(gT, 2) + '</span></div>' +
+      '<div class="read"><span class="k">Vitesse</span><span class="v">' + fmt(o.v / 1000, 1) + ' km/s</span><span class="s">≈ ' + fmt(Math.round(o.v * 3.6 / 100) * 100, 0) + ' km/h</span></div>' +
+      '<div class="read"><span class="k">Un tour dure</span><span class="v">' + (hrs ? hrs + ' h ' : '') + (mins < 10 && hrs ? '0' : '') + mins + ' min</span><span class="s">' + fmt(86400 / o.T, 1) + ' tours par jour</span></div>';
+    var svg = $('orbSvg'); clear(svg);
+    var s = 110 / 42500, cx = 200, cy = 120;
+    mk(svg, 'circle', { cx: cx, cy: cy, r: 6370 * s, style: 'fill:var(--two-soft);stroke:var(--two)', 'stroke-width': 2 });
+    mk(svg, 'circle', { cx: cx, cy: cy, r: (6370 + h) * s, fill: 'none', style: 'stroke:var(--acc)', 'stroke-width': 2, 'stroke-dasharray': '5 4' });
+    mk(svg, 'circle', { cx: cx + (6370 + h) * s, cy: cy, r: 5, style: 'fill:var(--acc)' });
+    mk(svg, 'text', { x: cx, y: cy + 5, 'text-anchor': 'middle', 'font-size': 12 }, 'Terre');
+    mk(svg, 'text', { x: 6, y: 234, 'font-size': 12, style: 'fill:var(--ink-soft)' }, 'À l\'échelle');
+  }
+  $('hO').addEventListener('input', orbit);
+  $('hO').value = hToS(400); orbForced = 400; orbit();
+
+  /* ---------- Quiz ---------- */
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  function rnd(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+  function p10(e) { return e === 0 ? '1' : e === 1 ? '10' : '10<sup>' + e + '</sup>'; }
+  function makeQ(t) {
+    if (t === 0) { var k = rnd(2, 5); return { q: 'La distance entre deux objets est multipliée par ' + k + '. Par combien la force de gravitation est-elle <strong>divisée</strong> ?', a: k * k, tol: 0.001, how: 'Force ÷ ' + k + '² = ÷ ' + (k * k) }; }
+    if (t === 1) { var k1 = rnd(2, 6); return { q: 'La masse d\'un des deux objets est multipliée par ' + k1 + ' (le reste ne change pas). Par combien la force est-elle multipliée ?', a: k1, tol: 0.001, how: 'La force est proportionnelle à chaque masse : × ' + k1 }; }
+    if (t === 2) {
+      var c = pick([[2, 2, 1, 'on double les deux masses'], [2, 1, 2, 'on double une masse et on double la distance'], [4, 1, 2, 'on multiplie une masse par 4 et la distance par 2'], [3, 3, 3, 'on triple les deux masses et la distance'], [3, 1, 3, 'on triple une masse et la distance']]);
+      var f = c[0] * c[1] / (c[2] * c[2]);
+      return { q: 'Si ' + c[3] + ', par combien la force est-elle multipliée ?', a: f, tol: 0.001, how: c[0] + ' × ' + c[1] + ' ÷ ' + c[2] + '² = ' + fmt(f) };
+    }
+    if (t === 3) {
+      var p = rnd(2, 4), qd = rnd(0, 2), n = -11 + 2 * p - 2 * qd;
+      return { q: 'Deux boules de ' + p10(p) + ' kg chacune sont à ' + p10(qd) + ' m l\'une de l\'autre. La force vaut 6,67 × 10<sup>n</sup> N. Combien vaut n ?', a: n, tol: 0.001, how: '6,67 × 10⁻¹¹ × 10^' + p + ' × 10^' + p + ' ÷ (10^' + qd + ')² = 6,67 × 10^(−11 + ' + (2 * p) + ' − ' + (2 * qd) + ') : n = ' + fmt(n) };
+    }
+    if (t === 4) { var m = rnd(30, 70), P = m * 9.8; return { q: 'La Terre attire un élève de ' + m + ' kg avec une force d\'environ ' + fmt(P) + ' N. Avec quelle force (en N) l\'élève attire-t-il la Terre ?', a: P, tol: 0.051, how: 'Même valeur, ' + fmt(P) + ' N : l\'interaction est mutuelle.' }; }
+    if (t === 5) {
+      var M = pick([2, 3, 4, 8, 9]), R = pick([1, 2, 3]); while (M === 1 && R === 1) R = pick([2, 3]);
+      var g = 9.8 * M / (R * R);
+      return { q: 'Une planète imaginaire a une masse ' + M + ' fois plus grande que la Terre et un rayon ' + (R === 1 ? 'égal à' : R + ' fois plus grand que') + ' celui de la Terre. Combien vaut g à sa surface (en N/kg) ? (Sur Terre, g ≈ 9,8 N/kg.)', a: g, tol: 0.051, how: 'g ≈ 9,8 × ' + M + ' ÷ ' + R + '² ≈ ' + fmt(g, 2) + ' N/kg' };
+    }
+    if (t === 6) { var as = pick([['Mars', 3.7], ['la Lune', 1.6]]), m6 = rnd(20, 90); return { q: 'Sur ' + as[0] + ', g ≈ ' + fmt(as[1]) + ' N/kg. Quel est le poids (en N) d\'un robot de ' + m6 + ' kg ?', a: m6 * as[1], tol: 0.051, how: 'P = m × g = ' + m6 + ' × ' + fmt(as[1]) + ' = ' + fmt(m6 * as[1]) + ' N' }; }
+    var k7 = rnd(2, 5); return { q: 'La distance entre deux objets est divisée par ' + k7 + '. Par combien la force est-elle <strong>multipliée</strong> ?', a: k7 * k7, tol: 0.001, how: 'd² est divisé par ' + k7 + '² = ' + (k7 * k7) + ', donc la force est multipliée par ' + (k7 * k7) };
+  }
+  var quiz = $('quiz'), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ''; done = [];
+    var order = [0, 1, 2, 3, 4, 5, 6, 7];
+    for (var i = order.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), tmp = order[i]; order[i] = order[j]; order[j] = tmp; }
+    for (var k = 0; k < 8; k++) {
+      var Q = makeQ(order[k]), li = document.createElement('li');
+      li.innerHTML = '<span>' + Q.q + '</span><input type="text" id="qa' + k + '" inputmode="decimal" autocomplete="off" aria-label="Ta réponse à la question ' + (k + 1) + '"><button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+      quiz.appendChild(li);
+      (function (k, Q) {
+        function check() {
+          var fb = $('qf' + k), x = num($('qa' + k).value);
+          if (isNaN(x)) { fb.className = 'fb'; fb.textContent = 'Écris un nombre.'; return; }
+          if (Math.abs(x - Q.a) <= Q.tol) { fb.className = 'fb ok'; fb.textContent = 'Bravo, c\'est juste !'; done[k] = true; }
+          else { done[k] = false; fb.className = 'fb no'; fb.innerHTML = 'Pas tout à fait : la réponse est ' + fmt(Q.a, 2) + '.<span>' + Q.how + '</span>'; }
+          $('score').textContent = done.filter(Boolean).length + ' / 8';
+        }
+        $('qb' + k).addEventListener('click', check);
+        $('qa' + k).addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+      })(k, Q);
+    }
+    $('score').textContent = '0 / 8';
+  }
+  $('newQuiz').addEventListener('click', newQuiz);
+  newQuiz();
+
+  window.__grav = {
+    G: G, force: force, distFactor: distFactor, gSurface: gSurface, sci: sciTxt,
+    vCirc: vCirc, vEsc: vEsc, simulate: simulate, orbitAt: orbitAt, sunPull: sunPull,
+    cannon: {
+      set: function (v) { $('vC').value = v; cannonSet(v); return C.sim.outcome; },
+      step: function () { cStep(); return this.state(); },
+      instant: function () { cInstant(); return this.state(); },
+      state: function () { var p = C.sim.points[C.i]; return { v: C.v, outcome: C.sim.outcome, index: C.i, last: C.sim.points.length - 1, t: p[0], altKm: (Math.sqrt(p[1] * p[1] + p[2] * p[2]) - RT) / 1000 }; }
+    }
+  };
+})();
+</script>
+</body>
+</html>

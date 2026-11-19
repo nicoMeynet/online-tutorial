@@ -76,6 +76,12 @@ Accueil de la physique : [physique.html](physique.html).
 | [Les forces](les-forces.html) | Actions mécaniques de contact et à distance, le diagramme objet-interaction, la force en flèche, l'équilibre, l'inertie et les frottements, un quiz. |
 | [Les formes d'énergie](les-formes-d-energie.html) | Les formes d'énergie, la conservation, les chaînes énergétiques, le rendement, le skate-park cinétique ↔ potentielle, les énergies renouvelables, un quiz. |
 | [Le son](le-son.html) | La vibration, la propagation de proche en proche, pas de son dans le vide, la vitesse du son, la distance d'un orage, l'écho, les sons audibles, les décibels, un quiz. |
+| [Les acides et les bases : le pH](les-acides-et-les-bases.html) | L'échelle du pH avec les produits du quotidien, papier pH et chou rouge, les ions H⁺ et HO⁻, la dilution, la sécurité et les pictogrammes, un quiz. |
+| [La gravitation](la-gravitation.html) | L'attraction entre deux masses, F = G × mA × mB ÷ d², le lien avec le poids, le canon de Newton et les orbites, les marées, un quiz. |
+| [L'énergie cinétique et la sécurité routière](l-energie-cinetique-et-la-securite-routiere.html) | Ec = ½ m v², la vitesse au carré, la hauteur de chute équivalente, distance de réaction et de freinage, une simulation de route, un quiz. |
+| [Tension, intensité et loi d'Ohm](la-loi-d-ohm.html) | Ampèremètre et voltmètre, un multimètre virtuel, les lois des circuits série et dérivation, U = R × I avec une expérience virtuelle, un quiz. |
+| [La puissance et l'énergie électrique](la-puissance-et-l-energie-electrique.html) | Les étiquettes des appareils, P = U × I, la multiprise et le disjoncteur, E = P × t, la veille, DEL contre ampoule, un quiz. |
+| [Les signaux et la communication](les-signaux-et-la-communication.html) | Émetteur, canal, récepteur, analogique et numérique, le Morse et le binaire, la fibre optique, les ondes radio, le débit, un quiz. |
 
 ## Pour réviser
 

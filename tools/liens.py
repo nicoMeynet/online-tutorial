@@ -16,6 +16,16 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 
 TOPICS = [
+    ("les acides et les bases", "les-acides-et-les-bases.html"),
+    ("le pH", "les-acides-et-les-bases.html"),
+    ("la gravitation", "la-gravitation.html"),
+    ("l'énergie cinétique et la sécurité routière", "l-energie-cinetique-et-la-securite-routiere.html"),
+    ("l'énergie cinétique", "l-energie-cinetique-et-la-securite-routiere.html"),
+    ("la loi d'Ohm", "la-loi-d-ohm.html"),
+    ("la puissance et l'énergie électrique", "la-puissance-et-l-energie-electrique.html"),
+    ("la puissance électrique", "la-puissance-et-l-energie-electrique.html"),
+    ("les signaux et la communication", "les-signaux-et-la-communication.html"),
+    ("les signaux", "les-signaux-et-la-communication.html"),
     ("les mélanges et les solutions", "les-melanges-et-les-solutions.html"),
     ("les transformations chimiques", "les-transformations-chimiques.html"),
     ("l'Univers et le système solaire", "l-univers-et-le-systeme-solaire.html"),

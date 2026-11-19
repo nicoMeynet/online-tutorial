@@ -1,0 +1,1303 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tension, intensité et loi d'Ohm</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, encre bleu « multimètre », marge rouge. Les lampes allumées sont jaune vif, les voltmètres violets. */
+:root {
+  --paper: #f7f9fb;
+  --grid: #e1e8ee;
+  --card: #ffffff;
+  --ink: #111c26;
+  --ink-soft: #4f6070;
+  --acc: #0369a1;
+  --acc-soft: #e0f2fe;
+  --two: #7c3aed;
+  --two-soft: #ede9fe;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #fef08a;
+  --lit: #facc15;
+  --line: #d3dde6;
+  --lcd: #c8d6c0;
+  --lcd-ink: #1b2a1b;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0d141a; --grid: #172129; --card: #131c24; --ink: #e8f0f6; --ink-soft: #a7b8c6;
+    --acc: #38bdf8; --acc-soft: #0c2a3d; --two: #c4b5fd; --two-soft: #2a2145;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4a3f10; --lit: #facc15; --line: #2a3945;
+    --lcd: #9fb196; --lcd-ink: #142014;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0d141a; --grid: #172129; --card: #131c24; --ink: #e8f0f6; --ink-soft: #a7b8c6;
+  --acc: #38bdf8; --acc-soft: #0c2a3d; --two: #c4b5fd; --two-soft: #2a2145;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4a3f10; --lit: #facc15; --line: #2a3945;
+  --lcd: #9fb196; --lcd-ink: #142014;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+.formula { font-family: var(--f-mono); font-size: 1.35rem; font-weight: 600; color: var(--acc); text-align: center; padding: 6px 0; overflow-wrap: anywhere; }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 6px 12px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); min-height: 40px; }
+button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.btns .lab { font-weight: 700; min-width: 0; }
+input[type="text"] { font: inherit; font-family: var(--f-mono); font-size: 1.05rem; padding: 8px 10px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; }
+select { font: inherit; font-family: var(--f-mono); font-size: 1rem; padding: 7px 8px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); min-height: 40px; }
+input[type="range"] { width: 100%; accent-color: var(--acc); min-height: 32px; }
+.sl { display: flex; flex-direction: column; gap: 4px; }
+.sl label { font-weight: 700; }
+
+.verdict { border-radius: 8px; padding: 12px 14px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; background: var(--paper); border: 1.5px solid var(--line); }
+.verdict.yes { background: var(--ok-soft); color: var(--ok); border-color: transparent; }
+.verdict.no { background: var(--red-soft); color: var(--red); border-color: transparent; }
+.verdict.warn { background: var(--hl); color: var(--ink); border-color: transparent; }
+.verdict span { font-weight: 400; color: var(--ink); }
+.meterout { font-family: var(--f-mono); font-size: 1.5rem; font-weight: 600; color: var(--acc) !important; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
+.tag.acc { color: var(--acc); }
+.tag.two { color: var(--two); }
+.tag.ok { color: var(--ok); }
+.tag.no { color: var(--red); }
+
+/* Schémas électriques */
+.circ svg, .graph svg { width: 100%; height: auto; display: block; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; }
+.wire { stroke: var(--ink); stroke-width: 3; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.wire.mw { stroke: var(--acc); }
+.wire.vw { stroke: var(--two); }
+.ghostw { stroke: var(--ink-soft); stroke-width: 2; fill: none; stroke-dasharray: 4 5; opacity: .7; }
+.ghost { fill: var(--card); stroke: var(--ink-soft); stroke-width: 2; stroke-dasharray: 4 4; }
+.plate { stroke: var(--ink); stroke-width: 3; stroke-linecap: round; }
+.plate.thick { stroke-width: 7; stroke-linecap: butt; }
+.body { fill: var(--card); stroke: var(--ink); stroke-width: 3; }
+.body.lit { fill: var(--lit); }
+.body.meter { fill: var(--acc-soft); stroke: var(--acc); }
+.body.vmeter { fill: var(--two-soft); stroke: var(--two); }
+.body.mmeter { fill: var(--card); stroke: var(--ink-soft); }
+.cross { stroke: var(--ink); stroke-width: 2.5; stroke-linecap: round; }
+.cross.litc { stroke: #5c3a00; }
+.halo { fill: var(--lit); }
+.pt { fill: var(--card); stroke: var(--acc); stroke-width: 2.5; }
+.dot { fill: var(--ink); }
+.tap { cursor: pointer; }
+.drag { cursor: grab; touch-action: none; }
+.drag.held { cursor: grabbing; }
+.flow { fill: none; stroke: var(--acc); stroke-width: 3.5; stroke-linecap: round; stroke-dasharray: 6 14; animation: flow 1s linear infinite; }
+.flow.short { stroke: var(--red); }
+.arrow { fill: var(--acc); }
+.arrow.short { fill: var(--red); }
+.val { font-weight: 700; }
+.val.a { fill: var(--acc); }
+.val.v { fill: var(--two); }
+@keyframes flow { from { stroke-dashoffset: 20; } to { stroke-dashoffset: 0; } }
+@media (prefers-reduced-motion: reduce) { .flow { animation: none; } }
+
+/* Graphiques */
+.gridl { stroke: var(--line); stroke-width: 1; }
+.axis { stroke: var(--ink); stroke-width: 2; }
+.mp { stroke: var(--card); stroke-width: 1.5; }
+.c0 { fill: var(--acc); stroke: var(--acc); }
+.c1 { fill: var(--two); stroke: var(--two); }
+.c2 { fill: var(--ok); stroke: var(--ok); }
+.c3 { fill: var(--red); stroke: var(--red); }
+.fit { stroke-width: 2.5; fill: none; stroke-dasharray: 7 5; }
+.curve { fill: none !important; stroke-width: 3; }
+.mp.c0, .mp.c1, .mp.c2, .mp.c3 { stroke: var(--card); }
+text.c0, text.c1, text.c2, text.c3 { stroke: none; font-weight: 700; }
+
+/* Multimètre */
+.mmwrap { display: grid; grid-template-columns: minmax(0, 260px) minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 620px) { .mmwrap { grid-template-columns: minmax(0, 1fr); } .mmwrap .mmdev { max-width: 300px; justify-self: center; width: 100%; } }
+.mmdev svg { width: 100%; height: auto; display: block; }
+.mmcase { fill: #f2b705; stroke: var(--ink); stroke-width: 3; }
+.mmface { fill: #2b2f36; }
+.lcdr { fill: var(--lcd); stroke: #111; stroke-width: 2; }
+.lcdt { fill: var(--lcd-ink) !important; font-weight: 600; }
+.knob { fill: #e9edf1; stroke: #111; stroke-width: 3; }
+.knobp { stroke: #cf3a52; stroke-width: 5; stroke-linecap: round; }
+.dlab { fill: #f4f6f8 !important; font-weight: 700; }
+.dlab.on { fill: #facc15 !important; }
+.tick { stroke: #f4f6f8; stroke-width: 2; }
+.sock { fill: #111; stroke: #9aa3ad; stroke-width: 2.5; }
+.sock.red { fill: #cf3a52; stroke: #ffd0d8; }
+.sock.com { fill: #111; stroke: #facc15; }
+.slab { fill: #f4f6f8 !important; font-weight: 600; }
+.mmctl { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+
+.ctl { display: flex; flex-direction: column; gap: 10px; }
+.ctl .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.ctl .row > .lab { font-weight: 700; margin-right: 4px; }
+.ctl button { padding: 5px 10px; }
+.chal { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.chal li { display: flex; gap: 10px; align-items: baseline; padding: 6px 10px; border-radius: 8px; border: 1.5px dashed var(--line); }
+.chal li .ck { font-family: var(--f-mono); font-weight: 700; color: var(--ink-soft); flex: none; }
+.chal li.done { border-style: solid; border-color: var(--ok); background: var(--ok-soft); }
+.chal li.done .ck { color: var(--ok); }
+
+.tblwrap { overflow-x: auto; max-width: 100%; }
+.tbl { width: 100%; border-collapse: collapse; font-family: var(--f-mono); font-size: .9rem; font-variant-numeric: tabular-nums; }
+.tbl th, .tbl td { border: 1.5px solid var(--line); padding: 5px 8px; text-align: right; }
+.tbl th { font-family: var(--f-display); text-align: center; background: var(--paper); }
+.tbl td.nm { text-align: left; font-weight: 700; }
+.laws { display: flex; flex-direction: column; gap: 6px; font-family: var(--f-mono); font-size: .95rem; overflow-wrap: anywhere; }
+.laws .okk { color: var(--ok); font-weight: 600; }
+
+.recipe { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.recipe li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; padding: 8px 12px; border: 1.5px solid var(--line); border-radius: 8px; font-variant-numeric: tabular-nums; }
+.recipe .q { font-family: var(--f-mono); font-weight: 600; color: var(--acc); text-align: right; }
+.recipe li.danger .q { color: var(--red); }
+
+/* Code des couleurs */
+.swrow { display: flex; flex-direction: column; gap: 6px; }
+.swrow .lab { font-weight: 700; }
+.sws { display: flex; flex-wrap: wrap; gap: 6px; }
+.sws button { width: 40px; height: 40px; min-height: 40px; padding: 0; box-shadow: 2px 2px 0 var(--ink); }
+.sws button[aria-pressed="true"] { outline: 3px solid var(--acc); outline-offset: 2px; }
+
+/* Calculatrice */
+.calc { display: grid; grid-template-columns: minmax(0, 200px) minmax(0, 1fr); gap: 16px; align-items: center; }
+@media (max-width: 560px) { .calc { grid-template-columns: minmax(0, 1fr); } .calc svg { max-width: 200px; justify-self: center; } }
+.calc svg { width: 100%; height: auto; display: block; }
+.tri { fill: var(--card); stroke: var(--ink); stroke-width: 3; }
+.tril { stroke: var(--ink); stroke-width: 2.5; }
+.trit { font-family: var(--f-display) !important; font-weight: 800; }
+.trion { fill: var(--acc-soft); stroke: var(--acc); stroke-width: 2.5; }
+.crow { display: grid; grid-template-columns: 2.2rem minmax(0, 1fr) auto; gap: 8px; align-items: center; }
+.crow .nm { font-family: var(--f-display); font-weight: 800; font-size: 1.2rem; color: var(--acc); }
+.crow .res { font-family: var(--f-mono); font-weight: 600; color: var(--acc); padding: 8px 10px; border: 2px dashed var(--acc); border-radius: 8px; min-width: 0; overflow-wrap: anywhere; }
+
+/* Multiprise */
+.gauge { position: relative; height: 24px; border: 2px solid var(--ink); border-radius: 6px; background: var(--paper); overflow: hidden; }
+.gauge .fill { height: 100%; width: 0; background: var(--ok); transition: width .3s; }
+.gauge .mark { position: absolute; top: 0; bottom: 0; left: 80%; width: 3px; background: var(--red); }
+.gscale { display: flex; justify-content: space-between; font-family: var(--f-mono); font-size: .8rem; color: var(--ink-soft); }
+
+.errs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.errs li { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--paper); }
+.errs .bad { color: var(--red); text-decoration: line-through; overflow-wrap: anywhere; }
+.errs .good { color: var(--ok); font-weight: 700; overflow-wrap: anywhere; }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 110px auto; gap: 10px; align-items: center; }
+.quiz li > span:first-child { overflow-wrap: anywhere; min-width: 0; }
+.quiz input[type="text"] { font-size: 1rem; padding: 6px 8px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb:empty { display: none; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc); }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 120px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+<!--ticons--><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Tutoriels"><script src="progress.js" defer></script><!--/ticons-->
+<style id="tnav-css">
+.tnav-top { display: flex; margin: 0 0 4px; }
+.tnav-home { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font-weight: 700; font-size: .95rem; text-decoration: none; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tnav-home:hover, .tnav-home:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.tnav-bottom { margin-top: 8px; display: flex; flex-direction: column; gap: 12px; }
+.tnav-bottom h2 { margin: 0; }
+.tnav-pn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tnav-pn a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--ink, #222); border-radius: 10px;
+  background: var(--card, #fff); color: var(--ink, #222); text-decoration: none; box-shadow: 3px 3px 0 var(--ink, #222); min-width: 0; }
+.tnav-pn a span { font-size: .85rem; color: var(--ink-soft, #666); }
+.tnav-pn a strong { overflow-wrap: anywhere; }
+.tnav-pn a.next { text-align: right; grid-column: 2; }
+.tnav-bottom .tnav-home { align-self: center; }
+@media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
+</style>
+</head>
+<body>
+<main class="page">
+<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="physique.html">← Tous les tutoriels de physique</a></nav><!--/tnav-->
+
+
+  <header class="hero">
+    <span class="eyebrow">Tutoriel de physique-chimie · niveau 4<sup>e</sup></span>
+    <h1>Tension, intensité et loi d'Ohm</h1>
+    <p class="lead">Dans le tutoriel sur <a class="tlink" href="les-circuits-electriques.html">les circuits électriques</a>, tu as vu des lampes qui brillent « fort » ou « faiblement ». Ici, on passe aux mesures : la <strong>tension</strong> en volts, l'<strong>intensité</strong> en ampères, la <strong>résistance</strong> en ohms. Avec un multimètre virtuel, tu vas découvrir les lois des circuits et la célèbre loi d'Ohm.</p>
+    <div class="box">
+      <div class="circ"><svg id="heroSvg" viewBox="0 0 400 180" role="img" aria-label="Une pile, un ampèremètre en série et une lampe ; un voltmètre mesure la tension aux bornes de la lampe"></svg></div>
+      <div class="sl">
+        <label for="heroU">Tension de la pile : <span id="heroUv" class="mono">4,5 V</span></label>
+        <input id="heroU" type="range" min="0" max="6" step="0.5" value="4.5">
+      </div>
+      <div class="verdict" id="heroOut" aria-live="polite"></div>
+    </div>
+    <div class="note red">
+      <span class="note-title">Toutes les expériences de ce tutoriel se font avec des piles</span>
+      <span>Une pile ou un générateur de classe donne quelques volts (1,5 V, 4,5 V, 6 V, 12 V au maximum) : sans danger. Le courant des prises de la maison (230 V) est <strong>dangereux, voire mortel</strong>. On ne fait jamais de mesure sur une prise.</span>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · L'intensité</span>
+    <h2>Combien de courant passe ? L'ampère</h2>
+    <p>Le courant électrique, c'est un mouvement d'électrons dans les fils. L'<strong>intensité</strong> du courant dit <span class="hl">combien de charges électriques passent chaque seconde</span> en un point du circuit. On la note <strong>I</strong> et on la mesure en <strong>ampères</strong> (symbole <strong>A</strong>). Pour les petits courants, on utilise le <strong>milliampère</strong> : 1 mA = 0,001 A, donc 1 A = 1 000 mA.</p>
+    <p>Une image qui aide : un circuit ressemble à un circuit d'eau fermé. L'intensité, c'est comme le <strong>débit</strong> d'eau dans un tuyau (des litres par seconde) : plus il y a d'eau qui passe chaque seconde, plus le débit est grand.</p>
+    <div class="cards">
+      <div class="box"><span class="tag acc">Électricité</span><strong>Générateur (pile)</strong><span class="soft">Il met le courant en mouvement.</span></div>
+      <div class="box"><span class="tag acc">Eau</span><strong>Pompe</strong><span class="soft">Elle met l'eau en mouvement dans les tuyaux.</span></div>
+      <div class="box"><span class="tag acc">Électricité</span><strong>Intensité I (en A)</strong><span class="soft">La quantité d'électricité qui passe chaque seconde.</span></div>
+      <div class="box"><span class="tag acc">Eau</span><strong>Débit (en L/s)</strong><span class="soft">La quantité d'eau qui passe chaque seconde.</span></div>
+    </div>
+    <p>On mesure l'intensité avec un <strong>ampèremètre</strong> (symbole : un rond avec un A). Comme un compteur d'eau, il doit être <strong>sur le chemin</strong> du courant : on ouvre le circuit et on le place <span class="hl">en série</span>, pour que tout le courant le traverse.</p>
+    <div class="box">
+      <h3>Place l'ampèremètre</h3>
+      <p class="soft">Fais glisser l'ampèremètre (le rond bleu en haut à droite) sur un point du circuit, ou choisis une place avec les boutons. Les ronds numérotés sont des places <strong>en série</strong> (sur un fil) ; les ronds en pointillés sont des places <strong>en dérivation</strong> (aux bornes d'un dipôle). La pile donne 6 V.</p>
+      <div class="circ"><svg id="plaA" viewBox="0 0 400 290" role="img" aria-label="Circuit avec une pile, une lampe et une résistance, et un ampèremètre à placer"></svg></div>
+      <div class="btns" id="plaArow" role="group" aria-label="Place de l'ampèremètre"></div>
+      <div class="verdict" id="plaAout" aria-live="polite"></div>
+      <ul class="chal" id="plaAchal"></ul>
+    </div>
+    <ul class="recipe">
+      <li><span>Une DEL allumée</span><span class="q">environ 20 mA</span></li>
+      <li><span>La petite lampe d'une lampe de poche</span><span class="q">environ 0,3 A</span></li>
+      <li><span>Un chargeur de téléphone (côté téléphone)</span><span class="q">1 à 3 A</span></li>
+      <li><span>Une bouilloire sur une prise</span><span class="q">environ 9 A</span></li>
+      <li><span>Le démarreur d'une voiture</span><span class="q">plus de 100 A</span></li>
+      <li class="danger"><span>Un éclair d'orage</span><span class="q">des dizaines de milliers d'A</span></li>
+    </ul>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · La tension</span>
+    <h2>La « poussée » du générateur : le volt</h2>
+    <p>Pour que l'eau circule, la pompe doit la <strong>pousser</strong> : elle crée une différence de pression entre sa sortie et son entrée. Pour l'électricité, c'est pareil : le générateur crée une <strong>tension</strong> entre ses deux bornes. On la note <strong>U</strong> et on la mesure en <strong>volts</strong> (symbole <strong>V</strong>).</p>
+    <p>Attention, une tension ne « circule » pas : elle existe <span class="hl">entre deux points</span>. On dit « la tension <strong>aux bornes</strong> de la lampe », comme on dirait la différence de hauteur entre le haut et le bas d'une cascade.</p>
+    <p>On mesure une tension avec un <strong>voltmètre</strong> (un rond avec un V). On ne coupe pas le circuit : on relie ses deux bornes aux deux bornes du dipôle. C'est un branchement <span class="hl">en dérivation</span> (on dit aussi « en parallèle »).</p>
+    <div class="box">
+      <h3>Place le voltmètre</h3>
+      <p class="soft">Même circuit, avec un voltmètre (le rond violet). Essaie toutes les places, même les mauvaises : ici, rien ne peut casser.</p>
+      <div class="circ"><svg id="plaV" viewBox="0 0 400 290" role="img" aria-label="Circuit avec une pile, une lampe et une résistance, et un voltmètre à placer"></svg></div>
+      <div class="btns" id="plaVrow" role="group" aria-label="Place du voltmètre"></div>
+      <div class="verdict" id="plaVout" aria-live="polite"></div>
+      <ul class="chal" id="plaVchal"></ul>
+    </div>
+    <div class="cards">
+      <div class="box"><span class="tag acc">Ampèremètre · A</span><strong>En série</strong><span class="soft">On ouvre le circuit et on l'insère sur le chemin du courant. Il laisse passer le courant très facilement, comme un fil.</span></div>
+      <div class="box"><span class="tag two">Voltmètre · V</span><strong>En dérivation</strong><span class="soft">On relie ses bornes aux deux bornes du dipôle, sans rien couper. Il ne laisse presque pas passer le courant.</span></div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Le multimètre</span>
+    <h2>Un seul appareil, trois métiers</h2>
+    <p>En classe, on utilise un <strong>multimètre</strong> : selon la position de son <strong>sélecteur</strong> (le gros bouton rond), il devient voltmètre (V), ampèremètre (A) ou ohmmètre (Ω, pour mesurer une résistance). Le fil noir va toujours dans la borne <strong>COM</strong>. Le fil rouge va dans la borne <strong>V Ω</strong> pour une tension ou une résistance, et dans la borne <strong>mA</strong> ou <strong>10 A</strong> pour une intensité.</p>
+    <p>Chaque position a un <strong>calibre</strong> : c'est la plus grande valeur que l'appareil peut afficher. Si la valeur est trop grande, l'écran affiche un <strong>« 1 » tout à gauche</strong>. La bonne méthode : commencer par le plus grand calibre, puis descendre tant que l'écran n'affiche pas « 1 ». Le plus petit calibre possible donne le plus de chiffres.</p>
+    <div class="box">
+      <div class="mmwrap">
+        <div class="mmdev"><svg id="mmSvg" viewBox="0 0 260 340" role="img" aria-label="Multimètre avec écran, sélecteur rotatif et quatre bornes"></svg></div>
+        <div class="mmctl">
+          <div class="btns" role="group" aria-label="Tourner le sélecteur"><button type="button" id="mmL">◀ Tourner</button><button type="button" id="mmR">Tourner ▶</button></div>
+          <div class="ctl">
+            <div class="row" role="group" aria-label="Branchement"><span class="lab">Branchement :</span><button type="button" id="mmMder">En dérivation</button><button type="button" id="mmMserie">En série</button><button type="button" id="mmMseule">Résistance seule</button></div>
+            <div class="row" role="group" aria-label="Résistance"><span class="lab">Résistance :</span><button type="button" id="mmR0">47 Ω</button><button type="button" id="mmR1">470 Ω</button><button type="button" id="mmR2">4,7 kΩ</button></div>
+            <div class="row"><button type="button" id="mmRev">Inverser les fils</button><button type="button" id="mmFuse">Changer le fusible</button></div>
+          </div>
+          <div class="circ"><svg id="mmCirc" viewBox="0 0 320 200" role="img" aria-label="Schéma du branchement du multimètre"></svg></div>
+        </div>
+      </div>
+      <div class="verdict" id="mmOut" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Et le signe moins ?</span>
+      <span>Si l'on branche les fils à l'envers (la borne COM du côté de la borne + de la pile), le multimètre affiche une valeur <strong>négative</strong>. Ce n'est pas grave : la valeur est juste, c'est le sens qui est inversé. Essaie le bouton « Inverser les fils ».</span>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · Les lois des circuits</span>
+    <h2>Série et dérivation, en chiffres</h2>
+    <p>Dans ce simulateur, chaque lampe est modélisée par une <strong>résistance</strong> (on verra ce mot à l'étape suivante) : plus sa résistance est grande, plus elle freine le courant. La page calcule toutes les tensions et toutes les intensités. Change le montage, la tension du générateur et les lampes, et observe ce qui reste toujours vrai.</p>
+    <div class="box">
+      <div class="ctl">
+        <div class="row" role="group" aria-label="Type de montage"><span class="lab">Montage :</span><button type="button" id="lwS">En série</button><button type="button" id="lwD">En dérivation</button></div>
+        <div class="row" role="group" aria-label="Nombre de lampes"><span class="lab">Lampes :</span><button type="button" id="lwN2">2</button><button type="button" id="lwN3">3</button></div>
+        <div class="sl"><label for="lwU">Tension du générateur : <span id="lwUv" class="mono">6,0 V</span></label><input id="lwU" type="range" min="0" max="12" step="0.5" value="6"></div>
+        <div id="lwRows" class="ctl"></div>
+      </div>
+      <div class="circ"><svg id="lwSvg" viewBox="0 0 400 250" role="img" aria-label="Schéma du circuit avec les valeurs mesurées"></svg></div>
+      <div class="tblwrap"><table class="tbl" id="lwTbl"></table></div>
+      <div class="laws" id="lwLaws" aria-live="polite"></div>
+    </div>
+    <div class="cards">
+      <div class="box"><span class="tag acc">En série</span><strong>Même intensité partout</strong><span class="soft">Il n'y a qu'un chemin : l'intensité est <strong>la même</strong> en tout point. Les tensions s'<strong>additionnent</strong> : U = U₁ + U₂ (+ U₃…). C'est la <strong>loi d'additivité des tensions</strong>.</span></div>
+      <div class="box"><span class="tag acc">En dérivation</span><strong>Même tension sur chaque branche</strong><span class="soft">Chaque branche est reliée aux deux bornes du générateur : elles ont <strong>la même tension</strong>. Les intensités s'<strong>additionnent</strong> : I = I₁ + I₂ (+ I₃…). C'est la <strong>loi des nœuds</strong>.</span></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Pourquoi « nœud » ?</span>
+      <span>Un <strong>nœud</strong>, c'est un point où plusieurs fils se rejoignent (le gros point noir sur le schéma). Tout le courant qui arrive à un nœud en repart : il ne se perd pas, il se partage. C'est comme l'eau d'une rivière qui se sépare en deux bras, puis se rejoint.</span>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · La résistance</span>
+    <h2>Ce qui freine le courant : l'ohm</h2>
+    <p>Un dipôle qui freine le passage du courant a une <strong>résistance</strong>. On la note <strong>R</strong> et on la mesure en <strong>ohms</strong> (symbole <strong>Ω</strong>, la lettre grecque oméga). Plus R est grande, plus le courant a du mal à passer : avec la même pile, l'intensité est plus faible. Dans l'image de l'eau, c'est un <strong>tuyau étroit</strong>.</p>
+    <p>On rencontre souvent le <strong>kiloohm</strong> (1 kΩ = 1 000 Ω) et le <strong>mégaohm</strong> (1 MΩ = 1 000 000 Ω). Un fil de connexion a une résistance presque nulle (bien moins de 1 Ω) ; une lampe de poche, quelques ohms ; le corps humain, des milliers d'ohms. Les « résistances » vendues dans le commerce sont de petits composants qui servent à limiter le courant, par exemple pour protéger une DEL.</p>
+    <div class="box">
+      <h3>Bonus : le code des couleurs</h3>
+      <p class="soft">Une résistance est trop petite pour qu'on y écrive sa valeur. On peint des bagues de couleur : la 1<sup>re</sup> donne le 1<sup>er</sup> chiffre, la 2<sup>e</sup> le 2<sup>e</sup> chiffre, la 3<sup>e</sup> le nombre de zéros à ajouter. La bague dorée, un peu à l'écart, indique la précision (± 5 %).</p>
+      <div class="circ"><svg id="ccSvg" viewBox="0 0 300 90" role="img" aria-label="Résistance avec ses bagues de couleur"></svg></div>
+      <div class="swrow"><span class="lab" id="ccL0">1<sup>re</sup> bague : 1<sup>er</sup> chiffre</span><div class="sws" id="cc0" role="group" aria-labelledby="ccL0"></div></div>
+      <div class="swrow"><span class="lab" id="ccL1">2<sup>e</sup> bague : 2<sup>e</sup> chiffre</span><div class="sws" id="cc1" role="group" aria-labelledby="ccL1"></div></div>
+      <div class="swrow"><span class="lab" id="ccL2">3<sup>e</sup> bague : nombre de zéros</span><div class="sws" id="cc2" role="group" aria-labelledby="ccL2"></div></div>
+      <div class="verdict yes" id="ccOut" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="ccRand">Une résistance au hasard</button></div>
+      <div class="btns" id="ccGuess" hidden>
+        <span class="lab">Sa valeur, en Ω :</span>
+        <span style="flex: 1 1 140px; min-width: 0;"><input type="text" id="ccIn" inputmode="decimal" autocomplete="off" aria-label="Valeur de la résistance en ohms"></span>
+        <button type="button" id="ccChk">Vérifier</button>
+        <button type="button" id="ccShow">Afficher</button>
+      </div>
+      <p class="soft">Une phrase pour retenir l'ordre des couleurs (noir 0, marron 1, rouge 2, orange 3, jaune 4, vert 5, bleu 6, violet 7, gris 8, blanc 9) : « <strong>N</strong>e <strong>M</strong>angez <strong>R</strong>ien <strong>O</strong>u <strong>J</strong>eûnez, <strong>V</strong>oilà <strong>B</strong>ien <strong>V</strong>otre <strong>G</strong>rande <strong>B</strong>êtise ».</p>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · La loi d'Ohm</span>
+    <h2>L'expérience : U et I sont proportionnelles</h2>
+    <p>Prenons une résistance et faisons varier la tension du générateur. Un voltmètre mesure la tension U aux bornes de la résistance, un ampèremètre mesure l'intensité I qui la traverse. Note chaque mesure dans le tableau, puis regarde le graphique.</p>
+    <div class="box">
+      <div class="btns" role="group" aria-label="Choisir la résistance"><span class="lab">Résistance :</span><button type="button" id="ox0">100 Ω</button><button type="button" id="ox1">150 Ω</button><button type="button" id="ox2">220 Ω</button><button type="button" id="ox3">470 Ω</button></div>
+      <div class="sl"><label for="oxU">Tension du générateur : <span id="oxUv" class="mono">0,0 V</span></label><input id="oxU" type="range" min="0" max="12" step="0.5" value="0"></div>
+      <div class="circ"><svg id="oxSvg" viewBox="0 0 400 200" role="img" aria-label="Générateur réglable, ampèremètre en série et résistance, voltmètre aux bornes de la résistance"></svg></div>
+      <div class="btns">
+        <button type="button" id="oxRec">Noter la mesure</button>
+        <button type="button" id="oxAuto">Série de mesures automatique</button>
+        <button type="button" id="oxLine" aria-pressed="false">Tracer la droite</button>
+        <button type="button" id="oxClr">Tout effacer</button>
+      </div>
+      <div class="graph"><svg id="oxGraph" viewBox="0 0 400 300" role="img" aria-label="Graphique de la tension U en fonction de l'intensité I"></svg></div>
+      <div class="tblwrap"><table class="tbl" id="oxTbl"></table></div>
+      <div class="verdict" id="oxOut" aria-live="polite"></div>
+    </div>
+    <p>Tu remarques trois choses. Les points sont <strong>alignés</strong>. La droite passe par l'<strong>origine</strong> (pas de tension, pas de courant). Et le quotient U ÷ I est <strong>toujours le même</strong> pour une résistance donnée : c'est sa résistance R ! U et I sont donc <strong>proportionnelles</strong>, et le coefficient de proportionnalité est R. C'est exactement ce que tu as vu dans le tutoriel sur <a class="tlink" href="la-proportionnalite.html">la proportionnalité</a> : un tableau où l'on passe d'une ligne à l'autre en multipliant toujours par le même nombre, et un graphique qui est une droite passant par l'origine.</p>
+    <div class="box">
+      <span class="tag acc">Loi d'Ohm</span>
+      <div class="formula">U = R × I</div>
+      <span>avec <strong>U</strong> en volts (V), <strong>R</strong> en ohms (Ω) et <strong>I</strong> en ampères (A). On peut aussi l'écrire <strong>I = U ÷ R</strong> ou <strong>R = U ÷ I</strong>.</span>
+      <span class="soft">Dans le langage du tutoriel sur <a class="tlink" href="les-fonctions.html">les fonctions</a> : U est une <strong>fonction linéaire</strong> de I, U = f(I) = R × I. Sa représentation graphique est une droite qui passe par l'origine, et R est son <strong>coefficient directeur</strong> (sa « pente ») : plus R est grande, plus la droite monte vite.</span>
+    </div>
+    <div class="box">
+      <h3>Bonus : une lampe n'est pas une vraie résistance</h3>
+      <p class="soft">Quand la tension augmente, le filament d'une lampe chauffe de plus en plus, et un métal chaud freine davantage le courant. Sa résistance n'est donc pas constante : sa courbe U(I) n'est pas une droite. On dit que la lampe ne « suit » pas la loi d'Ohm. (Valeurs d'un modèle simple de lampe 6 V – 0,3 A.)</p>
+      <div class="sl"><label for="lpU">Tension aux bornes de la lampe : <span id="lpUv" class="mono">3,0 V</span></label><input id="lpU" type="range" min="0" max="6" step="0.25" value="3"></div>
+      <div class="graph"><svg id="lpSvg" viewBox="0 0 400 240" role="img" aria-label="Courbe U(I) d'une lampe comparée à la droite d'une résistance de 20 ohms"></svg></div>
+      <div class="verdict" id="lpOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Calculer</span>
+    <h2>La calculatrice de la loi d'Ohm</h2>
+    <p>Connaissant deux des trois grandeurs, on calcule la troisième. Le petit triangle aide à retenir : cache la lettre que tu cherches, il reste la formule. U en haut ; R et I côte à côte en bas (on multiplie). Pour U : R × I. Pour I : U sur R. Pour R : U sur I.</p>
+    <p>Le piège, ce sont les <strong>unités</strong> : il faut utiliser des volts, des ohms et des ampères. Convertis d'abord les mA en A et les kΩ en Ω (voir le tutoriel sur <a class="tlink" href="les-conversions.html">les conversions</a>). La calculatrice le fait pour toi et te montre comment.</p>
+    <div class="box">
+      <div class="calc">
+        <svg id="triSvg" viewBox="0 0 200 150" role="img" aria-label="Triangle de la loi d'Ohm : U en haut, R et I en bas"></svg>
+        <div class="ctl">
+          <div class="row" role="group" aria-label="Grandeur cherchée"><span class="lab">Je cherche :</span><button type="button" id="cwU">U</button><button type="button" id="cwR">R</button><button type="button" id="cwI">I</button></div>
+          <div class="crow" id="crowU"><span class="nm">U</span><span id="cvU"><input type="text" id="ciU" inputmode="decimal" autocomplete="off" aria-label="Tension U"></span><select id="cuU" aria-label="Unité de U"><option value="1">V</option><option value="0.001">mV</option></select></div>
+          <div class="crow" id="crowR"><span class="nm">R</span><span id="cvR"><input type="text" id="ciR" inputmode="decimal" autocomplete="off" aria-label="Résistance R"></span><select id="cuR" aria-label="Unité de R"><option value="1">Ω</option><option value="1000">kΩ</option></select></div>
+          <div class="crow" id="crowI"><span class="nm">I</span><span id="cvI"><input type="text" id="ciI" inputmode="decimal" autocomplete="off" aria-label="Intensité I"></span><select id="cuI" aria-label="Unité de I"><option value="1">A</option><option value="0.001">mA</option></select></div>
+        </div>
+      </div>
+      <div class="verdict" id="calcOut" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Une astuce de pro</span>
+      <span>Des kiloohms multipliés par des milliampères donnent… des volts ! Par exemple 2 kΩ × 3 mA = 6 V, car 2 000 Ω × 0,003 A = 6 V. Les « kilo » et les « milli » se compensent. Mais au collège, le plus sûr reste de tout convertir en Ω et en A.</span>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · La sécurité</span>
+    <h2>Trop de courant, ça chauffe</h2>
+    <p>Quand un courant traverse un fil, le fil chauffe : c'est l'<strong>effet Joule</strong>. Plus l'intensité est grande, plus il chauffe. Un fil trop fin traversé par un courant trop fort peut faire fondre sa gaine en plastique et provoquer un incendie.</p>
+    <p>Pour l'éviter, chaque circuit de la maison est protégé. Un <strong>fusible</strong> contient un fil très fin qui fond et coupe le circuit si l'intensité dépasse une limite ; il faut ensuite le changer. Un <strong>disjoncteur</strong> fait le même travail, mais on peut le réarmer. Les appareils d'une maison sont branchés <strong>en dérivation</strong> : d'après la loi des nœuds, leurs intensités s'additionnent dans les fils de la multiprise.</p>
+    <div class="box">
+      <h3>La multiprise surchargée</h3>
+      <p class="soft">Allume les appareils branchés sur la même multiprise (prévue pour 16 A au maximum). Les intensités sont des ordres de grandeur pour des appareils branchés sur le secteur. C'est une simulation : on ne fait jamais d'essai sur une vraie prise.</p>
+      <div class="btns" id="appBtns" role="group" aria-label="Appareils branchés sur la multiprise"></div>
+      <div class="gauge" aria-hidden="true"><div class="fill" id="gFill"></div><div class="mark"></div></div>
+      <div class="gscale" aria-hidden="true"><span>0 A</span><span>10 A</span><span>20 A</span></div>
+      <span class="soft">Le trait rouge marque la limite de 16 A.</span>
+      <div class="verdict" id="appOut" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="appReset">Réarmer le disjoncteur</button></div>
+    </div>
+    <div class="note red">
+      <span class="note-title">Le 230 V du secteur : danger de mort</span>
+      <span>Pour le corps humain, ce n'est pas la chaleur des fils le plus grand danger : c'est le courant qui le traverse. Quelques milliampères suffisent pour sentir une secousse, et à partir de quelques dizaines de milliampères (environ 30 mA), le courant peut arrêter le cœur. Avec le 230 V d'une prise, c'est possible. C'est pour cela que le tableau électrique contient un <strong>disjoncteur différentiel 30 mA</strong>, qui coupe tout dès qu'un courant « s'échappe ». Règles d'or : jamais de multimètre ni d'objet dans une prise, jamais d'appareil près de l'eau, et des piles de quelques volts pour toutes les expériences.</span>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Un peu d'histoire</span>
+    <h2>Trois savants, trois unités</h2>
+    <ol class="timeline">
+      <li><span class="when">vers 1800</span><div class="what"><strong>Alessandro Volta</strong><span>Ce physicien italien empile des disques de cuivre et de zinc séparés par du carton mouillé d'eau salée : c'est la première <strong>pile</strong>. Pour la première fois, on dispose d'un courant qui dure. Le <strong>volt</strong> porte son nom.</span></div></li>
+      <li><span class="when">années 1820</span><div class="what"><strong>André-Marie Ampère</strong><span>Ce savant français étudie le courant électrique et les effets magnétiques qu'il produit. On lui attribue souvent les expressions « courant électrique » et « tension électrique ». L'<strong>ampère</strong> porte son nom.</span></div></li>
+      <li><span class="when">1827</span><div class="what"><strong>Georg Simon Ohm</strong><span>Ce professeur allemand fait de nombreuses mesures avec des fils de longueurs différentes et publie la loi qui porte aujourd'hui son nom. On raconte que son travail a d'abord été mal accueilli, avant d'être reconnu quelques années plus tard. L'<strong>ohm</strong> porte son nom.</span></div></li>
+      <li><span class="when">fin du XIX<sup>e</sup> siècle</span><div class="what"><strong>Des unités pour le monde entier</strong><span>Avec le développement de l'électricité (télégraphe, éclairage), des congrès internationaux adoptent le volt, l'ampère et l'ohm comme unités communes à tous les pays.</span></div></li>
+    </ol>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · Attention</span>
+    <h2>Les erreurs fréquentes</h2>
+    <div class="box">
+      <ul class="errs">
+        <li><span class="bad">« L'ampèremètre se branche aux bornes de la lampe. »</span><span class="good">L'ampèremètre se branche en série, sur le chemin du courant. Aux bornes d'un dipôle, il le court-circuite.</span></li>
+        <li><span class="bad">« Le voltmètre se branche en série. »</span><span class="good">Le voltmètre se branche en dérivation, aux bornes du dipôle. En série, il bloque presque tout le courant.</span></li>
+        <li><span class="bad">« La tension circule dans les fils. »</span><span class="good">C'est le courant qui circule. La tension existe entre deux points : on parle de la tension aux bornes d'un dipôle.</span></li>
+        <li><span class="bad">« En série, la tension est la même partout. »</span><span class="good">En série, c'est l'intensité qui est la même partout. Les tensions s'additionnent : U = U₁ + U₂.</span></li>
+        <li><span class="bad">« En dérivation, chaque lampe reçoit la moitié de la tension. »</span><span class="good">En dérivation, chaque branche a la même tension que le générateur. Ce sont les intensités qui s'additionnent : I = I₁ + I₂.</span></li>
+        <li><span class="bad">« 220 Ω × 20 mA = 4 400 V. »</span><span class="good">Il faut convertir : 20 mA = 0,020 A, donc U = 220 × 0,020 = 4,4 V.</span></li>
+        <li><span class="bad">« Une lampe suit la loi d'Ohm. »</span><span class="good">Pas vraiment : son filament chauffe et sa résistance augmente. Sa courbe U(I) n'est pas une droite.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Réponds par un nombre, dans l'unité demandée (la virgule est acceptée). Les appareils de mesure sont bien branchés, sauf si on dit le contraire.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Nouvelles questions</button>
+    </div>
+  </section>
+
+  <!-- 12 -->
+  <section>
+    <span class="eyebrow">Étape 12 · À toi de jouer</span>
+    <h2>Six problèmes</h2>
+    <div class="exos">
+      <details>
+        <summary>Trois lampes identiques<span class="q">Trois lampes identiques sont branchées en série sur une pile de 4,5 V. Quelle est la tension aux bornes de chacune ?</span></summary>
+        <div><span>D'après la loi d'additivité, U₁ + U₂ + U₃ = 4,5 V. Les lampes sont identiques, donc elles se partagent la tension à parts égales : 4,5 ÷ 3 = <strong>1,5 V</strong> chacune.</span></div>
+      </details>
+      <details>
+        <summary>La multiprise<span class="q">Sur la même multiprise, on branche une bouilloire (9 A) et un radiateur (6,5 A). Quelle est l'intensité dans le câble de la multiprise ? Est-ce raisonnable si elle est prévue pour 16 A ?</span></summary>
+        <div><span>Les appareils sont en dérivation : loi des nœuds, I = 9 + 6,5 = <strong>15,5 A</strong>. C'est juste sous la limite de 16 A : le câble chauffe. Si on ajoute un aspirateur, on dépasse : le disjoncteur doit couper. Mieux vaut brancher les gros appareils sur des prises différentes.</span></div>
+      </details>
+      <details>
+        <summary>La protection de la DEL<span class="q">La résistance de protection d'une DEL vaut 150 Ω. Le voltmètre indique 3 V à ses bornes. Quelle intensité traverse la résistance (et la DEL, en série) ?</span></summary>
+        <div><span>I = U ÷ R = 3 ÷ 150 = <strong>0,02 A</strong>, soit <strong>20 mA</strong>. Comme la DEL est en série avec la résistance, elle est traversée par le même courant de 20 mA.</span></div>
+      </details>
+      <details>
+        <summary>Lire un graphique<span class="q">La courbe U(I) d'un dipôle est une droite qui passe par l'origine et par le point (I = 0,05 A ; U = 2,35 V). Quelle est sa résistance ?</span></summary>
+        <div><span>Une droite qui passe par l'origine : U et I sont proportionnelles, le dipôle suit la loi d'Ohm. R = U ÷ I = 2,35 ÷ 0,05 = <strong>47 Ω</strong>. C'est le coefficient directeur de la droite.</span></div>
+      </details>
+      <details>
+        <summary>L'erreur de Théo<span class="q">Théo veut mesurer l'intensité dans son circuit. Il règle son multimètre sur « 200 mA » et pose les pointes sur les deux bornes de la pile. Que se passe-t-il ?</span></summary>
+        <div><span>Un ampèremètre laisse passer le courant comme un fil : Théo vient de relier directement les deux bornes de la pile. C'est un <strong>court-circuit</strong>. Le courant est très fort, le fusible du multimètre grille et la pile chauffe. Il fallait ouvrir le circuit et placer l'ampèremètre <strong>en série</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Le bon calibre<span class="q">Tu veux mesurer une intensité d'environ 15 mA. Ton multimètre propose les calibres 10 A, 200 mA et 20 mA. Lequel choisis-tu ?</span></summary>
+        <div><span>Le plus petit calibre qui reste plus grand que la valeur : <strong>20 mA</strong>. Il affichera par exemple 15,04 mA, alors que le calibre 10 A n'afficherait que 0,02 A. Si tu ne connais pas l'ordre de grandeur, commence par 10 A et descends.</span></div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• L'<strong>intensité</strong> I du courant se mesure en <strong>ampères</strong> (A) avec un <strong>ampèremètre</strong> branché <strong>en série</strong>. 1 A = 1 000 mA.</span>
+      <span>• La <strong>tension</strong> U entre deux points se mesure en <strong>volts</strong> (V) avec un <strong>voltmètre</strong> branché <strong>en dérivation</strong>, aux bornes du dipôle.</span>
+      <span>• Avec un multimètre : fil noir dans COM, on choisit la fonction (V, A, Ω) et le plus petit <strong>calibre</strong> qui reste plus grand que la valeur. Un « 1 » à gauche signifie que le calibre est trop petit.</span>
+      <span>• <strong>En série</strong> : l'intensité est la même partout ; les tensions s'additionnent, U = U₁ + U₂ (loi d'additivité des tensions).</span>
+      <span>• <strong>En dérivation</strong> : chaque branche a la même tension ; les intensités s'additionnent, I = I₁ + I₂ (loi des nœuds).</span>
+      <span>• La <strong>résistance</strong> R se mesure en <strong>ohms</strong> (Ω) ; 1 kΩ = 1 000 Ω. Plus R est grande, plus elle freine le courant.</span>
+      <span>• <strong>Loi d'Ohm</strong> : pour une résistance, <strong>U = R × I</strong> (U en V, R en Ω, I en A). U et I sont proportionnelles : la courbe U(I) est une droite qui passe par l'origine, de coefficient directeur R.</span>
+      <span>• Une lampe ne suit pas exactement la loi d'Ohm : sa résistance augmente quand son filament chauffe.</span>
+      <span>• Un courant trop fort fait chauffer les fils : fusibles et disjoncteurs protègent les circuits. Le secteur (230 V) est <strong>dangereux</strong> : on expérimente seulement avec des piles.</span>
+    </div>
+  </section>
+
+<!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"><a class="prev" href="les-circuits-electriques.html"><span>← Précédent</span><strong>Les circuits électriques</strong></a><a class="next" href="la-puissance-et-l-energie-electrique.html"><span>Suivant →</span><strong>La puissance et l&#x27;énergie électrique</strong></a></div><a class="tnav-home" href="physique.html">⌂ Tous les tutoriels de physique</a></nav><!--/tnav-->
+<footer>Fiche de révision · Tension, intensité et loi d'Ohm</footer>
+</main>
+
+<script>
+(function () {
+  /* Hooks de test : window.__ohm
+     ohm({ U, R, I }) → donne deux grandeurs (unités de base V, Ω, A), l'autre à null ; renvoie { U, R, I } complété ou { err: 'texte' }.
+     series(U, Rs) → { Req, I, Us: [tensions] } (dipôles ohmiques en série sur un générateur idéal de tension U).
+     parallel(U, Rs) → { Req, I, Is: [intensités] } (dipôles ohmiques en dérivation).
+     place(kind, slotId) → modèle du placement d'un appareil (kind 'A' ou 'V') dans le circuit pile 6 V + lampe 20 Ω + résistance 10 Ω :
+       { main, L, R, W, br (intensités en A dans les fils, la lampe, la résistance, le fil du bas, l'appareil), read (valeur lue ou null), state 'ok'|'warn'|'danger'|'none' }.
+       slotId : 's0'..'s3' (en série), 'pL', 'pR', 'pP', 'pW' (en dérivation aux bornes de la lampe, de la résistance, de la pile, d'un fil) ; null = débranché.
+     mm(pos, mode, R, rev, blown) → lecture du multimètre { disp, unit, over, val, state, blow } ; pos = index dans mmPositions, mode 'der'|'serie'|'seule', R en Ω, rev = fils inversés, blown = fusible grillé.
+     mmPositions → liste des positions du sélecteur { lab, q, cal, scale, dec, unit, sock }.
+     colorCode(d1, d2, m) → valeur en Ω de la résistance aux bagues (d1, d2, multiplicateur 10^m).
+     fit(points) → R estimée (Ω) par la droite passant par l'origine (moindres carrés) ; points = [[U, I], …] ; null si aucun I non nul.
+     lampI(U) → intensité (A) dans la lampe modèle 6 V – 0,3 A : 0,3 × (U / 6)^0,6 ; lampR(U) → U / I (Ω).
+     multiprise(indices) → intensité totale (A) des appareils choisis ; appliances → liste { n, I }.
+     makeQ(t) → question de quiz de type t (0..9) : { q, a, how }.
+  */
+  var NS = 'http://www.w3.org/2000/svg', BIG = 20;
+  function $(id) { return document.getElementById(id); }
+  function mk(p, name, attrs, text) { var e = document.createElementNS(NS, name); for (var a in attrs) if (attrs[a] != null) e.setAttribute(a, attrs[a]); if (text != null) e.textContent = text; p.appendChild(e); return e; }
+  function clear(e) { while (e.firstChild) e.removeChild(e.firstChild); }
+  function fmt(x, d, dmax) { var r = Math.round(x * 1e9) / 1e9; if (Object.is(r, -0)) r = 0; return r.toLocaleString('fr-FR', { minimumFractionDigits: d || 0, maximumFractionDigits: dmax != null ? dmax : (d == null ? 3 : d) }).replace('-', '−'); }
+  function sig(x, n) { if (!isFinite(x)) return '∞'; if (x === 0) return '0'; return fmt(Number(x.toPrecision(n || 4)), 0, 12); }
+  function num(s) { var t = String(s).replace(/\s/g, '').replace(/[−–]/g, '-').replace(',', '.'); if (t === '') return NaN; var x = Number(t); return isFinite(x) ? x : NaN; }
+  function pressed(id, on) { var e = $(id); if (e) e.setAttribute('aria-pressed', on ? 'true' : 'false'); }
+  function sum(a) { return a.reduce(function (s, x) { return s + x; }, 0); }
+  function rnd(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  function fA(x) { return fmt(x, 2, 3) + ' A'; }
+  function fV(x) { return fmt(x, 1, 2) + ' V'; }
+
+  /* ---------- Symboles normalisés (mêmes dessins que le tutoriel sur les circuits) ---------- */
+  function sym(p, kind, x, y, a, o) {
+    o = o || {}; a = a || 0;
+    var g = mk(p, 'g', { transform: 'translate(' + x + ' ' + y + ') rotate(' + a + ')' });
+    function ln(x1, y1, x2, y2, cls) { return mk(g, 'line', { x1: x1, y1: y1, x2: x2, y2: y2, 'class': cls || 'wire' }); }
+    function txt(tx, ty, s, size) { return mk(g, 'text', { transform: 'translate(' + tx + ' ' + ty + ') rotate(' + (-a) + ')', 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-size': size || 16, 'font-weight': 700 }, s); }
+    var b = o.b || 0, sb = Math.sqrt(b);
+    if (o.onclick) { g.setAttribute('class', 'tap'); mk(g, 'rect', { x: -30, y: -24, width: 60, height: 48, fill: 'transparent' }); g.addEventListener('click', o.onclick); }
+    if (kind === 'pile') { ln(-30, 0, -5, 0); ln(5, 0, 30, 0); ln(-5, -18, -5, 18, 'plate'); ln(5, -9, 5, 9, 'plate thick'); if (!o.nolabel) { txt(-15, -24, '+'); txt(15, -24, '−'); } }
+    else if (kind === 'lamp') {
+      ln(-30, 0, -14, 0); ln(14, 0, 30, 0);
+      if (b > 0) mk(g, 'circle', { r: (16 + 12 * sb).toFixed(1), 'class': 'halo', 'fill-opacity': (0.2 + 0.35 * sb).toFixed(2) });
+      mk(g, 'circle', { r: 14, 'class': 'body' + (b > 0 ? ' lit' : ''), style: b > 0 ? 'fill-opacity:' + (0.35 + 0.65 * sb).toFixed(2) : null });
+      var cc = 'cross' + (b > 0 ? ' litc' : '');
+      ln(-9.9, -9.9, 9.9, 9.9, cc); ln(-9.9, 9.9, 9.9, -9.9, cc);
+    }
+    else if (kind === 'res') { ln(-30, 0, -16, 0); ln(16, 0, 30, 0); mk(g, 'rect', { x: -16, y: -7, width: 32, height: 14, 'class': 'body' }); }
+    else if (kind === 'meter') { ln(-30, 0, -14, 0); ln(14, 0, 30, 0); mk(g, 'circle', { r: 14, 'class': 'body ' + (o.cls || 'meter') }); txt(0, 0, o.t || '', 15); }
+    return g;
+  }
+  function pts(p) { return p.map(function (q) { return q[0] + ',' + q[1]; }).join(' '); }
+  function wire(g, p, cls) { return mk(g, 'polyline', { points: pts(p), 'class': 'wire' + (cls ? ' ' + cls : '') }); }
+  function dot(g, x, y) { mk(g, 'circle', { cx: x, cy: y, r: 4, 'class': 'dot' }); }
+  function tx(g, x, y, s, anchor, size, cls) { return mk(g, 'text', { x: x, y: y, 'text-anchor': anchor || 'middle', 'dominant-baseline': 'central', 'font-size': size || 16, 'font-weight': 600, 'class': cls || null }, s); }
+  function flow(g, p, I, short) {
+    if (!(I > 0)) return;
+    var dur = Math.max(0.15, Math.min(3, 0.8 / I)).toFixed(2);
+    for (var i = 0; i + 1 < p.length; i++) {
+      var x1 = p[i][0], y1 = p[i][1], x2 = p[i + 1][0], y2 = p[i + 1][1], L = Math.hypot(x2 - x1, y2 - y1);
+      if (L < 1) continue;
+      mk(g, 'line', { x1: x1, y1: y1, x2: x2, y2: y2, 'class': 'flow' + (short ? ' short' : ''), style: 'animation-duration:' + dur + 's' });
+      if (L >= 34) {
+        var deg = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+        mk(g, 'polygon', { points: '7,0 -5,-6 -5,6', transform: 'translate(' + ((x1 + x2) / 2) + ' ' + ((y1 + y2) / 2) + ') rotate(' + deg + ')', 'class': 'arrow' + (short ? ' short' : '') });
+      }
+    }
+  }
+  function layers(svg) { clear(svg); return { w: mk(svg, 'g', {}), f: mk(svg, 'g', {}), s: mk(svg, 'g', {}) }; }
+  function lampB(I, Inom) { return Math.min(1, Math.pow(I / Inom, 2)); }
+  function svgPt(svg, e) { var p = svg.createSVGPoint(); p.x = e.clientX; p.y = e.clientY; var m = svg.getScreenCTM(); return m ? p.matrixTransform(m.inverse()) : { x: 0, y: 0 }; }
+
+  /* ---------- Hero ---------- */
+  function heroRender() {
+    var U = Number($('heroU').value), I = U / 20, L = layers($('heroSvg')), k = I / 0.2;
+    var a = [[50, 65], [50, 35], [120, 35]], b = [[180, 35], [300, 35], [300, 65]], c = [[300, 125], [300, 155], [50, 155], [50, 125]];
+    [a, b, c].forEach(function (p) { wire(L.w, p); flow(L.f, p, k); });
+    wire(L.w, [[300, 48], [360, 48], [360, 65]], 'vw'); wire(L.w, [[360, 125], [360, 142], [300, 142]], 'vw');
+    dot(L.s, 300, 48); dot(L.s, 300, 142);
+    sym(L.s, 'pile', 50, 95, 90);
+    sym(L.s, 'meter', 150, 35, 0, { t: 'A' });
+    sym(L.s, 'lamp', 300, 95, 90, { b: lampB(I, 0.3) });
+    sym(L.s, 'meter', 360, 95, 90, { t: 'V', cls: 'vmeter' });
+    tx(L.s, 84, 95, fV(U), 'start', 14);
+    tx(L.s, 150, 64, fA(I), 'middle', 15, 'val a');
+    tx(L.s, 360, 170, fV(U), 'middle', 15, 'val v');
+    tx(L.s, 270, 95, 'lampe', 'end', 14);
+    $('heroUv').textContent = fV(U);
+    var out = $('heroOut');
+    if (U === 0) { out.className = 'verdict'; out.innerHTML = "Pas de tension, pas de courant.<span>La pile ne « pousse » plus : l'ampèremètre indique 0 A et la lampe est éteinte.</span>"; }
+    else { out.className = 'verdict yes'; out.innerHTML = 'U = ' + fV(U) + ' → I = ' + fA(I) + "<span>Augmente la tension : la pile « pousse » plus fort, l'intensité augmente et la lampe brille davantage. Ici, l'intensité est même proportionnelle à la tension. Pourquoi ? Réponse à l'étape 6.</span>"; }
+  }
+  $('heroU').addEventListener('input', heroRender);
+  heroRender();
+
+  /* ---------- Étapes 1 et 2 : placer un ampèremètre ou un voltmètre ---------- */
+  var PE = 6, PRL = 20, PRR = 10, I0 = PE / (PRL + PRR);
+  var SLOTS = [
+    { id: 's0', t: 'serie', x: 110, y: 90, a: 0, n: '1', name: 'Point 1' },
+    { id: 's1', t: 'serie', x: 235, y: 90, a: 0, n: '2', name: 'Point 2' },
+    { id: 's2', t: 'serie', x: 360, y: 160, a: 90, n: '3', name: 'Point 3' },
+    { id: 's3', t: 'serie', x: 215, y: 230, a: 0, n: '4', name: 'Point 4' },
+    { id: 'pL', t: 'der', x: 180, y: 40, a: 0, br: [[140, 90], [140, 40], [150, 40]], br2: [[210, 40], [220, 40], [220, 90]], name: 'Aux bornes de la lampe' },
+    { id: 'pR', t: 'der', x: 290, y: 40, a: 0, br: [[250, 90], [250, 40], [260, 40]], br2: [[320, 40], [330, 40], [330, 90]], name: 'Aux bornes de la résistance' },
+    { id: 'pP', t: 'der', x: 25, y: 160, a: 90, br: [[70, 110], [25, 110], [25, 130]], br2: [[25, 190], [25, 210], [70, 210]], name: 'Aux bornes de la pile' },
+    { id: 'pW', t: 'der', x: 215, y: 268, a: 0, br: [[150, 230], [150, 268], [185, 268]], br2: [[245, 268], [280, 268], [280, 230]], name: "Aux bornes d'un fil" }
+  ];
+  function slotById(id) { return SLOTS.filter(function (s) { return s.id === id; })[0] || null; }
+  var SEGS = [
+    { k: 'main', p: [[70, 130], [70, 90], [140, 90]] }, { k: 'L', p: [[140, 90], [150, 90]] }, { k: 'L', p: [[210, 90], [220, 90]] },
+    { k: 'main', p: [[220, 90], [250, 90]] }, { k: 'R', p: [[250, 90], [260, 90]] }, { k: 'R', p: [[320, 90], [330, 90]] },
+    { k: 'main', p: [[330, 90], [360, 90], [360, 230], [280, 230]] }, { k: 'W', p: [[280, 230], [150, 230]] }, { k: 'main', p: [[150, 230], [70, 230], [70, 190]] }
+  ];
+  function placeModel(kind, id) {
+    var s = id ? slotById(id) : null;
+    var r = { main: I0, L: I0, R: I0, W: I0, br: 0, short: false, read: null, disp: '', state: 'none', title: '', msg: '' };
+    var nm = kind === 'A' ? "L'ampèremètre" : 'Le voltmètre';
+    if (!s) { r.title = nm + " n'est pas branché."; r.msg = 'Fais-le glisser sur une place du circuit, ou choisis une place avec les boutons.'; return r; }
+    if (kind === 'A') {
+      if (s.t === 'serie') { r.read = I0; r.state = 'ok'; r.title = 'Bien branché : en série !'; r.msg = "Tout le courant de la boucle traverse l'ampèremètre. Essaie un autre point numéroté : il affiche la même valeur, car en série le courant est le même partout."; }
+      else if (s.id === 'pL') { var i1 = PE / PRR; r.main = i1; r.L = 0; r.R = i1; r.W = i1; r.br = i1; r.read = i1; r.state = 'warn'; r.title = 'Mauvais branchement : en dérivation !'; r.msg = "L'ampèremètre laisse passer le courant aussi facilement qu'un fil : il court-circuite la lampe, qui s'éteint. Il affiche une valeur, mais ce n'est plus le courant du circuit normal."; }
+      else if (s.id === 'pR') { var i2 = PE / PRL; r.main = i2; r.L = i2; r.R = 0; r.W = i2; r.br = i2; r.read = i2; r.state = 'warn'; r.title = 'Mauvais branchement : en dérivation !'; r.msg = "L'ampèremètre court-circuite la résistance : le courant passe par lui au lieu de passer par elle. La lampe brille plus fort, et la mesure ne correspond plus au circuit normal."; }
+      else { r.main = 0; r.L = 0; r.R = 0; r.W = 0; r.br = BIG; r.short = true; r.state = 'danger'; r.disp = 'fusible grillé'; r.title = 'Danger : court-circuit de la pile !'; r.msg = "L'ampèremètre relie directement les deux bornes de la pile, comme un fil. Le courant devient énorme : le fusible du multimètre grille et, en vrai, la pile chauffe. Un ampèremètre ne se branche jamais en dérivation."; }
+    } else {
+      if (s.t === 'serie') { r.main = 0; r.L = 0; r.R = 0; r.W = 0; r.read = PE; r.state = 'warn'; r.title = 'Mauvais branchement : en série !'; r.msg = "Le voltmètre ne laisse presque pas passer le courant : la lampe s'éteint. Il affiche à peu près la tension de la pile, mais il ne mesure rien d'utile. Un voltmètre se branche en dérivation, aux bornes d'un dipôle."; }
+      else if (s.id === 'pL') { r.read = I0 * PRL; r.state = 'ok'; r.title = 'Bien branché : aux bornes de la lampe.'; r.msg = 'Le voltmètre est en dérivation : le circuit fonctionne normalement, et il mesure la tension aux bornes de la lampe.'; }
+      else if (s.id === 'pR') { r.read = I0 * PRR; r.state = 'ok'; r.title = 'Bien branché : aux bornes de la résistance.'; r.msg = 'Compare avec la tension aux bornes de la lampe et celle de la pile. Tu remarques quelque chose ?'; }
+      else if (s.id === 'pP') { r.read = PE; r.state = 'ok'; r.title = 'Bien branché : aux bornes de la pile.'; r.msg = 'Tu lis la tension du générateur. Remarque : ' + fmt(I0 * PRL) + ' V (lampe) + ' + fmt(I0 * PRR) + ' V (résistance) = ' + fmt(PE) + ' V (pile).'; }
+      else { r.read = 0; r.state = 'ok'; r.title = "Bien branché… aux bornes d'un fil."; r.msg = "Entre les deux bouts d'un fil de connexion, la tension est presque nulle : 0 V. Un fil ne « consomme » pas de poussée."; }
+    }
+    if (r.read != null) r.disp = kind === 'A' ? fA(r.read) : fmt(r.read, 2) + ' V';
+    return r;
+  }
+  function makePlacer(o) {
+    var svg = $(o.svg), st = { slot: -1, from: -1, visited: {}, tok: null, moved: 0, p0: null, pid: null, done: [] };
+    var list = SLOTS.filter(function (s) { return o.kind === 'V' || s.id !== 'pW'; });
+    var letter = o.kind === 'A' ? 'A' : 'V', mcls = o.kind === 'A' ? 'meter' : 'vmeter', wcls = o.kind === 'A' ? 'mw' : 'vw';
+    function cur() { return st.slot >= 0 ? list[st.slot].id : null; }
+    function token(g) { mk(g, 'circle', { r: 26, fill: 'transparent' }); mk(g, 'circle', { r: 16, 'class': 'body ' + mcls }); mk(g, 'text', { 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-size': 16, 'font-weight': 700 }, letter); }
+    function render() {
+      var L = layers(svg), m = placeModel(o.kind, cur()), held = st.slot === -2;
+      SEGS.forEach(function (sg) { wire(L.w, sg.p); flow(L.f, sg.p, m[sg.k] / I0); });
+      sym(L.s, 'pile', 70, 160, 90); tx(L.s, 104, 160, '6 V', 'start', 14);
+      sym(L.s, 'lamp', 180, 90, 0, { b: lampB(m.L, 0.3) }); tx(L.s, 180, 122, 'lampe', 'middle', 14);
+      sym(L.s, 'res', 290, 90, 0); tx(L.s, 290, 122, 'résistance', 'middle', 14);
+      list.forEach(function (s, j) {
+        if (j === st.slot) return;
+        var g = mk(L.s, 'g', { 'class': 'tap' });
+        g.addEventListener('click', function () { place(j); });
+        if (s.t === 'serie') { mk(g, 'circle', { cx: s.x, cy: s.y, r: 18, fill: 'transparent' }); mk(g, 'circle', { cx: s.x, cy: s.y, r: 11, 'class': 'pt' }); tx(g, s.x, s.y, s.n, 'middle', 13); }
+        else { mk(g, 'polyline', { points: pts(s.br), 'class': 'ghostw' }); mk(g, 'polyline', { points: pts(s.br2), 'class': 'ghostw' }); mk(g, 'circle', { cx: s.x, cy: s.y, r: 14, 'class': 'ghost' }); tx(g, s.x, s.y, '+', 'middle', 15); }
+      });
+      if (st.slot >= 0) {
+        var s = list[st.slot];
+        if (s.t === 'der') { wire(L.w, s.br, wcls); wire(L.w, s.br2, wcls); dot(L.s, s.br[0][0], s.br[0][1]); dot(L.s, s.br2[2][0], s.br2[2][1]); flow(L.f, s.br, m.br / I0, m.short); flow(L.f, s.br2, m.br / I0, m.short); }
+        var g2 = sym(L.s, 'meter', s.x, s.y, s.a, { t: letter, cls: mcls });
+        mk(g2, 'rect', { x: -30, y: -22, width: 60, height: 44, fill: 'transparent' });
+        g2.setAttribute('class', 'drag');
+        g2.addEventListener('pointerdown', startDrag);
+      } else if (st.slot === -1) {
+        var g3 = mk(L.s, 'g', { transform: 'translate(372 32)', 'class': 'drag' }); token(g3);
+        g3.addEventListener('pointerdown', startDrag);
+        tx(L.s, 372, 62, 'à placer', 'middle', 11);
+      }
+      if (held) return;
+      list.forEach(function (s2, j) { pressed(o.row + j, j === st.slot); });
+      var out = $(o.out);
+      out.className = 'verdict' + (m.state === 'ok' ? ' yes' : m.state === 'warn' ? ' warn' : m.state === 'danger' ? ' no' : '');
+      out.innerHTML = m.title + (m.disp ? "<span class='meterout'>" + (o.kind === 'A' ? 'I' : 'U') + ' : ' + m.disp + '</span>' : '') + '<span>' + m.msg + '</span>';
+      o.chal.forEach(function (c, k) { if (!st.done[k] && c.test(st, cur())) st.done[k] = true; var li = $(o.out + 'c' + k); li.classList.toggle('done', !!st.done[k]); li.querySelector('.ck').textContent = st.done[k] ? '✓' : '○'; });
+    }
+    function place(j) { st.slot = j; if (j >= 0) st.visited[list[j].id] = true; render(); }
+    function startDrag(e) {
+      if (e.button != null && e.button !== 0) return;
+      e.preventDefault();
+      st.from = st.slot; st.slot = -2; st.moved = 0; st.pid = e.pointerId; st.p0 = svgPt(svg, e);
+      render();
+      st.tok = mk(svg, 'g', { 'class': 'drag held', transform: 'translate(' + st.p0.x + ' ' + st.p0.y + ')' }); token(st.tok);
+      try { svg.setPointerCapture(e.pointerId); } catch (err) { /* rien */ }
+    }
+    svg.addEventListener('pointermove', function (e) {
+      if (st.slot !== -2 || e.pointerId !== st.pid) return;
+      var p = svgPt(svg, e); st.moved = Math.max(st.moved, Math.hypot(p.x - st.p0.x, p.y - st.p0.y));
+      st.tok.setAttribute('transform', 'translate(' + p.x + ' ' + p.y + ')'); e.preventDefault();
+    });
+    function endDrag(e) {
+      if (st.slot !== -2 || e.pointerId !== st.pid) return;
+      var p = svgPt(svg, e), best = -1, bd = 48;
+      list.forEach(function (s, j) { var d = Math.hypot(p.x - s.x, p.y - s.y); if (d < bd) { bd = d; best = j; } });
+      if (st.moved < 6) best = st.from;
+      place(best);
+    }
+    svg.addEventListener('pointerup', endDrag);
+    svg.addEventListener('pointercancel', function (e) { if (st.slot === -2 && e.pointerId === st.pid) place(st.from); });
+    var row = $(o.row);
+    list.forEach(function (s, j) { var b = document.createElement('button'); b.type = 'button'; b.id = o.row + j; b.textContent = s.name; b.addEventListener('click', function () { place(j); }); row.appendChild(b); });
+    var rb = document.createElement('button'); rb.type = 'button'; rb.textContent = 'Débrancher'; rb.addEventListener('click', function () { place(-1); }); row.appendChild(rb);
+    var ul = $(o.chalId);
+    o.chal.forEach(function (c, k) { var li = document.createElement('li'); li.id = o.out + 'c' + k; li.innerHTML = "<span class='ck'>○</span><span>" + c.t + '</span>'; ul.appendChild(li); });
+    render();
+  }
+  function seriesVisited(st) { return ['s0', 's1', 's2', 's3'].filter(function (id) { return st.visited[id]; }).length; }
+  makePlacer({ svg: 'plaA', kind: 'A', row: 'plaArow', out: 'plaAout', chalId: 'plaAchal', chal: [
+    { t: "Mesure l'intensité du courant qui traverse la lampe.", test: function (st, id) { return !!id && id.charAt(0) === 's'; } },
+    { t: "Vérifie en trois points différents que l'intensité est la même partout.", test: function (st) { return seriesVisited(st) >= 3; } },
+    { t: 'Repère un branchement dangereux (dans le simulateur seulement !).', test: function (st, id) { return id === 'pP'; } }
+  ] });
+  makePlacer({ svg: 'plaV', kind: 'V', row: 'plaVrow', out: 'plaVout', chalId: 'plaVchal', chal: [
+    { t: 'Mesure la tension aux bornes de la lampe.', test: function (st, id) { return id === 'pL'; } },
+    { t: 'Mesure la tension aux bornes de la pile.', test: function (st, id) { return id === 'pP'; } },
+    { t: 'Mesure aussi la tension aux bornes de la résistance, et vérifie que U(lampe) + U(résistance) = U(pile).', test: function (st) { return st.visited.pL && st.visited.pR && st.visited.pP; } },
+    { t: 'Trouve une place où le voltmètre (bien branché) affiche 0 V.', test: function (st, id) { return id === 'pW'; } }
+  ] });
+
+  /* ---------- Étape 3 : le multimètre ---------- */
+  var MMPOS = [
+    { lab: 'OFF', q: 'off' },
+    { lab: '20 V', q: 'V', cal: 20, scale: 1, dec: 2, unit: 'V', sock: 'VΩ' },
+    { lab: '2 V', q: 'V', cal: 2, scale: 1, dec: 3, unit: 'V', sock: 'VΩ' },
+    { lab: '200 mV', q: 'V', cal: 0.2, scale: 1000, dec: 1, unit: 'mV', sock: 'VΩ' },
+    { lab: '10 A', q: 'A', cal: 10, scale: 1, dec: 2, unit: 'A', sock: '10A' },
+    { lab: '200 mA', q: 'A', cal: 0.2, scale: 1000, dec: 1, unit: 'mA', sock: 'mA' },
+    { lab: '20 mA', q: 'A', cal: 0.02, scale: 1000, dec: 2, unit: 'mA', sock: 'mA' },
+    { lab: '200 Ω', q: 'R', cal: 200, scale: 1, dec: 1, unit: 'Ω', sock: 'VΩ' },
+    { lab: '2 kΩ', q: 'R', cal: 2000, scale: 0.001, dec: 3, unit: 'kΩ', sock: 'VΩ' },
+    { lab: '20 kΩ', q: 'R', cal: 20000, scale: 0.001, dec: 2, unit: 'kΩ', sock: 'VΩ' }
+  ];
+  var MME = 4.5, MMR = [47, 470, 4700];
+  function mmRead(pos, mode, R, rev, blown) {
+    var P = MMPOS[pos], out = { disp: '', unit: P.unit || '', over: false, val: null, state: 'ok', blow: false, I: 0, msg: '', title: '' };
+    if (mode === 'der') out.I = MME / R; else if (mode === 'serie') out.I = (P.q === 'A' && !blown) ? MME / R : 0;
+    if (P.q === 'off') { out.state = 'none'; out.title = 'Le multimètre est éteint.'; out.msg = 'Tourne le sélecteur pour choisir une fonction et un calibre.'; return out; }
+    if (P.q === 'V') {
+      if (mode === 'der') { out.val = MME; out.title = 'Voltmètre en dérivation : bonne méthode.'; out.msg = 'Il mesure la tension aux bornes de la résistance (ici, égale à celle de la pile, 4,5 V).'; }
+      else if (mode === 'serie') { out.val = MME; out.state = 'warn'; out.title = 'Voltmètre en série : mauvais branchement.'; out.msg = "Il bloque presque tout le courant (l'intensité devient quasi nulle). Il affiche à peu près la tension de la pile, mais ce n'est pas une mesure utile."; }
+      else { out.val = 0; out.state = 'warn'; out.title = 'Aucune tension.'; out.msg = 'Une résistance seule, sans générateur, ne crée pas de tension.'; }
+    } else if (P.q === 'A') {
+      if (mode === 'der') {
+        out.val = 0; out.state = 'danger'; out.blow = !blown;
+        out.title = blown ? 'Fusible grillé.' : 'Court-circuit : le fusible grille !';
+        out.msg = "En dérivation, l'ampèremètre relie directement les bornes de la pile (il se comporte comme un fil). Le courant devient énorme et le fusible de protection du multimètre fond. Un ampèremètre se branche en série. Clique sur « Changer le fusible ».";
+      } else if (mode === 'serie') {
+        if (blown) { out.val = 0; out.state = 'danger'; out.title = 'Le fusible est grillé : 0 affiché.'; out.msg = "Le circuit est coupé à l'intérieur du multimètre. Change le fusible pour mesurer."; }
+        else { out.val = MME / R; out.title = 'Ampèremètre en série : bonne méthode.'; out.msg = "Tout le courant de la boucle le traverse. Valeur exacte (calculée avec la loi d'Ohm) : " + sig(MME / R * 1000, 4) + ' mA.'; }
+      } else { out.val = 0; out.state = 'warn'; out.title = 'Aucun courant.'; out.msg = 'Sans générateur, aucun courant ne circule.'; }
+    } else {
+      if (mode === 'seule') { out.val = R; out.title = 'Ohmmètre sur la résistance débranchée : bonne méthode.'; out.msg = "Le multimètre envoie lui-même un tout petit courant dans la résistance pour la mesurer. C'est pour ça qu'elle doit être seule, hors du circuit."; }
+      else { out.state = 'danger'; out.disp = '- - -'; out.title = 'Mesure impossible.'; out.msg = "On ne mesure jamais une résistance dans un circuit branché à un générateur : la mesure est fausse et on peut abîmer l'appareil. Débranche d'abord la résistance."; return out; }
+    }
+    if (Math.abs(out.val) >= P.cal) { out.over = true; out.disp = '1'; out.msg += ' L\'écran affiche « 1 » tout à gauche : la valeur dépasse le calibre de ' + P.lab + '. Prends un calibre plus grand.'; if (out.state === 'ok') out.state = 'warn'; }
+    else {
+      out.disp = (rev && P.q !== 'R' && out.val !== 0 ? '−' : '') + fmt(Math.abs(out.val) * P.scale, P.dec);
+      if (out.state === 'ok' && out.val !== 0) {
+        var better = MMPOS.some(function (Q) { return Q.q === P.q && Q.cal < P.cal && Math.abs(out.val) < Q.cal; });
+        if (better) out.msg += ' Astuce : un calibre plus petit donnerait plus de chiffres.';
+        else out.msg += ' Tu as choisi le meilleur calibre.';
+        if (rev && P.q !== 'R') out.msg += ' Le signe − indique que les fils sont inversés.';
+      }
+    }
+    return out;
+  }
+  var mm = { pos: 0, mode: 'der', r: 1, rev: false, blown: false };
+  var MMCX = 130, MMCY = 178;
+  function mmAng(i) { return -135 + 30 * i; }
+  function mmRender() {
+    var svg = $('mmSvg'); clear(svg);
+    var P = MMPOS[mm.pos], R = MMR[mm.r], m = mmRead(mm.pos, mm.mode, R, mm.rev, mm.blown);
+    if (m.blow) { mm.blown = true; }
+    mk(svg, 'rect', { x: 6, y: 4, width: 248, height: 332, rx: 20, 'class': 'mmcase' });
+    mk(svg, 'rect', { x: 18, y: 14, width: 224, height: 312, rx: 14, 'class': 'mmface' });
+    mk(svg, 'rect', { x: 30, y: 24, width: 200, height: 52, rx: 6, 'class': 'lcdr' });
+    if (m.over) tx(svg, 42, 50, '1', 'start', 32, 'lcdt');
+    else if (m.disp.length > 6) tx(svg, 130, 50, m.disp, 'middle', 22, 'lcdt');
+    else tx(svg, 196, 50, m.disp, 'end', 32, 'lcdt');
+    if (P.q !== 'off') tx(svg, 222, 64, m.over ? '' : (m.disp === '- - -' ? '' : P.unit), 'end', 12, 'lcdt');
+    if (mm.blown) tx(svg, 36, 34, 'FUSE', 'start', 9, 'lcdt');
+    MMPOS.forEach(function (Q, i) {
+      var th = mmAng(i) * Math.PI / 180, lx = MMCX + 84 * Math.sin(th), ly = MMCY - 84 * Math.cos(th);
+      mk(svg, 'line', { x1: MMCX + 50 * Math.sin(th), y1: MMCY - 50 * Math.cos(th), x2: MMCX + 58 * Math.sin(th), y2: MMCY - 58 * Math.cos(th), 'class': 'tick' });
+      var g = mk(svg, 'g', { 'class': 'tap' });
+      mk(g, 'rect', { x: lx - 24, y: ly - 12, width: 48, height: 24, fill: 'transparent' });
+      tx(g, lx, ly, Q.lab, 'middle', 12, 'dlab' + (i === mm.pos ? ' on' : ''));
+      g.addEventListener('click', function () { mm.pos = i; mmRender(); });
+    });
+    mk(svg, 'circle', { cx: MMCX, cy: MMCY, r: 40, 'class': 'knob' });
+    var th0 = mmAng(mm.pos) * Math.PI / 180;
+    mk(svg, 'line', { x1: MMCX, y1: MMCY, x2: MMCX + 34 * Math.sin(th0), y2: MMCY - 34 * Math.cos(th0), 'class': 'knobp' });
+    var socks = ['10A', 'mA', 'COM', 'VΩ'];
+    socks.forEach(function (s, j) {
+      var x = 52 + 52 * j, cls = 'sock';
+      if (P.q !== 'off') { if (s === 'COM') cls += ' com'; else if (s === P.sock) cls += ' red'; }
+      mk(svg, 'circle', { cx: x, cy: 292, r: 11, 'class': cls });
+      tx(svg, x, 316, s, 'middle', 11, 'slab');
+    });
+    /* schéma du branchement */
+    var L = layers($('mmCirc')), t = P.q === 'off' ? '' : P.q === 'R' ? 'Ω' : P.q, k = m.I / 0.05;
+    if (mm.mode === 'seule') {
+      sym(L.s, 'pile', 40, 100, 90, { nolabel: true }); tx(L.s, 40, 150, 'pile', 'middle', 12); tx(L.s, 40, 166, 'à part', 'middle', 12);
+      wire(L.w, [[130, 140], [110, 140], [110, 70], [130, 70]], 'mw'); wire(L.w, [[190, 70], [210, 70], [210, 140], [190, 140]], 'mw');
+      sym(L.s, 'res', 160, 140, 0); tx(L.s, 160, 165, fmtR(R), 'middle', 13);
+      sym(L.s, 'meter', 160, 70, 0, { t: t, cls: 'mmeter' }); tx(L.s, 160, 40, 'multimètre', 'middle', 12);
+    } else {
+      var a1 = mm.mode === 'serie' ? [[40, 70], [40, 40], [100, 40]] : [[40, 70], [40, 40], [220, 40], [220, 70]];
+      var a2 = mm.mode === 'serie' ? [[160, 40], [220, 40], [220, 70]] : null;
+      var a3 = [[220, 130], [220, 160], [40, 160], [40, 130]];
+      [a1, a2, a3].forEach(function (p) { if (p) { wire(L.w, p); flow(L.f, p, k); } });
+      sym(L.s, 'pile', 40, 100, 90); tx(L.s, 72, 100, '4,5 V', 'start', 13);
+      sym(L.s, 'res', 220, 100, 90); tx(L.s, 196, 100, fmtR(R), 'end', 13);
+      if (mm.mode === 'serie') { sym(L.s, 'meter', 130, 40, 0, { t: t, cls: 'mmeter' }); tx(L.s, 130, 70, 'multimètre', 'middle', 12); }
+      else {
+        wire(L.w, [[220, 55], [280, 55], [280, 70]], 'mw'); wire(L.w, [[280, 130], [280, 145], [220, 145]], 'mw'); dot(L.s, 220, 55); dot(L.s, 220, 145);
+        sym(L.s, 'meter', 280, 100, 90, { t: t, cls: 'mmeter' }); tx(L.s, 280, 180, 'multimètre', 'middle', 12);
+      }
+    }
+    pressed('mmMder', mm.mode === 'der'); pressed('mmMserie', mm.mode === 'serie'); pressed('mmMseule', mm.mode === 'seule');
+    for (var i = 0; i < 3; i++) pressed('mmR' + i, mm.r === i);
+    pressed('mmRev', mm.rev);
+    $('mmFuse').disabled = !mm.blown;
+    var out = $('mmOut');
+    out.className = 'verdict' + (m.state === 'ok' ? ' yes' : m.state === 'warn' ? ' warn' : m.state === 'danger' ? ' no' : '');
+    var sockTxt = P.q === 'off' ? '' : ' Fil rouge dans la borne ' + P.sock + ', fil noir dans COM.';
+    out.innerHTML = 'Sélecteur sur ' + P.lab + ' · ' + m.title + '<span>' + m.msg + sockTxt + '</span>';
+  }
+  function fmtR(R) { return R >= 1e6 ? fmt(R / 1e6, 0, 2) + ' MΩ' : R >= 1000 ? fmt(R / 1000, 0, 2) + ' kΩ' : fmt(R, 0, 2) + ' Ω'; }
+  $('mmL').addEventListener('click', function () { mm.pos = (mm.pos + MMPOS.length - 1) % MMPOS.length; mmRender(); });
+  $('mmR').addEventListener('click', function () { mm.pos = (mm.pos + 1) % MMPOS.length; mmRender(); });
+  [['mmMder', 'der'], ['mmMserie', 'serie'], ['mmMseule', 'seule']].forEach(function (p) { $(p[0]).addEventListener('click', function () { mm.mode = p[1]; mmRender(); }); });
+  [0, 1, 2].forEach(function (i) { $('mmR' + i).addEventListener('click', function () { mm.r = i; mmRender(); }); });
+  $('mmRev').addEventListener('click', function () { mm.rev = !mm.rev; mmRender(); });
+  $('mmFuse').addEventListener('click', function () { mm.blown = false; if (MMPOS[mm.pos].q === 'A' && mm.mode === 'der') mm.pos = 0; mmRender(); });
+  mmRender();
+
+  /* ---------- Étape 4 : lois en série et en dérivation ---------- */
+  function series(U, Rs) { var Rt = sum(Rs), I = Rt > 0 ? U / Rt : Infinity; return { Req: Rt, I: I, Us: Rs.map(function (R) { return I * R; }) }; }
+  function parallel(U, Rs) { var Is = Rs.map(function (R) { return U / R; }); return { Req: 1 / sum(Rs.map(function (R) { return 1 / R; })), I: sum(Is), Is: Is }; }
+  var LWR = [10, 20, 30, 60];
+  var lw = { mode: 'serie', n: 2, R: [20, 20, 30] };
+  function lwRender() {
+    var U = Number($('lwU').value), n = lw.n, Rs = lw.R.slice(0, n), L = layers($('lwSvg')), i, x, rows = [];
+    $('lwUv').textContent = fV(U);
+    if (lw.mode === 'serie') {
+      var r = series(U, Rs), xs = n === 2 ? [150, 260] : [120, 210, 300], T = 50, B = 200, k = r.I / 0.2;
+      var chain = [[[40, 95], [40, T], [xs[0] - 30, T]]];
+      for (i = 1; i < n; i++) chain.push([[xs[i - 1] + 30, T], [xs[i] - 30, T]]);
+      chain.push([[xs[n - 1] + 30, T], [360, T], [360, B], [40, B], [40, 155]]);
+      chain.forEach(function (p) { wire(L.w, p); flow(L.f, p, k); });
+      sym(L.s, 'pile', 40, 125, 90); tx(L.s, 74, 125, fV(U), 'start', 13);
+      for (i = 0; i < n; i++) {
+        x = xs[i];
+        sym(L.s, 'lamp', x, T, 0, { b: Math.min(1, r.Us[i] * r.I / 3.6) });
+        tx(L.s, x, 20, 'U' + '₁₂₃'.charAt(i) + ' = ' + fV(r.Us[i]), 'middle', n === 3 ? 12 : 13, 'val v');
+        tx(L.s, x, 84, 'L' + (i + 1) + ' · ' + Rs[i] + ' Ω', 'middle', 13);
+        rows.push(['L' + (i + 1), Rs[i] + ' Ω', fV(r.Us[i]), fA(r.I)]);
+      }
+      sym(L.s, 'meter', 200, B, 0, { t: 'A' }); tx(L.s, 200, 230, fA(r.I), 'middle', 13, 'val a');
+      sym(L.s, 'meter', 360, 125, 90, { t: 'A' }); tx(L.s, 338, 125, fA(r.I), 'end', 13, 'val a');
+      var sU = sum(r.Us.map(function (u) { return Math.round(u * 100) / 100; })), same = Math.abs(sU - Math.round(U * 100) / 100) < 1e-9;
+      $('lwLaws').innerHTML = "<span><span class='okk'>✓ Même intensité partout :</span> I = " + fA(r.I) + ' aux deux ampèremètres et dans chaque lampe.</span>' +
+        "<span><span class='okk'>✓ Additivité des tensions :</span> " + r.Us.map(fV).join(' + ') + ' = ' + fV(U) + (same ? '' : ' (aux arrondis près)') + ' = tension du générateur.</span>' +
+        '<span>La lampe de plus grande résistance a la plus grande tension à ses bornes.</span>';
+    } else {
+      var q = parallel(U, Rs), xp = n === 2 ? [190, 310] : [150, 240, 330], T2 = 40, B2 = 215;
+      function beyond(j) { var s = 0; for (var z = j; z < n; z++) s += q.Is[z]; return s; }
+      var a1 = [[40, 100], [40, T2], [65, T2]]; wire(L.w, a1); flow(L.f, a1, q.I / 0.2);
+      var prev = 125;
+      for (i = 0; i < n; i++) { var s1 = [[prev, T2], [xp[i], T2]]; wire(L.w, s1); flow(L.f, s1, beyond(i) / 0.2); prev = xp[i]; }
+      for (i = n - 1; i >= 0; i--) { var s2 = [[xp[i], B2], [i > 0 ? xp[i - 1] : 40, B2]]; if (i === 0) s2.push([40, 160]); wire(L.w, s2); flow(L.f, s2, beyond(i) / 0.2); }
+      for (i = 0; i < n; i++) {
+        x = xp[i];
+        if (i < n - 1) { dot(L.s, x, T2); dot(L.s, x, B2); }
+        [[[x, T2], [x, 55]], [[x, 115], [x, 125]], [[x, 185], [x, B2]]].forEach(function (p) { wire(L.w, p); flow(L.f, p, q.Is[i] / 0.2); });
+        sym(L.s, 'meter', x, 85, 90, { t: 'A' }); tx(L.s, x + 18, 85, fA(q.Is[i]), 'start', 12, 'val a');
+        sym(L.s, 'lamp', x, 155, 90, { b: Math.min(1, U * q.Is[i] / 3.6) }); tx(L.s, x + 18, 155, fV(U), 'start', 12, 'val v');
+        tx(L.s, x, 234, 'L' + (i + 1) + ' · ' + Rs[i] + ' Ω', 'middle', 12);
+        rows.push(['L' + (i + 1), Rs[i] + ' Ω', fV(U), fA(q.Is[i])]);
+      }
+      sym(L.s, 'meter', 95, T2, 0, { t: 'A' }); tx(L.s, 95, 66, fA(q.I), 'middle', 12, 'val a');
+      sym(L.s, 'pile', 40, 130, 90); tx(L.s, 66, 130, fV(U), 'start', 12);
+      var sI = sum(q.Is.map(function (v) { return Math.round(v * 1000) / 1000; })), same2 = Math.abs(sI - Math.round(q.I * 1000) / 1000) < 1e-9;
+      $('lwLaws').innerHTML = "<span><span class='okk'>✓ Même tension sur chaque branche :</span> " + fV(U) + ' aux bornes de chaque lampe, comme le générateur.</span>' +
+        "<span><span class='okk'>✓ Loi des nœuds :</span> " + q.Is.map(fA).join(' + ') + ' = ' + fA(q.I) + (same2 ? '' : ' (aux arrondis près)') + " = intensité dans la branche principale.</span>" +
+        "<span>La lampe de plus petite résistance est traversée par le plus grand courant.</span>";
+    }
+    var tb = $('lwTbl'); tb.innerHTML = '<tr><th>Lampe</th><th>R</th><th>U</th><th>I</th></tr>' + rows.map(function (rw) { return "<tr><td class='nm'>" + rw.join('</td><td>') + '</td></tr>'; }).join('');
+    if (U === 0) $('lwLaws').innerHTML += '<span>Générateur à 0 V : aucune tension, aucun courant. Les lois restent vraies : 0 + 0 = 0 !</span>';
+    pressed('lwS', lw.mode === 'serie'); pressed('lwD', lw.mode === 'derivation'); pressed('lwN2', n === 2); pressed('lwN3', n === 3);
+    var box = $('lwRows'); clear(box);
+    for (i = 0; i < n; i++) (function (i) {
+      var row = document.createElement('div'); row.className = 'row'; row.setAttribute('role', 'group'); row.setAttribute('aria-label', 'Résistance de la lampe L' + (i + 1));
+      var lab = document.createElement('span'); lab.className = 'lab'; lab.textContent = 'L' + (i + 1) + ' :'; row.appendChild(lab);
+      LWR.forEach(function (R, j) {
+        var b = document.createElement('button'); b.type = 'button'; b.id = 'lwr' + i + '_' + j; b.textContent = R + ' Ω'; b.setAttribute('aria-pressed', lw.R[i] === R ? 'true' : 'false');
+        b.addEventListener('click', function () { lw.R[i] = R; lwRender(); $('lwr' + i + '_' + j).focus(); });
+        row.appendChild(b);
+      });
+      box.appendChild(row);
+    })(i);
+  }
+  $('lwS').addEventListener('click', function () { lw.mode = 'serie'; lwRender(); });
+  $('lwD').addEventListener('click', function () { lw.mode = 'derivation'; lwRender(); });
+  $('lwN2').addEventListener('click', function () { lw.n = 2; lwRender(); });
+  $('lwN3').addEventListener('click', function () { lw.n = 3; lwRender(); });
+  $('lwU').addEventListener('input', lwRender);
+  lwRender();
+
+  /* ---------- Étape 5 : code des couleurs ---------- */
+  var COLS = [
+    { n: 'noir', c: '#111111' }, { n: 'marron', c: '#7b3f00' }, { n: 'rouge', c: '#d62828' }, { n: 'orange', c: '#f77f00' }, { n: 'jaune', c: '#f2c500' },
+    { n: 'vert', c: '#2a9d3f' }, { n: 'bleu', c: '#1f5fd1' }, { n: 'violet', c: '#7b2cbf' }, { n: 'gris', c: '#8d8d8d' }, { n: 'blanc', c: '#ffffff' }
+  ];
+  function colorCode(d1, d2, m) { return (10 * d1 + d2) * Math.pow(10, m); }
+  var cc = { b: [4, 7, 2], hide: false };
+  var CCMAX = [9, 9, 6];
+  function ccRender() {
+    var svg = $('ccSvg'); clear(svg);
+    mk(svg, 'line', { x1: 10, y1: 45, x2: 290, y2: 45, 'class': 'wire' });
+    mk(svg, 'rect', { x: 60, y: 22, width: 180, height: 46, rx: 18, fill: '#e9d6a8', stroke: '#111', 'stroke-width': 2.5 });
+    [95, 125, 155].forEach(function (x, k) { mk(svg, 'rect', { x: x, y: 22.5, width: 14, height: 45, fill: COLS[cc.b[k]].c, stroke: '#111', 'stroke-width': 1 }); });
+    mk(svg, 'rect', { x: 205, y: 22.5, width: 12, height: 45, fill: '#c9a227', stroke: '#111', 'stroke-width': 1 });
+    for (var k = 0; k < 3; k++) for (var v = 0; v <= 9; v++) { var b = $('cc' + k + '_' + v); if (b) b.setAttribute('aria-pressed', cc.b[k] === v ? 'true' : 'false'); }
+    var R = colorCode(cc.b[0], cc.b[1], cc.b[2]), out = $('ccOut');
+    if (cc.hide) { out.className = 'verdict'; out.innerHTML = 'Quelle est la valeur de cette résistance ?<span>Lis les couleurs : ' + cc.b.map(function (v) { return COLS[v].n; }).join(', ') + ', puis doré.</span>'; }
+    else {
+      out.className = 'verdict yes';
+      out.innerHTML = 'R = ' + fmtR(R) + '<span>' + COLS[cc.b[0]].n + ' (' + cc.b[0] + '), ' + COLS[cc.b[1]].n + ' (' + cc.b[1] + '), ' + COLS[cc.b[2]].n + ' (' + cc.b[2] + (cc.b[2] > 1 ? ' zéros' : ' zéro') + ') : ' + (10 * cc.b[0] + cc.b[1]) + ' × ' + fmt(Math.pow(10, cc.b[2])) + ' = ' + fmt(R) + ' Ω. Avec la bague dorée, la vraie valeur est entre ' + sig(R * 0.95, 4) + ' Ω et ' + sig(R * 1.05, 4) + ' Ω.</span>';
+    }
+    $('ccGuess').hidden = !cc.hide;
+  }
+  [0, 1, 2].forEach(function (k) {
+    for (var v = (k === 0 ? 1 : 0); v <= CCMAX[k]; v++) (function (v) {
+      var b = document.createElement('button'); b.type = 'button'; b.id = 'cc' + k + '_' + v; b.style.background = COLS[v].c;
+      b.setAttribute('aria-label', COLS[v].n + ' (' + v + ')'); b.title = COLS[v].n + ' = ' + v;
+      b.addEventListener('click', function () { cc.b[k] = v; cc.hide = false; ccRender(); });
+      $('cc' + k).appendChild(b);
+    })(v);
+  });
+  $('ccRand').addEventListener('click', function () { cc.b = [rnd(1, 9), rnd(0, 9), rnd(0, 5)]; cc.hide = true; $('ccIn').value = ''; ccRender(); $('ccIn').focus(); });
+  function ccCheck() {
+    var R = colorCode(cc.b[0], cc.b[1], cc.b[2]), x = num($('ccIn').value), out = $('ccOut');
+    if (isNaN(x)) { out.className = 'verdict'; out.innerHTML = 'Écris un nombre, en ohms.<span>Par exemple 4700 pour 4,7 kΩ.</span>'; return; }
+    if (Math.abs(x - R) < 1e-6 * R) { cc.hide = false; ccRender(); $('ccOut').innerHTML = 'Bravo, c\'est juste ! ' + $('ccOut').innerHTML; }
+    else { out.className = 'verdict no'; out.innerHTML = 'Pas tout à fait.<span>Indice : 1<sup>er</sup> chiffre ' + COLS[cc.b[0]].n + ', 2<sup>e</sup> chiffre ' + COLS[cc.b[1]].n + ', puis autant de zéros que le chiffre de la couleur ' + COLS[cc.b[2]].n + '.</span>'; }
+  }
+  $('ccChk').addEventListener('click', ccCheck);
+  $('ccIn').addEventListener('keydown', function (e) { if (e.key === 'Enter') ccCheck(); });
+  $('ccShow').addEventListener('click', function () { cc.hide = false; ccRender(); });
+  ccRender();
+
+  /* ---------- Étape 6 : l'expérience de la loi d'Ohm ---------- */
+  var OXR = [100, 150, 220, 470];
+  var ox = { r: 0, data: [], line: false };
+  function oxMeas(U, R) { var mA = Math.round(U / R * 10000) / 10; return { U: Math.round(U * 100) / 100, mA: mA, I: mA / 1000 }; }
+  function fit(points) { var a = 0, b = 0; points.forEach(function (p) { a += p[0] * p[1]; b += p[1] * p[1]; }); return b > 0 ? a / b : null; }
+  function oxRender() {
+    var U = Number($('oxU').value), R = OXR[ox.r], m = oxMeas(U, R), L = layers($('oxSvg')), k = (U / R) / 0.05;
+    $('oxUv').textContent = fV(U);
+    var a = [[40, 70], [40, 40], [120, 40]], b = [[180, 40], [300, 40], [300, 70]], c = [[300, 130], [300, 160], [40, 160], [40, 130]];
+    [a, b, c].forEach(function (p) { wire(L.w, p); flow(L.f, p, k); });
+    wire(L.w, [[300, 52], [360, 52], [360, 70]], 'vw'); wire(L.w, [[360, 130], [360, 148], [300, 148]], 'vw'); dot(L.s, 300, 52); dot(L.s, 300, 148);
+    sym(L.s, 'pile', 40, 100, 90); tx(L.s, 72, 100, fV(U), 'start', 13); tx(L.s, 72, 120, 'réglable', 'start', 11);
+    sym(L.s, 'meter', 150, 40, 0, { t: 'A' }); tx(L.s, 150, 70, fmt(m.mA, 1) + ' mA', 'middle', 15, 'val a');
+    sym(L.s, 'res', 300, 100, 90); tx(L.s, 280, 100, 'R = ' + R + ' Ω', 'end', 13);
+    sym(L.s, 'meter', 360, 100, 90, { t: 'V', cls: 'vmeter' }); tx(L.s, 360, 182, fmt(m.U, 2) + ' V', 'middle', 15, 'val v');
+    for (var i = 0; i < 4; i++) pressed('ox' + i, ox.r === i);
+    pressed('oxLine', ox.line);
+    oxGraph(); oxTable();
+  }
+  function oxRecord(U) {
+    var R = OXR[ox.r], m = oxMeas(U, R);
+    ox.data = ox.data.filter(function (d) { return !(d.r === ox.r && d.U === m.U); });
+    ox.data.push({ r: ox.r, U: m.U, I: m.I });
+    ox.data.sort(function (p, q) { return p.r - q.r || p.U - q.U; });
+  }
+  function oxGraph() {
+    var svg = $('oxGraph'); clear(svg);
+    var X0 = 50, X1 = 385, Y0 = 255, Y1 = 30, IM = 0.12, UM = 12, k;
+    function px(I) { return X0 + I / IM * (X1 - X0); } function py(U) { return Y0 - U / UM * (Y0 - Y1); }
+    for (k = 0; k <= 6; k++) { var xg = px(k * 0.02); mk(svg, 'line', { x1: xg, y1: Y0, x2: xg, y2: Y1, 'class': 'gridl' }); tx(svg, xg, Y0 + 14, fmt(k * 0.02, 2), 'middle', 11); }
+    for (k = 0; k <= 6; k++) { var yg = py(k * 2); mk(svg, 'line', { x1: X0, y1: yg, x2: X1, y2: yg, 'class': 'gridl' }); tx(svg, X0 - 8, yg, String(k * 2), 'end', 11); }
+    mk(svg, 'line', { x1: X0, y1: Y0, x2: X1, y2: Y0, 'class': 'axis' }); mk(svg, 'line', { x1: X0, y1: Y0, x2: X0, y2: Y1 - 6, 'class': 'axis' });
+    tx(svg, X1, Y0 + 32, 'I (en A)', 'end', 12); tx(svg, 6, 12, 'U (en V)', 'start', 12);
+    var out = [];
+    for (var r = 0; r < 4; r++) {
+      var ps = ox.data.filter(function (d) { return d.r === r; });
+      if (ox.line) {
+        var Rf = fit(ps.map(function (d) { return [d.U, d.I]; }));
+        if (Rf && ps.filter(function (d) { return d.I > 0; }).length >= 2) {
+          var Ie = Math.min(IM, UM / Rf), Ue = Rf * Ie;
+          mk(svg, 'line', { x1: px(0), y1: py(0), x2: px(Ie), y2: py(Ue), 'class': 'fit c' + r, fill: 'none' });
+          tx(svg, Math.min(px(Ie), X1), Y1 - 10, '≈ ' + fmt(Rf, 0) + ' Ω', Ie >= IM - 1e-9 ? 'end' : 'middle', 11, 'c' + r);
+          out.push(OXR[r] + ' Ω : coefficient directeur ≈ ' + fmt(Rf, 1) + ' Ω');
+        }
+      }
+      ps.forEach(function (d) { mk(svg, 'circle', { cx: px(d.I), cy: py(d.U), r: 5, 'class': 'mp c' + r }); });
+    }
+    var o = $('oxOut'), n = ox.data.length;
+    if (!n) { o.className = 'verdict'; o.innerHTML = 'Aucune mesure pour l\'instant.<span>Règle la tension, puis clique sur « Noter la mesure ». Fais au moins 4 ou 5 mesures, ou lance la série automatique.</span>'; }
+    else if (ox.line && out.length) { o.className = 'verdict yes'; o.innerHTML = 'Chaque série de points est sur une droite qui passe par l\'origine.<span>' + out.join(' ; ') + '. Le coefficient directeur (U ÷ I) est la résistance : on retrouve la valeur écrite sur chaque résistance, aux arrondis de mesure près.</span>'; }
+    else if (ox.line) { o.className = 'verdict'; o.innerHTML = 'Il faut au moins deux mesures avec un courant non nul pour tracer une droite.<span>Note d\'autres mesures.</span>'; }
+    else { o.className = 'verdict'; o.innerHTML = n + (n > 1 ? ' mesures notées.' : ' mesure notée.') + '<span>Les points semblent-ils alignés avec l\'origine ? Clique sur « Tracer la droite » pour vérifier. Essaie aussi une autre résistance.</span>'; }
+  }
+  function oxTable() {
+    var tb = $('oxTbl');
+    if (!ox.data.length) { tb.innerHTML = '<tr><th>R</th><th>U (V)</th><th>I (A)</th><th>U ÷ I (Ω)</th></tr><tr><td colspan="4" style="text-align:center">—</td></tr>'; return; }
+    tb.innerHTML = '<tr><th>R</th><th>U (V)</th><th>I (A)</th><th>U ÷ I (Ω)</th></tr>' + ox.data.map(function (d) {
+      return "<tr><td class='nm'>" + OXR[d.r] + ' Ω</td><td>' + fmt(d.U, 2) + '</td><td>' + fmt(d.I, 4) + '</td><td>' + (d.I > 0 ? fmt(d.U / d.I, 1) : '—') + '</td></tr>';
+    }).join('');
+  }
+  [0, 1, 2, 3].forEach(function (i) { $('ox' + i).addEventListener('click', function () { ox.r = i; oxRender(); }); });
+  $('oxU').addEventListener('input', oxRender);
+  $('oxRec').addEventListener('click', function () { oxRecord(Number($('oxU').value)); oxRender(); });
+  $('oxAuto').addEventListener('click', function () { for (var u = 0; u <= 12; u += 2) oxRecord(u); oxRender(); });
+  $('oxLine').addEventListener('click', function () { ox.line = !ox.line; oxRender(); });
+  $('oxClr').addEventListener('click', function () { ox.data = []; ox.line = false; oxRender(); });
+  oxRender();
+
+  /* Bonus : la lampe */
+  function lampI(U) { return U <= 0 ? 0 : 0.3 * Math.pow(U / 6, 0.6); }
+  function lampR(U) { var I = lampI(U); return I > 0 ? U / I : null; }
+  function lpRender() {
+    var U = Number($('lpU').value), I = lampI(U), svg = $('lpSvg'); clear(svg);
+    var X0 = 50, X1 = 385, Y0 = 205, Y1 = 20, IM = 0.35, UM = 7, k;
+    function px(i) { return X0 + i / IM * (X1 - X0); } function py(u) { return Y0 - u / UM * (Y0 - Y1); }
+    for (k = 0; k <= 7; k++) { var xg = px(k * 0.05); mk(svg, 'line', { x1: xg, y1: Y0, x2: xg, y2: Y1, 'class': 'gridl' }); tx(svg, xg, Y0 + 14, fmt(k * 0.05, 2), 'middle', 11); }
+    for (k = 0; k <= 7; k++) { var yg = py(k); mk(svg, 'line', { x1: X0, y1: yg, x2: X1, y2: yg, 'class': 'gridl' }); tx(svg, X0 - 8, yg, String(k), 'end', 11); }
+    mk(svg, 'line', { x1: X0, y1: Y0, x2: X1, y2: Y0, 'class': 'axis' }); mk(svg, 'line', { x1: X0, y1: Y0, x2: X0, y2: Y1, 'class': 'axis' });
+    tx(svg, X1, Y0 + 30, 'I (en A)', 'end', 12); tx(svg, 6, 10, 'U (en V)', 'start', 12);
+    mk(svg, 'line', { x1: px(0), y1: py(0), x2: px(0.35), y2: py(7), 'class': 'fit c1' });
+    var pp = []; for (var u = 0; u <= 6.0001; u += 0.1) pp.push([px(lampI(u)), py(u)]);
+    mk(svg, 'polyline', { points: pts(pp), 'class': 'curve c0', fill: 'none' });
+    tx(svg, px(0.21), py(5.4), 'résistance 20 Ω', 'end', 12, 'c1');
+    tx(svg, px(0.31), py(4.2), 'lampe', 'start', 12, 'c0');
+    mk(svg, 'circle', { cx: px(I), cy: py(U), r: 6, fill: 'var(--lit)', stroke: 'var(--ink)', 'stroke-width': 2 });
+    $('lpUv').textContent = fV(U);
+    var o = $('lpOut');
+    if (U === 0) { o.className = 'verdict'; o.innerHTML = 'U = 0 V : aucun courant, la lampe est éteinte.<span>Augmente la tension et regarde la résistance U ÷ I changer.</span>'; }
+    else { o.className = 'verdict yes'; o.innerHTML = 'U = ' + fV(U) + ' ; I = ' + fmt(I, 3) + ' A ; U ÷ I ≈ ' + fmt(U / I, 1) + ' Ω<span>À faible tension, le filament est tiède et sa résistance est faible. À 6 V, il est très chaud : U ÷ I atteint 20 Ω. Le quotient change, donc U et I ne sont pas proportionnelles.</span>'; }
+  }
+  $('lpU').addEventListener('input', lpRender);
+  lpRender();
+
+  /* ---------- Étape 7 : la calculatrice ---------- */
+  function ohm(q) {
+    var U = q.U, R = q.R, I = q.I, given = [U, R, I].filter(function (v) { return v != null; });
+    if (given.length !== 2) return { err: 'Donne exactement deux grandeurs.' };
+    if (given.some(function (v) { return isNaN(v); })) return { err: 'Écris deux nombres.' };
+    if (given.some(function (v) { return v < 0; })) return { err: 'Les valeurs doivent être positives.' };
+    if (U == null) return { U: R * I, R: R, I: I };
+    if (I == null) { if (R === 0) return { err: 'R = 0 Ω, c\'est un simple fil : un court-circuit ! L\'intensité serait énorme (et la loi d\'Ohm ne permet pas de la calculer).' }; return { U: U, R: R, I: U / R }; }
+    if (I === 0) return { err: 'Avec I = 0 A, aucun courant ne passe (circuit ouvert ?) : on ne peut pas calculer R ainsi.' };
+    return { U: U, R: U / I, I: I };
+  }
+  var calc = { want: 'I' };
+  var CU = { U: [['V', 1], ['mV', 0.001]], R: [['Ω', 1], ['kΩ', 1000]], I: [['A', 1], ['mA', 0.001]] };
+  function unitName(k) { var v = Number($('cu' + k).value); return CU[k].filter(function (p) { return p[1] === v; })[0][0]; }
+  function triRender() {
+    var svg = $('triSvg'); clear(svg);
+    mk(svg, 'polygon', { points: '100,10 190,140 10,140', 'class': 'tri' });
+    mk(svg, 'line', { x1: 51.5, y1: 80, x2: 148.5, y2: 80, 'class': 'tril' }); mk(svg, 'line', { x1: 100, y1: 80, x2: 100, y2: 140, 'class': 'tril' });
+    [['U', 100, 55], ['R', 66, 112], ['I', 134, 112]].forEach(function (p) {
+      var g = mk(svg, 'g', { 'class': 'tap' });
+      mk(g, 'circle', { cx: p[1], cy: p[2], r: 20, 'class': calc.want === p[0] ? 'trion' : null, fill: calc.want === p[0] ? null : 'transparent' });
+      mk(g, 'text', { x: p[1], y: p[2], 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-size': 26, 'class': 'trit' }, calc.want === p[0] ? '?' : p[0]);
+      g.addEventListener('click', function () { setWant(p[0]); });
+    });
+    tx(svg, 100, 128, '×', 'middle', 14);
+  }
+  function setWant(k) {
+    if (k === calc.want) return;
+    var old = calc.want, r = calc.last;
+    calc.want = k;
+    if (r && !r.err) { $('ci' + old).value = sig(r[old], 6).replace(/\s/g, ''); $('cu' + old).value = '1'; }
+    calcRender();
+  }
+  function calcRender() {
+    ['U', 'R', 'I'].forEach(function (k) {
+      pressed('cw' + k, calc.want === k);
+      var inp = $('ci' + k); inp.disabled = calc.want === k; inp.placeholder = calc.want === k ? '? (calculé)' : 'valeur';
+      if (calc.want === k) inp.value = '';
+      $('cu' + k).disabled = calc.want === k;
+    });
+    triRender(); calcCompute();
+  }
+  function calcCompute() {
+    var w = calc.want, q = { U: null, R: null, I: null }, base = {}, conv = [];
+    ['U', 'R', 'I'].forEach(function (k) {
+      if (k === w) return;
+      var raw = $('ci' + k).value, x = num(raw), f = Number($('cu' + k).value);
+      q[k] = raw.trim() === '' ? NaN : x * f; base[k] = x;
+      if (!isNaN(x) && f !== 1) conv.push(fmt(x, 0, 6) + ' ' + unitName(k) + ' = ' + sig(x * f, 6) + ' ' + CU[k][0][0]);
+    });
+    var out = $('calcOut'), r = ohm(q);
+    calc.last = r;
+    if (r.err) { out.className = 'verdict' + (r.err === 'Écris deux nombres.' ? '' : ' no'); out.innerHTML = (r.err === 'Écris deux nombres.' ? 'Remplis les deux cases.' : 'Calcul impossible.') + '<span>' + r.err + '</span>'; return; }
+    var line;
+    if (w === 'U') line = 'U = R × I = ' + sig(r.R, 6) + ' Ω × ' + sig(r.I, 6) + ' A = ' + sig(r.U) + ' V' + (r.U > 0 && r.U < 1 ? ' = ' + sig(r.U * 1000) + ' mV' : '');
+    else if (w === 'I') line = 'I = U ÷ R = ' + sig(r.U, 6) + ' V ÷ ' + sig(r.R, 6) + ' Ω = ' + sig(r.I) + ' A' + (r.I > 0 && r.I < 1 ? ' = ' + sig(r.I * 1000) + ' mA' : '');
+    else line = 'R = U ÷ I = ' + sig(r.U, 6) + ' V ÷ ' + sig(r.I, 6) + ' A = ' + sig(r.R) + ' Ω' + (r.R >= 1000 ? ' = ' + sig(r.R / 1000) + ' kΩ' : '');
+    var warn = r.U > 24 ? ' Attention : au-delà de quelques dizaines de volts, une tension peut être dangereuse. Au collège, on reste à quelques volts.' : '';
+    out.className = 'verdict yes';
+    out.innerHTML = "<span class='meterout'>" + line + '</span><span>' + (conv.length ? 'Conversions d\'abord : ' + conv.join(' ; ') + '. ' : '') + 'Les valeurs sont arrondies à 4 chiffres significatifs.' + warn + '</span>';
+  }
+  ['U', 'R', 'I'].forEach(function (k) {
+    $('cw' + k).addEventListener('click', function () { setWant(k); });
+    $('ci' + k).addEventListener('input', calcCompute);
+    $('cu' + k).addEventListener('change', calcCompute);
+  });
+  $('ciU').value = '4,5'; $('ciR').value = '220';
+  calcRender();
+
+  /* ---------- Étape 8 : la multiprise ---------- */
+  var APPS = [
+    { n: 'Lampe DEL', I: 0.05 }, { n: 'Chargeur de téléphone', I: 0.1 }, { n: 'Ordinateur portable', I: 0.3 }, { n: 'Télévision', I: 0.5 },
+    { n: 'Aspirateur', I: 4 }, { n: 'Radiateur électrique', I: 6.5 }, { n: 'Sèche-cheveux', I: 8 }, { n: 'Bouilloire', I: 9 }
+  ];
+  var app = { on: APPS.map(function () { return false; }), tripped: false, last: 0 };
+  function multiprise(idx) { return sum(idx.map(function (i) { return APPS[i].I; })); }
+  function onIdx() { var r = []; app.on.forEach(function (v, i) { if (v) r.push(i); }); return r; }
+  function appRender() {
+    var idx = onIdx(), tot = multiprise(idx);
+    APPS.forEach(function (a, i) { pressed('app' + i, app.on[i]); });
+    var fill = $('gFill'), out = $('appOut');
+    fill.style.width = Math.min(100, (app.tripped ? app.last : tot) / 20 * 100) + '%';
+    fill.style.background = app.tripped || tot > 16 ? 'var(--red)' : tot > 10 ? 'var(--acc)' : 'var(--ok)';
+    $('appReset').disabled = !app.tripped;
+    if (app.tripped) { out.className = 'verdict no'; out.innerHTML = 'Le disjoncteur a coupé le courant !<span>Le total aurait été de ' + fmt(app.last, 2) + ' A, plus que les 16 A prévus : les fils auraient trop chauffé. Tous les appareils sont éteints. Réarme le disjoncteur, puis branche moins de gros appareils en même temps.</span>'; return; }
+    if (!idx.length) { out.className = 'verdict'; out.innerHTML = 'Aucun appareil allumé : I = 0 A.<span>Allume des appareils.</span>'; return; }
+    var line = idx.map(function (i) { return fmt(APPS[i].I, 0, 2); }).join(' + ') + ' = ' + fmt(tot, 0, 2) + ' A';
+    out.className = 'verdict ' + (tot > 10 ? 'warn' : 'yes');
+    out.innerHTML = 'Intensité dans le câble de la multiprise : ' + fmt(tot, 0, 2) + ' A<span>Loi des nœuds : ' + line + '. ' + (tot > 10 ? 'On approche de la limite de 16 A : le câble chauffe.' : 'Pas de problème.') + '</span>';
+  }
+  APPS.forEach(function (a, i) {
+    var b = document.createElement('button'); b.type = 'button'; b.id = 'app' + i; b.textContent = a.n + ' · ' + fmt(a.I, 0, 2) + ' A';
+    b.addEventListener('click', function () {
+      if (app.tripped) return;
+      app.on[i] = !app.on[i];
+      var tot = multiprise(onIdx());
+      if (tot > 16) { app.tripped = true; app.last = tot; app.on = APPS.map(function () { return false; }); }
+      appRender();
+    });
+    $('appBtns').appendChild(b);
+  });
+  $('appReset').addEventListener('click', function () { app.tripped = false; app.last = 0; appRender(); });
+  appRender();
+
+  /* ---------- Quiz ---------- */
+  function makeQ(t) {
+    var UG, U1, I1, I2, It, R, U, I, Im;
+    if (t === 0) { UG = pick([4.5, 6, 9, 12]); U1 = rnd(1, Math.round(UG * 2) - 1) / 2; return { q: 'Une pile de ' + fmt(UG) + ' V alimente deux lampes L1 et L2 en série. Le voltmètre indique ' + fmt(U1) + ' V aux bornes de L1. Quelle est la tension aux bornes de L2, en V ?', a: UG - U1, how: 'Additivité des tensions en série : U₂ = ' + fmt(UG) + ' − ' + fmt(U1) + ' = ' + fmt(UG - U1) + ' V.' }; }
+    if (t === 1) { I1 = pick([0.12, 0.15, 0.2, 0.25, 0.3]); return { q: 'Trois lampes sont en série avec une pile. Un ampèremètre placé juste après la borne + indique ' + fmt(I1) + ' A. Que mesure un ampèremètre placé entre L2 et L3, en A ?', a: I1, how: 'En série, l\'intensité est la même en tout point : ' + fmt(I1) + ' A.' }; }
+    if (t === 2) { I1 = rnd(10, 60) / 100; I2 = rnd(10, 60) / 100; It = Math.round((I1 + I2) * 100) / 100; return { q: 'Deux lampes sont en dérivation. L1 est traversée par ' + fmt(I1) + ' A et L2 par ' + fmt(I2) + ' A. Quelle intensité traverse la branche principale (la pile), en A ?', a: It, how: 'Loi des nœuds : I = ' + fmt(I1) + ' + ' + fmt(I2) + ' = ' + fmt(It) + ' A.' }; }
+    if (t === 3) { It = rnd(50, 120) / 100; I1 = rnd(10, Math.round(It * 100) - 10) / 100; I2 = Math.round((It - I1) * 100) / 100; return { q: 'Deux lampes sont en dérivation. La pile débite ' + fmt(It) + ' A et la lampe L1 est traversée par ' + fmt(I1) + ' A. Quelle intensité traverse L2, en A ?', a: I2, how: 'Loi des nœuds : I₂ = I − I₁ = ' + fmt(It) + ' − ' + fmt(I1) + ' = ' + fmt(I2) + ' A.' }; }
+    if (t === 4) { UG = pick([4.5, 6, 9, 12]); return { q: 'Deux lampes différentes sont branchées en dérivation sur une pile de ' + fmt(UG) + ' V. Quelle est la tension aux bornes de L2, en V ?', a: UG, how: 'En dérivation, chaque branche a la même tension que le générateur : ' + fmt(UG) + ' V.' }; }
+    if (t === 5) { R = pick([10, 20, 50, 100, 200]); Im = pick([20, 30, 40, 50, 60]); U = R * Im / 1000; return { q: 'Une résistance de ' + R + ' Ω est traversée par un courant de ' + Im + ' mA. Quelle est la tension à ses bornes, en V ?', a: U, how: 'On convertit : ' + Im + ' mA = ' + fmt(Im / 1000) + ' A. Puis U = R × I = ' + R + ' × ' + fmt(Im / 1000) + ' = ' + fmt(U) + ' V.' }; }
+    if (t === 6) { R = pick([100, 200, 500, 1000]); U = pick([2, 4, 5, 6, 10]); Im = U / R * 1000; return { q: 'On applique une tension de ' + U + ' V aux bornes d\'une résistance de ' + fmt(R) + ' Ω. Quelle intensité la traverse, en mA ?', a: Im, how: 'I = U ÷ R = ' + U + ' ÷ ' + fmt(R) + ' = ' + fmt(Im / 1000, 0, 4) + ' A = ' + fmt(Im) + ' mA.' }; }
+    if (t === 7) { U = pick([3, 6, 9, 12]); I = pick([0.1, 0.2, 0.3, 0.5]); return { q: 'Un dipôle ohmique a une tension de ' + U + ' V à ses bornes et est traversé par ' + fmt(I) + ' A. Quelle est sa résistance, en Ω ?', a: U / I, how: 'R = U ÷ I = ' + U + ' ÷ ' + fmt(I) + ' = ' + fmt(U / I) + ' Ω.' }; }
+    if (t === 8) {
+      var v = rnd(0, 2);
+      if (v === 0) { Im = pick([20, 45, 150, 350, 500, 1200]); return { q: 'Convertis ' + fmt(Im) + ' mA en A.', a: Im / 1000, how: '1 A = 1 000 mA, donc on divise par 1 000 : ' + fmt(Im / 1000) + ' A.' }; }
+      if (v === 1) { I = pick([0.03, 0.25, 0.4, 1.5]); return { q: 'Convertis ' + fmt(I) + ' A en mA.', a: I * 1000, how: 'On multiplie par 1 000 : ' + fmt(I * 1000) + ' mA.' }; }
+      R = pick([1, 2.2, 4.7, 10, 47]); return { q: 'Convertis ' + fmt(R) + ' kΩ en Ω.', a: R * 1000, how: '1 kΩ = 1 000 Ω : ' + fmt(R * 1000) + ' Ω.' };
+    }
+    U = pick([0.8, 1.5, 4.5, 9, 12]); var cal = U < 2 ? 2 : 20;
+    return { q: 'Tu veux mesurer une tension d\'environ ' + fmt(U) + ' V. Ton multimètre propose les calibres 2 V, 20 V et 200 V. Lequel donne la mesure la plus précise ? (Écris le nombre de volts.)', a: cal, how: 'On prend le plus petit calibre qui reste plus grand que la valeur : ' + cal + ' V.' + (cal === 20 ? ' Sur 2 V, l\'écran afficherait « 1 ».' : '') };
+  }
+  var quiz = $('quiz'), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ''; done = [];
+    var types = shuffle([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]).slice(0, 8);
+    for (var k = 0; k < 8; k++) {
+      var Q = makeQ(types[k]), li = document.createElement('li');
+      li.innerHTML = '<span>' + Q.q + '</span><input type="text" id="qa' + k + '" inputmode="decimal" autocomplete="off" aria-label="Ta réponse à la question ' + (k + 1) + '"><button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+      quiz.appendChild(li);
+      (function (k, Q) {
+        function chk() {
+          var fb = $('qf' + k), x = num($('qa' + k).value);
+          if (isNaN(x)) { fb.className = 'fb'; fb.textContent = 'Écris un nombre.'; return; }
+          if (Math.abs(x - Q.a) <= Math.abs(Q.a) * 0.005 + 1e-9) { fb.className = 'fb ok'; fb.textContent = 'Bravo, c\'est juste !'; done[k] = true; }
+          else { done[k] = false; fb.className = 'fb no'; fb.innerHTML = 'Pas tout à fait : la réponse est ' + sig(Q.a, 6) + '.<span>' + Q.how + '</span>'; }
+          $('score').textContent = done.filter(Boolean).length + ' / 8';
+        }
+        $('qb' + k).addEventListener('click', chk);
+        $('qa' + k).addEventListener('keydown', function (e) { if (e.key === 'Enter') chk(); });
+      })(k, Q);
+    }
+    $('score').textContent = '0 / 8';
+  }
+  $('newQuiz').addEventListener('click', newQuiz);
+  newQuiz();
+
+  window.__ohm = {
+    ohm: ohm, series: series, parallel: parallel, place: placeModel, mm: mmRead, mmPositions: MMPOS,
+    colorCode: colorCode, fit: fit, lampI: lampI, lampR: lampR, multiprise: multiprise,
+    appliances: APPS.map(function (a) { return { n: a.n, I: a.I }; }), makeQ: makeQ
+  };
+})();
+</script>
+</body>
+</html>
