@@ -1,0 +1,820 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Le nombre π</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : une page de cahier à grands carreaux, une colonne de lecture, marge rouge à gauche sur grand écran. */
+:root {
+  --paper: #f6f8fc;
+  --grid: #e1e8f4;
+  --card: #ffffff;
+  --ink: #1a2745;
+  --ink-soft: #4d5a78;
+  --blue: #2346b5;
+  --blue-soft: #dbe4fb;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #fff0a3;
+  --line: #cfd8e8;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0f1627; --grid: #18233a; --card: #151f35; --ink: #e7ecf7; --ink-soft: #a7b3cc;
+    --blue: #86a6ff; --blue-soft: #1e2b52; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #2a3754;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0f1627; --grid: #18233a; --card: #151f35; --ink: #e7ecf7; --ink-soft: #a7b3cc;
+  --blue: #86a6ff; --blue-soft: #1e2b52; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #2a3754;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page {
+  max-width: 760px;
+  margin: 0 auto;
+  padding-block: 40px 80px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 56px;
+}
+@media (min-width: 900px) {
+  .page::before {
+    content: ""; position: absolute; top: 0; bottom: 0; left: -36px;
+    width: 2px; background: var(--red); opacity: .55;
+  }
+}
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+strong { font-weight: 700; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+
+section { display: flex; flex-direction: column; gap: 18px; }
+.eyebrow {
+  font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--red); font-weight: 600;
+}
+
+/* Hero */
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero-top { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+.big-pi {
+  font-family: var(--f-display); font-weight: 800; color: var(--blue);
+  font-size: clamp(6rem, 22vw, 10rem); line-height: .8; transform: rotate(-4deg);
+}
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+.ticker {
+  overflow: hidden; border-block: 2px solid var(--ink); padding-block: 8px;
+  font-family: var(--f-mono); font-size: 1.05rem; white-space: nowrap; color: var(--ink);
+  mask-image: linear-gradient(90deg, #000 85%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent);
+}
+.ticker span { display: inline-block; animation: run 60s linear infinite; }
+@keyframes run { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+/* Boîtes */
+.box {
+  background: var(--card); border: 2px solid var(--ink); border-radius: 10px;
+  padding: 20px; display: flex; flex-direction: column; gap: 14px;
+  box-shadow: 4px 4px 0 var(--ink);
+}
+.note {
+  border-left: 4px solid var(--blue); background: var(--blue-soft);
+  padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px;
+}
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+
+.figure { overflow-x: auto; }
+.figure svg { display: block; width: 100%; height: auto; min-width: 0; }
+svg text { font-family: var(--f-mono); fill: var(--ink-soft); }
+
+button {
+  font: inherit; font-family: var(--f-display); font-weight: 700;
+  background: var(--blue); color: var(--card); border: 2px solid var(--ink);
+  border-radius: 8px; padding: 8px 16px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink);
+  align-self: flex-start;
+}
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+
+/* Frise */
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0; }
+.timeline li {
+  display: grid; grid-template-columns: 112px 1fr; gap: 16px;
+  padding-block: 14px; border-bottom: 1px dashed var(--line);
+}
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.timeline .val { font-family: var(--f-mono); color: var(--blue); font-size: .95rem; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+/* Décimales */
+.digits {
+  font-family: var(--f-mono); font-size: 1rem; line-height: 1.9; word-spacing: .3em;
+  overflow-wrap: anywhere; color: var(--ink);
+}
+.compare { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.compare .box { gap: 8px; box-shadow: none; border-width: 1.5px; }
+.compare .num { font-family: var(--f-mono); font-size: 1.05rem; overflow-wrap: anywhere; }
+.rep { color: var(--red); font-weight: 600; text-decoration: underline wavy var(--red); text-underline-offset: 4px; }
+.tag {
+  font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase;
+  align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor;
+}
+.tag.ok { color: var(--blue); }
+.tag.no { color: var(--red); }
+
+/* Formules */
+.formulas { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+.formula {
+  font-family: var(--f-display); font-weight: 800; font-size: 2rem; color: var(--blue);
+  letter-spacing: .01em;
+}
+.formula sup { font-size: .6em; }
+.calc { display: grid; grid-template-columns: 190px 1fr; gap: 20px; align-items: center; }
+.calc > svg { width: 100%; max-width: 190px; height: auto; }
+.calc > div { min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+@media (max-width: 560px) {
+  .calc { grid-template-columns: 1fr; gap: 12px; }
+  .calc > svg { max-width: 150px; margin: 0 auto; }
+}
+label { font-weight: 700; }
+input[type="range"] { width: 100%; accent-color: var(--blue); }
+.results { display: flex; flex-direction: column; gap: 8px; font-variant-numeric: tabular-nums; }
+.res {
+  border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 12px;
+  display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; align-items: baseline;
+}
+.res-name { font-family: var(--f-display); font-weight: 700; }
+.res-val { font-family: var(--f-mono); font-weight: 600; color: var(--blue); font-size: 1.05rem; white-space: nowrap; }
+.res-val.r { color: var(--red); }
+.res-calc { grid-column: 1 / -1; font-family: var(--f-mono); font-size: .85rem; color: var(--ink-soft); overflow-wrap: anywhere; }
+
+/* Exercices */
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details {
+  background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px;
+}
+summary { cursor: pointer; font-weight: 700; list-style-position: outside; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+
+/* Moyen mnémotechnique */
+.poem { display: flex; flex-wrap: wrap; gap: 10px 14px; font-family: var(--f-display); font-size: 1.35rem; font-weight: 700; }
+.poem span { display: inline-flex; flex-direction: column; align-items: center; }
+.poem small { font-family: var(--f-mono); font-size: .85rem; color: var(--red); font-weight: 600; }
+
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ticker span { animation: none; }
+}
+</style>
+
+</head>
+<body>
+<main class="page">
+
+  <header class="hero">
+    <div class="hero-top">
+      <div class="big-pi" aria-hidden="true">π</div>
+      <div style="display:flex;flex-direction:column;gap:10px;min-width:0;flex:1 1 280px">
+        <span class="eyebrow">Tutoriel de maths · niveau collège</span>
+        <h1>Le nombre π</h1>
+        <p class="lead">Un nombre qui se cache dans chaque cercle, que les humains cherchent depuis 4 000 ans… et qui ne s'arrête jamais.</p>
+      </div>
+    </div>
+    <div class="ticker" aria-label="Les premières décimales de pi">
+      <span>3,14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211706798 · 3,14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211706798 · </span>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · C'est quoi, π ?</span>
+    <h2>Le tour d'un cercle, mesuré en diamètres</h2>
+    <p>Prends n'importe quel cercle : une pièce de monnaie, une roue de vélo, une pizza. Mesure son <strong>diamètre</strong> (la largeur, en passant par le centre). Puis mesure son <strong>périmètre</strong> (la longueur du tour complet).</p>
+    <p>Divise le périmètre par le diamètre. Tu trouves toujours le même nombre, quel que soit le cercle : <span class="hl"><strong>environ 3,14</strong></span>. Ce nombre, on l'appelle <strong>π</strong> (on dit « pi »).</p>
+
+    <div class="box">
+      <h3>Expérience : on fait rouler une roue</h3>
+      <p>La roue ci-dessous a un diamètre de 1. Fais-la rouler d'un tour complet et regarde la longueur de la trace laissée au sol.</p>
+      <div class="figure">
+        <svg id="roll" viewBox="0 0 640 210" role="img" aria-label="Une roue de diamètre 1 roule d'un tour et parcourt une distance de pi">
+          <line x1="20" y1="170" x2="620" y2="170" stroke="var(--ink)" stroke-width="2"></line>
+          <g id="ticks"></g>
+          <line id="trace" x1="60" y1="170" x2="60" y2="170" stroke="var(--red)" stroke-width="6" stroke-linecap="round"></line>
+          <g id="wheel" transform="translate(60 95)">
+            <circle r="75" fill="var(--blue-soft)" stroke="var(--line)" stroke-width="2" stroke-dasharray="4 5"></circle>
+            <circle id="rim" r="75" fill="none" stroke="var(--red)" stroke-width="6" transform="rotate(90)"></circle>
+            <line x1="-75" y1="0" x2="75" y2="0" stroke="var(--blue)" stroke-width="2"></line>
+            <circle r="4" fill="var(--blue)"></circle>
+            <circle cx="0" cy="75" r="7" fill="var(--ink)"></circle>
+          </g>
+          <text id="piLabel" x="531" y="40" text-anchor="middle" font-size="16" opacity="0">≈ 3,14 diamètres</text>
+        </svg>
+      </div>
+      <button id="rollBtn" type="button">Faire rouler la roue</button>
+      <p style="color:var(--ink-soft)">Le bord rouge de la roue se « déroule » sur le sol. Un tour complet fait un peu plus de 3 diamètres : exactement <strong>π diamètres</strong>.</p>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · D'où vient π ?</span>
+    <h2>4 000 ans de chasse aux décimales</h2>
+    <p>Personne n'a « inventé » π un beau matin. On l'a découvert petit à petit, en mesurant des cercles, puis en calculant de plus en plus précisément. Voici les grandes étapes.</p>
+
+    <ol class="timeline">
+      <li>
+        <span class="when">vers −1900</span>
+        <div class="what">
+          <strong>Les Babyloniens</strong>
+          <span>Sur des tablettes d'argile, ils utilisent un nombre proche de π pour leurs calculs de construction.</span>
+          <span class="val">π ≈ 3,125</span>
+        </div>
+      </li>
+      <li>
+        <span class="when">vers −1650</span>
+        <div class="what">
+          <strong>Les Égyptiens</strong>
+          <span>Le scribe Ahmès écrit sur un papyrus (le papyrus Rhind) une méthode pour calculer l'aire d'un champ rond.</span>
+          <span class="val">π ≈ 3,16</span>
+        </div>
+      </li>
+      <li>
+        <span class="when">vers −250</span>
+        <div class="what">
+          <strong>Archimède, en Grèce</strong>
+          <span>Le premier à le calculer avec une vraie méthode : il coince le cercle entre deux polygones à 96 côtés, un à l'intérieur et un à l'extérieur.</span>
+          <span class="val">3,1408 &lt; π &lt; 3,1429</span>
+        </div>
+      </li>
+      <li>
+        <span class="when">vers 480</span>
+        <div class="what">
+          <strong>Zu Chongzhi, en Chine</strong>
+          <span>Il trouve 7 décimales justes, un record qui tiendra près de 900 ans. Il propose aussi la fraction 355/113.</span>
+          <span class="val">π ≈ 3,1415926</span>
+        </div>
+      </li>
+      <li>
+        <span class="when">1706 – 1737</span>
+        <div class="what">
+          <strong>Le symbole π</strong>
+          <span>L'Anglais William Jones utilise la lettre grecque π (la première lettre de <em>périphérie</em>, le tour). Le célèbre mathématicien Leonhard Euler la rend populaire.</span>
+        </div>
+      </li>
+      <li>
+        <span class="when">1761</span>
+        <div class="what">
+          <strong>Lambert prouve que π ne s'arrête jamais</strong>
+          <span>Il démontre que π est un nombre <strong>irrationnel</strong> (on y revient juste après).</span>
+        </div>
+      </li>
+      <li>
+        <span class="when">1949</span>
+        <div class="what">
+          <strong>Le premier ordinateur s'y met</strong>
+          <span>L'ENIAC, un ordinateur grand comme une pièce, calcule 2 037 décimales en 70 heures.</span>
+        </div>
+      </li>
+      <li>
+        <span class="when">2025</span>
+        <div class="what">
+          <strong>Le record actuel</strong>
+          <span>Des ordinateurs très puissants ont calculé plus de <strong>300 000 milliards</strong> de décimales. Imprimées, elles rempliraient des millions de livres !</span>
+        </div>
+      </li>
+    </ol>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Son profil</span>
+    <h2>Un nombre « irrationnel »</h2>
+    <p>Le mot que tu cherches, c'est <span class="hl"><strong>irrationnel</strong></span>. Ça veut dire deux choses :</p>
+    <div class="note">
+      <span>1. Ses décimales <strong>ne s'arrêtent jamais</strong>.</span>
+      <span>2. Elles ne forment <strong>jamais un motif qui se répète</strong> en boucle.</span>
+    </div>
+    <p>Compare avec des fractions. Quand tu divises 1 par 3 ou 1 par 7, les décimales sont infinies aussi, mais elles tournent en rond : le même bloc revient pour toujours. Avec π, aucun bloc ne revient en boucle.</p>
+
+    <div class="compare">
+      <div class="box">
+        <span class="tag no">Motif qui se répète</span>
+        <strong>1 ÷ 3</strong>
+        <span class="num">0,<span class="rep">3</span><span class="rep">3</span><span class="rep">3</span><span class="rep">3</span><span class="rep">3</span>…</span>
+      </div>
+      <div class="box">
+        <span class="tag no">Motif qui se répète</span>
+        <strong>1 ÷ 7</strong>
+        <span class="num">0,<span class="rep">142857</span> <span class="rep">142857</span>…</span>
+      </div>
+      <div class="box">
+        <span class="tag ok">Aucun motif</span>
+        <strong>π</strong>
+        <span class="num">3,14159 26535 89793…</span>
+      </div>
+    </div>
+
+    <div class="note red">
+      <span class="note-title">Attention au piège</span>
+      <span>Les <em>chiffres</em> de π reviennent bien sûr (il n'y en a que dix, de 0 à 9 !). On trouve même six 9 à la suite à partir de la 762<sup>e</sup> décimale. Ce qui ne se répète jamais, c'est un <em>motif en boucle</em>, comme le 142857 de 1 ÷ 7.</span>
+    </div>
+
+    <p>Conséquence : <strong>on ne peut pas écrire π exactement</strong>, ni avec une fraction, ni avec un nombre fini de décimales. 3,14 ou 22/7 ne sont que des valeurs approchées.</p>
+
+    <div class="box">
+      <h3>Les 100 premières décimales</h3>
+      <p class="digits">3,<br>1415926535 8979323846 2643383279 5028841971 6939937510<br>5820974944 5923078164 0628620899 8628034825 3421170679</p>
+      <p style="color:var(--ink-soft)">Pour info, les ingénieurs de la NASA n'utilisent qu'environ 15 décimales pour guider leurs sondes spatiales. C'est déjà largement assez précis.</p>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · Les formules</span>
+    <h2>Périmètre et aire d'un cercle</h2>
+    <p>D'abord, deux mots à connaître. Le <strong>rayon</strong> <span class="mono">r</span> va du centre jusqu'au bord. Le <strong>diamètre</strong> <span class="mono">d</span> traverse tout le cercle : c'est deux rayons, donc <span class="mono">d = 2 × r</span>.</p>
+
+    <div class="formulas">
+      <div class="box">
+        <span class="eyebrow" style="color:var(--blue)">Le tour du cercle</span>
+        <h3>Périmètre</h3>
+        <div class="formula">P = 2 × π × r</div>
+        <p>ou, ce qui revient au même, <span class="mono">P = π × d</span>. C'est exactement l'expérience de la roue : un tour = π diamètres.</p>
+        <p style="color:var(--ink-soft)">Unité : une longueur (cm, m…)</p>
+      </div>
+      <div class="box">
+        <span class="eyebrow">L'intérieur du cercle</span>
+        <h3>Aire</h3>
+        <div class="formula" style="color:var(--red)">A = π × r<sup>2</sup></div>
+        <p><span class="mono">r<sup>2</sup></span> veut dire <span class="mono">r × r</span>. Donc <span class="mono">A = π × r × r</span>.</p>
+        <p style="color:var(--ink-soft)">Unité : une surface (cm², m²…)</p>
+      </div>
+    </div>
+
+    <div class="box">
+      <h3>Essaie avec ton propre cercle</h3>
+      <div class="calc">
+        <svg viewBox="0 0 200 200" role="img" aria-label="Cercle dont le rayon change avec le curseur">
+          <circle id="cDisk" cx="100" cy="100" r="60" fill="var(--red-soft)" stroke="var(--blue)" stroke-width="4"></circle>
+          <line id="cRad" x1="100" y1="100" x2="160" y2="100" stroke="var(--ink)" stroke-width="2"></line>
+          <circle cx="100" cy="100" r="3.5" fill="var(--ink)"></circle>
+          <text id="cRadLbl" x="130" y="92" text-anchor="middle" font-size="13">r</text>
+        </svg>
+        <div>
+          <label for="radius">Rayon : <span id="rOut" class="mono">5</span> cm</label>
+          <input id="radius" type="range" min="1" max="20" step="0.5" value="5">
+          <div class="results">
+            <div class="res"><span class="res-name">Diamètre</span><span class="res-val"><span id="dOut">10</span> cm</span><span class="res-calc">d = 2 × <span class="rv">5</span></span></div>
+            <div class="res"><span class="res-name">Périmètre</span><span class="res-val">≈ <span id="pOut">31,42</span> cm</span><span class="res-calc">P = 2 × π × <span class="rv">5</span></span></div>
+            <div class="res"><span class="res-name">Aire</span><span class="res-val r">≈ <span id="aOut">78,54</span> cm²</span><span class="res-calc">A = π × <span class="rv">5</span> × <span class="rv">5</span></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="box">
+      <h3>Pourquoi l'aire vaut π × r × r ?</h3>
+      <p>Découpe le cercle en parts, comme une pizza. Range les parts tête-bêche : une vers le haut, une vers le bas. Plus les parts sont fines, plus on obtient… un rectangle !</p>
+      <div class="figure">
+        <svg id="slices" viewBox="0 0 470 170" role="img" aria-label="Un cercle découpé en parts, réarrangées en presque-rectangle"></svg>
+      </div>
+      <label for="nSlices">Nombre de parts : <span id="nOut" class="mono">8</span></label>
+      <input id="nSlices" type="range" min="4" max="40" step="2" value="8">
+      <p>La hauteur de ce rectangle, c'est le rayon <span class="mono">r</span>. Sa largeur, c'est la moitié du tour du cercle, donc <span class="mono">π × r</span>. Aire du rectangle = largeur × hauteur = <strong>π × r × r</strong>. Et voilà la formule.</p>
+    </div>
+
+    <h3 style="font-size:1.5rem;margin-top:12px">Les arcs de cercle</h3>
+    <p>Un <strong>arc de cercle</strong>, c'est un morceau du tour du cercle. La part de pizza qui va avec s'appelle un <strong>secteur</strong>. Pour les calculer, on regarde l'<strong>angle</strong> au centre. Un tour complet fait <strong>360°</strong>.</p>
+    <p>Si l'angle vaut 90°, c'est 90 ÷ 360 = <span class="hl">un quart du tour</span>. L'arc est donc un quart du périmètre, et le secteur un quart de l'aire. C'est tout !</p>
+
+    <div class="formulas">
+      <div class="box">
+        <span class="eyebrow" style="color:var(--blue)">Un morceau du tour</span>
+        <h3>Longueur de l'arc</h3>
+        <div class="formula" style="font-size:1.45rem">L = <span style="white-space:nowrap">(angle ÷ 360)</span> × 2 × π × r</div>
+        <p>La fraction du tour, multipliée par le périmètre.</p>
+      </div>
+      <div class="box">
+        <span class="eyebrow">Une part de pizza</span>
+        <h3>Aire du secteur</h3>
+        <div class="formula" style="font-size:1.45rem;color:var(--red)">A = <span style="white-space:nowrap">(angle ÷ 360)</span> × π × r<sup>2</sup></div>
+        <p>La fraction du tour, multipliée par l'aire du disque.</p>
+      </div>
+    </div>
+
+    <div class="box">
+      <h3>Essaie avec un arc</h3>
+      <div class="calc">
+        <svg viewBox="0 0 200 200" role="img" aria-label="Cercle avec un secteur dont l'angle change avec le curseur">
+          <circle cx="100" cy="100" r="80" fill="none" stroke="var(--line)" stroke-width="3"></circle>
+          <path id="secFill" d="" fill="var(--red-soft)" stroke="var(--red)" stroke-width="1.5"></path>
+          <path id="secArc" d="" fill="none" stroke="var(--blue)" stroke-width="6" stroke-linecap="round"></path>
+          <circle cx="100" cy="100" r="3.5" fill="var(--ink)"></circle>
+          <text id="secLbl" x="100" y="100" text-anchor="middle" font-size="14" style="font-weight:600">90°</text>
+        </svg>
+        <div>
+          <label for="arcR">Rayon : <span id="arcROut" class="mono">10</span> cm</label>
+          <input id="arcR" type="range" min="1" max="20" step="0.5" value="10">
+          <label for="arcA">Angle : <span id="arcAOut" class="mono">90</span>° <span id="arcFrac" style="font-weight:400;color:var(--ink-soft)">(1/4 du tour)</span></label>
+          <input id="arcA" type="range" min="5" max="360" step="5" value="90">
+          <div class="results">
+            <div class="res"><span class="res-name">Longueur de l'arc</span><span class="res-val">≈ <span id="arcLOut">15,71</span> cm</span><span class="res-calc">L = (<span class="av">90</span> ÷ 360) × 2 × π × <span class="arv">10</span></span></div>
+            <div class="res"><span class="res-name">Aire du secteur</span><span class="res-val r">≈ <span id="arcSOut">78,54</span> cm²</span><span class="res-calc">A = (<span class="av">90</span> ÷ 360) × π × <span class="arv">10</span> × <span class="arv">10</span></span></div>
+          </div>
+        </div>
+      </div>
+      <div class="note">
+        <span class="note-title">Longueur de l'arc, pas à pas</span>
+        <span>1. Fraction du tour : <span class="mono"><span class="av">90</span> ÷ 360 <b id="stepF">= 0,25</b></span></span>
+        <span>2. Périmètre du cercle entier : <span class="mono">2 × π × <span class="arv">10</span> ≈ <b id="stepP">62,83</b> cm</span></span>
+        <span>3. Longueur de l'arc : <span class="mono"><span id="stepF2">0,25</span> × <span id="stepP2">62,83</span> ≈ <b id="stepL" style="color:var(--blue)">15,71</b> cm</span></span>
+      </div>
+    </div>
+
+    <div class="box">
+      <h3>Longueur de l'arc pour les angles les plus courants</h3>
+      <p>Avec un cercle de rayon <span class="mono">r = <span class="arv">10</span> cm</span> (change le rayon avec le curseur au-dessus) :</p>
+      <div style="overflow-x:auto">
+        <table id="arcTable" style="border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;min-width:300px">
+          <thead>
+            <tr style="text-align:left;border-bottom:2px solid var(--ink)">
+              <th style="padding:6px 8px">Angle</th>
+              <th style="padding:6px 8px">Fraction du tour</th>
+              <th style="padding:6px 8px;text-align:right">Longueur de l'arc</th>
+            </tr>
+          </thead>
+          <tbody class="mono"></tbody>
+        </table>
+      </div>
+      <p style="color:var(--ink-soft)">Astuce : quand l'angle double, la longueur de l'arc double aussi.</p>
+    </div>
+
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · À toi de jouer</span>
+    <h2>Quatre petits exercices</h2>
+    <p>Prends π ≈ 3,14 et une calculatrice. Clique sur un exercice pour voir la réponse quand tu as trouvé.</p>
+    <div class="exos">
+      <details>
+        <summary>La roue de vélo<span class="q">Une roue de vélo a un diamètre de 70 cm. Quelle distance parcourt le vélo quand la roue fait un tour ?</span></summary>
+        <div>
+          <span>On cherche le périmètre, et on connaît le diamètre : P = π × d.</span>
+          <span>P ≈ 3,14 × 70 = <strong>219,8 cm</strong>, soit environ 2,2 mètres par tour.</span>
+        </div>
+      </details>
+      <details>
+        <summary>La pizza<span class="q">Une pizza a un rayon de 15 cm. Quelle est sa surface ?</span></summary>
+        <div>
+          <span>On cherche l'aire : A = π × r × r.</span>
+          <span>A ≈ 3,14 × 15 × 15 = 3,14 × 225 = <strong>706,5 cm²</strong>.</span>
+        </div>
+      </details>
+      <details>
+        <summary>L'horloge<span class="q">La grande aiguille d'une horloge mesure 10 cm. Quelle distance parcourt sa pointe en 15 minutes ?</span></summary>
+        <div>
+          <span>En 15 minutes, l'aiguille fait un quart de tour, soit 90°. On cherche la longueur d'un arc : L = (angle ÷ 360) × 2 × π × r.</span>
+          <span>L ≈ (90 ÷ 360) × 2 × 3,14 × 10 = 0,25 × 62,8 = <strong>15,7 cm</strong>.</span>
+        </div>
+      </details>
+      <details>
+        <summary>Le défi gourmand<span class="q">Vaut-il mieux manger une grande pizza de 30 cm de diamètre, ou deux pizzas de 20 cm de diamètre ?</span></summary>
+        <div>
+          <span>Attention, on donne le diamètre : il faut d'abord prendre la moitié pour avoir le rayon.</span>
+          <span>Grande pizza : r = 15, A ≈ 3,14 × 15 × 15 = 706,5 cm².</span>
+          <span>Deux petites : r = 10, A ≈ 2 × 3,14 × 10 × 10 = 628 cm².</span>
+          <span><strong>La grande pizza gagne</strong>, alors que 30 cm paraît plus petit que 2 × 20 cm. C'est l'effet du « r × r » : quand le rayon grandit, l'aire grandit beaucoup plus vite.</span>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Bonus · Pour s'en souvenir</span>
+    <h2>Une phrase pour retenir π</h2>
+    <p>Compte les lettres de chaque mot de cette vieille phrase française : tu obtiens les premiers chiffres de π.</p>
+    <div class="box">
+      <div class="poem" aria-label="Que j'aime à faire apprendre un nombre utile aux sages : 3,1415926535">
+        <span>Que<small>3</small></span>
+        <span>j'<small>1</small></span>
+        <span>aime<small>4</small></span>
+        <span>à<small>1</small></span>
+        <span>faire<small>5</small></span>
+        <span>apprendre<small>9</small></span>
+        <span>un<small>2</small></span>
+        <span>nombre<small>6</small></span>
+        <span>utile<small>5</small></span>
+        <span>aux<small>3</small></span>
+        <span>sages<small>5</small></span>
+      </div>
+      <p class="mono" style="color:var(--blue);font-weight:600">→ 3,1415926535</p>
+    </div>
+    <div class="note">
+      <span class="note-title">Le 14 mars, c'est la journée de π</span>
+      <span>Les Américains écrivent cette date 3/14, comme 3,14. Partout dans le monde, des écoles organisent ce jour-là des concours de récitation de décimales… et mangent des tartes (en anglais, <em>pie</em> se prononce comme « pi »).</span>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Bonus · Les champions de mémoire</span>
+    <h2>Jusqu'où peut-on réciter π ?</h2>
+    <p>Certaines personnes s'entraînent pendant des années pour réciter π de tête, le plus loin possible, sans une seule erreur. Voici quelques records célèbres.</p>
+
+    <ol class="timeline">
+      <li>
+        <span class="when">2004</span>
+        <div class="what">
+          <strong>Daniel Tammet, Royaume-Uni</strong>
+          <span>Le jour de π, à l'université d'Oxford, il récite 22 514 décimales en un peu plus de 5 heures. Il raconte qu'il « voit » les chiffres comme des formes et des couleurs.</span>
+          <span class="val">22 514 décimales</span>
+        </div>
+      </li>
+      <li>
+        <span class="when">2005</span>
+        <div class="what">
+          <strong>Lu Chao, Chine</strong>
+          <span>Un étudiant chinois récite pendant 24 heures d'affilée, et devient champion du monde officiel.</span>
+          <span class="val">67 890 décimales</span>
+        </div>
+      </li>
+      <li>
+        <span class="when">2006</span>
+        <div class="what">
+          <strong>Akira Haraguchi, Japon</strong>
+          <span>Il affirme avoir récité 100 000 décimales en 16 heures. Son exploit n'a pas été validé par le Livre Guinness des records, mais il reste très connu.</span>
+          <span class="val">100 000 décimales (non officiel)</span>
+        </div>
+      </li>
+      <li>
+        <span class="when">2015</span>
+        <div class="what">
+          <strong>Rajveer Meena, Inde</strong>
+          <span>Le record officiel du Livre Guinness. Il récite pendant près de 10 heures… <strong>les yeux bandés</strong>.</span>
+          <span class="val">70 000 décimales</span>
+        </div>
+      </li>
+    </ol>
+
+    <div class="note">
+      <span class="note-title">Pour te rendre compte</span>
+      <span>70 000 chiffres, c'est à peu près 35 pages de livre remplies uniquement de chiffres, sans une seule faute. La plupart des gens retiennent 3,14… et c'est déjà très bien !</span>
+    </div>
+
+    <div class="note red">
+      <span class="note-title">Leur secret</span>
+      <span>Les champions n'apprennent pas les chiffres « par cœur » un par un. Ils les transforment en <strong>images et en histoires</strong>. Akira Haraguchi, par exemple, associe chaque chiffre à une syllabe japonaise pour inventer des histoires qu'il récite. C'est la même idée que la phrase « Que j'aime à faire… », en beaucoup plus long.</span>
+    </div>
+
+    <div class="box">
+      <h3>Et toi, combien en connais-tu ?</h3>
+      <p>Tape les chiffres de π que tu connais (sans tricher en regardant plus haut !). La page compte combien sont justes.</p>
+      <label for="memo">Tes chiffres :</label>
+      <input id="memo" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="3,14…"
+        style="font:inherit;font-family:var(--f-mono);font-size:1.1rem;padding:10px 12px;border:2px solid var(--ink);border-radius:8px;background:var(--paper);color:var(--ink);width:100%">
+      <p id="memoOut" class="mono" style="color:var(--ink-soft)" aria-live="polite">Commence par 3,14…</p>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• <strong>π ≈ 3,14</strong> : c'est le nombre de diamètres qu'il faut pour faire le tour d'un cercle.</span>
+      <span>• Connu depuis environ 4 000 ans, calculé de plus en plus précisément au fil des siècles.</span>
+      <span>• π est <strong>irrationnel</strong> : ses décimales sont infinies et ne se répètent jamais en boucle.</span>
+      <span>• Périmètre : <strong>P = 2 × π × r</strong> &nbsp;·&nbsp; Aire : <strong>A = π × r²</strong></span>
+      <span>• Arc et secteur : on multiplie par la fraction du tour, <strong>angle ÷ 360</strong>.</span>
+    </div>
+  </section>
+
+  <footer>Fiche de révision · Le nombre π</footer>
+</main>
+
+<script>
+(function () {
+  var fr = function (x, d) { return x.toLocaleString('fr-FR', { minimumFractionDigits: d, maximumFractionDigits: d }); };
+  var NS = 'http://www.w3.org/2000/svg';
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* --- Roue qui roule --- */
+  var X0 = 60, D = 150, R = 75, C = Math.PI * D;
+  var ticks = document.getElementById('ticks');
+  function addTick(x, label, strong) {
+    var l = document.createElementNS(NS, 'line');
+    l.setAttribute('x1', x); l.setAttribute('x2', x); l.setAttribute('y1', 162); l.setAttribute('y2', 178);
+    l.setAttribute('stroke', strong ? 'var(--red)' : 'var(--ink)'); l.setAttribute('stroke-width', strong ? 3 : 2);
+    ticks.appendChild(l);
+    var t = document.createElementNS(NS, 'text');
+    t.setAttribute('x', x); t.setAttribute('y', 198); t.setAttribute('text-anchor', 'middle'); t.setAttribute('font-size', 14);
+    if (strong) { t.setAttribute('style', 'fill:var(--red);font-weight:600'); }
+    t.textContent = label; ticks.appendChild(t);
+  }
+  [0, 1, 2, 3].forEach(function (k) { addTick(X0 + k * D, String(k), false); });
+  addTick(X0 + C, 'π', true);
+
+  var wheel = document.getElementById('wheel'), rim = document.getElementById('rim');
+  var trace = document.getElementById('trace'), piLabel = document.getElementById('piLabel');
+  var rimLen = 2 * Math.PI * R;
+  function draw(t) {
+    var cx = X0 + t * C;
+    wheel.setAttribute('transform', 'translate(' + cx + ' 95) rotate(' + (t * 360) + ')');
+    rim.setAttribute('stroke-dasharray', ((1 - t) * rimLen) + ' ' + rimLen);
+    trace.setAttribute('x2', cx);
+    piLabel.setAttribute('opacity', t >= 1 ? 1 : 0);
+  }
+  draw(0);
+  var anim = null;
+  document.getElementById('rollBtn').addEventListener('click', function () {
+    if (anim) cancelAnimationFrame(anim);
+    if (reduce) { draw(1); return; }
+    var start = null, dur = 3200;
+    function step(ts) {
+      if (!start) start = ts;
+      var t = Math.min(1, (ts - start) / dur);
+      var e = t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+      draw(e);
+      if (t < 1) anim = requestAnimationFrame(step);
+    }
+    anim = requestAnimationFrame(step);
+  });
+
+  /* --- Calculatrice --- */
+  var rIn = document.getElementById('radius');
+  function calc() {
+    var r = parseFloat(rIn.value);
+    var rs = fr(r, r % 1 ? 1 : 0);
+    document.getElementById('rOut').textContent = rs;
+    document.querySelectorAll('.rv').forEach(function (el) { el.textContent = rs; });
+    document.getElementById('dOut').textContent = fr(2 * r, r % 1 ? 1 : 0);
+    document.getElementById('pOut').textContent = fr(2 * Math.PI * r, 2);
+    document.getElementById('aOut').textContent = fr(Math.PI * r * r, 2);
+    var px = 12 + r * 4.1;
+    document.getElementById('cDisk').setAttribute('r', px);
+    document.getElementById('cRad').setAttribute('x2', 100 + px);
+    var lbl = document.getElementById('cRadLbl');
+    lbl.setAttribute('x', 100 + px / 2);
+  }
+  rIn.addEventListener('input', calc); calc();
+
+  /* --- Arcs de cercle --- */
+  var arcR = document.getElementById('arcR'), arcA = document.getElementById('arcA');
+  function gcd(a, b) { return b ? gcd(b, a % b) : a; }
+  function arcs() {
+    var r = parseFloat(arcR.value), ang = parseInt(arcA.value, 10);
+    var rs = fr(r, r % 1 ? 1 : 0);
+    document.getElementById('arcROut').textContent = rs;
+    document.getElementById('arcAOut').textContent = ang;
+    document.querySelectorAll('.arv').forEach(function (el) { el.textContent = rs; });
+    document.querySelectorAll('.av').forEach(function (el) { el.textContent = ang; });
+    var g = gcd(ang, 360), num = ang / g, den = 360 / g;
+    document.getElementById('arcFrac').textContent = ang === 360 ? '(le tour complet)' : ang === 180 ? '(la moitié du tour)' : (den <= 12 ? '(' + num + '/' + den + ' du tour)' : '');
+    document.getElementById('arcLOut').textContent = fr(ang / 360 * 2 * Math.PI * r, 2);
+    document.getElementById('arcSOut').textContent = fr(ang / 360 * Math.PI * r * r, 2);
+    var f = ang / 360, f3 = Math.round(f * 1000) / 1000;
+    var exact = Math.abs(f3 - f) < 1e-9;
+    var fNum = fr(f3, Math.round(f3 * 1000) % 10 ? 3 : 2);
+    var pTxt = fr(2 * Math.PI * r, 2);
+    document.getElementById('stepF').textContent = (exact ? '= ' : '≈ ') + fNum;
+    document.getElementById('stepF2').textContent = fNum;
+    document.getElementById('stepP').textContent = pTxt;
+    document.getElementById('stepP2').textContent = pTxt;
+    document.getElementById('stepL').textContent = fr(ang / 360 * 2 * Math.PI * r, 2);
+    var tb = document.querySelector('#arcTable tbody');
+    var rows = [[30, '1/12'], [45, '1/8'], [60, '1/6'], [90, '1/4'], [120, '1/3'], [180, '1/2'], [270, '3/4'], [360, 'le tour entier']];
+    tb.innerHTML = rows.map(function (row) {
+      var on = row[0] === ang ? ' style="background:var(--hl)"' : '';
+      return '<tr' + on + '><td style="padding:6px 8px;border-bottom:1px dashed var(--line)">' + row[0] + '°</td>' +
+        '<td style="padding:6px 8px;border-bottom:1px dashed var(--line)">' + row[1] + '</td>' +
+        '<td style="padding:6px 8px;border-bottom:1px dashed var(--line);text-align:right;color:var(--blue);font-weight:600">' + fr(row[0] / 360 * 2 * Math.PI * r, 2) + ' cm</td></tr>';
+    }).join('');
+    var R = 80, cx = 100, cy = 100, t = ang * Math.PI / 180;
+    var ex = cx + R * Math.sin(t), ey = cy - R * Math.cos(t), large = ang > 180 ? 1 : 0;
+    var arcD, fillD;
+    if (ang >= 360) {
+      arcD = 'M' + cx + ' ' + (cy - R) + 'A' + R + ' ' + R + ' 0 1 1 ' + cx + ' ' + (cy + R) + 'A' + R + ' ' + R + ' 0 1 1 ' + cx + ' ' + (cy - R);
+      fillD = arcD + 'Z';
+    } else {
+      arcD = 'M' + cx + ' ' + (cy - R) + 'A' + R + ' ' + R + ' 0 ' + large + ' 1 ' + ex + ' ' + ey;
+      fillD = 'M' + cx + ' ' + cy + 'L' + cx + ' ' + (cy - R) + 'A' + R + ' ' + R + ' 0 ' + large + ' 1 ' + ex + ' ' + ey + 'Z';
+    }
+    document.getElementById('secArc').setAttribute('d', arcD);
+    document.getElementById('secFill').setAttribute('d', fillD);
+    var mid = t / 2, lbl = document.getElementById('secLbl');
+    var lr = ang >= 360 ? 0 : 42;
+    lbl.setAttribute('x', cx + lr * Math.sin(mid));
+    lbl.setAttribute('y', cy - lr * Math.cos(mid) + (ang >= 360 ? -10 : 5));
+    lbl.textContent = ang + '°';
+  }
+  arcR.addEventListener('input', arcs); arcA.addEventListener('input', arcs); arcs();
+
+  /* --- Parts de pizza --- */
+  var svg = document.getElementById('slices'), nIn = document.getElementById('nSlices');
+  function slices() {
+    var n = parseInt(nIn.value, 10), RR = 70, a = 2 * Math.PI / n;
+    document.getElementById('nOut').textContent = n;
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    var cA = 'var(--blue)', cB = 'var(--red)';
+    function path(d, fill) {
+      var p = document.createElementNS(NS, 'path');
+      p.setAttribute('d', d); p.setAttribute('fill', fill);
+      p.setAttribute('stroke', 'var(--card)'); p.setAttribute('stroke-width', 1.5); p.setAttribute('stroke-linejoin', 'round');
+      svg.appendChild(p);
+    }
+    // Cercle découpé
+    var cx = 85, cy = 85;
+    for (var i = 0; i < n; i++) {
+      var a0 = Math.PI + i * a, a1 = a0 + a;
+      var x0 = cx + RR * Math.cos(a0), y0 = cy + RR * Math.sin(a0);
+      var x1 = cx + RR * Math.cos(a1), y1 = cy + RR * Math.sin(a1);
+      path('M' + cx + ' ' + cy + 'L' + x0 + ' ' + y0 + 'A' + RR + ' ' + RR + ' 0 0 1 ' + x1 + ' ' + y1 + 'Z', i < n / 2 ? cA : cB);
+    }
+    // Flèche
+    var ar = document.createElementNS(NS, 'path');
+    ar.setAttribute('d', 'M168 85 L190 85 M183 78 L191 85 L183 92');
+    ar.setAttribute('stroke', 'var(--ink)'); ar.setAttribute('stroke-width', 2.5); ar.setAttribute('fill', 'none');
+    ar.setAttribute('stroke-linecap', 'round'); ar.setAttribute('stroke-linejoin', 'round');
+    svg.appendChild(ar);
+    // Réarrangement
+    var s = RR * Math.sin(a / 2), h = RR * Math.cos(a / 2);
+    var left = 205, top = cy - h / 2;
+    for (var k = 0; k < n / 2; k++) {
+      var px = left + s + k * 2 * s;
+      // part pointe en haut (arc en bas)
+      path('M' + px + ' ' + top + 'L' + (px - s) + ' ' + (top + h) + 'A' + RR + ' ' + RR + ' 0 0 0 ' + (px + s) + ' ' + (top + h) + 'Z', cB);
+      // part pointe en bas (arc en haut)
+      var qx = px + s, qy = top + h;
+      path('M' + qx + ' ' + qy + 'L' + (qx - s) + ' ' + top + 'A' + RR + ' ' + RR + ' 0 0 1 ' + (qx + s) + ' ' + top + 'Z', cA);
+    }
+    // Repères
+    var w = (n / 2) * 2 * s + s;
+    function txt(x, y, str, anchor) {
+      var t = document.createElementNS(NS, 'text');
+      t.setAttribute('x', x); t.setAttribute('y', y); t.setAttribute('font-size', 13);
+      t.setAttribute('text-anchor', anchor || 'middle'); t.textContent = str; svg.appendChild(t);
+    }
+    txt(left + w / 2, 165, 'largeur ≈ π × r');
+    txt(left - 4, cy + 4, 'r', 'end');
+  }
+  nIn.addEventListener('input', slices); slices();
+
+  /* --- Défi mémoire --- */
+  var PI = '31415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679';
+  var memo = document.getElementById('memo'), memoOut = document.getElementById('memoOut');
+  memo.addEventListener('input', function () {
+    var typed = memo.value.replace(/[^0-9]/g, '');
+    if (!typed) { memoOut.textContent = 'Commence par 3,14…'; memoOut.style.color = 'var(--ink-soft)'; return; }
+    var ok = 0;
+    while (ok < typed.length && ok < PI.length && typed[ok] === PI[ok]) ok++;
+    var dec = Math.max(0, ok - 1);
+    if (ok === typed.length) {
+      memoOut.style.color = 'var(--blue)';
+      memoOut.textContent = ok >= PI.length
+        ? 'Bravo ! Les 100 décimales sont justes. Tu es prêt pour les champions !'
+        : 'Tout est juste : ' + dec + ' décimale' + (dec > 1 ? 's' : '') + '. Continue !';
+    } else {
+      memoOut.style.color = 'var(--red)';
+      memoOut.textContent = 'Erreur au chiffre n°' + (ok + 1) + ' (il fallait un ' + PI[ok] + '). Tu avais ' + dec + ' décimale' + (dec > 1 ? 's' : '') + ' justes.';
+    }
+  });
+})();
+</script>
+</body>
+</html>
