@@ -12,6 +12,7 @@ Chaque tutoriel est une seule page HTML, sans installation. Il suffit de l'ouvri
 | [Le nombre e](le-nombre-e.html) | La banque de Bernoulli, la recette des factorielles, pourquoi e est irrationnel, où on le trouve (croissance, refroidissement, Père Noël secret), des exercices. |
 | [Les formes géométriques](les-formes-geometriques.html) | Périmètre, aire et volume des formes 2D (carré, rectangle, triangle, parallélogramme, losange, trapèze, cercle) et 3D (cube, pavé, cylindre, pyramide, cône, boule), la formule d'Euler, les conversions d'unités, des exercices. |
 | [Le théorème de Pythagore](le-theoreme-de-pythagore.html) | Le triangle rectangle et l'hypoténuse, a² + b² = c² avec les trois carrés, la preuve du puzzle, calculer un côté, la réciproque, les triplets, l'histoire et des exercices. |
+| [Le théorème de Thalès](le-theoreme-de-thales.html) | Les rapports égaux avec des parallèles, une figure à déformer (triangle et papillon), le produit en croix, la mesure de la pyramide avec un bâton, la réciproque, l'histoire de Thalès et des exercices. |
 | [Les priorités de calcul](les-priorites-de-calcul.html) | L'ordre des opérations (parenthèses, puissances, × et ÷, + et −), de gauche à droite, un calculateur pas à pas, les pièges (× caché, −3², barre de fraction), un quiz et des problèmes à mettre en calcul. |
 
 ## Ajouter un tutoriel

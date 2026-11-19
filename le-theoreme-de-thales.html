@@ -1,0 +1,540 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Le théorème de Thalès</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, encre fuchsia, marge rouge. Le petit triangle et le grand ont chacun leur couleur. */
+:root {
+  --paper: #faf6fa;
+  --grid: #eee2ee;
+  --card: #ffffff;
+  --ink: #2c1a2e;
+  --ink-soft: #66506a;
+  --acc: #a21caf;
+  --acc-soft: #f5dcf8;
+  --big: #2f5b9a;
+  --big-soft: #dbe7f7;
+  --sun: #c2410c;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --hl: #fff0a3;
+  --line: #e4d4e5;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #170f18; --grid: #231825; --card: #1e1420; --ink: #f3e8f4; --ink-soft: #bba4be;
+    --acc: #e879f9; --acc-soft: #3f1a45; --big: #8fb5ef; --big-soft: #1c2b44; --sun: #fb923c;
+    --red: #ff7d92; --red-soft: #3a1c27; --ok: #6fd39f; --ok-soft: #173a29; --hl: #4b4318; --line: #3a2a3c;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #170f18; --grid: #231825; --card: #1e1420; --ink: #f3e8f4; --ink-soft: #bba4be;
+  --acc: #e879f9; --acc-soft: #3f1a45; --big: #8fb5ef; --big-soft: #1c2b44; --sun: #fb923c;
+  --red: #ff7d92; --red-soft: #3a1c27; --ok: #6fd39f; --ok-soft: #173a29; --hl: #4b4318; --line: #3a2a3c;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero-top { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+.hero-top svg { width: 180px; height: auto; flex: none; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+
+/* Rapports écrits comme des fractions */
+.ratios { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; font-family: var(--f-display); font-weight: 800; font-size: clamp(1.5rem, 6vw, 2.2rem); }
+.frac { display: inline-flex; flex-direction: column; align-items: center; line-height: 1.1; }
+.frac .n { color: var(--acc); padding: 0 6px 2px; border-bottom: 3px solid var(--ink); }
+.frac .d { color: var(--big); padding: 2px 6px 0; }
+.eq { color: var(--ink); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 6px 12px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; }
+
+.two { display: grid; grid-template-columns: 320px 1fr; gap: 20px; align-items: start; }
+.two > svg { width: 100%; max-width: 320px; height: auto; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; }
+.two > div { min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+@media (max-width: 640px) { .two { grid-template-columns: 1fr; } .two > svg { margin: 0 auto; } }
+.param { display: flex; flex-direction: column; gap: 2px; }
+.param label { font-weight: 700; }
+input[type="range"] { width: 100%; accent-color: var(--acc); }
+
+table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+th, td { padding: 6px 8px; border-bottom: 1px dashed var(--line); text-align: left; font-family: var(--f-mono); font-size: .95rem; }
+thead th { border-bottom: 2px solid var(--ink); font-family: var(--f-display); font-size: 1rem; }
+td.r { color: var(--acc); font-weight: 600; text-align: right; }
+.scroll { overflow-x: auto; }
+
+.inputs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 14px; }
+.inputs label { font-weight: 700; display: flex; flex-direction: column; gap: 4px; font-family: var(--f-mono); }
+.inputs .top { color: var(--acc); }
+.inputs .bot { color: var(--big); }
+@media (max-width: 420px) { .inputs { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+input[type="text"] { font: inherit; font-family: var(--f-mono); font-size: 1.05rem; padding: 8px 10px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; }
+.steps { font-family: var(--f-mono); font-size: .98rem; display: flex; flex-direction: column; gap: 4px; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; padding: 12px 14px; overflow-wrap: anywhere; }
+.steps b { color: var(--acc); }
+.steps .err { color: var(--red); font-family: var(--f-body); }
+.verdict { border-radius: 8px; padding: 12px 14px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+.verdict.yes { background: var(--ok-soft); color: var(--ok); }
+.verdict.no { background: var(--red-soft); color: var(--red); }
+.verdict span { font-weight: 400; color: var(--ink); }
+
+.results { display: flex; flex-direction: column; gap: 8px; font-variant-numeric: tabular-nums; }
+.res { border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 12px; display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; align-items: baseline; }
+.res-name { font-family: var(--f-display); font-weight: 700; }
+.res-val { font-family: var(--f-mono); font-weight: 600; color: var(--acc); font-size: 1.05rem; white-space: nowrap; }
+.res-calc { grid-column: 1 / -1; font-family: var(--f-mono); font-size: .85rem; color: var(--ink-soft); overflow-wrap: anywhere; }
+
+.pyr { display: grid; grid-template-columns: 3fr 1fr; gap: 10px; }
+.pyr svg { width: 100%; height: auto; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; }
+@media (max-width: 520px) { .pyr { grid-template-columns: 1fr; } .pyr svg:last-child { max-width: 220px; justify-self: center; } }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 120px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+</head>
+<body>
+<main class="page">
+
+  <header class="hero">
+    <div class="hero-top">
+      <svg viewBox="0 0 200 170" aria-hidden="true">
+        <path d="M70 12 L10 160 L190 160 Z" fill="var(--big-soft)" stroke="var(--big)" stroke-width="3" stroke-linejoin="round"></path>
+        <path d="M70 12 L40 86 L130 86 Z" fill="var(--acc-soft)" stroke="var(--acc)" stroke-width="3" stroke-linejoin="round"></path>
+        <path d="M80 80 l8 6 l-8 6 M90 154 l8 6 l-8 6" fill="none" stroke="var(--ink)" stroke-width="2"></path>
+      </svg>
+      <div style="display:flex;flex-direction:column;gap:10px;min-width:0;flex:1 1 280px">
+        <span class="eyebrow">Tutoriel de maths · niveau 3<sup>e</sup></span>
+        <h1>Le théorème de Thalès</h1>
+        <p class="lead">Un petit triangle caché dans un grand. Avec une seule règle, Thalès aurait mesuré la hauteur d'une pyramide sans y grimper.</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · L'idée</span>
+    <h2>Un agrandissement parfait</h2>
+    <p>Dessine un triangle ABC. Trace une droite <strong>parallèle</strong> au côté [BC] : elle coupe [AB] en M et [AC] en N. Tu obtiens un petit triangle AMN rangé dans le grand.</p>
+    <p>Le grand triangle est un <strong>agrandissement exact</strong> du petit, comme une photo zoomée. Toutes les longueurs sont multipliées par le même nombre. Donc les rapports sont égaux :</p>
+    <div class="box">
+      <div class="ratios" aria-label="AM sur AB égale AN sur AC égale MN sur BC">
+        <span class="frac"><span class="n">AM</span><span class="d">AB</span></span><span class="eq">=</span>
+        <span class="frac"><span class="n">AN</span><span class="d">AC</span></span><span class="eq">=</span>
+        <span class="frac"><span class="n">MN</span><span class="d">BC</span></span>
+      </div>
+      <p class="soft">En haut, les côtés du petit triangle (en fuchsia). En bas, les côtés du grand qui leur correspondent (en bleu).</p>
+    </div>
+    <div class="note">
+      <span class="note-title">La condition obligatoire</span>
+      <span>Ça ne marche que si <strong>(MN) est parallèle à (BC)</strong>, et si M est sur la droite (AB) et N sur la droite (AC). Sans parallèles, pas de Thalès !</span>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · Vois-le en vrai</span>
+    <h2>Les rapports restent égaux</h2>
+    <p>Déplace la droite parallèle et déforme le triangle. Les longueurs changent, mais les trois rapports restent toujours égaux entre eux.</p>
+    <div class="box">
+      <div class="btns" role="group" aria-label="Choisir la configuration">
+        <button id="cfgTri" type="button" aria-pressed="true">Triangle emboîté</button>
+        <button id="cfgPap" type="button" aria-pressed="false">Papillon</button>
+      </div>
+      <div class="two">
+        <svg id="fig" viewBox="0 0 320 260" role="img" aria-label="Figure de Thalès : triangle ABC coupé par une droite MN parallèle à BC"></svg>
+        <div>
+          <div class="param">
+            <label for="kIn">Position de la droite (MN) : <span class="mono" id="kOut">0,5</span></label>
+            <input id="kIn" type="range" min="0.2" max="0.8" step="0.05" value="0.5">
+          </div>
+          <div class="param">
+            <label for="axIn">Déformer le triangle (point A)</label>
+            <input id="axIn" type="range" min="1" max="7" step="0.25" value="3">
+          </div>
+          <div class="scroll">
+            <table>
+              <thead><tr><th>Rapport</th><th>Calcul</th><th style="text-align:right">Valeur</th></tr></thead>
+              <tbody id="ratioRows"></tbody>
+            </table>
+          </div>
+          <p class="soft" id="cfgNote">Longueurs en cm, arrondies au centième.</p>
+        </div>
+      </div>
+    </div>
+    <div class="note">
+      <span class="note-title">La configuration « papillon »</span>
+      <span>Les points M et N peuvent aussi être <strong>de l'autre côté de A</strong>. Les deux triangles se touchent par la pointe, comme les ailes d'un papillon. Le théorème marche pareil, avec les mêmes rapports.</span>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Calculer une longueur</span>
+    <h2>Le produit en croix</h2>
+    <p>Pour trouver une longueur inconnue, on écrit l'égalité de deux rapports, puis on fait un <strong>produit en croix</strong> (comme la règle de trois).</p>
+    <div class="box">
+      <p>Exemple : AM = 3, AB = 5 et AN = 4,2. Combien mesure AC ?</p>
+      <div class="ratios" style="font-size:1.4rem">
+        <span class="frac"><span class="n">3</span><span class="d">5</span></span><span class="eq">=</span>
+        <span class="frac"><span class="n">4,2</span><span class="d">AC</span></span>
+      </div>
+      <p class="mono">AC = 5 × 4,2 ÷ 3 = 21 ÷ 3 = <strong>7</strong></p>
+      <p class="soft">On multiplie les deux nombres « en diagonale » (5 et 4,2), puis on divise par le troisième (3).</p>
+    </div>
+
+    <div class="box">
+      <h3>Calculatrice de Thalès</h3>
+      <p class="soft">Remplis les longueurs que tu connais (en cm) et laisse vides celles que tu cherches. Il faut au moins un rapport complet : deux longueurs qui vont ensemble, comme AM et AB.</p>
+      <div class="inputs">
+        <label class="top" for="fAM">AM<input id="fAM" type="text" inputmode="decimal" autocomplete="off" value="3"></label>
+        <label class="top" for="fAN">AN<input id="fAN" type="text" inputmode="decimal" autocomplete="off" value="4,2"></label>
+        <label class="top" for="fMN">MN<input id="fMN" type="text" inputmode="decimal" autocomplete="off" value=""></label>
+        <label class="bot" for="fAB">AB<input id="fAB" type="text" inputmode="decimal" autocomplete="off" value="5"></label>
+        <label class="bot" for="fAC">AC<input id="fAC" type="text" inputmode="decimal" autocomplete="off" value=""></label>
+        <label class="bot" for="fBC">BC<input id="fBC" type="text" inputmode="decimal" autocomplete="off" value="6"></label>
+      </div>
+      <div class="steps" id="calcOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · La pyramide</span>
+    <h2>Comment Thalès a mesuré la pyramide</h2>
+    <p>On raconte qu'en Égypte, Thalès a mesuré la hauteur de la grande pyramide de Khéops avec un simple bâton planté au sol. Son astuce : <strong>les rayons du soleil sont parallèles</strong>. Le bâton et son ombre forment un petit triangle, la pyramide et son ombre un grand. C'est Thalès !</p>
+    <div class="box">
+      <div class="pyr">
+        <svg id="pyrSvg" viewBox="0 0 600 200" role="img" aria-label="La pyramide, son ombre et un rayon de soleil"></svg>
+        <svg id="stickSvg" viewBox="0 0 200 200" role="img" aria-label="Le bâton, son ombre et un rayon de soleil, en zoom"></svg>
+      </div>
+      <p class="soft" style="font-size:.9rem">Les dessins ne sont pas à la même échelle : le bâton est dessiné en zoom. Mais le rayon de soleil a la même pente dans les deux.</p>
+      <div class="param">
+        <label for="sunIn">Heure de la journée (longueur de l'ombre du bâton) : <span class="mono" id="sunOut">3</span> m</label>
+        <input id="sunIn" type="range" min="2" max="6" step="0.1" value="3">
+      </div>
+      <div class="results">
+        <div class="res"><span class="res-name">Bâton</span><span class="res-val">2 m</span><span class="res-calc">Ombre du bâton : <span id="sh1">3</span> m</span></div>
+        <div class="res"><span class="res-name">Ombre de la pyramide</span><span class="res-val"><span id="sh2">219</span> m</span><span class="res-calc">Mesurée depuis le centre : 115 m (la moitié de la base) + <span id="sh3">104</span> m (l'ombre qui dépasse)</span></div>
+        <div class="res"><span class="res-name">Hauteur de la pyramide</span><span class="res-val" style="color:var(--sun)"><span id="hOut">146</span> m</span><span class="res-calc" id="hCalc">h = 219 × 2 ÷ 3 = 146</span></div>
+      </div>
+      <p class="soft">Bouge le curseur : quelle que soit l'heure, on trouve toujours <strong>146 m</strong>, la hauteur d'origine de la pyramide. Aujourd'hui, son sommet abîmé la fait plutôt 139 m.</p>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · La réciproque</span>
+    <h2>Est-ce que mes droites sont parallèles ?</h2>
+    <p>Thalès marche aussi dans l'autre sens. Si les points A, M, B et A, N, C sont alignés <strong>dans le même ordre</strong>, et si <span class="mono">AM ÷ AB = AN ÷ AC</span>, alors les droites (MN) et (BC) sont parallèles.</p>
+    <p class="soft">Pour comparer deux rapports sans arrondir, on utilise encore le produit en croix : on compare AM × AC et AN × AB.</p>
+    <div class="box">
+      <h3>Vérificateur de parallèles</h3>
+      <div class="inputs">
+        <label class="top" for="rAM">AM<input id="rAM" type="text" inputmode="decimal" autocomplete="off" value="4"></label>
+        <label class="top" for="rAN">AN<input id="rAN" type="text" inputmode="decimal" autocomplete="off" value="6"></label>
+        <span></span>
+        <label class="bot" for="rAB">AB<input id="rAB" type="text" inputmode="decimal" autocomplete="off" value="10"></label>
+        <label class="bot" for="rAC">AC<input id="rAC" type="text" inputmode="decimal" autocomplete="off" value="15"></label>
+      </div>
+      <div class="steps" id="recSteps"></div>
+      <div class="verdict yes" id="recVerdict" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · Qui était Thalès ?</span>
+    <h2>Le premier des savants grecs</h2>
+    <ol class="timeline">
+      <li>
+        <span class="when">vers −625</span>
+        <div class="what"><strong>Naissance à Milet</strong><span>Une ville grecque sur la côte de l'actuelle Turquie. Thalès est commerçant, voyageur, astronome et mathématicien.</span></div>
+      </li>
+      <li>
+        <span class="when">en Égypte</span>
+        <div class="what"><strong>La pyramide et le bâton</strong><span>Selon les récits anciens, il mesure la hauteur de la pyramide avec son ombre, ce qui impressionne les Égyptiens.</span></div>
+      </li>
+      <li>
+        <span class="when">−585</span>
+        <div class="what"><strong>L'éclipse</strong><span>La légende dit qu'il a prédit une éclipse de Soleil. Elle serait arrivée pendant une bataille, et les deux armées, effrayées, auraient fait la paix.</span></div>
+      </li>
+      <li>
+        <span class="when">vers −547</span>
+        <div class="what"><strong>Un des « sept sages »</strong><span>Les Grecs le comptent parmi les sept sages de l'Antiquité. Il est souvent appelé le premier philosophe.</span></div>
+      </li>
+    </ol>
+    <div class="note">
+      <span class="note-title">Le savant dans le puits</span>
+      <span>Le philosophe Platon raconte que Thalès, en marchant la nuit les yeux fixés sur les étoiles, est tombé dans un puits. Une servante s'est moquée de lui : il voulait connaître le ciel, mais ne voyait pas ce qu'il avait sous les pieds !</span>
+    </div>
+    <p class="soft">Attention si tu cherches en anglais : le « Thales's theorem » des Anglais parle d'autre chose (un triangle dans un demi-cercle). Notre théorème s'appelle chez eux « intercept theorem ».</p>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Dans la vraie vie</span>
+    <h2>Thalès sert encore</h2>
+    <div class="cards">
+      <div class="box"><strong>La hauteur d'un arbre</strong><span class="soft">Comme pour la pyramide : un bâton, deux ombres, un produit en croix. Pas besoin de grimper.</span></div>
+      <div class="box"><strong>Les cartes et les plans</strong><span class="soft">Une carte à l'échelle est une réduction : toutes les longueurs sont divisées par le même nombre, exactement comme dans Thalès.</span></div>
+      <div class="box"><strong>L'appareil photo et l'œil</strong><span class="soft">La lumière passe par un petit trou et forme une image renversée : c'est une configuration papillon !</span></div>
+      <div class="box"><strong>Le pouce du dessinateur</strong><span class="soft">Bras tendu, le pouce cache un objet lointain. Avec la longueur du bras et la distance, on peut estimer la taille de l'objet.</span></div>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · À toi de jouer</span>
+    <h2>Six petits exercices</h2>
+    <p>Dans les exercices 1, 2, 4 et 5, M est sur [AB] et N sur [AC]. Commence toujours par vérifier qu'il y a des parallèles.</p>
+    <div class="exos">
+      <details>
+        <summary>Trouver MN<span class="q">(MN) // (BC), AM = 2 cm, AB = 5 cm et BC = 7,5 cm. Calcule MN.</span></summary>
+        <div><span>AM ÷ AB = MN ÷ BC, donc 2 ÷ 5 = MN ÷ 7,5.</span><span>MN = 2 × 7,5 ÷ 5 = 15 ÷ 5 = <strong>3 cm</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Trouver AC<span class="q">(MN) // (BC), AM = 3 cm, AB = 6 cm et AN = 4 cm. Calcule AC.</span></summary>
+        <div><span>AM ÷ AB = AN ÷ AC, donc 3 ÷ 6 = 4 ÷ AC.</span><span>AC = 6 × 4 ÷ 3 = 24 ÷ 3 = <strong>8 cm</strong>.</span></div>
+      </details>
+      <details>
+        <summary>La hauteur de l'arbre<span class="q">Un bâton de 1 m fait une ombre de 1,5 m. Au même moment, l'ombre d'un arbre mesure 12 m. Quelle est la hauteur de l'arbre ?</span></summary>
+        <div><span>Les rayons du soleil sont parallèles : hauteur ÷ ombre est la même pour le bâton et pour l'arbre.</span><span>h = 12 × 1 ÷ 1,5 = <strong>8 m</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Parallèles ou pas ? (1)<span class="q">AM = 4, AB = 10, AN = 6 et AC = 15. Les droites (MN) et (BC) sont-elles parallèles ?</span></summary>
+        <div><span>AM × AC = 4 × 15 = 60 et AN × AB = 6 × 10 = 60.</span><span>C'est égal (et les points sont dans le même ordre), donc <strong>oui, elles sont parallèles</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Parallèles ou pas ? (2)<span class="q">AM = 3, AB = 7, AN = 4 et AC = 9. Les droites (MN) et (BC) sont-elles parallèles ?</span></summary>
+        <div><span>AM × AC = 3 × 9 = 27 et AN × AB = 4 × 7 = 28.</span><span>27 n'est pas égal à 28, donc <strong>non, elles ne sont pas parallèles</strong>. C'est très proche : seul le calcul permet de le voir !</span></div>
+      </details>
+      <details>
+        <summary>Le papillon<span class="q">Les droites (BM) et (CN) se coupent en A, avec (MN) // (BC). AM = 2 cm, AB = 6 cm et MN = 3 cm. Calcule BC.</span></summary>
+        <div><span>Configuration papillon : AM ÷ AB = MN ÷ BC, donc 2 ÷ 6 = 3 ÷ BC.</span><span>BC = 6 × 3 ÷ 2 = 18 ÷ 2 = <strong>9 cm</strong>.</span></div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• Il faut deux droites qui se coupent en A, et <strong>deux parallèles</strong> (MN) et (BC).</span>
+      <span>• Alors <strong>AM ÷ AB = AN ÷ AC = MN ÷ BC</strong> : le petit triangle en haut, le grand en bas.</span>
+      <span>• Pour trouver une longueur : <strong>produit en croix</strong>.</span>
+      <span>• Ça marche aussi en <strong>papillon</strong>, quand M et N sont de l'autre côté de A.</span>
+      <span>• <strong>Réciproque</strong> : si les rapports sont égaux (et les points dans le même ordre), les droites sont parallèles.</span>
+    </div>
+  </section>
+
+  <footer>Fiche de révision · Le théorème de Thalès</footer>
+</main>
+
+<script>
+(function () {
+  var NS = 'http://www.w3.org/2000/svg';
+  function fmt(x, d) { return x.toLocaleString('fr-FR', { maximumFractionDigits: d == null ? 2 : d }); }
+  function num(s) { var t = String(s).replace(/\s/g, '').replace(',', '.'); if (t === '') return null; var x = parseFloat(t); return isFinite(x) ? x : NaN; }
+  function mk(svg, name, attrs, text) { var e = document.createElementNS(NS, name); for (var a in attrs) e.setAttribute(a, attrs[a]); if (text != null) e.textContent = text; svg.appendChild(e); return e; }
+  function dist(p, q) { return Math.hypot(p[0] - q[0], p[1] - q[1]); }
+
+  /* ---------- Figure interactive ---------- */
+  var svg = document.getElementById('fig'), kIn = document.getElementById('kIn'), axIn = document.getElementById('axIn');
+  var mode = 'tri';
+  var boxes = { tri: [-0.6, -0.6, 8.6, 6.6], pap: [-5, -0.6, 13, 11.4] };
+  function chevron(p, q, color) {
+    var mx = (p[0] + q[0]) / 2, my = (p[1] + q[1]) / 2;
+    return 'M' + (mx - 4) + ' ' + (my - 6) + ' l8 6 l-8 6';
+  }
+  function draw() {
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    var k = parseFloat(kIn.value), ax = parseFloat(axIn.value);
+    var A = [ax, 6], B = [0, 0], C = [8, 0], s = mode === 'tri' ? 1 : -1;
+    var M = [A[0] + s * k * (B[0] - A[0]), A[1] + s * k * (B[1] - A[1])];
+    var N = [A[0] + s * k * (C[0] - A[0]), A[1] + s * k * (C[1] - A[1])];
+    var all = [A, B, C, M, N];
+    var bb = mode === 'tri' ? boxes.tri : [Math.min.apply(null, all.map(function (p) { return p[0]; })), Math.min.apply(null, all.map(function (p) { return p[1]; })), Math.max.apply(null, all.map(function (p) { return p[0]; })), Math.max.apply(null, all.map(function (p) { return p[1]; }))];
+    var W = 320, H = 260, pad = 26;
+    var sc = Math.min((W - 2 * pad) / (bb[2] - bb[0]), (H - 2 * pad) / (bb[3] - bb[1]));
+    var tx = W / 2 - sc * (bb[0] + bb[2]) / 2, ty = H / 2 + sc * (bb[1] + bb[3]) / 2;
+    function S(p) { return [tx + sc * p[0], ty - sc * p[1]]; }
+    function poly(pts, fill, stroke) { mk(svg, 'polygon', { points: pts.map(function (p) { return S(p).join(','); }).join(' '), fill: fill, stroke: stroke, 'stroke-width': 2.5, 'stroke-linejoin': 'round' }); }
+    poly([A, B, C], 'var(--big-soft)', 'var(--big)');
+    poly([A, M, N], 'var(--acc-soft)', 'var(--acc)');
+    if (mode === 'pap') {
+      [[M, B], [N, C]].forEach(function (seg) { var a = S(seg[0]), b = S(seg[1]); mk(svg, 'line', { x1: a[0], y1: a[1], x2: b[0], y2: b[1], stroke: 'var(--ink-soft)', 'stroke-width': 1.5 }); });
+    }
+    var sB = S(B), sC = S(C), sM = S(M), sN = S(N);
+    mk(svg, 'path', { d: chevron(sB, sC), fill: 'none', stroke: 'var(--ink)', 'stroke-width': 2 });
+    mk(svg, 'path', { d: chevron(sM, sN), fill: 'none', stroke: 'var(--ink)', 'stroke-width': 2 });
+    var G = [(A[0] + B[0] + C[0]) / 3, (A[1] + B[1] + C[1]) / 3];
+    [['A', A], ['B', B], ['C', C], ['M', M], ['N', N]].forEach(function (pt) {
+      var p = S(pt[1]), g = S(mode === 'pap' && (pt[0] === 'M' || pt[0] === 'N') ? [(A[0] + M[0] + N[0]) / 3, (A[1] + M[1] + N[1]) / 3] : G);
+      var dx = p[0] - g[0], dy = p[1] - g[1], L = Math.hypot(dx, dy) || 1;
+      if (pt[0] === 'A' && mode === 'pap') { dx = 1; dy = 0; L = 1; }
+      mk(svg, 'circle', { cx: p[0], cy: p[1], r: 3.5, fill: 'var(--ink)' });
+      mk(svg, 'text', { x: p[0] + dx / L * 14, y: p[1] + dy / L * 14 + 5, 'text-anchor': 'middle', 'font-size': 15, style: 'font-weight:700' }, pt[0]);
+    });
+    var AM = dist(A, M), AB = dist(A, B), AN = dist(A, N), AC = dist(A, C), MN = dist(M, N), BC = dist(B, C);
+    var rows = [['AM ÷ AB', AM, AB], ['AN ÷ AC', AN, AC], ['MN ÷ BC', MN, BC]];
+    document.getElementById('ratioRows').innerHTML = rows.map(function (r) {
+      return '<tr><td>' + r[0] + '</td><td>' + fmt(r[1]) + ' ÷ ' + fmt(r[2]) + '</td><td class="r">' + fmt(r[1] / r[2], 2) + '</td></tr>';
+    }).join('');
+    document.getElementById('kOut').textContent = fmt(k);
+  }
+  function setMode(m) {
+    mode = m;
+    document.getElementById('cfgTri').setAttribute('aria-pressed', m === 'tri' ? 'true' : 'false');
+    document.getElementById('cfgPap').setAttribute('aria-pressed', m === 'pap' ? 'true' : 'false');
+    draw();
+  }
+  document.getElementById('cfgTri').addEventListener('click', function () { setMode('tri'); });
+  document.getElementById('cfgPap').addEventListener('click', function () { setMode('pap'); });
+  kIn.addEventListener('input', draw); axIn.addEventListener('input', draw); draw();
+
+  /* ---------- Calculatrice ---------- */
+  var pairs = [['AM', 'AB'], ['AN', 'AC'], ['MN', 'BC']];
+  function calc() {
+    var v = {}, bad = false;
+    ['AM', 'AB', 'AN', 'AC', 'MN', 'BC'].forEach(function (n) { var x = num(document.getElementById('f' + n).value); if (x !== null && !(x > 0)) bad = true; v[n] = x; });
+    var out = document.getElementById('calcOut');
+    if (bad) { out.innerHTML = '<span class="err">Les longueurs doivent être des nombres plus grands que 0.</span>'; return; }
+    var ref = null;
+    pairs.forEach(function (p) { if (!ref && v[p[0]] && v[p[1]]) ref = p; });
+    if (!ref) { out.innerHTML = '<span class="err">Il faut au moins un rapport complet : deux longueurs qui vont ensemble (AM et AB, ou AN et AC, ou MN et BC).</span>'; return; }
+    var k = v[ref[0]] / v[ref[1]], lines = ['Rapport connu : ' + ref[0] + ' ÷ ' + ref[1] + ' = ' + fmt(v[ref[0]], 4) + ' ÷ ' + fmt(v[ref[1]], 4)], found = 0;
+    pairs.forEach(function (p) {
+      if (p === ref) return;
+      var a = v[p[0]], b = v[p[1]];
+      if (a && b) {
+        if (Math.abs(a * v[ref[1]] - b * v[ref[0]]) > 1e-9 * Math.max(1, a * v[ref[1]])) lines.push('<span class="err">Attention : ' + p[0] + ' ÷ ' + p[1] + ' n\'est pas égal à ' + ref[0] + ' ÷ ' + ref[1] + '. Vérifie tes longueurs.</span>');
+        return;
+      }
+      if (a && !b) { var r = v[ref[1]] * a / v[ref[0]]; lines.push(p[1] + ' = ' + ref[1] + ' × ' + p[0] + ' ÷ ' + ref[0] + ' = ' + fmt(v[ref[1]], 4) + ' × ' + fmt(a, 4) + ' ÷ ' + fmt(v[ref[0]], 4) + ' <b>' + (Math.abs(r * 100 - Math.round(r * 100)) < 1e-6 ? '= ' : '≈ ') + fmt(r) + '</b>'); found++; }
+      if (b && !a) { var r2 = v[ref[0]] * b / v[ref[1]]; lines.push(p[0] + ' = ' + ref[0] + ' × ' + p[1] + ' ÷ ' + ref[1] + ' = ' + fmt(v[ref[0]], 4) + ' × ' + fmt(b, 4) + ' ÷ ' + fmt(v[ref[1]], 4) + ' <b>' + (Math.abs(r2 * 100 - Math.round(r2 * 100)) < 1e-6 ? '= ' : '≈ ') + fmt(r2) + '</b>'); found++; }
+    });
+    if (!found && lines.length === 1) lines.push('Laisse vide une longueur à trouver.');
+    out.innerHTML = lines.map(function (l) { return '<span>' + l + '</span>'; }).join('');
+  }
+  ['AM', 'AB', 'AN', 'AC', 'MN', 'BC'].forEach(function (n) { document.getElementById('f' + n).addEventListener('input', calc); });
+  calc();
+
+  /* ---------- Pyramide ---------- */
+  var sunIn = document.getElementById('sunIn'), pyr = document.getElementById('pyrSvg'), stick = document.getElementById('stickSvg');
+  var H = 146, HALF = 115, STICK = 2;
+  function pyramid() {
+    var s = parseFloat(sunIn.value), shadow = H * s / STICK, beyond = shadow - HALF;
+    while (pyr.firstChild) pyr.removeChild(pyr.firstChild);
+    while (stick.firstChild) stick.removeChild(stick.firstChild);
+    var g = 180, cx = 125, k = 1;
+    var apex = [cx, g - H * k], tip = [cx + shadow * k, g];
+    mk(pyr, 'line', { x1: 0, y1: g, x2: 600, y2: g, stroke: 'var(--ink)', 'stroke-width': 2 });
+    mk(pyr, 'polygon', { points: [cx, g].join(',') + ' ' + tip.join(',') + ' ' + apex.join(','), fill: 'var(--acc-soft)', stroke: 'none' });
+    mk(pyr, 'polygon', { points: [cx - HALF, g] + ' ' + [cx + HALF, g] + ' ' + apex.join(','), fill: 'var(--big-soft)', stroke: 'var(--big)', 'stroke-width': 2.5, 'stroke-linejoin': 'round' });
+    mk(pyr, 'line', { x1: cx, y1: g, x2: apex[0], y2: apex[1], stroke: 'var(--ink-soft)', 'stroke-width': 1.5, 'stroke-dasharray': '5 4' });
+    mk(pyr, 'line', { x1: cx + HALF, y1: g, x2: tip[0], y2: g, stroke: 'var(--ink)', 'stroke-width': 5, 'stroke-linecap': 'round', opacity: .55 });
+    var dx = tip[0] - apex[0], dy = tip[1] - apex[1], L = Math.hypot(dx, dy);
+    mk(pyr, 'line', { x1: apex[0] - dx / L * 40, y1: apex[1] - dy / L * 40, x2: tip[0], y2: tip[1], stroke: 'var(--sun)', 'stroke-width': 2.5 });
+    mk(pyr, 'text', { x: cx + 8, y: g - H / 2, 'font-size': 22, style: 'font-weight:700' }, 'h ?');
+    mk(pyr, 'text', { x: Math.min(tip[0], 550), y: g - 8, 'text-anchor': 'middle', 'font-size': 20, style: 'font-weight:600' }, fmt(shadow, 0) + ' m');
+    /* Bâton en zoom */
+    var z = 28, sx = 30, top = [sx, g - STICK * z], stip = [sx + s * z, g];
+    mk(stick, 'line', { x1: 0, y1: g, x2: 200, y2: g, stroke: 'var(--ink)', 'stroke-width': 2 });
+    mk(stick, 'polygon', { points: [sx, g] + ' ' + stip.join(',') + ' ' + top.join(','), fill: 'var(--acc-soft)', stroke: 'none' });
+    mk(stick, 'line', { x1: sx, y1: g, x2: top[0], y2: top[1], stroke: 'var(--ink)', 'stroke-width': 5, 'stroke-linecap': 'round' });
+    var ddx = stip[0] - top[0], ddy = stip[1] - top[1], LL = Math.hypot(ddx, ddy);
+    mk(stick, 'line', { x1: top[0] - ddx / LL * 30, y1: top[1] - ddy / LL * 30, x2: stip[0], y2: stip[1], stroke: 'var(--sun)', 'stroke-width': 2.5 });
+    mk(stick, 'text', { x: sx + 8, y: g - STICK * z / 2, 'font-size': 13, style: 'font-weight:700' }, '2 m');
+    mk(stick, 'text', { x: Math.min(stip[0], 180), y: g + 16, 'text-anchor': 'middle', 'font-size': 13 }, fmt(s, 1) + ' m');
+    document.getElementById('sunOut').textContent = fmt(s, 1);
+    document.getElementById('sh1').textContent = fmt(s, 1);
+    document.getElementById('sh2').textContent = fmt(shadow, 1);
+    document.getElementById('sh3').textContent = fmt(beyond, 1);
+    var h = shadow * STICK / s;
+    document.getElementById('hOut').textContent = fmt(h, 1);
+    document.getElementById('hCalc').textContent = 'h = ombre de la pyramide × bâton ÷ ombre du bâton = ' + fmt(shadow, 1) + ' × 2 ÷ ' + fmt(s, 1) + ' = ' + fmt(h, 1);
+  }
+  sunIn.addEventListener('input', pyramid); pyramid();
+
+  /* ---------- Réciproque ---------- */
+  function rec() {
+    var v = {}; ['AM', 'AB', 'AN', 'AC'].forEach(function (n) { v[n] = num(document.getElementById('r' + n).value); });
+    var steps = document.getElementById('recSteps'), out = document.getElementById('recVerdict');
+    if (['AM', 'AB', 'AN', 'AC'].some(function (n) { return !(v[n] > 0); })) { steps.innerHTML = '<span class="err">Remplis les 4 longueurs avec des nombres plus grands que 0.</span>'; out.hidden = true; return; }
+    out.hidden = false;
+    var p1 = v.AM * v.AC, p2 = v.AN * v.AB;
+    steps.innerHTML = '<span>AM ÷ AB = ' + fmt(v.AM, 4) + ' ÷ ' + fmt(v.AB, 4) + ' ≈ ' + fmt(v.AM / v.AB, 4) + '</span>' +
+      '<span>AN ÷ AC = ' + fmt(v.AN, 4) + ' ÷ ' + fmt(v.AC, 4) + ' ≈ ' + fmt(v.AN / v.AC, 4) + '</span>' +
+      '<span>Produit en croix : AM × AC = <b>' + fmt(p1, 4) + '</b> et AN × AB = <b>' + fmt(p2, 4) + '</b></span>';
+    if (Math.abs(p1 - p2) <= 1e-9 * Math.max(p1, p2)) {
+      out.className = 'verdict yes';
+      out.innerHTML = 'C\'est égal : (MN) et (BC) sont parallèles.<span>À condition que A, M, B et A, N, C soient alignés dans le même ordre.</span>';
+    } else {
+      out.className = 'verdict no';
+      out.innerHTML = 'Ce n\'est pas égal : (MN) et (BC) ne sont pas parallèles.<span>Si elles l\'étaient, Thalès dirait que les rapports sont égaux.</span>';
+    }
+  }
+  ['AM', 'AB', 'AN', 'AC'].forEach(function (n) { document.getElementById('r' + n).addEventListener('input', rec); });
+  rec();
+})();
+</script>
+</body>
+</html>
