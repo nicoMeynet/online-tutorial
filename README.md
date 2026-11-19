@@ -58,6 +58,19 @@ Chaque tutoriel est une seule page HTML, sans installation. Il suffit de l'ouvri
 | [Les jeux de stratégie](les-jeux-de-strategie.html) | Allumettes, course à 20, Nim et la somme de Nim, morpion contre l'ordinateur, raisonner à rebours, le dilemme du prisonnier, un quiz. |
 | [Les maths et la musique](les-maths-et-la-musique.html) | Fréquences et ondes, l'octave, la corde de Pythagore, les intervalles, la gamme tempérée et un mini-piano, les rythmes en fractions, un quiz. |
 
+## Physique-chimie
+
+Accueil de la physique : [physique.html](physique.html).
+
+| Tutoriel | Sujet |
+|---|---|
+| [Les états de la matière](les-etats-de-la-matiere.html) | Solide, liquide, gaz avec une boîte de particules, les six changements d'état, la courbe de chauffe et ses paliers, l'ébullition en altitude, le cycle de l'eau, un quiz. |
+| [Les atomes et les molécules](les-atomes-et-les-molecules.html) | La taille d'un atome, un constructeur d'atomes et d'ions, le tableau périodique, un constructeur de molécules, lire une formule chimique, un quiz. |
+| [Le mouvement](le-mouvement.html) | Référentiel, trajectoire, chronophotographie (uniforme, accéléré, ralenti), vitesse moyenne et instantanée, le manège, le graphique distance-temps, un quiz. |
+| [Le poids et la masse](le-poids-et-la-masse.html) | Masse et poids, un dynamomètre virtuel, P = m × g, ton poids sur la Lune et les planètes, le poids comme une flèche, la station spatiale, un quiz. |
+| [Les circuits électriques](les-circuits-electriques.html) | La boucle, les symboles, conducteurs et isolants, un simulateur série et dérivation, le sens du courant, la DEL, la sécurité, un quiz. |
+| [La lumière](la-lumiere.html) | Sources et objets diffusants, propagation rectiligne, ombres et éclipses, vitesse de la lumière, prisme, synthèse RVB, couleur perçue, réflexion, un quiz. |
+
 ## Pour réviser
 
 | Page | Contenu |
@@ -72,5 +85,5 @@ La **progression** (tutoriels ouverts, meilleur score à chaque quiz) est enregi
 
 1. Ajouter un fichier `nom-du-tutoriel.html` à la racine.
 2. Ajouter une ligne dans le tableau ci-dessus.
-3. Ajouter une carte dans `index.html`, dans la bonne catégorie.
+3. Ajouter une carte dans `index.html` (maths) ou `physique.html` (physique-chimie), dans la bonne catégorie.
 4. Lancer `python tools/fiches.py`, puis `python tools/liens.py` : il ajoute le logo (icône d'onglet et d'écran d'accueil), le retour à l'accueil, les liens « précédent / suivant » (dans l'ordre de `index.html`) et transforme les mentions « le tutoriel sur … » en liens. On peut le relancer sans risque.

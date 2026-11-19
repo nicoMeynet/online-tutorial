@@ -40,6 +40,7 @@ h2 { font-family: var(--f-display); font-weight: 800; font-size: 1.35rem; margin
 .tools button { font: 700 .95rem var(--f-body); padding: 8px 14px; border: 2px solid var(--ink); border-radius: 10px; background: var(--card); color: var(--ink); cursor: pointer; box-shadow: 2px 2px 0 var(--ink); }
 .tools button.main { background: var(--navy); color: var(--paper); border-color: var(--navy); }
 .cat { margin: 28px 0 0; }
+.subject { font-size: 1.8rem; margin: 36px 0 0; color: var(--navy); }
 .cat-head { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; border-bottom: 3px solid var(--navy); padding-bottom: 6px; margin-bottom: 14px; }
 .cat-head button { font: 700 .85rem var(--f-body); padding: 4px 10px; border: 1.5px solid var(--soft); border-radius: 8px; background: transparent; color: var(--soft); cursor: pointer; }
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 14px; }
@@ -65,6 +66,9 @@ footer { margin-top: 36px; color: var(--soft); font-size: .9rem; text-align: cen
   .page { max-width: none; padding: 0; }
   .cat { break-before: page; margin: 0; }
   .cat:first-of-type { break-before: auto; }
+  .subject { break-before: page; }
+  .subject:first-of-type { break-before: auto; }
+  body[data-only] .subject { display: none; }
   .grid { grid-template-columns: 1fr 1fr; gap: 8px; }
   .fiche { border-color: #999; padding: 8px 10px; }
   .fiche h3 a::after { content: ""; }
@@ -96,6 +100,8 @@ JS = """<script>
 def summary(path):
     if path.name == "les-formes-geometriques.html":
         return FORMES
+    if not path.exists():
+        return None
     s = path.read_text(encoding="utf-8")
     m = re.search(r'<section[^>]*>\s*<span class="eyebrow">À retenir[^<]*</span>(.*?)</section>', s, re.S)
     if not m:
@@ -107,10 +113,15 @@ def summary(path):
 
 
 def main():
-    idx = (ROOT / "index.html").read_text(encoding="utf-8")
     out = []
     count = 0
-    for sec in re.finditer(r'<section class="cat" id="([^"]+)"[^>]*>(.*?)</section>', idx, re.S):
+    subjects = [("index.html", "maths", "Maths"), ("physique.html", "physique", "Physique-chimie")]
+    for landing, sid, sname in subjects:
+      if not (ROOT / landing).exists():
+          continue
+      idx = (ROOT / landing).read_text(encoding="utf-8")
+      out.append(f'<h2 class="subject" id="{sid}">{sname}</h2>')
+      for sec in re.finditer(r'<section class="cat" id="([^"]+)"[^>]*>(.*?)</section>', idx, re.S):
         cid, inner = sec.group(1), sec.group(2)
         name = html.unescape(re.search(r"<h2[^>]*>(.*?)</h2>", inner).group(1))
         cards = re.findall(r'<a class="card[^"]*" href="([^"]+\.html)".*?<strong>(.*?)</strong>', inner, re.S)

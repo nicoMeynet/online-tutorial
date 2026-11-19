@@ -1,0 +1,1104 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Les circuits électriques</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, encre orange électrique, marge rouge. Les lampes allumées sont jaune vif. */
+:root {
+  --paper: #faf8f3;
+  --grid: #ebe5d6;
+  --card: #ffffff;
+  --ink: #1f1a10;
+  --ink-soft: #645a45;
+  --acc: #c2410c;
+  --acc-soft: #ffedd5;
+  --two: #1c64c8;
+  --two-soft: #dbe8fa;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #fef08a;
+  --lit: #facc15;
+  --line: #e2d9c5;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #14120c; --grid: #221e14; --card: #1c1910; --ink: #f4efe2; --ink-soft: #c2b89f;
+    --acc: #fb923c; --acc-soft: #431f0b; --two: #7fb0ff; --two-soft: #1a2a45;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4a3f10; --lit: #facc15; --line: #3a3322;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #14120c; --grid: #221e14; --card: #1c1910; --ink: #f4efe2; --ink-soft: #c2b89f;
+  --acc: #fb923c; --acc-soft: #431f0b; --two: #7fb0ff; --two-soft: #1a2a45;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4a3f10; --lit: #facc15; --line: #3a3322;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 6px 12px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); min-height: 40px; }
+button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.btns .lab { font-weight: 700; min-width: 0; }
+input[type="text"] { font: inherit; font-family: var(--f-mono); font-size: 1.05rem; padding: 8px 10px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; }
+
+.verdict { border-radius: 8px; padding: 12px 14px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; background: var(--paper); border: 1.5px solid var(--line); }
+.verdict.yes { background: var(--ok-soft); color: var(--ok); border-color: transparent; }
+.verdict.no { background: var(--red-soft); color: var(--red); border-color: transparent; }
+.verdict span { font-weight: 400; color: var(--ink); }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
+.tag.ok { color: var(--ok); }
+.tag.no { color: var(--red); }
+.tag.acc { color: var(--acc); }
+
+/* Schémas électriques */
+.circ svg { width: 100%; height: auto; display: block; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; }
+.wire { stroke: var(--ink); stroke-width: 3; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.wire.shunt { stroke: var(--two); stroke-width: 3.5; }
+.plate { stroke: var(--ink); stroke-width: 3; stroke-linecap: round; }
+.plate.thick { stroke-width: 7; stroke-linecap: butt; }
+.body { fill: var(--card); stroke: var(--ink); stroke-width: 3; }
+.body.lit { fill: var(--lit); }
+.body.broken { stroke: var(--red); stroke-dasharray: 5 4; }
+.body.meter { fill: var(--acc-soft); stroke: var(--acc); }
+.cross { stroke: var(--ink); stroke-width: 2.5; stroke-linecap: round; }
+.cross.litc { stroke: #5c3a00; }
+.cross.brk { stroke: var(--red); }
+.halo { fill: var(--lit); }
+.term { fill: var(--card); stroke: var(--ink); stroke-width: 2.5; }
+.thin { stroke: var(--ink); stroke-width: 2; stroke-linecap: round; }
+.tip { fill: var(--ink); }
+.dot { fill: var(--ink); }
+.flow { fill: none; stroke: var(--acc); stroke-width: 3.5; stroke-linecap: round; stroke-dasharray: 6 14; animation: flow 1s linear infinite; }
+.flow.short { stroke: var(--red); }
+.arrow { fill: var(--acc); }
+.arrow.short { fill: var(--red); }
+.tap { cursor: pointer; }
+.pt { fill: var(--card); stroke: var(--acc); stroke-width: 2.5; }
+.spin { transform-box: fill-box; transform-origin: center; animation: spin 1s linear infinite; }
+.spin.rev { animation-direction: reverse; }
+.blade { fill: var(--two); }
+.mat { stroke: var(--ink); stroke-width: 1.5; }
+.clip { fill: var(--red); stroke: var(--ink); stroke-width: 1.5; }
+.clip.blk { fill: var(--ink-soft); }
+@keyframes flow { from { stroke-dashoffset: 20; } to { stroke-dashoffset: 0; } }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.noanim .flow, .noanim .spin { animation: none; }
+@media (prefers-reduced-motion: reduce) { .flow, .spin { animation: none; } }
+
+.minis { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; }
+.mini { border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px; background: var(--card); min-width: 0; }
+.mini svg { width: 100%; height: auto; display: block; background: var(--paper); border-radius: 6px; }
+.mini .fbk { font-size: .95rem; }
+.mini .fbk.ok { color: var(--ok); font-weight: 700; }
+.mini .fbk.no { color: var(--red); font-weight: 700; }
+.mini .fbk span { display: block; color: var(--ink); font-weight: 400; }
+.mini .btns button { flex: 1 1 auto; }
+
+.symgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; }
+.symcard { border: 1.5px solid var(--line); border-radius: 10px; padding: 10px 12px; background: var(--paper); display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.symcard svg { width: 100%; max-width: 150px; height: auto; align-self: center; }
+.symcard strong { font-family: var(--f-display); }
+.symcard span { font-size: .92rem; color: var(--ink-soft); }
+.memo { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 8px; }
+.memo button { min-height: 84px; padding: 4px; display: flex; align-items: center; justify-content: center; text-align: center; font-size: .85rem; line-height: 1.2; box-shadow: 2px 2px 0 var(--ink); min-width: 0; overflow-wrap: break-word; }
+.memo button svg { width: 100%; max-width: 74px; height: auto; }
+.memo button.down { background: var(--acc-soft); color: var(--acc); font-size: 1.6rem; }
+.memo button.up { background: var(--card); }
+.memo button.found { background: var(--ok-soft); border-color: var(--ok); box-shadow: none; }
+
+.lamps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.lamps li { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; padding: 8px 12px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--paper); }
+.lamps .nm { font-family: var(--f-mono); font-weight: 600; color: var(--acc); }
+.lamps .st { flex: 1 1 180px; min-width: 0; }
+.lamps .dotlit { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--ink); background: var(--card); flex: none; }
+.ctl { display: flex; flex-direction: column; gap: 10px; }
+.ctl .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.ctl .row > .lab { font-weight: 700; margin-right: 4px; }
+.ctl button { padding: 5px 10px; }
+.chal { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.chal li { display: flex; gap: 10px; align-items: baseline; padding: 6px 10px; border-radius: 8px; border: 1.5px dashed var(--line); }
+.chal li .ck { font-family: var(--f-mono); font-weight: 700; color: var(--ink-soft); flex: none; }
+.chal li.done { border-style: solid; border-color: var(--ok); background: var(--ok-soft); }
+.chal li.done .ck { color: var(--ok); }
+.meterout { font-family: var(--f-mono); font-size: 1.5rem; font-weight: 600; color: var(--acc); }
+
+.recipe { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.recipe li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; padding: 8px 12px; border: 1.5px solid var(--line); border-radius: 8px; font-variant-numeric: tabular-nums; }
+.recipe .q { font-family: var(--f-mono); font-weight: 600; color: var(--acc); text-align: right; }
+.recipe li.danger .q { color: var(--red); }
+
+.errs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.errs li { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--paper); }
+.errs .bad { color: var(--red); text-decoration: line-through; overflow-wrap: anywhere; }
+.errs .good { color: var(--ok); font-weight: 700; overflow-wrap: anywhere; }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 110px auto; gap: 10px; align-items: center; }
+.quiz li > span:first-child { overflow-wrap: anywhere; min-width: 0; }
+.quiz input[type="text"] { font-size: 1rem; padding: 6px 8px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb:empty { display: none; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc); }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 120px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+<!--ticons--><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Tutoriels"><script src="progress.js" defer></script><!--/ticons-->
+<style id="tnav-css">
+.tnav-top { display: flex; margin: 0 0 4px; }
+.tnav-home { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font-weight: 700; font-size: .95rem; text-decoration: none; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tnav-home:hover, .tnav-home:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.tnav-bottom { margin-top: 8px; display: flex; flex-direction: column; gap: 12px; }
+.tnav-bottom h2 { margin: 0; }
+.tnav-pn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tnav-pn a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--ink, #222); border-radius: 10px;
+  background: var(--card, #fff); color: var(--ink, #222); text-decoration: none; box-shadow: 3px 3px 0 var(--ink, #222); min-width: 0; }
+.tnav-pn a span { font-size: .85rem; color: var(--ink-soft, #666); }
+.tnav-pn a strong { overflow-wrap: anywhere; }
+.tnav-pn a.next { text-align: right; grid-column: 2; }
+.tnav-bottom .tnav-home { align-self: center; }
+@media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
+</style>
+</head>
+<body>
+<main class="page">
+<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="physique.html">← Tous les tutoriels de physique</a></nav><!--/tnav-->
+
+
+  <header class="hero">
+    <span class="eyebrow">Tutoriel de physique-chimie · niveau 5<sup>e</sup>–4<sup>e</sup></span>
+    <h1>Les circuits électriques</h1>
+    <p class="lead">Une pile, deux fils, une lampe : et la lumière s'allume. Mais seulement si le courant peut faire le tour complet. Dans ce tutoriel, tu vas construire des circuits, les dessiner comme un électricien, et comprendre pourquoi certaines lampes brillent… et d'autres pas.</p>
+    <div class="box">
+      <div class="circ"><svg id="heroSvg" viewBox="0 0 400 180" role="img" aria-label="Un circuit simple : une pile, un interrupteur et une lampe en boucle"></svg></div>
+      <div class="btns">
+        <button type="button" id="heroBtn">Fermer l'interrupteur</button>
+        <span id="heroOut" class="soft" aria-live="polite">L'interrupteur est ouvert : la lampe est éteinte.</span>
+      </div>
+    </div>
+    <div class="note">
+      <span class="note-title">Toutes les expériences de ce tutoriel se font avec des piles</span>
+      <span>Une pile donne une tension de quelques volts (1,5 V, 4,5 V ou 9 V) : sans danger pour le corps. Le courant des prises de la maison (230 V) est, lui, <strong>dangereux, voire mortel</strong>. On n'expérimente jamais avec.</span>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · La boucle</span>
+    <h2>Un générateur et une boucle fermée</h2>
+    <p>Pour qu'une lampe s'allume, il faut deux choses : un <strong>générateur</strong> (ici une pile), qui « pousse » le courant, et une <span class="hl">boucle fermée</span> qui part d'une borne de la pile, traverse la lampe et revient à l'autre borne. Si la boucle est coupée quelque part, on dit que le circuit est <strong>ouvert</strong> : aucun courant ne circule, nulle part.</p>
+    <p>Chaque élément du circuit (pile, lampe, interrupteur, moteur…) a <strong>deux bornes</strong> : on l'appelle un <strong>dipôle</strong> (« di » veut dire deux). La pile a une borne <strong>+</strong> et une borne <strong>−</strong>.</p>
+    <div class="box">
+      <h3>Brille ou ne brille pas ?</h3>
+      <p class="soft">Pour chaque schéma, fais ton pari. Les symboles sont expliqués à l'étape suivante : la pile est à gauche (grand trait = +), la lampe est le rond avec une croix.</p>
+      <div class="minis" id="minis"></div>
+      <span class="score" id="minisScore">0 / 6</span>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · Les symboles</span>
+    <h2>Dessiner un circuit comme un électricien</h2>
+    <p>Dessiner une vraie lampe, avec son culot et son verre, c'est long. Les électriciens du monde entier utilisent des <strong>symboles normalisés</strong> : des dessins simples que tout le monde comprend. Un dessin de circuit avec ces symboles s'appelle un <strong>schéma</strong>. On trace les fils bien droits, à la règle, et le circuit forme un rectangle.</p>
+    <div class="symgrid" id="symgrid"></div>
+    <div class="box">
+      <h3>Le memory des symboles</h3>
+      <p class="soft">Retourne deux cartes. Trouve chaque symbole et son nom. Huit paires à trouver.</p>
+      <div class="memo" id="memo"></div>
+      <div class="btns">
+        <span class="score" id="memoScore">0 / 8</span>
+        <span class="soft" id="memoTries">0 essai</span>
+        <button type="button" id="memoNew">Nouvelle partie</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Conducteurs et isolants</span>
+    <h2>Le testeur de matériaux</h2>
+    <p>Certains matériaux laissent passer le courant : ce sont des <strong>conducteurs</strong>. D'autres le bloquent : ce sont des <strong>isolants</strong>. Pour le savoir, on place le matériau entre les deux pinces d'un circuit testeur. Si la lampe s'allume, le matériau est conducteur.</p>
+    <div class="box">
+      <div class="btns" id="matBtns" role="group" aria-label="Choisir un matériau"></div>
+      <div class="circ"><svg id="testSvg" viewBox="0 0 400 200" role="img" aria-label="Circuit testeur : pile, lampe et deux pinces qui tiennent le matériau"></svg></div>
+      <div class="btns">
+        <span class="lab">Ton pari :</span>
+        <button type="button" id="betC">Conducteur</button>
+        <button type="button" id="betI">Isolant</button>
+      </div>
+      <div class="verdict" id="testOut" aria-live="polite"></div>
+      <span class="soft" id="testScore">Bons paris : 0 sur 0 matériau testé.</span>
+    </div>
+    <div class="note">
+      <span class="note-title">À retenir sur les matériaux</span>
+      <span>Tous les <strong>métaux</strong> sont conducteurs (cuivre, fer, aluminium…). Le <strong>graphite</strong> (la mine du crayon) aussi. Le bois sec, le plastique, le verre, le caoutchouc et l'air sont des <strong>isolants</strong>. C'est pour ça qu'un fil électrique est en cuivre, entouré d'une gaine de plastique.</span>
+    </div>
+    <div class="note red">
+      <span class="note-title">Attention : le corps humain conduit</span>
+      <span>L'eau du robinet et le corps humain contiennent des sels : ils conduisent le courant. Avec une pile, on ne sent rien. Avec le 230 V du secteur, le courant peut traverser le corps et être mortel. Jamais d'appareil électrique branché près de l'eau.</span>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · Le simulateur</span>
+    <h2>Série ou dérivation ?</h2>
+    <p>Il y a deux façons de brancher plusieurs lampes. <strong>En série</strong> : les lampes sont à la suite, sur une seule boucle. <strong>En dérivation</strong> (on dit aussi « en parallèle ») : chaque lampe a sa propre branche, reliée aux deux bornes de la pile.</p>
+    <p>Joue avec le circuit : change le montage, le nombre de lampes, ouvre les interrupteurs, grille une lampe, ou ajoute un fil (en bleu) qui la contourne. Tu peux aussi cliquer directement sur les interrupteurs et les lampes du schéma. Les flèches orange montrent le courant.</p>
+    <div class="box">
+      <div class="ctl">
+        <div class="row" role="group" aria-label="Type de montage"><span class="lab">Montage :</span><button type="button" id="mSerie">En série</button><button type="button" id="mDer">En dérivation</button></div>
+        <div class="row" role="group" aria-label="Nombre de lampes"><span class="lab">Lampes :</span><button type="button" id="nb1">1</button><button type="button" id="nb2">2</button><button type="button" id="nb3">3</button></div>
+        <div class="row" id="swRow" role="group" aria-label="Interrupteurs"></div>
+      </div>
+      <div class="circ"><svg id="simSvg" viewBox="0 0 400 280" role="img" aria-label="Schéma du circuit simulé"></svg></div>
+      <ul class="lamps" id="lampList"></ul>
+      <div class="ctl">
+        <div class="row"><button type="button" id="pileShort">Fil sur la pile</button><button type="button" id="animBtn" aria-pressed="true">Animation</button><button type="button" id="simReset">Tout réinitialiser</button></div>
+      </div>
+      <div class="verdict" id="simOut" aria-live="polite"></div>
+      <h3>Quatre défis</h3>
+      <ul class="chal" id="chal">
+        <li id="ch0"><span class="ck">○</span><span>Fais briller <strong>deux lampes normalement</strong> en même temps.</span></li>
+        <li id="ch1"><span class="ck">○</span><span>Avec <strong>3 lampes en série</strong>, éteins une seule lampe, sans rien griller, en gardant les deux autres allumées.</span></li>
+        <li id="ch2"><span class="ck">○</span><span>En <strong>dérivation</strong>, grille une lampe tout en gardant au moins une autre lampe allumée.</span></li>
+        <li id="ch3"><span class="ck">○</span><span>Provoque un <strong>court-circuit</strong> de la pile… seulement dans le simulateur !</span></li>
+      </ul>
+    </div>
+    <div class="cards">
+      <div class="box"><span class="tag acc">En série</span><strong>Un seul chemin</strong><span class="soft">Plus il y a de lampes, <strong>moins elles brillent</strong> : elles se partagent la pile. Si une lampe grille ou si on ouvre l'interrupteur, <strong>tout s'éteint</strong>. Une lampe court-circuitée par un fil s'éteint et les autres brillent plus fort.</span></div>
+      <div class="box"><span class="tag acc">En dérivation</span><strong>Un chemin par lampe</strong><span class="soft">Chaque lampe brille <strong>comme si elle était seule</strong>. Si une lampe grille, <strong>seule sa branche</strong> s'éteint. Mais un fil sur une lampe relie directement les bornes de la pile : <strong>court-circuit</strong> de la pile !</span></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Et chez toi ?</span>
+      <span>Les lampes et les prises d'une maison sont branchées <strong>en dérivation</strong> : on peut éteindre la cuisine sans éteindre le salon, et une ampoule grillée n'éteint pas toute la maison. Les vieilles guirlandes de Noël, elles, étaient souvent en série : une seule ampoule grillée et toute la guirlande s'éteignait !</span>
+    </div>
+    <p class="soft">Notre modèle est simple : une pile qui pousse toujours pareil et des lampes identiques. Plus tard, avec la <strong>tension</strong> (en volts, V), l'<strong>intensité</strong> (en ampères, A) et la <strong>loi d'Ohm</strong>, on pourra faire de vrais calculs.</p>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Le sens du courant</span>
+    <h2>De la borne + vers la borne −</h2>
+    <p>Par <strong>convention</strong>, on dit que le courant sort de la pile par la borne <strong>+</strong>, fait le tour du circuit, et rentre par la borne <strong>−</strong>. Sur un schéma, on le montre avec des flèches sur les fils.</p>
+    <p>Retourne la pile : le courant change de sens. Une lampe s'en moque, elle brille pareil. Un <strong>moteur</strong>, lui, se met à tourner dans l'autre sens.</p>
+    <div class="box">
+      <div class="btns">
+        <button type="button" id="dirFlip">Retourner la pile</button>
+        <span class="lab">Récepteur :</span>
+        <button type="button" id="dirLamp">Lampe</button>
+        <button type="button" id="dirMotor">Moteur</button>
+        <button type="button" id="animBtn2" aria-pressed="true">Animation</button>
+      </div>
+      <div class="circ"><svg id="dirSvg" viewBox="0 0 400 240" role="img" aria-label="Circuit avec une pile que l'on peut retourner et une lampe ou un moteur"></svg></div>
+      <div class="verdict" id="dirOut" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Et les électrons ?</span>
+      <span>Dans un fil de métal, ce qui bouge vraiment, ce sont de toutes petites particules : les <strong>électrons</strong>. Ils vont… dans l'autre sens, du − vers le + ! Le sens « conventionnel » a été choisi au XIX<sup>e</sup> siècle, bien avant qu'on connaisse les électrons. On l'a gardé : c'est lui qu'on utilise au collège.</span>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · La DEL</span>
+    <h2>Un sens interdit pour le courant</h2>
+    <p>La <strong>DEL</strong> (diode électroluminescente, <em>LED</em> en anglais) est une petite lampe qui consomme très peu. Mais elle a une particularité : elle ne laisse passer le courant <strong>que dans un seul sens</strong>, celui de la pointe du triangle de son symbole. Dans ce sens, elle est <strong>passante</strong> et s'allume. Dans l'autre, elle est <strong>bloquante</strong> : plus aucun courant dans toute la boucle.</p>
+    <p>Une DEL se branche toujours avec une <strong>résistance de protection</strong> (ou une lampe) en série : sinon, trop de courant la traverse et elle grille.</p>
+    <div class="box">
+      <div class="btns">
+        <button type="button" id="ledFlip">Retourner la DEL</button>
+        <button type="button" id="ledPile">Retourner la pile</button>
+        <span class="lab">Protection :</span>
+        <button type="button" id="ledRes">Résistance</button>
+        <button type="button" id="ledLamp">Lampe</button>
+      </div>
+      <div class="circ"><svg id="ledSvg" viewBox="0 0 400 240" role="img" aria-label="Circuit avec une pile, une protection et une DEL"></svg></div>
+      <div class="verdict" id="ledOut" aria-live="polite"></div>
+    </div>
+    <p>La DEL sert souvent de <strong>témoin</strong> (le petit voyant d'une télé en veille, d'un chargeur) et, comme elle chauffe peu, elle remplace aujourd'hui presque toutes les anciennes ampoules.</p>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · La boucle</span>
+    <h2>Le courant ne s'use pas</h2>
+    <p>On croit souvent que la lampe « mange » du courant, et qu'il en reste moins après elle. C'est faux ! Dans une boucle en série, le courant est <span class="hl">le même partout</span> : avant les lampes, après les lampes, près du + et près du −. On le mesure avec un <strong>ampèremètre</strong> (symbole : un rond avec un A), et on l'exprime en <strong>ampères</strong> (A).</p>
+    <p>Choisis un point du circuit pour y placer l'ampèremètre. Compare.</p>
+    <div class="box">
+      <div class="btns" role="group" aria-label="Nombre de lampes en série"><span class="lab">Lampes :</span><button type="button" id="ln1">1</button><button type="button" id="ln2">2</button><button type="button" id="ln3">3</button></div>
+      <div class="btns" role="group" aria-label="Position de l'ampèremètre"><span class="lab">Ampèremètre :</span><button type="button" id="pt0">Point 1</button><button type="button" id="pt1">Point 2</button><button type="button" id="pt2">Point 3</button><button type="button" id="pt3">Point 4</button></div>
+      <div class="circ"><svg id="loopSvg" viewBox="0 0 400 240" role="img" aria-label="Boucle en série avec un ampèremètre déplaçable"></svg></div>
+      <div class="verdict" id="loopOut" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Alors, qu'est-ce que la lampe utilise ?</span>
+      <span>Elle utilise de l'<strong>énergie</strong>, que la pile fournit et que le courant transporte. La lampe la transforme en lumière et en chaleur. Pense à la chaîne d'un vélo : elle fait le tour sans disparaître, mais elle transmet l'effort des pédales à la roue. (Ce n'est qu'une image : le courant n'est pas une chaîne !)</span>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · La sécurité</span>
+    <h2>Pile : oui. Prise : jamais.</h2>
+    <p>La <strong>tension</strong> d'un générateur s'exprime en <strong>volts</strong> (V). Plus elle est grande, plus le courant peut être fort, et plus il peut être dangereux pour le corps. Voici quelques ordres de grandeur.</p>
+    <ul class="recipe">
+      <li><span>Pile de télécommande (format AA)</span><span class="q">1,5 V</span></li>
+      <li><span>Pile plate de la classe</span><span class="q">4,5 V</span></li>
+      <li><span>Batterie de téléphone</span><span class="q">environ 4 V</span></li>
+      <li><span>Batterie de voiture</span><span class="q">12 V</span></li>
+      <li class="danger"><span>Prise de courant de la maison</span><span class="q">230 V</span></li>
+      <li class="danger"><span>Ligne au-dessus d'un TGV (caténaire)</span><span class="q">25 000 V</span></li>
+      <li class="danger"><span>Ligne à très haute tension</span><span class="q">jusqu'à 400 000 V</span></li>
+      <li class="danger"><span>Éclair d'orage (difficile à mesurer)</span><span class="q">des millions de V</span></li>
+    </ul>
+    <div class="box">
+      <h3>Danger ou pas ?</h3>
+      <div class="minis" id="safe"></div>
+      <span class="score" id="safeScore">0 / 8</span>
+    </div>
+    <div class="note red">
+      <span class="note-title">Les règles d'or</span>
+      <span>• On n'ouvre jamais une prise, une rallonge ou un appareil branché. • On ne met rien dans une prise. • Jamais d'appareil branché près de l'eau, jamais les mains mouillées. • On ne touche pas un fil abîmé. • On reste loin des lignes électriques et des transformateurs. • Une pile en court-circuit chauffe : on ne relie jamais ses bornes par un fil ou un objet en métal.</span>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Un peu d'histoire</span>
+    <h2>De la grenouille à la DEL</h2>
+    <ol class="timeline">
+      <li><span class="when">vers 1780</span><div class="what"><strong>Luigi Galvani</strong><span>Ce médecin italien remarque que des pattes de grenouille se contractent quand on les touche avec deux métaux différents. Il croit à une « électricité animale ».</span></div></li>
+      <li><span class="when">1800</span><div class="what"><strong>Alessandro Volta et la pile</strong><span>Volta pense plutôt que ce sont les deux métaux qui produisent l'électricité. Il empile des disques de cuivre et de zinc séparés par du carton mouillé d'eau salée : c'est la première <strong>pile</strong>, le premier générateur qui donne un courant continu. Le <strong>volt</strong> porte son nom.</span></div></li>
+      <li><span class="when">années 1820</span><div class="what"><strong>André-Marie Ampère</strong><span>Il étudie le courant et ses effets. On lui doit une grande partie du vocabulaire, et l'<strong>ampère</strong> porte son nom.</span></div></li>
+      <li><span class="when">vers 1880</span><div class="what"><strong>Les lampes à incandescence</strong><span>Plusieurs inventeurs fabriquent des lampes où un filament chauffé brille dans une ampoule de verre. Thomas Edison, aux États-Unis, et Joseph Swan, en Angleterre, sont les plus connus. Edison a surtout réussi à rendre la lampe solide et à créer tout un réseau pour l'alimenter.</span></div></li>
+      <li><span class="when">XX<sup>e</sup> siècle</span><div class="what"><strong>Les DEL</strong><span>Les premières DEL rouges apparaissent dans les années 1960. La DEL bleue, très difficile à fabriquer, arrive dans les années 1990 : elle permet enfin la lumière blanche. Ses inventeurs ont reçu le prix Nobel de physique en 2014.</span></div></li>
+    </ol>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · Attention</span>
+    <h2>Les erreurs fréquentes</h2>
+    <div class="box">
+      <ul class="errs">
+        <li><span class="bad">« Il suffit d'un fil entre la pile et la lampe. »</span><span class="good">Il faut une boucle fermée : de la borne + à la borne −, en passant par la lampe.</span></li>
+        <li><span class="bad">« La lampe consomme le courant : il en reste moins après. »</span><span class="good">Le courant est le même avant et après la lampe. Elle utilise de l'énergie, pas du courant.</span></li>
+        <li><span class="bad">« Dans le circuit, le courant va du − vers le +. »</span><span class="good">Par convention, hors de la pile, le courant va de la borne + vers la borne −.</span><span class="soft">Les électrons, eux, vont dans l'autre sens.</span></li>
+        <li><span class="bad">« Un court-circuit, c'est un circuit coupé. »</span><span class="good">Un court-circuit, c'est un fil qui relie directement les deux bornes d'un dipôle : le courant passe par le fil et contourne le dipôle.</span></li>
+        <li><span class="bad">« En dérivation, plus il y a de lampes, moins elles brillent. »</span><span class="good">En dérivation, chaque lampe brille comme si elle était seule. C'est en série qu'elles brillent moins.</span><span class="soft">En dérivation, la pile fournit plus de courant au total : elle s'use plus vite.</span></li>
+        <li><span class="bad">« La DEL marche dans les deux sens. »</span><span class="good">La DEL ne laisse passer le courant que dans son sens passant, celui de la pointe du triangle.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Réponds par un nombre entier. Toutes les lampes sont identiques, et les interrupteurs sont fermés sauf si on dit le contraire.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Nouvelles questions</button>
+    </div>
+  </section>
+
+  <!-- 12 -->
+  <section>
+    <span class="eyebrow">Étape 12 · À toi de jouer</span>
+    <h2>Six problèmes</h2>
+    <div class="exos">
+      <details>
+        <summary>La guirlande<span class="q">Une vieille guirlande de 20 ampoules s'éteint complètement quand une seule ampoule grille. Comment sont branchées ses ampoules ?</span></summary>
+        <div><span>Elles sont <strong>en série</strong> : il n'y a qu'un seul chemin. L'ampoule grillée ouvre le circuit, donc plus aucun courant ne circule. En dérivation, seule l'ampoule grillée se serait éteinte.</span></div>
+      </details>
+      <details>
+        <summary>Le schéma<span class="q">Décris le schéma d'un circuit qui contient une pile, un interrupteur et un moteur. Où place-t-on l'interrupteur ?</span></summary>
+        <div><span>On dessine un rectangle : le symbole de la pile sur un côté, le moteur (un rond avec un M) sur un autre, l'interrupteur sur un troisième, reliés par des traits droits. Comme tout est <strong>en série</strong>, l'interrupteur peut être <strong>n'importe où</strong> dans la boucle : il coupe toujours tout le circuit.</span></div>
+      </details>
+      <details>
+        <summary>Le fil de trop<span class="q">Deux lampes en série brillent faiblement. On relie les deux bornes de la lampe L1 par un fil. Que se passe-t-il ?</span></summary>
+        <div><span>L1 est <strong>court-circuitée</strong> : le courant passe par le fil et L1 s'éteint. Il ne reste qu'une lampe sur la pile : L2 brille <strong>normalement</strong>, plus fort qu'avant. Ce n'est pas un court-circuit de la pile, car L2 est toujours dans la boucle.</span></div>
+      </details>
+      <details>
+        <summary>La DEL retournée<span class="q">Une pile, une lampe et une DEL sont en série. La DEL est branchée dans le sens bloquant. La lampe brille-t-elle ?</span></summary>
+        <div><span><strong>Non</strong>. La DEL bloquante agit comme un interrupteur ouvert : aucun courant ne circule dans toute la boucle, donc la lampe est éteinte aussi. Il suffit de retourner la DEL (ou la pile) pour que tout s'allume.</span></div>
+      </details>
+      <details>
+        <summary>Le crayon<span class="q">Léa met un crayon de bois entier entre les pinces du testeur : la lampe ne s'allume pas. Pourtant, la mine en graphite conduit. Pourquoi ?</span></summary>
+        <div><span>Les pinces touchent le <strong>bois</strong>, qui est isolant. Le courant ne peut pas atteindre la mine. Il faut tailler le crayon des deux côtés pour que chaque pince touche directement la mine.</span></div>
+      </details>
+      <details>
+        <summary>Avant ou après ?<span class="q">Dans un circuit en série, un ampèremètre placé avant une lampe indique 0,20 A. Que montre-t-il si on le place après la lampe ?</span></summary>
+        <div><span>Toujours <strong>0,20 A</strong>. Dans une boucle en série, le courant est le même en tout point : la lampe ne « consomme » pas le courant.</span></div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• Un circuit électrique a besoin d'un <strong>générateur</strong> (une pile) et d'une <strong>boucle fermée</strong>. Si la boucle est ouverte, aucun courant ne circule.</span>
+      <span>• On dessine un <strong>schéma</strong> avec les <strong>symboles normalisés</strong> : pile, lampe, interrupteur, moteur, DEL, résistance, fils bien droits.</span>
+      <span>• Les <strong>métaux</strong> et le graphite sont <strong>conducteurs</strong> ; le bois, le plastique, le verre et l'air sont <strong>isolants</strong>.</span>
+      <span>• <strong>En série</strong> : un seul chemin, les lampes brillent moins, une lampe grillée éteint tout. <strong>En dérivation</strong> : chaque lampe brille comme seule, une lampe grillée n'éteint que sa branche.</span>
+      <span>• Un fil qui relie les bornes d'un dipôle le <strong>court-circuite</strong>. Le court-circuit de la pile est dangereux : elle chauffe.</span>
+      <span>• Par convention, le courant va de la borne <strong>+</strong> vers la borne <strong>−</strong> à l'extérieur de la pile. Il est le <strong>même partout</strong> dans une boucle : il ne s'use pas.</span>
+      <span>• La <strong>DEL</strong> ne laisse passer le courant que dans un sens (passant) ; dans l'autre, elle est bloquante.</span>
+      <span>• Le secteur (230 V) est <strong>dangereux</strong> : on expérimente seulement avec des piles de quelques volts.</span>
+    </div>
+  </section>
+
+  <!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"><a class="prev" href="le-poids-et-la-masse.html"><span>← Précédent</span><strong>Le poids et la masse</strong></a><a class="next" href="la-lumiere.html"><span>Suivant →</span><strong>La lumière</strong></a></div><a class="tnav-home" href="physique.html">⌂ Tous les tutoriels de physique</a></nav><!--/tnav-->
+<footer>Fiche de révision · Les circuits électriques</footer>
+</main>
+
+<script>
+(function () {
+  /* Hooks de test : window.__circ
+     solve(cfg) → { state: 'open' | 'ok' | 'short', where, I, m, lamps: [{ b, why }], branchI: [3 nombres] }
+       cfg = { mode: 'serie' | 'derivation', n: 1..3, k: bool (interrupteur principal K fermé),
+               sw: [bool ×3] (interrupteurs K1..K3 des branches, dérivation seulement),
+               broken: [bool ×3] (lampe grillée), shunt: [bool ×3] (fil entre les bornes de la lampe),
+               pileShort: bool (fil entre les bornes de la pile) }
+       Modèle idéal : pile de tension fixe, lampes identiques (même résistance R), fils parfaits.
+       b = éclat (puissance) relatif à une lampe seule sur la pile : série avec m lampes non court-circuitées → 1/m² ; dérivation → 1.
+       I = courant fourni par la pile en unités U/R (série : 1/m ; dérivation : nombre de branches allumées ; court-circuit : BIG = 20).
+     label(b) → « brille normalement » (b ≥ 0,99), « brille faiblement » (b ≥ 0,2), « brille très faiblement » (b > 0), « éteinte ».
+     conducts(id) → true / false pour un matériau du testeur ; materials → liste des matériaux { id, name, cond, b }.
+     ledPasses(plusTop, ledDown) → true si la DEL (sur le côté droit du schéma) est passante : le courant y descend si la borne + est en haut.
+     probe(n) → intensité (en A) lue par l'ampèremètre dans la boucle série de n lampes (modèle : 0,30 A pour une lampe, 0,30 / n sinon), identique en tout point.
+     check(i, cfg) → true si le défi i (0..3) du simulateur est réussi avec ce réglage.
+     makeQ(t) → question de quiz de type t (0..8) : { q, a, how }.
+  */
+  var NS = 'http://www.w3.org/2000/svg';
+  var BIG = 20;
+  function $(id) { return document.getElementById(id); }
+  function mk(p, name, attrs, text) { var e = document.createElementNS(NS, name); for (var a in attrs) if (attrs[a] != null) e.setAttribute(a, attrs[a]); if (text != null) e.textContent = text; p.appendChild(e); return e; }
+  function clear(e) { while (e.firstChild) e.removeChild(e.firstChild); }
+  function fmt(x, d) { var r = Math.round(x * 1e6) / 1e6; if (Object.is(r, -0)) r = 0; return r.toLocaleString('fr-FR', { minimumFractionDigits: d || 0, maximumFractionDigits: d == null ? 3 : d }).replace('-', '−'); }
+  function num(s) { var t = String(s).replace(/\s/g, '').replace(/[−–]/g, '-').replace(',', '.'); if (t === '') return NaN; var x = Number(t); return isFinite(x) ? x : NaN; }
+  function pressed(id, on) { $(id).setAttribute('aria-pressed', on ? 'true' : 'false'); }
+
+  /* ---------- Modèle électrique ---------- */
+  function label(b) { if (b >= 0.99) return 'brille normalement'; if (b >= 0.2) return 'brille faiblement'; if (b > 0) return 'brille très faiblement'; return 'éteinte'; }
+  function solve(c) {
+    var n = c.n, i, lamps = [], res = { state: 'ok', where: null, I: 0, m: 0, lamps: lamps, branchI: [0, 0, 0] };
+    for (i = 0; i < n; i++) lamps.push({ b: 0, why: '' });
+    function allOff(why) { lamps.forEach(function (L, j) { L.b = 0; L.why = c.broken[j] ? 'grillée (son filament est cassé)' : why; }); }
+    if (c.pileShort) { res.state = 'short'; res.where = 'pile'; res.I = BIG; allOff("éteinte : le fil sur la pile prend tout le courant"); return res; }
+    if (c.mode === 'serie') {
+      if (!c.k) { res.state = 'open'; allOff("éteinte : l'interrupteur K est ouvert"); return res; }
+      for (i = 0; i < n; i++) if (c.broken[i] && !c.shunt[i]) { res.state = 'open'; res.where = i; allOff('éteinte : la lampe grillée coupe la boucle'); return res; }
+      var m = 0; for (i = 0; i < n; i++) if (!c.shunt[i]) m++;
+      res.m = m;
+      if (m === 0) { res.state = 'short'; res.where = 'fils'; res.I = BIG; allOff('éteinte : court-circuitée par le fil'); return res; }
+      res.I = 1 / m;
+      for (i = 0; i < n; i++) {
+        if (c.shunt[i]) { lamps[i].b = 0; lamps[i].why = 'éteinte : court-circuitée par le fil' + (c.broken[i] ? ' (et grillée)' : ''); }
+        else { lamps[i].b = 1 / (m * m); lamps[i].why = label(1 / (m * m)); }
+      }
+      return res;
+    }
+    if (!c.k) { res.state = 'open'; allOff("éteinte : l'interrupteur principal K est ouvert"); return res; }
+    var shortB = false;
+    for (i = 0; i < n; i++) if (c.sw[i] && c.shunt[i]) shortB = true;
+    if (shortB) {
+      res.state = 'short'; res.where = 'branche';
+      for (i = 0; i < n; i++) {
+        lamps[i].b = 0;
+        if (c.sw[i] && c.shunt[i]) { lamps[i].why = 'éteinte : court-circuitée par le fil'; res.branchI[i] = BIG; res.I += BIG; }
+        else lamps[i].why = c.broken[i] ? 'grillée (son filament est cassé)' : 'éteinte : le court-circuit prive tout le circuit de courant';
+      }
+      return res;
+    }
+    for (i = 0; i < n; i++) {
+      if (!c.sw[i]) lamps[i].why = 'éteinte : son interrupteur K' + (i + 1) + ' est ouvert';
+      else if (c.broken[i]) lamps[i].why = 'grillée : seule sa branche est coupée';
+      else { lamps[i].b = 1; lamps[i].why = label(1); res.branchI[i] = 1; res.I += 1; }
+    }
+    if (res.I === 0) res.state = 'open';
+    return res;
+  }
+  function litCount(r) { return r.lamps.filter(function (L) { return L.b > 0; }).length; }
+
+  /* ---------- Symboles normalisés ---------- */
+  function sym(p, kind, x, y, a, o) {
+    o = o || {}; a = a || 0;
+    var g = mk(p, 'g', { transform: 'translate(' + x + ' ' + y + ') rotate(' + a + ')' });
+    function ln(x1, y1, x2, y2, cls) { return mk(g, 'line', { x1: x1, y1: y1, x2: x2, y2: y2, 'class': cls || 'wire' }); }
+    function txt(tx, ty, s, size) { return mk(g, 'text', { transform: 'translate(' + tx + ' ' + ty + ') rotate(' + (-a) + ')', 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-size': size || 16, 'font-weight': 700 }, s); }
+    var b = o.b || 0, sb = Math.sqrt(b);
+    if (o.onclick) { g.setAttribute('class', 'tap'); mk(g, 'rect', { x: -30, y: -24, width: 60, height: 48, fill: 'transparent' }); g.addEventListener('click', o.onclick); }
+    if (kind === 'wire') ln(-30, 0, 30, 0);
+    else if (kind === 'pile') { ln(-30, 0, -5, 0); ln(5, 0, 30, 0); ln(-5, -18, -5, 18, 'plate'); ln(5, -9, 5, 9, 'plate thick'); if (!o.nolabel) { txt(-15, -24, '+'); txt(15, -24, '−'); } }
+    else if (kind === 'lamp') {
+      ln(-30, 0, -14, 0); ln(14, 0, 30, 0);
+      if (b > 0) mk(g, 'circle', { r: (16 + 12 * sb).toFixed(1), 'class': 'halo', 'fill-opacity': (0.2 + 0.35 * sb).toFixed(2) });
+      mk(g, 'circle', { r: 14, 'class': 'body' + (b > 0 ? ' lit' : '') + (o.broken ? ' broken' : ''), style: b > 0 ? 'fill-opacity:' + (0.35 + 0.65 * sb).toFixed(2) : null });
+      var cc = 'cross' + (b > 0 ? ' litc' : '') + (o.broken ? ' brk' : '');
+      ln(-9.9, -9.9, 9.9, 9.9, cc); ln(-9.9, 9.9, 9.9, -9.9, cc);
+    }
+    else if (kind === 'switch') {
+      ln(-30, 0, -14, 0); ln(14, 0, 30, 0);
+      if (o.open) ln(-14, 0, 11, -15); else ln(-14, 0, 14, 0);
+      mk(g, 'circle', { cx: -14, cy: 0, r: 3.5, 'class': 'term' }); mk(g, 'circle', { cx: 14, cy: 0, r: 3.5, 'class': 'term' });
+    }
+    else if (kind === 'motor') { ln(-30, 0, -14, 0); ln(14, 0, 30, 0); mk(g, 'circle', { r: 14, 'class': 'body' }); txt(0, 0, 'M', 15); }
+    else if (kind === 'led') {
+      ln(-30, 0, -10, 0); ln(10, 0, 30, 0);
+      if (b > 0) mk(g, 'circle', { r: (14 + 10 * sb).toFixed(1), 'class': 'halo', 'fill-opacity': (0.25 + 0.35 * sb).toFixed(2) });
+      mk(g, 'polygon', { points: '-10,-11 -10,11 10,0', 'class': 'body' + (b > 0 ? ' lit' : '') });
+      ln(10, -11, 10, 11);
+      ln(0, -14, 8, -22, 'thin'); ln(6, -12, 14, -20, 'thin');
+      mk(g, 'polygon', { points: '8,-22 6.6,-16.3 2.3,-20.6', 'class': 'tip' }); mk(g, 'polygon', { points: '14,-20 12.6,-14.3 8.3,-18.6', 'class': 'tip' });
+    }
+    else if (kind === 'res') { ln(-30, 0, -16, 0); ln(16, 0, 30, 0); mk(g, 'rect', { x: -16, y: -7, width: 32, height: 14, 'class': 'body' }); }
+    else if (kind === 'amp') { ln(-30, 0, -14, 0); ln(14, 0, 30, 0); mk(g, 'circle', { r: 14, 'class': 'body meter' }); txt(0, 0, 'A', 15); }
+    return g;
+  }
+  function pts(p) { return p.map(function (q) { return q[0] + ',' + q[1]; }).join(' '); }
+  function wire(g, p, cls) { return mk(g, 'polyline', { points: pts(p), 'class': 'wire' + (cls ? ' ' + cls : '') }); }
+  function dot(g, x, y) { mk(g, 'circle', { cx: x, cy: y, r: 4, 'class': 'dot' }); }
+  function tx(g, x, y, s, anchor, size) { return mk(g, 'text', { x: x, y: y, 'text-anchor': anchor || 'middle', 'dominant-baseline': 'central', 'font-size': size || 16, 'font-weight': 600 }, s); }
+  function rev(p) { return p.slice().reverse(); }
+  function flow(g, p, I, short) {
+    if (!(I > 0)) return;
+    var dur = Math.max(0.15, Math.min(3, 0.8 / I)).toFixed(2);
+    for (var i = 0; i + 1 < p.length; i++) {
+      var x1 = p[i][0], y1 = p[i][1], x2 = p[i + 1][0], y2 = p[i + 1][1], L = Math.hypot(x2 - x1, y2 - y1);
+      if (L < 1) continue;
+      mk(g, 'line', { x1: x1, y1: y1, x2: x2, y2: y2, 'class': 'flow' + (short ? ' short' : ''), style: 'animation-duration:' + dur + 's' });
+      if (L >= 34) {
+        var deg = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+        mk(g, 'polygon', { points: '7,0 -5,-6 -5,6', transform: 'translate(' + ((x1 + x2) / 2) + ' ' + ((y1 + y2) / 2) + ') rotate(' + deg + ')', 'class': 'arrow' + (short ? ' short' : '') });
+      }
+    }
+  }
+  function layers(svg) { clear(svg); return { w: mk(svg, 'g', {}), s: mk(svg, 'g', {}), f: mk(svg, 'g', {}) }; }
+
+  /* ---------- Animation globale ---------- */
+  var animOn = true;
+  function setAnim(on) { animOn = on; document.querySelector('main.page').classList.toggle('noanim', !on); pressed('animBtn', on); pressed('animBtn2', on); }
+  $('animBtn').addEventListener('click', function () { setAnim(!animOn); });
+  $('animBtn2').addEventListener('click', function () { setAnim(!animOn); });
+
+  /* ---------- Hero ---------- */
+  var heroOn = false;
+  function heroRender() {
+    var L = layers($('heroSvg'));
+    var a = [[60, 60], [60, 30], [170, 30]], b = [[230, 30], [340, 30], [340, 60]], c = [[340, 120], [340, 150], [60, 150], [60, 120]];
+    [a, b, c].forEach(function (p) { wire(L.w, p); if (heroOn) flow(L.f, p, 1, false); });
+    sym(L.s, 'pile', 60, 90, 90);
+    sym(L.s, 'switch', 200, 30, 0, { open: !heroOn, onclick: heroToggle });
+    sym(L.s, 'lamp', 340, 90, 90, { b: heroOn ? 1 : 0 });
+    tx(L.s, 200, 62, 'interrupteur'); tx(L.s, 305, 90, 'lampe', 'end'); tx(L.s, 100, 90, 'pile', 'start');
+    $('heroBtn').textContent = heroOn ? "Ouvrir l'interrupteur" : "Fermer l'interrupteur";
+    $('heroOut').textContent = heroOn ? 'La boucle est fermée : le courant circule et la lampe brille.' : "L'interrupteur est ouvert : la lampe est éteinte.";
+  }
+  function heroToggle() { heroOn = !heroOn; heroRender(); }
+  $('heroBtn').addEventListener('click', heroToggle);
+  heroRender();
+
+  /* ---------- Cartes à parier (étapes 1 et 8) ---------- */
+  function choiceCards(boxId, scoreId, items, labels) {
+    var box = $(boxId), score = 0, answered = [];
+    items.forEach(function (it, k) {
+      var d = document.createElement('div'); d.className = 'mini';
+      var svg = null;
+      if (it.draw) { svg = document.createElementNS(NS, 'svg'); svg.setAttribute('viewBox', '0 0 200 140'); svg.setAttribute('role', 'img'); svg.setAttribute('aria-label', it.alt); d.appendChild(svg); it.draw(svg, false); }
+      else { var q = document.createElement('span'); q.textContent = it.q; d.appendChild(q); }
+      var bt = document.createElement('div'); bt.className = 'btns';
+      var fb = document.createElement('span'); fb.className = 'fbk'; fb.setAttribute('aria-live', 'polite');
+      labels.forEach(function (lb, v) {
+        var b = document.createElement('button'); b.type = 'button'; b.textContent = lb; b.id = boxId + k + '_' + v;
+        b.addEventListener('click', function () {
+          var good = v === it.ans;
+          if (!answered[k]) { answered[k] = true; if (good) score++; $(scoreId).textContent = score + ' / ' + items.length; }
+          fb.className = 'fbk ' + (good ? 'ok' : 'no');
+          fb.innerHTML = (good ? 'Bien vu !' : 'Eh non !') + '<span>' + it.why + '</span>';
+          if (svg) it.draw(svg, true);
+        });
+        bt.appendChild(b);
+      });
+      d.appendChild(bt); d.appendChild(fb); box.appendChild(d);
+    });
+  }
+  function miniBase(svg, opts) {
+    var L = layers(svg);
+    var top = opts.top || [[[30, 40], [30, 22], [170, 22], [170, 40]]];
+    var bot = opts.bot || [[[30, 100], [30, 118], [170, 118], [170, 100]]];
+    top.concat(bot).forEach(function (p) { wire(L.w, p); });
+    return L;
+  }
+  var minis = [
+    { alt: 'Pile et lampe reliées par deux fils en boucle', ans: 0, why: "La boucle est fermée : le courant sort par la borne +, traverse la lampe et revient par la borne −.",
+      draw: function (svg, r) { var L = miniBase(svg, {}); sym(L.s, 'pile', 30, 70, 90, { nolabel: true }); sym(L.s, 'lamp', 170, 70, 90, { b: r ? 1 : 0 }); if (r) { flow(L.f, [[30, 40], [30, 22], [170, 22], [170, 40]], 1); flow(L.f, [[170, 100], [170, 118], [30, 118], [30, 100]], 1); } } },
+    { alt: 'Pile et lampe, un des fils est débranché', ans: 1, why: "Un fil est débranché : le circuit est ouvert, le courant ne peut pas faire le tour.",
+      draw: function (svg) { var L = miniBase(svg, { bot: [[[30, 100], [30, 118], [92, 118]], [[170, 100], [170, 118], [118, 106]]] }); dot(L.s, 92, 118); dot(L.s, 118, 106); sym(L.s, 'pile', 30, 70, 90, { nolabel: true }); sym(L.s, 'lamp', 170, 70, 90); } },
+    { alt: 'Les deux fils de la lampe vont à la même borne de la pile', ans: 1, why: "Les deux fils de la lampe arrivent à la même borne (+). La lampe n'est pas entre les deux bornes de la pile : rien ne circule.",
+      draw: function (svg) { var L = miniBase(svg, { bot: [[[30, 100], [30, 112]], [[170, 100], [170, 118], [60, 118], [60, 22]]] }); dot(L.s, 60, 22); sym(L.s, 'pile', 30, 70, 90, { nolabel: true }); sym(L.s, 'lamp', 170, 70, 90); } },
+    { alt: 'Deux lampes en boucle, sans pile', ans: 1, why: "Il n'y a pas de générateur : sans pile, aucun courant, même si la boucle est fermée.",
+      draw: function (svg) { var L = miniBase(svg, {}); sym(L.s, 'lamp', 30, 70, 90); sym(L.s, 'lamp', 170, 70, 90); } },
+    { alt: 'Pile, interrupteur ouvert et lampe en boucle', ans: 1, why: "L'interrupteur est ouvert : il coupe la boucle comme un fil débranché.",
+      draw: function (svg) { var L = miniBase(svg, { top: [[[30, 40], [30, 22], [70, 22]], [[130, 22], [170, 22], [170, 40]]] }); sym(L.s, 'pile', 30, 70, 90, { nolabel: true }); sym(L.s, 'switch', 100, 22, 0, { open: true }); sym(L.s, 'lamp', 170, 70, 90); } },
+    { alt: 'Pile et lampe en boucle, avec un fil en plus qui relie directement les deux bornes de la pile', ans: 1, why: "Le fil de gauche relie directement les deux bornes de la pile : c'est un court-circuit. Le courant prend ce chemin facile et ne passe presque plus par la lampe. La pile chauffe : danger !",
+      draw: function (svg, r) { var L = miniBase(svg, {}); wire(L.w, [[30, 22], [8, 22], [8, 118], [30, 118]], 'shunt'); dot(L.s, 30, 22); dot(L.s, 30, 118); sym(L.s, 'pile', 30, 70, 90, { nolabel: true }); sym(L.s, 'lamp', 170, 70, 90); if (r) flow(L.f, [[30, 40], [30, 22], [8, 22], [8, 118], [30, 118], [30, 100]], BIG, true); } }
+  ];
+  choiceCards('minis', 'minisScore', minis, ['Elle brille', 'Elle ne brille pas']);
+
+  var safety = [
+    { q: "Construire un circuit avec une pile de 4,5 V, des fils et une lampe.", ans: 0, why: "C'est l'expérience de la classe. Une pile de quelques volts est sans danger pour le corps." },
+    { q: "Relier les deux bornes d'une pile plate avec un trombone.", ans: 1, why: "C'est un court-circuit : le trombone et la pile chauffent, on peut se brûler et la pile peut couler." },
+    { q: "Dévisser une prise de courant pour regarder dedans.", ans: 1, why: "230 V : danger de mort. Seul un électricien intervient, après avoir coupé le courant au tableau électrique." },
+    { q: "Toucher les deux bornes d'une pile de 1,5 V avec les doigts.", ans: 0, why: "La tension est bien trop faible : on ne sent rien." },
+    { q: "Utiliser un sèche-cheveux branché au bord d'une baignoire pleine.", ans: 1, why: "L'eau du bain conduit : si l'appareil tombe, le courant du secteur peut traverser le corps." },
+    { q: "Faire voler un cerf-volant près d'une ligne électrique.", ans: 1, why: "Les lignes portent des milliers de volts. Le courant peut descendre par la ficelle, surtout si elle est humide." },
+    { q: "Garder des piles dans sa poche avec des clés et des pièces.", ans: 1, why: "Le métal peut relier les bornes d'une pile : court-circuit, elle chauffe. Une batterie au lithium peut même prendre feu." },
+    { q: "Débrancher un appareil en tirant sur la fiche, avec les mains sèches.", ans: 0, why: "C'est la bonne façon : on tire sur la fiche, pas sur le câble, et jamais avec les mains mouillées." }
+  ];
+  choiceCards('safe', 'safeScore', safety, ['Sans danger', 'Dangereux']);
+
+  /* ---------- Galerie de symboles et memory ---------- */
+  var SYMS = [
+    { id: 'pile', kind: 'pile', name: 'Pile (générateur)', d: 'Grand trait fin : la borne +. Petit trait épais : la borne −.' },
+    { id: 'lamp', kind: 'lamp', name: 'Lampe', d: 'Un rond avec une croix.' },
+    { id: 'swO', kind: 'switch', o: { open: true }, name: 'Interrupteur ouvert', d: 'Le circuit est coupé : le courant ne passe pas.' },
+    { id: 'swF', kind: 'switch', o: { open: false }, name: 'Interrupteur fermé', d: 'Le courant passe.' },
+    { id: 'motor', kind: 'motor', name: 'Moteur', d: 'Un rond avec la lettre M.' },
+    { id: 'led', kind: 'led', name: 'DEL', d: 'Un triangle qui montre le sens passant, une barre, deux flèches pour la lumière.' },
+    { id: 'res', kind: 'res', name: 'Résistance', d: 'Un rectangle. Elle limite le courant.' },
+    { id: 'wire', kind: 'wire', name: 'Fil de connexion', d: 'Un trait bien droit, horizontal ou vertical.' }
+  ];
+  function symSvg(s) { var svg = document.createElementNS(NS, 'svg'); svg.setAttribute('viewBox', '-36 -32 72 50'); svg.setAttribute('aria-hidden', 'true'); sym(svg, s.kind, 0, 0, 0, s.o); return svg; }
+  SYMS.forEach(function (s) {
+    var d = document.createElement('div'); d.className = 'symcard';
+    d.appendChild(symSvg(s));
+    var st = document.createElement('strong'); st.textContent = s.name; d.appendChild(st);
+    var sp = document.createElement('span'); sp.textContent = s.d; d.appendChild(sp);
+    $('symgrid').appendChild(d);
+  });
+  var memo = { cards: [], open: [], found: 0, tries: 0, timer: null, btns: [] };
+  function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  function memoNew() {
+    clearTimeout(memo.timer);
+    memo.cards = shuffle(SYMS.map(function (s) { return { pair: s.id, face: 'sym', up: false, found: false }; }).concat(SYMS.map(function (s) { return { pair: s.id, face: 'name', up: false, found: false }; })));
+    memo.open = []; memo.found = 0; memo.tries = 0; memo.btns = [];
+    var box = $('memo'); clear(box);
+    memo.cards.forEach(function (c, i) {
+      var b = document.createElement('button'); b.type = 'button'; b.id = 'mc' + i;
+      b.addEventListener('click', function () { memoClick(i); });
+      box.appendChild(b); memo.btns.push(b);
+    });
+    memoRender();
+  }
+  function memoClose() { clearTimeout(memo.timer); memo.open.forEach(function (j) { memo.cards[j].up = false; }); memo.open = []; }
+  function memoClick(i) {
+    var c = memo.cards[i];
+    if (c.found || c.up) return;
+    if (memo.open.length === 2) memoClose();
+    c.up = true; memo.open.push(i);
+    if (memo.open.length === 2) {
+      memo.tries++;
+      var A = memo.cards[memo.open[0]], B = memo.cards[memo.open[1]];
+      if (A.pair === B.pair) { A.found = B.found = true; memo.open = []; memo.found++; }
+      else memo.timer = setTimeout(function () { memoClose(); memoRender(); }, 1200);
+    }
+    memoRender();
+  }
+  function memoRender() {
+    memo.cards.forEach(function (c, i) {
+      var b = memo.btns[i], s = SYMS.filter(function (z) { return z.id === c.pair; })[0];
+      clear(b);
+      if (c.up || c.found) {
+        b.className = c.found ? 'found' : 'up';
+        if (c.face === 'sym') b.appendChild(symSvg(s)); else b.textContent = s.name;
+        b.setAttribute('aria-label', c.face === 'sym' ? 'Carte retournée : symbole ' + s.name : 'Carte retournée : ' + s.name);
+      } else { b.className = 'down'; b.textContent = '?'; b.setAttribute('aria-label', 'Carte ' + (i + 1) + ', face cachée'); }
+    });
+    $('memoScore').textContent = memo.found + ' / 8';
+    $('memoTries').textContent = memo.found === 8 ? 'Bravo, tout trouvé en ' + memo.tries + ' essais !' : memo.tries + (memo.tries > 1 ? ' essais' : ' essai');
+  }
+  $('memoNew').addEventListener('click', memoNew);
+  memoNew();
+
+  /* ---------- Testeur de matériaux ---------- */
+  var MATS = [
+    { id: 'cuivre', name: 'Fil de cuivre', cond: true, b: 1, col: '#b87333', t: "Le cuivre est un métal, l'un des meilleurs conducteurs. Les fils électriques sont en cuivre." },
+    { id: 'fer', name: 'Clou en fer', cond: true, b: 1, col: '#8a8f98', t: 'Le fer est un métal : tous les métaux conduisent le courant.' },
+    { id: 'alu', name: 'Papier aluminium', cond: true, b: 1, col: '#c9ccd1', t: "L'aluminium est un métal : il conduit très bien." },
+    { id: 'piece', name: 'Pièce de monnaie', cond: true, b: 1, col: '#c8a24a', t: 'Les pièces sont faites de métaux (cuivre, nickel, zinc…) : elles conduisent.' },
+    { id: 'graphite', name: 'Mine de crayon (graphite)', cond: true, b: 0.3, col: '#3d3d3d', t: "Le graphite n'est pas un métal, mais il conduit, moins bien qu'un métal : la lampe brille faiblement." },
+    { id: 'sel', name: 'Eau salée', cond: true, b: 0.08, col: '#7fb5e0', t: "L'eau salée conduit, mais mal : la lampe brille à peine, parfois on ne voit rien. Une DEL, qui a besoin de très peu de courant, s'allume bien." },
+    { id: 'pure', name: 'Eau pure (distillée)', cond: false, b: 0, col: '#d6ebf8', t: "L'eau pure conduit très, très mal : pour notre testeur, c'est un isolant. Mais l'eau du robinet contient des sels : elle conduit davantage." },
+    { id: 'bois', name: 'Bâton de bois sec', cond: false, b: 0, col: '#b08550', t: 'Le bois sec est un isolant. (Mouillé, il peut conduire un peu.)' },
+    { id: 'plastique', name: 'Règle en plastique', cond: false, b: 0, col: '#5ba3d9', t: 'Le plastique est un isolant : on en fait les gaines des fils et les boîtiers des prises.' },
+    { id: 'verre', name: 'Verre', cond: false, b: 0, col: '#bfe3dc', t: 'Le verre est un isolant. On en a longtemps fait les isolateurs des lignes électriques.' },
+    { id: 'gomme', name: 'Gomme (caoutchouc)', cond: false, b: 0, col: '#e88aa0', t: 'Le caoutchouc est un isolant : les gants des électriciens sont en caoutchouc.' },
+    { id: 'air', name: 'Rien (de l\'air)', cond: false, b: 0, col: null, t: "L'air est un isolant : c'est pour ça qu'un interrupteur ouvert, avec un petit espace d'air, coupe le courant. Seule une tension énorme, comme celle d'un éclair, arrive à traverser l'air." }
+  ];
+  var test = { cur: 0, revealed: false, tried: {}, good: 0, n: 0 };
+  MATS.forEach(function (m, i) {
+    var b = document.createElement('button'); b.type = 'button'; b.id = 'mat' + i; b.textContent = m.name;
+    b.addEventListener('click', function () { test.cur = i; test.revealed = !!test.tried[m.id]; testRender(); });
+    $('matBtns').appendChild(b);
+  });
+  function bet(c) {
+    var m = MATS[test.cur], good = c === m.cond;
+    if (!test.tried[m.id]) { test.tried[m.id] = true; test.n++; if (good) test.good++; }
+    test.revealed = true; testRender(good);
+  }
+  $('betC').addEventListener('click', function () { bet(true); });
+  $('betI').addEventListener('click', function () { bet(false); });
+  function testRender(good) {
+    var L = layers($('testSvg')), m = MATS[test.cur], b = test.revealed && m.cond ? m.b : 0;
+    var a = [[50, 70], [50, 40], [170, 40]], c = [[230, 40], [350, 40], [350, 160], [262, 160]], d = [[148, 160], [50, 160], [50, 130]];
+    [a, c, d].forEach(function (p) { wire(L.w, p); if (b > 0) flow(L.f, p, b, false); });
+    if (m.col) mk(L.s, 'rect', { x: 156, y: 151, width: 98, height: 18, rx: 4, fill: m.col, 'class': 'mat' });
+    mk(L.s, 'rect', { x: 144, y: 153, width: 18, height: 14, rx: 2, 'class': 'clip' });
+    mk(L.s, 'rect', { x: 248, y: 153, width: 18, height: 14, rx: 2, 'class': 'clip blk' });
+    sym(L.s, 'pile', 50, 100, 90);
+    sym(L.s, 'lamp', 200, 40, 0, { b: b });
+    tx(L.s, 205, 188, m.name);
+    if (!test.revealed) tx(L.s, 200, 78, '?', 'middle', 22);
+    MATS.forEach(function (z, i) { pressed('mat' + i, i === test.cur); });
+    var out = $('testOut');
+    if (!test.revealed) { out.className = 'verdict'; out.innerHTML = '<span>Matériau choisi : <strong>' + m.name + '</strong>. Conducteur ou isolant ? Fais ton pari.</span>'; }
+    else {
+      out.className = 'verdict ' + (m.cond ? 'yes' : 'no');
+      out.innerHTML = (good === true ? 'Bon pari ! ' : good === false ? 'Raté ! ' : '') + m.name + ' : ' + (m.cond ? 'conducteur' : 'isolant') + ' (la lampe ' + label(b) + ').<span>' + m.t + '</span>';
+    }
+    $('testScore').textContent = 'Bons paris : ' + test.good + ' sur ' + test.n + (test.n > 1 ? ' matériaux testés' : ' matériau testé') + ' (' + MATS.length + ' en tout).';
+  }
+  testRender();
+
+  /* ---------- Simulateur ---------- */
+  function freshSim() { return { mode: 'serie', n: 2, k: true, sw: [true, true, true], broken: [false, false, false], shunt: [false, false, false], pileShort: false }; }
+  var sim = freshSim(), chalDone = [false, false, false, false];
+  function check(i, c) {
+    var r = solve(c), full = r.lamps.filter(function (L) { return L.b >= 0.99; }).length, lit = litCount(r);
+    if (i === 0) return full >= 2;
+    if (i === 1) return c.mode === 'serie' && c.n === 3 && r.state === 'ok' && lit === 2 && !c.broken.slice(0, 3).some(Boolean);
+    if (i === 2) return c.mode === 'derivation' && r.state === 'ok' && lit >= 1 && c.broken.slice(0, c.n).some(Boolean);
+    if (i === 3) return r.state === 'short';
+    return false;
+  }
+  function simRender() {
+    var L = layers($('simSvg')), r = solve(sim), n = sim.n, i, x;
+    var sh = r.state === 'short', pileSh = sh && r.where === 'pile';
+    if (sim.mode === 'serie') {
+      var xs = { 1: [200], 2: [150, 250], 3: [120, 200, 280] }[n], T = 50, B = 210, Lx = 40, Rx = 360;
+      var on = (r.state === 'ok' || sh) && !pileSh, I = r.I;
+      var p1 = [[Lx, 100], [Lx, T], [170, T]], p2 = [[230, T], [Rx, T], [Rx, B], [xs[n - 1] + 30, B]];
+      wire(L.w, p1); wire(L.w, p2); if (on) { flow(L.f, p1, I, sh); flow(L.f, p2, I, sh); }
+      for (i = n - 1; i >= 0; i--) {
+        x = xs[i];
+        if (sim.shunt[i]) { var sp = [[x + 30, B], [x + 30, B + 38], [x - 30, B + 38], [x - 30, B]]; wire(L.w, sp, 'shunt'); dot(L.s, x + 30, B); dot(L.s, x - 30, B); if (on) flow(L.f, sp, I, sh); }
+        var seg = i > 0 ? [[x - 30, B], [xs[i - 1] + 30, B]] : [[x - 30, B], [Lx, B], [Lx, 160]];
+        wire(L.w, seg); if (on) flow(L.f, seg, I, sh);
+      }
+      if (sim.pileShort) { var pw = [[Lx, 100], [12, 100], [12, 160], [Lx, 160]]; wire(L.w, pw, 'shunt'); dot(L.s, Lx, 100); dot(L.s, Lx, 160); flow(L.f, pw, BIG, true); }
+      sym(L.s, 'pile', Lx, 130, 90);
+      sym(L.s, 'switch', 200, T, 0, { open: !sim.k, onclick: function () { sim.k = !sim.k; simRender(); } });
+      tx(L.s, 200, T - 26, 'K');
+      for (i = 0; i < n; i++) {
+        (function (i) { sym(L.s, 'lamp', xs[i], B, 0, { b: r.lamps[i].b, broken: sim.broken[i], onclick: function () { sim.broken[i] = !sim.broken[i]; simRender(); } }); })(i);
+        tx(L.s, xs[i], B - 38, 'L' + (i + 1));
+      }
+    } else {
+      var xp = { 1: [250], 2: [200, 320], 3: [160, 250, 340] }[n], T2 = 40, B2 = 230, Lx2 = 40;
+      var bI = pileSh ? [0, 0, 0] : r.branchI;
+      var beyond = function (j) { var s = 0; for (var q = j; q < n; q++) s += bI[q]; return s; };
+      var tot = beyond(0);
+      var a1 = [[Lx2, 105], [Lx2, T2], [65, T2]]; wire(L.w, a1); flow(L.f, a1, tot, sh);
+      var prev = 125;
+      for (i = 0; i < n; i++) { var s1 = [[prev, T2], [xp[i], T2]]; wire(L.w, s1); flow(L.f, s1, beyond(i), sh); prev = xp[i]; }
+      for (i = n - 1; i >= 0; i--) { var s2 = [[xp[i], B2], [i > 0 ? xp[i - 1] : Lx2, B2]]; if (i === 0) s2.push([Lx2, 165]); wire(L.w, s2); flow(L.f, s2, beyond(i), sh); }
+      for (i = 0; i < n; i++) {
+        x = xp[i];
+        if (i < n - 1) { dot(L.s, x, T2); dot(L.s, x, B2); }
+        var b1 = [[x, T2], [x, 65]], b2 = [[x, 125], [x, 135]], b3 = [[x, 195], [x, B2]];
+        [b1, b2, b3].forEach(function (p) { wire(L.w, p); flow(L.f, p, bI[i], sh); });
+        if (sim.shunt[i]) { var sp2 = [[x, 135], [x + 28, 135], [x + 28, 195], [x, 195]]; wire(L.w, sp2, 'shunt'); dot(L.s, x, 135); dot(L.s, x, 195); flow(L.f, sp2, bI[i], sh); }
+        (function (i, x) {
+          sym(L.s, 'switch', x, 95, 90, { open: !sim.sw[i], onclick: function () { sim.sw[i] = !sim.sw[i]; simRender(); } });
+          sym(L.s, 'lamp', x, 165, 90, { b: r.lamps[i].b, broken: sim.broken[i], onclick: function () { sim.broken[i] = !sim.broken[i]; simRender(); } });
+        })(i, x);
+        tx(L.s, x - 20, 95, 'K' + (i + 1), 'end');
+        tx(L.s, x - 32, 165, 'L' + (i + 1), 'end');
+      }
+      if (sim.pileShort) { var pw2 = [[Lx2, 105], [12, 105], [12, 165], [Lx2, 165]]; wire(L.w, pw2, 'shunt'); dot(L.s, Lx2, 105); dot(L.s, Lx2, 165); flow(L.f, pw2, BIG, true); }
+      sym(L.s, 'pile', Lx2, 135, 90);
+      sym(L.s, 'switch', 95, T2, 0, { open: !sim.k, onclick: function () { sim.k = !sim.k; simRender(); } });
+      tx(L.s, 95, T2 + 22, 'K');
+    }
+    /* commandes */
+    pressed('mSerie', sim.mode === 'serie'); pressed('mDer', sim.mode === 'derivation');
+    for (i = 1; i <= 3; i++) pressed('nb' + i, sim.n === i);
+    pressed('pileShort', sim.pileShort);
+    var row = $('swRow'); clear(row);
+    var lab = document.createElement('span'); lab.className = 'lab'; lab.textContent = 'Interrupteurs :'; row.appendChild(lab);
+    var swList = [{ t: 'K', get: function () { return sim.k; }, set: function () { sim.k = !sim.k; } }];
+    if (sim.mode === 'derivation') for (i = 0; i < n; i++) (function (i) { swList.push({ t: 'K' + (i + 1), get: function () { return sim.sw[i]; }, set: function () { sim.sw[i] = !sim.sw[i]; } }); })(i);
+    swList.forEach(function (s, j) {
+      var b = document.createElement('button'); b.type = 'button'; b.id = 'sw' + j;
+      b.textContent = s.t + ' : ' + (s.get() ? 'fermé' : 'ouvert'); b.setAttribute('aria-pressed', s.get() ? 'true' : 'false');
+      b.addEventListener('click', function () { s.set(); simRender(); $('sw' + j).focus(); });
+      row.appendChild(b);
+    });
+    var ul = $('lampList'); clear(ul);
+    for (i = 0; i < n; i++) (function (i) {
+      var li = document.createElement('li'), Lp = r.lamps[i];
+      var dl = document.createElement('span'); dl.className = 'dotlit';
+      if (Lp.b > 0) { dl.style.background = 'var(--lit)'; dl.style.opacity = (0.35 + 0.65 * Math.sqrt(Lp.b)).toFixed(2); }
+      li.appendChild(dl);
+      var nm = document.createElement('span'); nm.className = 'nm'; nm.textContent = 'L' + (i + 1); li.appendChild(nm);
+      var st = document.createElement('span'); st.className = 'st'; st.textContent = Lp.why; li.appendChild(st);
+      var bb = document.createElement('button'); bb.type = 'button'; bb.id = 'brk' + i; bb.textContent = sim.broken[i] ? 'Réparer' : 'Griller';
+      bb.addEventListener('click', function () { sim.broken[i] = !sim.broken[i]; simRender(); $('brk' + i).focus(); });
+      var sb = document.createElement('button'); sb.type = 'button'; sb.id = 'shu' + i; sb.textContent = sim.shunt[i] ? 'Enlever le fil' : 'Fil sur la lampe';
+      sb.addEventListener('click', function () { sim.shunt[i] = !sim.shunt[i]; simRender(); $('shu' + i).focus(); });
+      li.appendChild(bb); li.appendChild(sb); ul.appendChild(li);
+    })(i);
+    /* verdict */
+    var out = $('simOut'), msg, amp = r.state === 'ok' ? 'Courant fourni par la pile : environ ' + fmt(0.3 * r.I, 2) + ' A (dans notre modèle, 0,30 A pour une lampe seule).' : '';
+    if (sh) {
+      out.className = 'verdict no';
+      msg = 'Court-circuit de la pile !<span>' + (r.where === 'pile' ? 'Le fil bleu relie directement les deux bornes de la pile.' : r.where === 'fils' ? 'Toutes les lampes sont contournées par des fils : il ne reste que des fils entre les bornes de la pile.' : "En dérivation, le fil sur la lampe relie directement le haut et le bas du circuit, donc les deux bornes de la pile.") + " Le courant devient énorme, les lampes s'éteignent, les fils et la pile chauffent. En vrai, ne fais jamais ça.</span>";
+    } else if (r.state === 'open') {
+      out.className = 'verdict';
+      msg = 'Circuit ouvert : aucun courant.<span>' + (sim.mode === 'serie' && r.where !== null ? "En série, il n'y a qu'un chemin : une seule lampe grillée suffit à tout éteindre." : 'Le courant ne peut pas faire le tour de la boucle.') + '</span>';
+    } else if (sim.mode === 'serie') {
+      out.className = 'verdict yes';
+      var nsh = sim.shunt.slice(0, n).filter(Boolean).length;
+      msg = 'Circuit fermé.<span>' + (r.m === 1 ? 'Une seule lampe sur la pile : elle brille normalement. ' : 'Les ' + r.m + ' lampes se partagent la pile : chacune brille moins que si elle était seule. ') + (nsh ? "Une lampe court-circuitée par un fil s'éteint : le courant passe par le fil, plus facile. Les autres brillent plus fort. " : '') + amp + '</span>';
+    } else {
+      out.className = 'verdict yes';
+      msg = 'Circuit fermé.<span>Chaque branche fermée est reliée directement aux deux bornes de la pile : chaque lampe allumée brille normalement, comme si elle était seule. Plus il y a de lampes allumées, plus la pile fournit de courant et plus vite elle s\'use. ' + amp + '</span>';
+    }
+    out.innerHTML = msg;
+    for (i = 0; i < 4; i++) {
+      if (!chalDone[i] && check(i, sim)) chalDone[i] = true;
+      var li2 = $('ch' + i); li2.classList.toggle('done', chalDone[i]); li2.querySelector('.ck').textContent = chalDone[i] ? '✓' : '○';
+    }
+  }
+  $('mSerie').addEventListener('click', function () { sim.mode = 'serie'; simRender(); });
+  $('mDer').addEventListener('click', function () { sim.mode = 'derivation'; simRender(); });
+  [1, 2, 3].forEach(function (k) { $('nb' + k).addEventListener('click', function () { sim.n = k; simRender(); }); });
+  $('pileShort').addEventListener('click', function () { sim.pileShort = !sim.pileShort; simRender(); });
+  $('simReset').addEventListener('click', function () { var m = sim.mode, n = sim.n; sim = freshSim(); sim.mode = m; sim.n = n; simRender(); });
+  simRender();
+
+  /* ---------- Sens du courant ---------- */
+  var dir = { flip: false, rec: 'lamp' };
+  function dirRender() {
+    var L = layers($('dirSvg'));
+    var top = [[50, 90], [50, 40], [280, 40], [280, 90]], bot = [[280, 150], [280, 200], [50, 200], [50, 150]];
+    wire(L.w, top); wire(L.w, bot);
+    if (!dir.flip) { flow(L.f, top, 1); flow(L.f, bot, 1); } else { flow(L.f, rev(bot), 1); flow(L.f, rev(top), 1); }
+    sym(L.s, 'pile', 50, 120, dir.flip ? -90 : 90);
+    if (dir.rec === 'lamp') { sym(L.s, 'lamp', 280, 120, 90, { b: 1 }); tx(L.s, 314, 120, 'lampe', 'start'); }
+    else {
+      mk(L.s, 'line', { x1: 294, y1: 120, x2: 352, y2: 120, 'class': 'thin' });
+      sym(L.s, 'motor', 280, 120, 90);
+      tx(L.s, 330, 224, 'moteur');
+      var outer = mk(L.s, 'g', { transform: 'translate(352 120)' }), inner = mk(outer, 'g', { 'class': 'spin' + (dir.flip ? ' rev' : '') });
+      mk(inner, 'circle', { r: 24, fill: 'transparent' });
+      mk(inner, 'ellipse', { rx: 22, ry: 6, 'class': 'blade' }); mk(inner, 'ellipse', { rx: 6, ry: 22, 'class': 'blade' });
+      mk(inner, 'circle', { r: 4, 'class': 'dot' });
+      tx(L.s, 352, 172, dir.flip ? '↺' : '↻', 'middle', 28);
+    }
+    var lines = dir.flip ? ['sens inverse', 'des aiguilles', "d'une montre"] : ['sens des', 'aiguilles', "d'une montre"];
+    lines.forEach(function (s, j) { tx(L.s, 150, 100 + 20 * j, s, 'middle', 15); });
+    pressed('dirLamp', dir.rec === 'lamp'); pressed('dirMotor', dir.rec === 'motor'); pressed('dirFlip', dir.flip);
+    var where = dir.flip ? 'en bas' : 'en haut';
+    $('dirOut').className = 'verdict yes';
+    $('dirOut').innerHTML = 'La borne + est ' + where + '.<span>Le courant sort par la borne +, fait le tour du circuit ' + (dir.flip ? 'dans le sens inverse des aiguilles d\'une montre' : 'dans le sens des aiguilles d\'une montre') + ', et rentre par la borne −. ' + (dir.rec === 'lamp' ? 'La lampe brille pareil dans les deux sens.' : 'Le moteur tourne ' + (dir.flip ? 'dans l\'autre sens (↺).' : 'dans un sens (↻). Retourne la pile pour l\'inverser.')) + '</span>';
+  }
+  $('dirFlip').addEventListener('click', function () { dir.flip = !dir.flip; dirRender(); });
+  $('dirLamp').addEventListener('click', function () { dir.rec = 'lamp'; dirRender(); });
+  $('dirMotor').addEventListener('click', function () { dir.rec = 'motor'; dirRender(); });
+  dirRender();
+
+  /* ---------- DEL ---------- */
+  function ledPasses(plusTop, ledDown) { return plusTop === ledDown; }
+  var led = { pileFlip: false, ledFlip: false, prot: 'res' };
+  function ledRender() {
+    var L = layers($('ledSvg')), plusTop = !led.pileFlip, ledDown = !led.ledFlip, ok = ledPasses(plusTop, ledDown);
+    var ch = [[[50, 90], [50, 40], [135, 40]], [[195, 40], [280, 40], [280, 90]], [[280, 150], [280, 200], [50, 200], [50, 150]]];
+    ch.forEach(function (p) { wire(L.w, p); if (ok) flow(L.f, plusTop ? p : rev(p), led.prot === 'lamp' ? 0.5 : 1); });
+    sym(L.s, 'pile', 50, 120, plusTop ? 90 : -90);
+    if (led.prot === 'res') { sym(L.s, 'res', 165, 40, 0); tx(L.s, 165, 16, 'résistance'); }
+    else { sym(L.s, 'lamp', 165, 40, 0, { b: ok ? 0.25 : 0 }); tx(L.s, 165, 76, 'lampe'); }
+    sym(L.s, 'led', 280, 120, ledDown ? 90 : -90, { b: ok ? 1 : 0 });
+    tx(L.s, 316, 120, 'DEL', 'start');
+    tx(L.s, 165, 140, ok ? 'passante' : 'bloquante', 'middle', 17);
+    pressed('ledRes', led.prot === 'res'); pressed('ledLamp', led.prot === 'lamp'); pressed('ledFlip', led.ledFlip); pressed('ledPile', led.pileFlip);
+    var out = $('ledOut');
+    out.className = 'verdict ' + (ok ? 'yes' : 'no');
+    out.innerHTML = ok ? 'La DEL est passante : elle s\'allume.<span>Le courant va de la borne + vers la borne − et traverse la DEL dans le sens de la pointe du triangle.' + (led.prot === 'lamp' ? ' La lampe, en série, brille faiblement.' : '') + '</span>'
+      : 'La DEL est bloquante : tout est éteint.<span>Le courant devrait traverser la DEL à contresens de la pointe du triangle : elle bloque. Comme tout est en série, aucun courant ne circule dans la boucle' + (led.prot === 'lamp' ? ', et la lampe est éteinte aussi.' : '.') + ' Retourne la DEL ou la pile.</span>';
+  }
+  $('ledFlip').addEventListener('click', function () { led.ledFlip = !led.ledFlip; ledRender(); });
+  $('ledPile').addEventListener('click', function () { led.pileFlip = !led.pileFlip; ledRender(); });
+  $('ledRes').addEventListener('click', function () { led.prot = 'res'; ledRender(); });
+  $('ledLamp').addEventListener('click', function () { led.prot = 'lamp'; ledRender(); });
+  ledRender();
+
+  /* ---------- La boucle et l'ampèremètre ---------- */
+  function probe(n) { return 0.3 / n; }
+  var loop = { n: 2, pt: 0 };
+  var PTS = [
+    { x: 105, y: 200, a: 0, name: 'juste après la borne +' },
+    { x: 40, y: 125, a: 90, name: 'avant les lampes' },
+    { x: 360, y: 125, a: 90, name: 'après les lampes' },
+    { x: 295, y: 200, a: 0, name: 'juste avant la borne −' }
+  ];
+  function loopRender() {
+    var L = layers($('loopSvg')), n = loop.n, xs = { 1: [200], 2: [160, 260], 3: [130, 210, 290] }[n], T = 50, B = 200, I = 1 / n, i;
+    var chain = [[[170, B], [40, B], [40, T], [xs[0] - 30, T]]];
+    for (i = 1; i < n; i++) chain.push([[xs[i - 1] + 30, T], [xs[i] - 30, T]]);
+    chain.push([[xs[n - 1] + 30, T], [360, T], [360, B], [230, B]]);
+    chain.forEach(function (p) { wire(L.w, p); flow(L.f, p, I); });
+    sym(L.s, 'pile', 200, B, 0);
+    for (i = 0; i < n; i++) { sym(L.s, 'lamp', xs[i], T, 0, { b: 1 / (n * n) }); tx(L.s, xs[i], T + 36, 'L' + (i + 1)); }
+    PTS.forEach(function (p, j) {
+      if (j === loop.pt) sym(L.s, 'amp', p.x, p.y, p.a);
+      else {
+        var g = mk(L.s, 'g', { 'class': 'tap' }); g.addEventListener('click', function () { loop.pt = j; loopRender(); });
+        mk(g, 'circle', { cx: p.x, cy: p.y, r: 11, 'class': 'pt' }); tx(g, p.x, p.y, String(j + 1), 'middle', 13);
+      }
+    });
+    var lp = PTS[loop.pt];
+    tx(L.s, lp.a ? (lp.x < 200 ? lp.x + 22 : lp.x - 22) : lp.x, lp.a ? lp.y : lp.y + 26, String(loop.pt + 1), lp.a ? (lp.x < 200 ? 'start' : 'end') : 'middle', 14);
+    for (i = 1; i <= 3; i++) pressed('ln' + i, n === i);
+    for (i = 0; i < 4; i++) pressed('pt' + i, loop.pt === i);
+    $('loopOut').className = 'verdict yes';
+    $('loopOut').innerHTML = 'Point ' + (loop.pt + 1) + ' (' + lp.name + ') : <span class="meterout">I = ' + fmt(probe(n), 2) + ' A</span><span>Déplace l\'ampèremètre : il indique la même valeur partout dans la boucle. Avec plus de lampes en série, le courant est plus faible… mais toujours le même partout. (Valeurs d\'un modèle simple, avec une pile plate et de petites lampes.)</span>';
+  }
+  [1, 2, 3].forEach(function (k) { $('ln' + k).addEventListener('click', function () { loop.n = k; loopRender(); }); });
+  [0, 1, 2, 3].forEach(function (k) { $('pt' + k).addEventListener('click', function () { loop.pt = k; loopRender(); }); });
+  loopRender();
+
+  /* ---------- Quiz ---------- */
+  function rnd(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+  function base(mode, n) { return { mode: mode, n: n, k: true, sw: [true, true, true], broken: [false, false, false], shunt: [false, false, false], pileShort: false }; }
+  function makeQ(t) {
+    var n = rnd(2, 3), i = rnd(0, n - 1), c, r;
+    if (t === 0) { c = base('serie', n); c.broken[i] = true; r = solve(c); return { q: n + ' lampes sont branchées en série. La lampe L' + (i + 1) + ' grille. Combien de lampes brillent encore ?', a: litCount(r), how: "En série, il n'y a qu'un chemin : la lampe grillée ouvre le circuit, tout s'éteint." }; }
+    if (t === 1) { c = base('derivation', n); c.broken[i] = true; r = solve(c); return { q: n + ' lampes sont branchées en dérivation. La lampe L' + (i + 1) + ' grille. Combien de lampes brillent encore ?', a: litCount(r), how: 'En dérivation, chaque lampe a sa branche : seule celle de L' + (i + 1) + ' est coupée.' }; }
+    if (t === 2) { var k = rnd(1, 2); c = base('serie', 3); for (var j = 0; j < k; j++) c.shunt[j] = true; r = solve(c); return { q: '3 lampes sont en série. On relie par un fil les bornes de ' + (k === 1 ? 'la lampe L1' : 'L1 et, avec un autre fil, celles de L2') + '. Combien de lampes brillent ?', a: litCount(r), how: "Une lampe court-circuitée s'éteint, les autres restent allumées (et brillent plus fort)." }; }
+    if (t === 3) { c = base('derivation', n); c.sw[i] = false; r = solve(c); return { q: n + ' lampes sont en dérivation, chacune avec son interrupteur. On ouvre l\'interrupteur de L' + (i + 1) + '. Combien de lampes brillent ?', a: litCount(r), how: 'Seule la branche de L' + (i + 1) + ' est ouverte : les autres branches restent fermées.' }; }
+    if (t === 4) { c = base('derivation', n); c.k = false; r = solve(c); return { q: n + ' lampes sont en dérivation. On ouvre l\'interrupteur principal, placé juste à côté de la pile. Combien de lampes brillent ?', a: litCount(r), how: "L'interrupteur principal est sur le chemin de toutes les branches : tout s'éteint." }; }
+    if (t === 5) { c = base('derivation', n); c.shunt[i] = true; r = solve(c); return { q: n + ' lampes sont en dérivation. On relie par un fil les deux bornes de la lampe L' + (i + 1) + '. Combien de lampes brillent ?', a: litCount(r), how: 'Le fil relie directement les deux bornes de la pile : court-circuit ! Tout s\'éteint et la pile chauffe.' }; }
+    if (t === 6) {
+      var pick = shuffle(MATS.filter(function (m) { return m.id !== 'air'; }).slice()).slice(0, 5), names = pick.map(function (m) { return m.name.toLowerCase(); }), conds = pick.filter(function (m) { return m.cond; });
+      return { q: 'Parmi : ' + names.join(', ') + ', combien sont des conducteurs ?', a: conds.length, how: conds.length ? 'Conducteurs : ' + conds.map(function (m) { return m.name.toLowerCase(); }).join(', ') + '.' : 'Aucun : ce sont tous des isolants.' };
+    }
+    if (t === 7) return { q: 'Quelle est la tension, en volts, d\'une prise de courant à la maison (en France, en Belgique, en Suisse…) ?', a: 230, how: '230 V : c\'est dangereux, voire mortel. On expérimente seulement avec des piles de quelques volts.' };
+    c = base('serie', n); r = solve(c);
+    return { q: 'Avec une lampe seule sur la pile, l\'ampèremètre indique ' + fmt(probe(1), 2) + ' A. On branche ' + n + ' lampes identiques en série. Par combien le courant est-il divisé (dans notre modèle simple) ?', a: Math.round(1 / r.I), how: 'Les ' + n + ' lampes se partagent la pile : ' + fmt(probe(1), 2) + ' ÷ ' + n + ' = ' + fmt(probe(n), 2) + ' A, le même partout dans la boucle.' };
+  }
+  var quiz = $('quiz'), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ''; done = [];
+    var types = shuffle([0, 1, 2, 3, 4, 5, 6, 7, 8]).slice(0, 8);
+    for (var k = 0; k < 8; k++) {
+      var Q = makeQ(types[k]), li = document.createElement('li');
+      li.innerHTML = '<span>' + Q.q + '</span><input type="text" id="qa' + k + '" inputmode="numeric" autocomplete="off" aria-label="Ta réponse à la question ' + (k + 1) + '"><button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+      quiz.appendChild(li);
+      (function (k, Q) {
+        function chk() {
+          var fb = $('qf' + k), x = num($('qa' + k).value);
+          if (isNaN(x)) { fb.className = 'fb'; fb.textContent = 'Écris un nombre.'; return; }
+          if (x === Q.a) { fb.className = 'fb ok'; fb.textContent = 'Bravo, c\'est juste !'; done[k] = true; }
+          else { done[k] = false; fb.className = 'fb no'; fb.innerHTML = 'Pas tout à fait : la réponse est ' + fmt(Q.a) + '.<span>' + Q.how + '</span>'; }
+          $('score').textContent = done.filter(Boolean).length + ' / 8';
+        }
+        $('qb' + k).addEventListener('click', chk);
+        $('qa' + k).addEventListener('keydown', function (e) { if (e.key === 'Enter') chk(); });
+      })(k, Q);
+    }
+    $('score').textContent = '0 / 8';
+  }
+  $('newQuiz').addEventListener('click', newQuiz);
+  newQuiz();
+
+  window.__circ = {
+    solve: solve, label: label, check: check, makeQ: makeQ, probe: probe, ledPasses: ledPasses,
+    materials: MATS.map(function (m) { return { id: m.id, name: m.name, cond: m.cond, b: m.b }; }),
+    conducts: function (id) { var m = MATS.filter(function (z) { return z.id === id; })[0]; return m ? m.cond : undefined; }
+  };
+})();
+</script>
+</body>
+</html>

@@ -78,10 +78,11 @@
     box.querySelector('.bar i').style.width = Math.round(100 * seen / cards.length) + '%';
   }
 
-  window.__progress = { load: load, key: KEY, refresh: function () { if (page === 'index.html') showOnLanding(); } };
+  var LANDING = page === 'index.html' || page === 'physique.html';
+  window.__progress = { load: load, key: KEY, refresh: function () { if (LANDING) showOnLanding(); } };
 
   function start() {
-    if (page === 'index.html') {
+    if (LANDING) {
       showOnLanding();
       var r = document.getElementById('progressReset');
       if (r) r.addEventListener('click', function () {

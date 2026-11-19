@@ -16,6 +16,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 
 TOPICS = [
+    ("les états de la matière", "les-etats-de-la-matiere.html"),
+    ("les atomes et les molécules", "les-atomes-et-les-molecules.html"),
+    ("le mouvement", "le-mouvement.html"),
+    ("le poids et la masse", "le-poids-et-la-masse.html"),
+    ("les circuits électriques", "les-circuits-electriques.html"),
+    ("la lumière", "la-lumiere.html"),
     ("la cryptographie", "la-cryptographie.html"),
     ("le binaire et les bases", "le-binaire-et-les-bases.html"),
     ("le binaire", "le-binaire-et-les-bases.html"),
@@ -105,10 +111,20 @@ a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-dec
 """
 
 
+# Une page d'accueil par matière : chaque tutoriel renvoie vers la sienne,
+# et « précédent / suivant » reste dans la même matière.
+LANDINGS = [("index.html", "Tous les tutoriels"), ("physique.html", "Tous les tutoriels de physique")]
+
+
 def landing_order():
-    idx = (ROOT / "index.html").read_text(encoding="utf-8")
-    cards = re.findall(r'<a class="card[^"]*" href="([^"]+\.html)".*?<strong>(.*?)</strong>', idx, re.S)
-    return [(h, html.unescape(re.sub(r"<[^>]+>", "", t)).strip()) for h, t in cards]
+    orders = []
+    for landing, label in LANDINGS:
+        f = ROOT / landing
+        if not f.exists():
+            continue
+        cards = re.findall(r'<a class="card[^"]*" href="([^"]+\.html)".*?<strong>(.*?)</strong>', f.read_text(encoding="utf-8"), re.S)
+        orders.append((landing, label, [(h, html.unescape(re.sub(r"<[^>]+>", "", t)).strip()) for h, t in cards]))
+    return orders
 
 
 def linkify(text, self_name):
@@ -142,9 +158,13 @@ def process(path, order):
     body = linkify(body, path.name)
     src = body + tail
 
-    names = [h for h, _ in order]
-    titles = dict(order)
-    top = '<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="index.html">← Tous les tutoriels</a></nav><!--/tnav-->\n'
+    home, label, seq = order[0][0], order[0][1], []
+    for landing, lab, cards in order:
+        if any(h == path.name for h, _ in cards):
+            home, label, seq = landing, lab, cards
+    names = [h for h, _ in seq]
+    titles = dict(seq)
+    top = f'<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="{home}">← {label}</a></nav><!--/tnav-->\n'
     bottom = ""
     if path.name in names:
         i = names.index(path.name)
@@ -157,7 +177,7 @@ def process(path, order):
             links += f'<a class="next" href="{nxt}"><span>Suivant →</span><strong>{html.escape(titles[nxt])}</strong></a>'
         bottom = ('<!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2>'
                   f'<div class="tnav-pn">{links}</div>'
-                  '<a class="tnav-home" href="index.html">⌂ Tous les tutoriels</a></nav><!--/tnav-->\n')
+                  f'<a class="tnav-home" href="{home}">⌂ {label}</a></nav><!--/tnav-->\n')
 
     src = src.replace('<main class="page">', '<main class="page">\n' + top, 1)
     end = src.index("</main>")
@@ -170,7 +190,7 @@ def process(path, order):
 
 def main():
     order = landing_order()
-    files = [ROOT / a for a in sys.argv[1:]] or sorted(p for p in ROOT.glob("*.html") if p.name != "index.html")
+    files = [ROOT / a for a in sys.argv[1:]] or sorted(p for p in ROOT.glob("*.html") if p.name not in dict(LANDINGS))
     for p in files:
         process(p, order)
         print("ok", p.name)

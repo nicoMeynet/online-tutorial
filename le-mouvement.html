@@ -1,0 +1,1067 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Le mouvement</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, encre vert forêt (comme un quai de gare et ses arbres), marge rouge. Les simulations de mouvement sont au centre. */
+:root {
+  --paper: #f6f9f6;
+  --grid: #dfe9e1;
+  --card: #ffffff;
+  --ink: #14261b;
+  --ink-soft: #4f6656;
+  --acc: #15803d;
+  --acc-soft: #dcfce7;
+  --two: #1c64c8;
+  --two-soft: #dbe8fa;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #fff0a3;
+  --line: #d3e0d6;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0d1510; --grid: #17231b; --card: #121c16; --ink: #e8f3ec; --ink-soft: #a3bcab;
+    --acc: #4ade80; --acc-soft: #12321f; --two: #7fb0ff; --two-soft: #1a2a45;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #26382c;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0d1510; --grid: #17231b; --card: #121c16; --ink: #e8f3ec; --ink-soft: #a3bcab;
+  --acc: #4ade80; --acc-soft: #12321f; --two: #7fb0ff; --two-soft: #1a2a45;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #26382c;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 6px 12px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); min-height: 40px; }
+button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.btns .lbl { font-weight: 700; margin-right: 2px; }
+input[type="text"] { font: inherit; font-family: var(--f-mono); font-size: 1.05rem; padding: 8px 10px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; }
+input[type="range"] { width: 100%; accent-color: var(--acc); }
+select { font: inherit; font-family: var(--f-mono); padding: 6px 8px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); min-height: 40px; }
+.param { display: flex; flex-direction: column; gap: 2px; }
+.param label { font-weight: 700; }
+.params { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px 18px; }
+
+.fig svg, svg.fig { width: 100%; height: auto; display: block; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; }
+.draw svg { touch-action: none; cursor: crosshair; }
+.verdict { border-radius: 8px; padding: 12px 14px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; background: var(--paper); border: 1.5px solid var(--line); }
+.verdict.yes { background: var(--ok-soft); color: var(--ok); border-color: transparent; }
+.verdict.no { background: var(--red-soft); color: var(--red); border-color: transparent; }
+.verdict span { font-weight: 400; color: var(--ink); }
+.err { color: var(--red); font-weight: 700; }
+
+.rows { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.rows li { display: grid; grid-template-columns: 90px 1fr; gap: 10px; padding: 8px 12px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--paper); align-items: baseline; }
+.rows li strong { font-family: var(--f-display); }
+.rows .mv { color: var(--acc); font-weight: 700; }
+.rows .st { color: var(--ink-soft); }
+
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chips span { font-family: var(--f-mono); font-size: .9rem; padding: 2px 8px; border-radius: 999px; border: 1.5px solid var(--acc); color: var(--acc); background: var(--acc-soft); }
+.calc { font-family: var(--f-mono); font-size: .98rem; display: flex; flex-direction: column; gap: 2px; overflow-wrap: anywhere; }
+.calc b { color: var(--acc); }
+
+.speeds { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.speeds button { width: 100%; display: grid; grid-template-columns: minmax(0, 9.5em) minmax(0, 1fr); gap: 10px; align-items: center; text-align: left; box-shadow: none; border-width: 1.5px; font-family: var(--f-body); font-weight: 400; padding: 6px 10px; }
+.speeds button:hover { box-shadow: none; transform: none; border-color: var(--acc); }
+.speeds button[aria-pressed="true"] { background: var(--acc-soft); color: var(--ink); border-color: var(--acc); }
+.speeds .bar { height: 14px; border-radius: 4px; background: var(--acc); display: block; min-width: 4px; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.cards svg { width: 100%; height: auto; display: block; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; color: var(--acc); }
+
+.big { font-family: var(--f-display); font-weight: 800; font-size: 1.6rem; color: var(--acc); }
+.duo { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; align-items: center; }
+
+.errs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.errs li { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--paper); }
+.errs .bad { color: var(--red); text-decoration: line-through; overflow-wrap: anywhere; }
+.errs .good { color: var(--ok); font-weight: 700; overflow-wrap: anywhere; }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 110px auto; gap: 10px; align-items: center; }
+.quiz input[type="text"] { font-size: 1rem; padding: 6px 8px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc); }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 120px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+<!--ticons--><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Tutoriels"><script src="progress.js" defer></script><!--/ticons-->
+<style id="tnav-css">
+.tnav-top { display: flex; margin: 0 0 4px; }
+.tnav-home { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font-weight: 700; font-size: .95rem; text-decoration: none; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tnav-home:hover, .tnav-home:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.tnav-bottom { margin-top: 8px; display: flex; flex-direction: column; gap: 12px; }
+.tnav-bottom h2 { margin: 0; }
+.tnav-pn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tnav-pn a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--ink, #222); border-radius: 10px;
+  background: var(--card, #fff); color: var(--ink, #222); text-decoration: none; box-shadow: 3px 3px 0 var(--ink, #222); min-width: 0; }
+.tnav-pn a span { font-size: .85rem; color: var(--ink-soft, #666); }
+.tnav-pn a strong { overflow-wrap: anywhere; }
+.tnav-pn a.next { text-align: right; grid-column: 2; }
+.tnav-bottom .tnav-home { align-self: center; }
+@media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
+</style>
+</head>
+<body>
+<main class="page">
+<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="physique.html">← Tous les tutoriels de physique</a></nav><!--/tnav-->
+
+
+  <header class="hero">
+    <span class="eyebrow">Tutoriel de physique-chimie · niveau 5<sup>e</sup>–4<sup>e</sup></span>
+    <h1>Le mouvement</h1>
+    <p class="lead">Assis dans un train, tu ne bouges pas… et pourtant tu files à 300 km/h. Pour décrire un mouvement, il faut dire par rapport à quoi, quel chemin est suivi, et à quelle vitesse.</p>
+    <div class="box">
+      <svg class="fig" viewBox="0 0 400 110" role="img" aria-label="Chronophotographie d'une balle : les positions s'écartent de plus en plus, la balle accélère">
+        <line x1="20" y1="70" x2="385" y2="70" stroke="var(--line)" stroke-width="2"/>
+        <g id="heroDots"></g>
+        <text x="20" y="100" font-size="13">Une photo toutes les 0,1 s</text>
+        <text x="385" y="30" font-size="13" text-anchor="end" fill="var(--acc)" style="fill:var(--acc)">de plus en plus écartées → ça accélère</text>
+      </svg>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · Le référentiel</span>
+    <h2>Bouger… par rapport à quoi ?</h2>
+    <p>Tom est assis dans un train. Léa l'attend sur le quai. <strong>Est-ce que Tom bouge ?</strong> Pour Léa, oui : il passe devant elle. Pour la dame assise en face de Tom, non : il reste à la même place.</p>
+    <p>Les deux ont raison ! Un mouvement se décrit toujours <span class="hl">par rapport à un objet de référence</span>, qu'on appelle le <strong>référentiel</strong>. Change de référentiel et regarde qui bouge.</p>
+    <div class="box">
+      <div class="btns" role="group" aria-label="Choix du référentiel">
+        <span class="lbl">Référentiel :</span>
+        <button type="button" id="refQuai" aria-pressed="true">le quai</button>
+        <button type="button" id="refTrain" aria-pressed="false">le train</button>
+        <button type="button" id="refTom" aria-pressed="false">Tom</button>
+      </div>
+      <div class="fig"><svg id="scene" viewBox="0 0 420 170" role="img" aria-label="Un train avec Tom à bord passe devant Léa, sur le quai"></svg></div>
+      <div class="param">
+        <label for="tScene">Temps : <span class="mono" id="tSceneOut">0 s</span></label>
+        <input id="tScene" type="range" min="0" max="8" step="0.1" value="0">
+      </div>
+      <div class="btns">
+        <button type="button" id="playScene">▶ Lancer</button>
+        <button type="button" id="stepScene">+ 1 s</button>
+        <button type="button" id="walkScene" aria-pressed="false">Tom marche vers l'avant</button>
+      </div>
+      <ul class="rows" id="sceneOut" aria-live="polite"></ul>
+    </div>
+    <div class="note">
+      <span class="note-title">La phrase à dire</span>
+      <span>On ne dit pas « Tom est immobile », mais « Tom est immobile <strong>par rapport au train</strong> » et « Tom est en mouvement <strong>par rapport au quai</strong> ». Le plus souvent, on prend la Terre (le sol, le quai) comme référentiel : c'est le <strong>référentiel terrestre</strong>.</span>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · La trajectoire</span>
+    <h2>Le chemin suivi</h2>
+    <p>La <strong>trajectoire</strong>, c'est la ligne formée par toutes les positions successives d'un point de l'objet. Comme la trace d'un avion dans le ciel. Il en existe trois grandes familles.</p>
+    <div class="cards">
+      <div class="box"><span class="tag">Rectiligne</span><svg viewBox="0 0 200 60" aria-hidden="true"><line x1="15" y1="30" x2="185" y2="30" stroke="var(--acc)" stroke-width="4" stroke-linecap="round"/></svg><strong>Une droite</strong><span class="soft">Une bille qui tombe tout droit, un train sur une voie bien droite.</span></div>
+      <div class="box"><span class="tag">Circulaire</span><svg viewBox="0 0 200 60" aria-hidden="true"><circle cx="100" cy="30" r="24" fill="none" stroke="var(--acc)" stroke-width="4"/></svg><strong>Un cercle</strong><span class="soft">Un siège de manège, la pointe d'une aiguille de montre.</span></div>
+      <div class="box"><span class="tag">Curviligne</span><svg viewBox="0 0 200 60" aria-hidden="true"><path d="M15 52 Q 100 -20 185 52" fill="none" stroke="var(--acc)" stroke-width="4" stroke-linecap="round"/></svg><strong>Une autre courbe</strong><span class="soft">Un ballon lancé, une voiture dans un virage, une feuille qui tombe.</span></div>
+    </div>
+    <div class="box draw">
+      <h3>Dessine une trajectoire</h3>
+      <p class="soft">Trace avec le doigt ou la souris dans le cadre. Quand tu lâches, la page reconnaît la famille de ta trajectoire.</p>
+      <svg id="drawPad" class="fig" viewBox="0 0 400 260" role="img" aria-label="Zone de dessin d'une trajectoire"></svg>
+      <div class="btns">
+        <button type="button" id="drLine">Exemple : droite</button>
+        <button type="button" id="drCircle">Exemple : cercle</button>
+        <button type="button" id="drCurve">Exemple : ballon</button>
+        <button type="button" id="drClear">Effacer</button>
+      </div>
+      <div class="verdict" id="drawOut" aria-live="polite"><span>Dessine quelque chose !</span></div>
+    </div>
+    <div class="box">
+      <h3>La valve d'une roue de vélo</h3>
+      <p class="soft">La trajectoire dépend aussi du référentiel. Regarde le petit bouchon de la chambre à air (la valve) pendant deux tours de roue.</p>
+      <div class="btns" role="group" aria-label="Référentiel pour la valve">
+        <button type="button" id="valBike" aria-pressed="true">par rapport au vélo</button>
+        <button type="button" id="valRoad" aria-pressed="false">par rapport à la route</button>
+      </div>
+      <svg id="valve" class="fig" viewBox="0 0 420 130" role="img" aria-label="Trajectoire de la valve d'une roue"></svg>
+      <p id="valveOut" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · La chronophotographie</span>
+    <h2>Une photo à intervalles réguliers</h2>
+    <p>Une <strong>chronophotographie</strong> superpose plusieurs photos d'un objet prises à des <strong>intervalles de temps égaux</strong>. Ici, une photo toutes les <strong>0,1 s</strong>. La trajectoire se voit par la forme, la vitesse par les <strong>écarts</strong> :</p>
+    <div class="cards">
+      <div class="box"><span class="tag">Uniforme</span><span class="soft">Écarts égaux : la vitesse ne change pas.</span></div>
+      <div class="box"><span class="tag">Accéléré</span><span class="soft">Écarts de plus en plus grands : l'objet va de plus en plus vite.</span></div>
+      <div class="box"><span class="tag">Ralenti</span><span class="soft">Écarts de plus en plus petits : l'objet freine.</span></div>
+    </div>
+    <div class="box">
+      <div class="btns" role="group" aria-label="Type de mouvement">
+        <button type="button" id="chU" aria-pressed="true">Uniforme</button>
+        <button type="button" id="chA" aria-pressed="false">Accéléré</button>
+        <button type="button" id="chR" aria-pressed="false">Ralenti</button>
+      </div>
+      <svg id="chrono" class="fig" viewBox="0 0 380 150" role="img" aria-label="Chronophotographie d'une balle qui roule"></svg>
+      <div class="btns">
+        <button type="button" id="chNext">Photo suivante</button>
+        <button type="button" id="chAll">Toutes les photos</button>
+        <button type="button" id="chRuler" aria-pressed="false">Afficher la règle</button>
+      </div>
+      <div class="chips" id="chGaps" aria-live="polite"></div>
+      <div class="btns">
+        <label for="chFrom" class="lbl">De la photo</label><select id="chFrom"></select>
+        <label for="chTo" class="lbl">à la photo</label><select id="chTo"></select>
+      </div>
+      <p class="soft">Astuce : tu peux aussi toucher deux balles sur la photo.</p>
+      <div class="calc" id="chOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · La vitesse</span>
+    <h2>v = d ÷ t</h2>
+    <p>La vitesse dit quelle distance on parcourt pendant une durée donnée : <strong>v = d ÷ t</strong>. Avec d en mètres (m) et t en secondes (s), la vitesse est en <strong>mètres par seconde (m/s)</strong>. Avec d en km et t en heures, elle est en <strong>km/h</strong>. Tous les calculs (et le triangle magique) sont dans le tutoriel sur <a class="tlink" href="la-vitesse.html">la vitesse</a>.</p>
+    <div class="note">
+      <span class="note-title">Passer des m/s aux km/h</span>
+      <span>1 m/s, c'est 3 600 m en une heure, donc 3,6 km/h. <strong>m/s → km/h : × 3,6</strong>. <strong>km/h → m/s : ÷ 3,6</strong>.</span>
+    </div>
+    <div class="box">
+      <div class="param">
+        <label for="conv">Vitesse : <span class="mono" id="convOut"></span></label>
+        <input id="conv" type="range" min="0" max="360" step="1" value="36">
+      </div>
+      <h3>Du plus lent au plus rapide</h3>
+      <p class="soft">La longueur des barres suit le nombre de zéros : chaque cran de 10 fois plus rapide ajoute la même longueur. Touche une ligne.</p>
+      <ul class="speeds" id="speeds"></ul>
+      <div class="verdict" id="speedOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Moyenne ou instantanée ?</span>
+    <h2>Le compteur et la moyenne</h2>
+    <p>Le compteur d'une voiture affiche la <strong>vitesse instantanée</strong> : la vitesse à cet instant précis. La <strong>vitesse moyenne</strong>, c'est la distance totale divisée par la durée totale, arrêts compris. Suis ce trajet en ville de 2 minutes, avec un feu rouge.</p>
+    <div class="box">
+      <div class="duo">
+        <svg id="gauge" class="fig" viewBox="0 0 240 150" role="img" aria-label="Compteur de vitesse"></svg>
+        <div class="calc" id="tripOut" aria-live="polite"></div>
+      </div>
+      <svg id="road" class="fig" viewBox="0 0 400 54" role="img" aria-label="Position de la voiture sur la route"></svg>
+      <svg id="tripGraph" class="fig" viewBox="0 0 400 210" role="img" aria-label="Graphique de la vitesse en fonction du temps"></svg>
+      <div class="param">
+        <label for="tTrip">Temps : <span class="mono" id="tTripOut">0 s</span></label>
+        <input id="tTrip" type="range" min="0" max="120" step="1" value="0">
+      </div>
+      <div class="btns">
+        <button type="button" id="playTrip">▶ Rouler</button>
+        <button type="button" id="stepTrip">+ 10 s</button>
+      </div>
+    </div>
+    <p>La zone verte sous la courbe représente la <strong>distance parcourue</strong>. La ligne en pointillés, c'est la vitesse moyenne : la vitesse constante qu'il aurait fallu pour faire la même distance dans le même temps.</p>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · Le manège</span>
+    <h2>Le mouvement circulaire uniforme</h2>
+    <p>Sur un manège qui tourne régulièrement, chaque cheval a un mouvement <strong>circulaire</strong> (trajectoire en cercle) et <strong>uniforme</strong> (sa vitesse garde la même valeur). Mais attention : la <strong>direction</strong> de la vitesse change sans arrêt. Les flèches le montrent.</p>
+    <div class="box">
+      <div class="duo">
+        <svg id="carousel" class="fig" viewBox="0 0 320 320" role="img" aria-label="Manège vu du dessus avec deux chevaux"></svg>
+        <div style="display:flex;flex-direction:column;gap:12px;min-width:0">
+          <div class="param">
+            <label for="perT">Durée d'un tour : <span class="mono" id="perTOut"></span></label>
+            <input id="perT" type="range" min="10" max="40" step="1" value="20">
+          </div>
+          <div class="param">
+            <label for="tCar">Temps : <span class="mono" id="tCarOut"></span></label>
+            <input id="tCar" type="range" min="0" max="40" step="0.5" value="0">
+          </div>
+          <div class="btns">
+            <button type="button" id="playCar">▶ Tourner</button>
+            <button type="button" id="ghostCar" aria-pressed="false">Chronophoto</button>
+          </div>
+          <div class="calc" id="carOut" aria-live="polite"></div>
+        </div>
+      </div>
+    </div>
+    <p>Pendant un tour, le cheval extérieur parcourt le périmètre 2 × π × R. Les deux chevaux font le tour dans le même temps, mais celui de l'extérieur va <strong>deux fois plus vite</strong> : son cercle est deux fois plus long. Pour des flèches qui représentent une vitesse, regarde le tutoriel sur <a class="tlink" href="les-vecteurs.html">les vecteurs</a>.</p>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Le graphique distance–temps</span>
+    <h2>La pente, c'est la vitesse</h2>
+    <p>On peut dessiner la distance parcourue en fonction du temps. Pour un mouvement uniforme, on obtient une <strong>droite qui passe par l'origine</strong> (comme dans le tutoriel sur <a class="tlink" href="la-proportionnalite.html">la proportionnalité</a>). Plus la droite est <strong>pentue</strong>, plus c'est rapide. Une droite horizontale : l'objet est immobile.</p>
+    <div class="box">
+      <div class="params">
+        <div class="param"><label for="vA">Alice : <span class="mono" id="vAOut"></span></label><input id="vA" type="range" min="0" max="3" step="0.1" value="1.5"></div>
+        <div class="param"><label for="vB">Bilal : <span class="mono" id="vBOut"></span></label><input id="vB" type="range" min="0" max="3" step="0.1" value="0.5"></div>
+      </div>
+      <svg id="dtGraph" class="fig" viewBox="0 0 400 260" role="img" aria-label="Graphique distance en fonction du temps pour Alice et Bilal"></svg>
+      <div class="calc" id="dtOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Jeu</span>
+    <h2>Devine le mouvement</h2>
+    <p>Voici la chronophotographie d'un objet (une photo à intervalles égaux, la photo 1 est entourée). Trouve sa trajectoire et comment varie sa vitesse.</p>
+    <div class="box">
+      <svg id="game" class="fig" viewBox="0 0 400 240" role="img" aria-label="Chronophotographie mystère"></svg>
+      <div class="btns" role="group" aria-label="Trajectoire">
+        <span class="lbl">Trajectoire :</span>
+        <button type="button" id="gT0" aria-pressed="false">rectiligne</button>
+        <button type="button" id="gT1" aria-pressed="false">circulaire</button>
+        <button type="button" id="gT2" aria-pressed="false">curviligne</button>
+      </div>
+      <div class="btns" role="group" aria-label="Vitesse">
+        <span class="lbl">Vitesse :</span>
+        <button type="button" id="gS0" aria-pressed="false">uniforme</button>
+        <button type="button" id="gS1" aria-pressed="false">accélérée</button>
+        <button type="button" id="gS2" aria-pressed="false">ralentie</button>
+      </div>
+      <div class="btns">
+        <button type="button" id="gCheck">Vérifier</button>
+        <button type="button" id="gNew">Nouveau mouvement</button>
+        <span class="score" id="gScore">0 / 0</span>
+      </div>
+      <div class="verdict" id="gOut" aria-live="polite"><span>Choisis une trajectoire et une vitesse.</span></div>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Un peu d'histoire</span>
+    <h2>Des billes, un bateau et des photos</h2>
+    <ol class="timeline">
+      <li><span class="when">Antiquité</span><div class="what"><strong>Aristote</strong><span>Le philosophe grec pensait, semble-t-il, qu'un objet ne bouge que si quelque chose le pousse, et que les objets lourds tombent plus vite. Ces idées ont duré très longtemps.</span></div></li>
+      <li><span class="when">début du XVII<sup>e</sup> siècle</span><div class="what"><strong>Galilée et le plan incliné</strong><span>Une chute est trop rapide pour être mesurée à l'œil. Galilée aurait donc fait rouler des billes sur une rampe en pente douce, en mesurant le temps avec de l'eau qui s'écoule. Il trouve que, pendant des durées égales, les distances parcourues grandissent comme 1, 3, 5, 7… : la bille accélère régulièrement.</span></div></li>
+      <li><span class="when">même époque</span><div class="what"><strong>Le bateau de Galilée</strong><span>Il explique aussi que, dans la cabine d'un bateau qui avance sans secousse, on ne peut pas savoir si on bouge : une balle lâchée tombe à nos pieds comme à terre. C'est l'idée du référentiel de l'étape 1.</span></div></li>
+      <li><span class="when">fin du XVII<sup>e</sup> siècle</span><div class="what"><strong>Newton</strong><span>Il écrit des lois du mouvement qui expliquent à la fois la chute d'une pomme et le mouvement de la Lune.</span></div></li>
+      <li><span class="when">fin du XIX<sup>e</sup> siècle</span><div class="what"><strong>Marey et Muybridge</strong><span>Le Français Étienne-Jules Marey invente la chronophotographie pour étudier le vol des oiseaux et la marche. À la même époque, Eadweard Muybridge photographie un cheval au galop image par image.</span></div></li>
+    </ol>
+    <div class="box">
+      <svg class="fig" viewBox="0 0 400 140" role="img" aria-label="Plan incliné de Galilée : distances 1, 3, 5, 7 pendant des durées égales">
+        <line x1="20" y1="30" x2="385" y2="125" stroke="var(--ink)" stroke-width="3"/>
+        <line x1="20" y1="125" x2="385" y2="125" stroke="var(--line)" stroke-width="2"/>
+        <g id="galileo"></g>
+      </svg>
+      <p class="soft">Pendant chaque durée égale, la bille parcourt 1, puis 3, puis 5, puis 7 unités de longueur. Au total : 1, 4, 9, 16… les carrés ! (voir le tutoriel sur <a class="tlink" href="les-puissances.html">les puissances</a>).</p>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · Attention</span>
+    <h2>Les erreurs fréquentes</h2>
+    <div class="box">
+      <ul class="errs">
+        <li><span class="bad">« Le passager est immobile. »</span><span class="good">Il est immobile par rapport au train, en mouvement par rapport au quai.</span><span class="soft">Toujours dire par rapport à quoi.</span></li>
+        <li><span class="bad">Des points rapprochés sur une chronophoto = rapide.</span><span class="good">Points rapprochés = lent. Points écartés = rapide.</span><span class="soft">Les photos sont prises à intervalles égaux : moins de distance dans le même temps, c'est plus lent.</span></li>
+        <li><span class="bad">Points régulièrement espacés = trajectoire rectiligne.</span><span class="good">Points régulièrement espacés = mouvement uniforme.</span><span class="soft">La forme donne la trajectoire, les écarts donnent la vitesse. Un manège a des points réguliers sur un cercle.</span></li>
+        <li><span class="bad">Circulaire uniforme : la vitesse ne change pas du tout.</span><span class="good">Sa valeur ne change pas, mais sa direction change tout le temps.</span></li>
+        <li><span class="bad">20 m/s = 20 km/h</span><span class="good">20 m/s = 20 × 3,6 = 72 km/h</span></li>
+        <li><span class="bad">Vitesse moyenne = moyenne des vitesses affichées.</span><span class="good">Vitesse moyenne = distance totale ÷ durée totale.</span><span class="soft">Les arrêts comptent dans la durée.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Écris un nombre (avec une virgule si besoin).</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Nouvelles questions</button>
+    </div>
+  </section>
+
+  <!-- 12 -->
+  <section>
+    <span class="eyebrow">Étape 12 · À toi de jouer</span>
+    <h2>Six problèmes</h2>
+    <div class="exos">
+      <details>
+        <summary>Le tapis roulant<span class="q">Zoé se tient immobile sur un tapis roulant d'aéroport. Est-elle en mouvement ?</span></summary>
+        <div><span>Par rapport au tapis : <strong>non</strong>, elle est immobile. Par rapport au sol de l'aéroport : <strong>oui</strong>, elle avance avec le tapis. Il faut préciser le référentiel.</span></div>
+      </details>
+      <details>
+        <summary>Le TGV<span class="q">Un TGV roule à 324 km/h. Quelle est sa vitesse en m/s ?</span></summary>
+        <div><span>324 ÷ 3,6 = <strong>90 m/s</strong>. En une seconde, il parcourt presque la longueur d'un terrain de foot.</span></div>
+      </details>
+      <details>
+        <summary>L'escargot<span class="q">Un escargot avance à environ 1 mm/s. Combien de temps lui faut-il pour parcourir 1 m ?</span></summary>
+        <div><span>1 m = 1 000 mm, donc t = 1 000 ÷ 1 = 1 000 s, soit <strong>environ 17 minutes</strong>.</span></div>
+      </details>
+      <details>
+        <summary>L'orage<span class="q">Tu vois un éclair, puis tu entends le tonnerre 3 s plus tard. Le son va à environ 340 m/s. À quelle distance est l'orage ?</span></summary>
+        <div><span>La lumière arrive presque instantanément. Le son met 3 s : d = v × t = 340 × 3 = <strong>1 020 m, environ 1 km</strong>. Astuce : nombre de secondes ÷ 3 ≈ distance en km.</span></div>
+      </details>
+      <details>
+        <summary>Le manège<span class="q">Un cheval de manège est à 5 m du centre. Le manège fait un tour en 20 s. Quelle est sa vitesse ?</span></summary>
+        <div><span>Un tour : 2 × π × 5 ≈ 31,4 m. v = 31,4 ÷ 20 ≈ <strong>1,6 m/s</strong>, soit environ 5,7 km/h, la vitesse d'un piéton. Valeur constante, direction qui change : mouvement circulaire uniforme.</span></div>
+      </details>
+      <details>
+        <summary>La chronophoto<span class="q">Une photo toutes les 0,2 s. Les écarts mesurés entre une balle et la suivante sont : 30 cm, 24 cm, 18 cm, 12 cm. Quel mouvement ? Vitesse moyenne entre la première et la dernière photo ?</span></summary>
+        <div><span>Écarts de plus en plus petits : mouvement <strong>ralenti</strong>. Distance : 30 + 24 + 18 + 12 = 84 cm = 0,84 m, en 4 × 0,2 = 0,8 s. v = 0,84 ÷ 0,8 = <strong>1,05 m/s</strong>.</span></div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• Un mouvement se décrit toujours <strong>par rapport à un référentiel</strong> : on peut être immobile dans le train et en mouvement par rapport au quai.</span>
+      <span>• La <strong>trajectoire</strong> est l'ensemble des positions successives : <strong>rectiligne</strong> (droite), <strong>circulaire</strong> (cercle) ou <strong>curviligne</strong> (autre courbe).</span>
+      <span>• Sur une <strong>chronophotographie</strong> (intervalles de temps égaux) : écarts égaux = <strong>uniforme</strong>, écarts qui grandissent = <strong>accéléré</strong>, écarts qui diminuent = <strong>ralenti</strong>.</span>
+      <span>• <strong>v = d ÷ t</strong>, en m/s ou en km/h. m/s → km/h : × 3,6 ; km/h → m/s : ÷ 3,6.</span>
+      <span>• Le compteur donne la vitesse <strong>instantanée</strong> ; la vitesse <strong>moyenne</strong> = distance totale ÷ durée totale.</span>
+      <span>• Mouvement <strong>circulaire uniforme</strong> : la valeur de la vitesse est constante, sa direction change.</span>
+      <span>• Graphique distance–temps : mouvement uniforme = droite, et <strong>la pente est la vitesse</strong>.</span>
+    </div>
+  </section>
+
+  <!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"><a class="prev" href="les-atomes-et-les-molecules.html"><span>← Précédent</span><strong>Les atomes et les molécules</strong></a><a class="next" href="le-poids-et-la-masse.html"><span>Suivant →</span><strong>Le poids et la masse</strong></a></div><a class="tnav-home" href="physique.html">⌂ Tous les tutoriels de physique</a></nav><!--/tnav-->
+<footer>Fiche de révision · Le mouvement</footer>
+</main>
+
+<script>
+(function () {
+  /* Test hooks (window.__mvt) :
+     posAt(ref, t, walk)       -> {lea, tom, train} : positions (m) dans le référentiel ref ('quai' | 'train' | 'tom') à l'instant t (s) ; walk = Tom marche à 1 m/s
+     relSpeed(obj, ref, walk)  -> m/s (signée, + = vers la droite) de obj ('lea' | 'tom' | 'train') par rapport à ref ; train à 10 m/s
+     classify(points)          -> 'rectiligne' | 'circulaire' | 'curviligne' | null (trop peu de points) ; points = [[x, y], ...]
+     chronoGaps(type)          -> 8 écarts en cm ('uniforme' : 20 ; 'accelere' : 6, 10, …, 34 ; 'ralenti' : 34, …, 6)
+     chronoPositions(type)     -> 9 positions en cm (photos 0..8, une toutes les 0,1 s)
+     speedBetween(type, i, j)  -> vitesse moyenne en m/s entre les photos i et j (indices 0..8), NaN si i = j
+     msToKmh(v), kmhToMs(v)    -> conversions (× 3,6 et ÷ 3,6)
+     tripSpeed(t)              -> km/h (vitesse instantanée du trajet en ville, t de 0 à 120 s)
+     tripDistance(t)           -> m parcourus depuis t = 0
+     tripAverage(t)            -> km/h (distance ÷ durée), 0 pour t = 0
+     carouselSpeed(R, T)       -> m/s = 2πR ÷ T
+     gameRound()               -> {traj, speed, pts} : une chronophoto mystère (traj 0/1/2 = rectiligne/circulaire/curviligne, speed 0/1/2 = uniforme/accélérée/ralentie)
+  */
+  var NS = 'http://www.w3.org/2000/svg';
+  function fmt(x, d) { var r = Math.round(x * 1e6) / 1e6; if (Object.is(r, -0)) r = 0; return r.toLocaleString('fr-FR', { maximumFractionDigits: d == null ? 3 : d }).replace('-', '−'); }
+  function num(s) { var t = String(s).replace(/\s/g, '').replace(/[−–]/g, '-').replace(',', '.'); if (t === '') return NaN; var x = Number(t); return isFinite(x) ? x : NaN; }
+  function mk(svg, name, attrs, text) { var e = document.createElementNS(NS, name); for (var a in attrs) e.setAttribute(a, attrs[a]); if (text != null) e.textContent = text; svg.appendChild(e); return e; }
+  function clear(svg) { while (svg.firstChild) svg.removeChild(svg.firstChild); }
+  function $(id) { return document.getElementById(id); }
+  function press(ids, on) { ids.forEach(function (id) { $(id).setAttribute('aria-pressed', id === on ? 'true' : 'false'); }); }
+  function exact(x) { return Math.abs(x * 100 - Math.round(x * 100)) < 1e-6; }
+  function eqs(x) { return exact(x) ? '= ' : '≈ '; }
+  function msToKmh(v) { return v * 3.6; }
+  function kmhToMs(v) { return v / 3.6; }
+  function arrow(svg, x1, y1, x2, y2, color, w, op) {
+    var g = mk(svg, 'g', { opacity: op == null ? 1 : op });
+    var dx = x2 - x1, dy = y2 - y1, L = Math.hypot(dx, dy);
+    if (L < 1) return g;
+    var ux = dx / L, uy = dy / L, h = Math.min(10, L * 0.6);
+    mk(g, 'line', { x1: x1, y1: y1, x2: x2 - ux * h * 0.8, y2: y2 - uy * h * 0.8, stroke: color, 'stroke-width': w, 'stroke-linecap': 'round' });
+    mk(g, 'polygon', { points: x2 + ',' + y2 + ' ' + (x2 - ux * h - uy * h * 0.55) + ',' + (y2 - uy * h + ux * h * 0.55) + ' ' + (x2 - ux * h + uy * h * 0.55) + ',' + (y2 - uy * h - ux * h * 0.55), fill: color });
+    return g;
+  }
+  /* Petit lecteur : avance un temps avec setInterval (ne dépend pas de requestAnimationFrame). */
+  function player(btn, slider, step, onTick, loop) {
+    var timer = null, label = btn.textContent;
+    function stop() { if (timer) { clearInterval(timer); timer = null; } btn.textContent = label; }
+    btn.addEventListener('click', function () {
+      if (timer) { stop(); return; }
+      var max = parseFloat(slider.max);
+      if (!loop && parseFloat(slider.value) >= max - 1e-9) slider.value = slider.min;
+      btn.textContent = '❚❚ Pause';
+      timer = setInterval(function () {
+        var v = parseFloat(slider.value) + step, mx = parseFloat(slider.max);
+        if (v > mx + 1e-9) { if (loop) v = 0; else { v = mx; slider.value = v; onTick(); stop(); return; } }
+        slider.value = v; onTick();
+      }, 50);
+    });
+    return stop;
+  }
+
+  /* ---------- Hero ---------- */
+  (function () {
+    var g = $('heroDots'), x = 30, gaps = [12, 18, 26, 36, 48, 62, 78];
+    mk(g, 'circle', { cx: x, cy: 70, r: 7, fill: 'var(--acc)' });
+    gaps.forEach(function (d, i) { x += d; mk(g, 'circle', { cx: x, cy: 70, r: 7, fill: 'var(--acc)', opacity: 0.45 + 0.55 * (i + 1) / gaps.length }); });
+  })();
+
+  /* ---------- Étape 1 : référentiel ---------- */
+  var VT = 10, VW = 1, LEA0 = 55, TOM0 = 5, SC = 3.5, X0 = 20;
+  function worldX(obj, t, walk) { if (obj === 'lea') return LEA0; if (obj === 'train') return VT * t; return VT * t + TOM0 + (walk ? VW * t : 0); }
+  function worldV(obj, walk) { return obj === 'lea' ? 0 : obj === 'train' ? VT : VT + (walk ? VW : 0); }
+  function refShift(ref, t, walk) { if (ref === 'quai') return 0; if (ref === 'train') return VT * t; return VT * t + (walk ? VW * t : 0); }
+  function posAt(ref, t, walk) { var s = refShift(ref, t, walk); return { lea: worldX('lea', t, walk) - s, tom: worldX('tom', t, walk) - s, train: worldX('train', t, walk) - s }; }
+  function relSpeed(obj, ref, walk) { var vr = ref === 'quai' ? 0 : worldV(ref === 'train' ? 'train' : 'tom', walk); return worldV(obj, walk) - vr; }
+
+  var scene = $('scene'), sRef = 'quai', sWalk = false, tSc = $('tScene');
+  var gBg = mk(scene, 'g', {}), gTrain, gTom, gFront, gLea, refLabel;
+  (function build() {
+    var w;
+    for (w = -40; w <= 240; w += 23) { mk(gBg, 'circle', { cx: w * SC, cy: 40, r: 16, fill: 'var(--ok-soft)', stroke: 'var(--ok)', 'stroke-width': 1.5 }); mk(gBg, 'line', { x1: w * SC, y1: 56, x2: w * SC, y2: 64, stroke: 'var(--ink-soft)', 'stroke-width': 3 }); }
+    for (w = -30; w <= 240; w += 15) { mk(gBg, 'line', { x1: w * SC + 8, y1: 22, x2: w * SC + 8, y2: 118, stroke: 'var(--ink-soft)', 'stroke-width': 2 }); mk(gBg, 'circle', { cx: w * SC + 8, cy: 22, r: 4, fill: 'var(--hl)', stroke: 'var(--ink-soft)' }); }
+    mk(gBg, 'line', { x1: -40 * SC, y1: 121, x2: 260 * SC, y2: 121, stroke: 'var(--ink)', 'stroke-width': 2 });
+    for (w = -40; w <= 240; w += 2) mk(gBg, 'line', { x1: w * SC, y1: 119, x2: w * SC, y2: 124, stroke: 'var(--ink-soft)', 'stroke-width': 1.5 });
+    gTrain = mk(scene, 'g', {});
+    mk(gTrain, 'rect', { x: 0, y: 66, width: 25 * SC, height: 46, rx: 7, fill: 'var(--two-soft)', stroke: 'var(--two)', 'stroke-width': 2.5 });
+    [6, 28, 50, 70].forEach(function (x) { mk(gTrain, 'rect', { x: x, y: 74, width: 15, height: 17, rx: 2, fill: 'var(--card)', stroke: 'var(--two)', 'stroke-width': 1.5 }); });
+    [12, 30, 58, 76].forEach(function (x) { mk(gTrain, 'circle', { cx: x, cy: 114, r: 5, fill: 'var(--ink)' }); });
+    gTom = mk(scene, 'g', {});
+    mk(gTom, 'circle', { cx: 0, cy: 80, r: 5, fill: 'var(--acc)' });
+    mk(gTom, 'rect', { x: -4, y: 86, width: 8, height: 14, rx: 3, fill: 'var(--acc)' });
+    mk(gTom, 'text', { x: 0, y: 60, 'text-anchor': 'middle', 'font-size': 13, 'font-weight': 700, style: 'fill:var(--acc)' }, 'Tom');
+    gFront = mk(scene, 'g', {});
+    mk(gFront, 'rect', { x: -40 * SC, y: 128, width: 300 * SC, height: 42, fill: 'var(--card)', stroke: 'none' });
+    mk(gFront, 'line', { x1: -40 * SC, y1: 128, x2: 260 * SC, y2: 128, stroke: 'var(--ink)', 'stroke-width': 2 });
+    for (w = -40; w <= 240; w += 5) mk(gFront, 'line', { x1: w * SC, y1: 128, x2: w * SC - 10, y2: 170, stroke: 'var(--line)', 'stroke-width': 1.5 });
+    gLea = mk(scene, 'g', {});
+    mk(gLea, 'circle', { cx: 0, cy: 136, r: 6, fill: 'var(--red)' });
+    mk(gLea, 'rect', { x: -5, y: 143, width: 10, height: 18, rx: 3, fill: 'var(--red)' });
+    mk(gLea, 'text', { x: 10, y: 156, 'font-size': 13, 'font-weight': 700, style: 'fill:var(--red)' }, 'Léa');
+    refLabel = mk(scene, 'text', { x: 8, y: 16, 'font-size': 13, 'font-weight': 700 }, '');
+  })();
+  function describe(v) {
+    if (Math.abs(v) < 1e-9) return '<span class="st">immobile</span>';
+    return '<span class="mv">' + (v > 0 ? 'avance (vers la droite)' : 'recule (vers la gauche)') + '</span> à ' + fmt(Math.abs(v)) + ' m/s, soit ' + fmt(msToKmh(Math.abs(v))) + ' km/h';
+  }
+  function drawScene() {
+    var t = parseFloat(tSc.value), p = posAt(sRef, t, sWalk), s = refShift(sRef, t, sWalk);
+    $('tSceneOut').textContent = fmt(t, 1) + ' s';
+    gBg.setAttribute('transform', 'translate(' + (X0 - s * SC) + ',0)');
+    gFront.setAttribute('transform', 'translate(' + (X0 - s * SC) + ',0)');
+    gTrain.setAttribute('transform', 'translate(' + (X0 + p.train * SC) + ',0)');
+    gTom.setAttribute('transform', 'translate(' + (X0 + p.tom * SC) + ',0)');
+    gLea.setAttribute('transform', 'translate(' + (X0 + p.lea * SC) + ',0)');
+    refLabel.textContent = 'Référentiel : ' + (sRef === 'quai' ? 'le quai' : sRef === 'train' ? 'le train' : 'Tom');
+    var names = { lea: 'Léa', tom: 'Tom', train: 'Le train' }, html = '';
+    ['tom', 'lea', 'train'].forEach(function (o) {
+      var isRef = (o === 'train' && sRef === 'train') || (o === 'tom' && sRef === 'tom');
+      html += '<li><strong>' + names[o] + '</strong><span>' + describe(relSpeed(o, sRef, sWalk)) + (isRef ? ' <span class="st">(c\'est le référentiel)</span>' : '') + '</span></li>';
+    });
+    html += '<li><strong>Le quai</strong><span>' + describe(relSpeed('lea', sRef, sWalk)) + (sRef === 'quai' ? ' <span class="st">(c\'est le référentiel)</span>' : '') + '</span></li>';
+    $('sceneOut').innerHTML = html;
+  }
+  [['refQuai', 'quai'], ['refTrain', 'train'], ['refTom', 'tom']].forEach(function (r) {
+    $(r[0]).addEventListener('click', function () { sRef = r[1]; press(['refQuai', 'refTrain', 'refTom'], r[0]); drawScene(); });
+  });
+  $('walkScene').addEventListener('click', function () { sWalk = !sWalk; this.setAttribute('aria-pressed', sWalk ? 'true' : 'false'); drawScene(); });
+  $('stepScene').addEventListener('click', function () { tSc.value = Math.min(8, parseFloat(tSc.value) + 1); drawScene(); });
+  tSc.addEventListener('input', drawScene);
+  player($('playScene'), tSc, 0.08, drawScene, false);
+  drawScene();
+
+  /* ---------- Étape 2 : trajectoires ---------- */
+  function fitCircle(P) {
+    var n = P.length, mx = 0, my = 0, i;
+    for (i = 0; i < n; i++) { mx += P[i][0]; my += P[i][1]; }
+    mx /= n; my /= n;
+    var suu = 0, svv = 0, suv = 0, suz = 0, svz = 0, sz = 0;
+    for (i = 0; i < n; i++) { var u = P[i][0] - mx, v = P[i][1] - my, z = u * u + v * v; suu += u * u; svv += v * v; suv += u * v; suz += u * z; svz += v * z; sz += z; }
+    var det = suu * svv - suv * suv;
+    if (Math.abs(det) < 1e-9) return null;
+    var D = (-suz * svv + svz * suv) / det, E = (-svz * suu + suz * suv) / det, F = -sz / n;
+    var cx = -D / 2, cy = -E / 2, R2 = cx * cx + cy * cy - F;
+    if (!(R2 > 0)) return null;
+    var R = Math.sqrt(R2), e2 = 0, ang = [];
+    for (i = 0; i < n; i++) { var du = P[i][0] - mx - cx, dv = P[i][1] - my - cy, d = Math.hypot(du, dv) - R; e2 += d * d; ang.push(Math.atan2(dv, du) * 180 / Math.PI); }
+    ang.sort(function (a, b) { return a - b; });
+    var gap = ang[0] + 360 - ang[n - 1];
+    for (i = 1; i < n; i++) gap = Math.max(gap, ang[i] - ang[i - 1]);
+    return { cx: cx + mx, cy: cy + my, R: R, err: Math.sqrt(e2 / n) / R, cover: 360 - gap };
+  }
+  function classify(P) {
+    if (!P || P.length < 8) return null;
+    var len = 0, i, n = P.length;
+    for (i = 1; i < n; i++) len += Math.hypot(P[i][0] - P[i - 1][0], P[i][1] - P[i - 1][1]);
+    if (len < 60) return null;
+    var mx = 0, my = 0;
+    for (i = 0; i < n; i++) { mx += P[i][0]; my += P[i][1]; }
+    mx /= n; my /= n;
+    var sxx = 0, syy = 0, sxy = 0;
+    for (i = 0; i < n; i++) { var u = P[i][0] - mx, v = P[i][1] - my; sxx += u * u; syy += v * v; sxy += u * v; }
+    sxx /= n; syy /= n; sxy /= n;
+    var tr = sxx + syy, det = sxx * syy - sxy * sxy, disc = Math.sqrt(Math.max(0, tr * tr / 4 - det)), l1 = tr / 2 + disc, l2 = Math.max(0, tr / 2 - disc);
+    if (l1 <= 0) return null;
+    if (Math.sqrt(l2 / l1) < 0.08) return 'rectiligne';
+    var c = fitCircle(P);
+    if (c && c.err < 0.08 && c.cover >= 220) return 'circulaire';
+    return 'curviligne';
+  }
+  var pad = $('drawPad'), pts = [], drawing = false, pathEl = null;
+  function padFrame() {
+    clear(pad);
+    for (var x = 20; x < 400; x += 20) mk(pad, 'line', { x1: x, y1: 0, x2: x, y2: 260, stroke: 'var(--line)', 'stroke-width': 0.6 });
+    for (var y = 20; y < 260; y += 20) mk(pad, 'line', { x1: 0, y1: y, x2: 400, y2: y, stroke: 'var(--line)', 'stroke-width': 0.6 });
+    pathEl = mk(pad, 'polyline', { points: '', fill: 'none', stroke: 'var(--acc)', 'stroke-width': 4, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' });
+  }
+  function padPt(e) { var r = pad.getBoundingClientRect(); return [(e.clientX - r.left) * 400 / r.width, (e.clientY - r.top) * 260 / r.height]; }
+  function redrawPath() { pathEl.setAttribute('points', pts.map(function (p) { return p[0].toFixed(1) + ',' + p[1].toFixed(1); }).join(' ')); }
+  var examples = { rectiligne: 'comme une bille qui tombe tout droit ou un train sur une voie droite.', circulaire: 'comme un siège de manège ou la pointe d\'une aiguille de montre.', curviligne: 'comme un ballon lancé ou une voiture dans un virage.' };
+  function judge() {
+    var c = classify(pts), out = $('drawOut');
+    if (!c) { out.className = 'verdict'; out.innerHTML = '<span>Trace un chemin un peu plus long.</span>'; return; }
+    out.className = 'verdict yes';
+    out.innerHTML = 'Trajectoire ' + c + '<span>' + (c === 'rectiligne' ? 'Une ligne droite, ' : c === 'circulaire' ? 'Un cercle (ou presque), ' : 'Une courbe qui n\'est ni une droite ni un cercle, ') + examples[c] + '</span>';
+  }
+  pad.addEventListener('pointerdown', function (e) { e.preventDefault(); drawing = true; padFrame(); pts = [padPt(e)]; redrawPath(); if (pad.setPointerCapture) try { pad.setPointerCapture(e.pointerId); } catch (x) {} });
+  pad.addEventListener('pointermove', function (e) { if (!drawing) return; var p = padPt(e), q = pts[pts.length - 1]; if (Math.hypot(p[0] - q[0], p[1] - q[1]) >= 3) { pts.push(p); redrawPath(); } });
+  function endDraw() { if (!drawing) return; drawing = false; judge(); }
+  pad.addEventListener('pointerup', endDraw); pad.addEventListener('pointercancel', endDraw);
+  function example(kind) {
+    padFrame(); pts = [];
+    for (var i = 0; i <= 60; i++) {
+      var s = i / 60;
+      if (kind === 'line') pts.push([40 + 320 * s, 210 - 150 * s]);
+      else if (kind === 'circle') pts.push([200 + 95 * Math.cos(2 * Math.PI * s), 130 + 95 * Math.sin(2 * Math.PI * s)]);
+      else pts.push([30 + 340 * s, 230 - 760 * s * (1 - s)]);
+    }
+    redrawPath(); judge();
+  }
+  $('drLine').addEventListener('click', function () { example('line'); });
+  $('drCircle').addEventListener('click', function () { example('circle'); });
+  $('drCurve').addEventListener('click', function () { example('curve'); });
+  $('drClear').addEventListener('click', function () { padFrame(); pts = []; $('drawOut').className = 'verdict'; $('drawOut').innerHTML = '<span>Dessine quelque chose !</span>'; });
+  padFrame();
+
+  /* Valve : cercle (vélo) ou cycloïde (route) */
+  var valve = $('valve'), valMode = 'bike';
+  function drawValve() {
+    clear(valve);
+    var R = 28, base = 112, i, p = [];
+    mk(valve, 'line', { x1: 0, y1: base + 4, x2: 420, y2: base + 4, stroke: 'var(--ink)', 'stroke-width': 2 });
+    if (valMode === 'bike') {
+      mk(valve, 'circle', { cx: 210, cy: base - R, r: R + 4, fill: 'none', stroke: 'var(--ink-soft)', 'stroke-width': 6 });
+      mk(valve, 'circle', { cx: 210, cy: base - R, r: 3, fill: 'var(--ink)' });
+      mk(valve, 'circle', { cx: 210, cy: base - R, r: R, fill: 'none', stroke: 'var(--acc)', 'stroke-width': 3, 'stroke-dasharray': '6 4' });
+      mk(valve, 'circle', { cx: 210, cy: base, r: 6, fill: 'var(--red)' });
+      $('valveOut').innerHTML = 'Pour quelqu\'un assis sur le vélo, la valve tourne autour de l\'axe : trajectoire <strong>circulaire</strong>.';
+    } else {
+      var x0 = 210 - 2 * Math.PI * R;
+      for (i = 0; i <= 200; i++) { var th = 4 * Math.PI * i / 200; p.push((x0 + R * (th - Math.sin(th))).toFixed(1) + ',' + (base - R * (1 - Math.cos(th))).toFixed(1)); }
+      mk(valve, 'polyline', { points: p.join(' '), fill: 'none', stroke: 'var(--acc)', 'stroke-width': 3, 'stroke-dasharray': '6 4' });
+      [0, 1, 2].forEach(function (k) { var cx = x0 + 2 * Math.PI * R * k; mk(valve, 'circle', { cx: cx, cy: base - R, r: R + 4, fill: 'none', stroke: 'var(--ink-soft)', 'stroke-width': 3, opacity: 0.35 }); mk(valve, 'circle', { cx: cx, cy: base, r: 6, fill: 'var(--red)' }); });
+      $('valveOut').innerHTML = 'Pour quelqu\'un au bord de la route, la valve avance en faisant des arches : trajectoire <strong>curviligne</strong> (une courbe appelée cycloïde). Même valve, autre référentiel, autre trajectoire !';
+    }
+  }
+  $('valBike').addEventListener('click', function () { valMode = 'bike'; press(['valBike', 'valRoad'], 'valBike'); drawValve(); });
+  $('valRoad').addEventListener('click', function () { valMode = 'road'; press(['valBike', 'valRoad'], 'valRoad'); drawValve(); });
+  drawValve();
+
+  /* ---------- Étape 3 : chronophotographie ---------- */
+  var DT = 0.1;
+  function chronoGaps(type) { var g = []; for (var k = 0; k < 8; k++) g.push(type === 'uniforme' ? 20 : type === 'accelere' ? 6 + 4 * k : 34 - 4 * k); return g; }
+  function chronoPositions(type) { var g = chronoGaps(type), p = [0]; for (var k = 0; k < 8; k++) p.push(p[k] + g[k]); return p; }
+  function speedBetween(type, i, j) { if (i === j) return NaN; var p = chronoPositions(type), a = Math.min(i, j), b = Math.max(i, j); return (p[b] - p[a]) / 100 / ((b - a) * DT); }
+  var chT = 'uniforme', chShown = 9, chRuler = false, chA = 0, chB = 8, chSel = 0, chSvg = $('chrono');
+  var fromS = $('chFrom'), toS = $('chTo');
+  for (var k = 0; k < 9; k++) { fromS.appendChild(new Option(String(k + 1), k)); toS.appendChild(new Option(String(k + 1), k)); }
+  function CX(cm) { return 30 + 2 * cm; }
+  function drawChrono() {
+    clear(chSvg);
+    var p = chronoPositions(chT), g = chronoGaps(chT), i;
+    mk(chSvg, 'line', { x1: 20, y1: 66, x2: 370, y2: 66, stroke: 'var(--line)', 'stroke-width': 2 });
+    if (chRuler) {
+      mk(chSvg, 'rect', { x: 22, y: 96, width: 340, height: 34, rx: 4, fill: 'var(--hl)', opacity: 0.6, stroke: 'var(--ink-soft)' });
+      for (i = 0; i <= 165; i += 5) { var X = CX(i); mk(chSvg, 'line', { x1: X, y1: 96, x2: X, y2: 96 + (i % 10 === 0 ? 12 : 6), stroke: 'var(--ink)', 'stroke-width': 1 }); if (i % 20 === 0) mk(chSvg, 'text', { x: X, y: 124, 'text-anchor': 'middle', 'font-size': 12 }, String(i)); }
+      mk(chSvg, 'text', { x: 358, y: 124, 'text-anchor': 'end', 'font-size': 11 }, 'cm');
+      for (i = 0; i < chShown; i++) mk(chSvg, 'line', { x1: CX(p[i]), y1: 72, x2: CX(p[i]), y2: 96, stroke: 'var(--ink-soft)', 'stroke-width': 1, 'stroke-dasharray': '2 2' });
+    } else {
+      mk(chSvg, 'text', { x: 20, y: 120, 'font-size': 13 }, 'Une photo toutes les 0,1 s');
+    }
+    var a = Math.min(chA, chB), b = Math.max(chA, chB);
+    if (a !== b && b < chShown) {
+      mk(chSvg, 'line', { x1: CX(p[a]), y1: 84, x2: CX(p[b]), y2: 84, stroke: 'var(--acc)', 'stroke-width': 3 });
+      mk(chSvg, 'line', { x1: CX(p[a]), y1: 78, x2: CX(p[a]), y2: 90, stroke: 'var(--acc)', 'stroke-width': 3 });
+      mk(chSvg, 'line', { x1: CX(p[b]), y1: 78, x2: CX(p[b]), y2: 90, stroke: 'var(--acc)', 'stroke-width': 3 });
+    }
+    for (i = 0; i < chShown; i++) {
+      var sel = (i === chA || i === chB);
+      mk(chSvg, 'circle', { cx: CX(p[i]), cy: 66, r: sel ? 7 : 6, fill: sel ? 'var(--acc)' : 'var(--two)', stroke: 'var(--card)', 'stroke-width': 1.5 });
+      mk(chSvg, 'text', { x: CX(p[i]), y: 48, 'text-anchor': 'middle', 'font-size': 12, style: sel ? 'fill:var(--acc);font-weight:700' : '' }, String(i + 1));
+      (function (i) {
+        var hit = mk(chSvg, 'circle', { cx: CX(p[i]), cy: 66, r: 12, fill: 'transparent', style: 'cursor:pointer' });
+        hit.addEventListener('click', function () { if (chSel === 0) { chA = i; chSel = 1; } else { chB = i; chSel = 0; } fromS.value = chA; toS.value = chB; drawChrono(); });
+      })(i);
+    }
+    $('chGaps').innerHTML = chRuler ? g.slice(0, Math.max(0, chShown - 1)).map(function (d, i) { return '<span>' + (i + 1) + '→' + (i + 2) + ' : ' + d + ' cm</span>'; }).join('') : '';
+    var out = $('chOut');
+    if (b >= chShown) { out.innerHTML = '<span class="soft">Affiche toutes les photos pour mesurer jusqu\'à la photo ' + (b + 1) + '.</span>'; return; }
+    if (a === b) { out.innerHTML = '<span class="soft">Choisis deux photos différentes.</span>'; return; }
+    var d = p[b] - p[a], t = (b - a) * DT, v = d / 100 / t;
+    out.innerHTML = '<span>Distance : d = ' + fmt(d) + ' cm = ' + fmt(d / 100) + ' m</span>' +
+      '<span>Durée : t = ' + (b - a) + ' × 0,1 s = ' + fmt(t) + ' s</span>' +
+      '<span>Vitesse moyenne : v = ' + fmt(d / 100) + ' ÷ ' + fmt(t) + ' <b>' + eqs(v) + fmt(v, 2) + ' m/s</b> (' + eqs(v * 3.6) + fmt(v * 3.6, 2) + ' km/h)</span>';
+  }
+  [['chU', 'uniforme'], ['chA', 'accelere'], ['chR', 'ralenti']].forEach(function (r) {
+    $(r[0]).addEventListener('click', function () { chT = r[1]; press(['chU', 'chA', 'chR'], r[0]); chShown = 1; drawChrono(); });
+  });
+  $('chNext').addEventListener('click', function () { chShown = chShown >= 9 ? 1 : chShown + 1; drawChrono(); });
+  $('chAll').addEventListener('click', function () { chShown = 9; drawChrono(); });
+  $('chRuler').addEventListener('click', function () { chRuler = !chRuler; this.setAttribute('aria-pressed', chRuler ? 'true' : 'false'); this.textContent = chRuler ? 'Cacher la règle' : 'Afficher la règle'; drawChrono(); });
+  fromS.addEventListener('change', function () { chA = parseInt(fromS.value, 10); drawChrono(); });
+  toS.addEventListener('change', function () { chB = parseInt(toS.value, 10); drawChrono(); });
+  fromS.value = 0; toS.value = 8; drawChrono();
+
+  /* ---------- Étape 4 : vitesses ---------- */
+  var conv = $('conv');
+  function drawConv() { var v = parseInt(conv.value, 10), ms = v / 3.6; $('convOut').textContent = v + ' km/h = ' + v + ' ÷ 3,6 ' + eqs(ms) + fmt(ms, 2) + ' m/s'; }
+  conv.addEventListener('input', drawConv); drawConv();
+  var SPEEDS = [
+    ['Escargot', 0.001, '0,001 m/s (1 mm/s)', '0,003 6 km/h'],
+    ['Piéton', 1.4, '1,4 m/s', '5 km/h'],
+    ['Cycliste', 5.5, '5,5 m/s', '20 km/h'],
+    ['Voiture (autoroute)', 36, '36 m/s', '130 km/h'],
+    ['TGV', 89, '89 m/s', '320 km/h'],
+    ['Avion de ligne', 250, '250 m/s', '900 km/h'],
+    ['Son dans l\'air', 340, '340 m/s', '1 200 km/h'],
+    ['Terre autour du Soleil', 30000, '30 000 m/s (30 km/s)', '108 000 km/h'],
+    ['Lumière', 3e8, '300 000 000 m/s (300 000 km/s)', '1,08 milliard de km/h']
+  ];
+  function fmtDur(s) {
+    if (s >= 3600) return 'environ ' + fmt(s / 3600, 0) + ' heures';
+    if (s >= 60) { var m = Math.floor(s / 60), r = Math.round(s - 60 * m); return 'environ ' + m + ' min ' + r + ' s'; }
+    if (s >= 1) return 'environ ' + fmt(s, 1) + ' s';
+    if (s >= 0.001) return 'environ ' + fmt(s * 1000, 1) + ' millisecondes';
+    return 'environ ' + fmt(s * 1e6, 2) + ' microseconde (millionième de seconde)';
+  }
+  var ul = $('speeds');
+  SPEEDS.forEach(function (s, i) {
+    var li = document.createElement('li'), b = document.createElement('button'), pc = (Math.log10(s[1]) + 3) / 11.5 * 100;
+    b.type = 'button'; b.id = 'sp' + i; b.setAttribute('aria-pressed', 'false');
+    b.innerHTML = '<span>' + s[0] + '</span><span style="min-width:0"><span class="bar" style="width:' + Math.max(2, pc).toFixed(1) + '%"></span></span>';
+    b.addEventListener('click', function () { showSpeed(i); });
+    li.appendChild(b); ul.appendChild(li);
+  });
+  function showSpeed(i) {
+    var s = SPEEDS[i];
+    SPEEDS.forEach(function (q, j) { $('sp' + j).setAttribute('aria-pressed', i === j ? 'true' : 'false'); });
+    $('speedOut').className = 'verdict yes';
+    $('speedOut').innerHTML = s[0] + ' : ' + s[2] + ' ≈ ' + s[3] + '<span>Pour parcourir 100 m : ' + fmtDur(100 / s[1]) + '.</span>';
+  }
+  showSpeed(1);
+
+  /* ---------- Étape 5 : trajet ---------- */
+  var SEG = [[0, 10, 0, 50], [10, 40, 50, 50], [40, 50, 50, 0], [50, 70, 0, 0], [70, 80, 0, 30], [80, 120, 30, 30]];
+  function tripSpeed(t) {
+    if (t <= 0) return 0;
+    for (var i = 0; i < SEG.length; i++) { var s = SEG[i]; if (t <= s[1]) return s[2] + (s[3] - s[2]) * (t - s[0]) / (s[1] - s[0]); }
+    return SEG[SEG.length - 1][3];
+  }
+  function tripDistance(t) {
+    var d = 0;
+    for (var i = 0; i < SEG.length; i++) {
+      var s = SEG[i]; if (t <= s[0]) break;
+      var te = Math.min(t, s[1]); d += (s[2] + tripSpeed(te)) / 2 * (te - s[0]) / 3.6;
+    }
+    return d;
+  }
+  function tripAverage(t) { return t > 0 ? tripDistance(t) / t * 3.6 : 0; }
+  var gauge = $('gauge'), tTrip = $('tTrip'), needle;
+  (function () {
+    var cx = 120, cy = 128, r = 98;
+    mk(gauge, 'path', { d: 'M ' + (cx - r) + ' ' + cy + ' A ' + r + ' ' + r + ' 0 0 1 ' + (cx + r) + ' ' + cy, fill: 'none', stroke: 'var(--ink)', 'stroke-width': 3 });
+    for (var v = 0; v <= 60; v += 5) {
+      var a = Math.PI - v / 60 * Math.PI, c = Math.cos(a), s = Math.sin(a), l = v % 10 === 0 ? 12 : 6;
+      mk(gauge, 'line', { x1: cx + r * c, y1: cy - r * s, x2: cx + (r - l) * c, y2: cy - (r - l) * s, stroke: 'var(--ink)', 'stroke-width': 2 });
+      if (v % 10 === 0) mk(gauge, 'text', { x: cx + (r - 26) * c, y: cy - (r - 26) * s + 5, 'text-anchor': 'middle', 'font-size': 14 }, String(v));
+    }
+    mk(gauge, 'text', { x: cx, y: cy - 30, 'text-anchor': 'middle', 'font-size': 13 }, 'km/h');
+    needle = mk(gauge, 'line', { x1: cx, y1: cy, x2: cx - r + 14, y2: cy, stroke: 'var(--red)', 'stroke-width': 4, 'stroke-linecap': 'round' });
+    mk(gauge, 'circle', { cx: cx, cy: cy, r: 7, fill: 'var(--ink)' });
+  })();
+  function drawTrip() {
+    var t = parseFloat(tTrip.value), v = tripSpeed(t), d = tripDistance(t), avg = tripAverage(t);
+    $('tTripOut').textContent = t + ' s';
+    var a = Math.PI - v / 60 * Math.PI, L = 84;
+    needle.setAttribute('x2', 120 + L * Math.cos(a)); needle.setAttribute('y2', 128 - L * Math.sin(a));
+    $('tripOut').innerHTML = '<span>Vitesse instantanée :</span><span class="big">' + fmt(v, 0) + ' km/h</span>' +
+      '<span>Distance parcourue : ' + fmt(d, 0) + ' m</span><span>Durée : ' + t + ' s</span>' +
+      '<span>Vitesse moyenne : ' + (t > 0 ? fmt(d, 0) + ' m ÷ ' + t + ' s ≈ <b>' + fmt(d / t, 1) + ' m/s ≈ ' + fmt(avg, 0) + ' km/h</b>' : '—') + '</span>';
+    var road = $('road'); clear(road);
+    mk(road, 'rect', { x: 10, y: 18, width: 380, height: 20, rx: 4, fill: 'var(--line)' });
+    mk(road, 'line', { x1: 10, y1: 28, x2: 390, y2: 28, stroke: 'var(--card)', 'stroke-width': 2, 'stroke-dasharray': '10 8' });
+    var fx = 20 + tripDistance(60) / 1000 * 360;
+    mk(road, 'rect', { x: fx + 6, y: 2, width: 9, height: 16, rx: 2, fill: 'var(--ink)' });
+    mk(road, 'circle', { cx: fx + 10.5, cy: 7, r: 3, fill: t >= 40 && t < 70 ? 'var(--red)' : 'var(--ink-soft)' });
+    mk(road, 'circle', { cx: fx + 10.5, cy: 14, r: 3, fill: t >= 70 ? 'var(--ok)' : 'var(--ink-soft)' });
+    mk(road, 'rect', { x: 20 + d / 1000 * 360 - 9, y: 21, width: 18, height: 14, rx: 4, fill: 'var(--acc)' });
+    mk(road, 'text', { x: 390, y: 52, 'text-anchor': 'end', 'font-size': 12 }, fmt(d, 0) + ' m');
+    var g = $('tripGraph'); clear(g);
+    var W = 400, H = 210, Lm = 42, B = 32, T = 12, R = 12;
+    function X(tt) { return Lm + tt / 120 * (W - Lm - R); } function Y(vv) { return H - B - vv / 60 * (H - B - T); }
+    for (var i = 0; i <= 6; i++) {
+      mk(g, 'line', { x1: X(i * 20), y1: T, x2: X(i * 20), y2: H - B, stroke: 'var(--line)' });
+      mk(g, 'text', { x: X(i * 20), y: H - B + 18, 'text-anchor': 'middle', 'font-size': 12 }, String(i * 20));
+    }
+    for (i = 0; i <= 6; i += 2) { mk(g, 'line', { x1: Lm, y1: Y(i * 10), x2: W - R, y2: Y(i * 10), stroke: 'var(--line)' }); mk(g, 'text', { x: Lm - 6, y: Y(i * 10) + 4, 'text-anchor': 'end', 'font-size': 12 }, String(i * 10)); }
+    var area = [X(0) + ',' + Y(0)], line = [];
+    for (var tt = 0; tt <= 120; tt += 1) { line.push(X(tt) + ',' + Y(tripSpeed(tt))); if (tt <= t) area.push(X(tt) + ',' + Y(tripSpeed(tt))); }
+    area.push(X(t) + ',' + Y(tripSpeed(t)), X(t) + ',' + Y(0));
+    if (t > 0) mk(g, 'polygon', { points: area.join(' '), fill: 'var(--acc-soft)' });
+    mk(g, 'polyline', { points: line.join(' '), fill: 'none', stroke: 'var(--acc)', 'stroke-width': 3 });
+    if (t > 0) { mk(g, 'line', { x1: X(0), y1: Y(avg), x2: X(t), y2: Y(avg), stroke: 'var(--two)', 'stroke-width': 2.5, 'stroke-dasharray': '6 4' }); }
+    mk(g, 'line', { x1: X(t), y1: T, x2: X(t), y2: H - B, stroke: 'var(--red)', 'stroke-width': 2 });
+    mk(g, 'circle', { cx: X(t), cy: Y(v), r: 5, fill: 'var(--red)' });
+    mk(g, 'line', { x1: Lm, y1: H - B, x2: W - R, y2: H - B, stroke: 'var(--ink)', 'stroke-width': 2 });
+    mk(g, 'line', { x1: Lm, y1: T, x2: Lm, y2: H - B, stroke: 'var(--ink)', 'stroke-width': 2 });
+    mk(g, 'text', { x: W - R, y: H - 2, 'text-anchor': 'end', 'font-size': 12 }, 't (s)');
+    mk(g, 'text', { x: Lm + 6, y: T + 12, 'font-size': 12 }, 'v (km/h)');
+  }
+  tTrip.addEventListener('input', drawTrip);
+  $('stepTrip').addEventListener('click', function () { tTrip.value = Math.min(120, parseFloat(tTrip.value) + 10); drawTrip(); });
+  player($('playTrip'), tTrip, 1, drawTrip, false);
+  drawTrip();
+
+  /* ---------- Étape 6 : manège ---------- */
+  function carouselSpeed(R, T) { return 2 * Math.PI * R / T; }
+  var car = $('carousel'), perT = $('perT'), tCar = $('tCar'), ghost = false, RIN = 3, ROUT = 6, PX = 20;
+  function drawCar() {
+    clear(car);
+    var T = parseInt(perT.value, 10), t = parseFloat(tCar.value), cx = 160, cy = 160, th = 2 * Math.PI * t / T;
+    var vIn = carouselSpeed(RIN, T), vOut = carouselSpeed(ROUT, T), AL = 14;
+    $('perTOut').textContent = T + ' s'; $('tCarOut').textContent = fmt(t, 1) + ' s';
+    mk(car, 'circle', { cx: cx, cy: cy, r: ROUT * PX + 14, fill: 'var(--acc-soft)', stroke: 'var(--acc)', 'stroke-width': 2 });
+    mk(car, 'circle', { cx: cx, cy: cy, r: ROUT * PX, fill: 'none', stroke: 'var(--acc)', 'stroke-width': 1.5, 'stroke-dasharray': '5 4' });
+    mk(car, 'circle', { cx: cx, cy: cy, r: RIN * PX, fill: 'none', stroke: 'var(--two)', 'stroke-width': 1.5, 'stroke-dasharray': '5 4' });
+    mk(car, 'line', { x1: cx, y1: cy, x2: cx + ROUT * PX * Math.cos(th), y2: cy - ROUT * PX * Math.sin(th), stroke: 'var(--ink-soft)', 'stroke-width': 2 });
+    mk(car, 'circle', { cx: cx, cy: cy, r: 8, fill: 'var(--ink)' });
+    if (ghost) {
+      for (var k = 0; k < 12; k++) {
+        var a = th - 2 * Math.PI * k / 12, gx = cx + ROUT * PX * Math.cos(a), gy = cy - ROUT * PX * Math.sin(a);
+        mk(car, 'circle', { cx: gx, cy: gy, r: 5, fill: 'var(--acc)', opacity: 0.5 });
+        arrow(car, gx, gy, gx - vOut * AL * Math.sin(a), gy - vOut * AL * Math.cos(a), 'var(--acc)', 2, 0.45);
+      }
+    }
+    [[RIN, vIn, 'var(--two)'], [ROUT, vOut, 'var(--acc)']].forEach(function (h) {
+      var x = cx + h[0] * PX * Math.cos(th), y = cy - h[0] * PX * Math.sin(th);
+      arrow(car, x, y, x - h[1] * AL * Math.sin(th), y - h[1] * AL * Math.cos(th), h[2], 3.5);
+      mk(car, 'circle', { cx: x, cy: y, r: 9, fill: h[2], stroke: 'var(--card)', 'stroke-width': 2 });
+    });
+    mk(car, 'text', { x: 8, y: 314, 'font-size': 12 }, 'vu du dessus');
+    $('carOut').innerHTML = '<span style="color:var(--two)">Cheval intérieur (R = 3 m) :</span><span>v = 2 × π × 3 ÷ ' + T + ' ≈ <b>' + fmt(vIn, 2) + ' m/s</b></span>' +
+      '<span style="color:var(--acc)">Cheval extérieur (R = 6 m) :</span><span>v = 2 × π × 6 ÷ ' + T + ' ≈ <b>' + fmt(vOut, 2) + ' m/s</b> (≈ ' + fmt(vOut * 3.6, 1) + ' km/h)</span>' +
+      '<span class="soft">La longueur des flèches ne change pas, leur direction tourne.</span>';
+  }
+  perT.addEventListener('input', drawCar); tCar.addEventListener('input', drawCar);
+  $('ghostCar').addEventListener('click', function () { ghost = !ghost; this.setAttribute('aria-pressed', ghost ? 'true' : 'false'); drawCar(); });
+  player($('playCar'), tCar, 0.25, drawCar, true);
+  drawCar();
+
+  /* ---------- Étape 7 : graphique distance–temps ---------- */
+  var vA = $('vA'), vB = $('vB');
+  function drawDT() {
+    var a = parseFloat(vA.value), b = parseFloat(vB.value), g = $('dtGraph'); clear(g);
+    $('vAOut').textContent = fmt(a, 1) + ' m/s'; $('vBOut').textContent = fmt(b, 1) + ' m/s';
+    var W = 400, H = 260, L = 44, B = 34, T = 12, R = 12;
+    function X(t) { return L + t / 10 * (W - L - R); } function Y(d) { return H - B - d / 30 * (H - B - T); }
+    for (var i = 0; i <= 10; i += 2) { mk(g, 'line', { x1: X(i), y1: T, x2: X(i), y2: H - B, stroke: 'var(--line)' }); mk(g, 'text', { x: X(i), y: H - B + 18, 'text-anchor': 'middle', 'font-size': 13 }, String(i)); }
+    for (i = 0; i <= 30; i += 5) { mk(g, 'line', { x1: L, y1: Y(i), x2: W - R, y2: Y(i), stroke: 'var(--line)' }); if (i % 10 === 0) mk(g, 'text', { x: L - 6, y: Y(i) + 4, 'text-anchor': 'end', 'font-size': 13 }, String(i)); }
+    mk(g, 'line', { x1: L, y1: H - B, x2: W - R, y2: H - B, stroke: 'var(--ink)', 'stroke-width': 2 });
+    mk(g, 'line', { x1: L, y1: T, x2: L, y2: H - B, stroke: 'var(--ink)', 'stroke-width': 2 });
+    mk(g, 'text', { x: W - R, y: H - 4, 'text-anchor': 'end', 'font-size': 12 }, 't (s)');
+    mk(g, 'text', { x: L + 6, y: T + 12, 'font-size': 12 }, 'd (m)');
+    function lineFor(v, col, name) {
+      var te = v * 10 > 30 ? 30 / v : 10;
+      mk(g, 'line', { x1: X(0), y1: Y(0), x2: X(te), y2: Y(v * te), stroke: col, 'stroke-width': 3.5, 'stroke-linecap': 'round' });
+      mk(g, 'text', { x: X(te) - 4, y: Y(v * te) - 8, 'text-anchor': 'end', 'font-size': 13, 'font-weight': 700, style: 'fill:' + col }, name);
+    }
+    mk(g, 'line', { x1: X(1), y1: Y(a), x2: X(5), y2: Y(a), stroke: 'var(--red)', 'stroke-width': 2, 'stroke-dasharray': '4 3' });
+    mk(g, 'line', { x1: X(5), y1: Y(a), x2: X(5), y2: Y(5 * a), stroke: 'var(--red)', 'stroke-width': 2, 'stroke-dasharray': '4 3' });
+    mk(g, 'text', { x: X(3), y: Y(a) + 16, 'text-anchor': 'middle', 'font-size': 12, style: 'fill:var(--red)' }, 'Δt = 4 s');
+    lineFor(b, 'var(--two)', 'Bilal');
+    lineFor(a, 'var(--acc)', 'Alice');
+    var dd = 4 * a, who = Math.abs(a - b) < 1e-9 ? 'Ils vont à la même vitesse : les droites sont confondues.' : (a > b ? 'Alice' : 'Bilal') + ' va plus vite : sa droite est plus pentue.';
+    $('dtOut').innerHTML = '<span>Triangle rouge (Alice) : de t = 1 s à t = 5 s, Δt = 4 s et Δd = ' + fmt(5 * a, 1) + ' − ' + fmt(a, 1) + ' = ' + fmt(dd, 1) + ' m</span>' +
+      '<span>Pente = Δd ÷ Δt = ' + fmt(dd, 1) + ' ÷ 4 = <b>' + fmt(a, 2) + ' m/s</b> : c\'est la vitesse d\'Alice.</span>' +
+      '<span>' + who + (a === 0 || b === 0 ? ' Une droite horizontale veut dire : immobile.' : '') + '</span>';
+  }
+  vA.addEventListener('input', drawDT); vB.addEventListener('input', drawDT); drawDT();
+
+  /* ---------- Étape 8 : jeu ---------- */
+  function rnd(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  function polyPath(traj) {
+    var P = [], i, N = 400;
+    if (traj === 0) { var y1 = rnd(60, 180), y2 = rnd(60, 180); for (i = 0; i <= N; i++) P.push([30 + 340 * i / N, y1 + (y2 - y1) * i / N]); }
+    else if (traj === 1) { var a0 = Math.random() * 2 * Math.PI; for (i = 0; i <= N; i++) { var a = a0 + 1.8 * Math.PI * i / N; P.push([200 + 95 * Math.cos(a), 122 + 95 * Math.sin(a)]); } }
+    else { var hgt = rnd(120, 170); for (i = 0; i <= N; i++) { var s = i / N; P.push([25 + 350 * s, 215 - 4 * hgt * s * (1 - s)]); } }
+    if (Math.random() < 0.5) P.reverse();
+    var cum = [0]; for (i = 1; i < P.length; i++) cum.push(cum[i - 1] + Math.hypot(P[i][0] - P[i - 1][0], P[i][1] - P[i - 1][1]));
+    return { P: P, cum: cum, L: cum[cum.length - 1] };
+  }
+  function at(path, s) {
+    var c = path.cum, i = 1; while (i < c.length - 1 && c[i] < s) i++;
+    var f = (s - c[i - 1]) / ((c[i] - c[i - 1]) || 1), A = path.P[i - 1], B = path.P[i];
+    return [A[0] + (B[0] - A[0]) * f, A[1] + (B[1] - A[1]) * f];
+  }
+  function gameRound() {
+    var traj = rnd(0, 2), speed = rnd(0, 2), gaps = [], k;
+    if (speed === 0) { var g0 = rnd(30, 42); for (k = 0; k < 7; k++) gaps.push(g0); }
+    else { var g1 = rnd(12, 16), st = rnd(6, 9); for (k = 0; k < 7; k++) gaps.push(g1 + st * k); if (speed === 2) gaps.reverse(); }
+    var path = polyPath(traj), tot = gaps.reduce(function (s, x) { return s + x; }, 0), s0 = Math.random() * Math.max(0, path.L - tot), pts = [at(path, s0)], s = s0;
+    for (k = 0; k < 7; k++) { s += gaps[k]; pts.push(at(path, s)); }
+    return { traj: traj, speed: speed, pts: pts, gaps: gaps };
+  }
+  var G = null, gT = null, gS = null, gGood = 0, gTot = 0, gDone = false;
+  var TN = ['rectiligne', 'circulaire', 'curviligne'], SN = ['uniforme', 'accélérée', 'ralentie'];
+  function newGame() {
+    G = gameRound(); gT = null; gS = null; gDone = false;
+    press(['gT0', 'gT1', 'gT2'], ''); press(['gS0', 'gS1', 'gS2'], '');
+    var svg = $('game'); clear(svg);
+    G.pts.forEach(function (p, i) {
+      if (i === 0) mk(svg, 'circle', { cx: p[0], cy: p[1], r: 11, fill: 'none', stroke: 'var(--red)', 'stroke-width': 2.5 });
+      mk(svg, 'circle', { cx: p[0], cy: p[1], r: 6, fill: 'var(--two)', stroke: 'var(--card)', 'stroke-width': 1.5 });
+    });
+    mk(svg, 'text', { x: G.pts[0][0], y: G.pts[0][1] - 16, 'text-anchor': 'middle', 'font-size': 13, style: 'fill:var(--red);font-weight:700' }, '1');
+    $('gOut').className = 'verdict'; $('gOut').innerHTML = '<span>Choisis une trajectoire et une vitesse.</span>';
+  }
+  [0, 1, 2].forEach(function (i) {
+    $('gT' + i).addEventListener('click', function () { if (gDone) return; gT = i; press(['gT0', 'gT1', 'gT2'], 'gT' + i); });
+    $('gS' + i).addEventListener('click', function () { if (gDone) return; gS = i; press(['gS0', 'gS1', 'gS2'], 'gS' + i); });
+  });
+  $('gCheck').addEventListener('click', function () {
+    var out = $('gOut');
+    if (gDone) return;
+    if (gT === null || gS === null) { out.className = 'verdict'; out.innerHTML = '<span>Choisis une réponse sur les deux lignes.</span>'; return; }
+    gDone = true; gTot++;
+    var ok = gT === G.traj && gS === G.speed; if (ok) gGood++;
+    var why = G.speed === 0 ? 'Les écarts entre deux photos sont tous égaux.' : G.speed === 1 ? 'Les écarts grandissent d\'une photo à la suivante.' : 'Les écarts diminuent d\'une photo à la suivante.';
+    out.className = 'verdict ' + (ok ? 'yes' : 'no');
+    out.innerHTML = (ok ? 'Bravo !' : 'Pas tout à fait.') + ' C\'est un mouvement ' + TN[G.traj] + ' et ' + (G.speed === 0 ? 'uniforme' : G.speed === 1 ? 'accéléré' : 'ralenti') + '.<span>' + why + '</span>';
+    $('gScore').textContent = gGood + ' / ' + gTot;
+  });
+  $('gNew').addEventListener('click', newGame);
+  newGame();
+
+  /* Plan incliné de Galilée */
+  (function () {
+    var g = $('galileo'), u = 365 / 16, acc = 0, cols = ['var(--acc)', 'var(--two)', 'var(--acc)', 'var(--two)'];
+    function P(d) { return [20 + d * u, 30 + d * u * 95 / 365]; }
+    mk(g, 'circle', { cx: P(0)[0], cy: P(0)[1] - 8, r: 7, fill: 'var(--red)' });
+    [1, 3, 5, 7].forEach(function (n, i) {
+      var a = P(acc), b = P(acc + n); acc += n;
+      mk(g, 'line', { x1: a[0], y1: a[1] - 4, x2: b[0], y2: b[1] - 4, stroke: cols[i], 'stroke-width': 7, 'stroke-linecap': 'butt' });
+      mk(g, 'line', { x1: b[0], y1: b[1] - 14, x2: b[0], y2: b[1] + 6, stroke: 'var(--ink)', 'stroke-width': 2 });
+      mk(g, 'text', { x: (a[0] + b[0]) / 2 + 6, y: (a[1] + b[1]) / 2 + 22, 'text-anchor': 'middle', 'font-size': 14, 'font-weight': 700 }, String(n));
+    });
+  })();
+
+  /* ---------- Quiz ---------- */
+  function makeQ(type) {
+    if (type === 0) { var v = pick([4, 5, 6, 8]), t = pick([10, 20, 30, 50]); return { q: 'Un cycliste parcourt ' + fmt(v * t) + ' m en ' + t + ' s. Quelle est sa vitesse (en m/s) ?', a: v, how: 'v = d ÷ t = ' + fmt(v * t) + ' ÷ ' + t + ' = ' + v + ' m/s' }; }
+    if (type === 1) { var m = pick([5, 10, 15, 20, 25, 30]); return { q: 'Convertis ' + m + ' m/s en km/h.', a: m * 3.6, how: m + ' × 3,6 = ' + fmt(m * 3.6) + ' km/h' }; }
+    if (type === 2) { var k = pick([18, 36, 54, 72, 90, 108]); return { q: 'Convertis ' + k + ' km/h en m/s.', a: k / 3.6, how: k + ' ÷ 3,6 = ' + fmt(k / 3.6) + ' m/s' }; }
+    if (type === 3) { var g = pick([10, 20, 30, 40, 50]), dt = pick([0.1, 0.2, 0.5]); return { q: 'Sur une chronophoto, une photo est prise toutes les ' + fmt(dt) + ' s. Entre deux photos, la balle avance de ' + g + ' cm. Quelle est sa vitesse (en m/s) ?', a: g / 100 / dt, how: fmt(g / 100) + ' m ÷ ' + fmt(dt) + ' s = ' + fmt(g / 100 / dt) + ' m/s' }; }
+    if (type === 4) { var w = pick([4, 5, 6]), V = pick([80, 100, 120, 150]); return { q: 'Dans un train qui roule à ' + V + ' km/h, Tom marche vers l\'avant à ' + w + ' km/h par rapport au train. Quelle est sa vitesse par rapport au quai (en km/h) ?', a: V + w, how: V + ' + ' + w + ' = ' + (V + w) + ' km/h : les deux vitesses s\'ajoutent' }; }
+    if (type === 5) { var V2 = pick([50, 70, 90]); return { q: 'Inès est assise dans un bus qui roule à ' + V2 + ' km/h. Quelle est sa vitesse par rapport au bus (en km/h) ?', a: 0, how: 'Elle reste à sa place dans le bus : 0 km/h par rapport au bus (mais ' + V2 + ' km/h par rapport à la route)' }; }
+    if (type === 6) { var vm = pick([60, 70, 80, 90]), h = pick([2, 3, 4]); return { q: 'Avec des arrêts et des ralentissements, une voiture parcourt ' + (vm * h) + ' km en ' + h + ' h. Quelle est sa vitesse moyenne (en km/h) ?', a: vm, how: (vm * h) + ' ÷ ' + h + ' = ' + vm + ' km/h' }; }
+    var s = pick([1, 2, 3, 4]), tt = pick([2, 4, 5]); return { q: 'Sur un graphique distance–temps, la droite passe par l\'origine et par le point (' + tt + ' s ; ' + (s * tt) + ' m). Quelle est la vitesse (en m/s) ?', a: s, how: 'Pente = ' + (s * tt) + ' ÷ ' + tt + ' = ' + s + ' m/s' };
+  }
+  var quiz = $('quiz'), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ''; done = [];
+    for (var k = 0; k < 8; k++) {
+      var Q = makeQ(k), li = document.createElement('li');
+      li.innerHTML = '<span>' + Q.q + '</span><input type="text" id="qa' + k + '" inputmode="decimal" autocomplete="off" aria-label="Ta réponse à la question ' + (k + 1) + '"><button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+      quiz.appendChild(li);
+      (function (k, Q) {
+        function check() {
+          var fb = $('qf' + k), x = num($('qa' + k).value);
+          if (isNaN(x)) { fb.className = 'fb'; fb.textContent = 'Écris un nombre.'; return; }
+          if (Math.abs(x - Q.a) < 0.006) { fb.className = 'fb ok'; fb.textContent = 'Bravo, c\'est juste !'; done[k] = true; }
+          else { done[k] = false; fb.className = 'fb no'; fb.innerHTML = 'Pas tout à fait : la réponse est ' + fmt(Q.a, 2) + '.<span>' + Q.how + '</span>'; }
+          $('score').textContent = done.filter(Boolean).length + ' / 8';
+        }
+        $('qb' + k).addEventListener('click', check);
+        $('qa' + k).addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+      })(k, Q);
+    }
+    $('score').textContent = '0 / 8';
+  }
+  $('newQuiz').addEventListener('click', newQuiz);
+  newQuiz();
+
+  window.__mvt = { posAt: posAt, relSpeed: relSpeed, classify: classify, chronoGaps: chronoGaps, chronoPositions: chronoPositions, speedBetween: speedBetween, msToKmh: msToKmh, kmhToMs: kmhToMs, tripSpeed: tripSpeed, tripDistance: tripDistance, tripAverage: tripAverage, carouselSpeed: carouselSpeed, gameRound: gameRound };
+})();
+</script>
+</body>
+</html>
