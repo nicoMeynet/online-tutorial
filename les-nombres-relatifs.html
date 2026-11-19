@@ -1,0 +1,556 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Les nombres relatifs</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, marge rouge. Comme sur un thermomètre : les positifs en orange (le chaud), les négatifs en bleu (le froid). */
+:root {
+  --paper: #f7f7f8;
+  --grid: #e3e4ea;
+  --card: #ffffff;
+  --ink: #1f2230;
+  --ink-soft: #565b70;
+  --pos: #d9480f;
+  --pos-soft: #fde4d5;
+  --neg: #1c64c8;
+  --neg-soft: #dbe8fa;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --hl: #fff0a3;
+  --line: #d8dae3;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #111218; --grid: #1b1c25; --card: #171821; --ink: #eceef5; --ink-soft: #a9adc0;
+    --pos: #ff8a4c; --pos-soft: #42251a; --neg: #7fb0ff; --neg-soft: #1a2a45;
+    --red: #ff7d92; --red-soft: #3a1c27; --ok: #6fd39f; --ok-soft: #173a29; --hl: #4b4318; --line: #2c2e3b;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #111218; --grid: #1b1c25; --card: #171821; --ink: #eceef5; --ink-soft: #a9adc0;
+  --pos: #ff8a4c; --pos-soft: #42251a; --neg: #7fb0ff; --neg-soft: #1a2a45;
+  --red: #ff7d92; --red-soft: #3a1c27; --ok: #6fd39f; --ok-soft: #173a29; --hl: #4b4318; --line: #2c2e3b;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+.pos { color: var(--pos); font-weight: 700; }
+.neg { color: var(--neg); font-weight: 700; }
+section { display: flex; flex-direction: column; gap: 18px; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero-top { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+.big-sign { font-family: var(--f-display); font-weight: 800; font-size: clamp(5rem, 20vw, 8rem); line-height: .8; display: flex; gap: 6px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+.note { border-left: 4px solid var(--pos); background: var(--pos-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.blue { border-left-color: var(--neg); background: var(--neg-soft); }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+.nl { width: 100%; height: auto; display: block; }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 6px 12px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button[aria-pressed="true"], button.main { background: var(--ink); color: var(--card); }
+button.op { font-family: var(--f-mono); font-size: 1.2rem; min-width: 48px; }
+button.ex { font-family: var(--f-mono); font-weight: 600; font-size: .9rem; }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+
+.two { display: grid; grid-template-columns: 120px 1fr; gap: 20px; align-items: start; }
+.two > svg { width: 100%; max-width: 120px; height: auto; }
+.two > div { min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+@media (max-width: 480px) { .two { grid-template-columns: 90px 1fr; gap: 12px; } }
+.param { display: flex; flex-direction: column; gap: 2px; }
+.param label { font-weight: 700; }
+input[type="range"] { width: 100%; accent-color: var(--ink); }
+input[type="text"] { font: inherit; font-family: var(--f-mono); font-size: 1.1rem; padding: 8px 10px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; }
+.pair { display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: end; }
+.pair label { font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+.pair .mid { font-family: var(--f-mono); font-size: 1.4rem; padding-bottom: 8px; }
+
+.results { display: flex; flex-direction: column; gap: 8px; font-variant-numeric: tabular-nums; }
+.res { border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 12px; display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; align-items: baseline; }
+.res-name { font-family: var(--f-display); font-weight: 700; }
+.res-val { font-family: var(--f-mono); font-weight: 600; font-size: 1.05rem; white-space: nowrap; }
+.steps { display: flex; flex-direction: column; gap: 6px; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; padding: 12px 14px; font-family: var(--f-mono); font-size: 1rem; overflow-wrap: anywhere; }
+.steps .why { font-family: var(--f-body); font-size: .92rem; color: var(--ink-soft); }
+.steps .big { font-size: 1.35rem; font-weight: 700; }
+.err { color: var(--red); font-family: var(--f-body); font-weight: 700; }
+.verdict { border-radius: 8px; padding: 12px 14px; font-weight: 700; background: var(--ok-soft); color: var(--ok); display: flex; flex-direction: column; gap: 4px; }
+.verdict span { color: var(--ink); font-weight: 400; }
+
+.signs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.signs div { border-radius: 10px; padding: 12px; text-align: center; font-family: var(--f-mono); font-size: 1.3rem; font-weight: 700; border: 2px solid currentColor; }
+.signs .p { color: var(--pos); background: var(--pos-soft); }
+.signs .n { color: var(--neg); background: var(--neg-soft); }
+.signs small { display: block; font-family: var(--f-body); font-size: .85rem; font-weight: 400; color: var(--ink-soft); }
+
+table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+th, td { padding: 6px 8px; border-bottom: 1px dashed var(--line); text-align: center; font-family: var(--f-mono); }
+thead th { border-bottom: 2px solid var(--ink); font-family: var(--f-display); }
+.scroll { overflow-x: auto; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 110px auto; gap: 10px; align-items: center; }
+.quiz .q { font-family: var(--f-mono); font-size: 1.05rem; font-weight: 600; }
+.quiz input[type="text"] { font-size: 1rem; padding: 6px 8px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz .q { grid-column: 1 / -1; } }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 120px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+</head>
+<body>
+<main class="page">
+
+  <header class="hero">
+    <div class="hero-top">
+      <div class="big-sign" aria-hidden="true"><span class="neg">−</span><span class="pos">+</span></div>
+      <div style="display:flex;flex-direction:column;gap:10px;min-width:0;flex:1 1 280px">
+        <span class="eyebrow">Tutoriel de maths · niveau 5<sup>e</sup>–4<sup>e</sup></span>
+        <h1>Les nombres relatifs</h1>
+        <p class="lead">Il fait −5 °C, le parking est au niveau −2, ton compte est à −10 € : sous le zéro, il y a encore des nombres. On les appelle les nombres négatifs.</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · Sous le zéro</span>
+    <h2>Positifs, négatifs et zéro</h2>
+    <p>Un <strong>nombre relatif</strong> a un <strong>signe</strong> et une <strong>distance à zéro</strong>. Les nombres plus grands que 0 sont <span class="pos">positifs</span> (+3, ou juste 3). Ceux plus petits que 0 sont <span class="neg">négatifs</span> (−3). Zéro n'est ni l'un ni l'autre.</p>
+    <div class="box">
+      <h3>Le thermomètre</h3>
+      <div class="two">
+        <svg id="thermo" viewBox="0 0 120 320" role="img" aria-label="Thermomètre"></svg>
+        <div>
+          <div class="param">
+            <label for="tIn">Température : <span class="mono" id="tOut">−5</span> °C</label>
+            <input id="tIn" type="range" min="-20" max="20" step="1" value="-5">
+          </div>
+          <div class="results">
+            <div class="res"><span class="res-name">Signe</span><span class="res-val" id="tSign"></span></div>
+            <div class="res"><span class="res-name">Distance à zéro</span><span class="res-val" id="tDist"></span></div>
+            <div class="res"><span class="res-name">Son opposé</span><span class="res-val" id="tOpp"></span></div>
+          </div>
+          <p class="soft" id="tNote"></p>
+        </div>
+      </div>
+    </div>
+    <div class="note blue">
+      <span class="note-title">Deux nombres opposés</span>
+      <span>−4 et 4 sont <strong>opposés</strong> : ils ont la même distance à zéro, mais des signes contraires. Sur la droite graduée, ils sont symétriques par rapport à 0.</span>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · La droite graduée</span>
+    <h2>Comparer deux nombres relatifs</h2>
+    <p>Sur une droite graduée, les nombres sont rangés du plus petit (à gauche) au plus grand (à droite). <span class="hl">Le plus grand est toujours celui qui est le plus à droite.</span></p>
+    <div class="box">
+      <div class="pair">
+        <label for="cA">Nombre 1<input id="cA" type="text" inputmode="decimal" autocomplete="off" value="-8"></label>
+        <span class="mid">?</span>
+        <label for="cB">Nombre 2<input id="cB" type="text" inputmode="decimal" autocomplete="off" value="-3"></label>
+      </div>
+      <svg id="cmpLine" class="nl" viewBox="0 0 640 180" role="img" aria-label="Droite graduée avec les deux nombres"></svg>
+      <div class="verdict" id="cmpOut" aria-live="polite"></div>
+    </div>
+    <div class="note red">
+      <span class="note-title">Le piège des négatifs</span>
+      <span>−8 est plus petit que −3, même si 8 est plus grand que 3 ! Pense à la température : −8 °C, c'est plus froid que −3 °C. Entre deux négatifs, le plus grand est celui qui est <strong>le plus proche de zéro</strong>.</span>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Additionner et soustraire</span>
+    <h2>Des sauts sur la droite</h2>
+    <p>Pour calculer <span class="mono">a + b</span>, on part de a sur la droite. Si b est <span class="pos">positif</span>, on avance vers la droite. Si b est <span class="neg">négatif</span>, on recule vers la gauche.</p>
+    <div class="cards">
+      <div class="box"><strong>Même signe</strong><span>On additionne les distances à zéro, et on garde le signe.</span><span class="mono soft">(−3) + (−5) = −8</span></div>
+      <div class="box"><strong>Signes contraires</strong><span>On soustrait les distances à zéro, et on garde le signe de celui qui est le plus loin de zéro.</span><span class="mono soft">(−7) + 4 = −3</span></div>
+      <div class="box"><strong>Soustraire</strong><span>Soustraire un nombre, c'est <strong>ajouter son opposé</strong>.</span><span class="mono soft">5 − (−2) = 5 + 2 = 7</span></div>
+    </div>
+    <div class="box">
+      <h3>Calculatrice des sauts</h3>
+      <div class="pair">
+        <label for="aA">Départ<input id="aA" type="text" inputmode="decimal" autocomplete="off" value="-7"></label>
+        <span class="mid" id="aSign">+</span>
+        <label for="aB">Saut<input id="aB" type="text" inputmode="decimal" autocomplete="off" value="4"></label>
+      </div>
+      <div class="btns" role="group" aria-label="Choisir l'opération">
+        <button class="op" id="op-add" type="button" aria-pressed="true">+</button>
+        <button class="op" id="op-sub" type="button" aria-pressed="false">−</button>
+      </div>
+      <svg id="addLine" class="nl" viewBox="0 0 640 180" role="img" aria-label="Le saut sur la droite graduée"></svg>
+      <div class="steps" id="addOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · Multiplier et diviser</span>
+    <h2>La règle des signes</h2>
+    <p>Pour multiplier ou diviser, on calcule d'abord <strong>sans les signes</strong>, puis on trouve le signe du résultat avec cette règle :</p>
+    <div class="signs">
+      <div class="p">+ × + = +<small>positif fois positif</small></div>
+      <div class="n">+ × − = −<small>positif fois négatif</small></div>
+      <div class="n">− × + = −<small>négatif fois positif</small></div>
+      <div class="p">− × − = +<small>négatif fois négatif</small></div>
+    </div>
+    <p>C'est pareil pour la division. Avec plusieurs nombres, <strong>compte les signes moins</strong> : s'il y en a un nombre <strong>pair</strong> (0, 2, 4…), le résultat est positif. S'il y en a un nombre <strong>impair</strong> (1, 3, 5…), il est négatif.</p>
+
+    <div class="box">
+      <h3>Pourquoi « moins fois moins » donne « plus » ?</h3>
+      <p>Regarde la table de (−2). Chaque fois qu'on enlève 1 au premier nombre, le résultat <strong>augmente de 2</strong>. La suite continue naturellement après zéro :</p>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Calcul</th><th>Résultat</th></tr></thead>
+          <tbody>
+            <tr><td>3 × (−2)</td><td class="neg">−6</td></tr>
+            <tr><td>2 × (−2)</td><td class="neg">−4</td></tr>
+            <tr><td>1 × (−2)</td><td class="neg">−2</td></tr>
+            <tr><td>0 × (−2)</td><td>0</td></tr>
+            <tr><td>(−1) × (−2)</td><td class="pos">2</td></tr>
+            <tr><td>(−2) × (−2)</td><td class="pos">4</td></tr>
+            <tr><td>(−3) × (−2)</td><td class="pos">6</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="soft">Une autre façon de le voir : enlever une dette, c'est comme gagner de l'argent.</p>
+    </div>
+
+    <div class="box">
+      <h3>Calculatrice des signes</h3>
+      <label for="mIn" style="font-weight:700">Écris des multiplications et des divisions :</label>
+      <input id="mIn" type="text" autocomplete="off" spellcheck="false" value="(−6) × 4 ÷ (−3)">
+      <div class="btns" id="mPresets" role="group" aria-label="Exemples"></div>
+      <div class="steps" id="mOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Dans la vraie vie</span>
+    <h2>Les nombres négatifs sont partout</h2>
+    <div class="cards">
+      <div class="box"><strong>La température</strong><span class="soft">En Sibérie, il peut faire −50 °C. Passer de −5 °C à 8 °C, c'est une hausse de 13 degrés.</span></div>
+      <div class="box"><strong>L'altitude</strong><span class="soft">La mer Morte est à environ −430 m, sous le niveau de la mer. Un plongeur à −12 m qui remonte de 5 m arrive à −7 m.</span></div>
+      <div class="box"><strong>L'ascenseur</strong><span class="soft">Le niveau −2 du parking est sous le rez-de-chaussée (niveau 0). Du niveau −2 au niveau 5, on monte de 7 étages.</span></div>
+      <div class="box"><strong>Le compte en banque</strong><span class="soft">Un compte à −20 € veut dire qu'on doit 20 € à la banque. Si on dépose 50 €, on arrive à 30 €.</span></div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · Quiz</span>
+    <h2>Huit calculs pour t'entraîner</h2>
+    <p>Écris ta réponse avec le signe moins si elle est négative (−5 ou -5).</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Nouveaux calculs</button>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Un peu d'histoire</span>
+    <h2>Les nombres qui faisaient peur</h2>
+    <ol class="timeline">
+      <li><span class="when">vers −200</span><div class="what"><strong>La Chine</strong><span>Dans le livre <em>Les Neuf Chapitres</em>, les calculateurs utilisent des baguettes rouges pour les nombres positifs et des baguettes noires pour les négatifs.</span></div></li>
+      <li><span class="when">628</span><div class="what"><strong>Brahmagupta, en Inde</strong><span>Il écrit les règles des signes en parlant de « fortunes » et de « dettes » : une dette multipliée par une dette donne une fortune.</span></div></li>
+      <li><span class="when">vers 1500</span><div class="what"><strong>L'Europe se méfie</strong><span>Beaucoup de mathématiciens européens refusent les nombres négatifs et les appellent des « nombres absurdes ». Ils mettront encore deux siècles à être acceptés.</span></div></li>
+      <li><span class="when">1742</span><div class="what"><strong>L'échelle Celsius</strong><span>Le Suédois Anders Celsius crée une échelle de température. Après lui, on y place le zéro à la glace qui fond : l'hiver se mesure alors avec des nombres négatifs.</span></div></li>
+    </ol>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · À toi de jouer</span>
+    <h2>Six problèmes</h2>
+    <div class="exos">
+      <details>
+        <summary>L'écart de température<span class="q">Le matin, il fait −7 °C. L'après-midi, il fait 4 °C. De combien la température a-t-elle augmenté ?</span></summary>
+        <div><span>On calcule 4 − (−7) = 4 + 7 = <strong>11 degrés</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Le plongeur<span class="q">Un plongeur est à −18 m. Il remonte de 6 m, puis redescend de 9 m. Où est-il ?</span></summary>
+        <div><span>−18 + 6 − 9 = −12 − 9 = <strong>−21 m</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Le compte en banque<span class="q">Tom a −15 € sur son compte. Il dépense encore 10 €, puis reçoit 40 €. Combien a-t-il ?</span></summary>
+        <div><span>−15 − 10 + 40 = −25 + 40 = <strong>15 €</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Ranger<span class="q">Range du plus petit au plus grand : 3 ; −5 ; 0 ; −1 ; −12 ; 7.</span></summary>
+        <div><span><strong>−12 &lt; −5 &lt; −1 &lt; 0 &lt; 3 &lt; 7</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Le signe d'un produit<span class="q">Sans calculer, quel est le signe de (−2) × 5 × (−3) × (−1) ? Puis calcule-le.</span></summary>
+        <div><span>Il y a 3 signes moins : c'est impair, donc le résultat est <strong>négatif</strong>.</span><span>2 × 5 × 3 × 1 = 30, donc le résultat est <strong>−30</strong>.</span></div>
+      </details>
+      <details>
+        <summary>La moyenne des températures<span class="q">Sur une semaine, les températures du matin sont : −3, −1, 2, −4, 0, 1, −2 (°C). Quelle est la température moyenne ?</span></summary>
+        <div><span>Somme : −3 − 1 + 2 − 4 + 0 + 1 − 2 = −7. Il y a 7 jours.</span><span>−7 ÷ 7 = <strong>−1 °C</strong>.</span></div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• Un nombre relatif a un <strong>signe</strong> et une <strong>distance à zéro</strong>. −4 et 4 sont opposés.</span>
+      <span>• Sur la droite graduée, <strong>le plus grand est le plus à droite</strong>. −8 &lt; −3.</span>
+      <span>• <strong>Addition</strong> : même signe, on additionne les distances ; signes contraires, on les soustrait et on garde le signe du plus loin de zéro.</span>
+      <span>• <strong>Soustraire</strong>, c'est ajouter l'opposé : a − b = a + (−b).</span>
+      <span>• <strong>× et ÷</strong> : un nombre pair de signes moins donne +, un nombre impair donne −.</span>
+    </div>
+  </section>
+
+  <footer>Fiche de révision · Les nombres relatifs</footer>
+</main>
+
+<script>
+(function () {
+  var NS = 'http://www.w3.org/2000/svg';
+  function fmt(x) { var r = Math.round(x * 1e4) / 1e4; if (Object.is(r, -0)) r = 0; return r.toLocaleString('fr-FR', { maximumFractionDigits: 4 }).replace('-', '−'); }
+  function wrap(x) { return x < 0 ? '(' + fmt(x) + ')' : fmt(x); }
+  function col(x) { return x > 0 ? 'pos' : x < 0 ? 'neg' : ''; }
+  function sp(x, w) { var c = col(x); return '<span class="' + c + '">' + (w ? wrap(x) : fmt(x)) + '</span>'; }
+  function num(s) { var t = String(s).replace(/\s/g, '').replace(/[−–]/g, '-').replace(',', '.').replace(/^\((.*)\)$/, '$1'); if (t === '' || t === '-' || t === '+') return NaN; var x = Number(t); return isFinite(x) ? x : NaN; }
+  function mk(svg, name, attrs, text) { var e = document.createElementNS(NS, name); for (var a in attrs) e.setAttribute(a, attrs[a]); if (text != null) e.textContent = text; svg.appendChild(e); return e; }
+  function clear(svg) { while (svg.firstChild) svg.removeChild(svg.firstChild); }
+
+  /* ---------- Droite graduée ---------- */
+  function numberLine(svg, values, marks, hop) {
+    clear(svg);
+    var lo = Math.min.apply(null, values.concat([-10])), hi = Math.max.apply(null, values.concat([10]));
+    lo = Math.floor((lo - 1) / 5) * 5; hi = Math.ceil((hi + 1) / 5) * 5;
+    var span = hi - lo, y = 92;
+    function X(v) { return 30 + (v - lo) / span * 580; }
+    mk(svg, 'line', { x1: 14, y1: y, x2: 626, y2: y, stroke: 'var(--ink)', 'stroke-width': 2.5 });
+    mk(svg, 'path', { d: 'M626 ' + y + ' l-10 -6 v12 Z', fill: 'var(--ink)' });
+    var labelStep = span <= 20 ? 1 : (span <= 40 ? 5 : 10), tickStep = span <= 60 ? 1 : 5;
+    for (var v = lo; v <= hi; v += tickStep) {
+      var big = v % labelStep === 0;
+      mk(svg, 'line', { x1: X(v), y1: y - (big ? 10 : 5), x2: X(v), y2: y + (big ? 10 : 5), stroke: v === 0 ? 'var(--ink)' : 'var(--ink-soft)', 'stroke-width': v === 0 ? 3.5 : 1.8 });
+      if (big) mk(svg, 'text', { x: X(v), y: y + 38, 'text-anchor': 'middle', 'font-size': span <= 20 ? 22 : 26, style: 'font-weight:' + (v === 0 ? 700 : 500) + ';fill:' + (v > 0 ? 'var(--pos)' : v < 0 ? 'var(--neg)' : 'var(--ink)') }, fmt(v));
+    }
+    if (hop) {
+      var a = hop.from, b = hop.by, color = b >= 0 ? 'var(--pos)' : 'var(--neg)', n = Math.abs(b);
+      if (Number.isInteger(a) && Number.isInteger(b) && n <= 30 && n > 0) {
+        var s = b > 0 ? 1 : -1;
+        for (var i = 0; i < n; i++) {
+          var x0 = X(a + i * s), x1 = X(a + (i + 1) * s), mid = (x0 + x1) / 2, h = Math.min(26, Math.abs(x1 - x0) * .9 + 6);
+          mk(svg, 'path', { d: 'M' + x0 + ' ' + (y - 4) + ' Q' + mid + ' ' + (y - 4 - h * 2) + ' ' + x1 + ' ' + (y - 4), fill: 'none', stroke: color, 'stroke-width': 2.2 });
+        }
+      } else if (b !== 0) {
+        var xa = X(a), xb = X(a + b);
+        mk(svg, 'path', { d: 'M' + xa + ' ' + (y - 4) + ' Q' + ((xa + xb) / 2) + ' ' + (y - 70) + ' ' + xb + ' ' + (y - 4), fill: 'none', stroke: color, 'stroke-width': 2.5 });
+      }
+      var xe = X(a + b), dir = b >= 0 ? 1 : -1;
+      if (b !== 0) mk(svg, 'path', { d: 'M' + xe + ' ' + (y - 4) + ' l' + (-dir * 9) + ' -9 l' + (dir * 2) + ' 9 Z', fill: color });
+    }
+    (marks || []).forEach(function (m) {
+      mk(svg, 'circle', { cx: X(m.v), cy: y, r: 9, fill: m.v > 0 ? 'var(--pos)' : m.v < 0 ? 'var(--neg)' : 'var(--ink)', stroke: 'var(--card)', 'stroke-width': 2.5 });
+      if (m.label) mk(svg, 'text', { x: Math.min(560, Math.max(80, X(m.v))), y: m.up ? 24 : 168, 'text-anchor': 'middle', 'font-size': 24, style: 'font-weight:700' }, m.label);
+    });
+  }
+
+  /* ---------- Thermomètre ---------- */
+  var th = document.getElementById('thermo'), tIn = document.getElementById('tIn');
+  function thermo() {
+    var t = parseInt(tIn.value, 10);
+    clear(th);
+    function Y(v) { return 140 - v * 6; }
+    mk(th, 'rect', { x: 44, y: 14, width: 24, height: 262, rx: 12, fill: 'var(--card)', stroke: 'var(--ink)', 'stroke-width': 2.5 });
+    var c = t >= 0 ? 'var(--pos)' : 'var(--neg)';
+    mk(th, 'rect', { x: 50, y: Y(t), width: 12, height: 290 - Y(t), fill: c });
+    mk(th, 'circle', { cx: 56, cy: 290, r: 20, fill: c, stroke: 'var(--ink)', 'stroke-width': 2.5 });
+    for (var v = -20; v <= 20; v += 5) {
+      mk(th, 'line', { x1: 68, y1: Y(v), x2: 80, y2: Y(v), stroke: 'var(--ink)', 'stroke-width': v === 0 ? 3 : 1.5 });
+      mk(th, 'text', { x: 84, y: Y(v) + 5, 'font-size': 14, style: 'font-weight:' + (v === 0 ? 700 : 400) + ';fill:' + (v > 0 ? 'var(--pos)' : v < 0 ? 'var(--neg)' : 'var(--ink)') }, fmt(v));
+    }
+    document.getElementById('tOut').textContent = fmt(t);
+    document.getElementById('tSign').innerHTML = t > 0 ? '<span class="pos">positif (+)</span>' : t < 0 ? '<span class="neg">négatif (−)</span>' : 'ni l\'un ni l\'autre';
+    document.getElementById('tDist').textContent = fmt(Math.abs(t));
+    document.getElementById('tOpp').innerHTML = sp(-t);
+    document.getElementById('tNote').textContent = t < 0 ? 'Il gèle : l\'eau devient de la glace en dessous de 0 °C.' : t === 0 ? '0 °C : la température où la glace fond.' : 'Au-dessus de zéro : pas de glace.';
+  }
+  tIn.addEventListener('input', thermo); thermo();
+
+  /* ---------- Comparer ---------- */
+  var cA = document.getElementById('cA'), cB = document.getElementById('cB');
+  function cmp() {
+    var a = num(cA.value), b = num(cB.value), out = document.getElementById('cmpOut'), svg = document.getElementById('cmpLine');
+    if (isNaN(a) || isNaN(b)) { clear(svg); out.innerHTML = '<span class="err">Écris deux nombres, comme −8 et −3.</span>'; return; }
+    if (Math.max(Math.abs(a), Math.abs(b)) > 1000) { out.innerHTML = '<span class="err">Choisis des nombres entre −1 000 et 1 000.</span>'; return; }
+    numberLine(svg, [a, b], [{ v: a, label: fmt(a), up: true }, { v: b, label: fmt(b), up: false }]);
+    if (a === b) { out.innerHTML = 'Les deux nombres sont égaux : ' + sp(a) + ' = ' + sp(b); return; }
+    var big = Math.max(a, b), small = Math.min(a, b);
+    var why = (a < 0 && b < 0) ? 'Les deux sont négatifs : le plus grand est le plus proche de zéro.' : (a >= 0 && b >= 0) ? 'Les deux sont positifs : le plus grand est le plus loin de zéro.' : 'Un positif est toujours plus grand qu\'un négatif.';
+    out.innerHTML = sp(small) + ' &lt; ' + sp(big) + '<span>' + fmt(big) + ' est plus à droite sur la droite graduée. ' + why + '</span>';
+  }
+  cA.addEventListener('input', cmp); cB.addEventListener('input', cmp); cmp();
+
+  /* ---------- Additionner / soustraire ---------- */
+  var op = 'add', aA = document.getElementById('aA'), aB = document.getElementById('aB');
+  function addCalc() {
+    var a = num(aA.value), b = num(aB.value), out = document.getElementById('addOut'), svg = document.getElementById('addLine');
+    document.getElementById('aSign').textContent = op === 'add' ? '+' : '−';
+    if (isNaN(a) || isNaN(b)) { clear(svg); out.innerHTML = '<span class="err">Écris deux nombres.</span>'; return; }
+    if (Math.max(Math.abs(a), Math.abs(b)) > 500) { clear(svg); out.innerHTML = '<span class="err">Choisis des nombres entre −500 et 500.</span>'; return; }
+    var lines = [], c = b;
+    lines.push('<span class="big">' + sp(a) + ' ' + (op === 'add' ? '+' : '−') + ' ' + sp(b, true) + '</span>');
+    if (op === 'sub') { c = -b; lines.push('<span>= ' + sp(a) + ' + ' + sp(c, true) + '</span><span class="why">Soustraire ' + fmt(b) + ', c\'est ajouter son opposé, ' + fmt(c) + '.</span>'); }
+    var r = a + c;
+    if (a === 0 || c === 0) lines.push('<span class="why">Ajouter 0 ne change rien, et 0 + un nombre donne ce nombre.</span>');
+    else if ((a > 0) === (c > 0)) lines.push('<span class="why">' + fmt(a) + ' et ' + fmt(c) + ' ont le même signe : on additionne les distances à zéro (' + fmt(Math.abs(a)) + ' + ' + fmt(Math.abs(c)) + ' = ' + fmt(Math.abs(a) + Math.abs(c)) + ') et on garde le signe ' + (a > 0 ? '+' : '−') + '.</span>');
+    else {
+      var far = Math.abs(a) >= Math.abs(c) ? a : c;
+      lines.push('<span class="why">Signes contraires : on soustrait les distances à zéro (' + fmt(Math.max(Math.abs(a), Math.abs(c))) + ' − ' + fmt(Math.min(Math.abs(a), Math.abs(c))) + ' = ' + fmt(Math.abs(Math.abs(a) - Math.abs(c))) + ')' + (r === 0 ? '. Les deux nombres sont opposés : le résultat est 0.' : ' et on garde le signe de ' + fmt(far) + ', le plus loin de zéro.') + '</span>');
+    }
+    lines.push('<span class="big">= ' + sp(r) + '</span>');
+    lines.push('<span class="why">Sur la droite : on part de ' + fmt(a) + ' et on ' + (c >= 0 ? 'avance de ' + fmt(c) + ' vers la droite' : 'recule de ' + fmt(-c) + ' vers la gauche') + '.</span>');
+    out.innerHTML = lines.join('');
+    numberLine(svg, [a, r], [{ v: a, label: 'départ ' + fmt(a), up: false }, { v: r, label: 'arrivée ' + fmt(r), up: true }], { from: a, by: c });
+  }
+  function setOp(o) { op = o; ['add', 'sub'].forEach(function (k) { document.getElementById('op-' + k).setAttribute('aria-pressed', k === o ? 'true' : 'false'); }); addCalc(); }
+  document.getElementById('op-add').addEventListener('click', function () { setOp('add'); });
+  document.getElementById('op-sub').addEventListener('click', function () { setOp('sub'); });
+  aA.addEventListener('input', addCalc); aB.addEventListener('input', addCalc); addCalc();
+
+  /* ---------- Multiplier / diviser ---------- */
+  var mIn = document.getElementById('mIn');
+  function mult() {
+    var out = document.getElementById('mOut');
+    var s = mIn.value.replace(/[−–]/g, '-').replace(/[x*·]/gi, '×').replace(/[\/:]/g, '÷').replace(/\s/g, '');
+    var parts = s.split(/(×|÷)/);
+    if (parts.length < 3) { out.innerHTML = '<span class="err">Écris au moins deux nombres séparés par × ou ÷.</span>'; return; }
+    var nums = [], ops = [];
+    for (var i = 0; i < parts.length; i++) {
+      if (i % 2 === 0) { var v = num(parts[i].replace(/^\((.*)\)$/, '$1')); if (isNaN(v)) { out.innerHTML = '<span class="err">« ' + parts[i].replace('-', '−') + ' » n\'est pas un nombre que je comprends.</span>'; return; } nums.push(v); }
+      else ops.push(parts[i]);
+    }
+    for (var j = 0; j < ops.length; j++) if (ops[j] === '÷' && nums[j + 1] === 0) { out.innerHTML = '<span class="err">On ne peut pas diviser par 0 !</span>'; return; }
+    var negs = nums.filter(function (x) { return x < 0; }).length;
+    var abs = nums.map(Math.abs), val = abs[0];
+    for (var k = 0; k < ops.length; k++) val = ops[k] === '×' ? val * abs[k + 1] : val / abs[k + 1];
+    var res = negs % 2 === 0 ? val : -val;
+    var expr = nums.map(function (x, i) { return (i ? ' ' + ops[i - 1] + ' ' : '') + sp(x, true); }).join('');
+    var lines = ['<span class="big">' + expr + '</span>'];
+    if (nums.some(function (x) { return x === 0; }) && ops.every(function (o, i) { return true; }) && nums.indexOf(0) >= 0) {
+      lines.push('<span class="why">Il y a un 0 : le résultat vaut 0 (pas de signe).</span>');
+      lines.push('<span class="big">= 0</span>');
+      out.innerHTML = lines.join(''); return;
+    }
+    lines.push('<span class="why">Nombre de signes moins : ' + negs + '. C\'est ' + (negs % 2 === 0 ? 'pair' : 'impair') + ', donc le résultat est ' + (negs % 2 === 0 ? '<span class="pos">positif</span>' : '<span class="neg">négatif</span>') + '.</span>');
+    lines.push('<span>Sans les signes : ' + abs.map(function (x, i) { return (i ? ' ' + ops[i - 1] + ' ' : '') + fmt(x); }).join('') + ' ' + (Math.abs(val * 1e4 - Math.round(val * 1e4)) < 1e-6 ? '=' : '≈') + ' ' + fmt(val) + '</span>');
+    lines.push('<span class="big">= ' + sp(res) + '</span>');
+    out.innerHTML = lines.join('');
+  }
+  ['(−6) × 4 ÷ (−3)', '(−5) × (−5)', '(−2) × 5 × (−3) × (−1)', '(−24) ÷ 6', '(−1) × (−1) × (−1) × (−1)'].forEach(function (ex, i) {
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'ex'; b.id = 'mp' + i; b.textContent = ex;
+    b.addEventListener('click', function () { mIn.value = ex; mult(); });
+    document.getElementById('mPresets').appendChild(b);
+  });
+  mIn.addEventListener('input', mult); mult();
+
+  /* ---------- Quiz ---------- */
+  function rnd(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+  function nz(a, b) { var v = 0; while (!v) v = rnd(a, b); return v; }
+  function makeQ() {
+    var t = rnd(0, 4), a, b;
+    if (t === 0) { a = rnd(-12, 12); b = nz(-12, 12); return { q: fmt(a) + ' + ' + wrap(b), a: a + b }; }
+    if (t === 1) { a = rnd(-12, 12); b = nz(-12, 12); return { q: fmt(a) + ' − ' + wrap(b), a: a - b }; }
+    if (t === 2) { a = nz(-9, 9); b = nz(-9, 9); return { q: wrap(a) + ' × ' + wrap(b), a: a * b }; }
+    if (t === 3) { var qv = nz(-9, 9); b = nz(-9, 9); return { q: wrap(qv * b) + ' ÷ ' + wrap(b), a: qv }; }
+    a = nz(-15, 15); b = nz(-15, 15); while (b === a) b = nz(-15, 15);
+    return { q: 'Le plus grand : ' + fmt(a) + ' ou ' + fmt(b) + ' ?', a: Math.max(a, b) };
+  }
+  var quiz = document.getElementById('quiz'), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ''; done = [];
+    for (var k = 0; k < 8; k++) {
+      var Q = makeQ(), li = document.createElement('li');
+      li.innerHTML = '<span class="q">' + Q.q + (Q.q.indexOf('?') < 0 ? ' = ?' : '') + '</span><input type="text" id="qa' + k + '" inputmode="text" autocomplete="off" aria-label="Ta réponse à la question ' + (k + 1) + '"><button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+      quiz.appendChild(li);
+      (function (k, Q) {
+        function check() {
+          var fb = document.getElementById('qf' + k), x = num(document.getElementById('qa' + k).value);
+          if (isNaN(x)) { fb.className = 'fb'; fb.textContent = 'Écris un nombre, comme −5 ou 3.'; return; }
+          if (Math.abs(x - Q.a) < 1e-9) { fb.className = 'fb ok'; fb.textContent = 'Bravo, c\'est juste !'; done[k] = true; }
+          else { done[k] = false; fb.className = 'fb no'; fb.innerHTML = 'Pas tout à fait : la réponse est ' + fmt(Q.a) + '.' + (x === -Q.a ? '<span>Attention au signe !</span>' : ''); }
+          document.getElementById('score').textContent = done.filter(Boolean).length + ' / 8';
+        }
+        document.getElementById('qb' + k).addEventListener('click', check);
+        document.getElementById('qa' + k).addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+      })(k, Q);
+    }
+    document.getElementById('score').textContent = '0 / 8';
+  }
+  document.getElementById('newQuiz').addEventListener('click', newQuiz);
+  newQuiz();
+})();
+</script>
+</body>
+</html>
