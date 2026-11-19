@@ -15,6 +15,7 @@ Chaque tutoriel est une seule page HTML, sans installation. Il suffit de l'ouvri
 | [Le théorème de Thalès](le-theoreme-de-thales.html) | Les rapports égaux avec des parallèles, une figure à déformer (triangle et papillon), le produit en croix, la mesure de la pyramide avec un bâton, la réciproque, l'histoire de Thalès et des exercices. |
 | [Les priorités de calcul](les-priorites-de-calcul.html) | L'ordre des opérations (parenthèses, puissances, × et ÷, + et −), de gauche à droite, un calculateur pas à pas, les pièges (× caché, −3², barre de fraction), un quiz et des problèmes à mettre en calcul. |
 | [Les fractions](les-fractions.html) | Numérateur et dénominateur, fractions égales et simplification, comparer, les quatre opérations avec une calculatrice pas à pas, fractions, décimaux et pourcentages, un quiz en images et des exercices. |
+| [Les équations](les-equations.html) | Les équations du premier degré : une balance interactive, les règles, la méthode en 4 étapes, un solveur pas à pas (parenthèses, fractions, cas sans solution), un quiz, l'histoire et des problèmes à mettre en équation. |
 
 ## Ajouter un tutoriel
 

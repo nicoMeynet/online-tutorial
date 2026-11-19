@@ -1,0 +1,634 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Les équations</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, encre moutarde, marge rouge. La balance est le fil rouge : x en moutarde, les unités en bleu. */
+:root {
+  --paper: #fbf9f1;
+  --grid: #eee8d2;
+  --card: #ffffff;
+  --ink: #2b2512;
+  --ink-soft: #675d40;
+  --acc: #a16207;
+  --acc-soft: #fdf0c4;
+  --unit: #2f5b9a;
+  --unit-soft: #dbe7f7;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --hl: #fff0a3;
+  --line: #e2dbc2;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #15130b; --grid: #211e12; --card: #1c1a0f; --ink: #f3efe0; --ink-soft: #bcb293;
+    --acc: #facc15; --acc-soft: #3d3310; --unit: #8fb5ef; --unit-soft: #1c2b44;
+    --red: #ff7d92; --red-soft: #3a1c27; --ok: #6fd39f; --ok-soft: #173a29; --hl: #4b4318; --line: #373120;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #15130b; --grid: #211e12; --card: #1c1a0f; --ink: #f3efe0; --ink-soft: #bcb293;
+  --acc: #facc15; --acc-soft: #3d3310; --unit: #8fb5ef; --unit-soft: #1c2b44;
+  --red: #ff7d92; --red-soft: #3a1c27; --ok: #6fd39f; --ok-soft: #173a29; --hl: #4b4318; --line: #373120;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+.x { color: var(--acc); font-weight: 700; font-style: italic; }
+section { display: flex; flex-direction: column; gap: 18px; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero-top { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+.hero-top svg { width: 180px; height: auto; flex: none; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+.big-eq { font-family: var(--f-mono); font-weight: 600; font-size: clamp(1.6rem, 7vw, 2.4rem); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 6px 12px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button.main, button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button.ex { font-family: var(--f-mono); font-weight: 600; font-size: .92rem; }
+button:disabled { opacity: .4; cursor: not-allowed; transform: none; box-shadow: 3px 3px 0 var(--ink); }
+button:not(:disabled):hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:not(:disabled):active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+
+.balance svg { width: 100%; height: auto; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; }
+.eqline { font-family: var(--f-mono); font-size: 1.5rem; font-weight: 600; text-align: center; }
+.msg { border-radius: 8px; padding: 10px 14px; font-weight: 700; }
+.msg.ok { background: var(--ok-soft); color: var(--ok); }
+.msg.info { background: var(--acc-soft); color: var(--ink); font-weight: 400; }
+.history { font-family: var(--f-mono); font-size: .92rem; color: var(--ink-soft); display: flex; flex-direction: column; gap: 2px; }
+
+.rules { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+.rules .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.method { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; counter-reset: m; }
+.method li { display: grid; grid-template-columns: 40px 1fr; gap: 12px; align-items: start; }
+.method li::before { counter-increment: m; content: counter(m); font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--acc); color: var(--card); }
+.method li div { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+
+label.big { font-weight: 700; }
+input[type="text"] { font: inherit; font-family: var(--f-mono); font-size: 1.15rem; padding: 10px 12px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; }
+.steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.steps li { display: flex; flex-direction: column; gap: 2px; padding-bottom: 10px; border-bottom: 1px dashed var(--line); }
+.steps li:last-child { border-bottom: 0; padding-bottom: 0; }
+.steps .e { font-family: var(--f-mono); font-size: 1.15rem; font-weight: 600; overflow-wrap: anywhere; }
+.steps .why { font-size: .92rem; color: var(--ink-soft); }
+.steps .act { font-family: var(--f-mono); font-size: .88rem; color: var(--unit); font-weight: 600; }
+.steps .sol { font-family: var(--f-mono); font-size: 1.4rem; font-weight: 700; color: var(--acc); }
+.steps .chk { font-family: var(--f-mono); font-size: .92rem; color: var(--ok); overflow-wrap: anywhere; }
+.err { color: var(--red); font-weight: 700; }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 110px auto; gap: 10px; align-items: center; }
+.quiz .q { font-family: var(--f-mono); font-size: 1.05rem; font-weight: 600; }
+.quiz input[type="text"] { font-size: 1rem; padding: 6px 8px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz .q { grid-column: 1 / -1; } }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc); }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 120px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+</head>
+<body>
+<main class="page">
+
+  <header class="hero">
+    <div class="hero-top">
+      <svg viewBox="0 0 200 140" aria-hidden="true">
+        <path d="M100 30 L88 128 L112 128 Z" fill="var(--ink)"></path>
+        <line x1="20" y1="30" x2="180" y2="30" stroke="var(--ink)" stroke-width="5" stroke-linecap="round"></line>
+        <line x1="40" y1="30" x2="40" y2="70" stroke="var(--ink)" stroke-width="2"></line>
+        <line x1="160" y1="30" x2="160" y2="70" stroke="var(--ink)" stroke-width="2"></line>
+        <path d="M14 70 h52 a8 8 0 0 1 -8 8 h-36 a8 8 0 0 1 -8 -8 Z" fill="var(--ink)"></path>
+        <path d="M134 70 h52 a8 8 0 0 1 -8 8 h-36 a8 8 0 0 1 -8 -8 Z" fill="var(--ink)"></path>
+        <rect x="22" y="44" width="24" height="24" rx="3" fill="var(--acc)"></rect>
+        <text x="34" y="62" text-anchor="middle" font-size="16" style="fill:var(--card);font-weight:700;font-style:italic">x</text>
+        <rect x="50" y="54" width="14" height="14" rx="2" fill="var(--unit)"></rect>
+        <rect x="140" y="54" width="14" height="14" rx="2" fill="var(--unit)"></rect>
+        <rect x="156" y="54" width="14" height="14" rx="2" fill="var(--unit)"></rect>
+        <rect x="172" y="54" width="14" height="14" rx="2" fill="var(--unit)"></rect>
+        <rect x="148" y="38" width="14" height="14" rx="2" fill="var(--unit)"></rect>
+      </svg>
+      <div style="display:flex;flex-direction:column;gap:10px;min-width:0;flex:1 1 280px">
+        <span class="eyebrow">Tutoriel de maths · niveau 4<sup>e</sup>–3<sup>e</sup></span>
+        <h1>Les équations</h1>
+        <p class="lead">Trouver un nombre caché, c'est comme équilibrer une balance. Une seule règle suffit : ce que tu fais d'un côté, tu le fais de l'autre.</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · C'est quoi une équation ?</span>
+    <h2>Un nombre caché à trouver</h2>
+    <p>« Je pense à un nombre. Je lui ajoute 5 et je trouve 12. Quel est ce nombre ? » En maths, on appelle le nombre caché <span class="x">x</span> (l'<strong>inconnue</strong>) et on écrit :</p>
+    <div class="box">
+      <div class="big-eq"><span class="x">x</span> + 5 = 12</div>
+      <p>C'est une <strong>équation</strong> : une égalité avec une inconnue. <strong>Résoudre</strong> l'équation, c'est trouver la valeur de <span class="x">x</span> qui rend l'égalité vraie. Ici, <span class="x">x</span> = 7, car 7 + 5 = 12. Le nombre 7 est la <strong>solution</strong>.</p>
+    </div>
+    <div class="rules">
+      <div class="box"><strong>Membre de gauche</strong><span class="soft">Tout ce qui est à gauche du signe = (ici <span class="mono">x + 5</span>).</span></div>
+      <div class="box"><strong>Membre de droite</strong><span class="soft">Tout ce qui est à droite du signe = (ici <span class="mono">12</span>).</span></div>
+      <div class="box"><strong>3x, c'est 3 × x</strong><span class="soft">On n'écrit pas le signe × devant x : 3x veut dire « 3 fois le nombre caché ».</span></div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · La balance</span>
+    <h2>Garder la balance en équilibre</h2>
+    <p>Une équation, c'est une balance en équilibre. À gauche et à droite, il y a le même poids. Chaque boîte <span class="x">x</span> pèse le nombre caché. Chaque petit cube bleu pèse 1.</p>
+    <p>Le but : qu'il ne reste <strong>qu'une seule boîte x</strong> d'un côté, et des cubes de l'autre. Pour garder l'équilibre, enlève toujours <strong>la même chose des deux côtés</strong>.</p>
+    <div class="box balance">
+      <div class="btns" id="challenges" role="group" aria-label="Choisir un défi"></div>
+      <svg id="bal" viewBox="0 0 360 230" role="img" aria-label="Balance avec des boîtes x et des cubes"></svg>
+      <div class="eqline" id="balEq" aria-live="polite"></div>
+      <div class="btns">
+        <button id="bMinus1" type="button">− 1 des deux côtés</button>
+        <button id="bMinusX" type="button">− x des deux côtés</button>
+        <button id="bDiv" type="button">÷ des deux côtés</button>
+        <button id="bReset" type="button">Recommencer</button>
+      </div>
+      <div class="msg info" id="balMsg" aria-live="polite"></div>
+      <div class="history" id="balHist"></div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Les règles</span>
+    <h2>Ce qu'on a le droit de faire</h2>
+    <p>Comme pour la balance, on peut transformer une équation sans changer sa solution, à condition de faire <strong>exactement la même chose aux deux membres</strong> :</p>
+    <div class="rules">
+      <div class="box"><strong>Ajouter ou soustraire</strong><span>le même nombre (ou le même nombre de x) des deux côtés.</span><span class="mono soft">x + 5 = 12 → x + 5 − 5 = 12 − 5 → x = 7</span></div>
+      <div class="box"><strong>Multiplier ou diviser</strong><span>les deux côtés par le même nombre, <strong>sauf 0</strong>.</span><span class="mono soft">3x = 18 → 3x ÷ 3 = 18 ÷ 3 → x = 6</span></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Le raccourci du « changement de côté »</span>
+      <span>On entend souvent : « un nombre qui change de côté change de signe ». C'est juste un raccourci de la règle : soustraire 5 des deux côtés revient à faire passer le + 5 à droite en − 5. Mais pour une multiplication, c'est différent : 3x = 18 devient x = 18 ÷ 3, pas x = 18 − 3 !</span>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · La méthode</span>
+    <h2>Quatre étapes pour toutes les équations</h2>
+    <div class="box">
+      <div class="big-eq" style="font-size:clamp(1.3rem,5.5vw,1.8rem)">5<span class="x">x</span> − 4 = 3<span class="x">x</span> + 10</div>
+      <ol class="method">
+        <li><div><strong>Rassembler les x à gauche</strong><span class="mono">On enlève 3x des deux côtés : 2x − 4 = 10</span></div></li>
+        <li><div><strong>Rassembler les nombres à droite</strong><span class="mono">On ajoute 4 des deux côtés : 2x = 14</span></div></li>
+        <li><div><strong>Diviser par le nombre devant x</strong><span class="mono">On divise par 2 des deux côtés : x = 7</span></div></li>
+        <li><div><strong>Vérifier</strong><span class="mono">À gauche : 5 × 7 − 4 = 31. À droite : 3 × 7 + 10 = 31. C'est bon !</span></div></li>
+      </ol>
+    </div>
+    <div class="note red">
+      <span class="note-title">Ne saute jamais la vérification</span>
+      <span>Elle prend 30 secondes et elle attrape presque toutes les erreurs. Si les deux membres ne donnent pas le même résultat, il y a une faute quelque part.</span>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Le solveur pas à pas</span>
+    <h2>Écris ton équation</h2>
+    <p>Tape une équation avec l'inconnue x (ou choisis un exemple). La page la résout étape par étape, comme sur ta copie, et vérifie la solution.</p>
+    <div class="box">
+      <div class="btns" id="presets" role="group" aria-label="Exemples d'équations"></div>
+      <label class="big" for="eqIn">Ton équation :</label>
+      <input id="eqIn" type="text" autocomplete="off" spellcheck="false" value="3x + 5 = 2x − 7">
+      <p class="soft" style="font-size:.9rem">Tu peux utiliser des parenthèses comme 2(x + 3), des fractions comme x/2, et des nombres à virgule comme 1,5.</p>
+      <ol class="steps" id="solveOut" aria-live="polite"></ol>
+    </div>
+    <div class="rules">
+      <div class="box"><strong>Pas de solution</strong><span class="soft">Parfois les x disparaissent et il reste une égalité fausse, comme 1 = 5. Aucun nombre ne marche : l'équation n'a <strong>pas de solution</strong>.</span></div>
+      <div class="box"><strong>Une infinité de solutions</strong><span class="soft">Parfois il reste une égalité toujours vraie, comme 3 = 3. Alors <strong>tous les nombres</strong> sont solutions.</span></div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · Mettre en équation</span>
+    <h2>Transformer un problème en équation</h2>
+    <p>Dans les exercices, l'équation n'est pas donnée : c'est à toi de l'écrire.</p>
+    <ol class="method">
+      <li><div><strong>Choisir l'inconnue</strong><span>Écris clairement : « Soit x le prix d'un cahier. »</span></div></li>
+      <li><div><strong>Écrire l'équation</strong><span>Traduis chaque phrase en calcul avec x.</span></div></li>
+      <li><div><strong>Résoudre</strong><span>Avec la méthode en 4 étapes.</span></div></li>
+      <li><div><strong>Répondre par une phrase</strong><span>« Un cahier coûte 3 €. » Et vérifie que la réponse a du sens.</span></div></li>
+    </ol>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Quiz</span>
+    <h2>Huit équations pour t'entraîner</h2>
+    <p>Résous sur une feuille, puis écris la valeur de x. Si tu te trompes, la page montre les étapes.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Nouvelles équations</button>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Un peu d'histoire</span>
+    <h2>D'où viennent les équations ?</h2>
+    <ol class="timeline">
+      <li><span class="when">vers −1650</span><div class="what"><strong>Les Égyptiens</strong><span>Le papyrus Rhind contient des problèmes du type « un tas et son septième font 19 ». Ils les résolvent par essais et corrections.</span></div></li>
+      <li><span class="when">vers 250</span><div class="what"><strong>Diophante d'Alexandrie</strong><span>Ce mathématicien grec commence à utiliser des symboles pour l'inconnue. On l'appelle parfois le « père de l'algèbre ».</span></div></li>
+      <li><span class="when">vers 820</span><div class="what"><strong>Al-Khwarizmi, à Bagdad</strong><span>Il écrit un livre qui explique comment résoudre les équations en « remettant à sa place » (en arabe, <em>al-jabr</em>). Ce mot a donné « algèbre », et son nom a donné « algorithme ».</span></div></li>
+      <li><span class="when">1591</span><div class="what"><strong>François Viète</strong><span>Ce mathématicien français utilise des lettres pour les nombres inconnus et les nombres connus.</span></div></li>
+      <li><span class="when">1637</span><div class="what"><strong>René Descartes</strong><span>Il prend l'habitude d'appeler les inconnues x, y et z. C'est grâce à lui qu'on écrit x aujourd'hui.</span></div></li>
+    </ol>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · À toi de jouer</span>
+    <h2>Six problèmes</h2>
+    <div class="exos">
+      <details>
+        <summary>Le nombre mystère<span class="q">Je pense à un nombre. Je le multiplie par 4 et j'ajoute 7. Je trouve 35. Quel est ce nombre ?</span></summary>
+        <div><span>Soit x le nombre : 4x + 7 = 35.</span><span>4x = 28, donc x = <strong>7</strong>. Vérification : 4 × 7 + 7 = 35.</span></div>
+      </details>
+      <details>
+        <summary>Les cahiers<span class="q">Lina achète 3 cahiers et un stylo à 2 €. Elle paie 11 €. Combien coûte un cahier ?</span></summary>
+        <div><span>Soit x le prix d'un cahier : 3x + 2 = 11.</span><span>3x = 9, donc x = 3. <strong>Un cahier coûte 3 €.</strong></span></div>
+      </details>
+      <details>
+        <summary>Les âges<span class="q">Léa a 3 fois l'âge de son frère. À eux deux, ils ont 32 ans. Quel âge a chacun ?</span></summary>
+        <div><span>Soit x l'âge du frère. Léa a 3x ans : x + 3x = 32.</span><span>4x = 32, donc x = 8. <strong>Le frère a 8 ans et Léa 24 ans.</strong></span></div>
+      </details>
+      <details>
+        <summary>Les deux forfaits<span class="q">Un club de sport coûte 20 € par mois plus 2 € par séance. Un autre coûte 5 € par séance, sans abonnement. Pour combien de séances les deux prix sont-ils égaux ?</span></summary>
+        <div><span>Soit x le nombre de séances : 20 + 2x = 5x.</span><span>20 = 3x, donc x ≈ 6,67. <strong>Entre 6 et 7 séances.</strong> Pour 7 séances ou plus, le club avec abonnement est moins cher.</span></div>
+      </details>
+      <details>
+        <summary>Le rectangle<span class="q">Un rectangle a une longueur égale au double de sa largeur. Son périmètre est 36 cm. Quelles sont ses dimensions ?</span></summary>
+        <div><span>Soit x la largeur. La longueur est 2x : 2 × (x + 2x) = 36, donc 6x = 36.</span><span>x = 6. <strong>Largeur 6 cm, longueur 12 cm.</strong></span></div>
+      </details>
+      <details>
+        <summary>L'énigme de Diophante<span class="q">On raconte que sur la tombe de Diophante était écrit : « Son enfance dura 1/6 de sa vie, sa jeunesse 1/12, puis il passa 1/7 de sa vie avant de se marier. 5 ans après naquit son fils, qui vécut la moitié de la vie de son père. Diophante mourut 4 ans après son fils. » À quel âge est-il mort ?</span></summary>
+        <div>
+          <span>Soit x son âge : x/6 + x/12 + x/7 + 5 + x/2 + 4 = x.</span>
+          <span>La solution est <strong>x = 84 ans</strong>.</span>
+          <button id="dioBtn" type="button" style="align-self:flex-start">Résoudre avec le solveur</button>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• Une équation est une <strong>égalité avec une inconnue</strong> x. La résoudre, c'est trouver x.</span>
+      <span>• On peut <strong>ajouter, soustraire, multiplier ou diviser</strong> les deux membres par le même nombre (sauf diviser par 0).</span>
+      <span>• Méthode : <strong>les x à gauche, les nombres à droite, on divise, on vérifie</strong>.</span>
+      <span>• Une équation peut avoir une solution, aucune solution, ou une infinité de solutions.</span>
+    </div>
+  </section>
+
+  <footer>Fiche de révision · Les équations</footer>
+</main>
+
+<script>
+(function () {
+  var NS = 'http://www.w3.org/2000/svg';
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+  /* ---------- Fractions exactes ---------- */
+  function gcd(a, b) { a = Math.abs(a); b = Math.abs(b); while (b) { var t = b; b = a % b; a = t; } return a || 1; }
+  function Q(n, d) { if (d === undefined) d = 1; if (d < 0) { n = -n; d = -d; } var g = gcd(n, d); return { n: n / g, d: d / g }; }
+  function add(a, b) { return Q(a.n * b.d + b.n * a.d, a.d * b.d); }
+  function sub(a, b) { return Q(a.n * b.d - b.n * a.d, a.d * b.d); }
+  function mul(a, b) { return Q(a.n * b.n, a.d * b.d); }
+  function div(a, b) { return Q(a.n * b.d, a.d * b.n); }
+  function zero(a) { return a.n === 0; }
+  function eq(a, b) { return a.n === b.n && a.d === b.d; }
+  function qs(a) { var s = Math.abs(a.n) + (a.d === 1 ? '' : '/' + a.d); return (a.n < 0 ? '−' : '') + s; }
+  function qdec(a) { return (a.n / a.d).toLocaleString('fr-FR', { maximumFractionDigits: 3 }).replace('-', '−'); }
+
+  /* ---------- Lecture d'une expression du premier degré ---------- */
+  function tokenize(s) {
+    if (/[²³^]/.test(s)) throw new Error('Il y a un x² : c\'est une équation du second degré, qu\'on verra au lycée.');
+    s = s.replace(/[−–—]/g, '-').replace(/[×·*]/g, '*').replace(/[÷:]/g, '/').replace(/X/g, 'x');
+    var t = [], i = 0;
+    while (i < s.length) {
+      var c = s[i];
+      if (/\s/.test(c)) { i++; continue; }
+      if (/[0-9.,]/.test(c)) {
+        var j = i; while (j < s.length && /[0-9.,]/.test(s[j])) j++;
+        var raw = s.slice(i, j).replace(',', '.');
+        if (raw.split('.').length > 2 || raw === '.') throw new Error('Le nombre « ' + s.slice(i, j) + ' » est mal écrit.');
+        var dec = (raw.split('.')[1] || '').length, m = Math.pow(10, dec);
+        t.push({ k: 'n', v: Q(Math.round(parseFloat(raw) * m), m) }); i = j; continue;
+      }
+      if (c === 'x') { t.push({ k: 'x' }); i++; continue; }
+      if ('+-*/()'.indexOf(c) >= 0) { t.push({ k: c }); i++; continue; }
+      if ('[]'.indexOf(c) >= 0) { t.push({ k: c === '[' ? '(' : ')' }); i++; continue; }
+      throw new Error('Je ne connais pas le signe « ' + c + ' ». Utilise la lettre x pour l\'inconnue.');
+    }
+    var out = [];
+    t.forEach(function (tk) {
+      var p = out[out.length - 1];
+      if (p && (p.k === 'n' || p.k === 'x' || p.k === ')') && (tk.k === 'x' || tk.k === '(' || (tk.k === 'n' && p.k !== 'n'))) out.push({ k: '*' });
+      out.push(tk);
+    });
+    return out;
+  }
+  function parseLin(str) {
+    var t = tokenize(str), i = 0;
+    if (!t.length) throw new Error('Un des deux membres est vide.');
+    function peek() { return t[i]; }
+    function expr() {
+      var v = term();
+      while (peek() && (peek().k === '+' || peek().k === '-')) { var o = t[i++].k, w = term(); v = o === '+' ? { a: add(v.a, w.a), b: add(v.b, w.b) } : { a: sub(v.a, w.a), b: sub(v.b, w.b) }; }
+      return v;
+    }
+    function term() {
+      var v = factor();
+      while (peek() && (peek().k === '*' || peek().k === '/')) {
+        var o = t[i++].k, w = factor();
+        if (o === '*') {
+          if (!zero(v.a) && !zero(w.a)) throw new Error('Il y a x × x : c\'est une équation du second degré, qu\'on verra au lycée.');
+          v = zero(v.a) ? { a: mul(v.b, w.a), b: mul(v.b, w.b) } : { a: mul(v.a, w.b), b: mul(v.b, w.b) };
+        } else {
+          if (!zero(w.a)) throw new Error('Diviser par x n\'est pas au programme ici.');
+          if (zero(w.b)) throw new Error('On ne peut pas diviser par 0 !');
+          v = { a: div(v.a, w.b), b: div(v.b, w.b) };
+        }
+      }
+      return v;
+    }
+    function factor() {
+      var tk = t[i];
+      if (!tk) throw new Error('Il manque quelque chose à la fin.');
+      if (tk.k === '+') { i++; return factor(); }
+      if (tk.k === '-') { i++; var f = factor(); return { a: Q(-f.a.n, f.a.d), b: Q(-f.b.n, f.b.d) }; }
+      if (tk.k === 'n') { i++; return { a: Q(0), b: tk.v }; }
+      if (tk.k === 'x') { i++; return { a: Q(1), b: Q(0) }; }
+      if (tk.k === '(') { i++; var v = expr(); if (!t[i] || t[i].k !== ')') throw new Error('Il manque une parenthèse fermante.'); i++; return v; }
+      throw new Error('Il manque un nombre à côté d\'un signe.');
+    }
+    var r = expr();
+    if (i < t.length) throw new Error(t[i].k === ')' ? 'Il y a une parenthèse fermante en trop.' : 'Je n\'arrive pas à lire ce membre.');
+    return r;
+  }
+  function coefX(a) {
+    if (a.n === a.d) return 'x';
+    if (a.n === -a.d) return '−x';
+    return (a.d === 1 ? qs(a) : (a.n < 0 ? '−' : '') + '(' + qs(Q(Math.abs(a.n), a.d)) + ')') + 'x';
+  }
+  function linStr(L) {
+    var s = '';
+    if (!zero(L.a)) s = coefX(L.a);
+    if (!zero(L.b)) {
+      if (s) s += L.b.n > 0 ? ' + ' + qs(L.b) : ' − ' + qs(Q(-L.b.n, L.b.d));
+      else s = qs(L.b);
+    }
+    return s || '0';
+  }
+  function plusMinus(q, withX) {
+    var abs = Q(Math.abs(q.n), q.d), t = withX ? coefX(abs) : qs(abs);
+    return (q.n > 0 ? 'On soustrait ' : 'On ajoute ') + t + ' des deux côtés';
+  }
+  function substitute(side, x) {
+    var v = x.d === 1 && x.n >= 0 ? qs(x) : '(' + qs(x) + ')';
+    return side.replace(/[−–]/g, '-').replace(/(\d)\s*x/g, '$1 × ' + v).replace(/\)\s*x/g, ') × ' + v).replace(/x/g, v).replace(/-/g, '−');
+  }
+  function evalLin(L, x) { return add(mul(L.a, x), L.b); }
+
+  function solve(input) {
+    var parts = input.split('=');
+    if (parts.length !== 2) throw new Error(parts.length < 2 ? 'Il manque le signe = .' : 'Il ne faut qu\'un seul signe = .');
+    if (!/x|X/.test(input)) throw new Error('Il n\'y a pas d\'inconnue x dans ton équation.');
+    var L = parseLin(parts[0]), R = parseLin(parts[1]), steps = [];
+    var canon = function (s) { return s.replace(/\s/g, '').replace(/[−–-]/g, '-').replace(/[*×·]/g, ''); };
+    steps.push({ e: esc(parts[0].trim()) + ' = ' + esc(parts[1].trim()), why: 'L\'équation de départ.' });
+    var reduced = linStr(L) + ' = ' + linStr(R);
+    if (canon(reduced) !== canon(input)) steps.push({ e: reduced, why: 'On développe et on réduit chaque membre.' });
+    var A = L.a, B = L.b, C = R.a, D = R.b;
+    if (!zero(C)) { A = sub(A, C); steps.push({ act: plusMinus(C, true), e: linStr({ a: A, b: B }) + ' = ' + qs(D), why: 'Tous les x sont maintenant à gauche.' }); C = Q(0); }
+    if (zero(A)) {
+      var ok = eq(B, D);
+      steps.push({ e: qs(B) + ' = ' + qs(D), why: 'Les x ont disparu !' });
+      return { steps: steps, kind: ok ? 'all' : 'none' };
+    }
+    if (!zero(B)) { D = sub(D, B); steps.push({ act: plusMinus(B, false), e: coefX(A) + ' = ' + qs(D), why: 'Tous les nombres sont maintenant à droite.' }); B = Q(0); }
+    var x = div(D, A);
+    if (!(A.n === 1 && A.d === 1)) steps.push({ act: 'On divise les deux côtés par ' + qs(A), e: 'x = ' + qs(x), why: x.d === 1 ? '' : 'La solution est une fraction, environ ' + qdec(x) + '.' });
+    var vl = evalLin(L, x), vr = evalLin(R, x);
+    return { steps: steps, kind: 'one', x: x, check: 'À gauche : ' + esc(substitute(parts[0].trim(), x)) + ' = ' + qs(vl) + ' · À droite : ' + esc(substitute(parts[1].trim(), x)) + ' = ' + qs(vr) + (eq(vl, vr) ? ' ✓' : '') };
+  }
+  window.__solve = solve;
+
+  /* ---------- Solveur ---------- */
+  var eqIn = document.getElementById('eqIn'), out = document.getElementById('solveOut');
+  function render() {
+    try {
+      var r = solve(eqIn.value), html = r.steps.map(function (s) {
+        return '<li>' + (s.act ? '<span class="act">' + s.act + '</span>' : '') + '<span class="e">' + s.e + '</span>' + (s.why ? '<span class="why">' + s.why + '</span>' : '') + '</li>';
+      }).join('');
+      if (r.kind === 'one') html += '<li><span class="why">Solution</span><span class="sol">x = ' + qs(r.x) + '</span><span class="chk">Vérification. ' + r.check + '</span></li>';
+      else if (r.kind === 'none') html += '<li><span class="sol" style="color:var(--red)">Pas de solution</span><span class="why">Cette égalité est fausse, quel que soit x.</span></li>';
+      else html += '<li><span class="sol">Tous les nombres sont solutions</span><span class="why">Cette égalité est toujours vraie, quel que soit x.</span></li>';
+      out.innerHTML = html;
+    } catch (e) { out.innerHTML = '<li><span class="err">' + e.message + '</span></li>'; }
+  }
+  ['3x + 5 = 2x − 7', '2(x + 3) = 14', '5x − 4 = 3x + 10', 'x/2 + 3 = 7', '4 − x = 2x + 1', '2x + 1 = 2x + 5', '3(x + 1) = 3x + 3'].forEach(function (ex, k) {
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'ex'; b.id = 'pre' + k; b.textContent = ex;
+    b.addEventListener('click', function () { eqIn.value = ex; render(); });
+    document.getElementById('presets').appendChild(b);
+  });
+  eqIn.addEventListener('input', render); render();
+  document.getElementById('dioBtn').addEventListener('click', function () {
+    eqIn.value = 'x/6 + x/12 + x/7 + 5 + x/2 + 4 = x'; render();
+    eqIn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+
+  /* ---------- Balance ---------- */
+  var challenges = [
+    { a: 1, b: 7, c: 0, d: 12 },
+    { a: 2, b: 3, c: 0, d: 11 },
+    { a: 3, b: 1, c: 1, d: 9 },
+    { a: 5, b: 2, c: 2, d: 11 }
+  ];
+  var cur = 0, st, hist;
+  var bal = document.getElementById('bal');
+  function side(a, b) { var s = ''; if (a) s = (a === 1 ? '' : a) + 'x'; if (b) s += (s ? ' + ' : '') + b; return s || '0'; }
+  function mk(name, attrs, text) { var e = document.createElementNS(NS, name); for (var k in attrs) e.setAttribute(k, attrs[k]); if (text != null) e.textContent = text; bal.appendChild(e); return e; }
+  function drawPan(cx, a, b) {
+    var y0 = 168;
+    mk('line', { x1: cx, y1: 70, x2: cx - 55, y2: y0, stroke: 'var(--ink-soft)', 'stroke-width': 1.5 });
+    mk('line', { x1: cx, y1: 70, x2: cx + 55, y2: y0, stroke: 'var(--ink-soft)', 'stroke-width': 1.5 });
+    mk('path', { d: 'M' + (cx - 70) + ' ' + y0 + ' h140 a10 10 0 0 1 -10 10 h-120 a10 10 0 0 1 -10 -10 Z', fill: 'var(--ink)' });
+    var items = [], i;
+    for (i = 0; i < a; i++) items.push('x');
+    for (i = 0; i < b; i++) items.push('1');
+    var x = cx - 64, y = y0, rowH = 0;
+    items.forEach(function (it) {
+      var w = it === 'x' ? 24 : 14, h = w;
+      if (x + w > cx + 66) { x = cx - 64; y -= rowH + 2; rowH = 0; }
+      if (it === 'x') {
+        mk('rect', { x: x, y: y - h, width: w, height: h, rx: 3, fill: 'var(--acc)' });
+        mk('text', { x: x + w / 2, y: y - 7, 'text-anchor': 'middle', 'font-size': 15, style: 'fill:var(--card);font-weight:700;font-style:italic' }, 'x');
+      } else mk('rect', { x: x, y: y - h, width: w, height: h, rx: 2, fill: 'var(--unit)' });
+      x += w + 2; rowH = Math.max(rowH, h);
+    });
+  }
+  function drawBal() {
+    while (bal.firstChild) bal.removeChild(bal.firstChild);
+    mk('path', { d: 'M180 70 L164 222 L196 222 Z', fill: 'var(--ink)' });
+    mk('line', { x1: 50, y1: 70, x2: 310, y2: 70, stroke: 'var(--ink)', 'stroke-width': 6, 'stroke-linecap': 'round' });
+    mk('circle', { cx: 180, cy: 70, r: 6, fill: 'var(--acc)' });
+    drawPan(90, st.a, st.b);
+    drawPan(270, st.c, st.d);
+    mk('text', { x: 90, y: 30, 'text-anchor': 'middle', 'font-size': 14, style: 'fill:var(--ink-soft)' }, 'gauche');
+    mk('text', { x: 270, y: 30, 'text-anchor': 'middle', 'font-size': 14, style: 'fill:var(--ink-soft)' }, 'droite');
+  }
+  function solved() { return (st.a === 1 && st.b === 0 && st.c === 0) || (st.c === 1 && st.d === 0 && st.a === 0); }
+  function canDiv() {
+    if (st.a > 1 && st.b === 0 && st.c === 0 && st.d % st.a === 0) return st.a;
+    if (st.c > 1 && st.d === 0 && st.a === 0 && st.b % st.c === 0) return st.c;
+    return 0;
+  }
+  function updateBal(msg) {
+    drawBal();
+    document.getElementById('balEq').innerHTML = side(st.a, st.b).replace(/x/g, '<span class="x">x</span>') + ' = ' + side(st.c, st.d).replace(/x/g, '<span class="x">x</span>');
+    var k = canDiv();
+    document.getElementById('bMinus1').disabled = !(st.b > 0 && st.d > 0);
+    document.getElementById('bMinusX').disabled = !(st.a > 0 && st.c > 0);
+    var bd = document.getElementById('bDiv'); bd.disabled = !k; bd.textContent = k ? '÷ ' + k + ' des deux côtés' : '÷ des deux côtés';
+    var m = document.getElementById('balMsg');
+    if (solved()) {
+      var ch = challenges[cur], v = st.a === 1 ? st.d : st.b;
+      m.className = 'msg ok';
+      m.textContent = 'Bravo ! x = ' + v + '. Vérifie sur l\'équation de départ : ' + side(ch.a, ch.b).replace(/(\d)x/, '$1 × ' + v).replace(/^x/, String(v)) + ' = ' + (ch.a * v + ch.b) + ' et ' + side(ch.c, ch.d).replace(/(\d)x/, '$1 × ' + v).replace(/^x/, String(v)) + ' = ' + (ch.c * v + ch.d) + '.';
+    } else {
+      m.className = 'msg info';
+      m.textContent = msg || (st.a > 0 && st.c > 0 ? 'Il y a des x des deux côtés : commence par en enlever.' : (st.b > 0 && st.d > 0 ? 'Enlève des cubes des deux côtés pour isoler les x.' : 'Il ne reste que des x d\'un côté : partage les deux côtés en parts égales.'));
+    }
+    document.getElementById('balHist').innerHTML = hist.map(function (h) { return '<span>' + h + '</span>'; }).join('');
+  }
+  function load(i) {
+    cur = i; var c = challenges[i]; st = { a: c.a, b: c.b, c: c.c, d: c.d }; hist = [];
+    challenges.forEach(function (ch, j) { document.getElementById('ch' + j).setAttribute('aria-pressed', j === i ? 'true' : 'false'); });
+    updateBal();
+  }
+  challenges.forEach(function (c, j) {
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'ex'; b.id = 'ch' + j;
+    b.textContent = side(c.a, c.b) + ' = ' + side(c.c, c.d);
+    b.addEventListener('click', function () { load(j); });
+    document.getElementById('challenges').appendChild(b);
+  });
+  function act(label) { hist.push(label + ' → ' + side(st.a, st.b) + ' = ' + side(st.c, st.d)); updateBal(); }
+  document.getElementById('bMinus1').addEventListener('click', function () { if (st.b > 0 && st.d > 0) { st.b--; st.d--; act('− 1'); } });
+  document.getElementById('bMinusX').addEventListener('click', function () { if (st.a > 0 && st.c > 0) { st.a--; st.c--; act('− x'); } });
+  document.getElementById('bDiv').addEventListener('click', function () {
+    var k = canDiv(); if (!k) return;
+    if (st.a > 1) { st.a = 1; st.d = st.d / k; } else { st.c = 1; st.b = st.b / k; }
+    act('÷ ' + k);
+  });
+  document.getElementById('bReset').addEventListener('click', function () { load(cur); });
+  load(1);
+
+  /* ---------- Quiz ---------- */
+  function rnd(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+  function term(n, withX, first) {
+    var abs = Math.abs(n), t = withX ? (abs === 1 ? 'x' : abs + 'x') : String(abs);
+    if (first) return (n < 0 ? '−' : '') + t;
+    return (n < 0 ? ' − ' : ' + ') + t;
+  }
+  function makeEq() {
+    var x = rnd(-4, 10) || 3, f = rnd(0, 2), a, b, c, d;
+    if (f === 0) { a = rnd(2, 6); b = rnd(-9, 12) || 4; return term(a, true, true) + term(b) + ' = ' + (a * x + b).toString().replace('-', '−'); }
+    if (f === 1) { a = rnd(3, 7); c = rnd(1, a - 1); b = rnd(-8, 10) || 2; d = (a - c) * x + b; return term(a, true, true) + term(b) + ' = ' + term(c, true, true) + (d ? term(d) : ''); }
+    a = rnd(2, 5); b = rnd(-5, 6) || 1; return a + '(x' + term(b) + ') = ' + String(a * (x + b)).replace('-', '−');
+  }
+  var quiz = document.getElementById('quiz'), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ''; done = [];
+    for (var k = 0; k < 8; k++) {
+      var e = makeEq(), li = document.createElement('li');
+      li.innerHTML = '<span class="q">' + e.replace(/x/g, '<span class="x">x</span>') + '</span><input type="text" id="qa' + k + '" inputmode="decimal" autocomplete="off" aria-label="Valeur de x pour l\'équation ' + (k + 1) + '" placeholder="x = ?"><button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+      quiz.appendChild(li);
+      (function (k, e) {
+        function check() {
+          var fb = document.getElementById('qf' + k), raw = document.getElementById('qa' + k).value.replace(/^\s*x\s*=\s*/, '').trim();
+          if (!raw) { fb.className = 'fb'; fb.textContent = 'Écris la valeur de x.'; return; }
+          var r = solve(e), ans;
+          try { var L = parseLin(raw); if (!zero(L.a)) throw 0; ans = L.b; } catch (er) { fb.className = 'fb no'; fb.textContent = 'Écris un nombre, comme 4 ou −2.'; return; }
+          if (eq(ans, r.x)) { fb.className = 'fb ok'; fb.textContent = 'Bravo, x = ' + qs(r.x) + ' !'; done[k] = true; }
+          else { done[k] = false; fb.className = 'fb no'; fb.innerHTML = 'Pas tout à fait : x = ' + qs(r.x) + '.<span>' + r.steps.slice(1).map(function (s) { return s.e; }).join('  →  ') + '</span>'; }
+          document.getElementById('score').textContent = done.filter(Boolean).length + ' / 8';
+        }
+        document.getElementById('qb' + k).addEventListener('click', check);
+        document.getElementById('qa' + k).addEventListener('keydown', function (ev) { if (ev.key === 'Enter') check(); });
+      })(k, e);
+    }
+    document.getElementById('score').textContent = '0 / 8';
+  }
+  document.getElementById('newQuiz').addEventListener('click', newQuiz);
+  newQuiz();
+  window.__makeEq = makeEq;
+})();
+</script>
+</body>
+</html>
