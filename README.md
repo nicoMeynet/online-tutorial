@@ -16,6 +16,7 @@ Chaque tutoriel est une seule page HTML, sans installation. Il suffit de l'ouvri
 | [Les priorités de calcul](les-priorites-de-calcul.html) | L'ordre des opérations (parenthèses, puissances, × et ÷, + et −), de gauche à droite, un calculateur pas à pas, les pièges (× caché, −3², barre de fraction), un quiz et des problèmes à mettre en calcul. |
 | [Les fractions](les-fractions.html) | Numérateur et dénominateur, fractions égales et simplification, comparer, les quatre opérations avec une calculatrice pas à pas, fractions, décimaux et pourcentages, un quiz en images et des exercices. |
 | [Les équations](les-equations.html) | Les équations du premier degré : une balance interactive, les règles, la méthode en 4 étapes, un solveur pas à pas (parenthèses, fractions, cas sans solution), un quiz, l'histoire et des problèmes à mettre en équation. |
+| [Les pourcentages](les-pourcentages.html) | Une part sur 100, prendre et trouver un pourcentage, hausses et soldes avec le coefficient multiplicateur, les pourcentages qui s'enchaînent (et ne s'additionnent pas), un quiz et des problèmes. |
 
 ## Ajouter un tutoriel
 
