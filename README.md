@@ -43,4 +43,5 @@ Chaque tutoriel est une seule page HTML, sans installation. Il suffit de l'ouvri
 
 1. Ajouter un fichier `nom-du-tutoriel.html` à la racine.
 2. Ajouter une ligne dans le tableau ci-dessus.
-3. Ajouter un lien dans `index.html`.
+3. Ajouter une carte dans `index.html`, dans la bonne catégorie.
+4. Lancer `python tools/liens.py` : il ajoute le retour à l'accueil, les liens « précédent / suivant » (dans l'ordre de `index.html`) et transforme les mentions « le tutoriel sur … » en liens. On peut le relancer sans risque.

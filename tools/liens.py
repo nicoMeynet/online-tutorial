@@ -1,0 +1,132 @@
+"""Ajoute la navigation entre tutoriels dans les pages du dépôt.
+
+- un lien « ← Tous les tutoriels » en haut de chaque page ;
+- les mentions « le tutoriel sur … » deviennent de vrais liens ;
+- en bas de page : tutoriel précédent / suivant (ordre de index.html) et retour à l'accueil.
+
+Le script peut être relancé autant de fois qu'on veut : il remplace ce qu'il a déjà ajouté.
+Usage : python tools/liens.py            (toutes les pages)
+        python tools/liens.py page.html  (certaines pages)
+"""
+import html
+import re
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+
+TOPICS = [
+    ("le théorème de Pythagore", "le-theoreme-de-pythagore.html"),
+    ("Pythagore", "le-theoreme-de-pythagore.html"),
+    ("le théorème de Thalès", "le-theoreme-de-thales.html"),
+    ("Thalès", "le-theoreme-de-thales.html"),
+    ("les ensembles de nombres", "les-ensembles-de-nombres.html"),
+    ("les priorités de calcul", "les-priorites-de-calcul.html"),
+    ("les nombres relatifs", "les-nombres-relatifs.html"),
+    ("la proportionnalité", "la-proportionnalite.html"),
+    ("les transformations", "les-transformations.html"),
+    ("les pourcentages", "les-pourcentages.html"),
+    ("les puissances", "les-puissances.html"),
+    ("les équations", "les-equations.html"),
+    ("les fonctions", "les-fonctions.html"),
+    ("les fractions", "les-fractions.html"),
+    ("les angles", "les-angles-et-triangles.html"),
+    ("la vitesse", "la-vitesse.html"),
+    ("le nombre e", "le-nombre-e.html"),
+    ("π", "le-nombre-pi.html"),
+    ("e", "le-nombre-e.html"),
+]
+T = "|".join(re.escape(n) for n, _ in TOPICS)
+MENTION = re.compile(r"(tutoriels? sur )(" + T + r")(?!\w)(\s*\([^)<]*\))?(?:(\s+et sur )(" + T + r")(?!\w))?")
+FILE = dict(TOPICS)
+
+CSS = """<style id="tnav-css">
+.tnav-top { display: flex; margin: 0 0 4px; }
+.tnav-home { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font-weight: 700; font-size: .95rem; text-decoration: none; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tnav-home:hover, .tnav-home:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.tnav-bottom { margin-top: 8px; display: flex; flex-direction: column; gap: 12px; }
+.tnav-bottom h2 { margin: 0; }
+.tnav-pn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tnav-pn a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--ink, #222); border-radius: 10px;
+  background: var(--card, #fff); color: var(--ink, #222); text-decoration: none; box-shadow: 3px 3px 0 var(--ink, #222); min-width: 0; }
+.tnav-pn a span { font-size: .85rem; color: var(--ink-soft, #666); }
+.tnav-pn a strong { overflow-wrap: anywhere; }
+.tnav-pn a.next { text-align: right; grid-column: 2; }
+.tnav-bottom .tnav-home { align-self: center; }
+@media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
+</style>
+"""
+
+
+def landing_order():
+    idx = (ROOT / "index.html").read_text(encoding="utf-8")
+    cards = re.findall(r'<a class="card[^"]*" href="([^"]+\.html)".*?<strong>(.*?)</strong>', idx, re.S)
+    return [(h, html.unescape(re.sub(r"<[^>]+>", "", t)).strip()) for h, t in cards]
+
+
+def linkify(text, self_name):
+    def one(name):
+        f = FILE[name]
+        return name if f == self_name else f'<a class="tlink" href="{f}">{name}</a>'
+
+    def rep(m):
+        before = text[:m.start()]
+        if before.rfind("<a ") > before.rfind("</a>"):
+            return m.group(0)  # déjà dans un lien
+        out = m.group(1) + one(m.group(2)) + (m.group(3) or "")
+        if m.group(5):
+            out += m.group(4) + one(m.group(5))
+        return out
+
+    return MENTION.sub(rep, text)
+
+
+def process(path, order):
+    src = path.read_text(encoding="utf-8")
+    src = re.sub(r'<style id="tnav-css">.*?</style>\n', "", src, flags=re.S)
+    src = re.sub(r"<!--tnav-->.*?<!--/tnav-->\n?", "", src, flags=re.S)
+    assert src.count('<main class="page">') == 1 and src.count("</main>") == 1, path.name
+
+    cut = src.rfind("<script>")
+    body, tail = (src[:cut], src[cut:]) if cut > 0 else (src, "")
+    body = linkify(body, path.name)
+    src = body + tail
+
+    names = [h for h, _ in order]
+    titles = dict(order)
+    top = '<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="index.html">← Tous les tutoriels</a></nav><!--/tnav-->\n'
+    bottom = ""
+    if path.name in names:
+        i = names.index(path.name)
+        prev = names[i - 1] if i > 0 else None
+        nxt = names[i + 1] if i + 1 < len(names) else None
+        links = ""
+        if prev:
+            links += f'<a class="prev" href="{prev}"><span>← Précédent</span><strong>{html.escape(titles[prev])}</strong></a>'
+        if nxt:
+            links += f'<a class="next" href="{nxt}"><span>Suivant →</span><strong>{html.escape(titles[nxt])}</strong></a>'
+        bottom = ('<!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2>'
+                  f'<div class="tnav-pn">{links}</div>'
+                  '<a class="tnav-home" href="index.html">⌂ Tous les tutoriels</a></nav><!--/tnav-->\n')
+
+    src = src.replace('<main class="page">', '<main class="page">\n' + top, 1)
+    end = src.index("</main>")
+    foot = src.rfind("<footer", 0, end)
+    at = foot if foot > src.index('<main class="page">') else end
+    src = src[:at] + bottom + src[at:]
+    src = src.replace("</head>", CSS + "</head>", 1)
+    path.write_text(src, encoding="utf-8", newline="\n")
+
+
+def main():
+    order = landing_order()
+    files = [ROOT / a for a in sys.argv[1:]] or sorted(p for p in ROOT.glob("*.html") if p.name != "index.html")
+    for p in files:
+        process(p, order)
+        print("ok", p.name)
+
+
+if __name__ == "__main__":
+    main()
