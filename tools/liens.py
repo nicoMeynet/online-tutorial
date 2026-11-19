@@ -13,9 +13,14 @@ import re
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import difficulte  # noqa: E402
+
 ROOT = Path(__file__).resolve().parent.parent
 
 TOPICS = [
+    ("les arnaques", "reperer-les-arnaques.html"),
+    ("l'hameçonnage", "reperer-les-arnaques.html"),
     ("le ciel bleu et l'arc-en-ciel", "le-ciel-bleu-et-l-arc-en-ciel.html"),
     ("l'arc-en-ciel", "le-ciel-bleu-et-l-arc-en-ciel.html"),
     ("la physique du sport", "la-physique-du-sport.html"),
@@ -114,7 +119,7 @@ ICONS = ('<!--ticons--><link rel="icon" href="icon.svg" type="image/svg+xml">'
          '<script src="progress.js" defer></script><!--/ticons-->\n')
 
 CSS = """<style id="tnav-css">
-.tnav-top { display: flex; margin: 0 0 4px; }
+.tnav-top { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin: 0 0 4px; }
 .tnav-home { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--ink, #222); border-radius: 999px;
   background: var(--card, #fff); color: var(--ink, #222); font-weight: 700; font-size: .95rem; text-decoration: none; box-shadow: 2px 2px 0 var(--ink, #222); }
 .tnav-home:hover, .tnav-home:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
@@ -131,11 +136,12 @@ a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-dec
 @media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
 </style>
 """
+CSS = CSS.replace("</style>", difficulte.BADGE_CSS + "</style>", 1)
 
 
 # Une page d'accueil par matière : chaque tutoriel renvoie vers la sienne,
 # et « précédent / suivant » reste dans la même matière.
-LANDINGS = [("index.html", "Tous les tutoriels"), ("physique.html", "Tous les tutoriels de physique")]
+LANDINGS = [("index.html", "Tous les tutoriels"), ("physique.html", "Tous les tutoriels de physique"), ("numerique.html", "Tous les tutoriels numériques")]
 # Pages de révision qui ne sont pas des cartes mais appartiennent à une matière.
 HOME_OF = {"physique.html": ("glossaire-physique.html", "revisions-brevet-physique.html")}
 
@@ -190,7 +196,8 @@ def process(path, order):
             home, label, seq = landing, lab, cards
     names = [h for h, _ in seq]
     titles = dict(seq)
-    top = f'<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="{home}">← {label}</a></nav><!--/tnav-->\n'
+    top = (f'<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="{home}">← {label}</a>'
+           f'{difficulte.badge(path.stem)}</nav><!--/tnav-->\n')
     bottom = ""
     if path.name in names:
         i = names.index(path.name)
@@ -215,6 +222,7 @@ def process(path, order):
 
 
 def main():
+    difficulte.apply_landings(ROOT)
     order = landing_order()
     files = [ROOT / a for a in sys.argv[1:]] or sorted(p for p in ROOT.glob("*.html") if p.name not in dict(LANDINGS))
     for p in files:

@@ -8,7 +8,11 @@ navigateur (progress.js, clé tutoriels-progression-v1).
 import html
 import json
 import re
+import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import difficulte  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -37,6 +41,8 @@ TRACKS = [
         "les-transformations-chimiques", "les-acides-et-les-bases", "les-forces", "le-poids-et-la-masse", "la-gravitation",
         "les-formes-d-energie", "l-energie-cinetique-et-la-securite-routiere", "la-loi-d-ohm",
         "la-puissance-et-l-energie-electrique", "les-signaux-et-la-communication", "revisions-brevet-physique"]),
+    ("securite", "numerique", "Se protéger en ligne", "collège", "Repérer les arnaques et garder ses comptes en sécurité.", [
+        "reperer-les-arnaques"]),
     ("pcurio", "physique", "Physique et curiosités", "tous niveaux", "La physique du ciel, du sport et du climat.", [
         "le-ciel-bleu-et-l-arc-en-ciel", "la-physique-du-sport", "le-climat-et-l-effet-de-serre"]),
 ]
@@ -113,17 +119,17 @@ CSS = r"""
 :root {
   --paper: #f6f7fb; --grid: #e2e6f0; --card: #ffffff; --ink: #1d2233; --soft: #545b72; --line: #d6dae6;
   --red: #cf3a52; --navy: #1f2a5c; --hl: #ffd34d; --ok: #15803d; --ok-s: #dcf3e3; --mid: #b45309; --mid-s: #fbe7cf;
-  --maths: #2346b5; --physique: #0e7490;
+  --maths: #2346b5; --physique: #0e7490; --numerique: #b91c1c;
   --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
   --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
   --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
   --paper: #10131c; --grid: #1a1f2c; --card: #171b27; --ink: #eceff7; --soft: #a9b0c6; --line: #2b3142; --red: #ff7d92;
-  --navy: #a9b8ff; --ok: #4ade80; --ok-s: #14301f; --mid: #f5a35c; --mid-s: #46301a; --maths: #8fb0ff; --physique: #67e8f9; color-scheme: dark; } }
+  --navy: #a9b8ff; --ok: #4ade80; --ok-s: #14301f; --mid: #f5a35c; --mid-s: #46301a; --maths: #8fb0ff; --physique: #67e8f9; --numerique: #fca5a5; color-scheme: dark; } }
 :root[data-theme="dark"] {
   --paper: #10131c; --grid: #1a1f2c; --card: #171b27; --ink: #eceff7; --soft: #a9b0c6; --line: #2b3142; --red: #ff7d92;
-  --navy: #a9b8ff; --ok: #4ade80; --ok-s: #14301f; --mid: #f5a35c; --mid-s: #46301a; --maths: #8fb0ff; --physique: #67e8f9; color-scheme: dark; }
+  --navy: #a9b8ff; --ok: #4ade80; --ok-s: #14301f; --mid: #f5a35c; --mid-s: #46301a; --maths: #8fb0ff; --physique: #67e8f9; --numerique: #fca5a5; color-scheme: dark; }
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
 body { margin: 0; color: var(--ink); font: 17px/1.6 var(--f-body);
@@ -173,6 +179,8 @@ li.started .state { border-color: var(--mid); color: var(--mid); background: var
 .reco a span { font: 700 .78rem var(--f-mono); color: var(--red); text-transform: uppercase; letter-spacing: .05em; }
 .reco a em { font-style: normal; color: var(--soft); font-size: .92rem; }
 .empty { color: var(--soft); }
+.steps .side { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+.track .mix { display: flex; flex-wrap: wrap; gap: 4px; }
 footer { color: var(--soft); font-size: .9rem; text-align: center; }
 @media (max-width: 560px) {
   .tracks { grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -182,7 +190,7 @@ footer { color: var(--soft); font-size: .9rem; text-align: center; }
   .next { grid-template-columns: 1fr; }
   .next .btn { justify-self: start; }
   .steps li { grid-template-columns: 34px 1fr; }
-  .steps li .state { grid-column: 2; justify-self: start; }
+  .steps li .side { grid-column: 2; flex-direction: row; justify-self: start; align-items: center; }
   .dot { width: 30px; height: 30px; font-size: .9rem; }
 }
 """
@@ -201,6 +209,10 @@ JS = r"""
     if (p.total) return p.best / p.total >= 0.75 ? 'done' : 'started';
     return 'started';
   }
+  var DL = { 1: 'Facile', 2: 'Moyen', 3: 'Difficile' };
+  function diffBadge(id) { var d = D.diff[id]; return d ? '<span class="diff d' + d + '">' + DL[d] + '</span>' : ''; }
+  function diffMix(steps) { var c = { 1: 0, 2: 0, 3: 0 }; steps.forEach(function (s) { if (D.diff[s]) c[D.diff[s]]++; });
+    return [1, 2, 3].filter(function (k) { return c[k]; }).map(function (k) { return '<span class="diff d' + k + '">' + c[k] + ' ' + DL[k].toLowerCase() + '</span>'; }).join(' '); }
   function info(id) { return D.pages[id] || { t: id, d: '' }; }
   function link(id) { return '<a href="' + id + '.html">' + esc(info(id).t) + '</a>'; }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
@@ -213,6 +225,7 @@ JS = r"""
   var subject = pref.subject || (location.hash === '#physique' ? 'physique' : 'maths');
   if (location.hash === '#physique') subject = 'physique';
   if (location.hash === '#maths') subject = 'maths';
+  if (location.hash === '#numerique') subject = 'numerique';
   var current = pref.track;
 
   function trackById(id) { for (var i = 0; i < D.tracks.length; i++) if (D.tracks[i].id === id) return D.tracks[i]; return null; }
@@ -236,7 +249,7 @@ JS = r"""
       return '<button type="button" class="track" style="--c:var(--' + t.subject + ')" data-id="' + t.id + '" aria-pressed="' + (t.id === current) + '">' +
         '<span class="lvl">' + esc(t.level) + '</span><strong>' + esc(t.title) + '</strong><span class="soft">' + esc(t.desc) + '</span>' +
         '<span class="bar" aria-hidden="true"><i style="width:' + Math.round(100 * done / t.steps.length) + '%"></i></span>' +
-        '<span class="count">' + done + ' / ' + t.steps.length + ' étapes réussies</span></button>';
+        '<span class="count">' + done + ' / ' + t.steps.length + ' étapes réussies</span><span class="mix">' + diffMix(t.steps) + '</span></button>';
     }).join('');
     box.querySelectorAll('.track').forEach(function (b) {
       b.onclick = function () { current = b.dataset.id; save(TKEY, { subject: subject, track: current }); render(); document.getElementById('trackTitle').scrollIntoView({ behavior: 'smooth', block: 'start' }); };
@@ -249,7 +262,7 @@ JS = r"""
       return;
     }
     var miss = missing(id), s = st(id), inf = info(id);
-    box.innerHTML = '<div><span class="tag">Ta prochaine étape</span><h3>' + esc(inf.t) + '</h3><p>' + esc(inf.d) + '</p></div>' +
+    box.innerHTML = '<div><span class="tag">Ta prochaine étape</span> ' + diffBadge(id) + '<h3>' + esc(inf.t) + '</h3><p>' + esc(inf.d) + '</p></div>' +
       '<a class="btn" href="' + id + '.html">' + (s === 'started' ? 'Continuer' : 'Commencer') + ' →</a>' +
       (miss.length ? '<p class="warn">Conseil : avant, revois ' + miss.map(link).join(' et ') + '. Ce sera plus facile.</p>' : '') +
       (s === 'started' && P[id + '.html'] && P[id + '.html'].total ? '<p class="warn">Ton meilleur score au quiz : ' + P[id + '.html'].best + ' / ' + P[id + '.html'].total + '. Vise 6 / 8 pour valider l\'étape.</p>' : '');
@@ -263,7 +276,7 @@ JS = r"""
       var meta = pre.length ? 'Après : ' + pre.map(link).join(', ') : esc(info(id).d);
       return '<li class="' + s + (id === nid ? ' current' : '') + '"><span class="dot">' + (s === 'done' ? '✓' : i + 1) + '</span>' +
         '<span><a class="t" href="' + id + '.html">' + esc(info(id).t) + '</a><br><span class="meta">' + meta + '</span></span>' +
-        '<span class="state">' + label + '</span></li>';
+        '<span class="side">' + diffBadge(id) + '<span class="state">' + label + '</span></span></li>';
     }).join('');
   }
   function renderReco() {
@@ -310,7 +323,7 @@ JS = r"""
 
 def landing_pages():
     pages = {}
-    for f in ("index.html", "physique.html"):
+    for f in ("index.html", "physique.html", "numerique.html"):
         s = (ROOT / f).read_text(encoding="utf-8")
         for href, title, desc in re.findall(r'<a class="card" href="([^"]+)\.html">.*?<strong>(.*?)</strong><span class="d">(.*?)</span>', s, re.S):
             pages[href] = {"t": html.unescape(re.sub(r"<[^>]+>", "", title)).strip(), "d": html.unescape(re.sub(r"<[^>]+>", "", desc)).strip()}
@@ -330,7 +343,7 @@ def main():
         print("pages inconnues :", sorted(set(unknown)))
     data = {
         "tracks": [{"id": i, "subject": su, "title": t, "level": lv, "desc": d, "steps": st} for i, su, t, lv, d, st in TRACKS],
-        "pre": PRE, "noquiz": NOQUIZ, "pages": pages,
+        "pre": PRE, "noquiz": NOQUIZ, "pages": pages, "diff": difficulte.DIFF,
     }
     page = f"""<!doctype html>
 <html lang="fr">
@@ -341,7 +354,7 @@ def main():
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=JetBrains+Mono:wght@500;600&display=swap">
-<style>{CSS}</style>
+<style>{CSS}{difficulte.BADGE_CSS}</style>
 </head>
 <body>
 <main class="page">
@@ -351,7 +364,7 @@ def main():
   <p class="lead">Choisis un parcours : la page suit ce que tu as déjà réussi, te dit quoi faire ensuite et te conseille de revoir une notion quand il en manque une. Une étape est réussie avec au moins 6 / 8 au quiz.</p>
   <p class="soft" id="summary"></p>
 </header>
-<nav class="subjects" aria-label="Choisir la matière"><button type="button" data-s="maths">Maths</button><button type="button" data-s="physique">Physique-chimie</button></nav>
+<nav class="subjects" aria-label="Choisir la matière"><button type="button" data-s="maths">Maths</button><button type="button" data-s="physique">Physique-chimie</button><button type="button" data-s="numerique">Numérique</button></nav>
 <section class="next" id="nextBox" aria-live="polite"></section>
 <section aria-labelledby="h-tracks"><h2 id="h-tracks" style="margin-bottom:12px">Choisis ton parcours</h2><div class="tracks" id="tracks"></div></section>
 <section aria-labelledby="h-reco"><h2 id="h-reco" style="margin-bottom:12px">Conseillé pour toi</h2><div class="reco" id="reco"></div></section>

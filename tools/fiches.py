@@ -115,7 +115,7 @@ def summary(path):
 def main():
     out = []
     count = 0
-    subjects = [("index.html", "maths", "Maths"), ("physique.html", "physique", "Physique-chimie")]
+    subjects = [("index.html", "maths", "Maths"), ("physique.html", "physique", "Physique-chimie"), ("numerique.html", "numerique", "Numérique")]
     for landing, sid, sname in subjects:
       if not (ROOT / landing).exists():
           continue

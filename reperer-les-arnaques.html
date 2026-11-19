@@ -1,0 +1,1165 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Repérer les arnaques et l'hameçonnage</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, marge rouge. Accent rouge « alerte », ambre pour les signaux d'avertissement, vert pour ce qui est légitime. Tous les noms, adresses et numéros des exemples sont inventés (domaines en .exemple). */
+:root {
+  --paper: #faf7f7;
+  --grid: #efe3e3;
+  --card: #ffffff;
+  --ink: #2a1a1c;
+  --ink-soft: #6d5558;
+  --acc: #b91c1c;
+  --acc-soft: #fde2e2;
+  --warn: #d97706;
+  --warn-soft: #fdf0d6;
+  --warn-ink: #92400e;
+  --two: #1c64c8;
+  --two-soft: #dbe8fa;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #fff0a3;
+  --line: #ead8d8;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #160f10; --grid: #241a1b; --card: #1e1516; --ink: #f6ecec; --ink-soft: #c4aaad;
+    --acc: #ff8b8b; --acc-soft: #45191b; --warn: #f5a524; --warn-soft: #3d2a0c; --warn-ink: #fbbf5a;
+    --two: #7fb0ff; --two-soft: #1a2a45;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #3a2a2b;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #160f10; --grid: #241a1b; --card: #1e1516; --ink: #f6ecec; --ink-soft: #c4aaad;
+  --acc: #ff8b8b; --acc-soft: #45191b; --warn: #f5a524; --warn-soft: #3d2a0c; --warn-ink: #fbbf5a;
+  --two: #7fb0ff; --two-soft: #1a2a45;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #3a2a2b;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note.warn { border-left-color: var(--warn); background: var(--warn-soft); }
+.note.ok { border-left-color: var(--ok); background: var(--ok-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+.fig svg { width: 100%; height: auto; display: block; }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 8px 12px; min-height: 44px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+input[type="text"] { font: inherit; font-family: var(--f-mono); font-size: 1rem; padding: 8px 10px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; }
+input[type="range"] { width: 100%; accent-color: var(--acc); }
+select { font: inherit; font-size: 1rem; padding: 8px 8px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; }
+.param { display: flex; flex-direction: column; gap: 2px; }
+.param label { font-weight: 700; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
+.tag.ok { color: var(--ok); }
+.tag.no { color: var(--acc); }
+.tag.warn { color: var(--warn-ink); }
+.ico { width: 34px; height: 34px; color: var(--acc); flex: none; }
+.ico.w { color: var(--warn); }
+.flag-head { display: flex; gap: 10px; align-items: center; }
+.ex { font-family: var(--f-mono); font-size: .88rem; color: var(--warn-ink); background: var(--warn-soft); border-radius: 6px; padding: 4px 8px; overflow-wrap: anywhere; }
+
+.verdict { border-radius: 8px; padding: 12px 14px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+.verdict.yes { background: var(--ok-soft); color: var(--ok); }
+.verdict.no { background: var(--acc-soft); color: var(--acc); }
+.verdict.mid { background: var(--warn-soft); color: var(--warn-ink); }
+.verdict span { font-weight: 400; color: var(--ink); }
+
+/* Dissecteur d'adresse */
+.url-out { font-family: var(--f-mono); font-size: 1.05rem; line-height: 2; overflow-wrap: anywhere; word-break: break-all; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+.u-scheme, .u-rest, .u-port { color: var(--ink-soft); }
+.u-user { color: var(--warn-ink); background: var(--warn-soft); text-decoration: line-through; border-radius: 4px; }
+.u-sub { color: var(--warn-ink); background: var(--warn-soft); border-radius: 4px; padding: 0 2px; }
+.u-dom { font-weight: 600; color: var(--acc); border: 2px solid var(--acc); border-radius: 5px; padding: 0 3px; }
+.u-dom.safe { color: var(--ok); border-color: var(--ok); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: .9rem; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.sw { width: 14px; height: 14px; border-radius: 3px; display: inline-block; border: 2px solid var(--line); }
+.tricks { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.tricks li { border: 1.5px solid var(--line); border-left: 5px solid var(--warn); border-radius: 8px; padding: 8px 12px; background: var(--card); }
+.tricks li.ok { border-left-color: var(--ok); }
+.tricks li.bad { border-left-color: var(--acc); }
+.tricks strong { font-family: var(--f-display); }
+
+/* Boîte de réception */
+.ib-top { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between; }
+.ib-grid { display: grid; grid-template-columns: minmax(0, 250px) minmax(0, 1fr); gap: 14px; align-items: start; }
+@media (max-width: 700px) { .ib-grid { grid-template-columns: minmax(0, 1fr); } }
+.ib-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; max-height: 560px; overflow-y: auto; padding-right: 4px; }
+@media (max-width: 700px) { .ib-list { max-height: 300px; } }
+.ib-list button { width: 100%; text-align: left; box-shadow: none; border-width: 1.5px; padding: 8px 10px; display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; font-family: var(--f-body); font-weight: 400; }
+.ib-list button:hover { transform: none; box-shadow: none; background: var(--paper); }
+.ib-list button[aria-current="true"] { border-color: var(--acc); border-width: 2.5px; background: var(--acc-soft); }
+.ib-from { font-weight: 700; font-family: var(--f-display); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.ib-kind { font-family: var(--f-mono); font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-soft); }
+.ib-prev { grid-column: 1 / -1; font-size: .85rem; color: var(--ink-soft); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.ib-st { font-family: var(--f-mono); font-size: .75rem; font-weight: 600; }
+.ib-st.good { color: var(--ok); }
+.ib-st.bad { color: var(--acc); }
+.reader { border: 1.5px solid var(--ink); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px; background: var(--paper); min-width: 0; }
+.rd-head { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; justify-content: space-between; }
+.rd-from { display: flex; flex-direction: column; min-width: 0; }
+.rd-from strong { font-family: var(--f-display); font-size: 1.1rem; }
+.rd-addr { font-family: var(--f-mono); font-size: .85rem; color: var(--ink-soft); overflow-wrap: anywhere; }
+.rd-subj { font-family: var(--f-display); font-weight: 700; }
+.rd-ctx { font-size: .92rem; color: var(--ink-soft); font-style: italic; }
+.bubble { background: var(--card); border: 1.5px solid var(--line); border-radius: 14px 14px 14px 4px; padding: 12px 14px; overflow-wrap: anywhere; }
+.bubble.call { border-style: dashed; }
+.lnk { font-family: var(--f-mono); font-size: .92em; color: var(--two); text-decoration: underline; text-decoration-style: dotted; overflow-wrap: anywhere; }
+.fakebtn { display: inline-block; font-family: var(--f-display); font-weight: 700; background: var(--two); color: var(--card); border-radius: 6px; padding: 2px 10px; }
+.file { font-family: var(--f-mono); font-size: .9em; border: 1.5px dashed var(--ink-soft); border-radius: 6px; padding: 0 6px; }
+.clue { font: inherit; display: inline; -webkit-box-decoration-break: clone; box-decoration-break: clone; padding: 0 2px; min-height: 0; border: 0; box-shadow: none; border-radius: 4px; cursor: pointer; text-align: left; font-family: inherit; font-weight: inherit; color: inherit; background: transparent; border-bottom: 2.5px dashed var(--acc); }
+.clue:hover { transform: none; box-shadow: none; background: var(--acc-soft); }
+.clue:active { transform: none; box-shadow: none; }
+.clue.warn { border-bottom-color: var(--warn); }
+.clue.okc { border-bottom-color: var(--ok); }
+.clue.found { background: var(--acc-soft); }
+.clue.warn.found { background: var(--warn-soft); }
+.clue.okc.found { background: var(--ok-soft); }
+.clue-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.clue-list li { border-left: 4px solid var(--acc); background: var(--card); border-radius: 0 8px 8px 0; padding: 6px 10px; font-size: .95rem; }
+.clue-list li.warn { border-left-color: var(--warn); }
+.clue-list li.okc { border-left-color: var(--ok); }
+.clue-list strong { font-family: var(--f-display); }
+.big-choice button { flex: 1 1 140px; }
+.b-scam { border-color: var(--acc); color: var(--acc); }
+.b-ok { border-color: var(--ok); color: var(--ok); }
+
+/* Réaction en chaîne */
+.chain-tbl { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: .95rem; }
+.chain-tbl th, .chain-tbl td { border: 1.5px solid var(--line); padding: 6px 8px; text-align: center; }
+.chain-tbl th { font-family: var(--f-display); background: var(--paper); }
+.scroll { overflow-x: auto; }
+
+/* Oups */
+.steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; counter-reset: st; }
+.steps li { counter-increment: st; display: grid; grid-template-columns: 34px 1fr; gap: 10px; align-items: start; border: 1.5px solid var(--line); border-radius: 10px; padding: 8px 10px; background: var(--card); }
+.steps li::before { content: counter(st); width: 30px; height: 30px; border-radius: 50%; background: var(--acc); color: var(--card); display: grid; place-items: center; font-family: var(--f-display); font-weight: 800; }
+.steps li.done { opacity: .6; }
+.steps li.done::before { content: "✓"; background: var(--ok); }
+.steps label { display: flex; gap: 8px; align-items: flex-start; cursor: pointer; }
+.steps input { width: 22px; height: 22px; margin-top: 3px; accent-color: var(--ok); flex: none; }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 220px auto; gap: 10px; align-items: center; }
+.quiz li > span:first-child { min-width: 0; overflow-wrap: anywhere; }
+.quiz select { font-size: .95rem; padding: 6px 6px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb:empty { display: none; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc); }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 140px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+details .msg { display: block; margin-top: 8px; font-weight: 400; font-family: var(--f-mono); font-size: .9rem; background: var(--paper); border: 1.5px dashed var(--line); border-radius: 8px; padding: 8px 10px; overflow-wrap: anywhere; color: var(--ink); }
+details ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+<!--ticons--><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Tutoriels"><script src="progress.js" defer></script><!--/ticons-->
+<style id="tnav-css">
+.tnav-top { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin: 0 0 4px; }
+.tnav-home { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font-weight: 700; font-size: .95rem; text-decoration: none; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tnav-home:hover, .tnav-home:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.tnav-bottom { margin-top: 8px; display: flex; flex-direction: column; gap: 12px; }
+.tnav-bottom h2 { margin: 0; }
+.tnav-pn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tnav-pn a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--ink, #222); border-radius: 10px;
+  background: var(--card, #fff); color: var(--ink, #222); text-decoration: none; box-shadow: 3px 3px 0 var(--ink, #222); min-width: 0; }
+.tnav-pn a span { font-size: .85rem; color: var(--ink-soft, #666); }
+.tnav-pn a strong { overflow-wrap: anywhere; }
+.tnav-pn a.next { text-align: right; grid-column: 2; }
+.tnav-bottom .tnav-home { align-self: center; }
+@media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
+.diff { font: 700 .72rem/1.2 var(--f-mono, monospace); padding: 2px 8px; border-radius: 99px; border: 1.5px solid; white-space: nowrap; }
+.diff.d1 { color: #15803d; border-color: #15803d; background: #dcf3e3; }
+.diff.d2 { color: #a15c07; border-color: #b45309; background: #fbe7cf; }
+.diff.d3 { color: #b91c1c; border-color: #b91c1c; background: #fde2e2; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root:not([data-theme="light"]) .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root:not([data-theme="light"]) .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; } }
+:root[data-theme="dark"] .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root[data-theme="dark"] .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root[data-theme="dark"] .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; }
+</style>
+</head>
+<body>
+<main class="page">
+<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="numerique.html">← Tous les tutoriels numériques</a><span class="diff d1" title="Difficulté : facile">Facile</span></nav><!--/tnav-->
+
+
+  <header class="hero">
+    <span class="eyebrow">Tutoriel numérique · niveau collège</span>
+    <h1>Repérer les arnaques et l'hameçonnage</h1>
+    <p class="lead">Un SMS « Ton colis est bloqué », un message de « ta banque », un ami qui t'envoie un lien bizarre… Certains messages sont des pièges. Bonne nouvelle : les pièges laissent presque toujours des traces. Ici, tu vas apprendre à les voir, calmement.</p>
+    <div class="box fig">
+      <svg viewBox="0 0 360 190" role="img" aria-label="Un faux SMS accroché à un hameçon, avec trois signaux d'alerte : urgence, argent et lien bizarre">
+        <rect x="118" y="6" width="150" height="180" rx="20" fill="var(--paper)" stroke="var(--ink)" stroke-width="2.5"/>
+        <rect x="170" y="14" width="46" height="6" rx="3" fill="var(--line)"/>
+        <rect x="130" y="40" width="126" height="98" rx="12" fill="var(--acc-soft)" stroke="var(--acc)" stroke-width="2"/>
+        <text x="140" y="62" font-size="13" font-weight="600">ColiZèbre :</text>
+        <text x="140" y="82" font-size="13">Colis bloqué !</text>
+        <text x="140" y="102" font-size="13">Payez 1,99 €</text>
+        <text x="140" y="122" font-size="13" fill="var(--two)" style="fill:var(--two)">sous 24 h…</text>
+        <line x1="300" y1="0" x2="300" y2="96" stroke="var(--ink-soft)" stroke-width="2"/>
+        <path d="M300 96 v18 a16 16 0 0 1 -32 0 v-10" fill="none" stroke="var(--ink)" stroke-width="3.5" stroke-linecap="round"/>
+        <path d="M268 104 l-6 8 m6 -8 l6 6" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+        <g font-size="13">
+          <circle cx="22" cy="60" r="10" fill="var(--warn)"/><text x="22" y="65" text-anchor="middle" font-weight="600" style="fill:#fff">!</text>
+          <text x="38" y="65">urgence</text>
+          <circle cx="22" cy="100" r="10" fill="var(--warn)"/><text x="22" y="105" text-anchor="middle" font-weight="600" style="fill:#fff">!</text>
+          <text x="38" y="105">argent</text>
+          <circle cx="22" cy="140" r="10" fill="var(--warn)"/><text x="22" y="145" text-anchor="middle" font-weight="600" style="fill:#fff">!</text>
+          <text x="38" y="145">lien</text>
+          <text x="38" y="162">bizarre</text>
+        </g>
+        <path d="M96 61 H128 M88 101 H128 M80 141 L128 122" stroke="var(--warn)" stroke-width="2" stroke-dasharray="4 4" fill="none"/>
+      </svg>
+    </div>
+    <p class="soft">Tous les noms, sites, numéros et marques de cette page sont <strong>inventés</strong>. Les adresses finissent par <span class="mono">.exemple</span>, une terminaison qui n'existe pas. Aucun lien n'est cliquable, rien n'est envoyé nulle part : c'est un entraînement.</p>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · L'idée</span>
+    <h2>Quelqu'un se fait passer pour un autre</h2>
+    <p>Une <strong>arnaque</strong> en ligne, c'est quand quelqu'un <strong>se fait passer pour une personne ou un service de confiance</strong> (ta banque, un livreur, ton jeu, un ami, ta mère…) pour obtenir quelque chose : de l'<strong>argent</strong>, un <strong>code</strong>, un <strong>mot de passe</strong> ou des <strong>informations personnelles</strong>.</p>
+    <p>On parle d'<strong>hameçonnage</strong> (en anglais <em>phishing</em>) : comme un pêcheur, l'escroc lance un appât et attend que quelqu'un morde. Il envoie souvent le même message à des milliers de personnes. <span class="hl">Ce n'est pas toi qu'il vise personnellement : il espère juste que quelqu'un se trompe.</span></p>
+    <div class="cards">
+      <div class="box"><span class="tag no">E-mail</span><strong>Le phishing</strong><span class="soft">Un faux e-mail de banque, de jeu, de livraison, avec un lien vers un faux site.</span></div>
+      <div class="box"><span class="tag no">SMS</span><strong>Le smishing</strong><span class="soft">SMS + phishing : faux colis, fausse amende, faux remboursement.</span></div>
+      <div class="box"><span class="tag no">Appel</span><strong>Le vishing</strong><span class="soft">De <em>voice</em>, la voix : un faux conseiller ou un faux technicien au téléphone.</span></div>
+      <div class="box"><span class="tag no">Messageries et réseaux</span><strong>Les faux amis</strong><span class="soft">Un compte piraté, un faux concours, un inconnu très gentil dans un jeu en ligne.</span></div>
+      <div class="box"><span class="tag no">Sites et QR codes</span><strong>Les faux sites</strong><span class="soft">Une copie parfaite d'un vrai site, ou un QR code collé par-dessus une vraie affiche.</span></div>
+    </div>
+    <div class="note ok">
+      <span class="note-title">Tout le monde peut se faire piéger</span>
+      <span>Des adultes, des profs, des informaticiens se font avoir chaque jour. Les escrocs sont des professionnels du mensonge. Se faire piéger n'est <strong>pas une honte</strong> : la seule chose importante, c'est d'en parler vite.</span>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · Les signaux d'alerte</span>
+    <h2>Dix signes qui doivent t'arrêter</h2>
+    <p>Un seul signe ne prouve pas toujours une arnaque. Mais dès que tu en vois un, <strong>tu ralentis</strong> et tu vérifies. Plusieurs signes ensemble : c'est presque sûrement un piège.</p>
+    <div class="cards" id="flags"></div>
+    <div class="note red">
+      <span class="note-title">La règle d'or</span>
+      <span><strong>Un vrai service ne te demande jamais ton code</strong> (code reçu par SMS, code de carte, mot de passe). Jamais par e-mail, jamais par SMS, jamais au téléphone. Si quelqu'un te le demande, c'est une arnaque.</span>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · L'intelligence artificielle</span>
+    <h2>L'IA change la donne</h2>
+    <p>Avant, on reconnaissait beaucoup d'arnaques à leurs fautes d'orthographe. Aujourd'hui, les escrocs utilisent aussi l'<strong>intelligence artificielle</strong> (IA) :</p>
+    <div class="cards">
+      <div class="box"><span class="tag warn">Texte</span><strong>Un français parfait</strong><span class="soft">Une IA écrit sans faute, dans le style d'une vraie banque. <strong>L'absence de fautes ne prouve rien.</strong></span></div>
+      <div class="box"><span class="tag warn">Voix</span><strong>Une voix imitée</strong><span class="soft">Avec de courts enregistrements (vidéos, messages vocaux), une IA peut imiter une voix : « Maman, c'est moi, j'ai changé de numéro… »</span></div>
+      <div class="box"><span class="tag warn">Vidéo</span><strong>Un visage truqué</strong><span class="soft">Un <em>deepfake</em> est une vidéo truquée où une personne connue semble dire des choses qu'elle n'a jamais dites.</span></div>
+      <div class="box"><span class="tag warn">Discussion</span><strong>Un bavard infatigable</strong><span class="soft">Un robot peut discuter pendant des heures, gentiment, pour gagner ta confiance.</span></div>
+    </div>
+    <p>Alors on regarde moins la forme, et plus <strong>ce qu'on te demande</strong>. Et on garde un réflexe imbattable : <span class="hl">vérifier par un autre chemin que tu connais déjà</span> (rappeler le numéro habituel, ouvrir toi-même l'appli officielle, demander en vrai). Dans une famille, on peut aussi choisir un <strong>mot de code secret</strong> : une personne qui ne le connaît pas n'est pas celle qu'elle prétend être.</p>
+    <div class="box">
+      <h3>Que fais-tu ?</h3>
+      <div class="btns" id="aiTabs" role="group" aria-label="Choisir une situation"></div>
+      <p id="aiText"></p>
+      <div class="btns" id="aiChoices" role="group" aria-label="Ta réaction"></div>
+      <div id="aiOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · Lire une adresse</span>
+    <h2>Où mène vraiment ce lien ?</h2>
+    <p>Une adresse web ressemble à <span class="mono">https://www.banque-pivoine.exemple/compte</span>. Ce qui compte, c'est le <strong>domaine</strong> : le « nom de famille » du site. Pour le trouver :</p>
+    <div class="box">
+      <span>1. On saute le début <span class="mono">https://</span>.</span>
+      <span>2. On s'arrête au <strong>premier « / »</strong> (ou « ? » ou « # »). Ce qui reste, c'est le nom de la machine.</span>
+      <span>3. S'il y a un <strong>@</strong>, on ne garde que ce qui est <strong>après</strong>.</span>
+      <span>4. On lit les <strong>deux derniers morceaux</strong> séparés par des points : <span class="mono">banque-pivoine.exemple</span>. C'est le vrai domaine. Tout ce qui est avant (<span class="mono">www.</span>, <span class="mono">compte.</span>…) n'est qu'un sous-dossier choisi par le propriétaire du domaine.</span>
+    </div>
+    <div class="box">
+      <h3>Le détecteur d'adresse</h3>
+      <div class="btns" id="urlPresets" role="group" aria-label="Exemples d'adresses"></div>
+      <label for="urlIn" style="font-weight:700">Ou écris une adresse (inventée ou non : l'analyse se fait seulement sur ta page, rien n'est envoyé)</label>
+      <input type="text" id="urlIn" autocomplete="off" spellcheck="false" autocapitalize="off" value="https://banque-pivoine.exemple.securite-compte.exemple/connexion">
+      <div class="url-out" id="urlOut" aria-live="polite"></div>
+      <div class="legend">
+        <span><i class="sw" style="background:var(--acc-soft);border-color:var(--acc)"></i>vrai domaine</span>
+        <span><i class="sw" style="background:var(--warn-soft);border-color:var(--warn)"></i>déguisement (sous-domaine, partie avant @)</span>
+        <span><i class="sw" style="background:var(--paper)"></i>le reste : chemin, protocole</span>
+      </div>
+      <div class="verdict" id="urlVerdict" aria-live="polite"></div>
+      <ul class="tricks" id="urlTricks"></ul>
+    </div>
+    <div class="note warn">
+      <span class="note-title">Le cadenas et le https</span>
+      <span><span class="mono">https</span> (avec un s) veut dire que la connexion est <strong>chiffrée</strong> : personne ne peut lire ce que tu envoies en chemin. Mais ça ne dit <strong>rien</strong> sur l'honnêteté du site : un faux site peut avoir https et un cadenas. Sans s (<span class="mono">http</span>), c'est encore pire.</span>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Le grand entraînement</span>
+    <h2>Ta boîte de réception</h2>
+    <p>Voici 15 messages reçus sur un téléphone imaginaire. Pour chacun, lis le contexte, puis décide : <strong>Arnaque</strong> ou <strong>Légitime</strong> ? Ensuite, touche les parties soulignées pour découvrir les indices. Rien n'est cliquable « pour de vrai ».</p>
+    <div class="box">
+      <div class="ib-top">
+        <span class="score" id="ibScore">0 / 15</span>
+        <span class="soft" id="ibProg">0 message trié sur 15</span>
+        <button type="button" id="ibReset">Recommencer</button>
+      </div>
+      <div class="ib-grid">
+        <ul class="ib-list" id="ibList" aria-label="Liste des messages"></ul>
+        <div class="reader" id="ibReader" aria-live="polite"></div>
+      </div>
+      <div id="ibEnd" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · Les conséquences</span>
+    <h2>Qu'est-ce que l'escroc veut faire ?</h2>
+    <p>Savoir ce que cherche l'escroc aide à comprendre pourquoi il faut réagir vite. Rien de tout ça n'est une fatalité : la plupart des problèmes se règlent, surtout quand on en parle tôt.</p>
+    <div class="cards">
+      <div class="box"><span class="tag no">Argent</span><strong>De l'argent perdu</strong><span class="soft">Avec un numéro de carte et le code reçu par SMS, il peut payer à ta place. Avec des cartes cadeaux, l'argent est presque impossible à récupérer.</span></div>
+      <div class="box"><span class="tag no">Compte</span><strong>Un compte volé</strong><span class="soft">Ton compte de jeu (et tes skins) ou de réseau social. Pire : il s'en sert pour piéger tes amis, qui te font confiance.</span></div>
+      <div class="box"><span class="tag no">Données</span><strong>Des infos revendues</strong><span class="soft">Nom, adresse, date de naissance, numéro de téléphone : ces listes se revendent à d'autres escrocs, qui t'enverront encore plus de messages.</span></div>
+      <div class="box"><span class="tag no">Identité</span><strong>L'usurpation d'identité</strong><span class="soft">Avec une photo de ta carte d'identité, quelqu'un peut ouvrir des comptes ou des abonnements à ton nom.</span></div>
+      <div class="box"><span class="tag no">Appareil</span><strong>Un logiciel malveillant</strong><span class="soft">Une pièce jointe ou une fausse appli peut espionner ton téléphone, voler tes mots de passe ou bloquer tes fichiers.</span></div>
+    </div>
+    <div class="box">
+      <h3>La réaction en chaîne d'un compte volé</h3>
+      <p class="soft">Le pirate a volé un compte. Il écrit à 10 amis : « Regarde cette vidéo de toi ! ». Combien d'amis, sur 10, vont croire le message ?</p>
+      <div class="param">
+        <label for="chainK">Amis piégés sur 10 : <span class="mono" id="chainKOut">2</span></label>
+        <input type="range" id="chainK" min="0" max="5" step="1" value="2">
+      </div>
+      <div class="fig"><svg id="chainSvg" viewBox="0 0 360 250" role="img" aria-label="Un compte volé au centre et dix amis autour qui reçoivent le faux message"></svg></div>
+      <div class="btns"><button type="button" id="chainGo">Le pirate envoie le message</button><button type="button" id="chainReset">Remettre à zéro</button></div>
+      <div class="scroll"><table class="chain-tbl" id="chainTbl"></table></div>
+      <p class="soft" id="chainNote"></p>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Les bons réflexes</span>
+    <h2>Ce que tu fais face à un message louche</h2>
+    <div class="cards">
+      <div class="box"><span class="tag ok">1</span><strong>Ne pas cliquer</strong><span class="soft">Ni le lien, ni le bouton, ni la pièce jointe, ni le QR code douteux.</span></div>
+      <div class="box"><span class="tag ok">2</span><strong>Ne rien répondre</strong><span class="soft">Même pas « STOP » ou « qui êtes-vous ? » : une réponse prouve que ton numéro est actif.</span></div>
+      <div class="box"><span class="tag ok">3</span><strong>Vérifier par un autre chemin</strong><span class="soft">Ouvre toi-même l'appli officielle, tape l'adresse que tu connais, rappelle le numéro habituel de la personne.</span></div>
+      <div class="box"><span class="tag ok">4</span><strong>Ne jamais donner un code</strong><span class="soft">Un code reçu par SMS est fait pour toi seul. Personne d'honnête ne te le demandera.</span></div>
+      <div class="box"><span class="tag ok">5</span><strong>En parler à un adulte</strong><span class="soft">Parent, prof, CPE : à deux, on voit mieux le piège. Et on ne te grondera pas d'avoir posé la question.</span></div>
+      <div class="box"><span class="tag ok">6</span><strong>Signaler, bloquer, supprimer</strong><span class="soft">Signale le compte dans l'appli, bloque l'expéditeur, puis supprime le message.</span></div>
+    </div>
+    <div class="note ok">
+      <span class="note-title">Où signaler et trouver de l'aide (en France)</span>
+      <span>• <strong>33700</strong> : tu peux y transférer gratuitement un SMS indésirable ou signaler un numéro qui t'a appelé (par SMS ou sur le site 33700.fr).</span>
+      <span>• <strong>cybermalveillance.gouv.fr</strong> : le site officiel d'aide aux victimes, avec des conseils pour chaque type d'arnaque.</span>
+      <span>• <strong>Pharos</strong> (internet-signalement.gouv.fr) : pour signaler un contenu illégal vu sur internet.</span>
+      <span>• <strong>3018</strong> : le numéro gratuit et confidentiel pour les jeunes qui ont un problème en ligne (harcèlement, chantage, compte piraté…).</span>
+      <span>• <strong>Ta banque</strong> : avec un adulte, au numéro inscrit <strong>au dos de la carte</strong> (jamais celui donné dans un message).</span>
+    </div>
+    <div class="note">
+      <span class="note-title">Et tes mots de passe ?</span>
+      <span>Un mot de passe <strong>différent pour chaque compte</strong> et <strong>long</strong> (une phrase de plusieurs mots au hasard, que tu inventes toi-même). Ajoute la <strong>double authentification</strong> : en plus du mot de passe, il faut un code ou une validation sur ton téléphone. Ainsi, même un mot de passe volé ne suffit pas. On en reparlera dans un autre tutoriel.</span>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Oups !</span>
+    <h2>J'ai cliqué… et maintenant ?</h2>
+    <p>Pas de panique. Ce n'est pas ta faute : c'est celle de l'escroc. Choisis ce qui t'est arrivé, et suis les étapes dans l'ordre. Tu peux les cocher au fur et à mesure.</p>
+    <div class="box">
+      <div class="btns" id="oupsBtns" role="group" aria-label="Ce qui t'est arrivé"></div>
+      <p id="oupsIntro" class="soft"></p>
+      <ol class="steps" id="oupsSteps"></ol>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Attention</span>
+    <h2>Les erreurs fréquentes</h2>
+    <div class="cards">
+      <div class="box"><span class="tag no">Faux</span><strong>« Il y a https et un cadenas, donc c'est sûr. »</strong><span class="soft">Le cadenas dit seulement que la connexion est chiffrée. Un faux site peut l'avoir aussi.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« Il n'y a aucune faute, donc c'est vrai. »</strong><span class="soft">Avec l'IA, les arnaques sont souvent parfaitement écrites. Regarde ce qu'on te demande.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« C'est mon ami qui me l'envoie, donc c'est sûr. »</strong><span class="soft">Son compte a pu être piraté. Vérifie avec lui par un autre moyen.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« Je réponds STOP pour me désabonner. »</strong><span class="soft">Sur un SMS louche, répondre confirme que ton numéro est actif. Transfère-le plutôt au 33700, puis supprime-le.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« Le numéro affiché est celui de ma banque. »</strong><span class="soft">Un numéro affiché peut être truqué. Raccroche, et rappelle toi-même le numéro au dos de la carte.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« C'est seulement 1,99 €, pas grave. »</strong><span class="soft">La petite somme sert d'appât : ce qu'on veut, c'est ton numéro de carte.</span></div>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Choisis ta réponse, puis vérifie.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Recommencer</button>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · Un peu d'histoire</span>
+    <h2>Des lettres aux voix imitées</h2>
+    <ol class="timeline">
+      <li><span class="when">XIXᵉ siècle</span><div class="what"><strong>« Le prisonnier espagnol »</strong><span>On raconte déjà des lettres promettant une grosse récompense à qui enverrait de l'argent pour libérer un riche prisonnier. Le principe de l'arnaque est très ancien.</span></div></li>
+      <li><span class="when">années 1980–1990</span><div class="what"><strong>L'« arnaque nigériane »</strong><span>Par lettre, puis par fax, puis par e-mail : un faux héritier promet une fortune contre de petits « frais ». On l'appelle aussi « fraude 419 », d'après un article de loi au Nigeria. Les escrocs qui l'utilisent peuvent être n'importe où dans le monde.</span></div></li>
+      <li><span class="when">milieu des années 1990</span><div class="what"><strong>Le mot « phishing »</strong><span>Des pirates volent des mots de passe sur les premières grandes messageries en ligne. Le mot mélange <em>fishing</em> (la pêche) et le « ph » de <em>phreaking</em>, le piratage des téléphones. En français, on dit <strong>hameçonnage</strong>.</span></div></li>
+      <li><span class="when">années 2010</span><div class="what"><strong>Les SMS et les appels</strong><span>Avec les smartphones arrivent le <em>smishing</em> (SMS) et le <em>vishing</em> (appels) : faux colis, faux conseillers, faux remboursements.</span></div></li>
+      <li><span class="when">années 2020</span><div class="what"><strong>L'IA s'en mêle</strong><span>Messages sans faute, voix imitées, vidéos truquées : les arnaques deviennent plus convaincantes. Mais les bons réflexes (ne rien donner, vérifier par un autre chemin) marchent toujours.</span></div></li>
+    </ol>
+  </section>
+
+  <!-- 12 -->
+  <section>
+    <span class="eyebrow">Étape 12 · À toi de jouer</span>
+    <h2>Six messages à analyser</h2>
+    <p>Pour chaque message, cherche tous les indices, décide si c'est une arnaque, et dis ce que tu ferais. Ouvre ensuite la correction.</p>
+    <div class="exos">
+      <details>
+        <summary>L'abonnement musique<span class="msg">De : Muzikoala &lt;service@muzik0ala.exemple&gt;<br>« Votre abonnement est suspendu : paiement refusé. Mettez à jour votre carte bancaire sous 48 h, sinon votre compte sera supprimé : muzikoala-facturation.exemple/carte »</span></summary>
+        <div>
+          <span><strong>Arnaque.</strong> Les indices :</span>
+          <ul>
+            <li>l'expéditeur : <span class="mono">muzik0ala.exemple</span> avec un <strong>zéro</strong> à la place du o (lettres sosies) ;</li>
+            <li>l'urgence et la menace : « sous 48 h », « supprimé » ;</li>
+            <li>le lien : le vrai domaine est <span class="mono">muzikoala-facturation.exemple</span>, avec un mot ajouté ;</li>
+            <li>la demande : ta carte bancaire.</li>
+          </ul>
+          <span><strong>Réaction :</strong> ne pas cliquer. Ouvrir soi-même l'appli officielle : si le paiement avait vraiment un problème, c'est écrit dedans.</span>
+        </div>
+      </details>
+      <details>
+        <summary>La « prof » pressée<span class="msg">SMS d'un numéro inconnu (06 00 00 00 00) :<br>« Bonjour, c'est Mme Martin, ta prof de français. J'ai besoin d'un service : achète-moi 3 cartes cadeaux de 50 € et envoie-moi les codes. Je te rembourse lundi. N'en parle pas aux autres élèves. »</span></summary>
+        <div>
+          <span><strong>Arnaque.</strong> Les indices :</span>
+          <ul>
+            <li>un numéro inconnu qui dit être quelqu'un que tu connais ;</li>
+            <li>un moyen de paiement inhabituel : des <strong>cartes cadeaux</strong> (impossible à récupérer) ;</li>
+            <li>le secret : « n'en parle pas » ;</li>
+            <li>une demande qui n'a aucun sens : une prof ne demande pas d'argent à un élève.</li>
+          </ul>
+          <span><strong>Réaction :</strong> ne rien acheter, ne pas répondre, montrer le message à tes parents ou à la vie scolaire.</span>
+        </div>
+      </details>
+      <details>
+        <summary>Le « développeur » du jeu<span class="msg">Message privé dans un jeu en ligne, du joueur « Dev_Pixelia » :<br>« Salut ! Je fais partie de l'équipe du jeu. Donne-moi ton identifiant et ton mot de passe, et je t'ajoute 10 000 pièces gratuites. Ça marche seulement aujourd'hui. »</span></summary>
+        <div>
+          <span><strong>Arnaque.</strong> Les indices :</span>
+          <ul>
+            <li>n'importe quel joueur peut s'appeler « Dev_… » ;</li>
+            <li>un cadeau trop beau pour être vrai ;</li>
+            <li>la demande de <strong>mot de passe</strong> : aucune équipe n'en a besoin ;</li>
+            <li>l'urgence : « seulement aujourd'hui ».</li>
+          </ul>
+          <span><strong>Réaction :</strong> ne rien donner, signaler et bloquer le joueur dans le jeu.</span>
+        </div>
+      </details>
+      <details>
+        <summary>La sortie au musée<span class="msg">De : Collège des Tilleuls &lt;ne-pas-repondre@college-tilleuls.exemple&gt;<br>« La sortie au musée de jeudi est confirmée. Pense à rapporter l'autorisation signée par tes parents à ton professeur principal. »</span></summary>
+        <div>
+          <span><strong>Légitime</strong>, très probablement. Les indices rassurants :</span>
+          <ul>
+            <li>le message est <strong>attendu</strong> : la sortie a été annoncée en classe ;</li>
+            <li>il ne contient ni lien, ni pièce jointe, ni demande d'argent ou de code ;</li>
+            <li>tout se vérifie en vrai, auprès du professeur.</li>
+          </ul>
+          <span><strong>Réaction :</strong> faire signer l'autorisation. Pas besoin de se méfier de tout : un message normal reste un message normal.</span>
+        </div>
+      </details>
+      <details>
+        <summary>Le faux technicien<span class="msg">Appel du 01 00 00 00 00 :<br>« Bonjour, ici le support Fenestra. Nous avons détecté un virus sur votre ordinateur. Installez tout de suite le programme AideDistance pour que nous puissions le réparer. »</span></summary>
+        <div>
+          <span><strong>Arnaque.</strong> Les indices :</span>
+          <ul>
+            <li>un appel inattendu : un vrai service ne surveille pas ton ordinateur pour t'appeler ;</li>
+            <li>la peur (« un virus ») et l'urgence (« tout de suite ») ;</li>
+            <li>la demande d'installer un programme qui permet de <strong>prendre le contrôle</strong> de l'ordinateur à distance.</li>
+          </ul>
+          <span><strong>Réaction :</strong> raccrocher, ne rien installer, prévenir un adulte.</span>
+        </div>
+      </details>
+      <details>
+        <summary>Le lien au @<span class="msg">Lien reçu : https://bavardo.exemple@cadeaux-gratuits.exemple/skins</span></summary>
+        <div>
+          <span><strong>Arnaque.</strong> Tout ce qui est <strong>avant le @</strong> est ignoré pour trouver le site. Le vrai domaine est <span class="mono">cadeaux-gratuits.exemple</span>, pas <span class="mono">bavardo.exemple</span>. Et des skins gratuits, c'est un appât classique.</span>
+          <span><strong>Réaction :</strong> ne pas cliquer. Teste-le dans le détecteur d'adresse de l'étape 4 !</span>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• Une arnaque, c'est quelqu'un qui <strong>se fait passer pour un autre</strong> pour obtenir de l'argent, un code, un mot de passe ou des informations.</span>
+      <span>• Les signaux d'alerte : <strong>urgence</strong>, cadeau trop beau, message inattendu, expéditeur ou lien bizarre, <strong>demande de code</strong>, secret, paiement inhabituel.</span>
+      <span>• <strong>Un vrai service ne te demande jamais ton code.</strong></span>
+      <span>• Pas de fautes ou https ne prouvent rien : avec l'IA, il faut <strong>vérifier par un autre chemin</strong> (appli officielle, numéro habituel).</span>
+      <span>• Le vrai domaine, ce sont les <strong>deux derniers morceaux</strong> avant le premier « / ».</span>
+      <span>• Si tu t'es fait piéger : <strong>en parler vite à un adulte</strong>, changer le mot de passe, prévenir la banque, signaler. Tout le monde peut se faire avoir.</span>
+    </div>
+  </section>
+
+  <!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"></div><a class="tnav-home" href="numerique.html">⌂ Tous les tutoriels numériques</a></nav><!--/tnav-->
+<footer>Fiche de révision · Repérer les arnaques et l'hameçonnage</footer>
+</main>
+
+<script>
+(function () {
+  /*
+   * Hooks de test : window.__arn
+   *   messages                -> tableau des 15 messages de la boîte de réception
+   *                              {id, kind, from, addr, time, subject, context, body, clues, verdict, summary}
+   *   classify(msgId)         -> 'arnaque' | 'legitime' (null si id inconnu)
+   *   checkChoice(id, choice) -> {ok, verdict, summary} (choice : 'arnaque' | 'legitime' ; null si id ou choix inconnu)
+   *   scoreOf(answers)        -> {correct, answered, total} pour answers = {id: choix}
+   *   domainOf(url)           -> {input, scheme, userinfo, hostRaw, host, sub, domain, port, rest,
+   *                               brand, official, tricks:[codes], error?}
+   *                              codes : 'at', 'http', 'subdomain', 'lookalike', 'extra', 'tld', 'short',
+   *                                      'ip', 'nodot', 'punycode', 'unicode'
+   *   chain(k, rounds)        -> [{round, accounts, messages, stolen, total}] (10 messages par compte volé)
+   *   brands, flags, scenarios, quiz
+   * Tout est fictif : marques inventées, domaines en .exemple, numéros en 00 00 00 00. Aucun lien réel.
+   */
+  var NS = 'http://www.w3.org/2000/svg';
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function mk(svg, name, attrs, text) { var e = document.createElementNS(NS, name); for (var a in attrs) e.setAttribute(a, attrs[a]); if (text != null) e.textContent = text; svg.appendChild(e); return e; }
+  function fmtInt(n) { return Number(n).toLocaleString('fr-FR').replace(/ /g, ' '); }
+
+  /* ---------- Icônes ---------- */
+  var ICONS = {
+    clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+    gift: '<rect x="3" y="8" width="18" height="4"/><rect x="5" y="12" width="14" height="9"/><path d="M12 8v13M12 8c-2-4-6-4-6-1 0 1 2 1 6 1M12 8c2-4 6-4 6-1 0 1-2 1-6 1"/>',
+    ques: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.8.4-1 1-1 1.7"/><circle cx="12" cy="17" r=".6"/>',
+    mail: '<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 7l9 6 9-6"/>',
+    link: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
+    key: '<circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M17 6l3 3M15 8l2 2"/>',
+    pen: '<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13 7l4 4"/>',
+    lock: '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+    clip: '<path d="M20 12l-8 8a5 5 0 0 1-7-7l9-9a3.5 3.5 0 0 1 5 5l-9 9a2 2 0 0 1-3-3l8-8"/>',
+    card: '<rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 10h20M6 15h4"/>'
+  };
+  function icon(n, cls) { return '<svg class="ico' + (cls ? ' ' + cls : '') + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ICONS[n] + '</svg>'; }
+
+  /* ---------- Signaux d'alerte ---------- */
+  var FLAGS = [
+    ['clock', 'Urgence et menace', 'On te presse pour que tu n\'aies pas le temps de réfléchir.', '« Votre compte sera fermé sous 24 h »'],
+    ['gift', 'Trop beau pour être vrai', 'Un cadeau, un gain, un remboursement que tu n\'attendais pas.', '« Félicitations, tu as gagné ! »'],
+    ['ques', 'Message inattendu', 'Tu n\'as rien commandé, rien demandé, et pourtant…', '« Votre colis est en attente »'],
+    ['mail', 'Expéditeur bizarre', 'Le nom affiché dit « Banque Pivoine », mais l\'adresse réelle est autre chose.', 'Banque Pivoine <alerte@pivoine-secu.exemple>'],
+    ['link', 'Lien qui ne mène pas au vrai site', 'Le texte du lien ressemble au vrai site, mais le domaine est différent.', 'banque-pivoine.exemple.securite.exemple'],
+    ['key', 'Demande de code ou de mot de passe', 'Un vrai service ne te demande jamais ton code, ni ton mot de passe.', '« Donne-moi le code reçu par SMS »'],
+    ['pen', 'Fautes et tournures étranges', 'Ça peut aider… mais avec l\'IA, beaucoup d\'arnaques n\'ont plus aucune faute.', '« Cher client, votre compte a été bloquer »'],
+    ['lock', 'Le secret', 'On te demande de ne rien dire : pour que personne ne t\'aide à voir le piège.', '« N\'en parle à personne »'],
+    ['clip', 'Pièce jointe inattendue', 'Un fichier qui peut contenir un logiciel malveillant.', 'Facture_urgente.zip'],
+    ['card', 'Paiement inhabituel', 'Cartes cadeaux, cryptomonnaie, virement à un inconnu : impossible à récupérer.', '« Payez avec des codes de cartes cadeaux »']
+  ];
+  $('flags').innerHTML = FLAGS.map(function (f) {
+    return '<div class="box"><div class="flag-head">' + icon(f[0]) + '<strong>' + esc(f[1]) + '</strong></div><span class="soft">' + esc(f[2]) + '</span><span class="ex">' + esc(f[3]) + '</span></div>';
+  }).join('');
+
+  /* ---------- L'IA : que fais-tu ? ---------- */
+  var AI = [
+    { name: 'La voix de Maman', text: 'Message vocal d\'un numéro inconnu. La voix ressemble vraiment à celle de ta mère : « C\'est moi, j\'ai perdu mon téléphone. Tu vas recevoir un code, envoie-le-moi vite, je t\'expliquerai. »',
+      c: [['J\'envoie le code : c\'est sa voix !', 'no', 'Une voix peut être imitée par une IA. Et ce code sert sûrement à voler ton compte de messagerie.'],
+          ['J\'appelle Maman sur son numéro habituel', 'yes', 'Parfait : tu vérifies par un chemin que tu connais déjà. Si elle répond, l\'arnaque est démasquée.'],
+          ['Je demande notre mot de code de famille', 'yes', 'Très bon réflexe : un imposteur ne le connaît pas. Et tu peux en plus appeler son numéro habituel.']] },
+    { name: 'La vidéo du youtubeur', text: 'Une vidéo montre « Max Pixel », un youtubeur que tu adores (inventé pour l\'exemple) : « Je donne 5 000 gemmes à mes abonnés ! Connectez-vous avec votre compte de jeu sur ce site. »',
+      c: [['Je me connecte vite avant la fin', 'no', 'C\'est peut-être un deepfake : une vidéo truquée. Et le site veut ton mot de passe de jeu.'],
+          ['Je vérifie sur sa chaîne officielle', 'yes', 'Oui : tu cherches toi-même sa vraie chaîne. Aucun vrai cadeau ne demande ton mot de passe.'],
+          ['J\'écris en commentaire « c\'est vrai ? »', 'mid', 'Les réponses peuvent venir de faux comptes complices. Mieux : vérifier sur sa chaîne officielle, et ne jamais donner ton mot de passe.']] },
+    { name: 'L\'e-mail parfait', text: 'Un e-mail de « Banque Pivoine », très bien écrit, avec le bon logo : « Pour la sécurité de votre compte, confirmez votre identité en cliquant ici avant ce soir. »',
+      c: [['Pas une faute : c\'est sûrement vrai', 'no', 'Avec l\'IA, un faux e-mail peut être parfait. L\'urgence (« avant ce soir ») et le lien sont des signaux d\'alerte.'],
+          ['J\'ouvre moi-même l\'appli de la banque', 'yes', 'Exactement : sans passer par le lien. Si rien n\'est signalé dans l\'appli, c\'était une arnaque.'],
+          ['Je réponds pour demander si c\'est vrai', 'no', 'Tu parlerais à l\'escroc lui-même ! Il te dira bien sûr que c\'est vrai.']] }
+  ];
+  var aiCur = 0;
+  AI.forEach(function (s, i) {
+    var b = document.createElement('button'); b.type = 'button'; b.id = 'aiT' + i; b.textContent = s.name;
+    b.addEventListener('click', function () { aiShow(i); }); $('aiTabs').appendChild(b);
+  });
+  function aiShow(i) {
+    aiCur = i;
+    AI.forEach(function (s, j) { $('aiT' + j).setAttribute('aria-pressed', j === i ? 'true' : 'false'); });
+    $('aiText').textContent = AI[i].text; $('aiOut').innerHTML = '';
+    $('aiChoices').innerHTML = '';
+    AI[i].c.forEach(function (c, j) {
+      var b = document.createElement('button'); b.type = 'button'; b.textContent = c[0];
+      b.addEventListener('click', function () {
+        var t = c[1] === 'yes' ? 'Bon réflexe !' : c[1] === 'mid' ? 'Pas suffisant…' : 'Attention, piège !';
+        $('aiOut').innerHTML = '<div class="verdict ' + c[1] + '">' + t + '<span>' + esc(c[2]) + '</span></div>';
+      });
+      $('aiChoices').appendChild(b);
+    });
+  }
+  aiShow(0);
+
+  /* URL-START : analyse d'une adresse (pure, sans DOM) */
+  var BRANDS = [
+    { name: 'Banque Pivoine', d: 'banque-pivoine.exemple', k: ['pivoine'] },
+    { name: 'ColiZèbre', d: 'colizebre.exemple', k: ['colizebre'] },
+    { name: 'Pixelia Arena', d: 'pixelia.exemple', k: ['pixelia'] },
+    { name: 'Bavardo', d: 'bavardo.exemple', k: ['bavardo'] },
+    { name: 'Ciné-Loutre', d: 'cineloutre.exemple', k: ['cineloutre'] },
+    { name: 'Muzikoala', d: 'muzikoala.exemple', k: ['muzikoala'] },
+    { name: 'Collège des Tilleuls', d: 'college-tilleuls.exemple', k: ['tilleuls'] },
+    { name: 'Caisse Santé Arc-en-ciel', d: 'sante-arcenciel.exemple', k: ['arcenciel'] },
+    { name: 'Fenestra', d: 'fenestra.exemple', k: ['fenestra'] },
+    { name: 'Ville de Bourg-Fictif', d: 'bourg-fictif.exemple', k: ['bourgfictif'] }
+  ];
+  var SHORT = ['ptilien.exemple', 'raccourci.exemple', 'mini-url.exemple'];
+  var TLDS = ['exemple', 'com', 'fr', 'net', 'org', 'eu', 'info', 'be', 'ch'];
+  function glyph(s) { return s.toLowerCase().replace(/rn/g, 'm').replace(/vv/g, 'w').replace(/0/g, 'o').replace(/[1i|]/g, 'l').replace(/-/g, ''); }
+  function lev(a, b) {
+    var m = a.length, n = b.length, d = [], i, j;
+    for (i = 0; i <= m; i++) { d[i] = [i]; }
+    for (j = 1; j <= n; j++) d[0][j] = j;
+    for (i = 1; i <= m; i++) for (j = 1; j <= n; j++) {
+      d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+      if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) d[i][j] = Math.min(d[i][j], d[i - 2][j - 2] + 1);
+    }
+    return d[m][n];
+  }
+  function hasKey(label, b) { var f = label.replace(/-/g, ''); return b.k.some(function (k) { return f.indexOf(k) >= 0; }); }
+  function domainOf(url) {
+    var raw = String(url == null ? '' : url).trim();
+    var r = { input: raw, scheme: '', userinfo: '', hostRaw: '', host: '', sub: '', domain: '', port: '', rest: '', brand: null, official: false, tricks: [] };
+    function add(t) { if (r.tricks.indexOf(t) < 0) r.tricks.push(t); }
+    if (!raw) { r.error = 'vide'; return r; }
+    if (/\s/.test(raw)) { r.error = 'espace'; return r; }
+    var s = raw, m = /^([a-zA-Z][a-zA-Z0-9+.\-]*):\/\//.exec(s);
+    if (m) { r.scheme = m[0]; s = s.slice(m[0].length); }
+    var cut = s.search(/[\/?#\\]/);
+    var auth = cut < 0 ? s : s.slice(0, cut);
+    r.rest = cut < 0 ? '' : s.slice(cut);
+    var at = auth.lastIndexOf('@');
+    if (at >= 0) { r.userinfo = auth.slice(0, at + 1); auth = auth.slice(at + 1); add('at'); }
+    var pm = /:(\d*)$/.exec(auth);
+    if (pm) { r.port = pm[0]; auth = auth.slice(0, pm.index); }
+    r.hostRaw = auth;
+    var host = auth.toLowerCase().replace(/\.+$/, '');
+    r.host = host;
+    if (!host || /[^a-z0-9.\-_ -￿]/.test(host)) { r.error = 'host'; return r; }
+    var labels = host.split('.');
+    if (labels.some(function (l) { return l === ''; })) { r.error = 'host'; return r; }
+    if (/^\d+(\.\d+){3}$/.test(host)) { r.domain = host; add('ip'); }
+    else if (labels.length < 2) { r.domain = host; add('nodot'); }
+    else { r.domain = labels.slice(-2).join('.'); r.sub = labels.slice(0, -2).join('.'); }
+    if (r.scheme.toLowerCase() === 'http://') add('http');
+    if (/(^|\.)xn--/.test(host)) add('punycode');
+    if (/[^\x00-\x7f]/.test(host)) add('unicode');
+    if (SHORT.indexOf(r.domain) >= 0) add('short');
+    BRANDS.forEach(function (b) { if (r.domain === b.d) { r.brand = b; r.official = true; } });
+    if (!r.official && r.tricks.indexOf('ip') < 0 && labels.length >= 2) {
+      var dl = labels[labels.length - 2], found = null;
+      BRANDS.forEach(function (b) {
+        if (found) return;
+        var bl = b.d.split('.')[0];
+        if (dl === bl) { found = b; add('tld'); }
+        else if (glyph(dl) === glyph(bl) || (bl.length >= 5 && lev(dl, bl) === 1)) { found = b; add('lookalike'); }
+      });
+      if (!found) BRANDS.forEach(function (b) { if (!found && hasKey(dl, b)) { found = b; add('extra'); } });
+      if (found) r.brand = found;
+    }
+    if (r.sub) {
+      var subl = r.sub.split('.'), hit = null;
+      subl.forEach(function (l) { BRANDS.forEach(function (b) { if (!hit && hasKey(l, b)) hit = b; }); });
+      var tldLike = subl.some(function (l) { return TLDS.indexOf(l) >= 0; });
+      if ((hit && (!r.official || hit !== r.brand)) || tldLike) {
+        add('subdomain');
+        if (!r.brand && hit) r.brand = hit;
+        r.subBrand = hit;
+      }
+    }
+    return r;
+  }
+  /* URL-END */
+
+  var TRICKS = {
+    at: ['bad', 'Le piège du @', 'Tout ce qui est avant le @ est ignoré pour trouver le site : c\'est un déguisement. Le navigateur va en réalité sur ce qui est après.'],
+    http: ['warn', 'http sans s', 'La connexion n\'est pas chiffrée : n\'y tape jamais rien de personnel. (Et rappelle-toi : même avec https, un site peut être faux.)'],
+    subdomain: ['bad', 'Le piège du sous-domaine', 'Le nom d\'une marque est placé au début, comme un déguisement. Mais le vrai domaine, c\'est la fin : n\'importe qui peut créer des sous-domaines sur son propre domaine.'],
+    lookalike: ['bad', 'Des lettres sosies', 'Le domaine ressemble à celui d\'une marque, mais une lettre change : rn au lieu de m, 0 (zéro) au lieu de o, 1 ou I (i majuscule) au lieu de l, lettres inversées…'],
+    extra: ['bad', 'Des mots en plus', 'Le domaine contient le nom d\'une marque avec des mots ajoutés (securite, livraison, paiement…). Ce n\'est pas le vrai domaine de la marque.'],
+    tld: ['bad', 'La mauvaise terminaison', 'Le nom est le même, mais la fin (après le dernier point) n\'est pas la bonne : c\'est un autre site, qui peut appartenir à n\'importe qui.'],
+    short: ['warn', 'Un lien raccourci', 'Un raccourcisseur cache la vraie destination. Impossible de savoir où il mène sans cliquer : méfiance.'],
+    ip: ['bad', 'Des chiffres à la place d\'un nom', 'Un site connu utilise un nom, pas une adresse en chiffres. C\'est très suspect.'],
+    nodot: ['warn', 'Pas de domaine complet', 'Il n\'y a pas de point : ce n\'est pas une adresse de site public habituelle.'],
+    punycode: ['bad', 'xn-- : lettres d\'un autre alphabet', 'Ce code cache des lettres spéciales qui imitent des lettres normales.'],
+    unicode: ['warn', 'Des lettres spéciales', 'Des lettres accentuées ou d\'un autre alphabet peuvent imiter un vrai nom.']
+  };
+
+  /* ---------- Détecteur d'adresse (interface) ---------- */
+  var URLS = [
+    ['Le vrai site', 'https://www.banque-pivoine.exemple/compte'],
+    ['Sous-domaine', 'https://banque-pivoine.exemple.securite-compte.exemple/connexion'],
+    ['Mots en plus', 'http://banque-pivoine-securite.exemple/login'],
+    ['Lettres sosies', 'https://rnuzikoala.exemple/offre'],
+    ['Zéro ou o ?', 'https://cinel0utre.exemple/abonnement'],
+    ['I ou l ?', 'https://coIizebre.exemple/suivi'],
+    ['Le @', 'https://pixelia.exemple@skins-gratuits.exemple/cadeau'],
+    ['Raccourci', 'https://ptilien.exemple/aB3x9'],
+    ['Piège du chemin', 'https://bavardo.exemple/aide/securite@pirate.exemple']
+  ];
+  var urlIn = $('urlIn');
+  URLS.forEach(function (u, i) {
+    var b = document.createElement('button'); b.type = 'button'; b.textContent = u[0];
+    b.addEventListener('click', function () { urlIn.value = u[1]; urlShow(); });
+    $('urlPresets').appendChild(b);
+  });
+  function urlShow() {
+    var r = domainOf(urlIn.value), out = $('urlOut'), v = $('urlVerdict'), tl = $('urlTricks');
+    if (r.error) {
+      out.textContent = r.input || '…';
+      v.className = 'verdict mid';
+      v.innerHTML = r.error === 'vide' ? 'Écris une adresse.' : r.error === 'espace' ? 'Une adresse web ne contient pas d\'espace.' : 'Je ne trouve pas de nom de site valable dans cette adresse.';
+      tl.innerHTML = ''; return;
+    }
+    var hl = r.hostRaw.toLowerCase(), idx = hl.lastIndexOf(r.domain);
+    if (idx < 0) idx = 0;
+    var subRaw = r.hostRaw.slice(0, idx), domRaw = r.hostRaw.slice(idx);
+    var html = '';
+    if (r.scheme) html += '<span class="u-scheme">' + esc(r.scheme) + '</span>';
+    if (r.userinfo) html += '<span class="u-user">' + esc(r.userinfo) + '</span>';
+    if (subRaw) html += '<span class="u-sub">' + esc(subRaw) + '</span>';
+    html += '<span class="u-dom' + (r.official ? ' safe' : '') + '">' + esc(domRaw) + '</span>';
+    if (r.port) html += '<span class="u-port">' + esc(r.port) + '</span>';
+    if (r.rest) html += '<span class="u-rest">' + esc(r.rest) + '</span>';
+    out.innerHTML = html;
+    var items = [];
+    r.tricks.forEach(function (t) { var T = TRICKS[t]; items.push('<li class="' + T[0] + '"><strong>' + esc(T[1]) + '</strong><br>' + esc(T[2]) + '</li>'); });
+    if (r.scheme.toLowerCase() === 'https://') items.push('<li><strong>https</strong><br>La connexion est chiffrée. C\'est bien, mais ça ne prouve pas que le site est le bon.</li>');
+    if (r.sub && r.official) items.push('<li class="ok"><strong>Sous-domaine normal</strong><br>« ' + esc(r.sub) + '. » est placé devant le vrai domaine : c\'est le propriétaire du domaine qui l\'a créé.</li>');
+    if (r.rest && /@/.test(r.rest) && !r.userinfo) items.push('<li class="ok"><strong>Un @ dans le chemin</strong><br>Ici, le @ est après le premier « / » : il fait partie du chemin et ne change pas le site.</li>');
+    tl.innerHTML = items.join('');
+    if (r.official) {
+      v.className = 'verdict yes';
+      v.innerHTML = 'Vrai domaine : ' + esc(r.domain) + '<span>C\'est bien le domaine officiel de « ' + esc(r.brand.name) + ' » (dans notre monde inventé). Mais un vrai lien dans un message inattendu peut aussi servir d\'appât : le plus sûr reste d\'ouvrir toi-même l\'appli.</span>';
+    } else if (r.brand) {
+      v.className = 'verdict no';
+      v.innerHTML = 'Vrai domaine : ' + esc(r.domain) + '<span>Ce n\'est PAS le site de « ' + esc(r.brand.name) + ' » (son vrai domaine est ' + esc(r.brand.d) + ').</span>';
+    } else {
+      v.className = 'verdict ' + (r.tricks.length ? 'no' : 'mid');
+      v.innerHTML = 'Vrai domaine : ' + esc(r.domain) + '<span>' + (r.tricks.length ? 'Plusieurs signaux d\'alerte : prudence.' : 'C\'est ce site-là qui s\'ouvrirait. Est-ce bien celui que tu attends ?') + '</span>';
+    }
+  }
+  urlIn.addEventListener('input', urlShow); urlShow();
+
+  /* ---------- Boîte de réception ---------- */
+  var KIND = { sms: 'SMS', mail: 'E-mail', call: 'Appel', game: 'Jeu', social: 'Réseau social', web: 'Site web', qr: 'QR code' };
+  var MSGS = [
+    { id: 'colis', kind: 'sms', from: 'ColiZèbre', addr: '06 00 00 00 00', time: '08:12', subject: '', context: 'Tu n\'as rien commandé ces derniers jours.',
+      body: 'ColiZèbre : votre colis n° 4471 est {u:bloqué au dépôt. Réglez les frais sous 24 h}, sinon il sera renvoyé. {m:Frais : 1,99 €}. Payez ici : {l:colizebre-livraison-frais.exemple/payer}',
+      verdict: 'arnaque', summary: 'Arnaque au faux colis. Pour suivre un vrai colis, ouvre l\'appli du transporteur ou tape toi-même son adresse, jamais le lien du SMS.',
+      clues: { from: ['flag', 'L\'expéditeur', 'Le nom « ColiZèbre » n\'est qu\'un texte : n\'importe qui peut l\'écrire. Et ce SMS vient d\'un simple numéro de portable.'],
+        u: ['flag', 'L\'urgence', '« Sous 24 h » : on veut que tu paies vite, sans réfléchir.'],
+        m: ['warn', 'La petite somme', '1,99 €, ça paraît rien. Mais le vrai but, c\'est d\'obtenir le numéro de la carte bancaire pour dépenser beaucoup plus.'],
+        l: ['flag', 'Le lien', 'Le vrai domaine est colizebre-livraison-frais.exemple, pas colizebre.exemple : des mots ont été ajoutés.', 'link'] } },
+    { id: 'releve', kind: 'mail', from: 'Banque Pivoine', addr: 'infos@banque-pivoine.exemple', time: '09:30', subject: 'Ton relevé de novembre est disponible', context: 'Tu as un compte pour les jeunes à la Banque Pivoine, ouvert avec tes parents. Ce message arrive chaque mois.',
+      body: 'Bonjour Sam, {a:ton relevé de compte de novembre est disponible dans ton application Banque Pivoine.} {b:Pour le consulter, ouvre l\'application comme d\'habitude.} {c:Rappel : nous ne te demanderons jamais tes codes, ni par e-mail, ni par téléphone.}',
+      verdict: 'legitime', summary: 'Message légitime : il est attendu, il ne contient aucun lien, ne demande rien, et tout se vérifie dans l\'appli officielle.',
+      clues: { from: ['ok', 'L\'adresse', 'Elle finit par banque-pivoine.exemple, le vrai domaine. Une adresse peut parfois être imitée : ce n\'est donc pas la seule preuve.'],
+        a: ['ok', 'Un message attendu', 'Un relevé chaque mois, c\'est normal.'],
+        b: ['ok', 'Le bon chemin', 'Pas de lien : on te dit d\'ouvrir toi-même l\'appli que tu connais.'],
+        c: ['ok', 'Aucune demande', 'Le message rappelle même la règle d\'or : jamais de code demandé.'] } },
+    { id: 'appel', kind: 'call', from: 'Service fraude Banque Pivoine', addr: 'Appel du 01 00 00 00 00 (transcription)', time: '10:05', subject: '', context: 'Tu as une carte de paiement pour ados de la Banque Pivoine.',
+      body: '« Bonjour, ici le {s:service anti-fraude de la Banque Pivoine}. {u:Une opération de 850 € vient d\'être faite avec ta carte, il faut l\'annuler tout de suite.} Tu vas recevoir un code par SMS : {c:lis-le-moi pour bloquer le paiement.} {x:Inutile de déranger tes parents, on règle ça ensemble.} »',
+      verdict: 'arnaque', summary: 'Faux conseiller bancaire. Raccroche et préviens un adulte : il appellera la banque avec le numéro au dos de la carte.',
+      clues: { from: ['warn', 'Le numéro affiché', 'Le numéro qui s\'affiche peut être truqué pour ressembler à celui de la banque (on appelle ça l\'usurpation de numéro).'],
+        s: ['flag', 'Qui parle ?', 'Au téléphone, n\'importe qui peut dire « je suis de ta banque ».'],
+        u: ['flag', 'La peur et l\'urgence', 'Une grosse somme, « tout de suite » : la peur empêche de réfléchir. C\'est fait exprès.'],
+        c: ['flag', 'La demande de code', 'Le code reçu par SMS sert justement à valider un paiement. Le donner, c\'est payer pour l\'escroc. Un vrai conseiller ne le demande jamais.'],
+        x: ['flag', 'Le secret', '« Inutile de déranger tes parents » : on t\'isole pour que personne ne t\'aide.'] } },
+    { id: 'ent', kind: 'mail', from: 'Collège des Tilleuls', addr: 'ne-pas-repondre@college-tilleuls.exemple', time: '11:40', subject: 'Nouvelle note disponible', context: 'Ton prof a annoncé en classe que les notes du contrôle seraient en ligne aujourd\'hui.',
+      body: '{a:Une nouvelle note de mathématiques a été publiée.} {b:Pour la consulter, ouvre l\'application Espace Tilleuls comme d\'habitude.} {c:Ce message ne te demande aucune information.}',
+      verdict: 'legitime', summary: 'Légitime : c\'est l\'adresse habituelle du collège, le message est attendu et ne demande rien.',
+      clues: { from: ['ok', 'L\'expéditeur', 'C\'est l\'adresse habituelle des notifications du collège (college-tilleuls.exemple).'],
+        a: ['ok', 'Attendu', 'Ton prof avait annoncé ces notes pour aujourd\'hui.'],
+        b: ['ok', 'Le bon chemin', 'On te dit d\'ouvrir l\'appli comme d\'habitude, pas de cliquer sur un lien.'],
+        c: ['ok', 'Aucune demande', 'Pas de mot de passe, pas de code, pas d\'argent.'] } },
+    { id: 'jeu', kind: 'game', from: 'Pixelia_Staff_Officiel', addr: 'Message privé d\'un joueur dans Pixelia Arena', time: '12:15', subject: '', context: 'Tu joues souvent à Pixelia Arena, et tu n\'as jamais triché.',
+      body: '{u:Ton compte sera suspendu dans 2 heures} pour triche. Pour prouver ton innocence, {c:connecte-toi avec ton identifiant et ton mot de passe} ici : {l:pixelia.exemple.verif-compte.exemple/connexion}. {g:Bonus : 2 000 gemmes offertes après vérification !}',
+      verdict: 'arnaque', summary: 'Faux message de modération pour voler ton compte de jeu (et tes skins). Ne clique pas : signale et bloque ce joueur dans le jeu.',
+      clues: { from: ['flag', 'L\'expéditeur', 'N\'importe quel joueur peut s\'appeler « Staff_Officiel ». Les vraies annonces arrivent dans les notifications officielles du jeu, pas en message privé.'],
+        u: ['flag', 'La menace', 'Suspendu « dans 2 heures » : peur + urgence.'],
+        c: ['flag', 'Le mot de passe', 'Aucune équipe de modération n\'a besoin de ton mot de passe.'],
+        l: ['flag', 'Le lien', 'Le vrai domaine est verif-compte.exemple. « pixelia.exemple » n\'est qu\'un déguisement placé au début : le piège du sous-domaine.', 'link'],
+        g: ['warn', 'Le cadeau', 'Les gemmes gratuites servent d\'appât.'] } },
+    { id: 'ines', kind: 'sms', from: 'Inès', addr: 'Dans tes contacts depuis longtemps', time: '13:02', subject: '', context: 'Vous en avez parlé hier au collège.',
+      body: '{a:On se retrouve à 14 h devant la médiathèque ?} {b:Pense à prendre ton maillot pour la piscine après.}',
+      verdict: 'legitime', summary: 'Légitime : un message normal d\'une amie, attendu, sans lien ni demande. Si un jour son style te paraît bizarre, demande-lui en vrai.',
+      clues: { from: ['ok', 'Une amie connue', 'C\'est le numéro habituel d\'Inès, enregistré depuis longtemps.'],
+        a: ['ok', 'Attendu', 'Vous aviez prévu ce rendez-vous ensemble.'],
+        b: ['ok', 'Rien d\'étrange', 'Pas de lien, pas d\'argent, pas de code : juste un rendez-vous.'] } },
+    { id: 'rembourse', kind: 'mail', from: 'Caisse Santé Arc-en-ciel', addr: 'remboursement@arcenciel-dossier-sante.exemple', time: '14:20', subject: 'Remboursement en attente : 147,30 €', context: 'Personne dans ta famille n\'a demandé de remboursement.',
+      body: 'Bonjour, {m:vous avez droit à un remboursement de 147,30 €.} {u:Votre dossier sera clôturé ce soir à minuit.} Pour recevoir la somme, {c:saisissez votre numéro de carte bancaire et son code de sécurité} : {b:[Recevoir mon remboursement]} Pièce jointe : {p:Dossier_Remb.zip}',
+      verdict: 'arnaque', summary: 'Faux remboursement. Pour recevoir de l\'argent, personne n\'a besoin du code de ta carte. Un adulte peut vérifier en se connectant lui-même à son vrai espace.',
+      clues: { from: ['flag', 'L\'adresse', 'arcenciel-dossier-sante.exemple n\'est pas le vrai domaine (sante-arcenciel.exemple).'],
+        m: ['warn', 'L\'argent offert', 'Une bonne nouvelle inattendue : c\'est l\'appât.'],
+        u: ['flag', 'L\'urgence', '« Ce soir à minuit » : encore la pression du temps.'],
+        c: ['flag', 'La demande', 'Avec le numéro de carte et le code de sécurité (les 3 chiffres au dos), on peut payer à ta place. Pour te verser de l\'argent, personne n\'en a besoin.'],
+        b: ['flag', 'Le bouton', 'On ne voit pas où mène ce bouton : c\'est fait pour cacher l\'adresse.', 'btn'],
+        p: ['flag', 'La pièce jointe', 'Un fichier .zip inattendu peut contenir un logiciel malveillant.', 'file'] } },
+    { id: 'maman', kind: 'sms', from: 'Numéro inconnu', addr: '06 00 00 00 01', time: '15:47', subject: '', context: 'Ta mère est au travail. Elle a son téléphone habituel ce matin.',
+      body: '{s:Coucou c\'est Maman ! J\'ai cassé mon téléphone, voici mon nouveau numéro.} Tu vas recevoir un code à 6 chiffres, {c:envoie-le-moi vite} stp, c\'est pour réinstaller ma messagerie. {x:Ne m\'appelle pas sur l\'ancien, il ne marche plus.} {u:Fais vite, je suis pressée !}',
+      verdict: 'arnaque', summary: 'Arnaque « Maman, j\'ai changé de numéro ». Appelle ta mère sur son numéro habituel (ou demande votre mot de code), et ne donne jamais le code.',
+      clues: { from: ['flag', 'Un numéro inconnu', 'Un numéro jamais vu qui dit être ta mère : n\'importe qui peut écrire « c\'est Maman ».'],
+        s: ['warn', 'L\'histoire', '« J\'ai cassé mon téléphone » : l\'excuse parfaite pour expliquer le nouveau numéro.'],
+        c: ['flag', 'Le code', 'Ce code sert à installer TON compte de messagerie sur un autre téléphone. Si tu le donnes, l\'escroc prend ton compte et écrit à tous tes contacts.'],
+        x: ['flag', 'Empêcher de vérifier', '« Ne m\'appelle pas » : c\'est justement ce qu\'il faut faire !'],
+        u: ['flag', 'L\'urgence', 'Toujours la même technique : te presser.'] } },
+    { id: 'recompense', kind: 'game', from: 'Pixelia Arena', addr: 'Notification dans l\'appli officielle du jeu', time: '16:10', subject: 'Événement d\'hiver', context: 'Tu as participé hier à l\'événement d\'hiver du jeu.',
+      body: '{a:Merci d\'avoir participé à l\'événement d\'hiver !} {b:Ta récompense (le skin « Flocon ») est déjà dans ton inventaire.} {c:Rappel : l\'équipe Pixelia ne te demandera jamais ton mot de passe.}',
+      verdict: 'legitime', summary: 'Légitime : la notification est dans l\'appli officielle, elle est attendue, et elle ne te demande rien.',
+      clues: { from: ['ok', 'Le bon endroit', 'La notification apparaît dans l\'appli officielle du jeu, que tu as installée toi-même.'],
+        a: ['ok', 'Attendu', 'Tu as vraiment participé à cet événement.'],
+        b: ['ok', 'Rien à faire', 'La récompense est déjà là : pas de lien, pas de connexion à refaire.'],
+        c: ['ok', 'La règle rappelée', 'Le jeu rappelle qu\'il ne demande jamais ton mot de passe.'] } },
+    { id: 'concours', kind: 'social', from: 'Bavardo Concours Officiel', addr: 'Compte @concours.bavardo.officiel, créé il y a 3 jours', time: '17:00', subject: '', context: 'Tu n\'as participé à aucun concours.',
+      body: '{w:Félicitations !!! Tu as été tiré au sort parmi 1 million d\'utilisateurs} pour gagner un téléphone dernier cri. {p:Il suffit de régler 2 € de frais de port avec une carte cadeau} et de nous envoyer son code. {u:Offre valable 30 minutes.}',
+      verdict: 'arnaque', summary: 'Faux concours. Tu n\'as rien gagné : on veut le code de la carte cadeau (et parfois tes infos). Signale et bloque le compte.',
+      clues: { from: ['flag', 'Le compte', 'Créé il y a 3 jours, avec « officiel » dans le nom : très facile à fabriquer.'],
+        w: ['warn', 'Trop beau', 'Gagner sans avoir joué, ça n\'existe pas.'],
+        p: ['flag', 'La carte cadeau', 'Payer avec le code d\'une carte cadeau, c\'est comme donner de l\'argent liquide à un inconnu : impossible à récupérer.'],
+        u: ['flag', 'L\'urgence', '30 minutes : pour t\'empêcher de demander conseil.'] } },
+    { id: 'popup', kind: 'web', from: 'Fenêtre ouverte sur un site de jeux', addr: 'Adresse : alerte-fenestra-securite.exemple', time: '17:35', subject: '', context: 'Tu cherchais un jeu gratuit en ligne quand cette page s\'est ouverte toute seule.',
+      body: '{a:ALERTE ! VOTRE ORDINATEUR EST INFECTÉ PAR 5 VIRUS.} {u:Ne fermez pas cette page et n\'éteignez pas l\'ordinateur}, sinon vos données seront effacées. {t:Appelez immédiatement le support Fenestra au 01 00 00 00 00.}',
+      verdict: 'arnaque', summary: 'Faux support technique. Ferme l\'onglet (ou le navigateur), n\'appelle pas, et préviens un adulte.',
+      clues: { from: ['flag', 'Le site', 'alerte-fenestra-securite.exemple : une page web, pas un antivirus. Et ce n\'est pas fenestra.exemple.'],
+        a: ['flag', 'Le message alarmant', 'Un site web ne peut pas scanner ton ordinateur. Les majuscules et le chiffre précis servent à faire peur.'],
+        u: ['flag', '« Ne fermez pas »', 'Au contraire : fermer l\'onglet suffit en général. Si la page bloque, ferme le navigateur.'],
+        t: ['flag', 'Le faux support', 'Au téléphone, on te demanderait d\'installer un programme pour prendre le contrôle de l\'ordinateur, puis de payer.'] } },
+    { id: 'code', kind: 'mail', from: 'Ciné-Loutre', addr: 'no-reply@cineloutre.exemple', time: '18:02', subject: 'Ton code de connexion', context: 'Tu viens de taper ton adresse dans l\'appli Ciné-Loutre pour te connecter sur la tablette familiale.',
+      body: '{a:Ton code de connexion : 482 913.} Il expire dans 10 minutes. {b:Si tu n\'as pas demandé ce code, ignore ce message.} {c:Ne communique ce code à personne, même pas à quelqu\'un qui dit travailler chez Ciné-Loutre.}',
+      verdict: 'legitime', summary: 'Légitime, parce que c\'est TOI qui viens de le demander : tape-le dans l\'appli. Si un code arrive sans que tu aies rien demandé, quelqu\'un essaie peut-être d\'entrer dans ton compte : ne le donne à personne et parles-en.',
+      clues: { from: ['ok', 'L\'adresse', 'no-reply@cineloutre.exemple : le vrai domaine. Mais la vraie preuve, c\'est la suite…'],
+        a: ['ok', 'Attendu', 'Tu viens toi-même de demander à te connecter : ce code répond à ton action.'],
+        b: ['ok', 'Pas de pression', 'Pas de menace, pas de lien à cliquer.'],
+        c: ['ok', 'Le bon conseil', 'Le message dit de ne donner ce code à personne : c\'est exactement la règle.'] } },
+    { id: 'job', kind: 'social', from: 'Recrutement Express', addr: 'Message de @job_facile_2026, un compte inconnu', time: '19:20', subject: '', context: 'Tu ne connais pas ce compte. Il t\'a écrit le premier.',
+      body: '{w:Gagne 300 € par jour depuis ton téléphone, sans expérience, dès 13 ans !} {d:Ton travail : recevoir de l\'argent sur ton compte et le renvoyer à nos partenaires.} {x:Reste discret, c\'est un job secret.} {c:Envoie-nous une photo de ta carte d\'identité pour commencer.}',
+      verdict: 'arnaque', summary: 'Fausse offre d\'emploi (piège de la « mule »). Ne réponds pas, ne donne aucun document, montre le message à un adulte et signale le compte.',
+      clues: { from: ['flag', 'L\'expéditeur', 'Un compte inconnu qui te contacte en premier pour un « job ».'],
+        w: ['warn', 'Trop facile', '300 € par jour sans rien faire, dès 13 ans : aucun vrai travail ne ressemble à ça.'],
+        d: ['flag', 'Faire passer de l\'argent', 'C\'est le piège de la « mule » : tu ferais passer de l\'argent volé par ton compte. C\'est illégal, et c\'est toi qu\'on retrouverait.'],
+        x: ['flag', 'Le secret', 'Un vrai travail n\'a pas besoin d\'être secret.'],
+        c: ['flag', 'La carte d\'identité', 'Avec une photo de ta pièce d\'identité, on peut ouvrir des comptes à ton nom : c\'est l\'usurpation d\'identité.'] } },
+    { id: 'parking', kind: 'qr', from: 'Autocollant sur un horodateur', addr: 'QR code collé par-dessus l\'affiche de la mairie', time: '20:05', subject: '', context: 'Tu es avec ton oncle sur le parking de la ville de Bourg-Fictif.',
+      body: 'Sur l\'horodateur, un autocollant : « {n:Nouveau ! Payez votre stationnement par QR code} ». Ton oncle le scanne : la page {l:parking-bourgfictif-paiement.exemple} s\'ouvre et {c:demande son numéro de carte bancaire} {m:pour 0,50 €}.',
+      verdict: 'arnaque', summary: 'Faux QR code. On paie avec l\'horodateur lui-même ou l\'appli officielle de la ville, ouverte soi-même. Et on prévient la mairie.',
+      clues: { from: ['flag', 'L\'autocollant', 'N\'importe qui peut coller un QR code par-dessus une vraie affiche. Un QR code n\'est qu\'un lien caché dans un dessin.'],
+        n: ['warn', 'Le « nouveau »', 'Le mot « nouveau » explique pourquoi l\'affiche a changé… et endort la méfiance.'],
+        l: ['flag', 'Le domaine', 'parking-bourgfictif-paiement.exemple n\'est pas le site de la ville (bourg-fictif.exemple).', 'link'],
+        c: ['flag', 'La carte', 'Le numéro de carte bancaire, tapé sur un site inconnu.'],
+        m: ['warn', 'La petite somme', 'Le montant est petit, mais le numéro de carte vaut bien plus.'] } },
+    { id: 'lucas', kind: 'social', from: 'Lucas (ton ami)', addr: 'Compte Bavardo de Lucas, que tu suis depuis 2 ans', time: '21:30', subject: '', context: 'Lucas n\'écrit jamais comme ça. Vous vous êtes vus ce matin et il n\'a parlé d\'aucune vidéo.',
+      body: '{s:Hé ! Mdr regarde cette vidéo, c\'est toi dedans ???} {l:bavardo-videos.exemple/v/k2x9} {c:Il faut te connecter avec ton compte Bavardo pour la voir.}',
+      verdict: 'arnaque', summary: 'Compte d\'ami piraté. Préviens Lucas par un autre moyen (SMS, en vrai), et ne te connecte jamais depuis un lien reçu.',
+      clues: { from: ['warn', 'Le compte de ton ami', 'C\'est bien le compte de Lucas… mais un compte peut être piraté. Le nom d\'un ami n\'est pas une preuve.'],
+        s: ['flag', 'Le style', 'Ce n\'est pas sa façon d\'écrire, et la curiosité (« c\'est toi dedans ? ») pousse à cliquer vite.'],
+        l: ['flag', 'Le lien', 'bavardo-videos.exemple n\'est pas bavardo.exemple : un mot a été ajouté.', 'link'],
+        c: ['flag', 'La connexion', 'Une page qui te demande ton compte pour voir une vidéo veut ton mot de passe.'] } }
+  ];
+  function parseBody(body) {
+    var out = [], re = /\{(\w+):([^}]*)\}/g, last = 0, m;
+    while ((m = re.exec(body))) { if (m.index > last) out.push({ t: body.slice(last, m.index) }); out.push({ t: m[2], k: m[1] }); last = re.lastIndex; }
+    if (last < body.length) out.push({ t: body.slice(last) });
+    return out;
+  }
+  function msgById(id) { for (var i = 0; i < MSGS.length; i++) if (MSGS[i].id === id) return MSGS[i]; return null; }
+  function normChoice(c) { c = String(c || '').toLowerCase().replace('é', 'e'); return c === 'arnaque' || c === 'legitime' ? c : null; }
+  function classify(id) { var m = msgById(id); return m ? m.verdict : null; }
+  function checkChoice(id, choice) { var m = msgById(id), c = normChoice(choice); if (!m || !c) return null; return { ok: c === m.verdict, verdict: m.verdict, summary: m.summary }; }
+  function scoreOf(answers) {
+    var correct = 0, answered = 0;
+    MSGS.forEach(function (m) { var c = normChoice(answers && answers[m.id]); if (c) { answered++; if (c === m.verdict) correct++; } });
+    return { correct: correct, answered: answered, total: MSGS.length };
+  }
+  var ans = {}, found = {}, cur = MSGS[0].id;
+  function clueCls(type) { return type === 'ok' ? 'okc' : type === 'warn' ? 'warn' : ''; }
+  function segHtml(text, style) {
+    var t = esc(text);
+    if (style === 'link') return '<span class="lnk">' + t + '</span>';
+    if (style === 'btn') return '<span class="fakebtn">' + t.replace(/^\[|\]$/g, '') + '</span>';
+    if (style === 'file') return '<span class="file">' + t + '</span>';
+    return t;
+  }
+  function wrapClue(m, k, inner) {
+    var c = m.clues[k];
+    if (!c || !ans[m.id]) return inner;
+    var f = found[m.id] && found[m.id][k];
+    return '<span role="button" tabindex="0" class="clue ' + clueCls(c[0]) + (f ? ' found' : '') + '" data-k="' + k + '" aria-pressed="' + (f ? 'true' : 'false') + '">' + inner + '</span>';
+  }
+  function ibList() {
+    $('ibList').innerHTML = MSGS.map(function (m) {
+      var st = '', a = ans[m.id];
+      if (a) st = a === m.verdict ? '<span class="ib-st good">✓ juste</span>' : '<span class="ib-st bad">✗ raté</span>';
+      else st = '<span class="ib-st">à trier</span>';
+      var prev = parseBody(m.body).map(function (p) { return p.t; }).join('');
+      return '<li><button type="button" data-id="' + m.id + '" aria-current="' + (m.id === cur ? 'true' : 'false') + '"><span class="ib-from">' + esc(m.from) + '</span>' + st + '<span class="ib-kind">' + KIND[m.kind] + ' · ' + m.time + '</span><span class="ib-prev">' + esc(prev) + '</span></button></li>';
+    }).join('');
+  }
+  function ibReader() {
+    var m = msgById(cur), a = ans[m.id], keys = Object.keys(m.clues), nf = 0;
+    keys.forEach(function (k) { if (found[m.id] && found[m.id][k]) nf++; });
+    var head = '<div class="rd-head"><span class="tag ' + (a ? (m.verdict === 'arnaque' ? 'no' : 'ok') : 'warn') + '">' + KIND[m.kind] + '</span><span class="mono soft">' + m.time + '</span></div>';
+    var from = wrapClue(m, 'from', '<span class="rd-from"><strong>' + esc(m.from) + '</strong><span class="rd-addr">' + esc(m.addr) + '</span></span>');
+    var html = head + from;
+    if (m.subject) html += '<span class="rd-subj">' + esc(m.subject) + '</span>';
+    html += '<span class="rd-ctx">Contexte : ' + esc(m.context) + '</span>';
+    html += '<div class="bubble' + (m.kind === 'call' ? ' call' : '') + '">' + parseBody(m.body).map(function (p) {
+      if (!p.k) return esc(p.t);
+      var c = m.clues[p.k];
+      return wrapClue(m, p.k, segHtml(p.t, c && c[3]));
+    }).join('') + '</div>';
+    if (!a) {
+      html += '<div class="btns big-choice"><button type="button" class="b-scam" data-choice="arnaque">Arnaque</button><button type="button" class="b-ok" data-choice="legitime">Légitime</button></div>';
+    } else {
+      var ok = a === m.verdict;
+      html += '<div class="verdict ' + (ok ? 'yes' : 'no') + '">' + (ok ? 'Bien vu ! ' : 'Pas cette fois. ') + (m.verdict === 'arnaque' ? 'C\'est une arnaque.' : 'Ce message est légitime.') + '<span>' + esc(m.summary) + '</span></div>';
+      html += '<p class="soft">' + (m.verdict === 'arnaque' ? 'Touche les parties soulignées pour découvrir les indices' : 'Touche les parties soulignées pour voir ce qui est rassurant') + ' : <strong>' + nf + ' / ' + keys.length + '</strong> trouvés.</p>';
+      html += '<ul class="clue-list">' + keys.filter(function (k) { return found[m.id] && found[m.id][k]; }).map(function (k) {
+        var c = m.clues[k]; return '<li class="' + clueCls(c[0]) + '"><strong>' + esc(c[1]) + ' :</strong> ' + esc(c[2]) + '</li>';
+      }).join('') + '</ul>';
+      html += '<div class="btns">' + (nf < keys.length ? '<button type="button" data-all="1">Tout montrer</button>' : '') + '<button type="button" data-next="1">Message suivant →</button></div>';
+    }
+    $('ibReader').innerHTML = html;
+  }
+  function ibScore() {
+    var s = scoreOf(ans);
+    $('ibScore').textContent = s.correct + ' / ' + s.total;
+    $('ibProg').textContent = s.answered + (s.answered > 1 ? ' messages triés' : ' message trié') + ' sur ' + s.total;
+    var end = $('ibEnd');
+    if (s.answered === s.total) {
+      var t = s.correct === s.total ? 'Parfait, tu as l\'œil d\'un expert !' : s.correct >= 12 ? 'Très bien joué ! Relis les messages ratés pour comprendre le piège.' : 'Bon début ! Relis les indices des messages ratés : chaque piège vu une fois est plus facile à repérer.';
+      end.innerHTML = '<div class="verdict ' + (s.correct >= 12 ? 'yes' : 'mid') + '">Boîte triée : ' + s.correct + ' bonnes réponses sur ' + s.total + '.<span>' + t + ' Dans la vraie vie, quand tu hésites, tu as le droit de demander à un adulte : c\'est le meilleur réflexe.</span></div>';
+    } else end.innerHTML = '';
+  }
+  function ibAll() { ibList(); ibReader(); ibScore(); }
+  $('ibList').addEventListener('click', function (e) { var b = e.target.closest('button[data-id]'); if (!b) return; cur = b.getAttribute('data-id'); ibList(); ibReader(); });
+  $('ibReader').addEventListener('click', function (e) {
+    var b = e.target.closest('button, .clue'); if (!b) return;
+    var m = msgById(cur);
+    if (b.hasAttribute('data-choice')) { ans[m.id] = b.getAttribute('data-choice'); found[m.id] = found[m.id] || {}; ibAll(); }
+    else if (b.hasAttribute('data-k')) { found[m.id] = found[m.id] || {}; found[m.id][b.getAttribute('data-k')] = true; ibReader(); }
+    else if (b.hasAttribute('data-all')) { found[m.id] = found[m.id] || {}; Object.keys(m.clues).forEach(function (k) { found[m.id][k] = true; }); ibReader(); }
+    else if (b.hasAttribute('data-next')) {
+      var i = MSGS.indexOf(m), j, nxt = null;
+      for (j = 1; j <= MSGS.length; j++) { var c = MSGS[(i + j) % MSGS.length]; if (!ans[c.id]) { nxt = c; break; } }
+      cur = (nxt || MSGS[(i + 1) % MSGS.length]).id; ibList(); ibReader();
+    }
+  });
+  $('ibReader').addEventListener('keydown', function (e) {
+    var c = e.target.closest && e.target.closest('.clue');
+    if (c && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); c.click(); }
+  });
+  $('ibReset').addEventListener('click', function () { ans = {}; found = {}; cur = MSGS[0].id; ibAll(); });
+  ibAll();
+
+  /* ---------- Réaction en chaîne ---------- */
+  function chain(k, rounds) {
+    var res = [], accounts = 1, total = 0;
+    for (var n = 1; n <= rounds; n++) { var messages = accounts * 10, stolen = accounts * k; total += stolen; res.push({ round: n, accounts: accounts, messages: messages, stolen: stolen, total: total }); accounts = stolen; }
+    return res;
+  }
+  var chainK = $('chainK'), chainState = 0, chainTimer = null;
+  function chainDraw() {
+    var svg = $('chainSvg'), k = parseInt(chainK.value, 10), cx = 180, cy = 125, R = 92;
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    var trapped = {}; for (var j = 0; j < k; j++) trapped[Math.floor(j * 10 / k)] = true;
+    for (var i = 0; i < 10; i++) {
+      var ang = -Math.PI / 2 + i * 2 * Math.PI / 10, x = cx + R * Math.cos(ang), y = cy + R * Math.sin(ang);
+      var st = chainState === 0 ? 'idle' : chainState === 1 ? 'sent' : (trapped[i] ? 'trap' : 'safe');
+      if (chainState > 0) mk(svg, 'line', { x1: cx, y1: cy, x2: x, y2: y, stroke: st === 'trap' ? 'var(--acc)' : 'var(--warn)', 'stroke-width': 2, 'stroke-dasharray': st === 'trap' ? '0' : '5 4' });
+      var fill = st === 'trap' ? 'var(--acc)' : st === 'safe' ? 'var(--ok-soft)' : st === 'sent' ? 'var(--warn-soft)' : 'var(--card)';
+      var stroke = st === 'trap' ? 'var(--acc)' : st === 'safe' ? 'var(--ok)' : st === 'sent' ? 'var(--warn)' : 'var(--ink-soft)';
+      mk(svg, 'circle', { cx: x, cy: y, r: 17, fill: fill, stroke: stroke, 'stroke-width': 2.5 });
+      var lab = st === 'trap' ? '✗' : st === 'safe' ? '✓' : st === 'sent' ? '✉' : (i + 1);
+      var t = mk(svg, 'text', { x: x, y: y + 5, 'text-anchor': 'middle', 'font-size': 14, 'font-weight': 600 }, lab);
+      if (st === 'trap') t.setAttribute('style', 'fill:var(--card)');
+    }
+    mk(svg, 'circle', { cx: cx, cy: cy, r: 38, fill: 'var(--acc-soft)', stroke: 'var(--acc)', 'stroke-width': 3 });
+    mk(svg, 'text', { x: cx, y: cy - 4, 'text-anchor': 'middle', 'font-size': 13, 'font-weight': 600 }, 'Compte');
+    mk(svg, 'text', { x: cx, y: cy + 13, 'text-anchor': 'middle', 'font-size': 13, 'font-weight': 600 }, 'volé');
+  }
+  function chainTable() {
+    var k = parseInt(chainK.value, 10), rows = chain(k, 4);
+    $('chainKOut').textContent = k;
+    $('chainTbl').innerHTML = '<tr><th>Tour</th><th>Comptes qui envoient</th><th>Messages envoyés</th><th>Nouveaux comptes volés</th></tr>' + rows.map(function (r) {
+      return '<tr><td>' + r.round + '</td><td>' + fmtInt(r.accounts) + '</td><td>' + fmtInt(r.messages) + '</td><td>' + fmtInt(r.stolen) + '</td></tr>';
+    }).join('');
+    var last = rows[rows.length - 1];
+    $('chainNote').textContent = k === 0 ? 'Si personne ne tombe dans le piège, la chaîne s\'arrête net. C\'est pour ça que ton réflexe protège aussi les autres !' :
+      k === 1 ? 'Avec 1 ami piégé à chaque fois, la chaîne ne s\'arrête jamais : un nouveau compte volé à chaque tour.' :
+      'Avec ' + k + ' amis piégés sur 10, après 4 tours : ' + fmtInt(last.total) + ' comptes volés en plus du premier. Chaque personne qui ne clique pas casse la chaîne, et prévenir ses amis l\'arrête encore plus vite.';
+  }
+  chainK.addEventListener('input', function () { chainState = 0; clearTimeout(chainTimer); chainDraw(); chainTable(); });
+  $('chainGo').addEventListener('click', function () { clearTimeout(chainTimer); chainState = 1; chainDraw(); chainTimer = setTimeout(function () { chainState = 2; chainDraw(); }, 700); });
+  $('chainReset').addEventListener('click', function () { clearTimeout(chainTimer); chainState = 0; chainDraw(); });
+  chainDraw(); chainTable();
+
+  /* ---------- Oups ---------- */
+  var STEP = {
+    adult: 'En parler tout de suite à un adulte de confiance (parent, prof, CPE). Pas de honte : tout le monde peut se faire piéger.',
+    close: 'Ne plus rien taper sur la page, et la fermer.',
+    lowrisk: 'Si tu as seulement ouvert la page, sans rien taper ni télécharger, le risque est en général faible. Reste attentif aux messages bizarres des jours suivants.',
+    pwd: 'Changer le mot de passe depuis l\'appli officielle (ou en tapant toi-même l\'adresse du vrai site), jamais avec le lien du message.',
+    pwdOther: 'Changer aussi le mot de passe partout où tu utilisais le même.',
+    twofa: 'Activer la double authentification sur ce compte.',
+    sessions: 'Dans les paramètres du compte, déconnecter les appareils que tu ne reconnais pas.',
+    recover: 'Si tu ne peux plus te connecter : utiliser la procédure « compte piraté » ou « mot de passe oublié » de l\'appli officielle.',
+    bank: 'Avec un adulte, appeler la banque au numéro inscrit au dos de la carte, pour bloquer la carte (faire opposition) ou annuler le paiement.',
+    friends: 'Prévenir tes amis, par un autre moyen, de ne pas cliquer sur les messages envoyés en ton nom.',
+    proofs: 'Garder les preuves : captures d\'écran du message, de l\'adresse, du numéro, de la date.',
+    report: 'Signaler : SMS au 33700, compte dans l\'appli (bouton « signaler »). Conseils et aide sur cybermalveillance.gouv.fr.',
+    complaint: 'Si de l\'argent a été perdu, un adulte peut porter plainte (commissariat ou gendarmerie).',
+    wifi: 'Couper le Wi-Fi et les données mobiles de l\'appareil.',
+    scan: 'Avec un adulte, désinstaller l\'appli inconnue et lancer une analyse avec un antivirus.',
+    pwdElse: 'Depuis un autre appareil sain, changer les mots de passe importants.',
+    noPay: 'Ne pas payer et ne plus répondre : payer n\'arrête presque jamais le chantage.',
+    block: 'Bloquer la personne, après avoir gardé les preuves.',
+    help3018: 'Appeler le 3018 (gratuit, confidentiel) : on t\'aide, et on peut faire retirer des contenus.',
+    pharos: 'Un adulte peut signaler le contenu sur internet-signalement.gouv.fr (Pharos).'
+  };
+  var OUPS = [
+    { name: 'J\'ai cliqué sur un lien', intro: 'Tu as ouvert la page, mais tu n\'as rien tapé.', s: ['close', 'lowrisk', 'adult', 'report'] },
+    { name: 'J\'ai tapé mon mot de passe', intro: 'Tu as écrit ton identifiant et ton mot de passe sur un faux site.', s: ['adult', 'close', 'pwd', 'pwdOther', 'twofa', 'sessions', 'proofs', 'report'] },
+    { name: 'J\'ai donné un code reçu par SMS', intro: 'Ce code a peut-être validé un paiement ou ouvert ton compte à quelqu\'un.', s: ['adult', 'bank', 'recover', 'sessions', 'twofa', 'proofs', 'report'] },
+    { name: 'J\'ai donné une carte bancaire', intro: 'Tu (ou un adulte) as tapé un numéro de carte sur un faux site.', s: ['adult', 'bank', 'proofs', 'complaint', 'report'] },
+    { name: 'J\'ai installé une appli ou ouvert un fichier', intro: 'Une appli inconnue ou une pièce jointe peut contenir un logiciel malveillant.', s: ['adult', 'wifi', 'scan', 'pwdElse', 'proofs'] },
+    { name: 'Mon compte envoie des messages bizarres', intro: 'Ton compte a été piraté et écrit à tes amis.', s: ['adult', 'recover', 'pwd', 'sessions', 'twofa', 'friends', 'proofs', 'report'] },
+    { name: 'On me fait du chantage', intro: 'Quelqu\'un menace de publier des photos ou des infos sur toi si tu ne paies pas.', s: ['adult', 'noPay', 'proofs', 'block', 'help3018', 'pharos'] }
+  ];
+  OUPS.forEach(function (o, i) {
+    var b = document.createElement('button'); b.type = 'button'; b.id = 'oups' + i; b.textContent = o.name;
+    b.addEventListener('click', function () { oupsShow(i); }); $('oupsBtns').appendChild(b);
+  });
+  function oupsShow(i) {
+    OUPS.forEach(function (o, j) { $('oups' + j).setAttribute('aria-pressed', j === i ? 'true' : 'false'); });
+    $('oupsIntro').textContent = OUPS[i].intro;
+    $('oupsSteps').innerHTML = OUPS[i].s.map(function (k, j) {
+      return '<li><label><input type="checkbox" id="st' + j + '"><span>' + esc(STEP[k]) + '</span></label></li>';
+    }).join('');
+  }
+  $('oupsSteps').addEventListener('change', function (e) { var li = e.target.closest('li'); if (li) li.classList.toggle('done', e.target.checked); });
+  oupsShow(1);
+
+  /* ---------- Quiz ---------- */
+  var QZ = [
+    { q: 'SMS d\'un 06 inconnu : « ColiZèbre : votre colis est bloqué, payez 1,99 € sous 24 h ». C\'est…', o: [['a', 'une arnaque probable'], ['b', 'un message fiable']], a: 'a', how: 'Numéro ordinaire, urgence, petite somme à payer via un lien : faux colis.' },
+    { q: 'Quel est le vrai domaine de banque-pivoine.exemple.alerte-compte.exemple/connexion ?', o: [['a', 'banque-pivoine.exemple'], ['b', 'alerte-compte.exemple'], ['c', 'exemple']], a: 'b', how: 'Avant le premier « / », on garde les deux derniers morceaux : alerte-compte.exemple.' },
+    { q: 'Vrai ou faux : un message sans aucune faute d\'orthographe vient forcément d\'un vrai service.', o: [['v', 'Vrai'], ['f', 'Faux']], a: 'f', how: 'Avec l\'IA, les arnaqueurs écrivent un français parfait. Regarde plutôt ce qu\'on te demande.' },
+    { q: 'Vrai ou faux : si l\'adresse commence par https://, le site est honnête.', o: [['v', 'Vrai'], ['f', 'Faux']], a: 'f', how: 'https veut seulement dire que la connexion est chiffrée. Un faux site peut avoir https.' },
+    { q: 'Au téléphone, un « conseiller de ta banque » te demande le code que tu viens de recevoir par SMS. Tu…', o: [['a', 'le lui lis, il a l\'air sérieux'], ['b', 'raccroches et préviens un adulte'], ['c', 'donnes seulement la moitié']], a: 'b', how: 'Un vrai service ne demande jamais ton code. L\'adulte rappellera la banque avec le numéro au dos de la carte.' },
+    { q: 'Oups, tu as tapé ton mot de passe sur un faux site. Que fais-tu en premier ?', o: [['a', 'j\'attends de voir'], ['b', 'j\'en parle à un adulte et je change le mot de passe dans l\'appli officielle'], ['c', 'je supprime le message et je n\'en parle à personne']], a: 'b', how: 'Agir vite et en parler : tout le monde peut se faire piéger, ce n\'est pas une honte.' },
+    { q: 'Vrai ou faux : une IA peut imiter la voix d\'un proche à partir de courts enregistrements.', o: [['v', 'Vrai'], ['f', 'Faux']], a: 'v', how: 'C\'est possible. Réflexe : rappeler la personne sur son numéro habituel, ou demander le mot de code de la famille.' },
+    { q: 'Ton ami t\'écrit : « Vote pour moi, connecte-toi avec ton compte sur ce lien ». C\'est sûr, puisque c\'est ton ami ?', o: [['o', 'Oui'], ['n', 'Non, son compte a pu être piraté']], a: 'n', how: 'Un compte piraté écrit à tous ses contacts. Vérifie avec ton ami par un autre moyen.' }
+  ];
+  var quiz = $('quiz'), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ''; done = [];
+    QZ.forEach(function (Q, k) {
+      var li = document.createElement('li');
+      li.innerHTML = '<span>' + esc(Q.q) + '</span><select id="qa' + k + '" aria-label="Ta réponse à la question ' + (k + 1) + '"><option value="">…</option>' + Q.o.map(function (o) { return '<option value="' + o[0] + '">' + esc(o[1]) + '</option>'; }).join('') + '</select><button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+      quiz.appendChild(li);
+      function check() {
+        var fb = $('qf' + k), v = $('qa' + k).value;
+        if (!v) { fb.className = 'fb'; fb.textContent = 'Choisis une réponse.'; return; }
+        if (v === Q.a) { fb.className = 'fb ok'; fb.innerHTML = 'Bravo, c\'est juste !<span>' + esc(Q.how) + '</span>'; done[k] = true; }
+        else {
+          done[k] = false;
+          var good = Q.o.filter(function (o) { return o[0] === Q.a; })[0][1];
+          fb.className = 'fb no'; fb.innerHTML = 'Pas tout à fait : la bonne réponse est « ' + esc(good) + ' ».<span>' + esc(Q.how) + '</span>';
+        }
+        $('score').textContent = done.filter(Boolean).length + ' / 8';
+      }
+      $('qb' + k).addEventListener('click', check);
+      $('qa' + k).addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+    });
+    $('score').textContent = '0 / 8';
+  }
+  $('newQuiz').addEventListener('click', newQuiz);
+  newQuiz();
+
+  window.__arn = { messages: MSGS, classify: classify, checkChoice: checkChoice, scoreOf: scoreOf, domainOf: domainOf, chain: chain, brands: BRANDS, flags: FLAGS, scenarios: OUPS, quiz: QZ };
+})();
+</script>
+</body>
+</html>

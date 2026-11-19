@@ -86,6 +86,14 @@ Accueil de la physique : [physique.html](physique.html).
 | [La physique du sport](la-physique-du-sport.html) | Le sprint, les lancers et le meilleur angle, le saut à la perche, les frottements, le parachute et la vitesse limite, l'effet Magnus, un quiz. |
 | [Le climat et l'effet de serre](le-climat-et-l-effet-de-serre.html) | Météo et climat, le bilan d'énergie de la Terre, l'effet de serre, le CO₂, le réchauffement, l'albédo, l'empreinte carbone et les solutions, un quiz. |
 
+## Numérique
+
+Accueil du numérique : [numerique.html](numerique.html).
+
+| Tutoriel | Sujet |
+|---|---|
+| [Repérer les arnaques et l'hameçonnage](reperer-les-arnaques.html) | Faux e-mails, SMS, appels et messages : les signaux d'alerte, lire un lien, l'IA et les arnaques, une boîte de réception à trier, les conséquences et quoi faire si on s'est fait avoir, un quiz. |
+
 ## Pour réviser
 
 | Page | Contenu |
@@ -103,5 +111,5 @@ La **progression** (tutoriels ouverts, meilleur score à chaque quiz) est enregi
 
 1. Ajouter un fichier `nom-du-tutoriel.html` à la racine.
 2. Ajouter une ligne dans le tableau ci-dessus.
-3. Ajouter une carte dans `index.html` (maths) ou `physique.html` (physique-chimie), dans la bonne catégorie.
+3. Ajouter une carte dans `index.html` (maths), `physique.html` (physique-chimie) ou `numerique.html` (numérique), dans la bonne catégorie.
 4. Ajouter le tutoriel dans un parcours de `tools/parcours.py` (et ses prérequis), puis lancer `python tools/parcours.py`, `python tools/fiches.py` et `python tools/liens.py` : il ajoute le logo (icône d'onglet et d'écran d'accueil), le retour à l'accueil, les liens « précédent / suivant » (dans l'ordre de `index.html`) et transforme les mentions « le tutoriel sur … » en liens. On peut le relancer sans risque.

@@ -80,7 +80,7 @@
     box.querySelector('.bar i').style.width = Math.round(100 * seen / cards.length) + '%';
   }
 
-  var LANDING = page === 'index.html' || page === 'physique.html';
+  var LANDING = page === 'index.html' || page === 'physique.html' || page === 'numerique.html';
   window.__progress = { load: load, key: KEY, refresh: function () { if (LANDING) showOnLanding(); } };
 
   function start() {

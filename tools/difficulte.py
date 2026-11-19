@@ -1,0 +1,82 @@
+"""Difficulté de chaque tutoriel : 1 = facile, 2 = moyen, 3 = difficile.
+
+Une seule source, utilisée par :
+- tools/liens.py  : badge en haut de chaque tutoriel, et badges sur les cartes des accueils ;
+- tools/parcours.py : badge sur chaque étape de « Mon parcours ».
+Pour changer un niveau, modifier ce fichier puis relancer parcours.py et liens.py.
+"""
+import re
+from pathlib import Path
+
+LABELS = {1: "Facile", 2: "Moyen", 3: "Difficile"}
+
+DIFF = {
+    # Maths
+    "les-priorites-de-calcul": 1, "les-nombres-relatifs": 1, "les-fractions": 2, "les-ensembles-de-nombres": 2,
+    "les-puissances": 2, "les-racines-carrees": 2, "les-nombres-premiers": 2, "les-grands-nombres-et-l-infini": 2,
+    "les-arrondis-et-ordres-de-grandeur": 1, "le-calcul-litteral": 2, "les-identites-remarquables": 3,
+    "les-equations": 2, "l-equation-produit-nul-et-les-systemes": 3, "les-inequations": 2, "les-fonctions": 3,
+    "la-proportionnalite": 1, "les-pourcentages": 2, "la-vitesse": 1, "les-grandeurs-composees": 2,
+    "les-conversions": 1, "les-echelles": 1, "les-formes-geometriques": 1, "la-sphere-et-la-boule": 2,
+    "les-angles-et-triangles": 1, "les-droites-remarquables": 2, "les-quadrilateres": 1,
+    "le-theoreme-de-pythagore": 2, "le-theoreme-de-thales": 3, "la-trigonometrie": 3, "les-transformations": 1,
+    "le-reperage": 1, "les-statistiques": 1, "les-probabilites": 2, "l-algorithmique": 1, "la-demonstration": 3,
+    "le-second-degre": 3, "les-vecteurs": 3, "les-suites": 3, "la-derivee": 3, "les-nombres-complexes": 3,
+    "la-cryptographie": 2, "le-binaire-et-les-bases": 2, "les-paradoxes-de-probabilite": 3, "les-fractales": 2,
+    "les-jeux-de-strategie": 1, "les-maths-et-la-musique": 2, "le-nombre-pi": 1, "le-nombre-e": 2,
+    "le-nombre-d-or": 1, "revisions-brevet": 3,
+    # Physique-chimie
+    "les-etats-de-la-matiere": 1, "les-melanges-et-les-solutions": 1, "les-atomes-et-les-molecules": 2,
+    "les-transformations-chimiques": 2, "les-acides-et-les-bases": 2, "l-univers-et-le-systeme-solaire": 1,
+    "le-mouvement": 1, "les-forces": 2, "le-poids-et-la-masse": 2, "la-gravitation": 3,
+    "les-formes-d-energie": 2, "l-energie-cinetique-et-la-securite-routiere": 3, "les-circuits-electriques": 1,
+    "la-loi-d-ohm": 2, "la-puissance-et-l-energie-electrique": 2, "la-lumiere": 1, "le-son": 1,
+    "les-signaux-et-la-communication": 2, "le-ciel-bleu-et-l-arc-en-ciel": 2, "la-physique-du-sport": 2,
+    "le-climat-et-l-effet-de-serre": 2, "revisions-brevet-physique": 3,
+    # Numérique
+    "reperer-les-arnaques": 1,
+}
+
+BADGE_CSS = (".diff { font: 700 .72rem/1.2 var(--f-mono, monospace); padding: 2px 8px; border-radius: 99px; border: 1.5px solid; white-space: nowrap; }\n"
+             ".diff.d1 { color: #15803d; border-color: #15803d; background: #dcf3e3; }\n"
+             ".diff.d2 { color: #a15c07; border-color: #b45309; background: #fbe7cf; }\n"
+             ".diff.d3 { color: #b91c1c; border-color: #b91c1c; background: #fde2e2; }\n"
+             "@media (prefers-color-scheme: dark) { :root:not([data-theme=\"light\"]) .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; }"
+             " :root:not([data-theme=\"light\"]) .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; }"
+             " :root:not([data-theme=\"light\"]) .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; } }\n"
+             ":root[data-theme=\"dark\"] .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; }"
+             " :root[data-theme=\"dark\"] .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; }"
+             " :root[data-theme=\"dark\"] .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; }\n")
+
+
+def badge(page_id):
+    d = DIFF.get(page_id)
+    if not d:
+        return ""
+    return f'<span class="diff d{d}" title="Difficulté : {LABELS[d].lower()}">{LABELS[d]}</span>'
+
+
+def apply_landings(root):
+    """Ajoute (ou met à jour) le badge de difficulté sur les cartes des accueils."""
+    for name in ("index.html", "physique.html", "numerique.html"):
+        f = Path(root) / name
+        if not f.exists():
+            continue
+        s = f.read_text(encoding="utf-8")
+        s = re.sub(r'<span class="tags">(<span class="diff[^>]*>[^<]*</span>)?(<span class="lvl">.*?</span>)</span>', r"\2", s)
+
+        def card(m):
+            href, body = m.group(1), m.group(2)
+            b = badge(href[:-5])
+            if not b:
+                return m.group(0)
+            body = re.sub(r'(<span class="lvl">.*?</span>)', lambda x: '<span class="tags">' + b + x.group(1) + "</span>", body, count=1)
+            return f'<a class="card" href="{href}">{body}'
+
+        s = re.sub(r'<a class="card" href="([^"]+\.html)">(.*?)(?=</a>)', card, s, flags=re.S)
+        css = "/*diff*/" + BADGE_CSS.replace("\n", " ") + "/*/diff*/\n" + \
+              "/*diff2*/a.card .tags { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }/*/diff2*/\n"
+        s = re.sub(r"/\*diff\*/.*?/\*/diff\*/\n", "", s, flags=re.S)
+        s = re.sub(r"/\*diff2\*/.*?/\*/diff2\*/\n", "", s, flags=re.S)
+        s = s.replace("</style>", css + "</style>", 1)
+        f.write_text(s, encoding="utf-8", newline="\n")
