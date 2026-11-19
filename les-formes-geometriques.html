@@ -1,0 +1,719 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Les formes géométriques</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les tutoriels π et e, encre violette, marge rouge, figures en perspective cavalière. */
+:root {
+  --paper: #f7f6fc;
+  --grid: #e5e2f3;
+  --card: #ffffff;
+  --ink: #241f3d;
+  --ink-soft: #5a5478;
+  --acc: #5b3fc0;
+  --acc-soft: #e6e0fa;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #fff0a3;
+  --line: #d6d2e8;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #12101d; --grid: #1c1930; --card: #1a1729; --ink: #ebe8f7; --ink-soft: #ada7c7;
+    --acc: #a993ff; --acc-soft: #2b2450; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #332e4d;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #12101d; --grid: #1c1930; --card: #1a1729; --ink: #ebe8f7; --ink-soft: #ada7c7;
+  --acc: #a993ff; --acc-soft: #2b2450; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #332e4d;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero-top { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+.hero-top svg { width: 150px; height: auto; flex: none; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink-soft); }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 6px 12px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; }
+
+/* Unités */
+.units { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+.units .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.units svg { width: 100%; max-width: 160px; height: auto; }
+.unit-tag { font-family: var(--f-mono); font-weight: 600; color: var(--acc); font-size: 1.1rem; }
+
+/* Fiches formes */
+.shapes { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; }
+.shape { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.shape svg { width: 100%; height: 96px; }
+.shape strong { font-family: var(--f-display); font-size: 1.1rem; }
+.f { font-family: var(--f-mono); font-size: .92rem; overflow-wrap: anywhere; }
+.f b { color: var(--acc); }
+.f.r b { color: var(--red); }
+
+/* Calculatrices */
+.calc { display: grid; grid-template-columns: 260px 1fr; gap: 20px; align-items: start; }
+.calc > svg { width: 100%; max-width: 260px; height: auto; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; }
+.calc > div { min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+@media (max-width: 600px) { .calc { grid-template-columns: 1fr; } .calc > svg { max-width: 300px; margin: 0 auto; } }
+.param { display: flex; flex-direction: column; gap: 2px; }
+.param label { font-weight: 700; }
+input[type="range"] { width: 100%; accent-color: var(--acc); }
+.results { display: flex; flex-direction: column; gap: 8px; font-variant-numeric: tabular-nums; }
+.res { border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 12px; display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; align-items: baseline; }
+.res-name { font-family: var(--f-display); font-weight: 700; }
+.res-val { font-family: var(--f-mono); font-weight: 600; color: var(--acc); font-size: 1.05rem; white-space: nowrap; }
+.res-val.r { color: var(--red); }
+.res-calc { grid-column: 1 / -1; font-family: var(--f-mono); font-size: .85rem; color: var(--ink-soft); overflow-wrap: anywhere; }
+
+.why { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+.why svg { width: 100%; height: auto; }
+
+table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+th, td { padding: 7px 8px; border-bottom: 1px dashed var(--line); text-align: left; }
+thead th { border-bottom: 2px solid var(--ink); font-family: var(--f-display); }
+td.n { font-family: var(--f-mono); text-align: center; }
+.scroll { overflow-x: auto; }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+</head>
+<body>
+<main class="page">
+
+  <header class="hero">
+    <div class="hero-top">
+      <svg viewBox="0 0 150 130" aria-hidden="true">
+        <rect x="8" y="62" width="56" height="56" fill="var(--acc-soft)" stroke="var(--acc)" stroke-width="3"></rect>
+        <circle cx="112" cy="90" r="28" fill="var(--red-soft)" stroke="var(--red)" stroke-width="3"></circle>
+        <path d="M40 8 L76 56 L4 56 Z" fill="var(--acc-soft)" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round"></path>
+        <path d="M92 18 h36 v36 h-36 Z M92 18 l14 -12 h36 l-14 12 M128 54 l14 -12 v-36" fill="none" stroke="var(--acc)" stroke-width="3" stroke-linejoin="round"></path>
+      </svg>
+      <div style="display:flex;flex-direction:column;gap:10px;min-width:0;flex:1 1 280px">
+        <span class="eyebrow">Tutoriel de maths · niveau collège</span>
+        <h1>Les formes géométriques</h1>
+        <p class="lead">Carrés, triangles, cubes, cylindres, boules… Comment mesurer leur tour, leur surface et ce qu'elles peuvent contenir.</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · Les mots à connaître</span>
+    <h2>Périmètre, aire et volume</h2>
+    <p>Trois mots reviennent tout le temps. Ils ne mesurent pas la même chose, et ils n'ont pas la même unité.</p>
+    <div class="units">
+      <div class="box">
+        <svg viewBox="0 0 160 70" aria-hidden="true">
+          <rect x="20" y="10" width="120" height="50" fill="none" stroke="var(--acc)" stroke-width="5" stroke-dasharray="10 6"></rect>
+        </svg>
+        <strong>Le périmètre</strong>
+        <span>La longueur du <strong>tour</strong> de la forme. Comme une ficelle posée tout autour.</span>
+        <span class="unit-tag">cm, m, km…</span>
+      </div>
+      <div class="box">
+        <svg viewBox="0 0 160 70" aria-hidden="true" id="areaUnits"></svg>
+        <strong>L'aire</strong>
+        <span>La <strong>surface</strong> à l'intérieur. On compte combien de petits carrés de 1 cm de côté elle contient.</span>
+        <span class="unit-tag">cm², m²…</span>
+      </div>
+      <div class="box">
+        <svg viewBox="0 0 160 70" aria-hidden="true" id="volUnits"></svg>
+        <strong>Le volume</strong>
+        <span>La <strong>place</strong> à l'intérieur d'un solide. On compte combien de petits cubes de 1 cm de côté il contient.</span>
+        <span class="unit-tag">cm³, m³, litres…</span>
+      </div>
+    </div>
+    <div class="note">
+      <span class="note-title">Pour les solides (en 3D), trois autres mots</span>
+      <span>Une <strong>face</strong> est une surface plate (un dé en a 6). Une <strong>arête</strong> est un bord où deux faces se touchent. Un <strong>sommet</strong> est un coin pointu.</span>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · Les formes plates (2D)</span>
+    <h2>Les formules des figures planes</h2>
+    <p>Une forme plate se dessine sur une feuille. Elle a un périmètre et une aire, mais pas de volume.</p>
+    <div class="shapes" id="cards2d"></div>
+
+    <div class="box">
+      <h3>Calculatrice des formes plates</h3>
+      <p class="soft">Choisis une forme, puis bouge les curseurs. Le dessin et les calculs changent en même temps.</p>
+      <div class="btns" id="pick2d" role="group" aria-label="Choisir une forme plate"></div>
+      <div class="calc">
+        <svg id="svg2d" viewBox="0 0 260 200" role="img" aria-label="Dessin de la forme choisie"></svg>
+        <div>
+          <div id="params2d" style="display:flex;flex-direction:column;gap:8px"></div>
+          <div class="results" id="res2d"></div>
+          <p class="soft" id="note2d" style="font-size:.92rem"></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Pourquoi ça marche ?</span>
+    <h2>Découper et recoller</h2>
+    <p>Pas besoin d'apprendre les formules par cœur sans les comprendre. La plupart viennent du rectangle : on découpe, on déplace un morceau, et on retombe sur un rectangle.</p>
+    <div class="why">
+      <div class="box">
+        <h3>Le triangle, c'est un demi-rectangle</h3>
+        <svg viewBox="0 0 240 150" role="img" aria-label="Un triangle dessiné dans un rectangle de même base et même hauteur">
+          <rect x="20" y="20" width="200" height="110" fill="var(--red-soft)" stroke="var(--ink-soft)" stroke-width="2" stroke-dasharray="6 5"></rect>
+          <path d="M20 130 L220 130 L90 20 Z" fill="var(--acc-soft)" stroke="var(--acc)" stroke-width="3" stroke-linejoin="round"></path>
+          <line x1="90" y1="20" x2="90" y2="130" stroke="var(--ink)" stroke-width="2" stroke-dasharray="5 4"></line>
+          <text x="120" y="146" text-anchor="middle" font-size="13">base b</text>
+          <text x="96" y="80" font-size="13">h</text>
+        </svg>
+        <p>Les deux morceaux roses sont exactement pareils que les deux moitiés du triangle violet. Le triangle prend donc la moitié du rectangle : <strong class="mono">A = b × h ÷ 2</strong>.</p>
+      </div>
+      <div class="box">
+        <h3>Le parallélogramme devient un rectangle</h3>
+        <svg viewBox="0 0 240 150" role="img" aria-label="On coupe un triangle sur le côté du parallélogramme et on le recolle de l'autre côté">
+          <path d="M20 130 L180 130 L220 20 L60 20 Z" fill="var(--acc-soft)" stroke="var(--acc)" stroke-width="3" stroke-linejoin="round"></path>
+          <path d="M20 130 L60 130 L60 20 Z" fill="var(--red-soft)" stroke="var(--red)" stroke-width="2" stroke-linejoin="round"></path>
+          <path d="M180 130 L220 130 L220 20 Z" fill="none" stroke="var(--red)" stroke-width="2" stroke-dasharray="5 4"></path>
+          <path d="M45 75 Q120 40 195 75" fill="none" stroke="var(--red)" stroke-width="2"></path>
+          <path d="M187 68 L196 76 L185 80" fill="none" stroke="var(--red)" stroke-width="2"></path>
+          <text x="120" y="146" text-anchor="middle" font-size="13">base b</text>
+        </svg>
+        <p>On coupe le triangle rouge à gauche et on le recolle à droite. On obtient un rectangle de même base et même hauteur : <strong class="mono">A = b × h</strong>.</p>
+      </div>
+    </div>
+    <div class="note red">
+      <span class="note-title">Attention : la hauteur n'est pas un côté !</span>
+      <span>La hauteur se mesure toujours <strong>tout droit</strong>, à angle droit avec la base (avec l'équerre). Pour un parallélogramme ou un triangle penché, elle est plus courte que le côté penché.</span>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · Les solides (3D)</span>
+    <h2>Les formules des solides</h2>
+    <p>Un solide a de l'épaisseur : on peut le tenir dans la main. Il a une aire (la surface de toutes ses faces, comme le papier pour l'emballer) et un volume (ce qu'il peut contenir). En classe, on les dessine en <strong>perspective cavalière</strong> : les arêtes cachées sont en pointillés.</p>
+    <div class="shapes" id="cards3d"></div>
+
+    <div class="box">
+      <h3>Calculatrice des solides</h3>
+      <p class="soft">Choisis un solide, puis bouge les curseurs.</p>
+      <div class="btns" id="pick3d" role="group" aria-label="Choisir un solide"></div>
+      <div class="calc">
+        <svg id="svg3d" viewBox="0 0 260 200" role="img" aria-label="Dessin du solide choisi en perspective cavalière"></svg>
+        <div>
+          <div id="params3d" style="display:flex;flex-direction:column;gap:8px"></div>
+          <div class="results" id="res3d"></div>
+          <p class="soft" id="note3d" style="font-size:.92rem"></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="note">
+      <span class="note-title">Le secret des pointus : diviser par 3</span>
+      <span>Une pyramide a exactement le tiers du volume du prisme qui a la même base et la même hauteur. Pareil pour le cône et le cylindre : il faut vider <strong>3 cônes</strong> remplis d'eau pour remplir le cylindre. C'est pour ça qu'on voit « ÷ 3 » dans leurs formules.</span>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Compter les faces</span>
+    <h2>Faces, sommets, arêtes… et la formule d'Euler</h2>
+    <p>Prends un solide aux faces plates. Compte ses faces (F), ses sommets (S) et ses arêtes (A). Calcule <strong class="mono">F + S − A</strong>. Tu trouves toujours… <strong>2</strong> !</p>
+    <div class="box">
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Solide</th><th style="text-align:center">Faces</th><th style="text-align:center">Sommets</th><th style="text-align:center">Arêtes</th><th style="text-align:center">F + S − A</th></tr></thead>
+          <tbody>
+            <tr><td>Cube (un dé)</td><td class="n">6</td><td class="n">8</td><td class="n">12</td><td class="n"><b>2</b></td></tr>
+            <tr><td>Pavé droit (une boîte)</td><td class="n">6</td><td class="n">8</td><td class="n">12</td><td class="n"><b>2</b></td></tr>
+            <tr><td>Pyramide à base carrée</td><td class="n">5</td><td class="n">5</td><td class="n">8</td><td class="n"><b>2</b></td></tr>
+            <tr><td>Prisme à base triangulaire</td><td class="n">5</td><td class="n">6</td><td class="n">9</td><td class="n"><b>2</b></td></tr>
+            <tr><td>Tétraèdre (pyramide à base triangulaire)</td><td class="n">4</td><td class="n">4</td><td class="n">6</td><td class="n"><b>2</b></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="soft">C'est encore Leonhard Euler, le mathématicien des tutoriels sur π et sur e, qui a découvert cette règle en 1750.</p>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · Les unités</span>
+    <h2>Convertir sans se tromper</h2>
+    <p>Le piège le plus courant : 1 m = 100 cm, mais 1 m² n'est <strong>pas</strong> 100 cm². Un carré de 1 m de côté contient 100 rangées de 100 petits carrés de 1 cm : ça fait <strong>10 000 cm²</strong>.</p>
+    <div class="box">
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Ce qu'on mesure</th><th>Conversion</th></tr></thead>
+          <tbody>
+            <tr><td>Longueur</td><td class="mono">1 m = 100 cm</td></tr>
+            <tr><td>Aire</td><td class="mono">1 m² = 100 × 100 = 10 000 cm²</td></tr>
+            <tr><td>Volume</td><td class="mono">1 m³ = 100 × 100 × 100 = 1 000 000 cm³</td></tr>
+            <tr><td>Volume en litres</td><td class="mono">1 L = 1 dm³ = 1 000 cm³</td></tr>
+            <tr><td>Petit volume</td><td class="mono">1 mL = 1 cm³</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="soft">Astuce : une brique de lait de 1 litre, c'est à peu près un cube de 10 cm de côté (10 × 10 × 10 = 1 000 cm³).</p>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · À toi de jouer</span>
+    <h2>Six petits exercices</h2>
+    <p>Prends une calculatrice (avec la touche π). Clique sur un exercice pour voir la réponse quand tu as trouvé.</p>
+    <div class="exos">
+      <details>
+        <summary>La clôture du jardin<span class="q">Un jardin rectangulaire mesure 12 m sur 8 m. Quelle longueur de grillage faut-il pour en faire le tour ?</span></summary>
+        <div><span>On cherche le tour : c'est le périmètre. P = 2 × (12 + 8) = 2 × 20 = <strong>40 m</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Le mur à peindre<span class="q">Un mur mesure 4 m de long et 2,5 m de haut. Il a une fenêtre de 1 m sur 1,2 m. Quelle surface faut-il peindre ?</span></summary>
+        <div>
+          <span>Aire du mur : 4 × 2,5 = 10 m². Aire de la fenêtre : 1 × 1,2 = 1,2 m².</span>
+          <span>On enlève la fenêtre : 10 − 1,2 = <strong>8,8 m²</strong>.</span>
+        </div>
+      </details>
+      <details>
+        <summary>La voile du bateau<span class="q">Une voile triangulaire a une base de 3 m et une hauteur de 5 m. Quelle est sa surface ?</span></summary>
+        <div><span>A = b × h ÷ 2 = 3 × 5 ÷ 2 = <strong>7,5 m²</strong>.</span></div>
+      </details>
+      <details>
+        <summary>L'aquarium<span class="q">Un aquarium a la forme d'un pavé de 50 cm × 30 cm × 40 cm. Combien de litres d'eau peut-il contenir ?</span></summary>
+        <div>
+          <span>V = 50 × 30 × 40 = 60 000 cm³.</span>
+          <span>Comme 1 L = 1 000 cm³ : 60 000 ÷ 1 000 = <strong>60 litres</strong>.</span>
+        </div>
+      </details>
+      <details>
+        <summary>La boîte de conserve<span class="q">Une boîte de conserve est un cylindre de rayon 4 cm et de hauteur 10 cm. Quel est son volume ?</span></summary>
+        <div>
+          <span>V = π × r × r × h = π × 4 × 4 × 10 = π × 160 ≈ <strong>502,7 cm³</strong>.</span>
+          <span>C'est environ un demi-litre.</span>
+        </div>
+      </details>
+      <details>
+        <summary>Le cornet de glace<span class="q">Un cornet est un cône de rayon 3 cm et de hauteur 12 cm. Combien de glace peut-il contenir (sans la boule du dessus) ?</span></summary>
+        <div>
+          <span>V = π × r × r × h ÷ 3 = π × 3 × 3 × 12 ÷ 3 = π × 36 ≈ <strong>113,1 cm³</strong>.</span>
+          <span>Un cylindre de même taille contiendrait 3 fois plus : environ 339 cm³.</span>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- Bonus -->
+  <section>
+    <span class="eyebrow">Bonus · Les formes dans la nature</span>
+    <h2>La nature est douée en géométrie</h2>
+    <div class="units">
+      <div class="box">
+        <strong>Les abeilles et les hexagones</strong>
+        <span class="soft">Les alvéoles des ruches sont des hexagones (6 côtés). C'est la forme qui permet de remplir toute la place avec le moins de cire possible pour les murs.</span>
+      </div>
+      <div class="box">
+        <strong>Les bulles de savon</strong>
+        <span class="soft">Une bulle est toujours ronde. La boule est la forme qui contient le plus d'air pour la plus petite surface de savon.</span>
+      </div>
+      <div class="box">
+        <strong>Les 5 solides parfaits</strong>
+        <span class="soft">Il existe seulement 5 solides dont toutes les faces sont identiques et régulières. On s'en sert comme dés dans les jeux de rôle : 4, 6, 8, 12 et 20 faces.</span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir · La fiche</span>
+    <div class="box">
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Forme</th><th>Périmètre ou aire</th><th>Aire ou volume</th></tr></thead>
+          <tbody id="sheet"></tbody>
+        </table>
+      </div>
+      <p class="soft">Les pyramides et les cônes : même formule que le prisme ou le cylindre, divisée par 3.</p>
+    </div>
+  </section>
+
+  <footer>Fiche de révision · Les formes géométriques</footer>
+</main>
+
+<script>
+(function () {
+  var NS = 'http://www.w3.org/2000/svg';
+  var PI = Math.PI;
+  function fr(x, d) { return x.toLocaleString('fr-FR', { minimumFractionDigits: d, maximumFractionDigits: d }); }
+  function v(x) { var r = Math.round(x * 100) / 100; return Math.abs(r - Math.round(r)) < 1e-9 ? fr(Math.round(r), 0) : (Math.abs(r * 10 - Math.round(r * 10)) < 1e-9 ? fr(r, 1) : fr(r, 2)); }
+  function exact(x) { return Math.abs(x * 100 - Math.round(x * 100)) < 1e-6; }
+  function hyp(a, b) { return Math.sqrt(a * a + b * b); }
+  var Q = 0.3536; /* perspective cavalière : fuyantes à 45°, réduites de moitié */
+
+  /* ---------- Formes ---------- */
+  var shapes2d = [
+    { id: 'carre', name: 'Carré', params: [['c', 'Côté c', 5]],
+      res: function (p) { return [
+        ['Périmètre', 4 * p.c, 'cm', 'P = 4 × c = 4 × ' + v(p.c)],
+        ['Aire', p.c * p.c, 'cm²', 'A = c × c = ' + v(p.c) + ' × ' + v(p.c), 1]]; },
+      draw: function (p) { return [
+        { t: 'poly', pts: [[0, 0], [p.c, 0], [p.c, p.c], [0, p.c]] },
+        { t: 'text', p: [p.c / 2, 0], dy: 16, s: 'c' }]; } },
+    { id: 'rectangle', name: 'Rectangle', params: [['L', 'Longueur L', 8], ['l', 'Largeur l', 4]],
+      res: function (p) { return [
+        ['Périmètre', 2 * (p.L + p.l), 'cm', 'P = 2 × (L + l) = 2 × (' + v(p.L) + ' + ' + v(p.l) + ')'],
+        ['Aire', p.L * p.l, 'cm²', 'A = L × l = ' + v(p.L) + ' × ' + v(p.l), 1]]; },
+      draw: function (p) { return [
+        { t: 'poly', pts: [[0, 0], [p.L, 0], [p.L, p.l], [0, p.l]] },
+        { t: 'text', p: [p.L / 2, 0], dy: 16, s: 'L' },
+        { t: 'text', p: [p.L, p.l / 2], dx: 12, s: 'l' }]; } },
+    { id: 'triangle', name: 'Triangle', params: [['b', 'Base b', 6], ['h', 'Hauteur h', 4]],
+      res: function (p) { var s = hyp(p.b / 2, p.h); return [
+        ['Périmètre', p.b + 2 * s, 'cm', 'P = côté + côté + base ≈ ' + v(s) + ' + ' + v(s) + ' + ' + v(p.b)],
+        ['Aire', p.b * p.h / 2, 'cm²', 'A = b × h ÷ 2 = ' + v(p.b) + ' × ' + v(p.h) + ' ÷ 2', 1]]; },
+      note: 'Pour le périmètre, on additionne les 3 côtés. Ici, les côtés penchés mesurent environ ',
+      noteVal: function (p) { return v(hyp(p.b / 2, p.h)) + ' cm (mesurés sur la figure).'; },
+      draw: function (p) { return [
+        { t: 'poly', pts: [[0, 0], [p.b, 0], [p.b / 2, p.h]] },
+        { t: 'line', a: [p.b / 2, 0], b: [p.b / 2, p.h], dash: 1, ink: 1 },
+        { t: 'text', p: [p.b / 2, 0], dy: 16, s: 'b' },
+        { t: 'text', p: [p.b / 2, p.h / 2], dx: 10, s: 'h', anchor: 'start' }]; } },
+    { id: 'parallelogramme', name: 'Parallélogramme', params: [['b', 'Base b', 7], ['c', 'Côté penché c', 4], ['h', 'Hauteur h', 3]],
+      fix: function (p) { if (p.h > p.c) p.h = p.c; },
+      res: function (p) { return [
+        ['Périmètre', 2 * (p.b + p.c), 'cm', 'P = 2 × (b + c) = 2 × (' + v(p.b) + ' + ' + v(p.c) + ')'],
+        ['Aire', p.b * p.h, 'cm²', 'A = b × h = ' + v(p.b) + ' × ' + v(p.h), 1]]; },
+      note: 'La hauteur ne peut pas être plus grande que le côté penché.',
+      draw: function (p) { var o = Math.sqrt(Math.max(0, p.c * p.c - p.h * p.h)); return [
+        { t: 'poly', pts: [[0, 0], [p.b, 0], [p.b + o, p.h], [o, p.h]] },
+        { t: 'line', a: [o, 0], b: [o, p.h], dash: 1, ink: 1 },
+        { t: 'text', p: [p.b / 2, 0], dy: 16, s: 'b' },
+        { t: 'text', p: [o, p.h / 2], dx: 8, s: 'h', anchor: 'start' },
+        { t: 'text', p: [p.b + o / 2, p.h / 2], dx: 12, s: 'c', anchor: 'start' }]; } },
+    { id: 'losange', name: 'Losange', params: [['D', 'Grande diagonale D', 8], ['d', 'Petite diagonale d', 5]],
+      res: function (p) { var s = hyp(p.D / 2, p.d / 2); return [
+        ['Périmètre', 4 * s, 'cm', 'P = 4 × côté ≈ 4 × ' + v(s)],
+        ['Aire', p.D * p.d / 2, 'cm²', 'A = D × d ÷ 2 = ' + v(p.D) + ' × ' + v(p.d) + ' ÷ 2', 1]]; },
+      note: 'Les 4 côtés d\'un losange sont égaux. Ici, chaque côté mesure environ ',
+      noteVal: function (p) { return v(hyp(p.D / 2, p.d / 2)) + ' cm (mesuré sur la figure).'; },
+      draw: function (p) { return [
+        { t: 'poly', pts: [[-p.D / 2, 0], [0, -p.d / 2], [p.D / 2, 0], [0, p.d / 2]] },
+        { t: 'line', a: [-p.D / 2, 0], b: [p.D / 2, 0], dash: 1, ink: 1 },
+        { t: 'line', a: [0, -p.d / 2], b: [0, p.d / 2], dash: 1, ink: 1 },
+        { t: 'text', p: [p.D / 4, 0], dy: -6, s: 'D' },
+        { t: 'text', p: [0, p.d / 4], dx: 10, s: 'd', anchor: 'start' }]; } },
+    { id: 'trapeze', name: 'Trapèze', params: [['B', 'Grande base B', 9], ['b', 'Petite base b', 5], ['h', 'Hauteur h', 4]],
+      fix: function (p) { if (p.b > p.B) p.b = p.B; },
+      res: function (p) { var s = hyp((p.B - p.b) / 2, p.h); return [
+        ['Périmètre', p.B + p.b + 2 * s, 'cm', 'P = B + b + côté + côté ≈ ' + v(p.B) + ' + ' + v(p.b) + ' + ' + v(s) + ' + ' + v(s)],
+        ['Aire', (p.B + p.b) * p.h / 2, 'cm²', 'A = (B + b) × h ÷ 2 = (' + v(p.B) + ' + ' + v(p.b) + ') × ' + v(p.h) + ' ÷ 2', 1]]; },
+      note: 'Les côtés penchés mesurent environ ',
+      noteVal: function (p) { return v(hyp((p.B - p.b) / 2, p.h)) + ' cm (mesurés sur la figure).'; },
+      draw: function (p) { var o = (p.B - p.b) / 2; return [
+        { t: 'poly', pts: [[0, 0], [p.B, 0], [o + p.b, p.h], [o, p.h]] },
+        { t: 'line', a: [o, 0], b: [o, p.h], dash: 1, ink: 1 },
+        { t: 'text', p: [p.B / 2, 0], dy: 16, s: 'B' },
+        { t: 'text', p: [p.B / 2, p.h], dy: -7, s: 'b' },
+        { t: 'text', p: [o, p.h / 2], dx: 8, s: 'h', anchor: 'start' }]; } },
+    { id: 'disque', name: 'Cercle', params: [['r', 'Rayon r', 4]],
+      res: function (p) { return [
+        ['Périmètre', 2 * PI * p.r, 'cm', 'P = 2 × π × r = 2 × π × ' + v(p.r)],
+        ['Aire', PI * p.r * p.r, 'cm²', 'A = π × r × r = π × ' + v(p.r) + ' × ' + v(p.r), 1]]; },
+      draw: function (p) { return [
+        { t: 'ell', c: [0, 0], rx: p.r, ry: p.r, part: 'full', fill: 1 },
+        { t: 'line', a: [0, 0], b: [p.r, 0], ink: 1 },
+        { t: 'dot', p: [0, 0] },
+        { t: 'text', p: [p.r / 2, 0], dy: -7, s: 'r' }]; } }
+  ];
+
+  function pave(L, l, h) {
+    var o = Q * l;
+    var A = [0, 0], B = [L, 0], C = [L, h], D = [0, h];
+    var A2 = [o, o], B2 = [L + o, o], C2 = [L + o, h + o], D2 = [o, h + o];
+    return [
+      { t: 'poly', pts: [A, B, C, D] },
+      { t: 'poly', pts: [D, C, C2, D2], light: 1 },
+      { t: 'poly', pts: [B, B2, C2, C], dark: 1 },
+      { t: 'line', a: A, b: A2, dash: 1 }, { t: 'line', a: A2, b: B2, dash: 1 }, { t: 'line', a: A2, b: D2, dash: 1 }
+    ];
+  }
+  var shapes3d = [
+    { id: 'cube', name: 'Cube', params: [['a', 'Arête a', 5]],
+      res: function (p) { return [
+        ['Volume', p.a * p.a * p.a, 'cm³', 'V = a × a × a = ' + v(p.a) + ' × ' + v(p.a) + ' × ' + v(p.a), 1, 1],
+        ['Aire totale (6 faces)', 6 * p.a * p.a, 'cm²', 'A = 6 × a × a = 6 × ' + v(p.a) + ' × ' + v(p.a)]]; },
+      draw: function (p) { return pave(p.a, p.a, p.a).concat([{ t: 'text', p: [p.a / 2, 0], dy: 16, s: 'a' }]); } },
+    { id: 'pave', name: 'Pavé droit', params: [['L', 'Longueur L', 7], ['l', 'Profondeur l', 4], ['h', 'Hauteur h', 3]],
+      res: function (p) { return [
+        ['Volume', p.L * p.l * p.h, 'cm³', 'V = L × l × h = ' + v(p.L) + ' × ' + v(p.l) + ' × ' + v(p.h), 1, 1],
+        ['Aire totale', 2 * (p.L * p.l + p.L * p.h + p.l * p.h), 'cm²', 'A = 2 × (L×l + L×h + l×h) = 2 × (' + v(p.L * p.l) + ' + ' + v(p.L * p.h) + ' + ' + v(p.l * p.h) + ')']]; },
+      draw: function (p) { var o = Q * p.l; return pave(p.L, p.l, p.h).concat([
+        { t: 'text', p: [p.L / 2, 0], dy: 16, s: 'L' },
+        { t: 'text', p: [0, p.h / 2], dx: -10, s: 'h', anchor: 'end' },
+        { t: 'text', p: [p.L + o / 2, o / 2], dx: 10, dy: 6, s: 'l', anchor: 'start' }]); } },
+    { id: 'cylindre', name: 'Cylindre', params: [['r', 'Rayon r', 3], ['h', 'Hauteur h', 5]],
+      res: function (p) { return [
+        ['Volume', PI * p.r * p.r * p.h, 'cm³', 'V = π × r × r × h = π × ' + v(p.r) + ' × ' + v(p.r) + ' × ' + v(p.h), 1, 1],
+        ['Aire totale (2 disques + le tour)', 2 * PI * p.r * p.r + 2 * PI * p.r * p.h, 'cm²', 'A = 2 × π × r × r + 2 × π × r × h = 2 × π × ' + v(p.r) + ' × ' + v(p.r) + ' + 2 × π × ' + v(p.r) + ' × ' + v(p.h)]]; },
+      draw: function (p) { var ry = p.r * 0.35; return [
+        { t: 'poly', pts: [[-p.r, 0], [p.r, 0], [p.r, p.h], [-p.r, p.h]], noStroke: 1 },
+        { t: 'ell', c: [0, 0], rx: p.r, ry: ry, part: 'frontfill' },
+        { t: 'ell', c: [0, 0], rx: p.r, ry: ry, part: 'back' },
+        { t: 'ell', c: [0, 0], rx: p.r, ry: ry, part: 'front' },
+        { t: 'line', a: [-p.r, 0], b: [-p.r, p.h] }, { t: 'line', a: [p.r, 0], b: [p.r, p.h] },
+        { t: 'ell', c: [0, p.h], rx: p.r, ry: ry, part: 'full', fill: 1, light: 1 },
+        { t: 'line', a: [0, p.h], b: [p.r, p.h], ink: 1 }, { t: 'dot', p: [0, p.h] },
+        { t: 'text', p: [p.r / 2, p.h], dy: -6, s: 'r' },
+        { t: 'text', p: [p.r, p.h / 2], dx: 10, s: 'h', anchor: 'start' }]; } },
+    { id: 'pyramide', name: 'Pyramide', params: [['c', 'Côté de la base c', 5], ['h', 'Hauteur h', 6]],
+      res: function (p) { return [
+        ['Volume', p.c * p.c * p.h / 3, 'cm³', 'V = aire de la base × h ÷ 3 = ' + v(p.c) + ' × ' + v(p.c) + ' × ' + v(p.h) + ' ÷ 3', 1, 1]]; },
+      note: 'Pour l\'aire, on additionne la base carrée et les 4 triangles. La hauteur des triangles se mesure sur le patron.',
+      draw: function (p) { var o = Q * p.c; var A = [0, 0], B = [p.c, 0], C = [p.c + o, o], D = [o, o]; var G = [(p.c + o) / 2, o / 2]; var S = [G[0], G[1] + p.h]; return [
+        { t: 'poly', pts: [A, B, S] }, { t: 'poly', pts: [B, C, S], dark: 1 },
+        { t: 'line', a: A, b: D, dash: 1 }, { t: 'line', a: D, b: C, dash: 1 }, { t: 'line', a: D, b: S, dash: 1 },
+        { t: 'line', a: G, b: S, dash: 1, ink: 1 }, { t: 'dot', p: G },
+        { t: 'text', p: [p.c / 2, 0], dy: 16, s: 'c' },
+        { t: 'text', p: [G[0], G[1] + p.h / 2], dx: 8, s: 'h', anchor: 'start' }]; } },
+    { id: 'cone', name: 'Cône', params: [['r', 'Rayon r', 3], ['h', 'Hauteur h', 7]],
+      res: function (p) { return [
+        ['Volume', PI * p.r * p.r * p.h / 3, 'cm³', 'V = π × r × r × h ÷ 3 = π × ' + v(p.r) + ' × ' + v(p.r) + ' × ' + v(p.h) + ' ÷ 3', 1, 1]]; },
+      note: 'L\'aire du cône (la surface du cornet) se calcule au lycée.',
+      draw: function (p) { var ry = p.r * 0.35; return [
+        { t: 'poly', pts: [[-p.r, 0], [p.r, 0], [0, p.h]], noStroke: 1 },
+        { t: 'ell', c: [0, 0], rx: p.r, ry: ry, part: 'frontfill' },
+        { t: 'ell', c: [0, 0], rx: p.r, ry: ry, part: 'back' },
+        { t: 'ell', c: [0, 0], rx: p.r, ry: ry, part: 'front' },
+        { t: 'line', a: [-p.r, 0], b: [0, p.h] }, { t: 'line', a: [p.r, 0], b: [0, p.h] },
+        { t: 'line', a: [0, 0], b: [0, p.h], dash: 1, ink: 1 }, { t: 'line', a: [0, 0], b: [p.r, 0], dash: 1, ink: 1 }, { t: 'dot', p: [0, 0] },
+        { t: 'text', p: [p.r / 2, 0], dy: -6, s: 'r' },
+        { t: 'text', p: [0, p.h / 2], dx: -8, s: 'h', anchor: 'end' }]; } },
+    { id: 'boule', name: 'Boule', params: [['r', 'Rayon r', 4]],
+      res: function (p) { return [
+        ['Volume', 4 * PI * p.r * p.r * p.r / 3, 'cm³', 'V = 4 × π × r × r × r ÷ 3 = 4 × π × ' + v(p.r) + ' × ' + v(p.r) + ' × ' + v(p.r) + ' ÷ 3', 1, 1],
+        ['Aire de la sphère', 4 * PI * p.r * p.r, 'cm²', 'A = 4 × π × r × r = 4 × π × ' + v(p.r) + ' × ' + v(p.r)]]; },
+      note: 'La boule, c\'est le solide plein. La sphère, c\'est seulement sa peau (comme un ballon).',
+      draw: function (p) { var ry = p.r * 0.3; return [
+        { t: 'ell', c: [0, 0], rx: p.r, ry: p.r, part: 'full', fill: 1 },
+        { t: 'ell', c: [0, 0], rx: p.r, ry: ry, part: 'back' },
+        { t: 'ell', c: [0, 0], rx: p.r, ry: ry, part: 'front' },
+        { t: 'line', a: [0, 0], b: [p.r, 0], ink: 1 }, { t: 'dot', p: [0, 0] },
+        { t: 'text', p: [p.r / 2, 0], dy: -7, s: 'r' }]; } }
+  ];
+
+  /* ---------- Rendu SVG ---------- */
+  function bbox(prims) {
+    var x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    function add(x, y) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+    prims.forEach(function (q) {
+      if (q.t === 'poly') q.pts.forEach(function (pt) { add(pt[0], pt[1]); });
+      if (q.t === 'line') { add(q.a[0], q.a[1]); add(q.b[0], q.b[1]); }
+      if (q.t === 'ell') { add(q.c[0] - q.rx, q.c[1] - q.ry); add(q.c[0] + q.rx, q.c[1] + q.ry); }
+    });
+    return [x0, y0, x1, y1];
+  }
+  function draw(svg, prims, k) {
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    var W = 260, H = 200, b = bbox(prims);
+    var tx = W / 2 - k * (b[0] + b[2]) / 2, ty = H / 2 + k * (b[1] + b[3]) / 2;
+    function S(pt) { return [tx + k * pt[0], ty - k * pt[1]]; }
+    function el(name, attrs, text) { var e = document.createElementNS(NS, name); for (var a in attrs) e.setAttribute(a, attrs[a]); if (text != null) e.textContent = text; svg.appendChild(e); return e; }
+    prims.forEach(function (q) {
+      var fill = q.dark ? 'var(--acc-soft)' : q.light ? 'var(--card)' : 'var(--acc-soft)';
+      if (q.t === 'poly') {
+        el('polygon', { points: q.pts.map(function (pt) { return S(pt).join(','); }).join(' '), fill: fill, 'fill-opacity': q.dark ? .75 : 1, stroke: q.noStroke ? 'none' : 'var(--acc)', 'stroke-width': 2.5, 'stroke-linejoin': 'round' });
+      } else if (q.t === 'line') {
+        var a = S(q.a), c = S(q.b);
+        el('line', { x1: a[0], y1: a[1], x2: c[0], y2: c[1], stroke: q.ink ? 'var(--ink)' : 'var(--acc)', 'stroke-width': q.ink ? 1.6 : 2.5, 'stroke-dasharray': q.dash ? '5 4' : 'none', 'stroke-linecap': 'round' });
+      } else if (q.t === 'ell') {
+        var ce = S(q.c), rx = q.rx * k, ry = q.ry * k;
+        var L = (ce[0] - rx) + ' ' + ce[1], R = (ce[0] + rx) + ' ' + ce[1];
+        if (q.part === 'full') el('ellipse', { cx: ce[0], cy: ce[1], rx: rx, ry: ry, fill: q.fill ? (q.light ? 'var(--card)' : 'var(--acc-soft)') : 'none', stroke: 'var(--acc)', 'stroke-width': 2.5 });
+        if (q.part === 'front') el('path', { d: 'M' + L + ' A' + rx + ' ' + ry + ' 0 0 0 ' + R, fill: 'none', stroke: 'var(--acc)', 'stroke-width': 2.5 });
+        if (q.part === 'frontfill') el('path', { d: 'M' + L + ' A' + rx + ' ' + ry + ' 0 0 0 ' + R + ' Z', fill: 'var(--acc-soft)', stroke: 'none' });
+        if (q.part === 'back') el('path', { d: 'M' + L + ' A' + rx + ' ' + ry + ' 0 0 1 ' + R, fill: 'none', stroke: 'var(--acc)', 'stroke-width': 2, 'stroke-dasharray': '5 4' });
+      } else if (q.t === 'dot') {
+        var d = S(q.p); el('circle', { cx: d[0], cy: d[1], r: 3, fill: 'var(--ink)' });
+      } else if (q.t === 'text') {
+        var t = S(q.p); el('text', { x: t[0] + (q.dx || 0), y: t[1] + (q.dy || 0) + 4, 'text-anchor': q.anchor || 'middle', 'font-size': 15, style: 'fill:var(--ink);font-weight:600' }, q.s);
+      }
+    });
+  }
+  function scaleFor(shape) {
+    /* Échelle fixe par forme, calculée avec les curseurs au maximum : la figure grandit vraiment quand on augmente les mesures. */
+    var p = {}; shape.params.forEach(function (pr) { p[pr[0]] = 10; });
+    if (shape.fix) shape.fix(p);
+    var b = bbox(shape.draw(p));
+    return Math.min((260 - 56) / (b[2] - b[0]), (200 - 48) / (b[3] - b[1]));
+  }
+
+  /* ---------- Calculatrices ---------- */
+  function makeCalc(kind, shapes) {
+    var pick = document.getElementById('pick' + kind), paramsBox = document.getElementById('params' + kind);
+    var resBox = document.getElementById('res' + kind), note = document.getElementById('note' + kind), svg = document.getElementById('svg' + kind);
+    var state = {}, cur = shapes[0];
+    shapes.forEach(function (s) {
+      state[s.id] = {}; s.params.forEach(function (pr) { state[s.id][pr[0]] = pr[2]; });
+      s.k = scaleFor(s);
+      var b = document.createElement('button'); b.type = 'button'; b.id = 'pick-' + kind + '-' + s.id; b.textContent = s.name;
+      b.addEventListener('click', function () { cur = s; build(); });
+      pick.appendChild(b);
+    });
+    function build() {
+      shapes.forEach(function (s) { document.getElementById('pick-' + kind + '-' + s.id).setAttribute('aria-pressed', s === cur ? 'true' : 'false'); });
+      paramsBox.innerHTML = '';
+      cur.params.forEach(function (pr) {
+        var id = 'p-' + kind + '-' + cur.id + '-' + pr[0];
+        var wrap = document.createElement('div'); wrap.className = 'param';
+        wrap.innerHTML = '<label for="' + id + '">' + pr[1] + ' : <span class="mono" id="' + id + '-out"></span> cm</label>' +
+          '<input id="' + id + '" type="range" min="1" max="10" step="0.5" value="' + state[cur.id][pr[0]] + '">';
+        paramsBox.appendChild(wrap);
+        wrap.querySelector('input').addEventListener('input', function (e) { state[cur.id][pr[0]] = parseFloat(e.target.value); update(); });
+      });
+      update();
+    }
+    function update() {
+      var p = state[cur.id];
+      if (cur.fix) cur.fix(p);
+      cur.params.forEach(function (pr) {
+        var id = 'p-' + kind + '-' + cur.id + '-' + pr[0];
+        document.getElementById(id).value = p[pr[0]];
+        document.getElementById(id + '-out').textContent = v(p[pr[0]]);
+      });
+      resBox.innerHTML = cur.res(p).map(function (r) {
+        var sign = exact(r[1]) ? '= ' : '≈ ';
+        var calc = r[3] + ' ' + sign + v(r[1]) + ' ' + r[2];
+        if (r[5]) calc += ' (soit ' + (r[1] < 1000 ? sign + v(r[1]) + ' mL' : sign + v(r[1] / 1000) + ' L') + ')';
+        return '<div class="res"><span class="res-name">' + r[0] + '</span><span class="res-val' + (r[4] ? ' r' : '') + '">' + sign + v(r[1]) + ' ' + r[2] + '</span><span class="res-calc">' + calc + '</span></div>';
+      }).join('');
+      note.textContent = (cur.note || '') + (cur.noteVal ? cur.noteVal(p) : '');
+      draw(svg, cur.draw(p), cur.k);
+    }
+    build();
+  }
+  makeCalc('2d', shapes2d);
+  makeCalc('3d', shapes3d);
+
+  /* ---------- Fiches des formes ---------- */
+  var cards2d = [
+    ['carre', 'Carré', 'P = 4 × c', 'A = c × c'],
+    ['rectangle', 'Rectangle', 'P = 2 × (L + l)', 'A = L × l'],
+    ['triangle', 'Triangle', 'P = somme des 3 côtés', 'A = b × h ÷ 2'],
+    ['parallelogramme', 'Parallélogramme', 'P = 2 × (b + c)', 'A = b × h'],
+    ['losange', 'Losange', 'P = 4 × côté', 'A = D × d ÷ 2'],
+    ['trapeze', 'Trapèze', 'P = somme des 4 côtés', 'A = (B + b) × h ÷ 2'],
+    ['disque', 'Cercle et disque', 'P = 2 × π × r', 'A = π × r × r']
+  ];
+  var cards3d = [
+    ['cube', 'Cube', 'V = a × a × a', 'Aire = 6 × a × a'],
+    ['pave', 'Pavé droit', 'V = L × l × h', 'Aire = 2 × (L×l + L×h + l×h)'],
+    ['cylindre', 'Cylindre', 'V = π × r × r × h', 'Aire = 2 × π × r × r + 2 × π × r × h'],
+    ['pyramide', 'Pyramide', 'V = aire de la base × h ÷ 3', 'Aire = base + triangles'],
+    ['cone', 'Cône', 'V = π × r × r × h ÷ 3', ''],
+    ['boule', 'Boule', 'V = 4 × π × r × r × r ÷ 3', 'Aire = 4 × π × r × r']
+  ];
+  function cards(boxId, list, shapes, firstLabel, secondLabel) {
+    var box = document.getElementById(boxId);
+    list.forEach(function (c) {
+      var s = shapes.filter(function (x) { return x.id === c[0]; })[0];
+      var div = document.createElement('div'); div.className = 'shape';
+      var sv = document.createElementNS(NS, 'svg'); sv.setAttribute('viewBox', '0 0 260 200'); sv.setAttribute('aria-hidden', 'true');
+      div.appendChild(sv);
+      var st = document.createElement('strong'); st.textContent = c[1]; div.appendChild(st);
+      var f1 = document.createElement('span'); f1.className = 'f'; f1.innerHTML = firstLabel + ' <b>' + c[2] + '</b>'; div.appendChild(f1);
+      if (c[3]) { var f2 = document.createElement('span'); f2.className = 'f r'; f2.innerHTML = secondLabel + ' <b>' + c[3] + '</b>'; div.appendChild(f2); }
+      box.appendChild(div);
+      var p = {}; s.params.forEach(function (pr) { p[pr[0]] = pr[2]; });
+      var prims = s.draw(p).filter(function (q) { return q.t !== 'text'; });
+      var b = bbox(prims);
+      draw(sv, prims, Math.min(220 / (b[2] - b[0]), 170 / (b[3] - b[1])));
+    });
+  }
+  cards('cards2d', cards2d, shapes2d, 'Périmètre :', 'Aire :');
+  cards('cards3d', cards3d, shapes3d, 'Volume :', '');
+
+  /* ---------- Fiche récapitulative ---------- */
+  var sheet = document.getElementById('sheet');
+  cards2d.concat(cards3d).forEach(function (c, i) {
+    var tr = document.createElement('tr');
+    var two = i < cards2d.length;
+    tr.innerHTML = '<td><strong>' + c[1] + '</strong></td><td class="mono" style="font-size:.9rem">' + (two ? c[2] : c[3] || '—') + '</td><td class="mono" style="font-size:.9rem;color:var(--acc)">' + (two ? c[3] : c[2]) + '</td>';
+    sheet.appendChild(tr);
+  });
+
+  /* ---------- Petits dessins des unités ---------- */
+  var au = document.getElementById('areaUnits');
+  for (var i = 0; i < 6; i++) for (var j = 0; j < 2; j++) {
+    var r = document.createElementNS(NS, 'rect');
+    r.setAttribute('x', 35 + i * 15); r.setAttribute('y', 18 + j * 15); r.setAttribute('width', 15); r.setAttribute('height', 15);
+    r.setAttribute('fill', (i + j) % 2 ? 'var(--acc-soft)' : 'var(--card)'); r.setAttribute('stroke', 'var(--acc)'); r.setAttribute('stroke-width', 1.5);
+    au.appendChild(r);
+  }
+  var vu = document.getElementById('volUnits');
+  function cube(x, y, s) {
+    var o = s * .5;
+    [[[x, y], [x + s, y], [x + s, y - s], [x, y - s], 'var(--acc-soft)'],
+     [[x, y - s], [x + s, y - s], [x + s + o, y - s - o], [x + o, y - s - o], 'var(--card)'],
+     [[x + s, y], [x + s + o, y - o], [x + s + o, y - s - o], [x + s, y - s], 'var(--acc-soft)']].forEach(function (f) {
+      var pg = document.createElementNS(NS, 'polygon');
+      pg.setAttribute('points', f.slice(0, 4).map(function (pt) { return pt.join(','); }).join(' '));
+      pg.setAttribute('fill', f[4]); pg.setAttribute('stroke', 'var(--acc)'); pg.setAttribute('stroke-width', 1.5); pg.setAttribute('stroke-linejoin', 'round');
+      vu.appendChild(pg);
+    });
+  }
+  [[0, 0], [1, 0], [2, 0], [0, 1], [1, 1], [2, 1]].forEach(function (c) { cube(40 + c[0] * 18, 62 - c[1] * 18, 18); });
+})();
+</script>
+</body>
+</html>
