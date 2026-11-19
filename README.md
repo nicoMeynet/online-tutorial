@@ -19,6 +19,7 @@ Chaque tutoriel est une seule page HTML, sans installation. Il suffit de l'ouvri
 | [Les pourcentages](les-pourcentages.html) | Une part sur 100, prendre et trouver un pourcentage, hausses et soldes avec le coefficient multiplicateur, les pourcentages qui s'enchaînent (et ne s'additionnent pas), un quiz et des problèmes. |
 | [Les nombres relatifs](les-nombres-relatifs.html) | Positifs et négatifs avec un thermomètre, comparer sur la droite graduée, additionner et soustraire en sauts, la règle des signes pour × et ÷, un quiz, l'histoire et des problèmes. |
 | [Les ensembles de nombres](les-ensembles-de-nombres.html) | ℕ, ℤ, 𝔻, ℚ, ℝ (et ℂ en bonus) : des poupées russes interactives, un classeur qui trouve la famille d'un nombre, le développement décimal des fractions, √2, un quiz et l'histoire. |
+| [La proportionnalité](la-proportionnalite.html) | Le coefficient de proportionnalité, un détecteur avec tableau et graphique, la quatrième proportionnelle (coefficient, passage à l'unité, produit en croix), une recette à adapter, les échelles, les pièges et un quiz. |
 
 ## Ajouter un tutoriel
 

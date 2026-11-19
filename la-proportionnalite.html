@@ -1,0 +1,505 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>La proportionnalité</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, encre chocolat (comme la pâte à crêpes), marge rouge. Les tableaux de proportionnalité sont au centre. */
+:root {
+  --paper: #faf7f4;
+  --grid: #ece4dc;
+  --card: #ffffff;
+  --ink: #2b1d14;
+  --ink-soft: #6b5546;
+  --acc: #9a3412;
+  --acc-soft: #fbe6d9;
+  --two: #1c64c8;
+  --two-soft: #dbe8fa;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #fff0a3;
+  --line: #e3d6cb;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #15100c; --grid: #221a14; --card: #1c1510; --ink: #f4ece5; --ink-soft: #c0aa9a;
+    --acc: #f0a477; --acc-soft: #45281a; --two: #7fb0ff; --two-soft: #1a2a45;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #382a20;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #15100c; --grid: #221a14; --card: #1c1510; --ink: #f4ece5; --ink-soft: #c0aa9a;
+  --acc: #f0a477; --acc-soft: #45281a; --two: #7fb0ff; --two-soft: #1a2a45;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #382a20;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 6px 12px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+input[type="text"] { font: inherit; font-family: var(--f-mono); font-size: 1.05rem; padding: 8px 10px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; }
+input[type="range"] { width: 100%; accent-color: var(--acc); }
+.param { display: flex; flex-direction: column; gap: 2px; }
+.param label { font-weight: 700; }
+
+/* Tableau de proportionnalité */
+.ptable { border-collapse: separate; border-spacing: 0; width: 100%; font-variant-numeric: tabular-nums; }
+.ptable th, .ptable td { border: 1.5px solid var(--ink); padding: 8px 10px; text-align: center; font-family: var(--f-mono); font-size: 1.05rem; }
+.ptable th { font-family: var(--f-display); text-align: left; background: var(--paper); white-space: nowrap; }
+.ptable tr:first-child td { background: var(--card); }
+.ptable tr:last-child td { background: var(--acc-soft); font-weight: 600; }
+.ptable input { font-family: var(--f-mono); font-size: 1rem; padding: 4px; border: 0; background: transparent; color: var(--ink); width: 100%; min-width: 4.4em; text-align: center; }
+.ptable td.in { padding: 2px; }
+.scroll { overflow-x: auto; }
+.coef { display: flex; align-items: center; gap: 10px; font-family: var(--f-mono); font-weight: 700; color: var(--acc); }
+.coef::before { content: "↓"; font-size: 1.4rem; }
+
+.graph svg { width: 100%; height: auto; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; }
+.verdict { border-radius: 8px; padding: 12px 14px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+.verdict.yes { background: var(--ok-soft); color: var(--ok); }
+.verdict.no { background: var(--red-soft); color: var(--red); }
+.verdict span { font-weight: 400; color: var(--ink); }
+
+.inputs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 14px; align-items: end; }
+.inputs label { font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+.methods { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
+.method { border: 1.5px solid var(--line); border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; background: var(--paper); }
+.method strong { font-family: var(--f-display); }
+.method .m { font-family: var(--f-mono); font-size: .95rem; overflow-wrap: anywhere; }
+.method .m b { color: var(--acc); }
+.err { color: var(--red); font-weight: 700; }
+
+.recipe { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.recipe li { display: grid; grid-template-columns: 1fr auto; gap: 10px; padding: 8px 12px; border: 1.5px solid var(--line); border-radius: 8px; font-variant-numeric: tabular-nums; }
+.recipe .q { font-family: var(--f-mono); font-weight: 600; color: var(--acc); }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
+.tag.ok { color: var(--ok); }
+.tag.no { color: var(--red); }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 110px auto; gap: 10px; align-items: center; }
+.quiz input[type="text"] { font-size: 1rem; padding: 6px 8px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc); }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 120px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+</head>
+<body>
+<main class="page">
+
+  <header class="hero">
+    <span class="eyebrow">Tutoriel de maths · niveau 5<sup>e</sup>–4<sup>e</sup></span>
+    <h1>La proportionnalité</h1>
+    <p class="lead">Deux fois plus de crêpes, deux fois plus de farine. Trois fois plus de baguettes, trois fois plus cher. Quand deux quantités grandissent ensemble au même rythme, elles sont proportionnelles.</p>
+    <div class="box">
+      <div class="scroll">
+        <table class="ptable" aria-label="Exemple : prix de baguettes à 1,20 euro">
+          <tr><th>Baguettes</th><td>1</td><td>2</td><td>3</td><td>5</td><td>10</td></tr>
+          <tr><th>Prix (€)</th><td>1,20</td><td>2,40</td><td>3,60</td><td>6,00</td><td>12,00</td></tr>
+        </table>
+      </div>
+      <span class="coef">× 1,2 à chaque colonne : c'est le coefficient de proportionnalité</span>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · L'idée</span>
+    <h2>Toujours multiplier par le même nombre</h2>
+    <p>Deux grandeurs sont <strong>proportionnelles</strong> quand on passe de l'une à l'autre en multipliant <strong>toujours par le même nombre</strong>. Ce nombre s'appelle le <strong>coefficient de proportionnalité</strong>.</p>
+    <p>Pour les baguettes à 1,20 €, le coefficient est 1,2 : prix = nombre de baguettes × 1,2. Pour le vérifier, on divise chaque prix par le nombre de baguettes. Si on trouve <span class="hl">toujours le même résultat</span>, c'est proportionnel.</p>
+    <div class="cards">
+      <div class="box"><span class="tag ok">Proportionnel</span><strong>Le prix des baguettes</strong><span class="soft">Chaque baguette coûte pareil : prix = nombre × 1,20 €.</span></div>
+      <div class="box"><span class="tag ok">Proportionnel</span><strong>Une recette</strong><span class="soft">Pour 2 fois plus de personnes, on double tous les ingrédients.</span></div>
+      <div class="box"><span class="tag no">Pas proportionnel</span><strong>L'âge et la taille</strong><span class="soft">Un bébé de 1 an mesure environ 75 cm. À 20 ans, on ne mesure pas 15 mètres !</span></div>
+      <div class="box"><span class="tag no">Pas proportionnel</span><strong>Le taxi</strong><span class="soft">On paie une somme de départ, plus un prix par kilomètre. Pour 0 km, on paie déjà quelque chose.</span></div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · Est-ce proportionnel ?</span>
+    <h2>Le détecteur de proportionnalité</h2>
+    <p>Remplis le tableau, ou choisis un exemple. La page divise chaque nombre du bas par celui du haut et dessine les points. <strong>Proportionnel</strong> veut dire : tous les quotients sont égaux, et les points sont <strong>alignés avec l'origine</strong> (le point 0 ; 0).</p>
+    <div class="box">
+      <div class="btns" id="presets" role="group" aria-label="Exemples de tableaux"></div>
+      <div class="scroll">
+        <table class="ptable" id="detTable">
+          <tr><th id="rowA">Quantité</th></tr>
+          <tr><th id="rowB">Prix</th></tr>
+        </table>
+      </div>
+      <div class="graph"><svg id="graph" viewBox="0 0 400 260" role="img" aria-label="Graphique des valeurs du tableau"></svg></div>
+      <div class="verdict" id="detOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · La quatrième proportionnelle</span>
+    <h2>Trouver la valeur qui manque</h2>
+    <p>On connaît trois nombres, il en manque un. Par exemple : « 3 cahiers coûtent 7,50 €. Combien coûtent 5 cahiers ? » Il y a trois méthodes, et elles donnent toujours le même résultat.</p>
+    <div class="box">
+      <h3>Calculatrice : si … donne …, alors … donne ?</h3>
+      <div class="inputs">
+        <label for="pa">Si<input id="pa" type="text" inputmode="decimal" autocomplete="off" value="3"></label>
+        <label for="pb">donne<input id="pb" type="text" inputmode="decimal" autocomplete="off" value="7,5"></label>
+        <label for="pc">alors<input id="pc" type="text" inputmode="decimal" autocomplete="off" value="5"></label>
+      </div>
+      <div class="scroll"><table class="ptable" id="fourTable"></table></div>
+      <div class="methods" id="methods" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Une quatrième méthode : la linéarité</span>
+      <span>Dans un tableau de proportionnalité, on peut aussi <strong>additionner</strong> ou <strong>multiplier</strong> des colonnes. Si 2 cahiers coûtent 5 € et 3 cahiers 7,50 €, alors 5 cahiers (2 + 3) coûtent 5 + 7,50 = 12,50 €. Et 6 cahiers (3 × 2) coûtent 7,50 × 2 = 15 €.</span>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · En cuisine</span>
+    <h2>Adapter une recette</h2>
+    <p>Voici une recette de crêpes pour 4 personnes. Choisis le nombre de personnes : chaque quantité est multipliée par le même coefficient.</p>
+    <div class="box">
+      <div class="param">
+        <label for="people">Nombre de personnes : <span class="mono" id="peopleOut">4</span></label>
+        <input id="people" type="range" min="1" max="16" step="1" value="4">
+      </div>
+      <p class="mono" id="recipeCoef" style="color:var(--acc);font-weight:600"></p>
+      <ul class="recipe" id="recipe"></ul>
+      <p class="soft" id="recipeNote"></p>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Les échelles</span>
+    <h2>Les cartes et les plans</h2>
+    <p>Sur une carte à l'échelle <strong>1/25 000</strong>, 1 cm sur la carte représente 25 000 cm en vrai, soit 250 m. Les distances sur la carte et dans la réalité sont proportionnelles.</p>
+    <div class="box">
+      <h3>Calculatrice d'échelle</h3>
+      <div class="inputs" style="grid-template-columns:repeat(2,minmax(0,1fr))">
+        <label for="scale">Échelle 1 /<input id="scale" type="text" inputmode="numeric" autocomplete="off" value="25000"></label>
+        <label for="mapcm">Sur la carte (cm)<input id="mapcm" type="text" inputmode="decimal" autocomplete="off" value="4"></label>
+      </div>
+      <div class="methods" id="scaleOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · Les pièges</span>
+    <h2>Tout n'est pas proportionnel</h2>
+    <div class="cards">
+      <div class="box"><strong>Les gâteaux au four</strong><span class="soft">Un gâteau cuit en 30 minutes. Deux gâteaux dans le même four ne cuisent pas en 60 minutes : ils cuisent ensemble en 30 minutes !</span></div>
+      <div class="box"><strong>Les abonnements</strong><span class="soft">Un forfait téléphone à 10 € par mois plus 0,10 € par SMS : à cause des 10 € de départ, le prix total n'est pas proportionnel au nombre de SMS.</span></div>
+      <div class="box"><strong>Les promotions</strong><span class="soft">« 3 paquets pour le prix de 2 » : 3 paquets ne coûtent pas 3 fois le prix d'un seul.</span></div>
+      <div class="box"><strong>Les ouvriers</strong><span class="soft">Si 2 peintres mettent 6 heures, 4 peintres mettront 3 heures. Plus de peintres, moins de temps : c'est l'inverse de la proportionnalité.</span></div>
+    </div>
+    <div class="note red">
+      <span class="note-title">Le test rapide</span>
+      <span>Demande-toi : « Si je double la première quantité, est-ce que la deuxième double aussi ? » Et : « Pour 0, est-ce que j'obtiens 0 ? » Si la réponse est non à une des deux questions, ce n'est pas proportionnel.</span>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Quiz</span>
+    <h2>Huit situations pour t'entraîner</h2>
+    <p>Toutes ces situations sont proportionnelles. Calcule la valeur qui manque.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Nouvelles situations</button>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Un peu d'histoire</span>
+    <h2>La « règle de trois »</h2>
+    <ol class="timeline">
+      <li><span class="when">vers −1650</span><div class="what"><strong>Les Égyptiens</strong><span>Le papyrus Rhind contient des partages de pains et de bière entre ouvriers, calculés en proportion.</span></div></li>
+      <li><span class="when">vers 500</span><div class="what"><strong>Aryabhata, en Inde</strong><span>Il décrit la méthode avec « trois quantités connues » pour en trouver une quatrième : la future règle de trois.</span></div></li>
+      <li><span class="when">1202</span><div class="what"><strong>Fibonacci</strong><span>Il l'explique aux marchands européens pour convertir des monnaies et calculer des prix. Pendant des siècles, savoir faire une « règle de trois » était le savoir le plus utile d'un commerçant.</span></div></li>
+    </ol>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · À toi de jouer</span>
+    <h2>Six problèmes</h2>
+    <div class="exos">
+      <details>
+        <summary>Les stylos<span class="q">4 stylos coûtent 6 €. Combien coûtent 10 stylos ?</span></summary>
+        <div><span>Un stylo coûte 6 ÷ 4 = 1,50 €. Donc 10 stylos coûtent 10 × 1,50 = <strong>15 €</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Le vélo<span class="q">À vitesse constante, un cycliste parcourt 45 km en 3 heures. Combien de kilomètres en 5 heures ?</span></summary>
+        <div><span>En 1 heure : 45 ÷ 3 = 15 km. En 5 heures : 5 × 15 = <strong>75 km</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Proportionnel ou pas ?<span class="q">Un tableau donne : 2 → 7 ; 4 → 14 ; 6 → 20. Est-ce un tableau de proportionnalité ?</span></summary>
+        <div><span>7 ÷ 2 = 3,5 ; 14 ÷ 4 = 3,5 ; mais 20 ÷ 6 ≈ 3,33. Les quotients ne sont pas tous égaux : <strong>non</strong>.</span></div>
+      </details>
+      <details>
+        <summary>La carte<span class="q">Sur une carte à l'échelle 1/50 000, deux villages sont à 6 cm. Quelle est la vraie distance ?</span></summary>
+        <div><span>6 × 50 000 = 300 000 cm = 3 000 m = <strong>3 km</strong>.</span></div>
+      </details>
+      <details>
+        <summary>La monnaie<span class="q">1 € vaut environ 1,10 dollar américain. Combien de dollars pour 80 € ?</span></summary>
+        <div><span>80 × 1,10 = <strong>88 dollars</strong> (environ, car le taux change chaque jour).</span></div>
+      </details>
+      <details>
+        <summary>La recette<span class="q">Pour 6 personnes, il faut 450 g de pâtes. Combien pour 4 personnes ?</span></summary>
+        <div><span>Pour 1 personne : 450 ÷ 6 = 75 g. Pour 4 personnes : 4 × 75 = <strong>300 g</strong>.</span></div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• Deux grandeurs sont <strong>proportionnelles</strong> si on passe de l'une à l'autre en multipliant toujours par le même <strong>coefficient</strong>.</span>
+      <span>• Test : tous les quotients du tableau sont égaux. Graphique : les points sont <strong>alignés avec l'origine</strong>.</span>
+      <span>• Pour la valeur qui manque : <strong>coefficient</strong>, <strong>passage à l'unité</strong> ou <strong>produit en croix</strong>.</span>
+      <span>• Les pourcentages, les échelles, les recettes, la vitesse constante et les conversions de monnaie sont des situations de proportionnalité.</span>
+    </div>
+  </section>
+
+  <footer>Fiche de révision · La proportionnalité</footer>
+</main>
+
+<script>
+(function () {
+  var NS = 'http://www.w3.org/2000/svg';
+  function fmt(x, d) { var r = Math.round(x * 1e6) / 1e6; if (Object.is(r, -0)) r = 0; return r.toLocaleString('fr-FR', { maximumFractionDigits: d == null ? 3 : d }).replace('-', '−'); }
+  function num(s) { var t = String(s).replace(/\s/g, '').replace(/[−–]/g, '-').replace(',', '.'); if (t === '') return NaN; var x = Number(t); return isFinite(x) ? x : NaN; }
+  function mk(svg, name, attrs, text) { var e = document.createElementNS(NS, name); for (var a in attrs) e.setAttribute(a, attrs[a]); if (text != null) e.textContent = text; svg.appendChild(e); return e; }
+  function exact(x) { return Math.abs(x * 1000 - Math.round(x * 1000)) < 1e-6; }
+  function eqs(x) { return exact(x) ? '= ' : '≈ '; }
+
+  /* ---------- Détecteur ---------- */
+  var presets = [
+    { name: 'Baguettes', a: 'Baguettes', b: 'Prix (€)', x: [1, 2, 3, 5, 8], y: [1.2, 2.4, 3.6, 6, 9.6] },
+    { name: 'Taxi', a: 'Distance (km)', b: 'Prix (€)', x: [0, 2, 5, 10, 20], y: [3, 6, 10.5, 18, 33] },
+    { name: 'Âge et taille', a: 'Âge (ans)', b: 'Taille (cm)', x: [1, 4, 8, 12, 16], y: [75, 102, 128, 150, 170] },
+    { name: 'Essence', a: 'Litres', b: 'Prix (€)', x: [5, 10, 20, 30, 40], y: [9, 18, 36, 54, 72] },
+    { name: 'À toi !', a: 'Quantité 1', b: 'Quantité 2', x: [1, 2, 3, '', ''], y: [4, 8, '', '', ''] }
+  ];
+  var tbl = document.getElementById('detTable'), cells = { x: [], y: [] };
+  for (var c = 0; c < 5; c++) {
+    ['x', 'y'].forEach(function (r, ri) {
+      var td = document.createElement('td'); td.className = 'in';
+      var inp = document.createElement('input'); inp.type = 'text'; inp.inputMode = 'decimal'; inp.id = 'd' + r + c; inp.setAttribute('aria-label', (r === 'x' ? 'Ligne du haut, colonne ' : 'Ligne du bas, colonne ') + (c + 1));
+      inp.addEventListener('input', detect);
+      td.appendChild(inp); tbl.rows[ri].appendChild(td); cells[r].push(inp);
+    });
+  }
+  presets.forEach(function (p, i) {
+    var b = document.createElement('button'); b.type = 'button'; b.id = 'pre' + i; b.textContent = p.name;
+    b.addEventListener('click', function () { load(i); });
+    document.getElementById('presets').appendChild(b);
+  });
+  function load(i) {
+    var p = presets[i];
+    document.getElementById('rowA').textContent = p.a; document.getElementById('rowB').textContent = p.b;
+    for (var c = 0; c < 5; c++) { cells.x[c].value = p.x[c] === '' ? '' : fmt(p.x[c]); cells.y[c].value = p.y[c] === '' ? '' : fmt(p.y[c]); }
+    presets.forEach(function (q, j) { document.getElementById('pre' + j).setAttribute('aria-pressed', j === i ? 'true' : 'false'); });
+    detect();
+  }
+  function detect() {
+    var pts = [], out = document.getElementById('detOut'), svg = document.getElementById('graph');
+    for (var c = 0; c < 5; c++) { var x = num(cells.x[c].value), y = num(cells.y[c].value); if (!isNaN(x) && !isNaN(y)) pts.push([x, y]); }
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    if (pts.length < 2) { out.className = 'verdict'; out.innerHTML = '<span>Remplis au moins deux colonnes complètes.</span>'; drawGraph(svg, pts, null); return; }
+    var lines = [], prop = true, k = null, zeroIssue = false;
+    pts.forEach(function (p) {
+      if (p[0] === 0) { if (p[1] !== 0) { prop = false; zeroIssue = true; lines.push(fmt(p[1]) + ' pour 0 : on devrait trouver 0'); } return; }
+      var q = p[1] / p[0];
+      lines.push(fmt(p[1]) + ' ÷ ' + fmt(p[0]) + ' ' + eqs(q) + fmt(q));
+      if (k === null) k = q; else if (Math.abs(q - k) > 1e-9 * Math.max(1, Math.abs(k))) prop = false;
+    });
+    if (k === null) { prop = false; }
+    if (prop) {
+      out.className = 'verdict yes';
+      out.innerHTML = 'Oui, c\'est proportionnel ! Le coefficient est ' + fmt(k) + '.<span class="mono">' + lines.join('<br>') + '</span><span>Tous les quotients sont égaux, et les points sont alignés avec l\'origine.</span>';
+    } else {
+      out.className = 'verdict no';
+      out.innerHTML = 'Non, ce n\'est pas proportionnel.<span class="mono">' + lines.join('<br>') + '</span><span>' + (zeroIssue ? 'Pour 0, on ne trouve pas 0.' : 'Les quotients ne sont pas tous égaux.') + '</span>';
+    }
+    drawGraph(svg, pts, prop ? k : null);
+  }
+  function drawGraph(svg, pts, k) {
+    var W = 400, H = 260, L = 46, B = 34, T = 14, R = 14;
+    var xm = Math.max.apply(null, pts.map(function (p) { return p[0]; }).concat([1])), ym = Math.max.apply(null, pts.map(function (p) { return p[1]; }).concat([1]));
+    function nice(v) { var p = Math.pow(10, Math.floor(Math.log10(v))), n = v / p; return (n <= 1 ? 1 : n <= 2 ? 2 : n <= 2.5 ? 2.5 : n <= 4 ? 4 : n <= 5 ? 5 : n <= 8 ? 8 : 10) * p; }
+    xm = nice(xm * 1.05); ym = nice(ym * 1.05);
+    function X(v) { return L + v / xm * (W - L - R); } function Y(v) { return H - B - v / ym * (H - B - T); }
+    for (var i = 0; i <= 4; i++) {
+      var gx = xm * i / 4, gy = ym * i / 4;
+      mk(svg, 'line', { x1: X(gx), y1: T, x2: X(gx), y2: H - B, stroke: 'var(--line)', 'stroke-width': 1 });
+      mk(svg, 'line', { x1: L, y1: Y(gy), x2: W - R, y2: Y(gy), stroke: 'var(--line)', 'stroke-width': 1 });
+      mk(svg, 'text', { x: X(gx), y: H - B + 20, 'text-anchor': 'middle', 'font-size': 13 }, fmt(gx));
+      mk(svg, 'text', { x: L - 6, y: Y(gy) + 5, 'text-anchor': 'end', 'font-size': 13 }, fmt(gy));
+    }
+    mk(svg, 'line', { x1: L, y1: H - B, x2: W - R, y2: H - B, stroke: 'var(--ink)', 'stroke-width': 2 });
+    mk(svg, 'line', { x1: L, y1: T, x2: L, y2: H - B, stroke: 'var(--ink)', 'stroke-width': 2 });
+    if (k !== null && k !== undefined) {
+      var xe = Math.min(xm, ym / k);
+      mk(svg, 'line', { x1: X(0), y1: Y(0), x2: X(xe), y2: Y(k * xe), stroke: 'var(--ok)', 'stroke-width': 2.5, 'stroke-dasharray': '6 5' });
+    }
+    mk(svg, 'circle', { cx: X(0), cy: Y(0), r: 4, fill: 'var(--ink)' });
+    pts.forEach(function (p) { if (p[0] >= 0 && p[1] >= 0) mk(svg, 'circle', { cx: X(p[0]), cy: Y(p[1]), r: 6, fill: k !== null && k !== undefined ? 'var(--ok)' : 'var(--acc)', stroke: 'var(--card)', 'stroke-width': 2 }); });
+  }
+  load(0);
+
+  /* ---------- Quatrième proportionnelle ---------- */
+  var pa = document.getElementById('pa'), pb = document.getElementById('pb'), pc = document.getElementById('pc');
+  function four() {
+    var a = num(pa.value), b = num(pb.value), c = num(pc.value), out = document.getElementById('methods'), ft = document.getElementById('fourTable');
+    if (isNaN(a) || isNaN(b) || isNaN(c)) { out.innerHTML = '<p class="err">Écris trois nombres.</p>'; ft.innerHTML = ''; return; }
+    if (a === 0) { out.innerHTML = '<p class="err">Le premier nombre ne peut pas être 0 (on ne peut pas diviser par 0).</p>'; ft.innerHTML = ''; return; }
+    var k = b / a, d = c * k, u = b / a;
+    ft.innerHTML = '<tr><th>Quantité 1</th><td>' + fmt(a) + '</td><td>' + fmt(c) + '</td></tr><tr><th>Quantité 2</th><td>' + fmt(b) + '</td><td style="color:var(--acc)">? ' + eqs(d) + fmt(d) + '</td></tr>';
+    out.innerHTML =
+      '<div class="method"><strong>Le coefficient</strong><span class="m">k = ' + fmt(b) + ' ÷ ' + fmt(a) + ' ' + eqs(k) + fmt(k) + '</span><span class="m">? = ' + fmt(c) + ' × ' + fmt(k) + ' <b>' + eqs(d) + fmt(d) + '</b></span></div>' +
+      '<div class="method"><strong>Le passage à l\'unité</strong><span class="m">Pour 1 : ' + fmt(b) + ' ÷ ' + fmt(a) + ' ' + eqs(u) + fmt(u) + '</span><span class="m">Pour ' + fmt(c) + ' : ' + fmt(c) + ' × ' + fmt(u) + ' <b>' + eqs(d) + fmt(d) + '</b></span></div>' +
+      '<div class="method"><strong>Le produit en croix</strong><span class="m">? = ' + fmt(b) + ' × ' + fmt(c) + ' ÷ ' + fmt(a) + '</span><span class="m">= ' + fmt(b * c) + ' ÷ ' + fmt(a) + ' <b>' + eqs(d) + fmt(d) + '</b></span></div>';
+  }
+  [pa, pb, pc].forEach(function (e) { e.addEventListener('input', four); }); four();
+
+  /* ---------- Recette ---------- */
+  var ingr = [['Farine', 250, 'g'], ['Œufs', 4, ''], ['Lait', 50, 'cL'], ['Beurre fondu', 50, 'g'], ['Sucre', 30, 'g'], ['Sel', 1, 'pincée']];
+  var people = document.getElementById('people');
+  function recipe() {
+    var n = parseInt(people.value, 10), k = n / 4;
+    document.getElementById('peopleOut').textContent = n;
+    document.getElementById('recipeCoef').textContent = 'Coefficient : ' + n + ' ÷ 4 ' + eqs(k) + fmt(k) + ' (on multiplie tout par ' + fmt(k) + ')';
+    document.getElementById('recipe').innerHTML = ingr.map(function (g) {
+      var q = g[1] * k, unit = g[2] === 'pincée' ? (q >= 2 ? ' pincées' : ' pincée') : (g[2] ? ' ' + g[2] : (q >= 2 ? ' œufs' : ' œuf'));
+      return '<li><span>' + g[0] + '</span><span class="q">' + fmt(q, 2) + unit + '</span></li>';
+    }).join('');
+    var eggs = 4 * k;
+    document.getElementById('recipeNote').textContent = Number.isInteger(eggs) ? 'Les maths et la cuisine sont d\'accord !' : 'On ne peut pas casser ' + fmt(eggs, 2) + ' œufs : en cuisine, on arrondit à ' + Math.round(eggs) + '. Les maths donnent la quantité exacte, la cuisine s\'adapte.';
+  }
+  people.addEventListener('input', recipe); recipe();
+
+  /* ---------- Échelle ---------- */
+  var sc = document.getElementById('scale'), mc = document.getElementById('mapcm');
+  function scale() {
+    var n = num(sc.value), d = num(mc.value), out = document.getElementById('scaleOut');
+    if (isNaN(n) || isNaN(d) || n <= 0 || d < 0) { out.innerHTML = '<p class="err">Écris une échelle et une distance positives.</p>'; return; }
+    var cm = d * n, m = cm / 100, km = m / 1000;
+    out.innerHTML = '<div class="method"><strong>Le calcul</strong><span class="m">' + fmt(d) + ' cm × ' + fmt(n) + ' = <b>' + fmt(cm) + ' cm</b> en vrai</span></div>' +
+      '<div class="method"><strong>En mètres et kilomètres</strong><span class="m">= ' + fmt(m) + ' m</span><span class="m">= <b>' + fmt(km) + ' km</b></span></div>' +
+      '<div class="method"><strong>1 cm sur la carte</strong><span class="m">= ' + fmt(n / 100) + ' m en vrai</span></div>';
+  }
+  sc.addEventListener('input', scale); mc.addEventListener('input', scale); scale();
+
+  /* ---------- Quiz ---------- */
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  function rnd(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+  function makeQ() {
+    var t = rnd(0, 3);
+    if (t === 0) { var n1 = rnd(2, 6), p = pick([0.5, 1.2, 1.5, 2, 2.5, 3, 4]), n2 = rnd(2, 12); while (n2 === n1) n2 = rnd(2, 12); return { q: n1 + ' cahiers coûtent ' + fmt(n1 * p, 2) + ' €. Combien coûtent ' + n2 + ' cahiers (en €) ?', a: n2 * p, how: 'Un cahier : ' + fmt(n1 * p, 2) + ' ÷ ' + n1 + ' = ' + fmt(p, 2) + ' €, donc ' + n2 + ' × ' + fmt(p, 2) + ' = ' + fmt(n2 * p, 2) + ' €' }; }
+    if (t === 1) { var cons = pick([5, 6, 7, 8]), km = pick([50, 150, 200, 250, 300, 400]); return { q: 'Une voiture consomme ' + cons + ' L d\'essence pour 100 km. Combien pour ' + km + ' km (en L) ?', a: cons * km / 100, how: cons + ' × ' + km + ' ÷ 100 = ' + fmt(cons * km / 100) + ' L' }; }
+    if (t === 2) { var g = pick([100, 200, 300, 400]), pp = pick([2, 6, 8, 10, 12]); return { q: 'Pour 4 personnes, il faut ' + g + ' g de riz. Combien pour ' + pp + ' personnes (en g) ?', a: g * pp / 4, how: 'Pour 1 : ' + g + ' ÷ 4 = ' + fmt(g / 4) + ' g, donc ' + pp + ' × ' + fmt(g / 4) + ' = ' + fmt(g * pp / 4) + ' g' }; }
+    var h = pick([2, 3, 4, 5]), sp = pick([12, 15, 20, 60, 80, 90]), h2 = pick([1, 2, 3, 6, 7]); while (h2 === h) h2 = pick([1, 2, 3, 6, 7]);
+    return { q: 'À vitesse constante, on parcourt ' + (sp * h) + ' km en ' + h + ' h. Combien de km en ' + h2 + ' h ?', a: sp * h2, how: 'En 1 h : ' + (sp * h) + ' ÷ ' + h + ' = ' + sp + ' km, donc ' + h2 + ' × ' + sp + ' = ' + (sp * h2) + ' km' };
+  }
+  var quiz = document.getElementById('quiz'), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ''; done = [];
+    for (var k = 0; k < 8; k++) {
+      var Q = makeQ(), li = document.createElement('li');
+      li.innerHTML = '<span>' + Q.q + '</span><input type="text" id="qa' + k + '" inputmode="decimal" autocomplete="off" aria-label="Ta réponse à la question ' + (k + 1) + '"><button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+      quiz.appendChild(li);
+      (function (k, Q) {
+        function check() {
+          var fb = document.getElementById('qf' + k), x = num(document.getElementById('qa' + k).value);
+          if (isNaN(x)) { fb.className = 'fb'; fb.textContent = 'Écris un nombre.'; return; }
+          if (Math.abs(x - Q.a) < 0.006) { fb.className = 'fb ok'; fb.textContent = 'Bravo, c\'est juste !'; done[k] = true; }
+          else { done[k] = false; fb.className = 'fb no'; fb.innerHTML = 'Pas tout à fait : la réponse est ' + fmt(Q.a, 2) + '.<span>' + Q.how + '</span>'; }
+          document.getElementById('score').textContent = done.filter(Boolean).length + ' / 8';
+        }
+        document.getElementById('qb' + k).addEventListener('click', check);
+        document.getElementById('qa' + k).addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+      })(k, Q);
+    }
+    document.getElementById('score').textContent = '0 / 8';
+  }
+  document.getElementById('newQuiz').addEventListener('click', newQuiz);
+  newQuiz();
+})();
+</script>
+</body>
+</html>
