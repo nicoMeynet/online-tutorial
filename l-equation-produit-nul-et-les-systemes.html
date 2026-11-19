@@ -1,0 +1,1112 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>L'équation produit nul et les systèmes</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, encre prune, marge rouge. Les courbes qui coupent l'axe et les droites qui se croisent sont au centre. */
+:root {
+  --paper: #faf7fc;
+  --grid: #ebe3f1;
+  --card: #ffffff;
+  --ink: #24122f;
+  --ink-soft: #67537a;
+  --acc: #7e22ce;
+  --acc-soft: #f1e4fc;
+  --two: #0f766e;
+  --two-soft: #d5f0ec;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #fff0a3;
+  --line: #e0d4ea;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #120c17; --grid: #1f1627; --card: #19111f; --ink: #f1eaf6; --ink-soft: #b9a8c8;
+    --acc: #d8b4fe; --acc-soft: #2e1a47; --two: #5eead4; --two-soft: #12332f;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #33263f;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #120c17; --grid: #1f1627; --card: #19111f; --ink: #f1eaf6; --ink-soft: #b9a8c8;
+  --acc: #d8b4fe; --acc-soft: #2e1a47; --two: #5eead4; --two-soft: #12332f;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #33263f;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+@media (max-width: 420px) { .box { padding: 14px; } }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+.fig svg { width: 100%; height: auto; display: block; }
+.graph svg { width: 100%; height: auto; display: block; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 8px 14px; min-height: 44px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+button:disabled { opacity: .45; cursor: default; transform: none; box-shadow: 3px 3px 0 var(--ink); }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+input[type="text"] { font: inherit; font-family: var(--f-mono); font-size: 1.05rem; padding: 8px 10px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; }
+input[type="range"] { width: 100%; accent-color: var(--acc); min-height: 32px; }
+.param { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.param label { font-weight: 700; }
+.params { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px 18px; }
+
+/* Ligne d'équation à trous */
+.eqrow { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-family: var(--f-mono); font-size: 1.1rem; font-weight: 600; }
+.eqrow input[type="text"] { width: 4.6em; text-align: center; padding: 6px 4px; }
+.eqrow .tag2 { font-family: var(--f-mono); color: var(--ink-soft); font-size: .9rem; min-width: 2.2em; }
+.preview { font-family: var(--f-mono); font-weight: 600; color: var(--acc); font-size: 1.1rem; overflow-wrap: anywhere; }
+
+.sys { border-left: 3px solid var(--acc); padding: 4px 0 4px 12px; font-family: var(--f-mono); font-size: 1.08rem; font-weight: 600; display: flex; flex-direction: column; gap: 2px; overflow-wrap: anywhere; }
+
+.steps { display: flex; flex-direction: column; gap: 6px; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; padding: 12px 14px; font-family: var(--f-mono); font-size: 1rem; overflow-wrap: anywhere; min-width: 0; }
+.steps b { color: var(--acc); font-size: 1.08rem; }
+.steps .why { font-family: var(--f-body); font-size: .97rem; color: var(--ink-soft); margin-top: 8px; }
+.steps .why:first-child { margin-top: 0; }
+.err { color: var(--red); font-weight: 700; font-family: var(--f-body); }
+
+.results { display: flex; flex-direction: column; gap: 8px; font-variant-numeric: tabular-nums; }
+.res { border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 12px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; align-items: baseline; }
+.res-name { font-family: var(--f-display); font-weight: 700; }
+.res-val { font-family: var(--f-mono); font-weight: 600; color: var(--acc); font-size: 1.05rem; white-space: nowrap; }
+.res-calc { grid-column: 1 / -1; font-family: var(--f-mono); font-size: .92rem; color: var(--ink-soft); overflow-wrap: anywhere; }
+.res.good { border-color: var(--ok); background: var(--ok-soft); }
+.res.good .res-val { color: var(--ok); }
+.res.bad .res-val { color: var(--red); }
+
+.verdict { border-radius: 8px; padding: 12px 14px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+.verdict:empty { display: none; }
+.verdict.yes { background: var(--ok-soft); color: var(--ok); }
+.verdict.no { background: var(--red-soft); color: var(--red); }
+.verdict.info { background: var(--acc-soft); color: var(--acc); }
+.verdict span { font-weight: 400; color: var(--ink); overflow-wrap: anywhere; }
+
+.legend { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: .95rem; align-items: center; }
+.legend span { display: inline-flex; align-items: center; gap: 8px; }
+.chip { display: inline-block; width: 18px; height: 18px; border-radius: 3px; border: 2px solid; flex: none; }
+.chip.a { background: var(--acc-soft); border-color: var(--acc); }
+.chip.b { background: var(--two-soft); border-color: var(--two); }
+.chip.c { background: var(--ok-soft); border-color: var(--ok); }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.cards .m { font-family: var(--f-mono); font-size: .95rem; overflow-wrap: anywhere; }
+.cards .m b { color: var(--acc); }
+.big { font-family: var(--f-mono); font-weight: 600; font-size: 1.25rem; color: var(--acc); overflow-wrap: anywhere; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
+.tag.ok { color: var(--ok); }
+.tag.no { color: var(--red); }
+
+.game-q { font-size: 1.1rem; }
+.guess { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 14px; max-width: 360px; }
+.guess label { font-weight: 700; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 110px auto; gap: 10px; align-items: center; }
+.quiz li > span:first-child { overflow-wrap: anywhere; min-width: 0; }
+.quiz input[type="text"] { font-size: 1rem; padding: 6px 8px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb:empty { display: none; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc); }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 120px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.errs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.errs li { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--paper); }
+.errs .bad { font-family: var(--f-mono); color: var(--red); text-decoration: line-through; overflow-wrap: anywhere; }
+.errs .good { font-family: var(--f-mono); color: var(--ok); font-weight: 600; overflow-wrap: anywhere; }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); overflow-wrap: anywhere; }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+<style id="tnav-css">
+.tnav-top { display: flex; margin: 0 0 4px; }
+.tnav-home { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font-weight: 700; font-size: .95rem; text-decoration: none; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tnav-home:hover, .tnav-home:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.tnav-bottom { margin-top: 8px; display: flex; flex-direction: column; gap: 12px; }
+.tnav-bottom h2 { margin: 0; }
+.tnav-pn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tnav-pn a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--ink, #222); border-radius: 10px;
+  background: var(--card, #fff); color: var(--ink, #222); text-decoration: none; box-shadow: 3px 3px 0 var(--ink, #222); min-width: 0; }
+.tnav-pn a span { font-size: .85rem; color: var(--ink-soft, #666); }
+.tnav-pn a strong { overflow-wrap: anywhere; }
+.tnav-pn a.next { text-align: right; grid-column: 2; }
+.tnav-bottom .tnav-home { align-self: center; }
+@media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
+</style>
+</head>
+<body>
+<main class="page">
+<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="index.html">← Tous les tutoriels</a></nav><!--/tnav-->
+
+
+  <header class="hero">
+    <span class="eyebrow">Tutoriel de maths · niveau 3<sup>e</sup></span>
+    <h1>L'équation produit nul et les systèmes</h1>
+    <p class="lead">Une seule règle permet de résoudre des équations avec des x² : si un produit vaut 0, un des facteurs vaut 0. Ensuite, on apprend à trouver deux nombres inconnus à la fois, avec deux équations.</p>
+    <div class="box fig">
+      <svg viewBox="0 0 400 180" role="img" aria-label="À gauche, une courbe qui coupe l'axe en deux points : les solutions d'une équation produit nul. À droite, deux droites qui se croisent en un point : la solution d'un système.">
+        <line x1="20" y1="110" x2="185" y2="110" stroke="var(--ink)" stroke-width="1.5"/>
+        <path d="M 35 70 Q 100 230 165 70" fill="none" stroke="var(--acc)" stroke-width="3"/>
+        <circle cx="54" cy="110" r="6" fill="var(--red)" stroke="var(--card)" stroke-width="2"/>
+        <circle cx="146" cy="110" r="6" fill="var(--red)" stroke="var(--card)" stroke-width="2"/>
+        <text x="100" y="30" text-anchor="middle" font-size="15" font-weight="600">A × B = 0</text>
+        <text x="100" y="172" text-anchor="middle" font-size="13">deux solutions</text>
+        <line x1="207" y1="10" x2="207" y2="170" stroke="var(--line)" stroke-width="1.5" stroke-dasharray="4 4"/>
+        <line x1="225" y1="133" x2="385" y2="20" stroke="var(--acc)" stroke-width="3"/>
+        <line x1="225" y1="45" x2="385" y2="120" stroke="var(--two)" stroke-width="3"/>
+        <circle cx="300" cy="80" r="7" fill="var(--red)" stroke="var(--card)" stroke-width="2"/>
+        <text x="300" y="172" text-anchor="middle" font-size="13">un point commun</text>
+      </svg>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · L'idée</span>
+    <h2>Quand un produit vaut zéro</h2>
+    <p>Pense à une multiplication A × B. Pour que le résultat fasse <strong>0</strong>, il n'y a qu'une seule façon : <span class="hl">un des deux nombres doit être 0</span> (ou les deux). Si A vaut 3 et B vaut −2, le produit vaut −6, pas 0. Aucune autre multiplication ne donne 0.</p>
+    <div class="note">
+      <span class="note-title">La propriété du produit nul</span>
+      <span class="big">Si A × B = 0, alors A = 0 ou B = 0.</span>
+      <span>Et dans l'autre sens : si A = 0 ou B = 0, alors A × B = 0. Le mot « ou » veut dire « l'un, l'autre, ou les deux ».</span>
+    </div>
+    <div class="box">
+      <h3>La table de multiplication de −5 à 5</h3>
+      <p class="soft">Clique sur une case (ou bouge les curseurs). Les cases vertes sont celles où le produit vaut 0 : elles forment une croix, exactement sur la ligne A = 0 et la colonne B = 0.</p>
+      <div class="params">
+        <div class="param"><label for="pA">A = <span class="mono" id="pAo">3</span></label><input id="pA" type="range" min="-5" max="5" step="1" value="3"></div>
+        <div class="param"><label for="pB">B = <span class="mono" id="pBo">−2</span></label><input id="pB" type="range" min="-5" max="5" step="1" value="-2"></div>
+      </div>
+      <div class="fig"><svg id="table" viewBox="0 0 320 320" role="img" aria-label="Table de multiplication de −5 à 5, cliquable"></svg></div>
+      <div class="verdict" id="prodOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · Résoudre</span>
+    <h2>L'équation (ax + b)(cx + d) = 0</h2>
+    <p>Prenons <strong>(2x + 6)(x − 4) = 0</strong>. C'est un produit de deux facteurs, et il vaut 0. Donc un des facteurs vaut 0 : <strong>2x + 6 = 0</strong> ou <strong>x − 4 = 0</strong>. On a remplacé une équation difficile par deux petites équations faciles, comme dans le tutoriel sur <a class="tlink" href="les-equations.html">les équations</a>.</p>
+    <p>2x + 6 = 0 donne 2x = −6, donc x = −3. Et x − 4 = 0 donne x = 4. L'équation a <strong>deux solutions</strong> : −3 et 4. Vérifions avec −3 : (2 × (−3) + 6)(−3 − 4) = 0 × (−7) = 0. ✓</p>
+    <div class="box">
+      <h3>Le solveur pas à pas</h3>
+      <p class="soft">Écris les quatre nombres (entiers, décimaux ou fractions comme 1/2). Puis avance étape par étape.</p>
+      <div class="eqrow" role="group" aria-label="Coefficients de l'équation produit nul">
+        <span>(</span><input id="za" type="text" inputmode="decimal" autocomplete="off" value="2" aria-label="a"><span>x +</span><input id="zb" type="text" inputmode="decimal" autocomplete="off" value="6" aria-label="b"><span>)(</span><input id="zc" type="text" inputmode="decimal" autocomplete="off" value="1" aria-label="c"><span>x +</span><input id="zd" type="text" inputmode="decimal" autocomplete="off" value="-4" aria-label="d"><span>) = 0</span>
+      </div>
+      <div class="btns" id="zPresets" role="group" aria-label="Exemples"></div>
+      <div class="preview" id="zPrev" aria-live="polite"></div>
+      <div class="steps" id="zSteps" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="zNext">Étape suivante</button><button type="button" id="zAll">Tout voir</button></div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Se ramener à un produit nul</span>
+    <h2>Les équations avec x²</h2>
+    <p>La règle ne marche que si on a <strong>un produit</strong> d'un côté et <strong>0</strong> de l'autre. Souvent, il faut d'abord tout mettre du même côté, puis <strong>factoriser</strong> (voir le tutoriel sur <a class="tlink" href="le-calcul-litteral.html">le calcul littéral</a> et celui sur les identités remarquables).</p>
+    <div class="cards">
+      <div class="box"><span class="tag ok">x² = 9</span><span class="m">x² − 9 = 0</span><span class="m">(x − 3)(x + 3) = 0</span><span class="m"><b>x = 3 ou x = −3</b></span><span class="soft">Deux solutions, car 3² = 9 et aussi (−3)² = 9.</span></div>
+      <div class="box"><span class="tag no">x² = −4</span><span class="m">Un carré n'est jamais négatif.</span><span class="m"><b>Aucune solution</b></span><span class="soft">2² = 4 et (−2)² = 4 aussi : jamais −4.</span></div>
+      <div class="box"><span class="tag ok">x² − 5x = 0</span><span class="m">x est en facteur :</span><span class="m">x(x − 5) = 0</span><span class="m"><b>x = 0 ou x = 5</b></span></div>
+      <div class="box"><span class="tag ok">x² − 16 = 0</span><span class="m">a² − b² = (a − b)(a + b) :</span><span class="m">(x − 4)(x + 4) = 0</span><span class="m"><b>x = 4 ou x = −4</b></span></div>
+    </div>
+    <div class="box">
+      <h3>Explorer x² = k</h3>
+      <p class="soft">Bouge k. La courbe violette est y = x², la droite verte est y = k. Les solutions sont les abscisses des points où elles se croisent.</p>
+      <div class="param"><label for="kk">k = <span class="mono" id="kko">9</span></label><input id="kk" type="range" min="-9" max="25" step="1" value="9"></div>
+      <div class="graph"><svg id="sqG" viewBox="0 0 400 280" role="img" aria-label="La parabole y = x² et la droite y = k"></svg></div>
+      <div class="steps" id="sqOut" aria-live="polite"></div>
+    </div>
+    <div class="note red">
+      <span class="note-title">Ne divise pas par x !</span>
+      <span>Pour x² = 5x, on a envie de « diviser par x » et de trouver x = 5. Mais on perd la solution x = 0 ! La bonne méthode : x² − 5x = 0, puis x(x − 5) = 0, donc x = 0 ou x = 5.</span>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · Sur un graphique</span>
+    <h2>Les solutions, là où la courbe coupe l'axe</h2>
+    <p>Résoudre (x − p)(x − q) = 0, c'est chercher les x pour lesquels y = (x − p)(x − q) vaut 0. Sur le graphique, ce sont les points où la courbe <strong>coupe l'axe des abscisses</strong> (l'axe horizontal, où y = 0). Voir aussi le tutoriel sur <a class="tlink" href="les-fonctions.html">les fonctions</a>.</p>
+    <div class="box">
+      <div class="params">
+        <div class="param"><label for="rp">p = <span class="mono" id="rpo">−2</span></label><input id="rp" type="range" min="-5" max="5" step="0.5" value="-2"></div>
+        <div class="param"><label for="rq">q = <span class="mono" id="rqo">3</span></label><input id="rq" type="range" min="-5" max="5" step="0.5" value="3"></div>
+      </div>
+      <div class="preview" id="rEq" aria-live="polite"></div>
+      <div class="graph"><svg id="rootG" viewBox="0 0 400 300" role="img" aria-label="Courbe y = (x − p)(x − q) et ses points sur l'axe"></svg></div>
+      <div class="verdict info" id="rOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Deux inconnues</span>
+    <h2>Le problème du café et des croissants</h2>
+    <p>Au café du coin, Léa paie <strong>7,00 €</strong> pour 2 cafés et 3 croissants. Tom paie <strong>4,10 €</strong> pour 1 café et 2 croissants. Combien coûte un café ? Et un croissant ?</p>
+    <p>On appelle <strong>x</strong> le prix d'un café et <strong>y</strong> le prix d'un croissant. Chaque ticket donne une équation. Ensemble, elles forment un <strong>système de deux équations à deux inconnues</strong> :</p>
+    <div class="sys"><span>(1) 2x + 3y = 7</span><span>(2) x + 2y = 4,1</span></div>
+    <p>Une <strong>solution</strong> du système, c'est un couple (x ; y) qui vérifie <span class="hl">les deux équations en même temps</span>.</p>
+    <div class="box">
+      <h3>Essaie de deviner les prix</h3>
+      <div class="params">
+        <div class="param"><label for="cx">Un café : <span class="mono" id="cxo">1,50 €</span></label><input id="cx" type="range" min="50" max="300" step="10" value="150"></div>
+        <div class="param"><label for="cy">Un croissant : <span class="mono" id="cyo">1,50 €</span></label><input id="cy" type="range" min="50" max="250" step="10" value="150"></div>
+      </div>
+      <div class="results" id="cafeRes" aria-live="polite"></div>
+      <div class="verdict" id="cafeOut" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Une équation seule ne suffit pas</span>
+      <span>Pour 2x + 3y = 7, il y a plein de couples qui marchent : (2 ; 1), (1,7 ; 1,2), (1,4 ; 1,4), (1,1 ; 1,6)… Il faut la deuxième équation pour choisir le bon. C'est pour ça qu'il faut <strong>deux équations pour deux inconnues</strong>.</span>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · Deux méthodes</span>
+    <h2>Substitution et combinaison</h2>
+    <div class="cards">
+      <div class="box">
+        <strong>La substitution</strong>
+        <span class="soft">On isole une inconnue dans une équation, puis on la remplace dans l'autre.</span>
+        <span class="m">(2) donne x = 4,1 − 2y</span>
+        <span class="m">Dans (1) : 2(4,1 − 2y) + 3y = 7</span>
+        <span class="m">8,2 − 4y + 3y = 7</span>
+        <span class="m">−y = −1,2 donc <b>y = 1,2</b></span>
+        <span class="m">x = 4,1 − 2 × 1,2 = <b>1,7</b></span>
+      </div>
+      <div class="box">
+        <strong>La combinaison</strong>
+        <span class="soft">On multiplie les équations pour avoir le même nombre de x, puis on les soustrait : les x disparaissent.</span>
+        <span class="m">(2) × 2 : 2x + 4y = 8,2</span>
+        <span class="m">(1) : 2x + 3y = 7</span>
+        <span class="m">On soustrait : y = 8,2 − 7 = <b>1,2</b></span>
+        <span class="m">Puis x = 4,1 − 2,4 = <b>1,7</b></span>
+      </div>
+    </div>
+    <p>Un café coûte <strong>1,70 €</strong> et un croissant <strong>1,20 €</strong>. On vérifie toujours : 2 × 1,70 + 3 × 1,20 = 7 ✓ et 1,70 + 2 × 1,20 = 4,10 ✓.</p>
+    <div class="box">
+      <h3>Le solveur de systèmes pas à pas</h3>
+      <p class="soft">Écris les coefficients (entiers, décimaux ou fractions). Choisis la méthode. Le solveur calcule avec des fractions exactes.</p>
+      <div class="eqrow" role="group" aria-label="Équation 1">
+        <span class="tag2">(1)</span><input id="sa" type="text" inputmode="decimal" autocomplete="off" value="2" aria-label="coefficient de x dans l'équation 1"><span>x +</span><input id="sb" type="text" inputmode="decimal" autocomplete="off" value="3" aria-label="coefficient de y dans l'équation 1"><span>y =</span><input id="se" type="text" inputmode="decimal" autocomplete="off" value="7" aria-label="nombre de droite de l'équation 1">
+      </div>
+      <div class="eqrow" role="group" aria-label="Équation 2">
+        <span class="tag2">(2)</span><input id="sc" type="text" inputmode="decimal" autocomplete="off" value="1" aria-label="coefficient de x dans l'équation 2"><span>x +</span><input id="sd" type="text" inputmode="decimal" autocomplete="off" value="2" aria-label="coefficient de y dans l'équation 2"><span>y =</span><input id="sf" type="text" inputmode="decimal" autocomplete="off" value="4,1" aria-label="nombre de droite de l'équation 2">
+      </div>
+      <div class="btns" id="sPresets" role="group" aria-label="Exemples de systèmes"></div>
+      <div class="sys" id="sPrev" aria-live="polite"></div>
+      <div class="btns" role="group" aria-label="Méthode">
+        <button type="button" id="mSub" aria-pressed="true">Substitution</button>
+        <button type="button" id="mComb" aria-pressed="false">Combinaison</button>
+      </div>
+      <div class="steps" id="sSteps" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="sNext">Étape suivante</button><button type="button" id="sAll">Tout voir</button></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Laquelle choisir ?</span>
+      <span>Si une inconnue a le coefficient 1 ou −1 (comme le x de x + 2y = 4,1), la <strong>substitution</strong> est rapide. Sinon, la <strong>combinaison</strong> évite les fractions. Les deux donnent toujours le même résultat.</span>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Interprétation graphique</span>
+    <h2>Deux droites qui se croisent</h2>
+    <p>Une équation comme y = 2x − 1 a une infinité de solutions : tous les points d'une <strong>droite</strong>. Deux équations, ce sont donc deux droites. La solution du système, c'est le <span class="hl">point commun aux deux droites</span> (voir le tutoriel sur <a class="tlink" href="le-reperage.html">le repérage</a>).</p>
+    <div class="box">
+      <div class="params">
+        <div class="param"><label for="m1">Pente de la droite 1 : <span class="mono" id="m1o">2</span></label><input id="m1" type="range" min="-3" max="3" step="0.5" value="2"></div>
+        <div class="param"><label for="p1">Hauteur à l'origine 1 : <span class="mono" id="p1o">−1</span></label><input id="p1" type="range" min="-5" max="5" step="0.5" value="-1"></div>
+        <div class="param"><label for="m2">Pente de la droite 2 : <span class="mono" id="m2o">−1</span></label><input id="m2" type="range" min="-3" max="3" step="0.5" value="-1"></div>
+        <div class="param"><label for="p2">Hauteur à l'origine 2 : <span class="mono" id="p2o">3</span></label><input id="p2" type="range" min="-5" max="5" step="0.5" value="3"></div>
+      </div>
+      <div class="btns" id="lPresets" role="group" aria-label="Exemples de droites"></div>
+      <div class="legend"><span><i class="chip a"></i><span class="mono" id="l1">y = 2x − 1</span></span><span><i class="chip b"></i><span class="mono" id="l2">y = −x + 3</span></span></div>
+      <div class="graph"><svg id="lineG" viewBox="0 0 360 360" role="img" aria-label="Deux droites et leur point d'intersection"></svg></div>
+      <div class="verdict" id="lOut" aria-live="polite"></div>
+    </div>
+    <div class="cards">
+      <div class="box"><span class="tag ok">Sécantes</span><strong>Un seul point commun</strong><span class="soft">Les pentes sont différentes : le système a une seule solution.</span></div>
+      <div class="box"><span class="tag no">Parallèles</span><strong>Aucun point commun</strong><span class="soft">Même pente, hauteurs différentes : les droites ne se croisent jamais. Pas de solution.</span></div>
+      <div class="box"><span class="tag ok">Confondues</span><strong>Une infinité de points</strong><span class="soft">C'est la même droite écrite deux fois : une infinité de solutions.</span></div>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Le jeu</span>
+    <h2>Devine les deux nombres</h2>
+    <p>Je pense à deux nombres entiers. Je te donne deux indices : à toi d'écrire le système et de le résoudre.</p>
+    <div class="box">
+      <div class="btns" role="group" aria-label="Niveau">
+        <button type="button" id="lv1" aria-pressed="true">Facile</button>
+        <button type="button" id="lv2" aria-pressed="false">Moyen</button>
+        <button type="button" id="lv3" aria-pressed="false">Difficile</button>
+      </div>
+      <p class="game-q" id="gQ"></p>
+      <div class="sys" id="gSys"></div>
+      <div class="guess">
+        <label for="gx">x =<input id="gx" type="text" inputmode="numeric" autocomplete="off"></label>
+        <label for="gy">y =<input id="gy" type="text" inputmode="numeric" autocomplete="off"></label>
+      </div>
+      <div class="btns">
+        <button type="button" id="gCheck">Vérifier</button>
+        <button type="button" id="gHint">Indice</button>
+        <button type="button" id="gSol">Solution</button>
+        <button type="button" id="gNew">Nouveaux nombres</button>
+        <span class="score" id="gScore">0 trouvé</span>
+      </div>
+      <div class="verdict" id="gOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Un peu d'histoire</span>
+    <h2>Des tablettes d'argile aux baguettes à calculer</h2>
+    <ol class="timeline">
+      <li><span class="when">il y a ~4 000 ans</span><div class="what"><strong>Les scribes de Babylone</strong><span>Sur des tablettes d'argile, on trouve des problèmes du type « la longueur et la largeur d'un champ, connaissant leur somme et leur surface ». Ils reviennent à des équations avec des carrés ou à des systèmes, résolus avec des recettes de calcul.</span></div></li>
+      <li><span class="when">vers le I<sup>er</sup> siècle</span><div class="what"><strong>Les <em>Neuf Chapitres</em>, en Chine</strong><span>Ce grand livre de problèmes a été rassemblé petit à petit, sans doute entre le II<sup>e</sup> siècle avant notre ère et le I<sup>er</sup> siècle de notre ère. Un chapitre, appelé <em>fangcheng</em>, résout des systèmes (par exemple avec plusieurs sortes de céréales) en rangeant les nombres en tableau avec des baguettes à calculer. La méthode ressemble beaucoup à notre combinaison.</span></div></li>
+      <li><span class="when">vers le III<sup>e</sup> siècle ?</span><div class="what"><strong>Diophante d'Alexandrie</strong><span>On connaît mal sa vie, même son siècle est incertain. Dans son <em>Arithmétique</em>, il cherche des nombres qui vérifient plusieurs conditions, comme « deux nombres dont on connaît la somme et la différence ». Il est l'un des premiers à utiliser un signe spécial pour le nombre inconnu.</span></div></li>
+      <li><span class="when">IX<sup>e</sup> siècle</span><div class="what"><strong>Al-Khwarizmi, à Bagdad</strong><span>Il classe et résout les équations avec des carrés, en ramenant tout d'un même côté. Le mot <em>algèbre</em> vient du titre de son livre.</span></div></li>
+      <li><span class="when">XVII<sup>e</sup> siècle</span><div class="what"><strong>Descartes et Fermat</strong><span>Ils relient les équations et les dessins : une équation devient une courbe ou une droite dans un repère. Résoudre un système, c'est alors trouver où deux droites se croisent.</span></div></li>
+    </ol>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · Attention</span>
+    <h2>Les erreurs fréquentes</h2>
+    <div class="box">
+      <ul class="errs">
+        <li><span class="bad">(x − 3)(x + 2) = 0 donc x = 3 ou x = 2</span><span class="good">x + 2 = 0 donne x = −2 : x = 3 ou x = −2</span><span class="soft">Résous vraiment chaque petite équation, attention au signe.</span></li>
+        <li><span class="bad">x² = 9 donc x = 3</span><span class="good">x² = 9 donc x = 3 ou x = −3</span><span class="soft">(−3)² = 9 aussi : n'oublie pas la solution négative.</span></li>
+        <li><span class="bad">x² = −4 donc x = −2</span><span class="good">x² = −4 n'a aucune solution</span><span class="soft">(−2)² = 4, pas −4. Un carré n'est jamais négatif.</span></li>
+        <li><span class="bad">x² = 3x, on divise par x : x = 3</span><span class="good">x² − 3x = 0, x(x − 3) = 0 : x = 0 ou x = 3</span><span class="soft">Diviser par x fait perdre la solution 0.</span></li>
+        <li><span class="bad">(x − 1)(x + 4) = 6 donc x − 1 = 6 ou x + 4 = 6</span><span class="good">La règle ne marche qu'avec 0 de l'autre côté</span><span class="soft">2 × 3 = 6, mais aussi 1 × 6 ou 12 × 0,5… Il faut d'abord se ramener à « … = 0 ».</span></li>
+        <li><span class="bad">x = 7 − y, on remplace dans la même équation : 7 − y + y = 7</span><span class="good">On remplace dans l'AUTRE équation</span><span class="soft">Sinon on trouve 0 = 0 et on n'avance pas.</span></li>
+        <li><span class="bad">(1) − (2) : on soustrait seulement les x et les y</span><span class="good">On soustrait aussi les nombres de droite</span><span class="soft">On soustrait les deux équations « membre à membre » : à gauche ET à droite.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Écris un nombre entier (il peut être négatif).</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Nouvelles questions</button>
+    </div>
+  </section>
+
+  <!-- 12 -->
+  <section>
+    <span class="eyebrow">Étape 12 · À toi de jouer</span>
+    <h2>Sept exercices</h2>
+    <div class="exos">
+      <details>
+        <summary>Produit nul<span class="q">Résous (3x − 6)(x + 4) = 0.</span></summary>
+        <div><span>3x − 6 = 0 ou x + 4 = 0. Donc 3x = 6, x = 2 ; ou x = −4.</span><span><strong>Deux solutions : 2 et −4.</strong></span></div>
+      </details>
+      <details>
+        <summary>Des carrés<span class="q">Résous x² = 49, puis x² = −1.</span></summary>
+        <div><span>x² = 49 : <strong>x = 7 ou x = −7</strong>.</span><span>x² = −1 : un carré n'est jamais négatif, <strong>aucune solution</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Avec une identité<span class="q">Résous 4x² − 9 = 0.</span></summary>
+        <div><span>4x² − 9 = (2x)² − 3² = (2x − 3)(2x + 3).</span><span>2x − 3 = 0 ou 2x + 3 = 0, donc <strong>x = 3/2 = 1,5 ou x = −1,5</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Le piège<span class="q">Résous x² = 3x.</span></summary>
+        <div><span>x² − 3x = 0, donc x(x − 3) = 0. <strong>x = 0 ou x = 3</strong>.</span><span>Si on divise par x, on oublie la solution 0.</span></div>
+      </details>
+      <details>
+        <summary>Système par substitution<span class="q">Résous : x + y = 12 et 3x + 2y = 30.</span></summary>
+        <div><span>De la première : x = 12 − y. Dans la deuxième : 3(12 − y) + 2y = 30, donc 36 − 3y + 2y = 30, −y = −6, y = 6.</span><span>Puis x = 12 − 6 = 6. <strong>(x ; y) = (6 ; 6)</strong>. Vérification : 3 × 6 + 2 × 6 = 30 ✓.</span></div>
+      </details>
+      <details>
+        <summary>Au cinéma<span class="q">2 places adulte et 3 places enfant coûtent 39 €. 1 place adulte et 2 places enfant coûtent 23 €. Quel est le prix de chaque place ?</span></summary>
+        <div><span>a = prix adulte, e = prix enfant : 2a + 3e = 39 et a + 2e = 23.</span><span>a = 23 − 2e, donc 2(23 − 2e) + 3e = 39, 46 − e = 39, e = 7. Puis a = 23 − 14 = 9.</span><span><strong>Adulte : 9 €, enfant : 7 €.</strong> Vérification : 18 + 21 = 39 ✓.</span></div>
+      </details>
+      <details>
+        <summary>Un système bizarre<span class="q">Résous : x + 2y = 4 et 2x + 4y = 5.</span></summary>
+        <div><span>On multiplie la première par 2 : 2x + 4y = 8. Mais la deuxième dit 2x + 4y = 5. Impossible d'avoir 8 = 5.</span><span><strong>Aucune solution</strong> : sur un graphique, ce sont deux droites parallèles.</span></div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• <strong>Produit nul</strong> : si A × B = 0, alors A = 0 ou B = 0. Ça ne marche qu'avec <strong>0</strong> de l'autre côté.</span>
+      <span>• Pour une équation avec x² : tout mettre d'un côté, <strong>factoriser</strong>, puis appliquer le produit nul.</span>
+      <span>• x² = k : deux solutions √k et −√k si k &gt; 0 ; une seule (0) si k = 0 ; <strong>aucune</strong> si k &lt; 0.</span>
+      <span>• Un <strong>système</strong> de deux équations à deux inconnues : on cherche le couple (x ; y) qui vérifie les deux.</span>
+      <span>• <strong>Substitution</strong> : isoler, remplacer dans l'autre. <strong>Combinaison</strong> : multiplier puis additionner ou soustraire pour éliminer une inconnue.</span>
+      <span>• Graphiquement : la solution est le point d'intersection de deux droites. Parallèles : aucune solution. Confondues : une infinité.</span>
+      <span>• Toujours <strong>vérifier</strong> en remplaçant dans les deux équations.</span>
+    </div>
+  </section>
+
+  <!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"><a class="prev" href="les-equations.html"><span>← Précédent</span><strong>Les équations</strong></a><a class="next" href="les-inequations.html"><span>Suivant →</span><strong>Les inéquations</strong></a></div><a class="tnav-home" href="index.html">⌂ Tous les tutoriels</a></nav><!--/tnav-->
+<footer>Fiche de révision · L'équation produit nul et les systèmes</footer>
+</main>
+
+<script>
+(function () {
+  /* Test hooks (window.__sys). Les nombres peuvent être donnés en nombres JS ou en chaînes ('1/2', '-0,5').
+     Les fractions sont des objets { n, d } réduits, d > 0.
+     frac(n, d)                     -> { n, d }            : fraction réduite, ex. frac(6, -4) = { n: -3, d: 2 }
+     parseFrac(s)                   -> { n, d } | null     : '3', '-2,5', '7/4', '−1/3' ; null si illisible ou division par 0
+     fracStr(f)                     -> string              : écriture décimale si elle est finie ('1,5'), sinon fraction ('−1/3')
+     zeroProduct(a, b, c, d)        -> { kind, roots, values, steps } pour (ax + b)(cx + d) = 0
+                                       kind : 'two' | 'one' | 'none' | 'all' ; roots : chaînes triées ; values : nombres
+     squareEq(k)                    -> { count, roots, values } pour x² = k (count 0, 1 ou 2 ; roots ex. ['−3', '3'] ou ['−√7', '√7'])
+     system(a, b, e, c, d, f)       -> { kind, x, y, xv, yv } pour ax + by = e et cx + dy = f
+                                       kind : 'unique' | 'none' | 'infinite' ; x, y : chaînes exactes (null si pas unique)
+     substitution(a, b, e, c, d, f) -> { kind, sol, steps } | null  (sol = [x, y] en fractions ; null si aucun coefficient non nul)
+     combinaison(a, b, e, c, d, f)  -> { kind, sol, steps } | null
+     intersect(m1, p1, m2, p2)      -> { kind, x, y } pour y = m1·x + p1 et y = m2·x + p2 (kind 'unique' | 'none' | 'infinite')
+     lin(terms)                     -> string : ex. lin([[2, 'x'], [-1, 'y'], [3, '']]) = '2x − y + 3'
+  */
+  var NS = 'http://www.w3.org/2000/svg';
+  var V = ['x', 'y'];
+  function $(id) { return document.getElementById(id); }
+  function fmt(x, d) { var r = Math.round(x * 1e6) / 1e6; if (Object.is(r, -0)) r = 0; return r.toLocaleString('fr-FR', { maximumFractionDigits: d == null ? 3 : d }).replace('-', '−'); }
+  function num(s) { var t = String(s).replace(/\s/g, '').replace(/[−–]/g, '-').replace(',', '.'); if (t === '') return NaN; var x = Number(t); return isFinite(x) ? x : NaN; }
+  function mk(svg, name, attrs, text) { var e = document.createElementNS(NS, name); for (var a in attrs) e.setAttribute(a, attrs[a]); if (text != null) e.textContent = text; svg.appendChild(e); return e; }
+  function clear(svg) { while (svg.firstChild) svg.removeChild(svg.firstChild); }
+  function rnd(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  function parN(n) { return n < 0 ? '(' + fmt(n) + ')' : fmt(n); }
+
+  /* ---------- Fractions exactes ---------- */
+  function gcd(a, b) { a = Math.abs(a); b = Math.abs(b); while (b) { var t = a % b; a = b; b = t; } return a; }
+  function F(n, d) {
+    if (d == null) d = 1;
+    if (d < 0) { n = -n; d = -d; }
+    var g = gcd(n, d) || 1; n = n / g; d = d / g;
+    if (n === 0) { n = 0; d = 1; }
+    return { n: n, d: d };
+  }
+  function fadd(a, b) { return F(a.n * b.d + b.n * a.d, a.d * b.d); }
+  function fsub(a, b) { return F(a.n * b.d - b.n * a.d, a.d * b.d); }
+  function fmul(a, b) { return F(a.n * b.n, a.d * b.d); }
+  function fdiv(a, b) { return F(a.n * b.d, a.d * b.n); }
+  function fneg(a) { return F(-a.n, a.d); }
+  function fabs(a) { return F(Math.abs(a.n), a.d); }
+  function fz(a) { return a.n === 0; }
+  function feq(a, b) { return a.n === b.n && a.d === b.d; }
+  function fval(a) { return a.n / a.d; }
+  function fone(a) { return a.n === 1 && a.d === 1; }
+  function fint(a) { return a.d === 1; }
+  function isDec(f) { var d = f.d, c2 = 0, c5 = 0; while (d % 2 === 0) { d /= 2; c2++; } while (d % 5 === 0) { d /= 5; c5++; } return d === 1 && Math.max(c2, c5) <= 4; }
+  function fs(f) { return (f.n < 0 ? '−' : '') + Math.abs(f.n).toLocaleString('fr-FR') + (f.d === 1 ? '' : '/' + f.d.toLocaleString('fr-FR')); }
+  function fd(f) { return isDec(f) ? fmt(f.n / f.d, 4) : fs(f); }
+  function par(f) { return f.n < 0 ? '(' + fd(f) + ')' : fd(f); }
+  function dec(str) {
+    var neg = str.charAt(0) === '-'; if (neg || str.charAt(0) === '+') str = str.slice(1);
+    var p = str.split('.'); if (p[1] && p[1].length > 4) return null;
+    var dd = p[1] ? Math.pow(10, p[1].length) : 1, n = parseInt(p[0] + (p[1] || ''), 10);
+    if (!isFinite(n) || n > 1e7) return null;
+    return F(neg ? -n : n, dd);
+  }
+  function parseFrac(s) {
+    var t = String(s).replace(/\s/g, '').replace(/[−–]/g, '-').replace(/,/g, '.');
+    var m = t.match(/^([+-]?\d+(?:\.\d+)?)(?:\/(\d+(?:\.\d+)?))?$/);
+    if (!m) return null;
+    var a = dec(m[1]); if (!a) return null;
+    if (!m[2]) return a;
+    var b = dec(m[2]); if (!b || fz(b)) return null;
+    return fdiv(a, b);
+  }
+  function toF(v) { if (v && typeof v === 'object') return v; return parseFrac(String(v)); }
+
+  /* ---------- Écriture des expressions ---------- */
+  function mon(a, v) { // a > 0
+    if (!v) return fd(a);
+    if (fone(a)) return v;
+    return isDec(a) ? fd(a) + v : '(' + fs(a) + ')' + v;
+  }
+  function sgn(c, v) { if (fz(c)) return ''; return (c.n < 0 ? ' − ' : ' + ') + mon(fabs(c), v); }
+  function lin(terms) {
+    var out = '';
+    terms.forEach(function (t) {
+      var c = toF(t[0]), v = t[1];
+      if (!c || fz(c)) return;
+      if (out === '') out = (c.n < 0 ? '−' : '') + mon(fabs(c), v);
+      else out += sgn(c, v);
+    });
+    return out === '' ? '0' : out;
+  }
+  function compound(s) { return / [+−] /.test(s); }
+  function times(c, expr) { // c × (expr), c non nul
+    var wrap = '(' + expr + ')';
+    if (fone(c)) return compound(expr) ? wrap : expr;
+    if (!compound(expr)) return (c.n === -1 && c.d === 1) ? '−' + par2(expr) : fd(c) + ' × ' + par2(expr);
+    if (c.n === -1 && c.d === 1) return '−' + wrap;
+    return isDec(c) ? fd(c) + wrap : fd(c) + ' × ' + wrap;
+  }
+  function prodSigned(c, val) { // ' + c × val'
+    if (fz(c)) return '';
+    var a = fabs(c);
+    return (c.n < 0 ? ' − ' : ' + ') + (fone(a) ? par(val) : fd(a) + ' × ' + par(val));
+  }
+  function lhs(r) { return lin([[r[0], 'x'], [r[1], 'y']]); }
+  function rowStr(r) { return lhs(r) + ' = ' + fd(r[2]); }
+
+  /* ---------- Produit nul ---------- */
+  function solveLin(a, b) { // ax + b = 0
+    if (!fz(a)) return { kind: 'one', x: fdiv(fneg(b), a) };
+    return fz(b) ? { kind: 'all' } : { kind: 'none' };
+  }
+  function prodStr(f1, f2) {
+    var c1 = compound(f1), c2 = compound(f2);
+    if (!c1 && c2) return f1 + '(' + f2 + ')';
+    if (c1 && c2) return '(' + f1 + ')(' + f2 + ')';
+    if (c1 && !c2) return '(' + f1 + ') × ' + par2(f2);
+    return par2(f1) + ' × ' + par2(f2);
+  }
+  function par2(s) { return s.charAt(0) === '−' ? '(' + s + ')' : s; }
+  function factorSteps(a, b, name) {
+    var f = lin([[a, 'x'], [b, '']]), s = solveLin(a, b), m = [];
+    if (s.kind === 'one') {
+      if (!(fone(a) && fz(b))) m.push(f + ' = 0');
+      if (!fz(b) && !fone(a)) m.push(lin([[a, 'x']]) + ' = ' + fd(fneg(b)));
+      if (!fone(a)) m.push('x = ' + fd(fneg(b)) + ' ÷ ' + par(a));
+      m.push('<b>x = ' + fd(s.x) + '</b>');
+      return { why: name + ' : on résout ' + f + ' = 0.', math: m, s: s };
+    }
+    if (s.kind === 'none') return { why: name + ' : ce facteur vaut toujours ' + fd(b) + ', quel que soit x.', math: ['Il n\'est jamais nul : <b>pas de solution de ce côté</b>.'], s: s };
+    return { why: name + ' : ce facteur vaut toujours 0.', math: ['Le produit vaut 0 pour <b>tous les x</b>.'], s: s };
+  }
+  function zeroProduct(a, b, c, d) {
+    a = toF(a); b = toF(b); c = toF(c); d = toF(d);
+    if (!a || !b || !c || !d) return null;
+    var f1 = lin([[a, 'x'], [b, '']]), f2 = lin([[c, 'x'], [d, '']]), eq = prodStr(f1, f2) + ' = 0', steps = [];
+    steps.push({ why: 'On a un produit de deux facteurs, et il vaut 0.', math: [eq] });
+    steps.push({ why: 'Propriété du produit nul : un des facteurs vaut 0.', math: [f1 + ' = 0   ou   ' + f2 + ' = 0'] });
+    var s1 = factorSteps(a, b, 'Premier facteur'), s2 = factorSteps(c, d, 'Deuxième facteur');
+    steps.push({ why: s1.why, math: s1.math }); steps.push({ why: s2.why, math: s2.math });
+    var kind, roots = [];
+    if (s1.s.kind === 'all' || s2.s.kind === 'all') kind = 'all';
+    else {
+      [s1.s, s2.s].forEach(function (s) { if (s.kind === 'one' && !roots.some(function (r) { return feq(r, s.x); })) roots.push(s.x); });
+      roots.sort(function (p, q) { return fval(p) - fval(q); });
+      kind = roots.length === 2 ? 'two' : roots.length === 1 ? 'one' : 'none';
+    }
+    var concl;
+    if (kind === 'all') concl = '<b>Tous les nombres sont solutions</b> : le produit vaut toujours 0.';
+    else if (kind === 'none') concl = '<b>Aucune solution</b> : aucun facteur ne peut valoir 0.';
+    else if (kind === 'one') concl = '<b>Une seule solution : x = ' + fd(roots[0]) + '</b>' + (s1.s.kind === 'one' && s2.s.kind === 'one' ? ' (les deux facteurs donnent la même)' : '');
+    else concl = '<b>Deux solutions : x = ' + fd(roots[0]) + ' ou x = ' + fd(roots[1]) + '</b>';
+    var check = [];
+    roots.forEach(function (r) {
+      var v1 = fadd(fmul(a, r), b), v2 = fadd(fmul(c, r), d);
+      check.push('x = ' + fd(r) + ' : ' + par(v1) + ' × ' + par(v2) + ' = ' + fd(fmul(v1, v2)) + (fz(fmul(v1, v2)) ? ' ✓' : ' ✗'));
+    });
+    steps.push({ why: 'Conclusion' + (check.length ? ' et vérification.' : '.'), math: [concl].concat(check) });
+    return { kind: kind, roots: roots.map(fd), values: roots.map(fval), steps: steps, eq: eq };
+  }
+
+  /* ---------- x² = k ---------- */
+  function sqrtStr(k) { var r = Math.round(Math.sqrt(k)); return r * r === k ? String(r) : '√' + k; }
+  function squareEq(k) {
+    k = Number(k);
+    if (k < 0) return { count: 0, roots: [], values: [] };
+    if (k === 0) return { count: 1, roots: ['0'], values: [0] };
+    var s = sqrtStr(k);
+    return { count: 2, roots: ['−' + s, s], values: [-Math.sqrt(k), Math.sqrt(k)] };
+  }
+
+  /* ---------- Systèmes ---------- */
+  function solveSys(R) {
+    var a = R[0][0], b = R[0][1], e = R[0][2], c = R[1][0], d = R[1][1], f = R[1][2];
+    var D = fsub(fmul(a, d), fmul(b, c)), Dx = fsub(fmul(e, d), fmul(b, f)), Dy = fsub(fmul(a, f), fmul(e, c));
+    if (!fz(D)) return { kind: 'unique', sol: [fdiv(Dx, D), fdiv(Dy, D)] };
+    if ((fz(a) && fz(b) && !fz(e)) || (fz(c) && fz(d) && !fz(f))) return { kind: 'none' };
+    if (!fz(Dx) || !fz(Dy)) return { kind: 'none' };
+    return { kind: 'infinite' };
+  }
+  function rows(a, b, e, c, d, f) {
+    var R = [[toF(a), toF(b), toF(e)], [toF(c), toF(d), toF(f)]];
+    for (var i = 0; i < 2; i++) for (var j = 0; j < 3; j++) if (!R[i][j]) return null;
+    return R;
+  }
+  function system(a, b, e, c, d, f) {
+    var R = rows(a, b, e, c, d, f); if (!R) return null;
+    var s = solveSys(R);
+    if (s.kind !== 'unique') return { kind: s.kind, x: null, y: null, xv: null, yv: null };
+    return { kind: 'unique', x: fd(s.sol[0]), y: fd(s.sol[1]), xv: fval(s.sol[0]), yv: fval(s.sol[1]) };
+  }
+  function checkStr(r, sol, n) {
+    var s = '';
+    for (var k = 0; k < 2; k++) {
+      if (fz(r[k])) continue;
+      if (s === '') s = fone(r[k]) ? par(sol[k]) : (r[k].n === -1 && r[k].d === 1 ? '−' + par(sol[k]) : fd(r[k]) + ' × ' + par(sol[k]));
+      else s += prodSigned(r[k], sol[k]);
+    }
+    var val = fadd(fmul(r[0], sol[0]), fmul(r[1], sol[1]));
+    return '(' + n + ') ' + (s || '0') + ' = ' + fd(val) + (feq(val, r[2]) ? ' ✓' : ' ✗');
+  }
+  function conclusion(R, sol) {
+    var m = ['<b>(x ; y) = (' + fd(sol[0]) + ' ; ' + fd(sol[1]) + ')</b>'];
+    if (!isDec(sol[0]) || !isDec(sol[1])) m.push('soit environ (' + fmt(fval(sol[0]), 3) + ' ; ' + fmt(fval(sol[1]), 3) + ')');
+    m.push(checkStr(R[0], sol, 1)); m.push(checkStr(R[1], sol, 2));
+    return { why: 'Conclusion : une seule solution. On vérifie dans les deux équations.', math: m };
+  }
+  function degenerate(st, left, right, vname, okText) {
+    if (feq(left, right)) {
+      st.push({ why: 'Les ' + vname + ' ont disparu ! Il reste ' + fd(left) + ' = ' + fd(right) + ' : c\'est toujours vrai.', math: ['<b>Une infinité de solutions</b>', okText] });
+      return { kind: 'infinite', sol: null, steps: st };
+    }
+    st.push({ why: 'Les ' + vname + ' ont disparu ! Il reste ' + fd(left) + ' = ' + fd(right) + ' : c\'est impossible.', math: ['<b>Aucune solution</b> : aucun couple ne vérifie les deux équations.'] });
+    return { kind: 'none', sol: null, steps: st };
+  }
+  function subSteps(R) {
+    var order = [[0, 0], [0, 1], [1, 0], [1, 1]], pk = null, k;
+    for (k = 0; k < 4 && !pk; k++) { var c1 = R[order[k][0]][order[k][1]]; if (!fz(c1) && fone(fabs(c1))) pk = order[k]; }
+    for (k = 0; k < 4 && !pk; k++) { if (!fz(R[order[k][0]][order[k][1]])) pk = order[k]; }
+    if (!pk) return null;
+    var i = pk[0], v = pk[1], j = 1 - i, u = 1 - v, Ri = R[i], Rj = R[j], cv = Ri[v], cu = Ri[u], st = [];
+    var p = fdiv(Ri[2], cv), q = fdiv(fneg(cu), cv), expr = lin([[p, ''], [q, V[u]]]);
+    var L = ['(' + (i + 1) + ') ' + rowStr(Ri)], rhs = lin([[Ri[2], ''], [fneg(cu), V[u]]]);
+    if (!fz(cu)) L.push(lin([[cv, V[v]]]) + ' = ' + rhs);
+    if (!fone(cv)) L.push(V[v] + ' = ' + (compound(rhs) ? '(' + rhs + ')' : rhs) + ' ÷ ' + par(cv));
+    var fin = V[v] + ' = ' + expr;
+    if (L[L.length - 1] === fin) L[L.length - 1] = '<b>' + fin + '</b>'; else L.push('<b>' + fin + '</b>');
+    st.push({ why: 'On isole ' + V[v] + ' dans l\'équation (' + (i + 1) + ')' + (fone(fabs(cv)) ? ' : son coefficient est ' + fd(cv) + ', c\'est le plus simple.' : '.'), math: L });
+    var cjv = Rj[v], cju = Rj[u], A = fadd(fmul(cjv, q), cju), c0 = fmul(cjv, p), B = fsub(Rj[2], c0);
+    var okText = 'Tous les couples qui vérifient (' + (i + 1) + ') ' + rowStr(Ri) + ' conviennent.';
+    if (fz(cjv)) st.push({ why: 'L\'équation (' + (j + 1) + ') ne contient pas de ' + V[v] + ' : on la résout directement.', math: ['(' + (j + 1) + ') ' + rowStr(Rj)] });
+    else {
+      st.push({ why: 'On remplace ' + V[v] + ' par ' + expr + ' dans l\'autre équation, la (' + (j + 1) + ').', math: ['(' + (j + 1) + ') ' + rowStr(Rj), times(cjv, expr) + sgn(cju, V[u]) + ' = ' + fd(Rj[2])] });
+      var D2 = [lin([[c0, ''], [fmul(cjv, q), V[u]], [cju, V[u]]]) + ' = ' + fd(Rj[2])];
+      if (!fz(A)) {
+        var g2 = lin([[c0, ''], [A, V[u]]]) + ' = ' + fd(Rj[2]);
+        if (g2 !== D2[0]) D2.push(g2);
+        if (!fz(c0)) D2.push(lin([[A, V[u]]]) + ' = ' + fd(Rj[2]) + ' − ' + par(c0) + ' = ' + fd(B));
+      }
+      st.push({ why: 'On développe, puis on regroupe les ' + V[u] + ' d\'un côté et les nombres de l\'autre.', math: D2 });
+    }
+    if (fz(A)) return degenerate(st, c0, Rj[2], V[u], okText);
+    var uval = fdiv(B, A);
+    st.push({ why: 'On trouve ' + V[u] + '.', math: [fone(A) ? '<b>' + V[u] + ' = ' + fd(uval) + '</b>' : V[u] + ' = ' + fd(B) + ' ÷ ' + par(A) + ' = <b>' + fd(uval) + '</b>'] });
+    var vval = fadd(p, fmul(q, uval));
+    if (fz(q)) st.push({ why: 'On connaissait déjà ' + V[v] + '.', math: ['<b>' + V[v] + ' = ' + fd(vval) + '</b>'] });
+    else {
+      var s = fz(p) ? '' : fd(p), a = fabs(q), term = fone(a) ? par(uval) : fd(a) + ' × ' + par(uval);
+      s = s === '' ? (q.n < 0 ? '−' : '') + term : s + (q.n < 0 ? ' − ' : ' + ') + term;
+      st.push({ why: 'On remplace ' + V[u] + ' par ' + fd(uval) + ' dans ' + V[v] + ' = ' + expr + '.', math: [V[v] + ' = ' + s + ' = <b>' + fd(vval) + '</b>'] });
+    }
+    var sol = []; sol[v] = vval; sol[u] = uval;
+    st.push(conclusion(R, sol));
+    return { kind: 'unique', sol: sol, steps: st };
+  }
+  function combSteps(R) {
+    var ev = (!fz(R[0][0]) && !fz(R[1][0])) ? 0 : ((!fz(R[0][1]) && !fz(R[1][1])) ? 1 : -1);
+    if (ev < 0) {
+      var s0 = subSteps(R); if (!s0) return null;
+      s0.steps.unshift({ why: 'Ici, une inconnue manque déjà dans une des équations : pas besoin de combiner. On résout directement, comme pour la substitution.', math: [] });
+      return s0;
+    }
+    var u = 1 - ev, a = R[0][ev], c = R[1][ev], k1 = fabs(c), k2 = fabs(a), st = [];
+    if (fint(k1) && fint(k2)) { var g = gcd(k1.n, k2.n); k1 = F(k1.n / g); k2 = F(k2.n / g); }
+    var S1 = R[0].map(function (z) { return fmul(z, k1); }), S2 = R[1].map(function (z) { return fmul(z, k2); });
+    var same = (a.n > 0) === (c.n > 0), op = same ? fsub : fadd, sign = same ? ' − ' : ' + ';
+    var N = [op(S1[0], S2[0]), op(S1[1], S2[1]), op(S1[2], S2[2])];
+    var tail = same ? '.' : ', au signe près.';
+    if (fone(k1) && fone(k2)) st.push({ why: 'On veut faire disparaître les ' + V[ev] + '. Dans (1) et (2), ils ont déjà le même coefficient' + tail, math: ['(1) ' + rowStr(R[0]), '(2) ' + rowStr(R[1])] });
+    else {
+      var mult = fone(k1) ? 'On multiplie (2) par ' + fd(k2) : (fone(k2) ? 'On multiplie (1) par ' + fd(k1) : 'On multiplie (1) par ' + fd(k1) + ' et (2) par ' + fd(k2));
+      st.push({ why: 'On veut faire disparaître les ' + V[ev] + '. ' + mult + ' : les ' + V[ev] + ' ont alors le même coefficient' + tail, math: [(fone(k1) ? '(1) : ' : '(1) × ' + fd(k1) + ' : ') + rowStr(S1), (fone(k2) ? '(2) : ' : '(2) × ' + fd(k2) + ' : ') + rowStr(S2)] });
+    }
+    st.push({ why: same ? 'Même signe devant ' + V[ev] + ' : on soustrait les deux équations, membre à membre.' : 'Signes contraires devant ' + V[ev] + ' : on additionne les deux équations, membre à membre.', math: ['(' + lhs(S1) + ')' + sign + '(' + lhs(S2) + ') = ' + fd(S1[2]) + sign + par(S2[2]), lin([[N[u], V[u]]]) + ' = ' + fd(N[2])] });
+    if (fz(N[u])) return degenerate(st, F(0), N[2], V[ev] + ' et les ' + V[u], 'Les deux équations disent la même chose : tous les couples qui vérifient (1) ' + rowStr(R[0]) + ' conviennent.');
+    var uval = fdiv(N[2], N[u]);
+    st.push({ why: 'On trouve ' + V[u] + '.', math: [fone(N[u]) ? '<b>' + V[u] + ' = ' + fd(uval) + '</b>' : V[u] + ' = ' + fd(N[2]) + ' ÷ ' + par(N[u]) + ' = <b>' + fd(uval) + '</b>'] });
+    var bu = fmul(R[0][u], uval), rest = fsub(R[0][2], bu), evval = fdiv(rest, a);
+    var L = [lin([[a, V[ev]]]) + prodSigned(R[0][u], uval) + ' = ' + fd(R[0][2])];
+    if (!fz(bu)) L.push(lin([[a, V[ev]]]) + ' = ' + fd(R[0][2]) + ' − ' + par(bu) + ' = ' + fd(rest));
+    if (fone(a) && !fz(bu)) L[L.length - 1] = '<b>' + L[L.length - 1] + '</b>';
+    else L.push(fone(a) ? '<b>' + V[ev] + ' = ' + fd(evval) + '</b>' : V[ev] + ' = ' + fd(rest) + ' ÷ ' + par(a) + ' = <b>' + fd(evval) + '</b>');
+    st.push({ why: 'On remplace ' + V[u] + ' par ' + fd(uval) + ' dans l\'équation (1).', math: L });
+    var sol = []; sol[ev] = evval; sol[u] = uval;
+    st.push(conclusion(R, sol));
+    return { kind: 'unique', sol: sol, steps: st };
+  }
+  function substitution(a, b, e, c, d, f) { var R = rows(a, b, e, c, d, f); return R ? subSteps(R) : null; }
+  function combinaison(a, b, e, c, d, f) { var R = rows(a, b, e, c, d, f); return R ? combSteps(R) : null; }
+  function intersect(m1, p1, m2, p2) {
+    m1 = toF(m1); p1 = toF(p1); m2 = toF(m2); p2 = toF(p2);
+    if (feq(m1, m2)) return { kind: feq(p1, p2) ? 'infinite' : 'none' };
+    var x = fdiv(fsub(p2, p1), fsub(m1, m2)), y = fadd(fmul(m1, x), p1);
+    return { kind: 'unique', x: fd(x), y: fd(y), xf: x, yf: y };
+  }
+
+  /* ---------- Pas à pas ---------- */
+  function Stepper(boxId, nextId, allId) {
+    var box = $(boxId), nb = $(nextId), ab = $(allId), steps = [], n = 1;
+    function draw() {
+      var h = '';
+      for (var i = 0; i < Math.min(n, steps.length); i++) {
+        h += '<div class="why">' + (i + 1) + '. ' + steps[i].why + '</div>';
+        steps[i].math.forEach(function (m) { h += '<div>' + m + '</div>'; });
+      }
+      box.innerHTML = h;
+      nb.disabled = ab.disabled = n >= steps.length;
+    }
+    nb.addEventListener('click', function () { n++; draw(); });
+    ab.addEventListener('click', function () { n = steps.length; draw(); });
+    return {
+      set: function (s, reset) { steps = s; if (reset) n = 1; draw(); },
+      err: function (msg) { steps = []; box.innerHTML = '<div class="err">' + msg + '</div>'; nb.disabled = ab.disabled = true; }
+    };
+  }
+
+  /* ---------- Repère ---------- */
+  function frame(svg, o) {
+    clear(svg);
+    var W = o.W, H = o.H, pad = 10;
+    function X(v) { return pad + (v - o.x0) / (o.x1 - o.x0) * (W - 2 * pad); }
+    function Y(v) { return H - pad - (v - o.y0) / (o.y1 - o.y0) * (H - 2 * pad); }
+    var v;
+    for (v = Math.ceil(o.x0 / o.gx) * o.gx; v <= o.x1; v += o.gx) mk(svg, 'line', { x1: X(v), y1: Y(o.y0), x2: X(v), y2: Y(o.y1), stroke: 'var(--line)', 'stroke-width': 1 });
+    for (v = Math.ceil(o.y0 / o.gy) * o.gy; v <= o.y1; v += o.gy) mk(svg, 'line', { x1: X(o.x0), y1: Y(v), x2: X(o.x1), y2: Y(v), stroke: 'var(--line)', 'stroke-width': 1 });
+    mk(svg, 'line', { x1: X(o.x0), y1: Y(0), x2: X(o.x1), y2: Y(0), stroke: 'var(--ink)', 'stroke-width': 1.6 });
+    mk(svg, 'line', { x1: X(0), y1: Y(o.y0), x2: X(0), y2: Y(o.y1), stroke: 'var(--ink)', 'stroke-width': 1.6 });
+    for (v = Math.ceil(o.x0 / o.lx) * o.lx; v <= o.x1; v += o.lx) if (v !== 0 && v > o.x0 && v < o.x1) mk(svg, 'text', { x: X(v), y: Y(0) + 17, 'text-anchor': 'middle', 'font-size': 13, fill: 'var(--ink-soft)' }, fmt(v));
+    for (v = Math.ceil(o.y0 / o.ly) * o.ly; v <= o.y1; v += o.ly) if (v !== 0 && v > o.y0 && v < o.y1) mk(svg, 'text', { x: X(0) - 6, y: Y(v) + 5, 'text-anchor': 'end', 'font-size': 13, fill: 'var(--ink-soft)' }, fmt(v));
+    var id = 'clip-' + svg.id, defs = mk(svg, 'defs', {}), cp = mk(defs, 'clipPath', { id: id });
+    mk(cp, 'rect', { x: X(o.x0), y: Y(o.y1), width: X(o.x1) - X(o.x0), height: Y(o.y0) - Y(o.y1) });
+    var g = mk(svg, 'g', { 'clip-path': 'url(#' + id + ')' });
+    return { X: X, Y: Y, g: g, o: o };
+  }
+  function curve(P, f, color, w) {
+    var pts = [], n = 160;
+    for (var i = 0; i <= n; i++) { var x = P.o.x0 + (P.o.x1 - P.o.x0) * i / n, y = f(x); y = Math.max(P.o.y0 - 50, Math.min(P.o.y1 + 50, y)); pts.push(P.X(x).toFixed(1) + ',' + P.Y(y).toFixed(1)); }
+    mk(P.g, 'polyline', { points: pts.join(' '), fill: 'none', stroke: color, 'stroke-width': w || 3, 'stroke-linejoin': 'round' });
+  }
+
+  /* ---------- Étape 1 : table ---------- */
+  var pA = $('pA'), pB = $('pB'), tsvg = $('table');
+  function drawTable() {
+    var A = parseInt(pA.value, 10), B = parseInt(pB.value, 10), C = 26, O = 34;
+    $('pAo').textContent = fmt(A); $('pBo').textContent = fmt(B);
+    clear(tsvg);
+    mk(tsvg, 'text', { x: 14, y: 22, 'text-anchor': 'middle', 'font-size': 13, 'font-weight': 600 }, '×');
+    for (var k = -5; k <= 5; k++) {
+      var i = k + 5;
+      mk(tsvg, 'text', { x: O + i * C + C / 2, y: 22, 'text-anchor': 'middle', 'font-size': 12, 'font-weight': k === B ? 700 : 400, fill: k === B ? 'var(--acc)' : 'var(--ink-soft)' }, fmt(k));
+      mk(tsvg, 'text', { x: 26, y: O + i * C + C / 2 + 4, 'text-anchor': 'end', 'font-size': 12, 'font-weight': k === A ? 700 : 400, fill: k === A ? 'var(--acc)' : 'var(--ink-soft)' }, fmt(k));
+    }
+    for (var r = -5; r <= 5; r++) for (var c = -5; c <= 5; c++) {
+      var p = r * c, x = O + (c + 5) * C, y = O + (r + 5) * C, cur = r === A && c === B;
+      var rect = mk(tsvg, 'rect', { x: x, y: y, width: C, height: C, fill: p === 0 ? 'var(--ok-soft)' : 'var(--card)', stroke: cur ? 'var(--acc)' : 'var(--line)', 'stroke-width': cur ? 3 : 1, style: 'cursor:pointer' });
+      var t = mk(tsvg, 'text', { x: x + C / 2, y: y + C / 2 + 4, 'text-anchor': 'middle', 'font-size': 11.5, 'font-weight': p === 0 || cur ? 700 : 400, fill: p === 0 ? 'var(--ok)' : 'var(--ink)', style: 'pointer-events:none' }, fmt(p));
+      (function (r, c) { rect.addEventListener('click', function () { pA.value = r; pB.value = c; drawTable(); }); })(r, c);
+    }
+    mk(tsvg, 'rect', { x: O + (B + 5) * C, y: O + (A + 5) * C, width: C, height: C, fill: 'none', stroke: 'var(--acc)', 'stroke-width': 3, style: 'pointer-events:none' });
+    var out = $('prodOut'), P = A * B;
+    if (P === 0) { out.className = 'verdict yes'; out.innerHTML = parN(A) + ' × ' + parN(B) + ' = 0<span>' + (A === 0 && B === 0 ? 'Les deux facteurs valent 0.' : (A === 0 ? 'Et justement, A = 0.' : 'Et justement, B = 0.')) + '</span>'; }
+    else { out.className = 'verdict no'; out.innerHTML = parN(A) + ' × ' + parN(B) + ' = ' + fmt(P) + '<span>Ni A ni B ne vaut 0 : le produit n\'est pas nul.</span>'; }
+  }
+  pA.addEventListener('input', drawTable); pB.addEventListener('input', drawTable); drawTable();
+
+  /* ---------- Étape 2 : solveur produit nul ---------- */
+  var zIn = ['za', 'zb', 'zc', 'zd'].map($), zStep = Stepper('zSteps', 'zNext', 'zAll');
+  var zPre = [['(2x + 6)(x − 4)', 2, 6, 1, -4], ['(3x − 1)(2x + 5)', 3, -1, 2, 5], ['x(x − 5)', 1, 0, 1, -5], ['(x − 2)(x − 2)', 1, -2, 1, -2], ['3(x + 1)', 0, 3, 1, 1], ['(x + 1) × 0', 1, 1, 0, 0]];
+  zPre.forEach(function (p) {
+    var b = document.createElement('button'); b.type = 'button'; b.textContent = p[0];
+    b.addEventListener('click', function () { for (var i = 0; i < 4; i++) zIn[i].value = fmt(p[i + 1]); zSolve(true); });
+    $('zPresets').appendChild(b);
+  });
+  function zSolve(reset) {
+    var r = zeroProduct(zIn[0].value, zIn[1].value, zIn[2].value, zIn[3].value);
+    if (!r) { $('zPrev').textContent = ''; zStep.err('Écris quatre nombres (par exemple 2, −3, 1,5 ou 1/2).'); return; }
+    $('zPrev').textContent = r.eq;
+    zStep.set(r.steps, reset);
+  }
+  zIn.forEach(function (e) { e.addEventListener('input', function () { zSolve(false); }); });
+  zSolve(true);
+
+  /* ---------- Étape 3 : x² = k ---------- */
+  var kk = $('kk');
+  function drawSq() {
+    var k = parseInt(kk.value, 10), R = squareEq(k);
+    $('kko').textContent = fmt(k);
+    var P = frame($('sqG'), { W: 400, H: 280, x0: -6.5, x1: 6.5, y0: -10, y1: 28, gx: 1, gy: 5, lx: 2, ly: 5 });
+    curve(P, function (x) { return x * x; }, 'var(--acc)', 3);
+    mk(P.g, 'line', { x1: P.X(-6.5), y1: P.Y(k), x2: P.X(6.5), y2: P.Y(k), stroke: 'var(--two)', 'stroke-width': 3, 'stroke-dasharray': k < 0 ? '7 5' : '' });
+    mk($('sqG'), 'text', { x: P.X(6.3), y: P.Y(k) - 7, 'text-anchor': 'end', 'font-size': 13, fill: 'var(--two)', 'font-weight': 600 }, 'y = ' + fmt(k));
+    R.values.forEach(function (x, i) {
+      mk($('sqG'), 'line', { x1: P.X(x), y1: P.Y(k), x2: P.X(x), y2: P.Y(0), stroke: 'var(--red)', 'stroke-width': 1.5, 'stroke-dasharray': '4 4' });
+      mk($('sqG'), 'circle', { cx: P.X(x), cy: P.Y(k), r: 6, fill: 'var(--red)', stroke: 'var(--card)', 'stroke-width': 2 });
+      mk($('sqG'), 'text', { x: P.X(x), y: P.Y(0) + 34, 'text-anchor': 'middle', 'font-size': 14, 'font-weight': 700, fill: 'var(--red)' }, R.roots[i]);
+    });
+    var m, s = sqrtStr(k);
+    if (k > 0) m = '<div>x² = ' + fmt(k) + '</div><div>x² − ' + fmt(k) + ' = 0</div><div>(x − ' + s + ')(x + ' + s + ') = 0</div><div><b>x = ' + s + ' ou x = −' + s + '</b>' + (s.charAt(0) === '√' ? ' (≈ ' + fmt(Math.sqrt(k), 2) + ')' : '') + '</div><div class="why">Deux solutions : ' + s + ' × ' + s + ' = ' + fmt(k) + ' et (−' + s + ') × (−' + s + ') = ' + fmt(k) + '.</div>';
+    else if (k === 0) m = '<div>x² = 0, donc x × x = 0</div><div><b>x = 0</b></div><div class="why">Une seule solution : la droite touche la courbe en un seul point.</div>';
+    else m = '<div>x² = ' + fmt(k) + '</div><div><b>Aucune solution</b></div><div class="why">Un carré n\'est jamais négatif : la droite passe sous la courbe sans la toucher.</div>';
+    $('sqOut').innerHTML = m;
+  }
+  kk.addEventListener('input', drawSq); drawSq();
+
+  /* ---------- Étape 4 : racines sur le graphique ---------- */
+  var rp = $('rp'), rq = $('rq');
+  function factorStr(p) { return p === 0 ? 'x' : (p > 0 ? 'x − ' + fmt(p) : 'x + ' + fmt(-p)); }
+  function drawRoots() {
+    var p = Number(rp.value), q = Number(rq.value), svg = $('rootG');
+    $('rpo').textContent = fmt(p); $('rqo').textContent = fmt(q);
+    var expd = lin([[1, 'x²'], [-(p + q), 'x'], [p * q, '']]);
+    $('rEq').textContent = 'y = ' + prodStr(factorStr(p), factorStr(q)) + ' = ' + expd;
+    var P = frame(svg, { W: 400, H: 300, x0: -6.5, x1: 6.5, y0: -10, y1: 10, gx: 1, gy: 2, lx: 2, ly: 4 });
+    curve(P, function (x) { return (x - p) * (x - q); }, 'var(--acc)', 3);
+    var roots = p === q ? [p] : [Math.min(p, q), Math.max(p, q)];
+    roots.forEach(function (r, i) {
+      var high = roots.length === 2 && Math.abs(p - q) < 2 && i === 1;
+      mk(svg, 'circle', { cx: P.X(r), cy: P.Y(0), r: 7, fill: 'var(--red)', stroke: 'var(--card)', 'stroke-width': 2 });
+      mk(svg, 'text', { x: P.X(r), y: P.Y(0) - (high ? 30 : 13), 'text-anchor': 'middle', 'font-size': 14, 'font-weight': 700, fill: 'var(--red)' }, 'x = ' + fmt(r));
+    });
+    var eq = prodStr(factorStr(p), factorStr(q)) + ' = 0';
+    $('rOut').innerHTML = (p === q ? 'Une seule solution : x = ' + fmt(p) : 'Deux solutions : x = ' + fmt(roots[0]) + ' ou x = ' + fmt(roots[1])) + '<span>' + (p === q ? 'Les deux facteurs sont les mêmes : la courbe touche l\'axe en un seul point.' : 'Pour ' + eq + ', chaque facteur donne une solution. La courbe coupe l\'axe exactement là.') + ' On sait donc aussi résoudre ' + expd + ' = 0 !</span>';
+  }
+  rp.addEventListener('input', drawRoots); rq.addEventListener('input', drawRoots); drawRoots();
+
+  /* ---------- Étape 5 : café et croissants ---------- */
+  var cx = $('cx'), cy = $('cy');
+  function euro(c) { return (c / 100).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €'; }
+  function cafe() {
+    var x = parseInt(cx.value, 10), y = parseInt(cy.value, 10), e1 = 2 * x + 3 * y, e2 = x + 2 * y, ok1 = e1 === 700, ok2 = e2 === 410;
+    $('cxo').textContent = euro(x); $('cyo').textContent = euro(y);
+    $('cafeRes').innerHTML =
+      '<div class="res ' + (ok1 ? 'good' : 'bad') + '"><span class="res-name">Ticket de Léa (1)</span><span class="res-val">' + euro(e1) + (ok1 ? ' ✓' : ' ✗') + '</span><span class="res-calc">2 × ' + euro(x) + ' + 3 × ' + euro(y) + ' = ' + euro(e1) + ' (il faut 7,00 €)</span></div>' +
+      '<div class="res ' + (ok2 ? 'good' : 'bad') + '"><span class="res-name">Ticket de Tom (2)</span><span class="res-val">' + euro(e2) + (ok2 ? ' ✓' : ' ✗') + '</span><span class="res-calc">' + euro(x) + ' + 2 × ' + euro(y) + ' = ' + euro(e2) + ' (il faut 4,10 €)</span></div>';
+    var out = $('cafeOut');
+    if (ok1 && ok2) { out.className = 'verdict yes'; out.innerHTML = 'Bravo ! Café : 1,70 €, croissant : 1,20 €.<span>Ce couple vérifie les deux équations en même temps : c\'est la solution du système.</span>'; }
+    else if (ok1 || ok2) { out.className = 'verdict info'; out.innerHTML = 'Une équation sur deux est juste.<span>Beaucoup de couples vérifient une seule équation. Il faut trouver celui qui vérifie les deux.</span>'; }
+    else { out.className = 'verdict no'; out.innerHTML = 'Pas encore.<span>Bouge les deux curseurs. Astuce : la méthode de l\'étape suivante évite de chercher au hasard.</span>'; }
+  }
+  cx.addEventListener('input', cafe); cy.addEventListener('input', cafe); cafe();
+
+  /* ---------- Étape 6 : solveur de systèmes ---------- */
+  var sIn = ['sa', 'sb', 'se', 'sc', 'sd', 'sf'].map($), sStep = Stepper('sSteps', 'sNext', 'sAll'), method = 'sub';
+  var sPre = [['Café', 2, 3, 7, 1, 2, '4,1'], ['Somme et différence', 1, 1, 10, 1, -1, 4], ['Avec des fractions', 3, 2, 1, 5, -4, 2], ['Pas de solution', 1, 2, 4, 2, 4, 5], ['Une infinité', 1, 2, 3, 2, 4, 6]];
+  sPre.forEach(function (p) {
+    var b = document.createElement('button'); b.type = 'button'; b.textContent = p[0];
+    b.addEventListener('click', function () { for (var i = 0; i < 6; i++) sIn[i].value = typeof p[i + 1] === 'string' ? p[i + 1] : fmt(p[i + 1]); sSolve(true); });
+    $('sPresets').appendChild(b);
+  });
+  function sSolve(reset) {
+    var v = sIn.map(function (e) { return e.value; }), R = rows(v[0], v[1], v[2], v[3], v[4], v[5]);
+    if (!R) { $('sPrev').innerHTML = ''; sStep.err('Écris six nombres (par exemple 2, −3, 4,1 ou 1/2).'); return; }
+    $('sPrev').innerHTML = '<span>(1) ' + rowStr(R[0]) + '</span><span>(2) ' + rowStr(R[1]) + '</span>';
+    var r = method === 'sub' ? subSteps(R) : combSteps(R);
+    if (!r) {
+      var k = solveSys(R);
+      sStep.set([{ why: 'Il n\'y a ni x ni y dans ces équations !', math: [k.kind === 'none' ? '<b>Aucune solution</b> : une des équations dit 0 = un nombre non nul.' : '<b>Une infinité de solutions</b> : 0 = 0 est toujours vrai, tous les couples conviennent.'] }], reset);
+      return;
+    }
+    sStep.set(r.steps, reset);
+  }
+  sIn.forEach(function (e) { e.addEventListener('input', function () { sSolve(false); }); });
+  function setMethod(m) { method = m; $('mSub').setAttribute('aria-pressed', m === 'sub'); $('mComb').setAttribute('aria-pressed', m === 'comb'); sSolve(true); }
+  $('mSub').addEventListener('click', function () { setMethod('sub'); });
+  $('mComb').addEventListener('click', function () { setMethod('comb'); });
+  sSolve(true);
+
+  /* ---------- Étape 7 : deux droites ---------- */
+  var lIn = ['m1', 'p1', 'm2', 'p2'].map($);
+  var lPre = [['Sécantes', 2, -1, -1, 3], ['Parallèles', 1, 2, 1, -2], ['Confondues', -0.5, 1, -0.5, 1], ['Hors du cadre', 0.5, 4, 1, -1]];
+  lPre.forEach(function (p) {
+    var b = document.createElement('button'); b.type = 'button'; b.textContent = p[0];
+    b.addEventListener('click', function () { for (var i = 0; i < 4; i++) lIn[i].value = p[i + 1]; drawLines(); });
+    $('lPresets').appendChild(b);
+  });
+  function lineEq(m, p) { return 'y = ' + lin([[m, 'x'], [p, '']]); }
+  function drawLines() {
+    var v = lIn.map(function (e) { return Number(e.value); }), svg = $('lineG');
+    ['m1o', 'p1o', 'm2o', 'p2o'].forEach(function (id, i) { $(id).textContent = fmt(v[i]); });
+    $('l1').textContent = lineEq(v[0], v[1]); $('l2').textContent = lineEq(v[2], v[3]);
+    var P = frame(svg, { W: 360, H: 360, x0: -6.5, x1: 6.5, y0: -6.5, y1: 6.5, gx: 1, gy: 1, lx: 2, ly: 2 });
+    var same = v[0] === v[2] && v[1] === v[3];
+    mk(P.g, 'line', { x1: P.X(-7), y1: P.Y(v[0] * -7 + v[1]), x2: P.X(7), y2: P.Y(v[0] * 7 + v[1]), stroke: 'var(--acc)', 'stroke-width': same ? 7 : 3 });
+    mk(P.g, 'line', { x1: P.X(-7), y1: P.Y(v[2] * -7 + v[3]), x2: P.X(7), y2: P.Y(v[2] * 7 + v[3]), stroke: 'var(--two)', 'stroke-width': 3, 'stroke-dasharray': same ? '8 6' : '' });
+    var I = intersect(v[0], v[1], v[2], v[3]), out = $('lOut');
+    var sys = '<span class="mono">' + lin([[fneg(toF(v[0])), 'x'], [1, 'y']]) + ' = ' + fmt(v[1]) + ' et ' + lin([[fneg(toF(v[2])), 'x'], [1, 'y']]) + ' = ' + fmt(v[3]) + '</span>';
+    if (I.kind === 'unique') {
+      var xv = fval(I.xf), yv = fval(I.yf), inside = Math.abs(xv) <= 6.5 && Math.abs(yv) <= 6.5;
+      if (inside) {
+        mk(svg, 'circle', { cx: P.X(xv), cy: P.Y(yv), r: 7, fill: 'var(--red)', stroke: 'var(--card)', 'stroke-width': 2 });
+        var lab = '(' + I.x + ' ; ' + I.y + ')', tx = Math.max(70, Math.min(290, P.X(xv))), ty = P.Y(yv) < 40 ? P.Y(yv) + 28 : P.Y(yv) - 14;
+        mk(svg, 'text', { x: tx, y: ty, 'text-anchor': 'middle', 'font-size': 14, 'font-weight': 700, fill: 'var(--red)', stroke: 'var(--paper)', 'stroke-width': 4, 'paint-order': 'stroke' }, lab);
+      }
+      out.className = 'verdict yes';
+      out.innerHTML = 'Un seul point commun : (' + I.x + ' ; ' + I.y + ')' + (inside ? '' : ', en dehors du dessin') + '<span>C\'est la solution du système ' + sys + '.' + (isDec(I.xf) && isDec(I.yf) ? '' : ' Environ (' + fmt(xv, 2) + ' ; ' + fmt(yv, 2) + ').') + '</span>';
+    } else if (I.kind === 'none') {
+      out.className = 'verdict no'; out.innerHTML = 'Droites parallèles : aucun point commun.<span>Même pente, mais pas la même hauteur à l\'origine. Le système ' + sys + ' n\'a aucune solution.</span>';
+    } else {
+      out.className = 'verdict info'; out.innerHTML = 'Droites confondues : une infinité de points communs.<span>Les deux équations décrivent la même droite. Tous ses points sont solutions.</span>';
+    }
+  }
+  lIn.forEach(function (e) { e.addEventListener('input', drawLines); }); drawLines();
+
+  /* ---------- Étape 8 : devine les deux nombres ---------- */
+  var level = 1, G = null, found = 0;
+  function genGame(lv) {
+    var x, y, a, b, c, d;
+    if (lv === 1) { x = rnd(4, 20); y = rnd(1, x - 1); return { x: x, y: y, R: [[1, 1, x + y], [1, -1, x - y]], q: 'Leur somme vaut ' + (x + y) + '. Leur différence (le grand moins le petit) vaut ' + (x - y) + '. On appelle x le grand et y le petit.', hint: 'Additionne les deux équations : les y disparaissent, et il reste 2x = ' + (x + y) + ' + ' + (x - y) + '.' }; }
+    if (lv === 2) {
+      x = rnd(1, 12); y = rnd(1, 12);
+      if (Math.random() < 0.5) return { x: x, y: y, R: [[2, 1, 2 * x + y], [1, 1, x + y]], q: 'Le double du premier plus le second vaut ' + (2 * x + y) + '. Le premier plus le second vaut ' + (x + y) + '.', hint: 'Soustrais : (2x + y) − (x + y) = x. Donc x = ' + (2 * x + y) + ' − ' + (x + y) + '.' };
+      return { x: x, y: y, R: [[3, -1, 3 * x - y], [1, 1, x + y]], q: 'Le triple du premier moins le second vaut ' + fmt(3 * x - y) + '. Le premier plus le second vaut ' + (x + y) + '.', hint: 'Additionne : (3x − y) + (x + y) = 4x. Donc 4x = ' + fmt(3 * x - y) + ' + ' + (x + y) + '.' };
+    }
+    do { a = pick([-3, -2, -1, 1, 2, 3, 4, 5]); b = pick([-3, -2, -1, 1, 2, 3, 4]); c = pick([-2, -1, 1, 2, 3, 4]); d = pick([-3, -2, -1, 1, 2, 3, 5]); } while (a * d - b * c === 0);
+    x = rnd(-6, 9); y = rnd(-6, 9);
+    var R = [[F(a), F(b), F(a * x + b * y)], [F(c), F(d), F(c * x + d * y)]], cs = combSteps(R);
+    return { x: x, y: y, R: [[a, b, a * x + b * y], [c, d, c * x + d * y]], q: 'Les deux nombres x et y (entiers, peut-être négatifs) vérifient ce système.', hint: cs.steps[0].why };
+  }
+  function newGame() {
+    G = genGame(level);
+    $('gQ').textContent = G.q;
+    $('gSys').innerHTML = G.R.map(function (r, i) { return '<span>(' + (i + 1) + ') ' + lin([[r[0], 'x'], [r[1], 'y']]) + ' = ' + fmt(r[2]) + '</span>'; }).join('');
+    $('gx').value = ''; $('gy').value = ''; $('gOut').className = 'verdict'; $('gOut').innerHTML = '';
+  }
+  function gCheck() {
+    var x = num($('gx').value), y = num($('gy').value), out = $('gOut');
+    if (isNaN(x) || isNaN(y)) { out.className = 'verdict info'; out.innerHTML = 'Écris un nombre pour x et pour y.'; return; }
+    var bad = [];
+    G.R.forEach(function (r, i) { var val = r[0] * x + r[1] * y; if (Math.abs(val - r[2]) > 1e-9) bad.push('(' + (i + 1) + ') donne ' + fmt(val) + ' au lieu de ' + fmt(r[2])); });
+    if (!bad.length) { if (!G.done) { G.done = true; found++; $('gScore').textContent = found + (found > 1 ? ' trouvés' : ' trouvé'); } out.className = 'verdict yes'; out.innerHTML = 'Bravo ! x = ' + fmt(x) + ' et y = ' + fmt(y) + '.<span>Les deux équations sont vérifiées. Clique sur « Nouveaux nombres » pour continuer.</span>'; }
+    else { out.className = 'verdict no'; out.innerHTML = 'Pas encore.<span>Avec x = ' + fmt(x) + ' et y = ' + fmt(y) + ', l\'équation ' + bad.join(' et l\'équation ') + '.</span>'; }
+  }
+  $('gCheck').addEventListener('click', gCheck);
+  ['gx', 'gy'].forEach(function (id) { $(id).addEventListener('keydown', function (e) { if (e.key === 'Enter') gCheck(); }); });
+  $('gHint').addEventListener('click', function () { $('gOut').className = 'verdict info'; $('gOut').innerHTML = 'Indice<span>' + G.hint + '</span>'; });
+  $('gSol').addEventListener('click', function () { G.done = true; $('gOut').className = 'verdict info'; $('gOut').innerHTML = 'Solution : x = ' + fmt(G.x) + ' et y = ' + fmt(G.y) + '<span>Essaie le solveur de l\'étape 6 avec ce système pour voir le détail.</span>'; });
+  $('gNew').addEventListener('click', newGame);
+  [1, 2, 3].forEach(function (lv) {
+    $('lv' + lv).addEventListener('click', function () { level = lv; [1, 2, 3].forEach(function (k) { $('lv' + k).setAttribute('aria-pressed', k === lv); }); newGame(); });
+  });
+  newGame();
+
+  /* ---------- Quiz ---------- */
+  function makeQ(t) {
+    var p, q, a, n, x, y, s, c;
+    if (t === 0) { p = rnd(1, 9); q = rnd(1, 9); return { q: '(x − ' + p + ')(x + ' + q + ') = 0. Quelle est la solution positive ?', a: p, how: 'x − ' + p + ' = 0 donne x = ' + p + ' ; x + ' + q + ' = 0 donne x = −' + q + '.' }; }
+    if (t === 1) { a = rnd(2, 5); x = rnd(1, 6); q = rnd(1, 9); return { q: '(' + a + 'x − ' + (a * x) + ')(x + ' + q + ') = 0. Quelle est la solution positive ?', a: x, how: a + 'x − ' + (a * x) + ' = 0 donne ' + a + 'x = ' + (a * x) + ', donc x = ' + (a * x) + ' ÷ ' + a + ' = ' + x + '.' }; }
+    if (t === 2) { n = rnd(2, 12); return { q: 'x² = ' + (n * n) + '. Quelle est la solution négative ?', a: -n, how: 'x = ' + n + ' ou x = −' + n + ', car ' + n + '² = (−' + n + ')² = ' + (n * n) + '.' }; }
+    if (t === 3) {
+      var kind = rnd(0, 2);
+      if (kind === 0) { n = rnd(1, 9); return { q: 'Combien de solutions a l\'équation x² + ' + n + ' = 0 ?', a: 0, how: 'x² = −' + n + ' : un carré n\'est jamais négatif, donc 0 solution.' }; }
+      if (kind === 1) { n = rnd(2, 9); return { q: 'Combien de solutions a l\'équation x² − ' + (n * n) + ' = 0 ?', a: 2, how: '(x − ' + n + ')(x + ' + n + ') = 0 : x = ' + n + ' ou x = −' + n + ', donc 2 solutions.' }; }
+      n = rnd(2, 9); return { q: 'Combien de solutions a l\'équation (x − ' + n + ')² = 0 ?', a: 1, how: '(x − ' + n + ')(x − ' + n + ') = 0 : les deux facteurs donnent x = ' + n + ', donc 1 seule solution.' };
+    }
+    if (t === 4) { n = rnd(2, 12); var plus = Math.random() < 0.5; return { q: 'x² ' + (plus ? '+' : '−') + ' ' + n + 'x = 0. Quelle est la solution qui n\'est pas 0 ?', a: plus ? -n : n, how: 'On factorise : x(x ' + (plus ? '+' : '−') + ' ' + n + ') = 0, donc x = 0 ou x = ' + (plus ? '−' : '') + n + '.' }; }
+    if (t === 5) { x = rnd(5, 20); y = rnd(1, x - 1); return { q: 'x + y = ' + (x + y) + ' et x − y = ' + (x - y) + '. Combien vaut x ?', a: x, how: 'On additionne : 2x = ' + (x + y) + ' + ' + (x - y) + ' = ' + (2 * x) + ', donc x = ' + x + ' (et y = ' + y + ').' }; }
+    if (t === 6) { s = rnd(1, 4); c = rnd(2, 6); return { q: '3 stylos et 2 cahiers coûtent ' + (3 * s + 2 * c) + ' €. 1 stylo et 1 cahier coûtent ' + (s + c) + ' €. Combien coûte un cahier (en €) ?', a: c, how: 'On multiplie la 2ᵉ par 3 : 3 stylos + 3 cahiers = ' + (3 * (s + c)) + ' €. On soustrait la 1ʳᵉ : 1 cahier = ' + (3 * (s + c)) + ' − ' + (3 * s + 2 * c) + ' = ' + c + ' €.' }; }
+    x = rnd(-5, 9); y = rnd(1, 8);
+    return { q: 'x + 2y = ' + fmt(x + 2 * y) + ' et x − y = ' + fmt(x - y) + '. Combien vaut y ?', a: y, how: 'On soustrait : (x + 2y) − (x − y) = 3y, et ' + fmt(x + 2 * y) + ' − ' + parN(x - y) + ' = ' + (3 * y) + ', donc y = ' + y + '.' };
+  }
+  var quiz = $('quiz'), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ''; done = [];
+    var order = [0, 1, 2, 3, 4, 5, 6, 7].sort(function () { return Math.random() - 0.5; });
+    for (var k = 0; k < 8; k++) {
+      var Q = makeQ(order[k]), li = document.createElement('li');
+      li.innerHTML = '<span>' + Q.q + '</span><input type="text" id="qa' + k + '" inputmode="text" autocomplete="off" aria-label="Ta réponse à la question ' + (k + 1) + '"><button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+      quiz.appendChild(li);
+      (function (k, Q) {
+        function check() {
+          var fb = $('qf' + k), x = num($('qa' + k).value);
+          if (isNaN(x)) { fb.className = 'fb'; fb.textContent = 'Écris un nombre.'; return; }
+          if (Math.abs(x - Q.a) < 1e-9) { fb.className = 'fb ok'; fb.innerHTML = 'Bravo, c\'est juste !'; done[k] = true; }
+          else { done[k] = false; fb.className = 'fb no'; fb.innerHTML = 'Pas tout à fait : la réponse est ' + fmt(Q.a) + '.<span>' + Q.how + '</span>'; }
+          $('score').textContent = done.filter(Boolean).length + ' / 8';
+        }
+        $('qb' + k).addEventListener('click', check);
+        $('qa' + k).addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+      })(k, Q);
+    }
+    $('score').textContent = '0 / 8';
+  }
+  $('newQuiz').addEventListener('click', newQuiz);
+  newQuiz();
+
+  window.__sys = {
+    frac: function (n, d) { return F(n, d); }, parseFrac: parseFrac, fracStr: function (f) { return fd(toF(f)); },
+    zeroProduct: zeroProduct, squareEq: squareEq, system: system, substitution: substitution, combinaison: combinaison,
+    intersect: function (m1, p1, m2, p2) { var r = intersect(m1, p1, m2, p2); return { kind: r.kind, x: r.x || null, y: r.y || null }; },
+    lin: lin
+  };
+})();
+</script>
+</body>
+</html>

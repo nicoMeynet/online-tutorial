@@ -1,0 +1,1073 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Les suites</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, encre vert forêt (comme une liane qui grimpe), marge rouge. Les termes numérotés u₀, u₁, u₂… et leurs graphiques sont au centre. */
+:root {
+  --paper: #f8faf3;
+  --grid: #e2e9d6;
+  --card: #ffffff;
+  --ink: #18220f;
+  --ink-soft: #55623f;
+  --acc: #4d7c0f;
+  --acc-soft: #e5f1d1;
+  --two: #1d5bbf;
+  --two-soft: #dce7f9;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #fff0a3;
+  --line: #d8e1c9;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0e1309; --grid: #1a2213; --card: #141b0e; --ink: #eef4e4; --ink-soft: #b1c09c;
+    --acc: #a6dc5c; --acc-soft: #263819; --two: #8fb6ff; --two-soft: #1a2a45;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #2c3a21;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0e1309; --grid: #1a2213; --card: #141b0e; --ink: #eef4e4; --ink-soft: #b1c09c;
+  --acc: #a6dc5c; --acc-soft: #263819; --two: #8fb6ff; --two-soft: #1a2a45;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #2c3a21;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+.big-eq { font-family: var(--f-mono); font-weight: 600; font-size: clamp(1.2rem, 5vw, 1.8rem); overflow-wrap: anywhere; color: var(--acc); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+@media (max-width: 420px) { .box { padding: 14px; } }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note.blue { border-left-color: var(--two); background: var(--two-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+svg text.a { fill: var(--acc); }
+svg text.b { fill: var(--two); }
+svg text.s { fill: var(--ink-soft); }
+.fig svg { width: 100%; height: auto; display: block; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; }
+.fig.narrow svg { max-width: 360px; margin: 0 auto; }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 8px 14px; min-height: 44px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button.ex { font-family: var(--f-mono); font-weight: 600; font-size: .95rem; }
+button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+button:disabled { opacity: .45; cursor: default; transform: none; }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+input[type="text"] { font: inherit; font-family: var(--f-mono); font-size: 1.05rem; padding: 8px 10px; min-height: 44px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; }
+input[type="range"] { width: 100%; accent-color: var(--acc); min-height: 32px; }
+.param { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.param label { font-weight: 700; }
+.sliders { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px 18px; }
+.inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px 14px; align-items: end; }
+.inputs label { font-weight: 700; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+
+/* Les termes d'une suite : des cases numérotées */
+.tiles { display: flex; flex-wrap: wrap; gap: 8px; align-items: stretch; }
+.tile { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 58px; padding: 6px 8px; border: 2px solid var(--ink); border-radius: 8px; background: var(--card); font-variant-numeric: tabular-nums; }
+.tile .v { font-family: var(--f-mono); font-weight: 600; font-size: 1.1rem; color: var(--acc); white-space: nowrap; }
+.tile .i { font-family: var(--f-mono); font-size: .85rem; color: var(--ink-soft); }
+.tile.q { border-style: dashed; border-color: var(--acc); background: var(--acc-soft); }
+.tile.q input { width: 5.2em; min-height: 36px; padding: 4px 6px; text-align: center; font-size: 1rem; }
+button.tile { box-shadow: none; min-height: 0; }
+button.tile:hover { transform: none; box-shadow: none; background: var(--acc-soft); }
+button.tile[aria-pressed="true"] { background: var(--acc); }
+button.tile[aria-pressed="true"] .v, button.tile[aria-pressed="true"] .i { color: var(--card); }
+.tiles.small .tile { min-width: 48px; padding: 4px 6px; }
+.tiles.small .tile .v { font-size: .95rem; }
+
+.results { display: flex; flex-direction: column; gap: 8px; font-variant-numeric: tabular-nums; }
+.res { border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 12px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; align-items: baseline; }
+.res-name { font-family: var(--f-display); font-weight: 700; }
+.res-val { font-family: var(--f-mono); font-weight: 600; color: var(--acc); font-size: 1.05rem; white-space: nowrap; }
+.res-val.b { color: var(--two); }
+.res-calc { grid-column: 1 / -1; font-family: var(--f-mono); font-size: .9rem; color: var(--ink-soft); overflow-wrap: anywhere; }
+.steps { display: flex; flex-direction: column; gap: 6px; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; padding: 12px 14px; font-family: var(--f-mono); font-size: 1rem; overflow-wrap: anywhere; min-width: 0; }
+.steps b { color: var(--acc); font-size: 1.1rem; }
+.steps .why { font-family: var(--f-body); font-size: .95rem; color: var(--ink-soft); }
+.err { color: var(--red); font-weight: 700; font-family: var(--f-body); }
+.ca { color: var(--acc); font-weight: 700; }
+.cb { color: var(--two); font-weight: 700; }
+
+.verdict { border-radius: 8px; padding: 12px 14px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+.verdict:empty { display: none; }
+.verdict.yes { background: var(--ok-soft); color: var(--ok); }
+.verdict.no { background: var(--red-soft); color: var(--red); }
+.verdict.info { background: var(--acc-soft); color: var(--acc); }
+.verdict.blue { background: var(--two-soft); color: var(--two); }
+.verdict span { font-weight: 400; color: var(--ink); overflow-wrap: anywhere; }
+
+.legend { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: .95rem; align-items: center; }
+.legend span { display: inline-flex; align-items: center; gap: 8px; }
+.chip { display: inline-block; width: 18px; height: 18px; border-radius: 3px; border: 2px solid; flex: none; }
+.chip.a { background: var(--acc-soft); border-color: var(--acc); }
+.chip.b { background: var(--two-soft); border-color: var(--two); }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.cards .m { font-family: var(--f-mono); font-size: .95rem; overflow-wrap: anywhere; }
+.cards .m b { color: var(--acc); }
+.idf { font-family: var(--f-mono); font-weight: 600; font-size: 1.1rem; color: var(--acc); overflow-wrap: anywhere; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
+.tag.a { color: var(--acc); }
+.tag.b { color: var(--two); }
+.tag.r { color: var(--red); }
+
+.flight { font-family: var(--f-mono); font-size: .92rem; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; padding: 10px 12px; max-height: 170px; overflow-y: auto; overflow-wrap: anywhere; line-height: 1.7; }
+.flight .up { color: var(--red); font-weight: 600; }
+.flight .top { background: var(--hl); font-weight: 700; padding: 0 2px; }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 110px auto; gap: 10px; align-items: center; }
+.quiz li > span:first-child { overflow-wrap: anywhere; min-width: 0; }
+.quiz input[type="text"] { font-size: 1rem; padding: 6px 8px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb:empty { display: none; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc); }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 120px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.errs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.errs li { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--paper); }
+.errs .bad { font-family: var(--f-mono); color: var(--red); text-decoration: line-through; overflow-wrap: anywhere; }
+.errs .good { font-family: var(--f-mono); color: var(--ok); font-weight: 600; overflow-wrap: anywhere; }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); overflow-wrap: anywhere; }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+<style id="tnav-css">
+.tnav-top { display: flex; margin: 0 0 4px; }
+.tnav-home { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font-weight: 700; font-size: .95rem; text-decoration: none; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tnav-home:hover, .tnav-home:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.tnav-bottom { margin-top: 8px; display: flex; flex-direction: column; gap: 12px; }
+.tnav-bottom h2 { margin: 0; }
+.tnav-pn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tnav-pn a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--ink, #222); border-radius: 10px;
+  background: var(--card, #fff); color: var(--ink, #222); text-decoration: none; box-shadow: 3px 3px 0 var(--ink, #222); min-width: 0; }
+.tnav-pn a span { font-size: .85rem; color: var(--ink-soft, #666); }
+.tnav-pn a strong { overflow-wrap: anywhere; }
+.tnav-pn a.next { text-align: right; grid-column: 2; }
+.tnav-bottom .tnav-home { align-self: center; }
+@media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
+</style>
+</head>
+<body>
+<main class="page">
+<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="index.html">← Tous les tutoriels</a></nav><!--/tnav-->
+
+
+  <header class="hero">
+    <span class="eyebrow">Tutoriel de maths · niveau lycée · avant-goût</span>
+    <h1>Les suites</h1>
+    <p class="lead">2, 5, 8, 11… Quel nombre vient après ? Une suite, c'est une liste de nombres rangés dans l'ordre, avec une règle cachée. On en trouve partout : dans une tirelire, un compte en banque, une balle qui rebondit, une population qui grandit.</p>
+    <div class="box">
+      <div class="fig"><svg viewBox="0 0 400 200" role="img" aria-label="Les termes 2, 5, 8, 11, 14, 17 dessinés comme des barres qui montent de 3 à chaque fois">
+        <line x1="20" y1="170" x2="390" y2="170" stroke="var(--ink)" stroke-width="2"/>
+        <rect x="32" y="152" width="40" height="18" fill="var(--acc-soft)" stroke="var(--acc)" stroke-width="2"/>
+        <rect x="92" y="125" width="40" height="45" fill="var(--acc-soft)" stroke="var(--acc)" stroke-width="2"/>
+        <rect x="152" y="98" width="40" height="72" fill="var(--acc-soft)" stroke="var(--acc)" stroke-width="2"/>
+        <rect x="212" y="71" width="40" height="99" fill="var(--acc-soft)" stroke="var(--acc)" stroke-width="2"/>
+        <rect x="272" y="44" width="40" height="126" fill="var(--acc-soft)" stroke="var(--acc)" stroke-width="2"/>
+        <rect x="332" y="17" width="40" height="153" fill="var(--acc)" opacity=".35" stroke="var(--acc)" stroke-width="2" stroke-dasharray="5 4"/>
+        <text x="52" y="146" text-anchor="middle" font-size="15" class="a" font-weight="600">2</text>
+        <text x="112" y="119" text-anchor="middle" font-size="15" class="a" font-weight="600">5</text>
+        <text x="172" y="92" text-anchor="middle" font-size="15" class="a" font-weight="600">8</text>
+        <text x="232" y="65" text-anchor="middle" font-size="15" class="a" font-weight="600">11</text>
+        <text x="292" y="38" text-anchor="middle" font-size="15" class="a" font-weight="600">14</text>
+        <text x="352" y="100" text-anchor="middle" font-size="22" font-weight="600">?</text>
+        <text x="52" y="190" text-anchor="middle" font-size="14">u₀</text>
+        <text x="112" y="190" text-anchor="middle" font-size="14">u₁</text>
+        <text x="172" y="190" text-anchor="middle" font-size="14">u₂</text>
+        <text x="232" y="190" text-anchor="middle" font-size="14">u₃</text>
+        <text x="292" y="190" text-anchor="middle" font-size="14">u₄</text>
+        <text x="352" y="190" text-anchor="middle" font-size="14">u₅</text>
+      </svg></div>
+      <span class="soft">Chaque barre monte de 3 : la suivante vaut 14 + 3 = 17. Tu viens de trouver la règle d'une suite.</span>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · L'idée</span>
+    <h2>Une liste de nombres numérotés</h2>
+    <p>Une <strong>suite</strong> est une liste de nombres dans un ordre précis. Chaque nombre s'appelle un <strong>terme</strong>. On donne un nom à la suite, souvent la lettre <strong>u</strong>, et on numérote les termes en commençant à 0 :</p>
+    <div class="steps">
+      <span>u₀ = 2 &nbsp; u₁ = 5 &nbsp; u₂ = 8 &nbsp; u₃ = 11 &nbsp; …</span>
+    </div>
+    <p>On lit « u indice 3 » ou simplement « u trois ». Le petit nombre en bas s'appelle le <strong>rang</strong> : c'est la place du terme dans la liste. Attention, <span class="hl">u₃ ne vaut pas 3</span> : u₃ est le terme qui est à la place numéro 3, ici 11.</p>
+    <div class="box">
+      <h3>Touche une case</h3>
+      <div class="tiles" id="idTiles" role="group" aria-label="Les termes de la suite 2, 5, 8, 11…"></div>
+      <div class="verdict info" id="idOut" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Et la lettre n ?</span>
+      <span>Pour parler d'un terme quelconque, on écrit <strong>uₙ</strong> (« u indice n »). La lettre n remplace n'importe quel rang : 0, 1, 2, 100… Le terme juste après uₙ s'écrit <strong>uₙ₊₁</strong>. Certains livres commencent à u₁ au lieu de u₀ : c'est juste une autre façon de numéroter.</span>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · Le jeu</span>
+    <h2>Devine le terme suivant</h2>
+    <p>Voici le début d'une suite. Trouve la règle et écris le terme suivant. Si tu bloques, demande un indice.</p>
+    <div class="box">
+      <div class="tiles" id="gTiles" aria-live="polite"></div>
+      <div class="btns">
+        <button type="button" id="gCheck">Vérifier</button>
+        <button type="button" id="gHint">Un indice</button>
+        <button type="button" id="gShow">La solution</button>
+        <button type="button" id="gNew">Nouvelle suite</button>
+      </div>
+      <div class="verdict" id="gFb" aria-live="polite"></div>
+      <span class="soft" id="gScore">Suites trouvées : 0 sur 0</span>
+    </div>
+    <div class="note red">
+      <span class="note-title">Quelques termes ne suffisent pas toujours</span>
+      <span>Place des points sur un cercle et relie-les tous : le disque est coupé en 1, 2, 4, 8, 16 morceaux… puis <strong>31</strong>, pas 32 ! Les premiers termes ressemblent à « on double », mais la vraie règle est autre. En maths, on ne devine pas une suite : on la <strong>définit</strong> par une règle précise.</span>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Deux façons de donner la règle</span>
+    <h2>Formule directe ou pas à pas</h2>
+    <p>Il y a deux grandes façons de définir une suite :</p>
+    <div class="cards">
+      <div class="box"><span class="tag a">Formule explicite</span><span class="idf">uₙ = 3n + 2</span><span class="soft">On calcule n'importe quel terme <strong>directement</strong> à partir de son rang. u₁₀₀ = 3 × 100 + 2 = 302, sans calculer les autres.</span></div>
+      <div class="box"><span class="tag b">Relation de récurrence</span><span class="idf">u₀ = 2 et uₙ₊₁ = uₙ + 3</span><span class="soft">On donne le <strong>premier terme</strong> et la façon de passer d'un terme au <strong>suivant</strong>. Pour u₁₀₀, il faut avancer pas à pas… ou trouver un raccourci.</span></div>
+    </div>
+    <p>Ces deux définitions donnent <strong>la même suite</strong> : 2, 5, 8, 11, 14… Essaie le générateur : choisis une règle et ses nombres, la page calcule les termes et les dessine.</p>
+    <div class="box">
+      <h3>Le générateur de suites</h3>
+      <div class="btns" id="genRules" role="group" aria-label="Choix de la règle"></div>
+      <div class="sliders">
+        <div class="param"><label for="genA"><span id="genALab">a</span> = <span class="mono" id="genAOut"></span></label><input id="genA" type="range"></div>
+        <div class="param"><label for="genB"><span id="genBLab">b</span> = <span class="mono" id="genBOut"></span></label><input id="genB" type="range"></div>
+        <div class="param"><label for="genN">Nombre de termes : <span class="mono" id="genNOut"></span></label><input id="genN" type="range" min="5" max="16" step="1" value="10"></div>
+      </div>
+      <p class="big-eq" id="genRule"></p>
+      <div class="tiles small" id="genTiles"></div>
+      <div class="btns" role="group" aria-label="Type de graphique">
+        <button type="button" id="genBars" aria-pressed="true">Barres</button>
+        <button type="button" id="genDots" aria-pressed="false">Points</button>
+      </div>
+      <div class="fig"><svg id="genSvg" viewBox="0 0 400 240" role="img" aria-label="Graphique des termes de la suite"></svg></div>
+      <div class="steps" id="genHow" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Une suite célèbre</span>
+      <span>La règle « chaque terme est la somme des deux précédents » donne 1, 1, 2, 3, 5, 8, 13… C'est la <strong>suite de Fibonacci</strong>. Elle a son histoire de lapins et ses liens avec le nombre d'or : tout est dans le tutoriel sur <a class="tlink" href="le-nombre-d-or.html">le nombre d'or</a>. Tu peux la tester ici avec la règle « Fibonacci ».</span>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · Suites arithmétiques</span>
+    <h2>Ajouter toujours le même nombre</h2>
+    <p>Tu as 3 € dans ta tirelire et tu ajoutes 2 € chaque semaine : 3, 5, 7, 9… Quand on <strong>ajoute toujours le même nombre</strong>, la suite est <strong>arithmétique</strong>. Ce nombre s'appelle la <strong>raison</strong>, notée <strong>r</strong>.</p>
+    <div class="steps">
+      <span>uₙ₊₁ = uₙ + r &nbsp;&nbsp;(récurrence)</span>
+      <span><b>uₙ = u₀ + n × r</b> &nbsp;&nbsp;(formule explicite)</span>
+      <span class="why">Pourquoi ? Pour aller de u₀ à uₙ, on fait n pas, et chaque pas ajoute r.</span>
+    </div>
+    <div class="box">
+      <h3>L'escalier</h3>
+      <div class="sliders">
+        <div class="param"><label for="arU">Premier terme u₀ = <span class="mono" id="arUOut">3</span></label><input id="arU" type="range" min="-10" max="20" step="1" value="3"></div>
+        <div class="param"><label for="arR">Raison r = <span class="mono" id="arROut">2</span></label><input id="arR" type="range" min="-5" max="5" step="0.5" value="2"></div>
+      </div>
+      <div class="fig"><svg id="arSvg" viewBox="0 0 400 240" role="img" aria-label="Les termes u₀ à u₁₀ d'une suite arithmétique, en escalier"></svg></div>
+      <p class="soft" id="arMsg"></p>
+      <div class="param"><label for="arN">Calcule un terme lointain : n = <span class="mono" id="arNOut">20</span></label><input id="arN" type="range" min="0" max="100" step="1" value="20"></div>
+      <div class="steps" id="arOut" aria-live="polite"></div>
+    </div>
+    <div class="note blue">
+      <span class="note-title">La somme 1 + 2 + … + n</span>
+      <span>Les nombres 1, 2, 3, … forment une suite arithmétique de raison 1. Pour les additionner vite, on les associe par paires : 1 + 100 = 2 + 99 = … = 101. C'est l'astuce attribuée au jeune Gauss, racontée dans le tutoriel sur <a class="tlink" href="l-algorithmique.html">l'algorithmique</a>. Elle donne <strong>1 + 2 + … + n = n × (n + 1) ÷ 2</strong>, par exemple 1 + 2 + … + 100 = 5 050.</span>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Suites géométriques</span>
+    <h2>Multiplier toujours par le même nombre</h2>
+    <p>Quand on <strong>multiplie toujours par le même nombre</strong>, la suite est <strong>géométrique</strong>. Ce nombre est encore appelé la <strong>raison</strong>, notée <strong>q</strong>. Par exemple 3, 6, 12, 24… : on multiplie par 2.</p>
+    <div class="steps">
+      <span>uₙ₊₁ = uₙ × q &nbsp;&nbsp;(récurrence)</span>
+      <span><b>uₙ = u₀ × qⁿ</b> &nbsp;&nbsp;(formule explicite)</span>
+      <span class="why">n pas, et chaque pas multiplie par q : on multiplie n fois par q, c'est une puissance (voir le tutoriel sur <a class="tlink" href="les-puissances.html">les puissances</a>).</span>
+    </div>
+    <p>Une hausse de 3 %, c'est multiplier par 1,03 (comme dans le tutoriel sur <a class="tlink" href="les-pourcentages.html">les pourcentages</a>). Une baisse de 40 %, c'est multiplier par 0,6. Voilà pourquoi les suites géométriques sont partout.</p>
+    <div class="box">
+      <div class="btns" id="geoPre" role="group" aria-label="Choix de l'exemple"></div>
+      <div class="sliders">
+        <div class="param"><label for="geo1"><span id="geo1Lab"></span> <span class="mono" id="geo1Out"></span></label><input id="geo1" type="range"></div>
+        <div class="param"><label for="geo2"><span id="geo2Lab"></span> <span class="mono" id="geo2Out"></span></label><input id="geo2" type="range"></div>
+        <div class="param"><label for="geo3"><span id="geo3Lab"></span> <span class="mono" id="geo3Out"></span></label><input id="geo3" type="range"></div>
+      </div>
+      <div class="fig"><svg id="geoSvg" viewBox="0 0 400 240" role="img" aria-label="Graphique des termes de la suite géométrique"></svg></div>
+      <div class="results" id="geoOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · Le grand duel</span>
+    <h2>Ajouter ou multiplier : qui gagne ?</h2>
+    <p>Imagine deux offres d'argent de poche (ou de salaire). Les deux commencent avec la même somme. Avec l'offre <span class="cb">A</span>, tu gagnes <strong>100 € de plus</strong> chaque mois : c'est une suite arithmétique. Avec l'offre <span class="ca">B</span>, tu gagnes <strong>5 % de plus</strong> chaque mois : c'est une suite géométrique. Au début, A est devant. Mais pour combien de temps ?</p>
+    <div class="box">
+      <div class="sliders">
+        <div class="param"><label for="duS">Somme de départ : <span class="mono" id="duSOut"></span></label><input id="duS" type="range" min="500" max="3000" step="100" value="1000"></div>
+        <div class="param"><label for="duA">Offre A : + <span class="mono" id="duAOut"></span> par mois</label><input id="duA" type="range" min="10" max="500" step="10" value="100"></div>
+        <div class="param"><label for="duP">Offre B : + <span class="mono" id="duPOut"></span> par mois</label><input id="duP" type="range" min="1" max="10" step="1" value="5"></div>
+      </div>
+      <div class="legend"><span><i class="chip b"></i>Offre A (on ajoute)</span><span><i class="chip a"></i>Offre B (on multiplie)</span></div>
+      <div class="fig"><svg id="duSvg" viewBox="0 0 400 240" role="img" aria-label="Les deux offres mois par mois : une droite et une courbe qui finit par la dépasser"></svg></div>
+      <div class="verdict" id="duOut" aria-live="polite"></div>
+      <div class="results" id="duTab"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">À retenir du duel</span>
+      <span>Une croissance qui <strong>multiplie</strong> (on dit <strong>exponentielle</strong>) finit <span class="hl">toujours</span> par dépasser une croissance qui <strong>ajoute</strong> (on dit <strong>linéaire</strong>), même si elle commence plus lentement. Bien sûr, +5 % par mois sur un salaire n'existe pas dans la vraie vie : c'est pour voir l'effet.</span>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Vers l'infini</span>
+    <h2>Où va la suite ?</h2>
+    <p>Prends une suite géométrique qui commence à 100. Si q est plus grand que 1, les termes grandissent sans fin. Si q est entre 0 et 1, ils rétrécissent. Est-ce qu'ils finissent par valoir 0 ? Bouge le curseur.</p>
+    <div class="box">
+      <div class="param"><label for="liQ">Raison q = <span class="mono" id="liQOut"></span></label><input id="liQ" type="range" min="0.1" max="1.5" step="0.05" value="0.5"></div>
+      <div class="fig"><svg id="liSvg" viewBox="0 0 400 240" role="img" aria-label="Les termes u₀ à u₂₅ de la suite géométrique de premier terme 100"></svg></div>
+      <div class="verdict" id="liOut" aria-live="polite"></div>
+    </div>
+    <p>Quand q est entre 0 et 1, les termes ne valent jamais exactement 0, mais ils s'en approchent <strong>autant qu'on veut</strong> : plus petit que 1, que 0,01, que 0,000 001… Il suffit d'aller assez loin. On dit que la suite <strong>tend vers 0</strong>, ou que sa <strong>limite</strong> est 0.</p>
+    <div class="box">
+      <h3>La moitié de ce qui reste</h3>
+      <p>Prends un carré d'aire 1. Colorie la moitié, puis la moitié de ce qui reste, puis encore la moitié de ce qui reste… On additionne 1/2 + 1/4 + 1/8 + …</p>
+      <div class="fig narrow"><svg id="zSvg" viewBox="0 0 300 300" role="img" aria-label="Un carré d'aire 1 rempli morceau par morceau, chaque morceau étant la moitié de ce qui reste"></svg></div>
+      <div class="btns">
+        <button type="button" id="zAdd">Ajouter un morceau</button>
+        <button type="button" id="zReset">Recommencer</button>
+      </div>
+      <div class="steps" id="zOut" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Une somme infinie qui vaut 1</span>
+      <span>Le morceau qui manque est toujours égal au dernier morceau ajouté : 1/2, puis 1/4, puis 1/8… Il tend vers 0. Donc la somme infinie 1/2 + 1/4 + 1/8 + … vaut exactement <strong>1</strong>. Le philosophe grec Zénon s'amusait déjà de ce genre de paradoxe. Pour aller plus loin, va voir le tutoriel sur <a class="tlink" href="les-grands-nombres-et-l-infini.html">les grands nombres et l'infini</a>.</span>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Bonus</span>
+    <h2>La suite de Syracuse, un mystère</h2>
+    <p>Choisis un nombre entier. S'il est <strong>pair</strong>, divise-le par 2. S'il est <strong>impair</strong>, multiplie-le par 3 et ajoute 1. Recommence avec le résultat. Par exemple : 6 → 3 → 10 → 5 → 16 → 8 → 4 → 2 → 1.</p>
+    <p>Arrivé à 1, on tourne en rond : 1 → 4 → 2 → 1. On dirait un grêlon dans un nuage : il monte, il descend, puis il tombe. On parle de <strong>vol</strong>, de <strong>temps de vol</strong> (le nombre d'étapes pour arriver à 1) et d'<strong>altitude maximale</strong>.</p>
+    <div class="box">
+      <h3>Lance un vol</h3>
+      <div class="inputs" style="grid-template-columns:minmax(0,1fr) auto">
+        <label for="syN">Nombre de départ (de 1 à 1 000 000)<input id="syN" type="text" inputmode="numeric" autocomplete="off" value="27"></label>
+        <button type="button" id="syGo">Décoller</button>
+      </div>
+      <div class="btns" id="syPre" role="group" aria-label="Nombres de départ proposés"></div>
+      <div class="fig"><svg id="sySvg" viewBox="0 0 400 240" role="img" aria-label="Le vol de Syracuse : la valeur à chaque étape"></svg></div>
+      <div class="results" id="syRes" aria-live="polite"></div>
+      <div class="flight" id="syList" tabindex="0" aria-label="Tous les termes du vol"></div>
+    </div>
+    <div class="note red">
+      <span class="note-title">Personne ne sait le démontrer</span>
+      <span>Est-ce que <strong>tous</strong> les nombres finissent par retomber à 1 ? Des ordinateurs l'ont vérifié pour tous les nombres de départ jusqu'à des nombres de plus de 20 chiffres. Mais vérifier beaucoup de cas, ce n'est pas une démonstration. C'est la <strong>conjecture de Syracuse</strong> : une règle qu'un enfant comprend, et que les plus grands mathématiciens n'ont pas encore su prouver.</span>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Un peu d'histoire</span>
+    <h2>Des lapins, des écoliers et des grêlons</h2>
+    <ol class="timeline">
+      <li><span class="when">il y a ~4 000 ans</span><div class="what"><strong>Les scribes de Babylone</strong><span>Sur des tablettes d'argile, on trouve des problèmes de prêts avec intérêts, et même la question : en combien de temps une somme double-t-elle ? Ce sont déjà des suites géométriques.</span></div></li>
+      <li><span class="when">V<sup>e</sup> siècle av. J.-C.</span><div class="what"><strong>Zénon d'Élée</strong><span>Ce philosophe grec invente des paradoxes : pour traverser une pièce, il faut d'abord en faire la moitié, puis la moitié du reste, puis… Comment arriver au bout ? Il faudra plus de 2 000 ans pour bien comprendre les sommes infinies.</span></div></li>
+      <li><span class="when">1202</span><div class="what"><strong>Fibonacci</strong><span>Dans son livre <em>Liber Abaci</em>, il pose le problème des lapins, qui donne la suite 1, 1, 2, 3, 5, 8… (voir le tutoriel sur <a class="tlink" href="le-nombre-d-or.html">le nombre d'or</a>).</span></div></li>
+      <li><span class="when">fin du XVIII<sup>e</sup> siècle</span><div class="what"><strong>Le jeune Gauss (anecdote)</strong><span>On raconte qu'à l'école, le petit Carl Friedrich Gauss a calculé 1 + 2 + … + 100 en quelques secondes. L'histoire a été racontée bien plus tard et sans doute embellie, mais l'astuce est juste.</span></div></li>
+      <li><span class="when">XIX<sup>e</sup> siècle</span><div class="what"><strong>La limite devient précise</strong><span>Des mathématiciens comme Augustin-Louis Cauchy donnent une définition rigoureuse de « tendre vers une limite ». Les paradoxes de Zénon sont enfin résolus.</span></div></li>
+      <li><span class="when">vers 1937</span><div class="what"><strong>Lothar Collatz</strong><span>Ce mathématicien allemand aurait proposé le problème des vols à cette époque. Il circule ensuite sous plusieurs noms : problème de Collatz, de Syracuse (d'après une université américaine, dit-on)… Il n'est toujours pas résolu.</span></div></li>
+    </ol>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · Attention</span>
+    <h2>Les erreurs fréquentes</h2>
+    <div class="box">
+      <ul class="errs">
+        <li><span class="bad">u₃ = 3</span><span class="good">u₃ = le terme de rang 3</span><span class="soft">Le rang (en bas) est la place. Le terme est le nombre qui est à cette place.</span></li>
+        <li><span class="bad">u₁₀ est le 10<sup>e</sup> terme</span><span class="good">u₁₀ est le 11<sup>e</sup> terme</span><span class="soft">Quand on commence à u₀, il y a u₀, u₁, …, u₁₀ : cela fait 11 termes.</span></li>
+        <li><span class="bad">u₀ = 3, q = 2 : u₄ = 3 × 2 × 4 = 24</span><span class="good">u₄ = 3 × 2⁴ = 3 × 16 = 48</span><span class="soft">Dans une suite géométrique, n est un exposant, pas un facteur.</span></li>
+        <li><span class="bad">+5 % par mois = +5 € par mois</span><span class="good">+5 % par mois = × 1,05 chaque mois</span><span class="soft">Un pourcentage multiplie (suite géométrique), un montant fixe s'ajoute (suite arithmétique).</span></li>
+        <li><span class="bad">Deux hausses de 10 % = une hausse de 20 %</span><span class="good">× 1,1 × 1,1 = × 1,21, soit +21 %</span><span class="soft">La deuxième hausse s'applique sur un montant qui a déjà augmenté.</span></li>
+        <li><span class="bad">u₀ = 100, q = 0,5 : un jour, uₙ = 0</span><span class="good">uₙ = 100 × 0,5ⁿ n'est jamais 0, mais tend vers 0</span><span class="soft">Se rapprocher autant qu'on veut, ce n'est pas atteindre.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Écris un nombre. Pour un nombre décimal, utilise la virgule.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Nouvelles questions</button>
+    </div>
+  </section>
+
+  <!-- 12 -->
+  <section>
+    <span class="eyebrow">Étape 12 · À toi de jouer</span>
+    <h2>Sept problèmes</h2>
+    <div class="exos">
+      <details>
+        <summary>La tirelire<span class="q">Tu as 4 € et tu ajoutes 7 € chaque semaine. Combien as-tu après 10 semaines ?</span></summary>
+        <div><span>Suite arithmétique de premier terme u₀ = 4 et de raison r = 7. u₁₀ = 4 + 10 × 7 = <strong>74 €</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Le doublement<span class="q">u₀ = 3 et on multiplie par 2 à chaque fois. Combien vaut u₅ ?</span></summary>
+        <div><span>Suite géométrique de raison q = 2. u₅ = 3 × 2⁵ = 3 × 32 = <strong>96</strong>. Vérification : 3, 6, 12, 24, 48, 96.</span></div>
+      </details>
+      <details>
+        <summary>À la Gauss<span class="q">Calcule 1 + 2 + 3 + … + 50.</span></summary>
+        <div><span>Avec la formule : 50 × 51 ÷ 2 = <strong>1 275</strong>. Ou par paires : 1 + 50 = 2 + 49 = … = 51, et il y a 25 paires : 25 × 51 = 1 275.</span></div>
+      </details>
+      <details>
+        <summary>Le livret d'épargne<span class="q">On place 500 € à 2 % par an (intérêts composés). Combien y a-t-il après 2 ans ?</span></summary>
+        <div><span>Chaque année, on multiplie par 1,02. 500 × 1,02² = 500 × 1,0404 = <strong>520,20 €</strong>. Avec des intérêts simples (+10 € par an), on aurait seulement 520 €.</span></div>
+      </details>
+      <details>
+        <summary>La balle<span class="q">Une balle lâchée de 3 m remonte à chaque rebond à la moitié de sa hauteur. À quelle hauteur remonte-t-elle après le 4<sup>e</sup> rebond ?</span></summary>
+        <div><span>3 × 0,5⁴ = 3 × 0,0625 = <strong>0,1875 m</strong>, soit environ 19 cm.</span></div>
+      </details>
+      <details>
+        <summary>Le vol de 12<span class="q">Écris le vol de Syracuse qui part de 12. Quel est son temps de vol ?</span></summary>
+        <div><span>12 → 6 → 3 → 10 → 5 → 16 → 8 → 4 → 2 → 1. Il y a 9 flèches : le temps de vol est <strong>9</strong>, et l'altitude maximale est 16.</span></div>
+      </details>
+      <details>
+        <summary>D'une forme à l'autre<span class="q">La suite est définie par uₙ = 5n − 1. Écris-la avec une relation de récurrence.</span></summary>
+        <div><span>u₀ = 5 × 0 − 1 = −1. Chaque fois que n augmente de 1, on ajoute 5. Donc <strong>u₀ = −1 et uₙ₊₁ = uₙ + 5</strong> : c'est une suite arithmétique de raison 5.</span></div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• Une <strong>suite</strong> est une liste numérotée de nombres : u₀, u₁, u₂… Le petit nombre est le <strong>rang</strong>, uₙ est le <strong>terme</strong> de rang n.</span>
+      <span>• <strong>Formule explicite</strong> : on calcule uₙ directement à partir de n. <strong>Récurrence</strong> : on donne u₀ et le passage de uₙ à uₙ₊₁.</span>
+      <span>• <strong>Arithmétique</strong> : on ajoute la raison r. uₙ = u₀ + n × r. Les points sont alignés.</span>
+      <span>• <strong>Géométrique</strong> : on multiplie par la raison q. uₙ = u₀ × qⁿ. Un pourcentage d'évolution donne une suite géométrique.</span>
+      <span>• Multiplier finit toujours par battre ajouter (si q &gt; 1). Si 0 &lt; q &lt; 1, la suite géométrique <strong>tend vers 0</strong>.</span>
+      <span>• 1/2 + 1/4 + 1/8 + … = 1. Et la conjecture de Syracuse attend toujours sa démonstration.</span>
+    </div>
+  </section>
+
+  <!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"><a class="prev" href="les-vecteurs.html"><span>← Précédent</span><strong>Les vecteurs</strong></a><a class="next" href="la-derivee.html"><span>Suivant →</span><strong>La dérivée</strong></a></div><a class="tnav-home" href="index.html">⌂ Tous les tutoriels</a></nav><!--/tnav-->
+<footer>Fiche de révision · Les suites</footer>
+</main>
+
+<script>
+(function () {
+  /* Test hooks (window.__sui) :
+     sub(n)                    -> string : indice, ex. sub(12) = '₁₂'
+     ruleTerms(id, a, b, N)    -> number[] : N premiers termes du générateur ; id = 'lin' (uₙ = a·n + b), 'sq' (uₙ = a·n² + b),
+                                  'add' (u₀ = b, uₙ₊₁ = uₙ + a), 'mul' (u₀ = b, uₙ₊₁ = a·uₙ), 'fib' (u₀ = a, u₁ = b, uₙ₊₂ = uₙ₊₁ + uₙ)
+     arith(u0, r, n)           -> u0 + n·r            ex. arith(3, 2, 20) = 43
+     geo(u0, q, n)             -> u0·qⁿ               ex. geo(3, 2, 4) = 48
+     gaussSum(n)               -> 1 + 2 + … + n       ex. gaussSum(100) = 5050
+     crossover(S, a, p)        -> premier mois n ≥ 1 où S·(1 + p/100)ⁿ > S + a·n (l'offre B dépasse A pour de bon), ex. crossover(1000, 100, 5) = 27
+     belowRank(u0, q, eps)     -> plus petit n tel que u0·qⁿ < eps (0 < q < 1), sinon null
+     zeno(k)                   -> { num: 2ᵏ − 1, den: 2ᵏ, sum, rest } : 1/2 + … + 1/2ᵏ
+     syracuse(n)               -> number[] : le vol de n jusqu'à 1 (inclus) ; null si n n'est pas un entier de 1 à 1 000 000
+     flight(n)                 -> { steps, max } : temps de vol et altitude maximale, ex. flight(27) = { steps: 111, max: 9232 }
+     makeGuess(kind)           -> { kind, terms: number[5], next, hint, rule } ; kind = 'arith' | 'geo' | 'carres' | 'fibo' | 'ecarts' | 'double'
+     makeQ(t)                  -> { q, a, how } question de quiz de type t (0 à 7)
+  */
+  var NS = 'http://www.w3.org/2000/svg';
+  var SUBS = '₀₁₂₃₄₅₆₇₈₉', SUPS = '⁰¹²³⁴⁵⁶⁷⁸⁹';
+  function sub(n) { return String(n).split('').map(function (d) { return SUBS.charAt(+d); }).join(''); }
+  function sup(n) { return String(n).split('').map(function (d) { return SUPS.charAt(+d); }).join(''); }
+  function fmt(x, d) { var r = Math.round(x * 1e6) / 1e6; if (Object.is(r, -0)) r = 0; return r.toLocaleString('fr-FR', { maximumFractionDigits: d == null ? 3 : d }).replace('-', '−'); }
+  function exactTo(x, d) { var p = Math.pow(10, d); return Math.abs(x * p - Math.round(x * p)) < 1e-6 * Math.max(1, Math.abs(x)); }
+  function val(x, d) { d = d == null ? 3 : d; return (exactTo(x, d) ? '' : '≈ ') + fmt(x, d); }
+  function eqs(x, d) { return exactTo(x, d == null ? 3 : d) ? '= ' : '≈ '; }
+  function par(x) { return x < 0 ? '(' + fmt(x) + ')' : fmt(x); }
+  function num(s) { var t = String(s).replace(/\s/g, '').replace(/[−–]/g, '-').replace(',', '.'); if (t === '') return NaN; var x = Number(t); return isFinite(x) ? x : NaN; }
+  function mk(svg, name, attrs, text) { var e = document.createElementNS(NS, name); for (var a in attrs) e.setAttribute(a, attrs[a]); if (text != null) e.textContent = text; svg.appendChild(e); return e; }
+  function clear(el) { while (el.firstChild) el.removeChild(el.firstChild); }
+  function $(id) { return document.getElementById(id); }
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  function rnd(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+  function niceStep(raw) { var p = Math.pow(10, Math.floor(Math.log10(raw))), n = raw / p; return (n <= 1 ? 1 : n <= 2 ? 2 : n <= 5 ? 5 : 10) * p; }
+  function short(v) {
+    var a = Math.abs(v);
+    if (a >= 1e6) return fmt(v / 1e6, 1) + ' M';
+    if (a >= 1e5) return fmt(v / 1e3, 0) + ' k';
+    return fmt(v, 2);
+  }
+
+  /* ---------- Graphique générique : barres, points ou ligne ---------- */
+  function plot(svg, series, o) {
+    o = o || {};
+    clear(svg);
+    var W = 400, H = 240, L = 54, R = 12, T = 14, B = 30;
+    var cnt = o.n || Math.max.apply(null, series.map(function (s) { return s.vals.length; }));
+    if (!(cnt >= 1)) cnt = 1;
+    var lo = 0, hi = 0;
+    series.forEach(function (s) { s.vals.forEach(function (v) { if (isFinite(v)) { if (v < lo) lo = v; if (v > hi) hi = v; } }); });
+    if (o.hi != null) hi = Math.max(hi, o.hi);
+    if (hi - lo < 1e-9) hi = lo + 1;
+    var step = niceStep((hi - lo) / 4);
+    lo = Math.floor(lo / step + 1e-9) * step; hi = Math.ceil(hi / step - 1e-9) * step;
+    if (hi - lo < step) hi = lo + step;
+    var cw = (W - L - R) / cnt;
+    function X(i) { return L + (i + 0.5) * cw; }
+    function Y(v) { return T + (hi - v) / (hi - lo) * (H - T - B); }
+    var nt = Math.round((hi - lo) / step);
+    for (var k = 0; k <= nt; k++) {
+      var tv = lo + k * step;
+      mk(svg, 'line', { x1: L, y1: Y(tv), x2: W - R, y2: Y(tv), stroke: 'var(--line)', 'stroke-width': 1 });
+      mk(svg, 'text', { x: L - 6, y: Y(tv) + 4, 'text-anchor': 'end', 'font-size': 12 }, short(tv));
+    }
+    var every = [1, 2, 5, 10, 20, 50, 100, 200, 500].filter(function (e) { return cnt / e <= 12; })[0] || 1000;
+    for (var i = 0; i < cnt; i += every) mk(svg, 'text', { x: X(i), y: H - B + 19, 'text-anchor': 'middle', 'font-size': 12, 'class': 's' }, String(i));
+    mk(svg, 'line', { x1: L, y1: T, x2: L, y2: H - B, stroke: 'var(--ink)', 'stroke-width': 1.5 });
+    mk(svg, 'line', { x1: L, y1: Y(0), x2: W - R, y2: Y(0), stroke: 'var(--ink)', 'stroke-width': 2 });
+    series.forEach(function (s) {
+      var vals = o.upto != null ? s.vals.slice(0, o.upto) : s.vals, col = s.color || 'var(--acc)';
+      if (s.style === 'bar') {
+        var bw = Math.max(2, Math.min(28, cw * 0.62));
+        vals.forEach(function (v, j) {
+          var y1 = Y(Math.max(v, 0)), y2 = Y(Math.min(v, 0));
+          mk(svg, 'rect', { x: X(j) - bw / 2, y: y1, width: bw, height: Math.max(1, y2 - y1), fill: s.fill || 'var(--acc-soft)', stroke: col, 'stroke-width': 1.5 });
+        });
+      } else if (s.style === 'dot') {
+        var r = Math.max(2.5, Math.min(6, cw / 3));
+        vals.forEach(function (v, j) { mk(svg, 'circle', { cx: X(j), cy: Y(v), r: r, fill: col, stroke: 'var(--card)', 'stroke-width': 1.5 }); });
+      } else if (s.style === 'line') {
+        if (vals.length > 1) mk(svg, 'polyline', { points: vals.map(function (v, j) { return X(j).toFixed(1) + ',' + Y(v).toFixed(1); }).join(' '), fill: 'none', stroke: col, 'stroke-width': 2.5, 'stroke-linejoin': 'round' });
+        if (cnt <= 40) vals.forEach(function (v, j) { mk(svg, 'circle', { cx: X(j), cy: Y(v), r: 3, fill: col }); });
+      }
+    });
+    if (o.xLabel) mk(svg, 'text', { x: W - R, y: H - 4, 'text-anchor': 'end', 'font-size': 11, 'class': 's' }, o.xLabel);
+    return { X: X, Y: Y, cw: cw };
+  }
+
+  /* ---------- Étape 1 : cases ---------- */
+  (function () {
+    var box = $('idTiles'), out = $('idOut'), btns = [];
+    for (var n = 0; n <= 6; n++) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'tile'; b.setAttribute('aria-pressed', 'false');
+      b.innerHTML = '<span class="v">' + (3 * n + 2) + '</span><span class="i">u' + sub(n) + '</span>';
+      (function (n, b) { b.addEventListener('click', function () {
+        btns.forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+        out.innerHTML = 'u' + sub(n) + ' = ' + (3 * n + 2) + '<span>Le rang est ' + n + ' (la place), le terme est ' + (3 * n + 2) + ' (le nombre). C\'est le ' + (n + 1) + (n === 0 ? '<sup>er</sup>' : '<sup>e</sup>') + ' terme de la liste, car on commence à u₀.</span>';
+      }); })(n, b);
+      btns.push(b); box.appendChild(b);
+    }
+    var dots = document.createElement('span'); dots.className = 'tile'; dots.innerHTML = '<span class="v">…</span><span class="i">&nbsp;</span>'; box.appendChild(dots);
+    btns[3].click();
+  })();
+
+  /* ---------- Étape 2 : devine le terme suivant ---------- */
+  function makeGuess(kind) {
+    var t = [], i, next, hint, rule;
+    if (kind === 'arith') {
+      var u0 = rnd(-5, 20), r = pick([-7, -5, -4, -3, -2, 2, 3, 4, 5, 6, 7, 9, 11]);
+      for (i = 0; i < 5; i++) t.push(u0 + i * r);
+      next = u0 + 5 * r; hint = 'Calcule la différence entre deux termes qui se suivent.';
+      rule = r > 0 ? 'On ajoute ' + r + ' à chaque fois (suite arithmétique de raison ' + r + ').' : 'On enlève ' + (-r) + ' à chaque fois (suite arithmétique de raison ' + fmt(r) + ').';
+    } else if (kind === 'geo') {
+      if (Math.random() < 0.35) {
+        var m = pick([1, 3, 5]);
+        for (i = 0; i < 5; i++) t.push(32 * m / Math.pow(2, i));
+        next = m; rule = 'On divise par 2 à chaque fois, c\'est-à-dire qu\'on multiplie par 0,5 (suite géométrique de raison 0,5).';
+      } else {
+        var g0 = pick([1, 2, 3, 5]), q = pick([2, 3]);
+        for (i = 0; i < 5; i++) t.push(g0 * Math.pow(q, i));
+        next = g0 * Math.pow(q, 5); rule = 'On multiplie par ' + q + ' à chaque fois (suite géométrique de raison ' + q + ').';
+      }
+      hint = 'Les écarts changent beaucoup. Essaie de diviser un terme par le précédent.';
+    } else if (kind === 'carres') {
+      var k = rnd(1, 4);
+      for (i = 0; i < 5; i++) t.push((k + i) * (k + i));
+      next = (k + 5) * (k + 5); hint = 'Ce sont des nombres célèbres : ' + k + ' × ' + k + ', ' + (k + 1) + ' × ' + (k + 1) + '…';
+      rule = 'Ce sont les carrés : ' + k + '², ' + (k + 1) + '², … donc le suivant est ' + (k + 5) + '² = ' + next + '.';
+    } else if (kind === 'fibo') {
+      var a = rnd(1, 4), b = rnd(a, 7);
+      t = [a, b]; for (i = 2; i < 5; i++) t.push(t[i - 1] + t[i - 2]);
+      next = t[3] + t[4]; hint = 'Regarde les deux termes juste avant, ensemble.';
+      rule = 'Chaque terme est la somme des deux précédents, comme la suite de Fibonacci : ' + t[3] + ' + ' + t[4] + ' = ' + next + '.';
+    } else if (kind === 'ecarts') {
+      var s = rnd(1, 10), d = rnd(1, 3), cur = s;
+      t = [s]; for (i = 0; i < 4; i++) { cur += d + i; t.push(cur); }
+      next = cur + d + 4; hint = 'Calcule les écarts entre deux termes : ils changent, mais de façon régulière.';
+      rule = 'Les écarts sont +' + d + ', +' + (d + 1) + ', +' + (d + 2) + ', +' + (d + 3) + '… donc on ajoute ' + (d + 4) + '.';
+    } else {
+      var w = rnd(1, 4);
+      t = [w]; for (i = 1; i < 5; i++) t.push(2 * t[i - 1] + 1);
+      next = 2 * t[4] + 1; hint = 'Essaie « multiplier par 2, puis ajouter un petit nombre ».';
+      rule = 'uₙ₊₁ = 2 × uₙ + 1 : on double puis on ajoute 1. 2 × ' + t[4] + ' + 1 = ' + next + '.';
+    }
+    return { kind: kind, terms: t, next: next, hint: hint, rule: rule };
+  }
+  (function () {
+    var kinds = ['arith', 'geo', 'carres', 'fibo', 'ecarts', 'double'], cur = null, lastKind = null, found = 0, played = 0, state;
+    function show() {
+      var k; do { k = pick(kinds); } while (k === lastKind);
+      lastKind = k; cur = makeGuess(k); state = { tried: false, done: false };
+      var h = cur.terms.map(function (v, i) { return '<span class="tile"><span class="v">' + fmt(v) + '</span><span class="i">u' + sub(i) + '</span></span>'; }).join('');
+      h += '<span class="tile q"><input type="text" id="gIn" inputmode="decimal" autocomplete="off" aria-label="Le terme u₅"><span class="i">u₅</span></span>';
+      $('gTiles').innerHTML = h; $('gFb').className = 'verdict'; $('gFb').innerHTML = '';
+      $('gIn').addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+    }
+    function score() { $('gScore').textContent = 'Suites trouvées : ' + found + ' sur ' + played; }
+    function check() {
+      var x = num($('gIn').value), fb = $('gFb');
+      if (isNaN(x)) { fb.className = 'verdict info'; fb.innerHTML = 'Écris un nombre dans la case u₅.'; return; }
+      if (!state.tried) { state.tried = true; played++; }
+      if (Math.abs(x - cur.next) < 1e-9) {
+        if (!state.done) { state.done = true; found++; }
+        fb.className = 'verdict yes'; fb.innerHTML = 'Bravo, u₅ = ' + fmt(cur.next) + ' !<span>' + cur.rule + '</span>';
+      } else { fb.className = 'verdict no'; fb.innerHTML = 'Ce n\'est pas ça. Essaie encore, ou demande un indice.'; }
+      score();
+    }
+    $('gCheck').addEventListener('click', check);
+    $('gHint').addEventListener('click', function () { $('gFb').className = 'verdict info'; $('gFb').innerHTML = 'Indice<span>' + cur.hint + '</span>'; });
+    $('gShow').addEventListener('click', function () {
+      if (!state.tried) { state.tried = true; played++; score(); }
+      $('gFb').className = 'verdict blue'; $('gFb').innerHTML = 'u₅ = ' + fmt(cur.next) + '<span>' + cur.rule + '</span>';
+    });
+    $('gNew').addEventListener('click', show);
+    show();
+  })();
+
+  /* ---------- Étape 3 : générateur ---------- */
+  function ruleTerms(id, a, b, N) {
+    var t = [], n;
+    for (n = 0; n < N; n++) {
+      if (id === 'lin') t.push(a * n + b);
+      else if (id === 'sq') t.push(a * n * n + b);
+      else if (id === 'add') t.push(n === 0 ? b : t[n - 1] + a);
+      else if (id === 'mul') t.push(n === 0 ? b : t[n - 1] * a);
+      else if (id === 'fib') t.push(n === 0 ? a : n === 1 ? b : t[n - 1] + t[n - 2]);
+    }
+    return t;
+  }
+  (function () {
+    function sg(x) { return x < 0 ? ' − ' + fmt(-x) : ' + ' + fmt(x); }
+    var rules = [
+      { id: 'lin', name: 'uₙ = a × n + b', A: [-5, 5, 1, 3, 'a'], B: [-10, 10, 1, 2, 'b'],
+        text: function (a, b) { return 'uₙ = ' + fmt(a) + ' × n' + sg(b); },
+        how: function (a, b) { return '<span class="why">Formule explicite : on remplace n par le rang, directement.</span><span>u₄ = ' + fmt(a) + ' × 4' + sg(b) + ' = ' + fmt(4 * a + b) + '</span><span>u₁₀₀ = ' + fmt(a) + ' × 100' + sg(b) + ' = <b>' + fmt(100 * a + b) + '</b></span><span class="why">C\'est aussi la suite u₀ = ' + fmt(b) + ' et uₙ₊₁ = uₙ' + sg(a) + ' : chaque pas ajoute a.</span>'; } },
+      { id: 'sq', name: 'uₙ = a × n² + b', A: [-3, 3, 1, 1, 'a'], B: [-10, 10, 1, 0, 'b'],
+        text: function (a, b) { return 'uₙ = ' + fmt(a) + ' × n²' + sg(b); },
+        how: function (a, b) { return '<span class="why">Formule explicite : on remplace n par le rang.</span><span>u₄ = ' + fmt(a) + ' × 4²' + sg(b) + ' = ' + fmt(16 * a + b) + '</span><span>u₁₀₀ = ' + fmt(a) + ' × 100²' + sg(b) + ' = <b>' + fmt(10000 * a + b) + '</b></span><span class="why">Ici, les écarts entre deux termes ne sont pas constants : ce n\'est ni arithmétique, ni géométrique (sauf si a = 0).</span>'; } },
+      { id: 'add', name: 'uₙ₊₁ = uₙ + a', A: [-5, 5, 1, 3, 'a'], B: [-10, 10, 1, 2, 'u₀'],
+        text: function (a, b) { return 'u₀ = ' + fmt(b) + ' et uₙ₊₁ = uₙ' + sg(a); },
+        how: function (a, b) { var t = ruleTerms('add', a, b, 4); return '<span class="why">Récurrence : on part de u₀ et on avance pas à pas.</span><span>u₁ = ' + fmt(t[0]) + sg(a) + ' = ' + fmt(t[1]) + '</span><span>u₂ = ' + fmt(t[1]) + sg(a) + ' = ' + fmt(t[2]) + '</span><span>u₃ = ' + fmt(t[2]) + sg(a) + ' = ' + fmt(t[3]) + ' …</span><span class="why">Raccourci : c\'est aussi uₙ = ' + fmt(b) + sg(a) + ' × n, donc u₁₀₀ = <b>' + fmt(b + 100 * a) + '</b>.</span>'; } },
+      { id: 'mul', name: 'uₙ₊₁ = a × uₙ', A: [-2, 3, 0.5, 2, 'a'], B: [-10, 10, 1, 1, 'u₀'],
+        text: function (a, b) { return 'u₀ = ' + fmt(b) + ' et uₙ₊₁ = ' + fmt(a) + ' × uₙ'; },
+        how: function (a, b) { var t = ruleTerms('mul', a, b, 4); return '<span class="why">Récurrence : on part de u₀ et on multiplie à chaque pas.</span><span>u₁ = ' + par(a) + ' × ' + par(t[0]) + ' = ' + val(t[1], 4) + '</span><span>u₂ = ' + par(a) + ' × ' + par(t[1]) + ' = ' + val(t[2], 4) + '</span><span>u₃ = ' + par(a) + ' × ' + par(t[2]) + ' = ' + val(t[3], 4) + ' …</span><span class="why">Raccourci : c\'est aussi uₙ = ' + par(b) + ' × ' + par(a) + 'ⁿ.' + (a < 0 ? ' Avec une raison négative, le signe change à chaque pas.' : '') + '</span>'; } },
+      { id: 'fib', name: 'Fibonacci', A: [-5, 5, 1, 1, 'u₀'], B: [-5, 5, 1, 1, 'u₁'],
+        text: function (a, b) { return 'u₀ = ' + fmt(a) + ', u₁ = ' + fmt(b) + ' et uₙ₊₂ = uₙ₊₁ + uₙ'; },
+        how: function (a, b) { var t = ruleTerms('fib', a, b, 5); return '<span class="why">Récurrence avec deux termes de départ : chaque terme est la somme des deux précédents.</span><span>u₂ = ' + fmt(t[1]) + ' + ' + par(t[0]) + ' = ' + fmt(t[2]) + '</span><span>u₃ = ' + fmt(t[2]) + ' + ' + par(t[1]) + ' = ' + fmt(t[3]) + '</span><span>u₄ = ' + fmt(t[3]) + ' + ' + par(t[2]) + ' = ' + fmt(t[4]) + ' …</span><span class="why">Il existe une formule explicite… avec le nombre d\'or dedans ! Elle est bien plus compliquée.</span>'; } }
+    ];
+    var cur = 0, mode = 'bar', sa = $('genA'), sb = $('genB'), sn = $('genN'), box = $('genRules');
+    rules.forEach(function (r, i) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'ex'; b.id = 'genR' + i; b.textContent = r.name;
+      b.addEventListener('click', function () { setRule(i); });
+      box.appendChild(b);
+    });
+    function cfg(inp, c) { inp.min = c[0]; inp.max = c[1]; inp.step = c[2]; inp.value = c[3]; }
+    function setRule(i) {
+      cur = i; var r = rules[i];
+      rules.forEach(function (q, j) { $('genR' + j).setAttribute('aria-pressed', j === i ? 'true' : 'false'); });
+      cfg(sa, r.A); cfg(sb, r.B); $('genALab').textContent = r.A[4]; $('genBLab').textContent = r.B[4];
+      draw();
+    }
+    function draw() {
+      var r = rules[cur], a = parseFloat(sa.value), b = parseFloat(sb.value), N = parseInt(sn.value, 10);
+      $('genAOut').textContent = fmt(a); $('genBOut').textContent = fmt(b); $('genNOut').textContent = N;
+      var t = ruleTerms(r.id, a, b, N);
+      $('genRule').textContent = r.text(a, b);
+      $('genTiles').innerHTML = t.map(function (v, i) { return '<span class="tile"><span class="v">' + val(v, 4) + '</span><span class="i">u' + sub(i) + '</span></span>'; }).join('');
+      plot($('genSvg'), [{ vals: t, style: mode }], { xLabel: 'rang n' });
+      $('genHow').innerHTML = r.how(a, b);
+    }
+    [sa, sb, sn].forEach(function (e) { e.addEventListener('input', draw); });
+    $('genBars').addEventListener('click', function () { mode = 'bar'; $('genBars').setAttribute('aria-pressed', 'true'); $('genDots').setAttribute('aria-pressed', 'false'); draw(); });
+    $('genDots').addEventListener('click', function () { mode = 'dot'; $('genDots').setAttribute('aria-pressed', 'true'); $('genBars').setAttribute('aria-pressed', 'false'); draw(); });
+    setRule(0);
+  })();
+
+  /* ---------- Étape 4 : suite arithmétique ---------- */
+  function arith(u0, r, n) { return u0 + n * r; }
+  function gaussSum(n) { return n * (n + 1) / 2; }
+  (function () {
+    var su = $('arU'), sr = $('arR'), sn = $('arN');
+    function draw() {
+      var u0 = parseFloat(su.value), r = parseFloat(sr.value), n = parseInt(sn.value, 10), t = [], i;
+      $('arUOut').textContent = fmt(u0); $('arROut').textContent = fmt(r); $('arNOut').textContent = n;
+      for (i = 0; i <= 10; i++) t.push(arith(u0, r, i));
+      var svg = $('arSvg'), P = plot(svg, [{ vals: t, style: 'none' }], { xLabel: 'rang n' });
+      mk(svg, 'line', { x1: P.X(0), y1: P.Y(t[0]), x2: P.X(10), y2: P.Y(t[10]), stroke: 'var(--two)', 'stroke-width': 1.5, 'stroke-dasharray': '6 5' });
+      if (r !== 0) {
+        for (i = 0; i < 10; i++) mk(svg, 'path', { d: 'M' + P.X(i) + ' ' + P.Y(t[i]) + ' H' + P.X(i + 1) + ' V' + P.Y(t[i + 1]), fill: 'none', stroke: 'var(--acc)', 'stroke-width': 2 });
+        for (i = 0; i < 3; i++) mk(svg, 'text', { x: P.X(i + 1) + 5, y: (P.Y(t[i]) + P.Y(t[i + 1])) / 2 + 4, 'font-size': 12, 'class': 'a', 'font-weight': 600 }, (r > 0 ? '+' : '−') + fmt(Math.abs(r)));
+      }
+      t.forEach(function (v, j) { mk(svg, 'circle', { cx: P.X(j), cy: P.Y(v), r: 5.5, fill: 'var(--acc)', stroke: 'var(--card)', 'stroke-width': 1.5 }); });
+      $('arMsg').textContent = r > 0 ? 'Chaque marche monte de ' + fmt(r) + ' : la suite est croissante, et tous les points sont alignés sur la droite en pointillés.'
+        : r < 0 ? 'Chaque marche descend de ' + fmt(-r) + ' : la suite est décroissante. Les points sont toujours alignés.'
+        : 'Avec r = 0, on ajoute 0 : tous les termes sont égaux. La suite est constante.';
+      var un = arith(u0, r, n);
+      $('arOut').innerHTML = '<span>u' + sub(n) + ' = u₀ + ' + n + ' × r</span><span>u' + sub(n) + ' = ' + fmt(u0) + ' + ' + n + ' × ' + par(r) + '</span><span>u' + sub(n) + ' = <b>' + fmt(un) + '</b></span><span class="why">Pas besoin de calculer les ' + n + ' termes d\'avant : la formule explicite fait le travail en une ligne.</span>';
+    }
+    [su, sr, sn].forEach(function (e) { e.addEventListener('input', draw); });
+    draw();
+  })();
+
+  /* ---------- Étape 5 : suite géométrique ---------- */
+  function geo(u0, q, n) { return u0 * Math.pow(q, n); }
+  (function () {
+    var presets = [
+      { name: 'Épargne', s1: ['Somme placée :', 100, 5000, 100, 1000, function (v) { return fmt(v) + ' €'; }],
+        s2: ['Taux d\'intérêt :', 1, 10, 0.5, 3, function (v) { return fmt(v) + ' % par an'; }],
+        s3: ['Nombre d\'années :', 1, 40, 1, 10, function (v) { return v; }],
+        q: function (v) { return 1 + v / 100; } },
+      { name: 'Balle qui rebondit', s1: ['Hauteur de départ :', 1, 5, 0.5, 2, function (v) { return fmt(v) + ' m'; }],
+        s2: ['À chaque rebond, elle garde', 30, 90, 5, 60, function (v) { return fmt(v) + ' % de sa hauteur'; }],
+        s3: ['Nombre de rebonds :', 1, 15, 1, 8, function (v) { return v; }],
+        q: function (v) { return v / 100; } },
+      { name: 'Bactéries', s1: ['Bactéries au départ :', 1, 50, 1, 10, function (v) { return v; }],
+        s2: ['Toutes les 20 minutes, leur nombre est multiplié par', 1.5, 3, 0.5, 2, function (v) { return fmt(v); }],
+        s3: ['Nombre de périodes de 20 min :', 1, 24, 1, 9, function (v) { return v; }],
+        q: function (v) { return v; } }
+    ];
+    var cur = 0, s1 = $('geo1'), s2 = $('geo2'), s3 = $('geo3');
+    presets.forEach(function (p, i) {
+      var b = document.createElement('button'); b.type = 'button'; b.id = 'geoP' + i; b.textContent = p.name;
+      b.addEventListener('click', function () { setP(i); });
+      $('geoPre').appendChild(b);
+    });
+    function cfg(inp, c) { inp.min = c[1]; inp.max = c[2]; inp.step = c[3]; inp.value = c[4]; }
+    function setP(i) {
+      cur = i; var p = presets[i];
+      presets.forEach(function (x, j) { $('geoP' + j).setAttribute('aria-pressed', j === i ? 'true' : 'false'); });
+      cfg(s1, p.s1); cfg(s2, p.s2); cfg(s3, p.s3);
+      $('geo1Lab').textContent = p.s1[0]; $('geo2Lab').textContent = p.s2[0]; $('geo3Lab').textContent = p.s3[0];
+      draw();
+    }
+    function res(name, v, calc, cls) { return '<div class="res"><span class="res-name">' + name + '</span><span class="res-val' + (cls ? ' ' + cls : '') + '">' + v + '</span><span class="res-calc">' + calc + '</span></div>'; }
+    function draw() {
+      var p = presets[cur], u0 = parseFloat(s1.value), v2 = parseFloat(s2.value), N = parseInt(s3.value, 10), q = p.q(v2), t = [], i;
+      $('geo1Out').textContent = p.s1[5](u0); $('geo2Out').textContent = p.s2[5](v2); $('geo3Out').textContent = p.s3[5](N);
+      for (i = 0; i <= N; i++) t.push(geo(u0, q, i));
+      plot($('geoSvg'), [{ vals: t, style: 'bar' }], { xLabel: cur === 0 ? 'années' : cur === 1 ? 'rebonds' : 'périodes' });
+      var uN = t[N], calc = 'u' + sub(N) + ' = u₀ × q' + sup(N) + ' = ' + fmt(u0) + ' × ' + fmt(q, 4) + sup(N), h;
+      if (cur === 0) {
+        var simple = u0 + N * u0 * v2 / 100;
+        h = res('Raison', 'q = ' + fmt(q, 4), '+' + fmt(v2) + ' %, c\'est multiplier par 1 + ' + fmt(v2) + ' ÷ 100 = ' + fmt(q, 4)) +
+            res('Après ' + N + (N > 1 ? ' ans' : ' an'), val(uN, 2) + ' €', calc + ' ' + eqs(uN, 2) + fmt(uN, 2) + ' €') +
+            res('Sans intérêts composés', val(simple, 2) + ' €', 'Intérêts simples : on ajouterait seulement ' + fmt(u0 * v2 / 100, 2) + ' € par an (suite arithmétique) : ' + fmt(u0) + ' + ' + N + ' × ' + fmt(u0 * v2 / 100, 2) + ' = ' + fmt(simple, 2) + ' €. Les intérêts composés rapportent ' + fmt(uN - simple, 2) + ' € de plus.', 'b');
+      } else if (cur === 1) {
+        h = res('Raison', 'q = ' + fmt(q, 2), 'Garder ' + fmt(v2) + ' %, c\'est multiplier par ' + fmt(q, 2) + ' à chaque rebond.') +
+            res('Après ' + N + ' rebond' + (N > 1 ? 's' : ''), val(uN, 2) + ' m', calc + ' ' + eqs(uN, 4) + fmt(uN, 4) + ' m, soit environ ' + fmt(uN * 100, 0) + ' cm') +
+            res('Et ensuite ?', '→ 0', 'Les hauteurs se rapprochent de 0 sans jamais l\'atteindre dans le calcul. En vrai, la balle finit par s\'arrêter.');
+      } else {
+        var mins = N * 20;
+        h = res('Raison', 'q = ' + fmt(q), 'Le nombre est multiplié par ' + fmt(q) + ' toutes les 20 minutes.') +
+            res('Après ' + (mins < 60 ? mins + ' min' : Math.floor(mins / 60) + ' h' + (mins % 60 ? ' ' + (mins % 60) + ' min' : '')), (Number.isInteger(uN) ? '' : '≈ ') + fmt(Math.round(uN), 0), calc + ' ' + eqs(uN, 0) + fmt(Math.round(uN), 0) + ' bactéries') +
+            res('Attention', '!', 'Avec une telle croissance, une seule bactérie qui double toutes les 20 minutes donnerait 2' + sup(33) + ', soit plus de 8 milliards de bactéries, en 11 heures. Heureusement, la nourriture finit par manquer.');
+      }
+      $('geoOut').innerHTML = h;
+    }
+    [s1, s2, s3].forEach(function (e) { e.addEventListener('input', draw); });
+    setP(0);
+  })();
+
+  /* ---------- Étape 6 : le duel ---------- */
+  function crossover(S, a, p) {
+    var q = 1 + p / 100;
+    for (var n = 1; n <= 100000; n++) { if (S * Math.pow(q, n) > S + a * n + 1e-9) return n; }
+    return null;
+  }
+  (function () {
+    var ss = $('duS'), sa = $('duA'), sp = $('duP');
+    function eur(x) { return fmt(Math.round(x * 100) / 100, 2) + ' €'; }
+    function draw() {
+      var S = parseFloat(ss.value), a = parseFloat(sa.value), p = parseFloat(sp.value), q = 1 + p / 100;
+      $('duSOut').textContent = fmt(S) + ' €'; $('duAOut').textContent = fmt(a) + ' €'; $('duPOut').textContent = fmt(p) + ' %';
+      var N = crossover(S, a, p), Hn = Math.max(12, Math.ceil(N * 1.3)), A = [], B = [], i;
+      for (i = 0; i <= Hn; i++) { A.push(S + a * i); B.push(S * Math.pow(q, i)); }
+      plot($('duSvg'), [{ vals: A, style: 'line', color: 'var(--two)' }, { vals: B, style: 'line', color: 'var(--acc)' }], { xLabel: 'mois' });
+      var out = $('duOut'), yrs = N / 12;
+      if (N === 1) {
+        out.className = 'verdict info';
+        out.innerHTML = 'L\'offre B gagne dès le premier mois !<span>' + fmt(p) + ' % de ' + fmt(S) + ' €, c\'est ' + eur(S * p / 100) + ', déjà plus que ' + fmt(a) + ' €. Et l\'écart ne fera que grandir.</span>';
+      } else {
+        out.className = 'verdict info';
+        out.innerHTML = 'L\'offre B dépasse l\'offre A au mois ' + N + (N >= 24 ? ' (environ ' + fmt(yrs, 1) + ' ans)' : '') + '.<span>Avant, A est devant (ou à égalité). À partir du mois ' + N + ', B reste devant pour toujours, et l\'écart explose.</span>';
+      }
+      var rows = [N - 1, N, Hn].filter(function (m, j, arr) { return m >= 1 && arr.indexOf(m) === j; });
+      $('duTab').innerHTML = rows.map(function (m) {
+        var am = S + a * m, bm = S * Math.pow(q, m);
+        return '<div class="res"><span class="res-name">Mois ' + m + '</span><span class="res-val ' + (bm > am + 1e-9 ? '' : 'b') + '">' + (bm > am + 1e-9 ? 'B devant' : am > bm + 1e-9 ? 'A devant' : 'égalité') + '</span><span class="res-calc">A : ' + fmt(S) + ' + ' + m + ' × ' + fmt(a) + ' = ' + eur(am) + ' · B : ' + fmt(S) + ' × ' + fmt(q, 2) + sup(m) + ' ≈ ' + eur(bm) + '</span></div>';
+      }).join('');
+    }
+    [ss, sa, sp].forEach(function (e) { e.addEventListener('input', draw); });
+    draw();
+  })();
+
+  /* ---------- Étape 7 : limite ---------- */
+  function belowRank(u0, q, eps) {
+    if (!(q > 0 && q < 1)) return null;
+    var u = u0;
+    for (var n = 0; n <= 100000; n++) { if (u < eps) return n; u *= q; }
+    return null;
+  }
+  (function () {
+    var sq = $('liQ');
+    function draw() {
+      var q = Math.round(parseFloat(sq.value) * 100) / 100, t = [], i;
+      $('liQOut').textContent = fmt(q, 2);
+      for (i = 0; i <= 25; i++) t.push(geo(100, q, i));
+      plot($('liSvg'), [{ vals: t, style: 'dot' }], { xLabel: 'rang n' });
+      var out = $('liOut');
+      if (q < 1) {
+        var n1 = belowRank(100, q, 1), n2 = belowRank(100, q, 0.01);
+        out.className = 'verdict yes';
+        out.innerHTML = 'Les termes se rapprochent de 0 : la limite est 0.<span>u₂₅ = 100 × ' + fmt(q, 2) + '²⁵ ' + (t[25] < 0.001 ? '≈ ' + t[25].toExponential(1).replace('.', ',').replace('e-', ' × 10^−').replace(/\^−(\d+)/, function (m, d) { return '⁻' + sup(d); }) : eqs(t[25]) + fmt(t[25])) + '. Les termes passent sous 1 à partir de u' + sub(n1) + ', et sous 0,01 à partir de u' + sub(n2) + '. Mais aucun ne vaut exactement 0.</span>';
+      } else if (q === 1) {
+        out.className = 'verdict blue';
+        out.innerHTML = 'q = 1 : on multiplie par 1, rien ne change.<span>Tous les termes valent 100. La suite est constante.</span>';
+      } else {
+        out.className = 'verdict no';
+        out.innerHTML = 'Les termes grandissent sans limite.<span>u₂₅ = 100 × ' + fmt(q, 2) + '²⁵ ≈ ' + fmt(Math.round(t[25]), 0) + '. On peut dépasser n\'importe quel nombre en allant assez loin : on dit que la suite tend vers l\'infini.</span>';
+      }
+    }
+    sq.addEventListener('input', draw);
+    draw();
+  })();
+
+  /* Zénon : 1/2 + 1/4 + … */
+  function zeno(k) { var den = Math.pow(2, k); return { num: den - 1, den: den, sum: (den - 1) / den, rest: 1 / den }; }
+  (function () {
+    var k = 0, MAX = 12, svg = $('zSvg');
+    function frac(d) { return d === 2 ? '½' : d === 4 ? '¼' : d === 8 ? '⅛' : '1/' + d; }
+    function draw() {
+      clear(svg);
+      mk(svg, 'rect', { x: 10, y: 10, width: 280, height: 280, fill: 'var(--card)', stroke: 'var(--ink)', 'stroke-width': 2 });
+      var x = 10, y = 10, w = 280, h = 280;
+      for (var i = 1; i <= k; i++) {
+        var px, py, pw, ph;
+        if (i % 2 === 1) { px = x; py = y; pw = w / 2; ph = h; x += w / 2; w /= 2; }
+        else { px = x; py = y; pw = w; ph = h / 2; y += h / 2; h /= 2; }
+        mk(svg, 'rect', { x: px, y: py, width: pw, height: ph, fill: i % 2 ? 'var(--acc-soft)' : 'var(--two-soft)', stroke: i % 2 ? 'var(--acc)' : 'var(--two)', 'stroke-width': 1.5 });
+        if (i <= 4) mk(svg, 'text', { x: px + pw / 2, y: py + ph / 2 + 6, 'text-anchor': 'middle', 'font-size': i <= 3 ? 20 : 15, 'font-weight': 600, 'class': i % 2 ? 'a' : 'b' }, frac(Math.pow(2, i)));
+      }
+      var z = zeno(k), out = $('zOut');
+      if (k === 0) { out.innerHTML = '<span>Le carré est vide. Clique sur « Ajouter un morceau ».</span>'; }
+      else {
+        var terms = []; for (var j = 1; j <= Math.min(k, 4); j++) terms.push('1/' + Math.pow(2, j));
+        if (k > 4) terms.push('…', '1/' + z.den);
+        out.innerHTML = '<span>' + terms.join(' + ') + '</span><span>= <b>' + z.num + '/' + z.den + '</b> ' + eqs(z.sum, 6) + fmt(z.sum, 6) + '</span><span class="why">Il manque encore 1/' + z.den + ' ' + eqs(z.rest, 6) + fmt(z.rest, 6) + ' du carré : exactement le dernier morceau ajouté.' + (k >= MAX ? ' Les morceaux sont maintenant trop petits pour être dessinés, mais on pourrait continuer sans fin.' : '') + '</span>';
+      }
+      $('zAdd').disabled = k >= MAX;
+    }
+    $('zAdd').addEventListener('click', function () { if (k < MAX) { k++; draw(); } });
+    $('zReset').addEventListener('click', function () { k = 0; draw(); });
+    draw();
+  })();
+
+  /* ---------- Étape 8 : Syracuse ---------- */
+  function syracuse(n) {
+    if (!(Number.isInteger(n) && n >= 1 && n <= 1000000)) return null;
+    var t = [n];
+    while (n !== 1) { n = n % 2 === 0 ? n / 2 : 3 * n + 1; t.push(n); }
+    return t;
+  }
+  function flight(n) { var t = syracuse(n); return t ? { steps: t.length - 1, max: Math.max.apply(null, t) } : null; }
+  (function () {
+    var inp = $('syN'), timer = null;
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    [6, 7, 15, 27, 97, 871].forEach(function (v) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'ex'; b.textContent = String(v);
+      b.addEventListener('click', function () { inp.value = v; go(); });
+      $('syPre').appendChild(b);
+    });
+    var rb = document.createElement('button'); rb.type = 'button'; rb.textContent = 'Au hasard';
+    rb.addEventListener('click', function () { inp.value = rnd(2, 9999); go(); });
+    $('syPre').appendChild(rb);
+    function go() {
+      if (timer) { clearInterval(timer); timer = null; }
+      var n = num(inp.value), t = syracuse(n), svg = $('sySvg');
+      if (!t) {
+        clear(svg); $('syList').innerHTML = '';
+        $('syRes').innerHTML = '<p class="err">Écris un nombre entier entre 1 et 1 000 000.</p>';
+        return;
+      }
+      var f = flight(n), imax = t.indexOf(f.max);
+      $('syRes').innerHTML =
+        '<div class="res"><span class="res-name">Temps de vol</span><span class="res-val">' + f.steps + ' étape' + (f.steps > 1 ? 's' : '') + '</span><span class="res-calc">' + (n === 1 ? '1 est déjà arrivé. Ensuite on tournerait en rond : 1 → 4 → 2 → 1.' : 'Nombre de flèches pour arriver à 1.') + '</span></div>' +
+        '<div class="res"><span class="res-name">Altitude maximale</span><span class="res-val">' + fmt(f.max, 0) + '</span><span class="res-calc">Atteinte à l\'étape ' + imax + '.' + (f.max > 100 * n ? ' Plus de 100 fois le départ !' : '') + '</span></div>';
+      $('syList').innerHTML = t.map(function (v, i) {
+        var cls = i === imax ? 'top' : (i > 0 && v > t[i - 1] ? 'up' : '');
+        return cls ? '<span class="' + cls + '">' + fmt(v, 0) + '</span>' : fmt(v, 0);
+      }).join(' → ');
+      var opts = { n: t.length, hi: f.max, xLabel: 'étapes' }, k = reduce ? t.length : 1;
+      opts.upto = k; plot(svg, [{ vals: t, style: 'line' }], opts);
+      if (!reduce) {
+        var inc = Math.max(1, Math.ceil(t.length / 60));
+        timer = setInterval(function () {
+          k = Math.min(t.length, k + inc); opts.upto = k; plot(svg, [{ vals: t, style: 'line' }], opts);
+          if (k >= t.length) { clearInterval(timer); timer = null; }
+        }, 25);
+      }
+    }
+    $('syGo').addEventListener('click', go);
+    inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') go(); });
+    go();
+  })();
+
+  /* ---------- Quiz ---------- */
+  function terms(list) { return list.map(function (v) { return fmt(v); }).join(' ; '); }
+  function makeQ(t) {
+    var i, list = [];
+    if (t === 0) {
+      var u0 = rnd(-10, 30), r = pick([-6, -4, -3, 3, 4, 5, 7, 8, 12]);
+      for (i = 0; i < 4; i++) list.push(u0 + i * r);
+      return { q: 'Suite arithmétique : ' + terms(list) + ' ; … Quel est le terme suivant ?', a: u0 + 4 * r, how: 'Raison r = ' + fmt(list[1]) + ' − ' + par(list[0]) + ' = ' + fmt(r) + ', donc ' + fmt(list[3]) + ' + ' + par(r) + ' = ' + fmt(u0 + 4 * r) };
+    }
+    if (t === 1) {
+      var g0 = pick([1, 2, 3, 4, 5]), q = pick([2, 3, 5]);
+      for (i = 0; i < 4; i++) list.push(g0 * Math.pow(q, i));
+      return { q: 'Suite géométrique : ' + terms(list) + ' ; … Quel est le terme suivant ?', a: g0 * Math.pow(q, 4), how: 'Raison q = ' + fmt(list[1]) + ' ÷ ' + fmt(list[0]) + ' = ' + q + ', donc ' + fmt(list[3]) + ' × ' + q + ' = ' + fmt(g0 * Math.pow(q, 4)) };
+    }
+    if (t === 2) {
+      var a = rnd(2, 9), b = pick([-9, -7, -5, -3, -1, 1, 2, 4, 6, 8, 10, 12]), k = rnd(5, 20);
+      var bs = b < 0 ? ' − ' + (-b) : ' + ' + b;
+      return { q: 'On a uₙ = ' + a + 'n' + bs + '. Combien vaut u' + sub(k) + ' ?', a: a * k + b, how: 'u' + sub(k) + ' = ' + a + ' × ' + k + bs + ' = ' + fmt(a * k + b) };
+    }
+    if (t === 3) {
+      var v0 = rnd(-20, 50), rr = pick([2, 3, 4, 5, -2, -3, 0.5]), n = pick([10, 20, 25, 50, 100]);
+      return { q: 'Suite arithmétique : u₀ = ' + fmt(v0) + ' et r = ' + fmt(rr) + '. Combien vaut u' + sub(n) + ' ?', a: v0 + n * rr, how: 'u' + sub(n) + ' = u₀ + ' + n + ' × r = ' + fmt(v0) + ' + ' + n + ' × ' + par(rr) + ' = ' + fmt(v0 + n * rr) };
+    }
+    if (t === 4) {
+      var w0 = pick([1, 2, 3, 5, 10]), qq = pick([2, 3]), m = pick([3, 4, 5]);
+      return { q: 'Suite géométrique : u₀ = ' + w0 + ' et q = ' + qq + '. Combien vaut u' + sub(m) + ' ?', a: w0 * Math.pow(qq, m), how: 'u' + sub(m) + ' = u₀ × q' + sup(m) + ' = ' + w0 + ' × ' + qq + sup(m) + ' = ' + w0 + ' × ' + Math.pow(qq, m) + ' = ' + fmt(w0 * Math.pow(qq, m)) };
+    }
+    if (t === 5) {
+      var z0 = rnd(-10, 20), rz = pick([-6, -5, -4, -3, -2, 2, 3, 4, 5, 6, 7, 8, 9]), kk = pick([4, 5, 10]), zk = z0 + kk * rz;
+      return { q: 'Suite arithmétique : u₀ = ' + fmt(z0) + ' et u' + sub(kk) + ' = ' + fmt(zk) + '. Quelle est la raison r ?', a: rz, how: 'De u₀ à u' + sub(kk) + ', on fait ' + kk + ' pas : r = (' + fmt(zk) + ' − ' + par(z0) + ') ÷ ' + kk + ' = ' + fmt(kk * rz) + ' ÷ ' + kk + ' = ' + fmt(rz) };
+    }
+    if (t === 6) {
+      var mm = pick([2, 3]), c = pick([-2, -1, 1, 2, 3]), x0 = rnd(0, 4), x = x0, steps = [];
+      var cs = c < 0 ? ' − ' + (-c) : ' + ' + c;
+      for (i = 1; i <= 3; i++) { var nx = mm * x + c; steps.push('u' + sub(i) + ' = ' + mm + ' × ' + par(x) + cs + ' = ' + fmt(nx)); x = nx; }
+      return { q: 'On a u₀ = ' + x0 + ' et uₙ₊₁ = ' + mm + 'uₙ' + cs + '. Combien vaut u₃ ?', a: x, how: steps.join(' ; ') };
+    }
+    var s = rnd(10, 60), y = s, path = [s];
+    for (i = 0; i < 3; i++) { y = y % 2 === 0 ? y / 2 : 3 * y + 1; path.push(y); }
+    return { q: 'Règle de Syracuse (pair : ÷ 2 ; impair : × 3 + 1). On part de ' + s + '. Quel nombre obtient-on après 3 étapes ?', a: y, how: path.join(' → ') };
+  }
+  (function () {
+    var quiz = $('quiz'), done = [];
+    function newQuiz() {
+      quiz.innerHTML = ''; done = [];
+      var order = [0, 1, 2, 3, 4, 5, 6, 7];
+      for (var i = order.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), tmp = order[i]; order[i] = order[j]; order[j] = tmp; }
+      for (var k = 0; k < 8; k++) {
+        var Q = makeQ(order[k]), li = document.createElement('li');
+        li.innerHTML = '<span>' + Q.q + '</span><input type="text" id="qa' + k + '" inputmode="decimal" autocomplete="off" aria-label="Ta réponse à la question ' + (k + 1) + '"><button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+        quiz.appendChild(li);
+        (function (k, Q) {
+          function check() {
+            var fb = $('qf' + k), x = num($('qa' + k).value);
+            if (isNaN(x)) { fb.className = 'fb'; fb.textContent = 'Écris un nombre.'; return; }
+            if (Math.abs(x - Q.a) < 0.006) { fb.className = 'fb ok'; fb.textContent = 'Bravo, c\'est juste !'; done[k] = true; }
+            else { done[k] = false; fb.className = 'fb no'; fb.innerHTML = 'Pas tout à fait : la réponse est ' + fmt(Q.a, 2) + '.<span>' + Q.how + '</span>'; }
+            $('score').textContent = done.filter(Boolean).length + ' / 8';
+          }
+          $('qb' + k).addEventListener('click', check);
+          $('qa' + k).addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+        })(k, Q);
+      }
+      $('score').textContent = '0 / 8';
+    }
+    $('newQuiz').addEventListener('click', newQuiz);
+    newQuiz();
+  })();
+
+  window.__sui = { sub: sub, ruleTerms: ruleTerms, arith: arith, geo: geo, gaussSum: gaussSum, crossover: crossover, belowRank: belowRank, zeno: zeno, syracuse: syracuse, flight: flight, makeGuess: makeGuess, makeQ: makeQ };
+})();
+</script>
+</body>
+</html>

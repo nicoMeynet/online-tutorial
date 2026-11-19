@@ -1,0 +1,1089 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Les nombres complexes</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, encre magenta-violet, marge rouge. Le plan complexe (un repère où chaque point est un nombre) est au centre. */
+:root {
+  --paper: #faf7fb;
+  --grid: #ede3f0;
+  --card: #ffffff;
+  --ink: #2a1630;
+  --ink-soft: #6a5470;
+  --acc: #a21caf;
+  --acc-soft: #f6e0f8;
+  --two: #0e7490;
+  --two-soft: #d9f0f5;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #fff0a3;
+  --line: #e2d3e6;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #140f16; --grid: #221a26; --card: #1c1520; --ink: #f6edf8; --ink-soft: #c6afcc;
+    --acc: #ec8af5; --acc-soft: #3c1842; --two: #62d0e6; --two-soft: #12343c;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #3a2c40;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #140f16; --grid: #221a26; --card: #1c1520; --ink: #f6edf8; --ink-soft: #c6afcc;
+  --acc: #ec8af5; --acc-soft: #3c1842; --two: #62d0e6; --two-soft: #12343c;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #3a2c40;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+.big-eq { font-family: var(--f-mono); font-weight: 600; font-size: clamp(1.25rem, 5.5vw, 1.9rem); overflow-wrap: anywhere; color: var(--acc); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+@media (max-width: 420px) { .box { padding: 14px; } }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+svg text.lab { fill: var(--ink-soft); font-size: 13px; }
+svg text.tl { font-size: 15px; font-weight: 600; paint-order: stroke; stroke: var(--paper); stroke-width: 4px; stroke-linejoin: round; }
+.fig svg { width: 100%; height: auto; display: block; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; }
+.fig.sq svg { max-width: 420px; margin: 0 auto; }
+.fig svg.drag { cursor: crosshair; touch-action: manipulation; }
+.hint { font-size: .92rem; color: var(--ink-soft); }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 8px 14px; min-height: 44px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button.ex { font-family: var(--f-mono); font-weight: 600; font-size: .95rem; }
+button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+button:disabled { opacity: .45; cursor: default; transform: none; }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+input[type="text"] { font: inherit; font-family: var(--f-mono); font-size: 1.05rem; padding: 8px 10px; min-height: 44px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; }
+input[type="range"] { width: 100%; accent-color: var(--acc); min-height: 32px; }
+.param { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.param label { font-weight: 700; }
+.sliders { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 18px; }
+@media (max-width: 420px) { .sliders { grid-template-columns: minmax(0, 1fr); } }
+.inputs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px 12px; align-items: end; }
+@media (max-width: 520px) { .inputs { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.inputs label { font-weight: 700; display: flex; flex-direction: column; gap: 4px; min-width: 0; font-size: .95rem; }
+
+.results { display: flex; flex-direction: column; gap: 8px; font-variant-numeric: tabular-nums; }
+.res { border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 12px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; align-items: baseline; }
+.res-name { font-family: var(--f-display); font-weight: 700; }
+.res-val { font-family: var(--f-mono); font-weight: 600; color: var(--acc); font-size: 1.05rem; text-align: right; overflow-wrap: anywhere; }
+.res-calc { grid-column: 1 / -1; font-family: var(--f-mono); font-size: .9rem; color: var(--ink-soft); overflow-wrap: anywhere; }
+.res.b .res-val { color: var(--two); }
+.res.total { border-color: var(--ok); background: var(--ok-soft); }
+.res.total .res-val { color: var(--ok); }
+.steps { display: flex; flex-direction: column; gap: 6px; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; padding: 12px 14px; font-family: var(--f-mono); font-size: 1rem; overflow-wrap: anywhere; min-width: 0; }
+.steps b { color: var(--acc); font-size: 1.1rem; }
+.steps .why { font-family: var(--f-body); font-size: .95rem; color: var(--ink-soft); margin-top: 6px; }
+.steps .why:first-child { margin-top: 0; }
+.steps .warn { font-family: var(--f-body); font-size: .95rem; color: var(--red); font-weight: 700; }
+.steps .good { font-family: var(--f-body); font-size: .95rem; color: var(--ok); font-weight: 700; }
+.err { color: var(--red); font-weight: 700; font-family: var(--f-body); }
+.ca { color: var(--acc); font-weight: 700; }
+.cb { color: var(--two); font-weight: 700; }
+.cc { color: var(--ok); font-weight: 700; }
+
+.verdict { border-radius: 8px; padding: 12px 14px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+.verdict:empty { display: none; }
+.verdict.yes { background: var(--ok-soft); color: var(--ok); }
+.verdict.no { background: var(--red-soft); color: var(--red); }
+.verdict.info { background: var(--acc-soft); color: var(--acc); }
+.verdict span { font-weight: 400; color: var(--ink); overflow-wrap: anywhere; }
+
+.cycle { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.cycle span { font-family: var(--f-mono); text-align: center; padding: 8px 4px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--paper); font-size: .95rem; }
+.cycle span.on { background: var(--acc-soft); border-color: var(--acc); color: var(--acc); font-weight: 700; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.cards .m { font-family: var(--f-mono); font-size: .95rem; overflow-wrap: anywhere; }
+.cards .m b { color: var(--acc); }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
+.tag.ok { color: var(--ok); }
+.tag.no { color: var(--red); }
+.tag.a { color: var(--acc); }
+
+.mandel { width: 100%; max-width: 480px; height: auto; display: block; margin: 0 auto; border-radius: 8px; border: 1.5px solid var(--line); cursor: zoom-in; touch-action: manipulation; background: #10061a; }
+.iters { font-family: var(--f-mono); font-size: .95rem; overflow-wrap: anywhere; }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 140px auto; gap: 10px; align-items: center; }
+.quiz li > span:first-child { overflow-wrap: anywhere; min-width: 0; }
+.quiz input[type="text"] { font-size: 1rem; padding: 6px 8px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb:empty { display: none; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc); }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 120px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.errs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.errs li { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--paper); }
+.errs .bad { font-family: var(--f-mono); color: var(--red); text-decoration: line-through; overflow-wrap: anywhere; }
+.errs .good { font-family: var(--f-mono); color: var(--ok); font-weight: 600; overflow-wrap: anywhere; }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); overflow-wrap: anywhere; }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+<style id="tnav-css">
+.tnav-top { display: flex; margin: 0 0 4px; }
+.tnav-home { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font-weight: 700; font-size: .95rem; text-decoration: none; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tnav-home:hover, .tnav-home:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.tnav-bottom { margin-top: 8px; display: flex; flex-direction: column; gap: 12px; }
+.tnav-bottom h2 { margin: 0; }
+.tnav-pn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tnav-pn a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--ink, #222); border-radius: 10px;
+  background: var(--card, #fff); color: var(--ink, #222); text-decoration: none; box-shadow: 3px 3px 0 var(--ink, #222); min-width: 0; }
+.tnav-pn a span { font-size: .85rem; color: var(--ink-soft, #666); }
+.tnav-pn a strong { overflow-wrap: anywhere; }
+.tnav-pn a.next { text-align: right; grid-column: 2; }
+.tnav-bottom .tnav-home { align-self: center; }
+@media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
+</style>
+</head>
+<body>
+<main class="page">
+<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="index.html">← Tous les tutoriels</a></nav><!--/tnav-->
+
+
+  <header class="hero">
+    <span class="eyebrow">Tutoriel de maths · niveau lycée · avant-goût</span>
+    <h1>Les nombres complexes</h1>
+    <p class="lead">Aucun nombre au carré ne donne −1… alors des mathématiciens en ont inventé un. Il s'appelle <strong>i</strong>. Avec lui, les nombres quittent leur droite graduée et s'étalent sur tout un plan, où multiplier veut dire… tourner.</p>
+    <div class="box">
+      <div class="fig sq"><svg id="heroSvg" viewBox="0 0 320 320" role="img" aria-label="Les points 1, i, −1 et −i sur un cercle : multiplier par i fait tourner d'un quart de tour"></svg></div>
+      <span class="big-eq" style="text-align:center">i² = −1</span>
+      <span class="soft" style="text-align:center">1 → i → −1 → −i → 1 : chaque « × i » est un quart de tour.</span>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · Le problème</span>
+    <h2>Un carré n'est jamais négatif</h2>
+    <p>Cherchons un nombre x tel que <strong>x² = −1</strong>. Essaie avec le curseur : tu vas vite voir qu'aucun nombre ne marche.</p>
+    <p>Un positif fois un positif, c'est positif. Un négatif fois un négatif, c'est aussi positif (règle des signes du tutoriel sur <a class="tlink" href="les-nombres-relatifs.html">les nombres relatifs</a>). Et 0 × 0 = 0. Le carré d'un nombre réel est donc <span class="hl">toujours positif ou nul</span>.</p>
+    <div class="box">
+      <div class="param">
+        <label for="sqX">x = <span class="mono" id="sqXOut">1,5</span></label>
+        <input id="sqX" type="range" min="-3" max="3" step="0.1" value="1.5">
+      </div>
+      <div class="fig"><svg id="sqSvg" viewBox="0 0 320 240" role="img" aria-label="Courbe des carrés : elle ne descend jamais sous zéro, donc jamais à −1"></svg></div>
+      <div class="verdict" id="sqOut" aria-live="polite"></div>
+    </div>
+    <p>La courbe des carrés reste toujours au-dessus de l'axe. Elle ne touche jamais la ligne rouge à −1. Conclusion : <strong>l'équation x² = −1 n'a aucune solution réelle.</strong></p>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · L'idée folle</span>
+    <h2>Inventer i, avec i² = −1</h2>
+    <p>Les mathématiciens ont fait un pari audacieux : <strong>et si on inventait un nouveau nombre dont le carré vaut −1 ?</strong> On l'appelle <strong>i</strong> (comme « imaginaire »).</p>
+    <div class="note">
+      <span class="note-title">La seule règle nouvelle</span>
+      <span class="big-eq">i × i = i² = −1</span>
+      <span>Pour tout le reste, on calcule comme d'habitude : on peut additionner, multiplier, développer, factoriser… Et chaque fois qu'on voit i², on le remplace par −1.</span>
+    </div>
+    <p>Avec i, on fabrique des nombres en deux morceaux : un morceau réel et un morceau « en i ». Un <strong>nombre complexe</strong> s'écrit :</p>
+    <div class="box" style="align-items:center;text-align:center">
+      <span class="big-eq">z = <span class="ca">a</span> + i<span class="cb">b</span></span>
+      <span><span class="ca">a</span> est la <strong>partie réelle</strong>, <span class="cb">b</span> est la <strong>partie imaginaire</strong>. Les deux sont des nombres réels ordinaires.</span>
+    </div>
+    <div class="cards">
+      <div class="box"><span class="tag a">Complexe</span><span class="m"><b>3 + 2i</b></span><span class="soft">Partie réelle 3, partie imaginaire 2. On écrit aussi 3 + i × 2 ou 3 + 2i : c'est pareil.</span></div>
+      <div class="box"><span class="tag a">Réel</span><span class="m"><b>5 = 5 + 0i</b></span><span class="soft">Un réel est aussi un complexe, avec une partie imaginaire nulle. Comme dans le tutoriel sur <a class="tlink" href="les-ensembles-de-nombres.html">les ensembles de nombres</a> : ℝ ⊂ ℂ.</span></div>
+      <div class="box"><span class="tag a">Imaginaire pur</span><span class="m"><b>−4i = 0 − 4i</b></span><span class="soft">Partie réelle 0, partie imaginaire −4.</span></div>
+      <div class="box"><span class="tag a">Complexe</span><span class="m"><b>√2 − i</b></span><span class="soft">Partie réelle √2, partie imaginaire −1 (car −i = −1 × i).</span></div>
+    </div>
+    <div class="note red">
+      <span class="note-title">Attention</span>
+      <span>La partie imaginaire, c'est le nombre <strong>b</strong>, sans le i. Pour 3 + 2i, la partie imaginaire est 2 (et pas 2i).</span>
+    </div>
+    <p>Un premier calcul : (2i)² = 2² × i² = 4 × (−1) = <strong>−4</strong>. Donc 2i est une solution de x² = −4. Le nombre i ne répare pas seulement x² = −1 : il répare toutes les équations de ce genre.</p>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Le plan complexe</span>
+    <h2>Chaque nombre est un point</h2>
+    <p>Les réels vivent sur une droite graduée. Mais un complexe a <strong>deux</strong> morceaux : il lui faut donc deux directions, comme dans le tutoriel sur <a class="tlink" href="le-reperage.html">le repérage</a>. On met la partie réelle sur l'axe horizontal et la partie imaginaire sur l'axe vertical. Le nombre <span class="ca">a</span> + i<span class="cb">b</span> devient le point de coordonnées (<span class="ca">a</span> ; <span class="cb">b</span>), ou une flèche qui part de 0.</p>
+    <div class="box">
+      <div class="fig sq"><svg id="plSvg" class="drag" viewBox="0 0 320 320" tabindex="0" role="img" aria-label="Plan complexe : touche ou fais glisser le point z. Au clavier : flèches."></svg></div>
+      <span class="hint">Fais glisser le point (ou touche le plan) pour choisir ton nombre.</span>
+      <span class="big-eq" id="plEq" aria-live="polite"></span>
+      <div class="results" id="plOut"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Le module : la longueur de la flèche</span>
+      <span>La flèche, la partie réelle et la partie imaginaire forment un triangle rectangle. Avec le théorème de Pythagore, la longueur de la flèche vaut <strong class="mono">|z| = √(a² + b²)</strong>. On l'appelle le <strong>module</strong> de z. Par exemple |3 + 4i| = √(9 + 16) = √25 = 5.</span>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · L'addition</span>
+    <h2>Additionner, c'est mettre les flèches bout à bout</h2>
+    <p>Pour additionner deux complexes, on ajoute les parties réelles ensemble et les parties imaginaires ensemble : (2 + i) + (1 + 3i) = 3 + 4i. Dans le plan, c'est une <strong>translation</strong> : on accroche la flèche <span class="cb">z₂</span> au bout de la flèche <span class="ca">z₁</span>.</p>
+    <div class="box">
+      <div class="fig sq"><svg id="addSvg" class="drag" viewBox="0 0 320 320" tabindex="0" role="img" aria-label="Addition de z₁ et z₂ dans le plan : fais glisser les deux points. Au clavier : flèches pour z₁, Maj + flèches pour z₂."></svg></div>
+      <span class="hint">Fais glisser <span class="ca">z₁</span> ou <span class="cb">z₂</span>. La flèche verte est la somme.</span>
+      <div class="steps" id="addOut" aria-live="polite"></div>
+    </div>
+    <p>Tu vois apparaître un parallélogramme : aller par <span class="ca">z₁</span> puis <span class="cb">z₂</span>, ou par <span class="cb">z₂</span> puis <span class="ca">z₁</span>, mène au même point. C'est pour ça que z₁ + z₂ = z₂ + z₁.</p>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Multiplier par i</span>
+    <h2>Fois i = un quart de tour</h2>
+    <p>Voici la surprise la plus jolie. Calculons i × (2 + i) = 2i + i² = 2i − 1 = −1 + 2i. Dans le plan, le point 2 + i a <strong>tourné d'un quart de tour</strong> (90°) autour de 0, dans le sens inverse des aiguilles d'une montre. C'est vrai pour tous les nombres : i × (a + ib) = −b + ia.</p>
+    <div class="box">
+      <div class="btns">
+        <button type="button" id="rotI" class="ex">× i</button>
+        <button type="button" id="rotM" class="ex">× (−1)</button>
+      </div>
+      <div class="fig sq"><svg id="rotSvg" class="drag" viewBox="0 0 320 320" tabindex="0" role="img" aria-label="Rotation : chaque appui sur fois i fait tourner le point d'un quart de tour. Touche le plan pour choisir un point de départ."></svg></div>
+      <div class="btns">
+        <button type="button" id="rot1">Repartir de 1</button>
+        <button type="button" id="rot2">Repartir de 2 + i</button>
+      </div>
+      <span class="hint">Touche le plan pour choisir un autre point de départ.</span>
+      <div class="steps" id="rotOut" aria-live="polite"></div>
+      <div class="cycle" id="cycle"><span>i⁰ = 1</span><span>i¹ = i</span><span>i² = −1</span><span>i³ = −i</span></div>
+    </div>
+    <p>En partant de 1 : 1 → i → −1 → −i → 1. Après quatre quarts de tour, on revient au départ : <strong>i⁴ = 1</strong>. Et multiplier par −1, c'est faire deux quarts de tour, un demi-tour : c'est bien logique, car −1 = i².</p>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · La multiplication</span>
+    <h2>Multiplier deux complexes, pas à pas</h2>
+    <p>On développe comme (a + b)(c + d) dans le tutoriel sur <a class="tlink" href="le-calcul-litteral.html">le calcul littéral</a> : chaque morceau du premier multiplie chaque morceau du second. Puis on remplace i² par −1. Le piège, ce sont les signes !</p>
+    <div class="box">
+      <div class="btns" id="mulPre" role="group" aria-label="Exemples de multiplications"></div>
+      <div class="inputs">
+        <label for="mA">z₁ : partie réelle<input id="mA" type="text" inputmode="decimal" autocomplete="off" value="2"></label>
+        <label for="mB">z₁ : partie imag.<input id="mB" type="text" inputmode="decimal" autocomplete="off" value="3"></label>
+        <label for="mC">z₂ : partie réelle<input id="mC" type="text" inputmode="decimal" autocomplete="off" value="1"></label>
+        <label for="mD">z₂ : partie imag.<input id="mD" type="text" inputmode="decimal" autocomplete="off" value="-4"></label>
+      </div>
+      <div class="steps" id="mulOut" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">La formule (pour les curieux)</span>
+      <span class="mono">(a + ib)(c + id) = (ac − bd) + i(ad + bc)</span>
+      <span>Le « − bd » vient de i × i = −1. C'est lui qu'on oublie le plus souvent.</span>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Longueurs et angles</span>
+    <h2>Multiplier, c'est agrandir et tourner</h2>
+    <p>Chaque complexe a une <strong>longueur</strong> (son module) et un <strong>angle</strong>, mesuré depuis l'axe des réels, dans le sens inverse des aiguilles d'une montre. La règle magique : quand on multiplie deux complexes, <span class="hl">les longueurs se multiplient et les angles s'additionnent</span>.</p>
+    <p>Multiplier par i, c'est le cas où la longueur vaut 1 (on ne grandit pas) et l'angle vaut 90° (un quart de tour).</p>
+    <div class="box">
+      <div class="sliders">
+        <div class="param"><label for="pR1"><span class="ca">z</span> : longueur <span class="mono" id="pR1o"></span></label><input id="pR1" type="range" min="0.5" max="2" step="0.25" value="1.5"></div>
+        <div class="param"><label for="pT1"><span class="ca">z</span> : angle <span class="mono" id="pT1o"></span></label><input id="pT1" type="range" min="0" max="180" step="15" value="30"></div>
+        <div class="param"><label for="pR2"><span class="cb">w</span> : longueur <span class="mono" id="pR2o"></span></label><input id="pR2" type="range" min="0.5" max="2" step="0.25" value="2"></div>
+        <div class="param"><label for="pT2"><span class="cb">w</span> : angle <span class="mono" id="pT2o"></span></label><input id="pT2" type="range" min="0" max="180" step="15" value="45"></div>
+      </div>
+      <div class="fig sq"><svg id="polSvg" viewBox="0 0 320 320" role="img" aria-label="Les flèches z, w et leur produit z × w, avec leurs angles"></svg></div>
+      <div class="results" id="polOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Le conjugué</span>
+    <h2>Le reflet dans le miroir</h2>
+    <p>Le <strong>conjugué</strong> de z = a + ib s'écrit <strong class="mono">z̄</strong> (« z barre ») : c'est a − ib. On change juste le signe de la partie imaginaire. Dans le plan, c'est le <strong>symétrique</strong> de z par rapport à l'axe des réels, comme un reflet dans l'eau.</p>
+    <div class="box">
+      <div class="fig sq"><svg id="cjSvg" class="drag" viewBox="0 0 320 320" tabindex="0" role="img" aria-label="Le point z et son conjugué, symétrique par rapport à l'axe horizontal. Fais glisser z."></svg></div>
+      <span class="hint">Fais glisser <span class="ca">z</span> : son reflet <span class="cb">z̄</span> suit.</span>
+      <div class="results" id="cjOut" aria-live="polite"></div>
+    </div>
+    <p>Le plus fort : <strong>z × z̄ est toujours un réel positif</strong>, égal à a² + b², c'est-à-dire |z|². Les i disparaissent ! C'est très pratique pour simplifier des calculs.</p>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Résoudre des équations</span>
+    <h2>Les équations sans solution en ont maintenant</h2>
+    <p>Grâce à i, x² + 1 = 0 a deux solutions : x² = −1, donc x = i ou x = −i. Vérifie : (−i)² = (−1)² × i² = 1 × (−1) = −1. De même, x² + 4 = 0 donne x = 2i ou x = −2i.</p>
+    <p>Pour une équation comme x² + 2x + 5 = 0, on « complète le carré » avec une identité remarquable (tutoriel sur <a class="tlink" href="les-identites-remarquables.html">les identités remarquables</a>) : x² + 2x = (x + 1)² − 1. Choisis une équation, la page la résout étape par étape.</p>
+    <div class="box">
+      <div class="btns" id="eqPre" role="group" aria-label="Exemples d'équations"></div>
+      <div class="sliders">
+        <div class="param"><label for="qB">Coefficient de x : <span class="mono" id="qBo"></span></label><input id="qB" type="range" min="-6" max="6" step="1" value="2"></div>
+        <div class="param"><label for="qC">Nombre seul : <span class="mono" id="qCo"></span></label><input id="qC" type="range" min="-10" max="15" step="1" value="5"></div>
+      </div>
+      <span class="big-eq" id="eqTitle" aria-live="polite"></span>
+      <div class="steps" id="eqOut" aria-live="polite"></div>
+    </div>
+    <p class="soft">Remarque : quand les solutions ne sont pas réelles, elles vont par paires de <strong>conjugués</strong> (−1 + 2i et −1 − 2i), symétriques par rapport à l'axe des réels.</p>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · À quoi ça sert ?</span>
+    <h2>« Imaginaires », mais très utiles</h2>
+    <p>Malgré leur nom, les nombres complexes servent tous les jours. Leur super-pouvoir : ils décrivent très bien tout ce qui <strong>tourne</strong> ou qui <strong>oscille</strong>.</p>
+    <div class="cards">
+      <div class="box"><strong>L'électricité</strong><span class="soft">Le courant de nos prises est alternatif : il oscille. Les ingénieurs le calculent avec des complexes. Ils écrivent souvent j au lieu de i, car i désigne déjà l'intensité du courant.</span></div>
+      <div class="box"><strong>Les sons et les signaux</strong><span class="soft">Une onde, c'est un peu comme un point qui tourne. Le traitement du son, des images et des signaux radio (téléphone, Wi-Fi) utilise énormément les complexes.</span></div>
+      <div class="box"><strong>La physique</strong><span class="soft">En mécanique quantique, la théorie des atomes et de la lumière, les complexes sont partout dans les équations de base.</span></div>
+      <div class="box"><strong>Les fractales</strong><span class="soft">Avec une simple règle de calcul sur les complexes, on dessine des formes d'une complexité infinie. Essaie ci-dessous.</span></div>
+    </div>
+    <div class="box">
+      <h3>L'ensemble de Mandelbrot</h3>
+      <p>Pour chaque point c du plan, on part de z = 0 et on répète la règle <strong class="mono">z → z² + c</strong>. Si z reste toujours près de 0, le point c est <strong>dans l'ensemble</strong> (en noir). Sinon, z s'enfuit vers l'infini, et la couleur dit à quelle vitesse.</p>
+      <div class="btns" id="mtPre" role="group" aria-label="Tester un point c"></div>
+      <div class="verdict" id="mtOut" aria-live="polite"></div>
+      <canvas id="mand" class="mandel" width="480" height="320" role="img" aria-label="Image de l'ensemble de Mandelbrot. Touche l'image pour zoomer."></canvas>
+      <div class="btns">
+        <button type="button" id="mandReset">Revenir au départ</button>
+        <span class="mono soft" id="mandOut"></span>
+      </div>
+      <span class="hint">Touche l'image pour zoomer × 2 à cet endroit. Les bords sont les plus beaux : le dessin ne devient jamais plus simple.</span>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · Un peu d'histoire</span>
+    <h2>Des nombres dont personne ne voulait</h2>
+    <ol class="timeline">
+      <li><span class="when">vers 1545</span><div class="what"><strong>Cardan et les équations du 3ᵉ degré</strong><span>En Italie, Jérôme Cardan publie des formules pour résoudre les équations avec x³ (trouvées en partie par d'autres, comme Tartaglia). Parfois, la formule fait apparaître la racine carrée d'un nombre négatif. Cardan trouve ça absurde et passe vite.</span></div></li>
+      <li><span class="when">vers 1570</span><div class="what"><strong>Bombelli ose calculer</strong><span>Rafael Bombelli donne des règles pour calculer avec ces racines « impossibles ». Et miracle : en les utilisant jusqu'au bout, il retrouve des solutions bien réelles.</span></div></li>
+      <li><span class="when">1637</span><div class="what"><strong>Descartes se moque</strong><span>René Descartes les appelle « imaginaires », un mot un peu moqueur : pour lui, ces nombres n'existent pas vraiment. Le nom est resté.</span></div></li>
+      <li><span class="when">vers 1777</span><div class="what"><strong>Euler et la lettre i</strong><span>Leonhard Euler, qui les utilise partout, choisit la lettre i pour √−1.</span></div></li>
+      <li><span class="when">vers 1800 – 1830</span><div class="what"><strong>Le plan complexe</strong><span>Plusieurs mathématiciens (dont Wessel et Argand) ont l'idée de dessiner les complexes comme des points d'un plan. Carl Friedrich Gauss rend cette idée célèbre et popularise le nom de « nombres complexes ».</span></div></li>
+      <li><span class="when">vers 1980</span><div class="what"><strong>Les fractales</strong><span>Grâce aux ordinateurs, Benoît Mandelbrot et d'autres dessinent l'ensemble qui porte son nom.</span></div></li>
+    </ol>
+    <div class="note">
+      <span class="note-title">L'astuce de Bombelli</span>
+      <span>Pour l'équation x³ = 15x + 4, la formule de Cardan fait apparaître √−121, soit 11i. Bombelli remarque que (2 + i)³ = 2 + 11i et (2 − i)³ = 2 − 11i. La formule donne alors x = (2 + i) + (2 − i) = <strong>4</strong> : les i s'annulent ! Et en effet 4³ = 64 = 15 × 4 + 4. Les imaginaires avaient servi de pont pour trouver un vrai nombre.</span>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Attention</span>
+    <h2>Les erreurs fréquentes</h2>
+    <ul class="errs">
+      <li><span class="bad">i² = 1</span><span class="good">i² = −1</span><span class="soft">C'est toute l'idée de i ! Son carré est négatif.</span></li>
+      <li><span class="bad">3i × 4i = 12</span><span class="good">3i × 4i = 12i² = −12</span><span class="soft">On n'oublie pas de remplacer i² par −1.</span></li>
+      <li><span class="bad">(2 + 3i)(1 + i) = 2 + 3i²</span><span class="good">(2 + 3i)(1 + i) = 2 + 2i + 3i + 3i² = −1 + 5i</span><span class="soft">Comme en calcul littéral, chaque morceau multiplie chaque morceau.</span></li>
+      <li><span class="bad">|3 + 4i| = 3 + 4 = 7</span><span class="good">|3 + 4i| = √(3² + 4²) = 5</span><span class="soft">Le module est une longueur : on utilise Pythagore.</span></li>
+      <li><span class="bad">la partie imaginaire de 5 − 2i est −2i</span><span class="good">la partie imaginaire de 5 − 2i est −2</span><span class="soft">C'est le nombre réel devant i, avec son signe.</span></li>
+      <li><span class="bad">√−9 = −3</span><span class="good">les solutions de x² = −9 sont 3i et −3i</span><span class="soft">(−3)² = 9, pas −9. Seul un nombre « en i » a un carré négatif.</span></li>
+    </ul>
+  </section>
+
+  <!-- 12 -->
+  <section>
+    <span class="eyebrow">Étape 12 · Quiz</span>
+    <h2>Huit calculs avec i</h2>
+    <p>Écris tes réponses sous la forme a + bi, par exemple <span class="mono">3 − 2i</span>, <span class="mono">-i</span> ou <span class="mono">5</span>. Tu peux taper le signe moins avec la touche - et la virgule avec , ou .</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Nouvelles questions</button>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À toi de jouer</span>
+    <h2>Six exercices</h2>
+    <div class="exos">
+      <details>
+        <summary>Une addition<span class="q">Calcule (3 + 2i) + (1 − 5i).</span></summary>
+        <div><span>Réels : 3 + 1 = 4. Imaginaires : 2 + (−5) = −3. Résultat : <strong>4 − 3i</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Un carré<span class="q">Calcule (1 + i)².</span></summary>
+        <div><span>(1 + i)² = 1² + 2 × 1 × i + i² = 1 + 2i − 1 = <strong>2i</strong>. Le carré d'un complexe peut être un imaginaire pur !</span></div>
+      </details>
+      <details>
+        <summary>Avec le conjugué<span class="q">Calcule (2 + i)(2 − i).</span></summary>
+        <div><span>4 − 2i + 2i − i² = 4 − (−1) = <strong>5</strong>. C'est bien 2² + 1² : un nombre fois son conjugué donne un réel.</span></div>
+      </details>
+      <details>
+        <summary>Une équation<span class="q">Résous x² + 9 = 0.</span></summary>
+        <div><span>x² = −9. Or (3i)² = 9 × i² = −9 et (−3i)² = −9 aussi. Solutions : <strong>x = 3i ou x = −3i</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Un module<span class="q">Calcule |−5 + 12i|.</span></summary>
+        <div><span>√((−5)² + 12²) = √(25 + 144) = √169 = <strong>13</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Défi<span class="q">Combien vaut i¹⁰ ? Et résous x² − 4x + 13 = 0.</span></summary>
+        <div><span>10 = 4 × 2 + 2, donc i¹⁰ = (i⁴)² × i² = 1 × (−1) = <strong>−1</strong> : 10 quarts de tour, c'est 2 tours complets plus un demi-tour.</span><span>x² − 4x = (x − 2)² − 4, donc (x − 2)² = 4 − 13 = −9. Alors x − 2 = 3i ou x − 2 = −3i : <strong>x = 2 + 3i ou x = 2 − 3i</strong>.</span></div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• Aucun réel n'a un carré négatif. On invente donc <strong>i</strong>, avec <strong>i² = −1</strong>.</span>
+      <span>• Un <strong>nombre complexe</strong> s'écrit z = a + ib : a est la partie réelle, b la partie imaginaire (sans le i).</span>
+      <span>• Dans le <strong>plan complexe</strong>, a + ib est le point (a ; b). Son <strong>module</strong> est la longueur |z| = √(a² + b²).</span>
+      <span>• <strong>Additionner</strong> = mettre les flèches bout à bout. <strong>Multiplier par i</strong> = tourner d'un quart de tour : i, −1, −i, 1, …</span>
+      <span>• <strong>Multiplier</strong> : on développe, puis i² = −1. Les longueurs se multiplient, les angles s'additionnent.</span>
+      <span>• Le <strong>conjugué</strong> de a + ib est a − ib, et z × z̄ = a² + b².</span>
+      <span>• Avec i, x² + 1 = 0 a deux solutions : i et −i.</span>
+    </div>
+  </section>
+
+  <!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"><a class="prev" href="la-derivee.html"><span>← Précédent</span><strong>La dérivée</strong></a><a class="next" href="le-nombre-pi.html"><span>Suivant →</span><strong>Le nombre π</strong></a></div><a class="tnav-home" href="index.html">⌂ Tous les tutoriels</a></nav><!--/tnav-->
+<footer>Fiche de révision · Les nombres complexes</footer>
+</main>
+
+<script>
+(function () {
+  'use strict';
+  /* Fonctions exposées pour les tests : window.__cpx
+     add(a, b, c, d)   -> [re, im]   (a + ib) + (c + id)
+     mul(a, b, c, d)   -> [re, im]   (a + ib)(c + id) = (ac − bd) + i(ad + bc)
+     mod(a, b)         -> nombre     |a + ib| = √(a² + b²)
+     conj(a, b)        -> [a, −b]
+     timesI(a, b)      -> [−b, a]    i × (a + ib) : quart de tour
+     powI(n)           -> [re, im]   iⁿ (n entier)
+     fromPolar(r, deg) -> [re, im]   longueur r, angle en degrés
+     solve(b, c)       -> { h, m, roots: [[re, im], [re, im]] }  x² + bx + c = 0, (x + h)² = m avec h = b/2, m = h² − c
+     parse(s)          -> [re, im] ou null   lit « 3 − 2i », « -i », « 2,5i », « 4 »…
+     fmtC(re, im, d)   -> texte      « 3 − 2i » (d décimales max, 3 par défaut)
+     mandel(cx, cy, n) -> nombre d'itérations avant que |z| > 2 (n si le point semble dans l'ensemble) */
+  var NS = 'http://www.w3.org/2000/svg';
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function rd(x, d) { var p = Math.pow(10, d == null ? 3 : d), r = Math.round(x * p) / p; return r === 0 ? 0 : r; }
+  function fmt(x, d) { d = d == null ? 3 : d; return rd(x, d).toLocaleString('fr-FR', { maximumFractionDigits: d }).replace('-', '−'); }
+  function num(s) { var t = String(s).replace(/\s/g, '').replace(/[−–]/g, '-').replace(',', '.'); if (t === '') return NaN; var x = Number(t); return isFinite(x) ? x : NaN; }
+  function par(s) { return s.charAt(0) === '−' ? '(' + s + ')' : s; }
+  function ti(x, d) { var r = rd(x, d); if (r === 0) return '0'; if (r === 1) return 'i'; if (r === -1) return '−i'; return fmt(r, d) + 'i'; }
+  function fmtC(re, im, d) {
+    var R = rd(re, d), I = rd(im, d);
+    if (I === 0) return fmt(R, d);
+    if (R === 0) return ti(I, d);
+    return fmt(R, d) + (I < 0 ? ' − ' : ' + ') + ti(Math.abs(I), d);
+  }
+  function sqI(x) { var f = fmt(x); return f === '1' ? 'i²' : f === '−1' ? '−i²' : f + 'i²'; }
+  function exactSqrt(m) { var s = Math.sqrt(m) * 1000; return Math.abs(s - Math.round(s)) < 1e-6; }
+  function wrapC(re, im, d) { var s = fmtC(re, im, d); return (rd(re, d) !== 0 && rd(im, d) !== 0) ? '(' + s + ')' : par(s); }
+  function joinT(arr) {
+    var out = '';
+    arr.filter(function (t) { return t !== '' && t != null; }).forEach(function (t, i) {
+      if (i === 0) out = t; else if (t.charAt(0) === '−') out += ' − ' + t.slice(1); else out += ' + ' + t;
+    });
+    return out || '0';
+  }
+  function sup(n) { var S = '⁰¹²³⁴⁵⁶⁷⁸⁹'; return String(n).split('').map(function (c) { return S[+c]; }).join(''); }
+  function clamp(x, a, b) { return Math.max(a, Math.min(b, x)); }
+  function isSq(x) { var s = Math.sqrt(x); return Math.abs(s - Math.round(s)) < 1e-9; }
+
+  /* ---------- Les maths ---------- */
+  var C = {
+    add: function (a, b, c, d) { return [a + c, b + d]; },
+    mul: function (a, b, c, d) { return [a * c - b * d, a * d + b * c]; },
+    mod: function (a, b) { return Math.sqrt(a * a + b * b); },
+    conj: function (a, b) { return [a, -b]; },
+    timesI: function (a, b) { return [-b, a]; },
+    powI: function (n) { var k = ((n % 4) + 4) % 4; return [[1, 0], [0, 1], [-1, 0], [0, -1]][k].slice(); },
+    fromPolar: function (r, deg) { var t = deg * Math.PI / 180; return [r * Math.cos(t), r * Math.sin(t)]; },
+    solve: function (b, c) {
+      var h = b / 2, m = h * h - c;
+      if (m >= 0) { var s = Math.sqrt(m); return { h: h, m: m, roots: [[-h + s, 0], [-h - s, 0]] }; }
+      var k = Math.sqrt(-m); return { h: h, m: m, roots: [[-h, k], [-h, -k]] };
+    },
+    parse: function (s) {
+      var t = String(s).replace(/\s/g, '').replace(/[−–]/g, '-').replace(/,/g, '.').replace(/[×*·]/g, '').replace(/I/g, 'i');
+      if (t === '') return null;
+      var parts = t.match(/[+-]?[^+-]+/g);
+      if (!parts || parts.join('') !== t) return null;
+      var re = 0, im = 0, ok = true;
+      parts.forEach(function (p) {
+        var m = p.match(/^([+-]?)(.*)$/), sg = m[1] === '-' ? -1 : 1, body = m[2], nI = (body.match(/i/g) || []).length;
+        if (nI > 1) { ok = false; return; }
+        var rest = body.replace('i', '');
+        if (rest !== '' && !/^(\d+\.?\d*|\.\d+)$/.test(rest)) { ok = false; return; }
+        if (nI === 1) im += sg * (rest === '' ? 1 : Number(rest));
+        else { if (rest === '') { ok = false; return; } re += sg * Number(rest); }
+      });
+      return ok ? [re, im] : null;
+    },
+    fmtC: fmtC,
+    mandel: function (cx, cy, max) {
+      var x = 0, y = 0;
+      for (var n = 0; n < max; n++) {
+        var x2 = x * x, y2 = y * y;
+        if (x2 + y2 > 4) return n;
+        y = 2 * x * y + cy; x = x2 - y2 + cx;
+      }
+      return max;
+    }
+  };
+  window.__cpx = C;
+
+  /* ---------- SVG ---------- */
+  function mk(parent, name, attrs, text) { var e = document.createElementNS(NS, name); for (var a in attrs) e.setAttribute(a, attrs[a]); if (text != null) e.textContent = text; parent.appendChild(e); return e; }
+  function clear(g) { while (g.firstChild) g.removeChild(g.firstChild); }
+  function plane(svg, R, ls) {
+    var c = 160, u = 144 / R;
+    function X(x) { return c + x * u; } function Y(y) { return c - y * u; }
+    var base = mk(svg, 'g', {});
+    for (var k = -R; k <= R; k++) {
+      mk(base, 'line', { x1: X(k), y1: Y(R), x2: X(k), y2: Y(-R), stroke: 'var(--line)', 'stroke-width': 1 });
+      mk(base, 'line', { x1: X(-R), y1: Y(k), x2: X(R), y2: Y(k), stroke: 'var(--line)', 'stroke-width': 1 });
+    }
+    mk(base, 'line', { x1: X(-R) - 8, y1: Y(0), x2: X(R) + 8, y2: Y(0), stroke: 'var(--ink-soft)', 'stroke-width': 1.6 });
+    mk(base, 'line', { x1: X(0), y1: Y(-R) + 8, x2: X(0), y2: Y(R) - 8, stroke: 'var(--ink-soft)', 'stroke-width': 1.6 });
+    if (ls > 0) {
+      for (k = -R; k <= R; k += ls) {
+        if (k === 0) continue;
+        mk(base, 'text', { x: X(k), y: Y(0) + 17, 'text-anchor': 'middle', 'class': 'lab' }, fmt(k));
+        mk(base, 'text', { x: X(0) - 6, y: Y(k) + 5, 'text-anchor': 'end', 'class': 'lab' }, ti(k));
+      }
+      mk(base, 'text', { x: X(0) - 6, y: Y(0) + 17, 'text-anchor': 'end', 'class': 'lab' }, '0');
+    }
+    var dyn = mk(svg, 'g', {});
+    return { X: X, Y: Y, u: u, R: R, dyn: dyn, svg: svg };
+  }
+  function arrow(g, x1, y1, x2, y2, col, w, dash) {
+    var dx = x2 - x1, dy = y2 - y1, L = Math.sqrt(dx * dx + dy * dy); if (L < 2) return;
+    var ux = dx / L, uy = dy / L, h = Math.min(12, L * 0.6), bx = x2 - ux * h, by = y2 - uy * h;
+    var at = { x1: x1, y1: y1, x2: bx, y2: by, stroke: col, 'stroke-width': w || 3, 'stroke-linecap': 'round' };
+    if (dash) at['stroke-dasharray'] = dash;
+    mk(g, 'line', at);
+    mk(g, 'polygon', { points: x2 + ',' + y2 + ' ' + (bx - uy * h * 0.5) + ',' + (by + ux * h * 0.5) + ' ' + (bx + uy * h * 0.5) + ',' + (by - ux * h * 0.5), fill: col });
+  }
+  function label(g, px, py, txt, col) {
+    var right = px <= 240, up = py >= 40;
+    mk(g, 'text', { x: px + (right ? 10 : -10), y: py + (up ? -10 : 22), 'text-anchor': right ? 'start' : 'end', 'class': 'tl', style: 'fill:' + col }, txt);
+  }
+  function handle(g, px, py, col) {
+    mk(g, 'circle', { cx: px, cy: py, r: 14, fill: col, opacity: 0.18 });
+    mk(g, 'circle', { cx: px, cy: py, r: 7, fill: col, stroke: 'var(--card)', 'stroke-width': 2 });
+  }
+  /* Glisser-déposer : près d'une poignée on la tire (sans faire défiler la page), ailleurs un simple toucher place la poignée la plus proche. */
+  function dragger(P, handles, snap, lim, onChange) {
+    var svg = P.svg, active = -1, dragged = false, thr = 34 / P.u;
+    function val(cx, cy) { var m = svg.getScreenCTM(); if (!m) return null; var pt = svg.createSVGPoint(); pt.x = cx; pt.y = cy; var p = pt.matrixTransform(m.inverse()); return [(p.x - 160) / P.u, (160 - p.y) / P.u]; }
+    function nearest(v) { var bi = 0, bd = Infinity; handles.forEach(function (h, i) { var d = Math.hypot(h[0] - v[0], h[1] - v[1]); if (d < bd) { bd = d; bi = i; } }); return [bi, bd]; }
+    function place(i, v) {
+      if (!v) return;
+      var x = clamp(Math.round(v[0] / snap) * snap, -lim, lim), y = clamp(Math.round(v[1] / snap) * snap, -lim, lim);
+      if (x === handles[i][0] && y === handles[i][1]) return;
+      handles[i][0] = x; handles[i][1] = y; onChange(i);
+    }
+    svg.addEventListener('touchstart', function (e) {
+      if (e.touches.length !== 1) return;
+      var v = val(e.touches[0].clientX, e.touches[0].clientY);
+      if (v && nearest(v)[1] < thr) e.preventDefault();
+    }, { passive: false });
+    svg.addEventListener('pointerdown', function (e) {
+      dragged = false;
+      var v = val(e.clientX, e.clientY); if (!v) return;
+      var n = nearest(v);
+      if (n[1] < thr) { active = n[0]; dragged = true; try { svg.setPointerCapture(e.pointerId); } catch (err) { /* rien */ } place(active, v); e.preventDefault(); }
+    });
+    svg.addEventListener('pointermove', function (e) { if (active >= 0) place(active, val(e.clientX, e.clientY)); });
+    function end() { active = -1; }
+    svg.addEventListener('pointerup', end); svg.addEventListener('pointercancel', end);
+    svg.addEventListener('click', function (e) {
+      if (dragged) { dragged = false; return; }
+      var v = val(e.clientX, e.clientY); if (!v) return;
+      place(nearest(v)[0], v);
+    });
+    svg.addEventListener('keydown', function (e) {
+      var dirs = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, 1], ArrowDown: [0, -1] }, d = dirs[e.key];
+      if (!d) return;
+      e.preventDefault();
+      var i = e.shiftKey && handles.length > 1 ? 1 : 0;
+      place(i, [handles[i][0] + d[0] * snap, handles[i][1] + d[1] * snap]);
+    });
+  }
+  function res(name, val, calc, cls) { return '<div class="res' + (cls ? ' ' + cls : '') + '"><span class="res-name">' + name + '</span><span class="res-val">' + val + '</span>' + (calc ? '<span class="res-calc">' + calc + '</span>' : '') + '</div>'; }
+
+  /* ---------- Hero ---------- */
+  (function () {
+    var P = plane(document.getElementById('heroSvg'), 2, 0), g = P.dyn, c = 160, r = P.u;
+    for (var k = 0; k < 4; k++) {
+      var a0 = (k * 90 + 14) * Math.PI / 180, a1 = (k * 90 + 76) * Math.PI / 180, rr = r;
+      var x0 = c + rr * Math.cos(a0), y0 = c - rr * Math.sin(a0), x1 = c + rr * Math.cos(a1), y1 = c - rr * Math.sin(a1);
+      mk(g, 'path', { d: 'M' + x0 + ' ' + y0 + ' A' + rr + ' ' + rr + ' 0 0 0 ' + x1 + ' ' + y1, fill: 'none', stroke: 'var(--acc)', 'stroke-width': 2.5 });
+      var tx = -Math.sin(a1), ty = -Math.cos(a1), hx = x1 - tx * 11, hy = y1 - ty * 11;
+      mk(g, 'polygon', { points: x1 + ',' + y1 + ' ' + (hx - ty * 5.5) + ',' + (hy + tx * 5.5) + ' ' + (hx + ty * 5.5) + ',' + (hy - tx * 5.5), fill: 'var(--acc)' });
+      var am = (k * 90 + 45) * Math.PI / 180;
+      mk(g, 'text', { x: c + 1.42 * r * Math.cos(am), y: c - 1.42 * r * Math.sin(am) + 5, 'text-anchor': 'middle', 'class': 'tl', style: 'fill:' + 'var(--acc)' }, '× i');
+    }
+    [[1, 0, '1'], [0, 1, 'i'], [-1, 0, '−1'], [0, -1, '−i']].forEach(function (p) {
+      var px = P.X(p[0]), py = P.Y(p[1]);
+      mk(g, 'circle', { cx: px, cy: py, r: 7, fill: 'var(--acc)', stroke: 'var(--card)', 'stroke-width': 2 });
+      mk(g, 'text', { x: px + (p[0] > 0 ? 12 : p[0] < 0 ? -12 : 12), y: py + (p[1] > 0 ? -8 : p[1] < 0 ? 22 : -10), 'text-anchor': p[0] < 0 ? 'end' : 'start', 'class': 'tl' }, p[2]);
+    });
+  })();
+
+  /* ---------- Étape 1 : x² jamais négatif ---------- */
+  (function () {
+    var svg = document.getElementById('sqSvg'), sl = document.getElementById('sqX');
+    function X(x) { return 34 + (x + 3) * (270 / 6); } function Y(y) { return 222 - (y + 2) * (206 / 11.5); }
+    var base = mk(svg, 'g', {});
+    for (var x = -3; x <= 3; x++) { mk(base, 'line', { x1: X(x), y1: Y(9.5), x2: X(x), y2: Y(-2), stroke: 'var(--line)' }); if (x !== 0) mk(base, 'text', { x: X(x), y: Y(0) + 16, 'text-anchor': 'middle', 'class': 'lab' }, fmt(x)); }
+    for (var y = -2; y <= 9; y++) { mk(base, 'line', { x1: X(-3), y1: Y(y), x2: X(3), y2: Y(y), stroke: 'var(--line)' }); if (y % 2 === 0 && y !== 0 || y === -1) mk(base, 'text', { x: X(0) - 6, y: Y(y) + 5, 'text-anchor': 'end', 'class': 'lab' }, fmt(y)); }
+    mk(base, 'line', { x1: X(-3), y1: Y(0), x2: X(3), y2: Y(0), stroke: 'var(--ink-soft)', 'stroke-width': 1.6 });
+    mk(base, 'line', { x1: X(0), y1: Y(-2), x2: X(0), y2: Y(9.5), stroke: 'var(--ink-soft)', 'stroke-width': 1.6 });
+    mk(base, 'line', { x1: X(-3), y1: Y(-1), x2: X(3), y2: Y(-1), stroke: 'var(--red)', 'stroke-width': 2.5, 'stroke-dasharray': '7 5' });
+    mk(base, 'text', { x: X(3) - 4, y: Y(-1) + 18, 'text-anchor': 'end', 'class': 'tl', style: 'fill:' + 'var(--red)' }, 'x² = −1 ?');
+    var pts = [];
+    for (var t = -3; t <= 3.0001; t += 0.05) pts.push(X(t).toFixed(1) + ',' + Y(t * t).toFixed(1));
+    mk(base, 'polyline', { points: pts.join(' '), fill: 'none', stroke: 'var(--acc)', 'stroke-width': 3 });
+    mk(base, 'text', { x: X(2.1) + 8, y: Y(4.4), 'class': 'tl', style: 'fill:' + 'var(--acc)' }, 'x²');
+    var dyn = mk(svg, 'g', {});
+    function draw() {
+      var x = rd(Number(sl.value), 1), y = x * x;
+      document.getElementById('sqXOut').textContent = fmt(x, 1);
+      clear(dyn);
+      mk(dyn, 'line', { x1: X(x), y1: Y(0), x2: X(x), y2: Y(y), stroke: 'var(--two)', 'stroke-width': 2, 'stroke-dasharray': '4 4' });
+      mk(dyn, 'circle', { cx: X(x), cy: Y(y), r: 7, fill: 'var(--two)', stroke: 'var(--card)', 'stroke-width': 2 });
+      var out = document.getElementById('sqOut');
+      out.className = 'verdict info';
+      var calc = par(fmt(x, 1)) + ' × ' + par(fmt(x, 1)) + ' = ' + fmt(y, 2);
+      out.innerHTML = 'x² = ' + calc + '<span>' + (x === 0 ? 'C\'est le plus petit carré possible : 0. Toujours pas −1.' : x < 0 ? 'Négatif fois négatif = positif. Raté, ce n\'est pas −1.' : 'Positif fois positif = positif. Raté, ce n\'est pas −1.') + '</span>';
+    }
+    sl.addEventListener('input', draw); draw();
+  })();
+
+  /* ---------- Étape 3 : le plan ---------- */
+  (function () {
+    var P = plane(document.getElementById('plSvg'), 4, 1), z = [[3, 2]];
+    function draw() {
+      var a = z[0][0], b = z[0][1], g = P.dyn, px = P.X(a), py = P.Y(b);
+      clear(g);
+      mk(g, 'line', { x1: px, y1: py, x2: px, y2: P.Y(0), stroke: 'var(--two)', 'stroke-width': 2, 'stroke-dasharray': '5 4' });
+      mk(g, 'line', { x1: P.X(0), y1: P.Y(0), x2: px, y2: P.Y(0), stroke: 'var(--acc)', 'stroke-width': 5, opacity: 0.35 });
+      mk(g, 'line', { x1: px, y1: P.Y(0), x2: px, y2: py, stroke: 'var(--two)', 'stroke-width': 5, opacity: 0.35 });
+      arrow(g, P.X(0), P.Y(0), px, py, 'var(--acc)', 3);
+      handle(g, px, py, 'var(--acc)');
+      label(g, px, py, 'z = ' + fmtC(a, b), 'var(--acc)');
+      document.getElementById('plEq').textContent = 'z = ' + fmtC(a, b);
+      var s = a * a + b * b, m = Math.sqrt(s);
+      var mtxt = '√(' + par(fmt(a)) + '² + ' + par(fmt(b)) + '²) = √' + fmt(s) + (s === 0 ? ' = 0' : isSq(s) ? ' = ' + fmt(m) : ' ≈ ' + fmt(m, 2));
+      document.getElementById('plOut').innerHTML =
+        res('Partie réelle a', fmt(a), 'sur l\'axe horizontal') +
+        res('Partie imaginaire b', fmt(b), 'sur l\'axe vertical', 'b') +
+        res('Module |z|', (s === 0 || isSq(s) ? '' : '≈ ') + fmt(m, 2), mtxt, 'total');
+    }
+    dragger(P, z, 1, 4, draw); draw();
+  })();
+
+  /* ---------- Étape 4 : l'addition ---------- */
+  (function () {
+    var P = plane(document.getElementById('addSvg'), 6, 2), h = [[2, 1], [1, 3]];
+    function draw() {
+      var a = h[0][0], b = h[0][1], c = h[1][0], d = h[1][1], s = C.add(a, b, c, d), g = P.dyn, O = [P.X(0), P.Y(0)];
+      clear(g);
+      arrow(g, P.X(a), P.Y(b), P.X(s[0]), P.Y(s[1]), 'var(--two)', 2, '6 5');
+      arrow(g, P.X(c), P.Y(d), P.X(s[0]), P.Y(s[1]), 'var(--acc)', 2, '6 5');
+      arrow(g, O[0], O[1], P.X(s[0]), P.Y(s[1]), 'var(--ok)', 4);
+      arrow(g, O[0], O[1], P.X(a), P.Y(b), 'var(--acc)', 3);
+      arrow(g, O[0], O[1], P.X(c), P.Y(d), 'var(--two)', 3);
+      handle(g, P.X(a), P.Y(b), 'var(--acc)'); handle(g, P.X(c), P.Y(d), 'var(--two)');
+      mk(g, 'circle', { cx: P.X(s[0]), cy: P.Y(s[1]), r: 6, fill: 'var(--ok)' });
+      label(g, P.X(a), P.Y(b), 'z₁', 'var(--acc)'); label(g, P.X(c), P.Y(d), 'z₂', 'var(--two)');
+      label(g, P.X(s[0]), P.Y(s[1]), 'z₁ + z₂', 'var(--ok)');
+      document.getElementById('addOut').innerHTML =
+        '<span><span class="ca">z₁ = ' + fmtC(a, b) + '</span> ; <span class="cb">z₂ = ' + fmtC(c, d) + '</span></span>' +
+        '<span class="why">On ajoute les réels ensemble, puis les imaginaires ensemble :</span>' +
+        '<span>Réels : ' + fmt(a) + ' + ' + par(fmt(c)) + ' = ' + fmt(s[0]) + '</span>' +
+        '<span>Imaginaires : ' + fmt(b) + ' + ' + par(fmt(d)) + ' = ' + fmt(s[1]) + '</span>' +
+        '<b class="cc">z₁ + z₂ = ' + fmtC(s[0], s[1]) + '</b>';
+    }
+    dragger(P, h, 1, 3, draw); draw();
+  })();
+
+  /* ---------- Étape 5 : × i = quart de tour ---------- */
+  (function () {
+    var P = plane(document.getElementById('rotSvg'), 4, 1), rh = [[1, 0]], cur = [1, 0], start = [1, 0], trail = [], n = 0, calc = '', busy = false;
+    var bI = document.getElementById('rotI'), bM = document.getElementById('rotM');
+    var iSq = sqI;
+    function iCalc(a, b) {
+      if (a === 0 && b === 0) return 'i × 0 = 0';
+      var chain = [joinT([a !== 0 ? ti(a) : '', b !== 0 ? iSq(b) : '']), joinT([a !== 0 ? ti(a) : '', b !== 0 ? fmt(-b) : '']), fmtC(-b, a)];
+      var out = [chain[0]]; for (var k = 1; k < 3; k++) if (chain[k] !== out[out.length - 1]) out.push(chain[k]);
+      return 'i × ' + wrapC(a, b) + ' = ' + out.join(' = ');
+    }
+    function draw(anim) {
+      var g = P.dyn, r = Math.sqrt(cur[0] * cur[0] + cur[1] * cur[1]);
+      clear(g);
+      if (r > 0.01) mk(g, 'circle', { cx: 160, cy: 160, r: r * P.u, fill: 'none', stroke: 'var(--acc)', 'stroke-width': 1.5, 'stroke-dasharray': '4 5', opacity: 0.6 });
+      trail.forEach(function (p) { mk(g, 'circle', { cx: P.X(p[0]), cy: P.Y(p[1]), r: 5, fill: 'var(--ink-soft)', opacity: 0.45 }); });
+      arrow(g, 160, 160, P.X(cur[0]), P.Y(cur[1]), 'var(--acc)', 3);
+      handle(g, P.X(cur[0]), P.Y(cur[1]), 'var(--acc)');
+      if (!anim) label(g, P.X(cur[0]), P.Y(cur[1]), fmtC(cur[0], cur[1]), 'var(--acc)');
+      if (anim) return;
+      var k = ((n % 4) + 4) % 4, pw = C.powI(n);
+      document.getElementById('rotOut').innerHTML =
+        (calc ? '<b>' + calc + '</b>' : '<span>Départ : ' + fmtC(cur[0], cur[1]) + '. Appuie sur « × i ».</span>') +
+        '<span class="why">Quarts de tour depuis le départ : ' + n + ' (soit ' + fmt(n * 90) + '°).</span>' +
+        '<span class="why">On a multiplié le départ ' + fmtC(start[0], start[1]) + ' par i' + sup(n) + ' = ' + fmtC(pw[0], pw[1]) + '.</span>';
+      var spans = document.getElementById('cycle').children;
+      for (var j = 0; j < 4; j++) spans[j].className = j === k ? 'on' : '';
+    }
+    function rotate(q) {
+      if (busy) return;
+      var a = cur[0], b = cur[1], to = q === 1 ? C.timesI(a, b) : [-a, -b];
+      calc = q === 1 ? iCalc(a, b) : '(−1) × ' + wrapC(a, b) + ' = ' + fmtC(to[0], to[1]);
+      trail.push([a, b]); if (trail.length > 7) trail.shift();
+      n += q;
+      var r = Math.sqrt(a * a + b * b), th0 = Math.atan2(b, a), dur = reduce ? 0 : 360 * q, t0 = null;
+      function finish() { cur = [to[0] === 0 ? 0 : to[0], to[1] === 0 ? 0 : to[1]]; rh[0][0] = cur[0]; rh[0][1] = cur[1]; busy = false; bI.disabled = bM.disabled = false; draw(false); }
+      if (!dur || r === 0) { finish(); return; }
+      busy = true; bI.disabled = bM.disabled = true;
+      function frame(ts) {
+        if (t0 === null) t0 = ts;
+        var t = Math.min(1, (ts - t0) / dur), e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2, th = th0 + e * q * Math.PI / 2;
+        cur = [r * Math.cos(th), r * Math.sin(th)]; draw(true);
+        if (t < 1) requestAnimationFrame(frame); else finish();
+      }
+      requestAnimationFrame(frame);
+    }
+    function reset(p) { if (busy) return; cur = p.slice(); start = p.slice(); rh[0][0] = p[0]; rh[0][1] = p[1]; trail = []; n = 0; calc = ''; draw(false); }
+    dragger(P, rh, 1, 4, function () { if (busy) { rh[0][0] = cur[0]; rh[0][1] = cur[1]; return; } reset(rh[0].slice()); });
+    bI.addEventListener('click', function () { rotate(1); });
+    bM.addEventListener('click', function () { rotate(2); });
+    document.getElementById('rot1').addEventListener('click', function () { reset([1, 0]); });
+    document.getElementById('rot2').addEventListener('click', function () { reset([2, 1]); });
+    draw(false);
+  })();
+
+  /* ---------- Étape 6 : multiplication pas à pas ---------- */
+  (function () {
+    var ids = ['mA', 'mB', 'mC', 'mD'], inp = ids.map(function (id) { return document.getElementById(id); });
+    var pres = [[2, 3, 1, -4], [1, 1, 1, -1], [0, 3, 0, 2], [1, 1, 1, 1], [3, -2, -1, 5]];
+    function iTerm(x) { return ti(x); }
+    function mulSteps(a, b, c, d) {
+      var p = C.mul(a, b, c, d), L = [];
+      L.push('<span>' + wrapC(a, b) + ' × ' + wrapC(c, d) + '</span>');
+      L.push('<span class="why">On distribue : chaque morceau du premier multiplie chaque morceau du second.</span>');
+      L.push('<span>' + fmt(a) + ' × ' + par(fmt(c)) + ' = ' + fmt(a * c) + '</span>');
+      L.push('<span>' + fmt(a) + ' × ' + par(iTerm(d)) + ' = ' + iTerm(a * d) + '</span>');
+      L.push('<span>' + iTerm(b) + ' × ' + par(fmt(c)) + ' = ' + iTerm(b * c) + '</span>');
+      if (rd(b * d) === 0) L.push('<span>' + iTerm(b) + ' × ' + par(iTerm(d)) + ' = 0</span>');
+      else L.push('<span>' + iTerm(b) + ' × ' + par(iTerm(d)) + ' = ' + sqI(b * d) + ' = ' + fmt(b * d) + ' × (−1) = <span class="ca">' + fmt(-b * d) + '</span></span>');
+      L.push('<span class="why">On regroupe (et i² a été remplacé par −1) :</span>');
+      L.push('<span>Partie réelle : ' + fmt(a * c) + ' + ' + par(fmt(-b * d)) + ' = ' + fmt(p[0]) + '</span>');
+      L.push('<span>Partie imaginaire : ' + fmt(a * d) + ' + ' + par(fmt(b * c)) + ' = ' + fmt(p[1]) + '</span>');
+      L.push('<b>= ' + fmtC(p[0], p[1]) + '</b>');
+      var m1 = C.mod(a, b), m2 = C.mod(c, d), mp = C.mod(p[0], p[1]);
+      L.push('<span class="why">Bonus : |z₁| × |z₂| ≈ ' + fmt(m1, 2) + ' × ' + fmt(m2, 2) + ' ≈ ' + fmt(m1 * m2, 2) + ' et |z₁ × z₂| ≈ ' + fmt(mp, 2) + '. Les longueurs se multiplient (étape 7) !</span>');
+      return L.join('');
+    }
+    function run() {
+      var v = inp.map(function (e) { return num(e.value); }), out = document.getElementById('mulOut');
+      pres.forEach(function (p, i) { document.getElementById('mp' + i).setAttribute('aria-pressed', p.every(function (x, j) { return x === v[j]; }) ? 'true' : 'false'); });
+      if (v.some(isNaN)) { out.innerHTML = '<span class="err">Écris quatre nombres (par exemple 2, 3, 1 et −4).</span>'; return; }
+      out.innerHTML = mulSteps(v[0], v[1], v[2], v[3]);
+    }
+    pres.forEach(function (p, i) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'ex'; b.id = 'mp' + i;
+      b.textContent = wrapC(p[0], p[1]) + wrapC(p[2], p[3]);
+      if (p[0] === 0) b.textContent = fmtC(p[0], p[1]) + ' × ' + fmtC(p[2], p[3]);
+      b.addEventListener('click', function () { p.forEach(function (x, j) { inp[j].value = fmt(x); }); run(); });
+      document.getElementById('mulPre').appendChild(b);
+    });
+    inp.forEach(function (e) { e.addEventListener('input', run); });
+    run();
+  })();
+
+  /* ---------- Étape 7 : longueurs et angles ---------- */
+  (function () {
+    var P = plane(document.getElementById('polSvg'), 4, 1), ids = ['pR1', 'pT1', 'pR2', 'pT2'], sl = ids.map(function (id) { return document.getElementById(id); });
+    function arc(g, rp, deg, col) {
+      var d = ((deg % 360) + 360) % 360; if (d === 0) return;
+      var t = d * Math.PI / 180, ex = 160 + rp * Math.cos(t), ey = 160 - rp * Math.sin(t);
+      mk(g, 'path', { d: 'M' + (160 + rp) + ' 160 A' + rp + ' ' + rp + ' 0 ' + (d > 180 ? 1 : 0) + ' 0 ' + ex + ' ' + ey, fill: 'none', stroke: col, 'stroke-width': 2.5 });
+    }
+    function draw() {
+      var r1 = Number(sl[0].value), t1 = Number(sl[1].value), r2 = Number(sl[2].value), t2 = Number(sl[3].value);
+      document.getElementById('pR1o').textContent = fmt(r1); document.getElementById('pT1o').textContent = t1 + '°';
+      document.getElementById('pR2o').textContent = fmt(r2); document.getElementById('pT2o').textContent = t2 + '°';
+      var z = C.fromPolar(r1, t1), w = C.fromPolar(r2, t2), p = C.mul(z[0], z[1], w[0], w[1]), g = P.dyn, ts = t1 + t2;
+      clear(g);
+      arc(g, 26, t1, 'var(--acc)'); arc(g, 38, t2, 'var(--two)'); arc(g, 50, ts, 'var(--ok)');
+      arrow(g, 160, 160, P.X(p[0]), P.Y(p[1]), 'var(--ok)', 4);
+      arrow(g, 160, 160, P.X(z[0]), P.Y(z[1]), 'var(--acc)', 3);
+      arrow(g, 160, 160, P.X(w[0]), P.Y(w[1]), 'var(--two)', 3);
+      label(g, P.X(z[0]), P.Y(z[1]), 'z', 'var(--acc)'); label(g, P.X(w[0]), P.Y(w[1]), 'w', 'var(--two)');
+      label(g, P.X(p[0]), P.Y(p[1]), 'z × w', 'var(--ok)');
+      var ang = ts === 360 ? '360° (un tour complet : retour sur l\'axe des réels)' : ts > 180 ? ts + '° (plus d\'un demi-tour)' : ts + '°';
+      document.getElementById('polOut').innerHTML =
+        res('<span class="ca">z</span>', 'longueur ' + fmt(r1) + ' · angle ' + t1 + '°', 'z ≈ ' + fmtC(z[0], z[1], 2)) +
+        res('<span class="cb">w</span>', 'longueur ' + fmt(r2) + ' · angle ' + t2 + '°', 'w ≈ ' + fmtC(w[0], w[1], 2), 'b') +
+        res('z × w', 'longueur ' + fmt(r1 * r2) + ' · angle ' + ts + '°',
+          'Longueurs : ' + fmt(r1) + ' × ' + fmt(r2) + ' = ' + fmt(r1 * r2) + ' · Angles : ' + t1 + '° + ' + t2 + '° = ' + ang +
+          '<br>Vérification avec le calcul (a + ib) : z × w ≈ ' + fmtC(p[0], p[1], 2) + ', de longueur ≈ ' + fmt(C.mod(p[0], p[1]), 2), 'total');
+    }
+    sl.forEach(function (e) { e.addEventListener('input', draw); }); draw();
+  })();
+
+  /* ---------- Étape 8 : le conjugué ---------- */
+  (function () {
+    var P = plane(document.getElementById('cjSvg'), 4, 1), z = [[3, 2]];
+    function draw() {
+      var a = z[0][0], b = z[0][1], g = P.dyn, cb = C.conj(a, b);
+      clear(g);
+      mk(g, 'line', { x1: P.X(a), y1: P.Y(b), x2: P.X(a), y2: P.Y(-b), stroke: 'var(--ink-soft)', 'stroke-width': 1.5, 'stroke-dasharray': '4 4' });
+      arrow(g, 160, 160, P.X(cb[0]), P.Y(cb[1]), 'var(--two)', 3);
+      arrow(g, 160, 160, P.X(a), P.Y(b), 'var(--acc)', 3);
+      mk(g, 'circle', { cx: P.X(cb[0]), cy: P.Y(cb[1]), r: 6, fill: 'var(--two)' });
+      handle(g, P.X(a), P.Y(b), 'var(--acc)');
+      if (b !== 0) { label(g, P.X(a), P.Y(b), 'z', 'var(--acc)'); label(g, P.X(cb[0]), P.Y(cb[1]), 'z̄', 'var(--two)'); }
+      else label(g, P.X(a), P.Y(b), 'z = z̄', 'var(--acc)');
+      var s = C.add(a, b, cb[0], cb[1]), p = C.mul(a, b, cb[0], cb[1]), exp;
+      if (a !== 0 && b !== 0) exp = wrapC(a, b) + wrapC(cb[0], cb[1]) + ' = ' + joinT([fmt(a * a), ti(-a * b), ti(a * b), sqI(-b * b)]) + ' = ' + fmt(a * a) + ' + ' + fmt(b * b) + ' = ' + fmt(p[0]);
+      else exp = wrapC(a, b) + ' × ' + wrapC(cb[0], cb[1]) + ' = ' + fmt(p[0]);
+      document.getElementById('cjOut').innerHTML =
+        res('<span class="ca">z</span>', fmtC(a, b)) +
+        res('<span class="cb">z̄</span> (conjugué)', fmtC(cb[0], cb[1]), b === 0 ? 'z est réel : il est son propre reflet.' : 'même partie réelle, partie imaginaire opposée', 'b') +
+        res('z + z̄', fmtC(s[0], s[1]), 'les i s\'annulent : on trouve 2 × ' + par(fmt(a)) + ' = ' + fmt(2 * a)) +
+        res('z × z̄', fmt(p[0]), exp + ' = |z|²', 'total');
+    }
+    dragger(P, z, 1, 4, draw); draw();
+  })();
+
+  /* ---------- Étape 9 : résoudre x² + bx + c = 0 ---------- */
+  (function () {
+    var sB = document.getElementById('qB'), sC = document.getElementById('qC');
+    var pres = [[0, 1], [0, 4], [2, 5], [-4, 13], [-5, 6], [0, -9]];
+    function xTerm(b) { return b === 0 ? '' : b === 1 ? 'x' : b === -1 ? '−x' : fmt(b) + 'x'; }
+    function eqStr(b, c) { return joinT(['x²', xTerm(b), c === 0 ? '' : fmt(c)]) + ' = 0'; }
+    function run() {
+      var b = Number(sB.value), c = Number(sC.value), S = C.solve(b, c), h = S.h, m = S.m, L = [];
+      document.getElementById('qBo').textContent = fmt(b); document.getElementById('qCo').textContent = fmt(c);
+      pres.forEach(function (p, i) { document.getElementById('ep' + i).setAttribute('aria-pressed', p[0] === b && p[1] === c ? 'true' : 'false'); });
+      document.getElementById('eqTitle').textContent = eqStr(b, c);
+      var lhs;
+      if (b === 0) {
+        lhs = 'x';
+        L.push('<span>x² = ' + fmt(-c) + '</span>');
+        L.push('<span class="why">On a isolé x² en passant le nombre seul de l\'autre côté.</span>');
+      } else {
+        lhs = 'x ' + (h < 0 ? '− ' : '+ ') + fmt(Math.abs(h));
+        var sq = '(' + lhs + ')²';
+        L.push('<span class="why">On complète le carré, avec (x + h)² = x² + 2hx + h² :</span>');
+        L.push('<span>' + joinT(['x²', xTerm(b)]) + ' = ' + sq + ' − ' + fmt(h * h) + '</span>');
+        L.push('<span class="why">L\'équation devient :</span>');
+        L.push('<span>' + sq + ' − ' + fmt(h * h) + ' + ' + par(fmt(c)) + ' = 0, donc ' + sq + ' = ' + fmt(h * h) + ' − ' + par(fmt(c)) + ' = ' + fmt(m) + '</span>');
+      }
+      var Lsq = b === 0 ? 'x²' : '(' + lhs + ')²';
+      if (m > 0) {
+        var s = Math.sqrt(m), ex = exactSqrt(m), sS = ex ? fmt(s) : '√' + fmt(m);
+        L.push('<span class="why">' + Lsq + ' = ' + fmt(m) + ' est positif : deux solutions réelles, pas besoin de i.</span>');
+        L.push('<span>' + lhs + ' = ' + sS + ' ou ' + lhs + ' = −' + sS + '</span>');
+        L.push('<b>x ' + (ex ? '= ' : '≈ ') + fmt(-h + s, 2) + ' ou x ' + (ex ? '= ' : '≈ ') + fmt(-h - s, 2) + '</b>');
+      } else if (m === 0) {
+        L.push('<span class="why">' + Lsq + ' = 0 : un carré nul, donc ' + lhs + ' = 0.</span>');
+        L.push('<b>Une seule solution : x = ' + fmt(-h) + '</b>');
+      } else {
+        var k = Math.sqrt(-m), exk = exactSqrt(-m), kT = exk ? ti(k) : 'i√' + fmt(-m);
+        L.push('<span class="warn">' + Lsq + ' = ' + fmt(m) + ' : un carré négatif ! Aucune solution réelle.</span>');
+        L.push('<span class="why">Mais avec i : (' + kT + ')² = ' + fmt(-m) + ' × i² = ' + fmt(m) + '. Et (−' + kT + ')² aussi.</span>');
+        L.push('<span>' + lhs + ' = ' + kT + ' ou ' + lhs + ' = −' + kT + '</span>');
+        function root(sg) {
+          if (exk) return fmtC(-h, sg * k);
+          var t = 'i√' + fmt(-m); if (rd(h) === 0) return (sg < 0 ? '−' : '') + t;
+          return fmt(-h) + (sg < 0 ? ' − ' : ' + ') + t;
+        }
+        L.push('<b>x = ' + root(1) + ' ou x = ' + root(-1) + '</b>');
+        if (!exk) L.push('<span class="why">Soit environ x ≈ ' + fmtC(-h, k, 2) + ' ou x ≈ ' + fmtC(-h, -k, 2) + '.</span>');
+        else {
+          var x0 = S.roots[0], sq2 = C.mul(x0[0], x0[1], x0[0], x0[1]), tot = [sq2[0] + b * x0[0] + c, sq2[1] + b * x0[1]];
+          var ok = Math.abs(tot[0]) < 1e-9 && Math.abs(tot[1]) < 1e-9;
+          L.push('<span class="good">Vérification avec x = ' + fmtC(x0[0], x0[1]) + ' : x² = ' + fmtC(sq2[0], sq2[1]) + (b !== 0 ? ', ' + fmt(b) + 'x = ' + fmtC(b * x0[0], b * x0[1]) : '') + ', et au total ' + fmtC(tot[0], tot[1]) + (ok ? ' ✓' : '') + '</span>');
+        }
+      }
+      document.getElementById('eqOut').innerHTML = L.join('');
+    }
+    pres.forEach(function (p, i) {
+      var bt = document.createElement('button'); bt.type = 'button'; bt.className = 'ex'; bt.id = 'ep' + i; bt.textContent = eqStr(p[0], p[1]);
+      bt.addEventListener('click', function () { sB.value = p[0]; sC.value = p[1]; run(); });
+      document.getElementById('eqPre').appendChild(bt);
+    });
+    sB.addEventListener('input', run); sC.addEventListener('input', run);
+    run();
+  })();
+
+  /* ---------- Étape 10 : Mandelbrot ---------- */
+  (function () {
+    var cv = document.getElementById('mand'), ctx = cv.getContext && cv.getContext('2d');
+    var W = cv.width, H = cv.height, view, level;
+    function reset() { view = { cx: -0.6, cy: 0, w: 3.3 }; level = 0; render(); }
+    function colour(n, max) {
+      if (n >= max) return [16, 6, 26];
+      var t = Math.sqrt(n / max), stops = [[24, 10, 52], [162, 28, 175], [255, 196, 120], [255, 252, 235]];
+      var s = Math.min(2.999, t * 3), i = Math.floor(s), f = s - i, A = stops[i], B = stops[i + 1];
+      return [A[0] + (B[0] - A[0]) * f, A[1] + (B[1] - A[1]) * f, A[2] + (B[2] - A[2]) * f];
+    }
+    function render() {
+      if (!ctx) return;
+      var img = ctx.createImageData(W, H), D = img.data, max = Math.min(60 + 25 * level, 250), sc = view.w / W, cache = {};
+      for (var py = 0; py < H; py++) {
+        var y = view.cy + (H / 2 - py) * sc;
+        for (var px = 0; px < W; px++) {
+          var x = view.cx + (px - W / 2) * sc, n = C.mandel(x, y, max), col = cache[n] || (cache[n] = colour(n, max)), o = (py * W + px) * 4;
+          D[o] = col[0]; D[o + 1] = col[1]; D[o + 2] = col[2]; D[o + 3] = 255;
+        }
+      }
+      ctx.putImageData(img, 0, 0);
+      document.getElementById('mandOut').textContent = 'Zoom × ' + fmt(Math.pow(2, level), 0) + ' · centre ' + fmtC(view.cx, view.cy, 4);
+    }
+    cv.addEventListener('click', function (e) {
+      var r = cv.getBoundingClientRect(); if (!r.width) return;
+      var px = (e.clientX - r.left) / r.width * W, py = (e.clientY - r.top) / r.height * H, sc = view.w / W;
+      view.cx += (px - W / 2) * sc; view.cy += (H / 2 - py) * sc;
+      if (level < 30) { view.w /= 2; level++; }
+      render();
+    });
+    document.getElementById('mandReset').addEventListener('click', reset);
+    reset();
+
+    /* Tester un point : quelques tours de z → z² + c */
+    var tests = [[-1, 0], [1, 0], [0, 1], [0.5, 0], [-0.5, 0.5]];
+    function test(c) {
+      var z = [0, 0], seq = ['0'], esc = false;
+      for (var k = 0; k < 6; k++) {
+        var s = C.mul(z[0], z[1], z[0], z[1]); z = [s[0] + c[0], s[1] + c[1]];
+        seq.push(fmtC(z[0], z[1], 2));
+        if (C.mod(z[0], z[1]) > 2) { esc = true; break; }
+      }
+      var inSet = !esc && C.mandel(c[0], c[1], 500) >= 500, out = document.getElementById('mtOut');
+      out.className = 'verdict ' + (inSet ? 'yes' : 'no');
+      out.innerHTML = 'c = ' + fmtC(c[0], c[1]) + ' : ' + (inSet ? 'z reste petit, c est dans l\'ensemble (noir).' : 'z s\'enfuit, c n\'est pas dans l\'ensemble.') +
+        '<span class="iters">' + seq.join(' → ') + (esc ? ' → … de plus en plus loin' : ' → …') + '</span>';
+      tests.forEach(function (t, i) { document.getElementById('mt' + i).setAttribute('aria-pressed', t === c ? 'true' : 'false'); });
+    }
+    tests.forEach(function (t, i) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'ex'; b.id = 'mt' + i; b.textContent = 'c = ' + fmtC(t[0], t[1]);
+      b.addEventListener('click', function () { test(t); });
+      document.getElementById('mtPre').appendChild(b);
+    });
+    test(tests[0]);
+  })();
+
+  /* ---------- Quiz ---------- */
+  function rnd(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+  function rnz(a, b) { var x = 0; while (x === 0) x = rnd(a, b); return x; }
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  function makeQ(t) {
+    var a, b, c, d, r;
+    if (t === 0) {
+      var n = rnd(2, 9), q = Math.floor(n / 4), k = n % 4, pw = C.powI(n), pk = C.powI(k), how;
+      if (n === 2) how = 'i² = −1 par définition';
+      else if (n === 3) how = 'i³ = i² × i = (−1) × i = −i';
+      else how = n + ' = 4 × ' + q + ' + ' + k + ', donc i' + sup(n) + ' = (i⁴)' + sup(q) + ' × i' + sup(k) + ' = 1 × ' + par(fmtC(pk[0], pk[1])) + ' = ' + fmtC(pw[0], pw[1]);
+      return { q: 'Combien vaut i' + sup(n) + ' ?', a: pw, how: how };
+    }
+    a = rnz(-6, 6); b = rnz(-6, 6); c = rnz(-6, 6); d = rnz(-6, 6);
+    if (t === 1) { r = C.add(a, b, c, d); return { q: 'Calcule ' + '(' + fmtC(a, b) + ') + (' + fmtC(c, d) + ')', a: r, how: 'Réels : ' + fmt(a) + ' + ' + par(fmt(c)) + ' = ' + fmt(r[0]) + ' ; imaginaires : ' + fmt(b) + ' + ' + par(fmt(d)) + ' = ' + fmt(r[1]) }; }
+    if (t === 2) { r = [a - c, b - d]; return { q: 'Calcule ' + '(' + fmtC(a, b) + ') − (' + fmtC(c, d) + ')', a: r, how: 'Réels : ' + fmt(a) + ' − ' + par(fmt(c)) + ' = ' + fmt(r[0]) + ' ; imaginaires : ' + fmt(b) + ' − ' + par(fmt(d)) + ' = ' + fmt(r[1]) }; }
+    if (t === 3) {
+      a = rnz(-3, 3); b = rnz(-3, 3); c = rnz(-3, 3); d = rnz(-3, 3); r = C.mul(a, b, c, d);
+      return { q: 'Calcule ' + '(' + fmtC(a, b) + ')(' + fmtC(c, d) + ')', a: r, how: 'Réel : ' + fmt(a) + ' × ' + par(fmt(c)) + ' − ' + par(fmt(b)) + ' × ' + par(fmt(d)) + ' = ' + fmt(r[0]) + ' ; imaginaire : ' + fmt(a) + ' × ' + par(fmt(d)) + ' + ' + par(fmt(b)) + ' × ' + par(fmt(c)) + ' = ' + fmt(r[1]) + ' (car i² = −1)' };
+    }
+    if (t === 4) {
+      var tr = pick([[3, 4], [4, 3], [6, 8], [8, 6], [5, 12], [12, 5], [0, 7]]), x = tr[0] * pick([1, -1]), y = tr[1] * pick([1, -1]), m = Math.sqrt(x * x + y * y);
+      return { q: 'Quel est le module |' + fmtC(x, y) + '| ?', a: [m, 0], how: '√(' + par(fmt(x)) + '² + ' + par(fmt(y)) + '²) = √' + fmt(x * x + y * y) + ' = ' + fmt(m) };
+    }
+    if (t === 5) return { q: 'Quel est le conjugué de ' + fmtC(a, b) + ' ?', a: [a, -b], how: 'On change le signe de la partie imaginaire : ' + fmtC(a, -b) };
+    if (t === 6) { r = C.timesI(a, b); return { q: 'Calcule i × (' + fmtC(a, b) + ')', a: r, how: 'i × (a + ib) = ai + bi² = −b + ai, donc ' + fmtC(r[0], r[1]) + ' (un quart de tour)' }; }
+    return { q: 'Quelle est la partie imaginaire de ' + fmtC(a, b) + ' ? (un nombre réel, sans i)', a: [b, 0], alt: [0, b], how: 'C\'est le nombre devant i, avec son signe : ' + fmt(b) };
+  }
+  var quiz = document.getElementById('quiz'), done = [];
+  function near(p, q) { return Math.abs(p[0] - q[0]) < 0.006 && Math.abs(p[1] - q[1]) < 0.006; }
+  function newQuiz() {
+    quiz.innerHTML = ''; done = [];
+    var order = [0, 1, 2, 3, 4, 5, 6, 7];
+    for (var s = order.length - 1; s > 0; s--) { var j = Math.floor(Math.random() * (s + 1)), tmp = order[s]; order[s] = order[j]; order[j] = tmp; }
+    for (var k = 0; k < 8; k++) {
+      var Q = makeQ(order[k]), li = document.createElement('li');
+      li.innerHTML = '<span>' + Q.q + '</span><input type="text" id="qa' + k + '" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="ex. 3 − 2i" aria-label="Ta réponse à la question ' + (k + 1) + '"><button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+      quiz.appendChild(li);
+      (function (k, Q) {
+        function check() {
+          var fb = document.getElementById('qf' + k), x = C.parse(document.getElementById('qa' + k).value);
+          if (!x) { fb.className = 'fb'; fb.textContent = 'Écris un nombre, par exemple 3 − 2i, -i ou 5.'; return; }
+          if (near(x, Q.a)) { fb.className = 'fb ok'; fb.textContent = 'Bravo, c\'est juste !'; done[k] = true; }
+          else if (Q.alt && near(x, Q.alt)) { fb.className = 'fb ok'; fb.innerHTML = 'Juste ! Mais la partie imaginaire s\'écrit sans le i : ' + fmt(Q.a[0]) + '.'; done[k] = true; }
+          else { done[k] = false; fb.className = 'fb no'; fb.innerHTML = 'Pas tout à fait : la réponse est ' + fmtC(Q.a[0], Q.a[1]) + '.<span>' + Q.how + '</span>'; }
+          document.getElementById('score').textContent = done.filter(Boolean).length + ' / 8';
+        }
+        document.getElementById('qb' + k).addEventListener('click', check);
+        document.getElementById('qa' + k).addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+      })(k, Q);
+    }
+    document.getElementById('score').textContent = '0 / 8';
+  }
+  document.getElementById('newQuiz').addEventListener('click', newQuiz);
+  newQuiz();
+})();
+</script>
+</body>
+</html>

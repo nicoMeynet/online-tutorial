@@ -1,0 +1,904 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Les grandeurs composées</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, encre bleu pétrole (comme l'eau du bain), marge rouge. Les unités composées (km/h, kWh, g/cm³…) sont au centre. */
+:root {
+  --paper: #f5f8f9;
+  --grid: #dde8ec;
+  --card: #ffffff;
+  --ink: #10262d;
+  --ink-soft: #4d6670;
+  --acc: #155e75;
+  --acc-soft: #d6edf3;
+  --two: #1c64c8;
+  --two-soft: #dbe8fa;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #fff0a3;
+  --line: #cddce1;
+  --water: #7cc4dc;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0c1417; --grid: #15232a; --card: #111c20; --ink: #e8f2f4; --ink-soft: #9bb4bc;
+    --acc: #67c7dc; --acc-soft: #123540; --two: #7fb0ff; --two-soft: #1a2a45;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #26383f; --water: #1f6f8a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0c1417; --grid: #15232a; --card: #111c20; --ink: #e8f2f4; --ink-soft: #9bb4bc;
+  --acc: #67c7dc; --acc-soft: #123540; --two: #7fb0ff; --two-soft: #1a2a45;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #26383f; --water: #1f6f8a;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+@media (max-width: 420px) { .box { padding: 14px; } }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 6px 12px; min-height: 40px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+input[type="text"], select { font: inherit; font-family: var(--f-mono); font-size: 1.05rem; padding: 8px 10px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; }
+input[type="range"] { width: 100%; accent-color: var(--acc); }
+.param { display: flex; flex-direction: column; gap: 2px; }
+.param label { font-weight: 700; }
+
+.inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px 14px; align-items: end; }
+.inputs label { font-weight: 700; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.methods { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
+.method { border: 1.5px solid var(--line); border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; background: var(--paper); min-width: 0; }
+.method strong { font-family: var(--f-display); }
+.method .m { font-family: var(--f-mono); font-size: .95rem; overflow-wrap: anywhere; }
+.method .m b { color: var(--acc); }
+.err { color: var(--red); font-weight: 700; }
+
+.verdict { border-radius: 8px; padding: 12px 14px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+.verdict.yes { background: var(--ok-soft); color: var(--ok); }
+.verdict.no { background: var(--red-soft); color: var(--red); }
+.verdict.mid { background: var(--acc-soft); color: var(--acc); }
+.verdict span { font-weight: 400; color: var(--ink); }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
+.tag.ok { color: var(--acc); }
+.tag.no { color: var(--two); }
+.big { font-family: var(--f-mono); font-size: 1.15rem; font-weight: 600; overflow-wrap: anywhere; }
+.big b { color: var(--acc); }
+
+/* Trieur produit / quotient */
+.sorter { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.sorter li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 10px; align-items: center; padding: 8px 12px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--paper); }
+.sorter .u { font-family: var(--f-mono); font-weight: 600; font-size: 1.1rem; }
+.sorter .fb { grid-column: 1 / -1; font-size: .95rem; }
+.sorter .fb.ok { color: var(--ok); }
+.sorter .fb.no { color: var(--red); }
+.sorter .btns { gap: 8px; }
+
+/* Figures */
+.fig svg { width: 100%; height: auto; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; display: block; }
+#obj { transition: transform .8s cubic-bezier(.3, 1.4, .5, 1); }
+
+/* Appareils électriques */
+.apps { display: flex; flex-direction: column; gap: 8px; }
+.app { display: grid; grid-template-columns: minmax(0, 1fr) 96px; gap: 6px 12px; align-items: center; padding: 8px 12px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--paper); }
+.app.on { border-color: var(--acc); background: var(--acc-soft); }
+.app button { justify-self: start; text-align: left; }
+.app input { padding: 6px 8px; font-size: 1rem; text-align: center; }
+.app .r { grid-column: 1 / -1; font-family: var(--f-mono); font-size: .9rem; color: var(--ink-soft); overflow-wrap: anywhere; }
+.app .r b { color: var(--acc); }
+.app .lbl { font-size: .8rem; color: var(--ink-soft); display: block; text-align: center; }
+
+/* Barres de densité */
+.bars { display: flex; flex-direction: column; gap: 6px; }
+.bar { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 8px; align-items: center; font-size: .92rem; }
+.bar .n { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bar .t { position: relative; height: 22px; background: var(--paper); border: 1px solid var(--line); border-radius: 4px; }
+.bar .f { position: absolute; left: 0; top: 0; bottom: 0; background: var(--acc); opacity: .55; border-radius: 3px; }
+.bar.sel .f { opacity: 1; }
+.bar.sel .n { font-weight: 700; color: var(--acc); }
+.bar .v { position: absolute; left: 6px; top: 0; line-height: 22px; font-family: var(--f-mono); font-size: .8rem; color: var(--ink); white-space: nowrap; }
+.bar.clip .f { right: 0; background: repeating-linear-gradient(45deg, var(--acc), var(--acc) 6px, transparent 6px, transparent 10px); }
+
+/* Paquets */
+.packs { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+.pack { display: flex; flex-direction: column; gap: 4px; text-align: left; padding: 12px 14px; font-weight: 400; }
+.pack .pn { font-family: var(--f-display); font-weight: 700; font-size: 1.1rem; }
+.pack .pp { font-family: var(--f-mono); font-weight: 600; font-size: 1.3rem; color: var(--acc); }
+.pack .pu { font-family: var(--f-mono); font-size: .88rem; min-height: 1.4em; overflow-wrap: anywhere; }
+.pack.best { border-color: var(--ok); box-shadow: 3px 3px 0 var(--ok); }
+.pack.wrong { border-color: var(--red); box-shadow: 3px 3px 0 var(--red); }
+
+.steps { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 6px; font-family: var(--f-mono); font-size: .95rem; }
+.steps li { overflow-wrap: anywhere; }
+.steps li span { font-family: var(--f-body); color: var(--ink-soft); display: block; font-size: .92rem; }
+
+.errs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.errs li { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--paper); }
+.errs .bad { font-family: var(--f-mono); color: var(--red); text-decoration: line-through; overflow-wrap: anywhere; }
+.errs .good { font-family: var(--f-mono); color: var(--ok); font-weight: 600; overflow-wrap: anywhere; }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 110px auto; gap: 10px; align-items: center; }
+.quiz input[type="text"] { font-size: 1rem; padding: 6px 8px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc); }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 120px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+<style id="tnav-css">
+.tnav-top { display: flex; margin: 0 0 4px; }
+.tnav-home { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font-weight: 700; font-size: .95rem; text-decoration: none; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tnav-home:hover, .tnav-home:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.tnav-bottom { margin-top: 8px; display: flex; flex-direction: column; gap: 12px; }
+.tnav-bottom h2 { margin: 0; }
+.tnav-pn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tnav-pn a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--ink, #222); border-radius: 10px;
+  background: var(--card, #fff); color: var(--ink, #222); text-decoration: none; box-shadow: 3px 3px 0 var(--ink, #222); min-width: 0; }
+.tnav-pn a span { font-size: .85rem; color: var(--ink-soft, #666); }
+.tnav-pn a strong { overflow-wrap: anywhere; }
+.tnav-pn a.next { text-align: right; grid-column: 2; }
+.tnav-bottom .tnav-home { align-self: center; }
+@media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
+</style>
+</head>
+<body>
+<main class="page">
+<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="index.html">← Tous les tutoriels</a></nav><!--/tnav-->
+
+
+  <header class="hero">
+    <span class="eyebrow">Tutoriel de maths · niveau 4<sup>e</sup>–3<sup>e</sup></span>
+    <h1>Les grandeurs composées</h1>
+    <p class="lead">Des kilomètres par heure, des litres par minute, des kilowattheures, des habitants par km²… Ces unités « à deux étages » se fabriquent en divisant ou en multipliant deux grandeurs. Une fois qu'on a compris le truc, on les lit toutes de la même façon.</p>
+    <div class="box">
+      <div class="methods">
+        <div class="method"><span class="tag no">Quotient (÷)</span><span class="m">150 L ÷ 12 min = <b>12,5 L/min</b></span><span class="soft">Le « / » se lit « par » : 12,5 litres <strong>par</strong> minute.</span></div>
+        <div class="method"><span class="tag ok">Produit (×)</span><span class="m">2 kW × 3 h = <b>6 kWh</b></span><span class="soft">Pas de « / » : des kilowatts <strong>fois</strong> des heures.</span></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · L'idée</span>
+    <h2>Diviser ou multiplier deux grandeurs</h2>
+    <p>Une <strong>grandeur composée</strong> est fabriquée à partir de deux autres grandeurs. Il y a deux familles :</p>
+    <div class="cards">
+      <div class="box"><span class="tag no">Grandeur quotient</span><strong>On divise</strong><span class="soft">Masse ÷ volume, litres ÷ minutes, habitants ÷ km². L'unité a un « / » : g/cm³, L/min, hab/km². Elle répond à « combien <em>pour un</em> ? ».</span></div>
+      <div class="box"><span class="tag ok">Grandeur produit</span><strong>On multiplie</strong><span class="soft">Puissance × durée, longueur × longueur. L'unité colle les deux morceaux : kWh, m². Elle mesure un « total ».</span></div>
+    </div>
+    <p>La <strong>vitesse</strong> en km/h est la grandeur quotient la plus connue : distance ÷ durée. Elle a son propre tutoriel, le tutoriel sur <a class="tlink" href="la-vitesse.html">la vitesse</a>. Ici, on découvre ses cousines.</p>
+    <div class="box">
+      <h3>Trie les unités</h3>
+      <p class="soft">Pour chaque unité : est-ce un produit (×) ou un quotient (÷) ?</p>
+      <ul class="sorter" id="sorter"></ul>
+      <p class="score" id="sortScore" aria-live="polite">0 / 10</p>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · Le débit</span>
+    <h2>Combien de litres par minute ?</h2>
+    <p>Le <strong>débit</strong> dit quelle quantité de liquide passe en une unité de temps. Un robinet qui donne 12 litres chaque minute a un débit de <span class="hl">12 L/min</span>.</p>
+    <p class="big">débit = volume ÷ durée &nbsp;donc&nbsp; durée = volume ÷ débit</p>
+    <div class="box">
+      <h3>Remplis la baignoire</h3>
+      <div class="inputs">
+        <div class="param"><label for="bV">Baignoire : <span class="mono" id="bVo"></span></label><input id="bV" type="range" min="50" max="250" step="10" value="150"></div>
+        <div class="param"><label for="bD">Débit : <span class="mono" id="bDo"></span></label><input id="bD" type="range" min="1" max="25" step="0.5" value="12"></div>
+      </div>
+      <div class="verdict mid" id="bOut" aria-live="polite"></div>
+      <div class="fig"><svg id="bath" viewBox="0 0 320 200" role="img" aria-label="Baignoire qui se remplit"></svg></div>
+      <div class="param"><label for="bT">Temps écoulé : <span class="mono" id="bTo"></span></label><input id="bT" type="range" min="0" max="13" step="0.1" value="0"></div>
+      <div class="btns">
+        <button type="button" id="bPlay">▶ Ouvrir le robinet</button>
+        <button type="button" id="bEnd">Aller à la fin</button>
+        <button type="button" id="bReset">Vider</button>
+      </div>
+      <p class="mono soft" id="bNow" aria-live="polite"></p>
+    </div>
+    <div class="note">
+      <span class="note-title">Une autre unité : le m³/h</span>
+      <span>Pour les gros débits (une pompe, une rivière), on utilise les mètres cubes par heure. 1 m³ = 1 000 L et 1 h = 60 min. Pour passer de L/min à m³/h : on multiplie par 60 (minutes dans une heure) puis on divise par 1 000.</span>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · La masse volumique</span>
+    <h2>Ça flotte ou ça coule ?</h2>
+    <p>Un kilo de plumes et un kilo de plomb ont la même masse, mais pas le même volume ! La <strong>masse volumique</strong> dit combien pèse un volume donné de matière, par exemple 1 cm³.</p>
+    <p class="big">masse volumique = masse ÷ volume</p>
+    <p>L'eau a une masse volumique de <span class="hl">1 g/cm³</span>, soit 1 000 kg/m³ (ou 1 kg par litre). La règle : un objet plein <strong>flotte</strong> si sa masse volumique est plus petite que celle du liquide, et il <strong>coule</strong> si elle est plus grande. Ce n'est pas la masse qui compte : un tronc d'arbre de 500 kg flotte, une bille d'acier de 5 g coule.</p>
+    <div class="box">
+      <h3>Le laboratoire</h3>
+      <div class="btns" id="liqs" role="group" aria-label="Choix du liquide"></div>
+      <div class="btns" id="mats" role="group" aria-label="Choix de la matière"></div>
+      <div class="inputs">
+        <label for="fM">Ou ton objet : masse (g)<input id="fM" type="text" inputmode="decimal" autocomplete="off" placeholder="ex. 30"></label>
+        <label for="fV">volume (cm³)<input id="fV" type="text" inputmode="decimal" autocomplete="off" placeholder="ex. 40"></label>
+      </div>
+      <div class="fig"><svg id="tank" viewBox="0 0 320 220" role="img" aria-label="Un cube posé dans un liquide"></svg></div>
+      <div class="verdict" id="fOut" aria-live="polite"></div>
+    </div>
+    <p class="soft">Les valeurs sont des valeurs <em>environ</em> : le bois, par exemple, dépend de l'arbre et de son humidité. Un cube qui flotte s'enfonce d'autant plus que sa masse volumique est proche de celle du liquide : la glace (environ 0,92 g/cm³) reste à environ 92 % sous l'eau douce. C'est pour ça qu'on ne voit que le sommet des icebergs.</p>
+    <div class="box">
+      <h3>La couronne du roi (une légende)</h3>
+      <p>Une couronne de 1 000 g. Si l'orfèvre a remplacé une partie de l'or (19,3 g/cm³) par de l'argent (10,5 g/cm³), plus léger à volume égal, la couronne prend <strong>plus de place</strong> : elle fait déborder plus d'eau.</p>
+      <div class="param"><label for="cAg">Part d'argent : <span class="mono" id="cAgo"></span></label><input id="cAg" type="range" min="0" max="50" step="1" value="0"></div>
+      <div class="bars" id="crownBars"></div>
+      <p class="mono" id="crownOut" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · L'énergie électrique</span>
+    <h2>Le kilowattheure, une grandeur produit</h2>
+    <p>La <strong>puissance</strong> d'un appareil (en watts, W) dit combien d'énergie il utilise à chaque instant. Plus il fonctionne longtemps, plus il consomme. L'énergie est donc un <strong>produit</strong> :</p>
+    <p class="big">énergie (kWh) = puissance (kW) × durée (h)</p>
+    <p>1 kW = 1 000 W. Un radiateur de 1 000 W allumé pendant 1 heure consomme 1 kWh. Attention : c'est bien kW <strong>×</strong> h, pas kW par heure ! Sur la facture, on paie chaque kWh.</p>
+    <div class="box">
+      <h3>La facture du mois</h3>
+      <p class="soft">Allume des appareils et règle combien d'heures par jour ils marchent. Le mois compte 30 jours.</p>
+      <div class="apps" id="apps"></div>
+      <div class="inputs">
+        <label for="ePrice">Prix d'un kWh (€)<input id="ePrice" type="text" inputmode="decimal" autocomplete="off" value="0,25"></label>
+      </div>
+      <div class="verdict mid" id="eOut" aria-live="polite"></div>
+      <p class="soft">Le prix d'un kWh change selon le pays et le contrat : souvent environ 0,20 € à 0,30 €. Mets celui de ta facture si tu le connais. Les puissances sont des ordres de grandeur.</p>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · La voiture</span>
+    <h2>Des litres pour 100 kilomètres</h2>
+    <p>La consommation d'une voiture s'écrit en <strong>L/100 km</strong> : le nombre de litres de carburant pour rouler 100 km. Une voiture à 6 L/100 km brûle 6 litres tous les 100 km. C'est une grandeur quotient, mais « pour 100 » au lieu de « pour 1 », car « 0,06 litre par kilomètre » serait peu parlant.</p>
+    <p class="big">litres = consommation × distance ÷ 100</p>
+    <div class="box">
+      <h3>Préparer un voyage</h3>
+      <div class="param"><label for="cC">Consommation : <span class="mono" id="cCo"></span></label><input id="cC" type="range" min="3" max="12" step="0.1" value="6.5"></div>
+      <div class="inputs">
+        <label for="cD">Distance (km)<input id="cD" type="text" inputmode="decimal" autocomplete="off" value="350"></label>
+        <label for="cP">Prix d'un litre (€)<input id="cP" type="text" inputmode="decimal" autocomplete="off" value="1,80"></label>
+        <label for="cT">Réservoir (L)<input id="cT" type="text" inputmode="decimal" autocomplete="off" value="50"></label>
+      </div>
+      <div class="methods" id="carOut" aria-live="polite"></div>
+    </div>
+    <p class="soft">Pour les voitures électriques, on parle plutôt de kWh/100 km : souvent environ 15 à 20 kWh pour 100 km.</p>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · La densité de population</span>
+    <h2>Combien d'habitants par km² ?</h2>
+    <p>La <strong>densité de population</strong> dit combien de personnes vivent, en moyenne, sur 1 km² (un carré de 1 km de côté).</p>
+    <p class="big">densité = nombre d'habitants ÷ superficie (km²)</p>
+    <div class="box">
+      <h3>Compare les pays</h3>
+      <label for="dSel" style="font-weight:700">Choisis un pays</label>
+      <select id="dSel"></select>
+      <div class="methods" id="dOut" aria-live="polite"></div>
+      <div class="bars" id="dBars"></div>
+      <p class="soft">Chiffres arrondis, environ (années 2020). Monaco dépasse l'échelle : sa barre est coupée.</p>
+    </div>
+    <div class="box">
+      <h3>Et ta ville ?</h3>
+      <div class="inputs">
+        <label for="tPop">Habitants<input id="tPop" type="text" inputmode="decimal" autocomplete="off" value="20 000"></label>
+        <label for="tArea">Superficie (km²)<input id="tArea" type="text" inputmode="decimal" autocomplete="off" value="12,5"></label>
+      </div>
+      <p class="big" id="tOut" aria-live="polite"></p>
+    </div>
+    <div class="note">
+      <span class="note-title">C'est une moyenne</span>
+      <span>Au Canada, il y a environ 4 habitants par km² en moyenne. Pourtant, des millions de gens vivent serrés à Toronto ou Montréal, et le Grand Nord est presque vide. La densité ne dit pas comment les gens sont répartis.</span>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Le prix au kilo</span>
+    <h2>Quel paquet est le moins cher ?</h2>
+    <p>Au supermarché, comparer les prix des paquets ne suffit pas : ils n'ont pas la même taille. On calcule le <strong>prix au kilo</strong> (ou au litre, ou à l'unité) : prix ÷ quantité. C'est aussi une grandeur quotient, en €/kg.</p>
+    <p>Exemple : 500 g de pâtes à 1,10 €. 500 g = 0,5 kg, donc 1,10 ÷ 0,5 = <span class="hl">2,20 €/kg</span>. Pense à convertir les grammes en kilos avant de diviser !</p>
+    <div class="box">
+      <h3>Le jeu du meilleur prix</h3>
+      <p class="soft" id="gTitle"></p>
+      <div class="packs" id="packs"></div>
+      <div class="verdict" id="gOut" aria-live="polite"></div>
+      <div class="btns">
+        <button type="button" id="gNew">Nouveaux paquets</button>
+        <span class="score" id="gScore">0 / 0</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Les conversions</span>
+    <h2>Convertir une unité composée</h2>
+    <p>La méthode marche pour toutes les unités composées : on <strong>remplace chaque unité</strong> du haut et du bas par sa valeur dans la nouvelle unité, puis on calcule. Pour m/s et km/h, le tutoriel sur <a class="tlink" href="la-vitesse.html">la vitesse</a> donne le raccourci : 1 m/s = 3,6 km/h.</p>
+    <div class="box">
+      <h3>Le convertisseur pas à pas</h3>
+      <div class="inputs">
+        <label for="kX">Valeur<input id="kX" type="text" inputmode="decimal" autocomplete="off" value="2,7"></label>
+        <label for="kSel">Conversion<select id="kSel"></select></label>
+      </div>
+      <ol class="steps" id="kSteps" aria-live="polite"></ol>
+    </div>
+    <div class="note">
+      <span class="note-title">Retiens ces trois-là</span>
+      <span class="mono">1 g/cm³ = 1 000 kg/m³ &nbsp;·&nbsp; 1 L/min = 0,06 m³/h &nbsp;·&nbsp; 1 m/s = 3,6 km/h</span>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Un peu d'histoire</span>
+    <h2>Eurêka !</h2>
+    <ol class="timeline">
+      <li><span class="when">III<sup>e</sup> s. av. J.-C.</span><div class="what"><strong>Archimède, à Syracuse</strong><span>Dans son livre <em>Des corps flottants</em>, il explique qu'un objet plongé dans un liquide est poussé vers le haut par une force égale au poids du liquide qu'il déplace. C'est pour cela que certains objets flottent.</span></div></li>
+      <li><span class="when">I<sup>er</sup> s. av. J.-C.</span><div class="what"><strong>La légende de la couronne</strong><span>L'architecte romain Vitruve, environ deux siècles plus tard, raconte une histoire : le roi Hiéron soupçonne son orfèvre d'avoir mélangé de l'argent à l'or de sa couronne. Archimède, en entrant dans son bain, voit l'eau monter et comprend qu'il peut mesurer le volume de la couronne. Il crie « Eurêka ! » (« J'ai trouvé ! »). <strong>C'est une légende</strong> : rien ne prouve qu'elle soit vraie, et la différence d'eau serait très petite à mesurer.</span></div></li>
+      <li><span class="when">fin du XVIII<sup>e</sup> s.</span><div class="what"><strong>Le système métrique</strong><span>En France, on définit le gramme à partir de l'eau : la masse d'un centimètre cube d'eau pure. Voilà pourquoi l'eau a une masse volumique de 1 g/cm³ « tout rond » : ce n'est pas un hasard, c'est un choix !</span></div></li>
+      <li><span class="when">XIX<sup>e</sup> s.</span><div class="what"><strong>Le watt</strong><span>L'unité de puissance prend le nom de James Watt, l'ingénieur écossais qui a amélioré la machine à vapeur au XVIII<sup>e</sup> siècle. Avec l'arrivée de l'électricité dans les maisons, les compteurs se mettent à compter des kilowattheures.</span></div></li>
+    </ol>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · Attention</span>
+    <h2>Les erreurs fréquentes</h2>
+    <div class="box">
+      <ul class="errs">
+        <li><span class="bad">kWh = kilowatts par heure</span><span class="good">kWh = kilowatts × heures</span><span class="soft">C'est un produit : il n'y a pas de « / » dans kWh.</span></li>
+        <li><span class="bad">2 000 W × 3 h = 6 000 kWh</span><span class="good">2 000 W × 3 h = 6 000 Wh = 6 kWh</span><span class="soft">Convertis les watts en kilowatts : 2 000 W = 2 kW.</span></li>
+        <li><span class="bad">2,7 g/cm³ = 2,7 kg/m³</span><span class="good">2,7 g/cm³ = 2 700 kg/m³</span><span class="soft">Il faut convertir le haut ET le bas de l'unité.</span></li>
+        <li><span class="bad">C'est lourd, donc ça coule.</span><span class="good">Ça coule si la masse volumique dépasse celle du liquide.</span><span class="soft">Un énorme bateau en acier flotte : il est creux, plein d'air.</span></li>
+        <li><span class="bad">6 L/100 km sur 300 km : 6 × 300 = 1 800 L</span><span class="good">6 × 300 ÷ 100 = 18 L</span><span class="soft">N'oublie pas le « pour 100 ».</span></li>
+        <li><span class="bad">densité = superficie ÷ habitants</span><span class="good">densité = habitants ÷ superficie</span><span class="soft">L'unité hab/km² te le rappelle : habitants en haut, km² en bas.</span></li>
+        <li><span class="bad">Le plus gros paquet est toujours le moins cher.</span><span class="good">On compare les prix au kilo.</span><span class="soft">Parfois le petit format, ou la promo, revient moins cher.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Écris seulement un nombre, dans l'unité demandée.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Nouvelles questions</button>
+    </div>
+  </section>
+
+  <!-- 12 -->
+  <section>
+    <span class="eyebrow">Étape 12 · À toi de jouer</span>
+    <h2>Six problèmes</h2>
+    <div class="exos">
+      <details>
+        <summary>Douche ou bain ?<span class="q">Une douche de 8 minutes avec un pommeau à 10 L/min, ou un bain de 150 L : quelle est la différence d'eau ?</span></summary>
+        <div><span>Douche : 10 × 8 = 80 L. Bain : 150 L. La douche économise 150 − 80 = <strong>70 L</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Le lingot mystère<span class="q">Un lingot de 500 cm³ a une masse de 9,65 kg. Dans quelle matière est-il ? (or : 19,3 g/cm³ ; plomb : 11,3 g/cm³)</span></summary>
+        <div><span>9,65 kg = 9 650 g. Masse volumique : 9 650 ÷ 500 = 19,3 g/cm³. C'est <strong>de l'or</strong>.</span></div>
+      </details>
+      <details>
+        <summary>La console de jeux<span class="q">Une console de 150 W marche 2 h par jour pendant 30 jours. Le kWh coûte 0,25 €. Combien ça coûte ?</span></summary>
+        <div><span>Par jour : 0,15 kW × 2 h = 0,3 kWh. En 30 jours : 0,3 × 30 = 9 kWh. Coût : 9 × 0,25 = <strong>2,25 €</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Le plein<span class="q">Une voiture consomme 6 L/100 km. Combien de litres pour 350 km ? Et combien de km avec un réservoir de 45 L ?</span></summary>
+        <div><span>350 km : 6 × 350 ÷ 100 = <strong>21 L</strong>.</span><span>Avec 45 L : 45 ÷ 6 = 7,5 « centaines de km », soit 7,5 × 100 = <strong>750 km</strong>.</span></div>
+      </details>
+      <details>
+        <summary>La Suisse<span class="q">La Suisse compte environ 9 millions d'habitants pour environ 41 300 km². Quelle est sa densité ?</span></summary>
+        <div><span>9 000 000 ÷ 41 300 ≈ <strong>218 hab/km²</strong> (environ).</span></div>
+      </details>
+      <details>
+        <summary>La pompe<span class="q">Une pompe a un débit de 36 m³/h. Combien de litres par minute ?</span></summary>
+        <div><span>36 m³ = 36 000 L et 1 h = 60 min. 36 000 ÷ 60 = <strong>600 L/min</strong>.</span></div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• Une <strong>grandeur quotient</strong> divise deux grandeurs (unité avec « / », qui se lit « par ») : vitesse en km/h, débit en L/min, masse volumique en g/cm³, densité en hab/km², prix en €/kg.</span>
+      <span>• Une <strong>grandeur produit</strong> multiplie deux grandeurs : énergie en kWh (kW × h), aire en m² (m × m).</span>
+      <span>• Avec une grandeur quotient, on retrouve les autres : volume = débit × durée, durée = volume ÷ débit, masse = masse volumique × volume.</span>
+      <span>• Un objet <strong>flotte</strong> si sa masse volumique est plus petite que celle du liquide (eau : 1 g/cm³).</span>
+      <span>• Pour convertir, on remplace <strong>le haut et le bas</strong> de l'unité : 1 g/cm³ = 1 000 kg/m³, 1 L/min = 0,06 m³/h.</span>
+    </div>
+  </section>
+
+  <!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"><a class="prev" href="la-vitesse.html"><span>← Précédent</span><strong>La vitesse</strong></a><a class="next" href="les-conversions.html"><span>Suivant →</span><strong>Les conversions d&#x27;unités</strong></a></div><a class="tnav-home" href="index.html">⌂ Tous les tutoriels</a></nav><!--/tnav-->
+<footer>Fiche de révision · Les grandeurs composées</footer>
+</main>
+
+<script>
+(function () {
+  /*
+   * Test hooks : window.__gc
+   *   flowTime(V, D)            → durée en min pour V litres à D L/min (Infinity si D ≤ 0)
+   *   levelAt(V, D, t)          → litres dans la baignoire après t min (plafonné à V)
+   *   lminToM3h(x), m3hToLmin(x)
+   *   rho(m, V)                 → masse volumique m ÷ V (NaN si V ≤ 0)
+   *   floatState(rObj, rLiq)    → { state: 'flotte' | 'coule' | 'entre deux eaux', sub: fraction immergée (0..1) }
+   *   crownVolume(m, pAg)       → volume (cm³) d'une couronne de m g avec une part pAg (0..1) d'argent
+   *   energyKWh(watts, hours)   → kWh
+   *   monthly(watts, hoursPerDay, pricePerKWh) → { kwh, cost } sur 30 jours
+   *   carLitres(c, d), autonomy(tankL, c) → km
+   *   density(pop, area)        → hab/km² (NaN si area ≤ 0)
+   *   unitPrice(price, qty)     → prix par unité de quantité
+   *   convert(x, kind)          → { value, steps[] } ; kind ∈ 'kmh-ms','ms-kmh','gcm3-kgm3','kgm3-gcm3','lmin-m3h','m3h-lmin'
+   *   classify(unit)            → 'P' (produit) | 'Q' (quotient) | undefined
+   *   fmt(x, d), num(s)
+   */
+  var NS = 'http://www.w3.org/2000/svg';
+  function fmt(x, d) { if (!isFinite(x)) return '∞'; var r = Math.round(x * 1e6) / 1e6; if (Object.is(r, -0)) r = 0; return r.toLocaleString('fr-FR', { maximumFractionDigits: d == null ? 3 : d }).replace('-', '−'); }
+  function money(x) { return (Math.round(x * 100) / 100).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+  function num(s) { var t = String(s).replace(/\s/g, '').replace(/[−–]/g, '-').replace(',', '.'); if (t === '') return NaN; var x = Number(t); return isFinite(x) ? x : NaN; }
+  function mk(svg, name, attrs, text) { var e = document.createElementNS(NS, name); for (var a in attrs) e.setAttribute(a, attrs[a]); if (text != null) e.textContent = text; svg.appendChild(e); return e; }
+  function clear(el) { while (el.firstChild) el.removeChild(el.firstChild); }
+  function $(id) { return document.getElementById(id); }
+  function eqs(x, d) { var p = Math.pow(10, d == null ? 3 : d); return Math.abs(x * p - Math.round(x * p)) < 1e-6 ? '= ' : '≈ '; }
+
+  /* ---------- Maths ---------- */
+  function flowTime(V, D) { return D > 0 ? V / D : Infinity; }
+  function levelAt(V, D, t) { return Math.min(V, Math.max(0, D * t)); }
+  function lminToM3h(x) { return x * 60 / 1000; }
+  function m3hToLmin(x) { return x * 1000 / 60; }
+  function rho(m, V) { return V > 0 ? m / V : NaN; }
+  function floatState(r, rl) {
+    if (Math.abs(r - rl) < 1e-9) return { state: 'entre deux eaux', sub: 1 };
+    if (r < rl) return { state: 'flotte', sub: r / rl };
+    return { state: 'coule', sub: 1 };
+  }
+  function crownVolume(m, pAg) { return m * (1 - pAg) / 19.3 + m * pAg / 10.5; }
+  function energyKWh(w, h) { return w / 1000 * h; }
+  function monthly(w, h, price) { var k = energyKWh(w, h) * 30; return { kwh: k, cost: k * price }; }
+  function carLitres(c, d) { return c * d / 100; }
+  function autonomy(tank, c) { return c > 0 ? tank / c * 100 : Infinity; }
+  function density(pop, area) { return area > 0 ? pop / area : NaN; }
+  function unitPrice(price, q) { return q > 0 ? price / q : NaN; }
+
+  var KINDS = {
+    'kmh-ms': { label: 'km/h → m/s', a: 'km', b: 'h', c: 'm', d: 's', nf: 1000, nfT: '1 000', df: 3600, dfT: '3 600', fin: function (x) { return fmt(x) + ' × 1 000 ÷ 3 600 = ' + fmt(x) + ' ÷ 3,6'; } },
+    'ms-kmh': { label: 'm/s → km/h', a: 'm', b: 's', c: 'km', d: 'h', nf: 0.001, nfT: '0,001', df: 1 / 3600, dfT: '1/3 600', fin: function (x) { return fmt(x) + ' × 0,001 × 3 600 = ' + fmt(x) + ' × 3,6'; } },
+    'gcm3-kgm3': { label: 'g/cm³ → kg/m³', a: 'g', b: 'cm³', c: 'kg', d: 'm³', nf: 0.001, nfT: '0,001', df: 0.000001, dfT: '0,000 001', fin: function (x) { return fmt(x) + ' × 0,001 ÷ 0,000 001 = ' + fmt(x) + ' × 1 000'; } },
+    'kgm3-gcm3': { label: 'kg/m³ → g/cm³', a: 'kg', b: 'm³', c: 'g', d: 'cm³', nf: 1000, nfT: '1 000', df: 1000000, dfT: '1 000 000', fin: function (x) { return fmt(x) + ' × 1 000 ÷ 1 000 000 = ' + fmt(x) + ' ÷ 1 000'; } },
+    'lmin-m3h': { label: 'L/min → m³/h', a: 'L', b: 'min', c: 'm³', d: 'h', nf: 0.001, nfT: '0,001', df: 1 / 60, dfT: '1/60', fin: function (x) { return fmt(x) + ' × 0,001 × 60 = ' + fmt(x) + ' × 0,06'; } },
+    'm3h-lmin': { label: 'm³/h → L/min', a: 'm³', b: 'h', c: 'L', d: 'min', nf: 1000, nfT: '1 000', df: 60, dfT: '60', fin: function (x) { return fmt(x) + ' × 1 000 ÷ 60'; } }
+  };
+  function convert(x, kind) {
+    var K = KINDS[kind]; if (!K || !isFinite(x)) return { value: NaN, steps: [] };
+    var v = x * K.nf / K.df;
+    var steps = [
+      ['1 ' + K.a + ' = ' + K.nfT + ' ' + K.c, 'On convertit l\'unité du haut.'],
+      ['1 ' + K.b + ' = ' + K.dfT + ' ' + K.d, 'On convertit l\'unité du bas.'],
+      [fmt(x) + ' ' + K.a + '/' + K.b + ' = ' + fmt(x) + ' × ' + K.nfT + ' ' + K.c + ' ÷ (' + K.dfT + ' ' + K.d + ')', 'On remplace chaque unité.'],
+      [K.fin(x), (K.df < 1 ? 'Diviser par ' + K.dfT + ', c\'est multiplier par ' + fmt(1 / K.df) + '.' : 'On calcule.')],
+      ['= ' + fmt(v, 6) + ' ' + K.c + '/' + K.d, 'Résultat.']
+    ];
+    return { value: v, steps: steps };
+  }
+
+  /* ---------- Étape 1 : trieur ---------- */
+  var UNITS = [
+    { u: 'km/h', k: 'Q', why: 'des kilomètres ÷ des heures (une vitesse)' },
+    { u: 'kWh', k: 'P', why: 'des kilowatts × des heures (une énergie)' },
+    { u: 'g/cm³', k: 'Q', why: 'des grammes ÷ des cm³ (une masse volumique)' },
+    { u: 'm²', k: 'P', why: 'des mètres × des mètres (une aire)' },
+    { u: 'hab/km²', k: 'Q', why: 'des habitants ÷ des km² (une densité)' },
+    { u: 'L/min', k: 'Q', why: 'des litres ÷ des minutes (un débit)' },
+    { u: '€/kg', k: 'Q', why: 'des euros ÷ des kilos (un prix au kilo)' },
+    { u: 'm³', k: 'P', why: 'm × m × m (un volume)' },
+    { u: 'L/100 km', k: 'Q', why: 'des litres ÷ des centaines de km (une consommation)' },
+    { u: 'mAh', k: 'P', why: 'des milliampères × des heures (la charge d\'une batterie de téléphone)' }
+  ];
+  function classify(u) { for (var i = 0; i < UNITS.length; i++) if (UNITS[i].u === u) return UNITS[i].k; return undefined; }
+  var sortOk = [];
+  UNITS.forEach(function (it, i) {
+    var li = document.createElement('li');
+    li.innerHTML = '<span class="u">' + it.u + '</span><span class="btns"><button type="button" id="sp' + i + '" aria-label="' + it.u + ' : produit">× produit</button><button type="button" id="sq' + i + '" aria-label="' + it.u + ' : quotient">÷ quotient</button></span><span class="fb" id="sf' + i + '" aria-live="polite"></span>';
+    $('sorter').appendChild(li);
+    function answer(k) {
+      $('sp' + i).setAttribute('aria-pressed', k === 'P' ? 'true' : 'false');
+      $('sq' + i).setAttribute('aria-pressed', k === 'Q' ? 'true' : 'false');
+      var fb = $('sf' + i), good = k === it.k;
+      sortOk[i] = good;
+      fb.className = 'fb ' + (good ? 'ok' : 'no');
+      fb.textContent = (good ? 'Oui : ' : 'Non, c\'est un ' + (it.k === 'P' ? 'produit' : 'quotient') + ' : ') + it.why + '.';
+      $('sortScore').textContent = sortOk.filter(Boolean).length + ' / 10';
+    }
+    $('sp' + i).addEventListener('click', function () { answer('P'); });
+    $('sq' + i).addEventListener('click', function () { answer('Q'); });
+  });
+
+  /* ---------- Étape 2 : baignoire ---------- */
+  var bV = $('bV'), bD = $('bD'), bT = $('bT'), bath = $('bath');
+  var bt = 0, playing = false, lastTs = null;
+  function minSec(t) {
+    if (!isFinite(t)) return '∞';
+    var s = Math.round(t * 60), h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), r = s % 60;
+    return ((h ? h + ' h ' : '') + (h || m ? m + ' min' : '') + (r ? ' ' + r + ' s' : (h || m ? '' : '0 s'))).trim();
+  }
+  function bathParams() { return { V: parseFloat(bV.value), D: parseFloat(bD.value) }; }
+  function bathSetup() {
+    var p = bathParams(), tf = flowTime(p.V, p.D);
+    $('bVo').textContent = fmt(p.V) + ' L';
+    $('bDo').textContent = fmt(p.D) + ' L/min';
+    bT.max = String(Math.ceil(tf) + 1);
+    if (bt > Math.ceil(tf) + 1) bt = Math.ceil(tf) + 1;
+    $('bOut').innerHTML = 'Durée pour remplir : ' + fmt(p.V) + ' ÷ ' + fmt(p.D) + ' ' + eqs(tf, 2) + fmt(tf, 2) + ' min, soit ' + minSec(tf) + '.' +
+      '<span class="mono">Débit en m³/h : ' + fmt(p.D) + ' × 60 ÷ 1 000 = ' + fmt(lminToM3h(p.D)) + ' m³/h</span>';
+    bathDraw();
+  }
+  function bathDraw() {
+    var p = bathParams(), lv = levelAt(p.V, p.D, bt), full = p.D * bt >= p.V - 1e-9;
+    bT.value = String(bt);
+    $('bTo').textContent = fmt(bt, 1) + ' min';
+    clear(bath);
+    var X0 = 40, X1 = 280, Y0 = 80, Y1 = 176, H = Y1 - Y0;
+    var defs = mk(bath, 'defs', {}), cp = document.createElementNS(NS, 'clipPath'); cp.setAttribute('id', 'tubClip'); defs.appendChild(cp);
+    var tubD = 'M' + X0 + ' ' + Y0 + ' L' + X1 + ' ' + Y0 + ' L' + X1 + ' ' + (Y1 - 26) + ' Q' + X1 + ' ' + Y1 + ' ' + (X1 - 30) + ' ' + Y1 + ' L' + (X0 + 30) + ' ' + Y1 + ' Q' + X0 + ' ' + Y1 + ' ' + X0 + ' ' + (Y1 - 26) + ' Z';
+    var cpp = document.createElementNS(NS, 'path'); cpp.setAttribute('d', tubD); cp.appendChild(cpp);
+    var h = H * lv / p.V;
+    mk(bath, 'rect', { x: X0, y: Y1 - h, width: X1 - X0, height: h + 1, fill: 'var(--water)', 'clip-path': 'url(#tubClip)' });
+    if (h > 1) mk(bath, 'line', { x1: X0, y1: Y1 - h, x2: X1, y2: Y1 - h, stroke: 'var(--acc)', 'stroke-width': 2, 'clip-path': 'url(#tubClip)' });
+    mk(bath, 'path', { d: tubD, fill: 'none', stroke: 'var(--ink)', 'stroke-width': 3 });
+    mk(bath, 'line', { x1: X0 + 34, y1: Y1, x2: X0 + 26, y2: Y1 + 16, stroke: 'var(--ink)', 'stroke-width': 3 });
+    mk(bath, 'line', { x1: X1 - 34, y1: Y1, x2: X1 - 26, y2: Y1 + 16, stroke: 'var(--ink)', 'stroke-width': 3 });
+    // robinet
+    mk(bath, 'path', { d: 'M296 80 L296 30 L246 30 L246 42', fill: 'none', stroke: 'var(--ink)', 'stroke-width': 6, 'stroke-linejoin': 'round' });
+    var running = !full && (playing || bt > 0);
+    if (running) mk(bath, 'rect', { x: 242, y: 44, width: 8, height: Math.max(0, Y1 - h - 44), fill: 'var(--water)' });
+    mk(bath, 'text', { x: 14, y: 26, 'font-size': 17, 'font-weight': 600 }, fmt(lv, 1) + ' L / ' + fmt(p.V) + ' L');
+    mk(bath, 'text', { x: 14, y: 50, 'font-size': 14, fill: 'var(--ink-soft)' }, full ? 'Pleine ! Ferme le robinet.' : Math.round(100 * lv / p.V) + ' % rempli');
+    $('bNow').textContent = 'Après ' + minSec(bt) + ' : ' + fmt(p.D) + ' × ' + fmt(bt, 2) + ' = ' + fmt(p.D * bt, 1) + ' L' + (full ? ' → la baignoire (' + fmt(p.V) + ' L) est pleine' + (p.D * bt > p.V + 1e-9 ? ', le reste déborderait !' : '.') : '.') ;
+  }
+  function setPlaying(on) { playing = on; $('bPlay').textContent = on ? '⏸ Pause' : '▶ Ouvrir le robinet'; $('bPlay').setAttribute('aria-pressed', on ? 'true' : 'false'); lastTs = null; if (on) requestAnimationFrame(tick); bathDraw(); }
+  function tick(ts) {
+    if (!playing) return;
+    var p = bathParams(), tf = flowTime(p.V, p.D);
+    if (lastTs !== null) bt += (ts - lastTs) / 1000 * tf / 6; // toute la baignoire en environ 6 secondes
+    lastTs = ts;
+    if (bt >= tf) { bt = tf; setPlaying(false); return; }
+    bathDraw();
+    requestAnimationFrame(tick);
+  }
+  $('bPlay').addEventListener('click', function () { var p = bathParams(); if (!playing && bt >= flowTime(p.V, p.D) - 1e-9) bt = 0; setPlaying(!playing); });
+  $('bEnd').addEventListener('click', function () { var p = bathParams(); bt = flowTime(p.V, p.D); setPlaying(false); });
+  $('bReset').addEventListener('click', function () { bt = 0; setPlaying(false); });
+  bT.addEventListener('input', function () { bt = parseFloat(bT.value); if (playing) { playing = false; $('bPlay').textContent = '▶ Ouvrir le robinet'; $('bPlay').setAttribute('aria-pressed', 'false'); } bathDraw(); });
+  bV.addEventListener('input', bathSetup); bD.addEventListener('input', bathSetup);
+  bathSetup();
+
+  /* ---------- Étape 3 : flotte ou coule ---------- */
+  var LIQS = [{ n: 'Eau douce', r: 1 }, { n: 'Eau de mer', r: 1.03 }, { n: 'Mer Morte (très salée)', r: 1.24 }];
+  var MATS = [
+    { n: 'Polystyrène', r: 0.03 }, { n: 'Liège', r: 0.24 }, { n: 'Bois de chêne', r: 0.75 }, { n: 'Bougie', r: 0.9 }, { n: 'Glace', r: 0.92 },
+    { n: 'Œuf frais', r: 1.08 }, { n: 'Plastique PET', r: 1.38 }, { n: 'Verre', r: 2.5 }, { n: 'Aluminium', r: 2.7 }, { n: 'Fer', r: 7.9 },
+    { n: 'Plomb', r: 11.3 }, { n: 'Or', r: 19.3 }
+  ];
+  var liq = 0, mat = 4, custom = false;
+  LIQS.forEach(function (L, i) { var b = document.createElement('button'); b.type = 'button'; b.id = 'lq' + i; b.textContent = L.n; b.addEventListener('click', function () { liq = i; floatRun(); }); $('liqs').appendChild(b); });
+  MATS.forEach(function (M, i) { var b = document.createElement('button'); b.type = 'button'; b.id = 'mt' + i; b.textContent = M.n; b.addEventListener('click', function () { mat = i; custom = false; $('fM').value = ''; $('fV').value = ''; floatRun(); }); $('mats').appendChild(b); });
+  var tank = $('tank'), SURF = 70, FLOOR = 206, S = 52, objG;
+  (function drawTank() {
+    mk(tank, 'rect', { x: 20, y: SURF, width: 280, height: FLOOR - SURF, fill: 'var(--water)', opacity: 0.75 });
+    mk(tank, 'line', { x1: 20, y1: SURF, x2: 300, y2: SURF, stroke: 'var(--acc)', 'stroke-width': 2, 'stroke-dasharray': '6 4' });
+    mk(tank, 'path', { d: 'M20 24 L20 ' + FLOOR + ' L300 ' + FLOOR + ' L300 24', fill: 'none', stroke: 'var(--ink)', 'stroke-width': 3 });
+    objG = mk(tank, 'g', { id: 'obj' });
+    mk(objG, 'rect', { x: 134, y: 0, width: S, height: S, rx: 4, fill: 'var(--card)', stroke: 'var(--ink)', 'stroke-width': 2.5, id: 'objR' });
+    mk(objG, 'text', { x: 160, y: S / 2 + 6, 'text-anchor': 'middle', 'font-size': 15, 'font-weight': 600, id: 'objT' }, '');
+    mk(tank, 'text', { x: 30, y: SURF - 8, 'font-size': 13, fill: 'var(--ink-soft)', id: 'liqT' }, '');
+  })();
+  function floatRun() {
+    var rl = LIQS[liq].r, r, name;
+    LIQS.forEach(function (L, i) { $('lq' + i).setAttribute('aria-pressed', i === liq ? 'true' : 'false'); });
+    if (custom) {
+      var m = num($('fM').value), V = num($('fV').value);
+      MATS.forEach(function (M, i) { $('mt' + i).setAttribute('aria-pressed', 'false'); });
+      if (isNaN(m) || isNaN(V) || m <= 0 || V <= 0) { $('fOut').className = 'verdict'; $('fOut').innerHTML = '<span class="err">Écris une masse et un volume positifs.</span>'; return; }
+      r = rho(m, V); name = 'Ton objet';
+      name += ' (' + fmt(m) + ' g ÷ ' + fmt(V) + ' cm³ ' + eqs(r) + fmt(r) + ' g/cm³)';
+    } else {
+      r = MATS[mat].r; name = MATS[mat].n;
+      MATS.forEach(function (M, i) { $('mt' + i).setAttribute('aria-pressed', i === mat ? 'true' : 'false'); });
+    }
+    var st = floatState(r, rl), top;
+    if (st.state === 'flotte') top = SURF - S + st.sub * S;
+    else if (st.state === 'coule') top = FLOOR - S - 2;
+    else top = (SURF + FLOOR - S) / 2;
+    objG.style.transform = 'translateY(' + top + 'px)';
+    objG.setAttribute('transform', 'translate(0 ' + top + ')');
+    $('objT').textContent = fmt(r, 2);
+    $('liqT').textContent = LIQS[liq].n + ' : ' + fmt(rl, 2) + ' g/cm³';
+    var o = $('fOut'), cmp = st.state === 'flotte' ? '<' : st.state === 'coule' ? '>' : '=';
+    o.className = 'verdict ' + (st.state === 'flotte' ? 'yes' : st.state === 'coule' ? 'no' : 'mid');
+    o.innerHTML = (st.state === 'flotte' ? 'Ça flotte !' : st.state === 'coule' ? 'Ça coule !' : 'Ça reste entre deux eaux.') +
+      '<span>' + name + ' : environ ' + fmt(r, 3) + ' g/cm³ ' + cmp + ' ' + fmt(rl, 2) + ' g/cm³ (' + LIQS[liq].n.toLowerCase() + ').</span>' +
+      '<span class="mono">En kg/m³ : ' + fmt(r * 1000) + ' kg/m³</span>' +
+      (st.state === 'flotte' ? '<span>Environ ' + Math.round(st.sub * 100) + ' % du cube est sous la surface (' + fmt(r, 3) + ' ÷ ' + fmt(rl, 2) + ').</span>' : '');
+  }
+  function customIn() { custom = $('fM').value.trim() !== '' || $('fV').value.trim() !== ''; floatRun(); }
+  $('fM').addEventListener('input', customIn); $('fV').addEventListener('input', customIn);
+  floatRun();
+
+  /* Couronne */
+  var V0 = crownVolume(1000, 0), VMAX = crownVolume(1000, 0.5);
+  function crown() {
+    var p = parseInt($('cAg').value, 10) / 100, V = crownVolume(1000, p), r = 1000 / V;
+    $('cAgo').textContent = Math.round(p * 100) + ' %';
+    function bar(label, v, sel) { return '<div class="bar' + (sel ? ' sel' : '') + '"><span class="n">' + label + '</span><span class="t"><span class="f" style="width:' + (100 * v / VMAX).toFixed(1) + '%"></span><span class="v">' + fmt(v, 1) + ' cm³</span></span></div>'; }
+    $('crownBars').innerHTML = bar('Or pur', V0, false) + bar('La couronne', V, true);
+    $('crownOut').textContent = 'Eau déplacée : ' + fmt(V, 1) + ' cm³ au lieu de ' + fmt(V0, 1) + ' cm³ → ' + fmt(r, 2) + ' g/cm³' + (p > 0 ? ' : l\'orfèvre a triché !' : ' : c\'est de l\'or pur.');
+  }
+  $('cAg').addEventListener('input', crown); crown();
+
+  /* ---------- Étape 4 : énergie ---------- */
+  var APPS = [
+    { n: 'Lampe LED', w: 8, h: 5 }, { n: 'Chargeur de téléphone', w: 10, h: 2 }, { n: 'Ordinateur portable', w: 50, h: 3 },
+    { n: 'Télévision', w: 100, h: 3 }, { n: 'Console de jeux', w: 150, h: 2 }, { n: 'Réfrigérateur (en moyenne)', w: 40, h: 24 },
+    { n: 'Bouilloire', w: 2000, h: 0.1 }, { n: 'Sèche-cheveux', w: 1800, h: 0.2 }, { n: 'Radiateur électrique', w: 1500, h: 4 }
+  ];
+  var appOn = [false, false, true, false, true, false, false, false, false];
+  APPS.forEach(function (A, i) {
+    var d = document.createElement('div'); d.className = 'app'; d.id = 'ap' + i;
+    d.innerHTML = '<button type="button" id="ab' + i + '">' + A.n + ' · ' + fmt(A.w) + ' W</button><label><span class="lbl">heures/jour</span><input type="text" id="ah' + i + '" inputmode="decimal" autocomplete="off" value="' + fmt(A.h) + '" aria-label="Heures par jour : ' + A.n + '"></label><span class="r" id="ar' + i + '"></span>';
+    $('apps').appendChild(d);
+    $('ab' + i).addEventListener('click', function () { appOn[i] = !appOn[i]; energy(); });
+    $('ah' + i).addEventListener('input', energy);
+  });
+  $('ePrice').addEventListener('input', energy);
+  function energy() {
+    var price = num($('ePrice').value), tot = 0, bad = false, any = false;
+    APPS.forEach(function (A, i) {
+      var on = appOn[i], h = num($('ah' + i).value), r = $('ar' + i);
+      $('ab' + i).setAttribute('aria-pressed', on ? 'true' : 'false');
+      $('ap' + i).className = 'app' + (on ? ' on' : '');
+      if (!on) { r.textContent = 'Éteint.'; return; }
+      if (isNaN(h) || h < 0 || h > 24) { r.innerHTML = '<span class="err">Entre 0 et 24 heures.</span>'; bad = true; return; }
+      any = true;
+      var kd = energyKWh(A.w, h), km = kd * 30; tot += km;
+      r.innerHTML = fmt(A.w / 1000) + ' kW × ' + fmt(h) + ' h ' + eqs(kd) + fmt(kd) + ' kWh par jour → × 30 ' + eqs(km) + '<b>' + fmt(km, 2) + ' kWh</b> par mois';
+    });
+    var o = $('eOut');
+    if (isNaN(price) || price < 0) { o.className = 'verdict'; o.innerHTML = '<span class="err">Écris un prix positif pour le kWh.</span>'; return; }
+    if (!any) { o.className = 'verdict'; o.innerHTML = '<span>Allume au moins un appareil.</span>'; return; }
+    o.className = 'verdict mid';
+    o.innerHTML = 'Total : ' + fmt(tot, 2) + ' kWh par mois' + (bad ? ' (sans les lignes en erreur)' : '') + '<span class="mono">Coût : ' + fmt(tot, 2) + ' × ' + fmt(price) + ' ≈ ' + money(tot * price) + ' € par mois</span>';
+  }
+  energy();
+
+  /* ---------- Étape 5 : voiture ---------- */
+  function car() {
+    var c = parseFloat($('cC').value), d = num($('cD').value), pr = num($('cP').value), tk = num($('cT').value), o = $('carOut');
+    $('cCo').textContent = fmt(c, 1) + ' L/100 km';
+    if ([d, pr, tk].some(function (x) { return isNaN(x) || x < 0; })) { o.innerHTML = '<p class="err">Écris des nombres positifs.</p>'; return; }
+    var L = carLitres(c, d), A = autonomy(tk, c);
+    o.innerHTML =
+      '<div class="method"><strong>Carburant</strong><span class="m">' + fmt(c, 1) + ' × ' + fmt(d) + ' ÷ 100</span><span class="m">' + eqs(L, 2) + '<b>' + fmt(L, 2) + ' L</b></span></div>' +
+      '<div class="method"><strong>Prix du trajet</strong><span class="m">' + fmt(L, 2) + ' L × ' + fmt(pr) + ' €</span><span class="m">≈ <b>' + money(L * pr) + ' €</b></span></div>' +
+      '<div class="method"><strong>Avec un plein</strong><span class="m">' + fmt(tk) + ' ÷ ' + fmt(c, 1) + ' × 100</span><span class="m">≈ <b>' + fmt(Math.round(A)) + ' km</b></span>' + (L > tk ? '<span class="err">Il faudra refaire le plein en route !</span>' : '') + '</div>';
+  }
+  ['cC', 'cD', 'cP', 'cT'].forEach(function (id) { $(id).addEventListener('input', car); }); car();
+
+  /* ---------- Étape 6 : densité ---------- */
+  var COUNTRIES = [
+    { n: 'France métropolitaine', p: 66e6, ps: '66 millions', a: 552000 },
+    { n: 'Suisse', p: 9e6, ps: '9 millions', a: 41300 },
+    { n: 'Belgique', p: 11.8e6, ps: '11,8 millions', a: 30700 },
+    { n: 'Canada', p: 40e6, ps: '40 millions', a: 9985000 },
+    { n: 'États-Unis', p: 335e6, ps: '335 millions', a: 9830000 },
+    { n: 'Brésil', p: 203e6, ps: '203 millions', a: 8516000 },
+    { n: 'Russie', p: 146e6, ps: '146 millions', a: 17100000 },
+    { n: 'Chine', p: 1410e6, ps: '1 410 millions', a: 9600000 },
+    { n: 'Inde', p: 1430e6, ps: '1 430 millions', a: 3287000 },
+    { n: 'Japon', p: 124e6, ps: '124 millions', a: 378000 },
+    { n: 'Bangladesh', p: 171e6, ps: '171 millions', a: 148000 },
+    { n: 'Sénégal', p: 18e6, ps: '18 millions', a: 197000 },
+    { n: 'Australie', p: 27e6, ps: '27 millions', a: 7690000 },
+    { n: 'Islande', p: 0.38e6, ps: '380 000', a: 103000 },
+    { n: 'Mongolie', p: 3.4e6, ps: '3,4 millions', a: 1564000 },
+    { n: 'Monaco', p: 38000, ps: '38 000', a: 2 }
+  ];
+  COUNTRIES.forEach(function (C, i) { var op = document.createElement('option'); op.value = String(i); op.textContent = C.n; $('dSel').appendChild(op); });
+  function dRound(x) { return x < 10 ? fmt(x, 1) : fmt(Math.round(x), 0); }
+  var DMAX = 1300;
+  function dens() {
+    var i = parseInt($('dSel').value, 10), C = COUNTRIES[i], d = density(C.p, C.a);
+    $('dOut').innerHTML = '<div class="method"><strong>' + C.n + '</strong><span class="m">environ ' + C.ps + ' d\'habitants</span><span class="m">environ ' + fmt(C.a) + ' km²</span></div>' +
+      '<div class="method"><strong>Densité</strong><span class="m">' + fmt(C.p) + ' ÷ ' + fmt(C.a) + '</span><span class="m">≈ <b>' + dRound(d) + ' hab/km²</b></span></div>';
+    var list = COUNTRIES.map(function (c, j) { return { c: c, j: j, d: density(c.p, c.a) }; }).sort(function (a, b) { return b.d - a.d; });
+    $('dBars').innerHTML = list.map(function (o) {
+      var w = Math.min(100, 100 * o.d / DMAX), clip = o.d > DMAX;
+      return '<div class="bar' + (o.j === i ? ' sel' : '') + (clip ? ' clip' : '') + '"><span class="n" title="' + o.c.n + '">' + o.c.n + '</span><span class="t"><span class="f" style="width:' + Math.max(0.6, w).toFixed(1) + '%"></span><span class="v">' + dRound(o.d) + '</span></span></div>';
+    }).join('');
+  }
+  $('dSel').addEventListener('change', dens); dens();
+  function town() {
+    var p = num($('tPop').value), a = num($('tArea').value), o = $('tOut');
+    if (isNaN(p) || isNaN(a) || p < 0 || a <= 0) { o.innerHTML = '<span class="err">Écris un nombre d\'habitants et une superficie positive.</span>'; return; }
+    var d = density(p, a);
+    o.innerHTML = fmt(p) + ' ÷ ' + fmt(a) + ' ' + eqs(d, 0) + '<b>' + fmt(Math.round(d), 0) + ' hab/km²</b>';
+  }
+  $('tPop').addEventListener('input', town); $('tArea').addEventListener('input', town); town();
+
+  /* ---------- Étape 7 : prix unitaire ---------- */
+  var PRODUCTS = [
+    { n: 'paquet de pâtes', u: 'kg', base: [1.4, 3.2], sizes: [[0.25, '250 g'], [0.5, '500 g'], [0.75, '3 × 250 g'], [1, '1 kg'], [2, '2 kg']] },
+    { n: 'paquet de céréales', u: 'kg', base: [4, 9], sizes: [[0.375, '375 g'], [0.5, '500 g'], [0.75, '750 g'], [1, '1 kg']] },
+    { n: 'jus d\'orange', u: 'L', base: [1.5, 3.5], sizes: [[1, '1 L'], [1.5, '1,5 L'], [1.5, '6 × 25 cL'], [2, '2 L'], [0.75, '75 cL']] },
+    { n: 'yaourts', u: 'yaourt', base: [0.2, 0.6], sizes: [[4, '4 yaourts'], [8, '8 yaourts'], [12, '12 yaourts'], [16, '16 yaourts']] }
+  ];
+  var game = null, gGood = 0, gTot = 0;
+  function rndF(a, b) { return a + Math.random() * (b - a); }
+  function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  function makeGame() {
+    for (var tries = 0; tries < 200; tries++) {
+      var P = PRODUCTS[Math.floor(Math.random() * PRODUCTS.length)], base = rndF(P.base[0], P.base[1]);
+      var sz = shuffle(P.sizes.slice()).slice(0, 3);
+      var packs = sz.map(function (s) { var pr = Math.round(s[0] * base * rndF(0.8, 1.25) * 100) / 100; return { q: s[0], lab: s[1], price: pr, up: unitPrice(pr, s[0]) }; });
+      if (packs.some(function (k) { return k.price < 0.1; })) continue;
+      var ups = packs.map(function (k) { return k.up; }).sort(function (a, b) { return a - b; });
+      if (ups[1] < ups[0] * 1.03) continue;
+      return { P: P, packs: packs, best: packs.map(function (k) { return k.up; }).indexOf(ups[0]) };
+    }
+    return null;
+  }
+  function upText(k, u) { var v = k.up, s = v < 1 ? fmt(v, 3) : money(v); return money(k.price) + ' ÷ ' + fmt(k.q) + (u === 'yaourt' ? '' : ' ' + u) + ' ' + eqs(v, v < 1 ? 3 : 2) + s + (u === 'yaourt' ? ' € le yaourt' : ' €/' + u); }
+  function newGame() {
+    game = makeGame(); game.done = false;
+    $('gTitle').textContent = 'Trois formats de ' + game.P.n + '. Touche le moins cher ' + (game.P.u === 'yaourt' ? 'par yaourt.' : 'au ' + (game.P.u === 'kg' ? 'kilo.' : 'litre.'));
+    $('packs').innerHTML = game.packs.map(function (k, i) { return '<button type="button" class="pack" id="pk' + i + '"><span class="pn">' + k.lab + '</span><span class="pp">' + money(k.price) + ' €</span><span class="pu" id="pu' + i + '"></span></button>'; }).join('');
+    game.packs.forEach(function (k, i) { $('pk' + i).addEventListener('click', function () { choose(i); }); });
+    $('gOut').className = 'verdict'; $('gOut').innerHTML = '<span>Calcule le prix ' + (game.P.u === 'yaourt' ? 'd\'un yaourt' : 'au ' + (game.P.u === 'kg' ? 'kilo' : 'litre')) + ' de chaque format.</span>';
+  }
+  function choose(i) {
+    if (game.done) return; game.done = true; gTot++;
+    var ok = i === game.best; if (ok) gGood++;
+    game.packs.forEach(function (k, j) { $('pu' + j).textContent = upText(k, game.P.u); $('pk' + j).className = 'pack' + (j === game.best ? ' best' : (j === i ? ' wrong' : '')); });
+    $('gOut').className = 'verdict ' + (ok ? 'yes' : 'no');
+    $('gOut').innerHTML = (ok ? 'Bien vu, c\'est le moins cher !' : 'Raté : le moins cher est « ' + game.packs[game.best].lab + ' ».') + '<span>Regarde le prix ' + (game.P.u === 'yaourt' ? 'par yaourt' : 'au ' + (game.P.u === 'kg' ? 'kilo' : 'litre')) + ' sous chaque format.</span>';
+    $('gScore').textContent = gGood + ' / ' + gTot;
+  }
+  $('gNew').addEventListener('click', newGame); newGame();
+
+  /* ---------- Étape 8 : convertisseur ---------- */
+  Object.keys(KINDS).forEach(function (k) { var op = document.createElement('option'); op.value = k; op.textContent = KINDS[k].label; $('kSel').appendChild(op); });
+  $('kSel').value = 'gcm3-kgm3';
+  function conv() {
+    var x = num($('kX').value), r = convert(x, $('kSel').value), ol = $('kSteps');
+    if (isNaN(x)) { ol.innerHTML = '<li class="err">Écris un nombre.</li>'; return; }
+    ol.innerHTML = r.steps.map(function (s) { return '<li>' + s[0] + '<span>' + s[1] + '</span></li>'; }).join('');
+  }
+  $('kX').addEventListener('input', conv); $('kSel').addEventListener('change', conv); conv();
+
+  /* ---------- Quiz ---------- */
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  var QTYPES = [
+    function () { var t = pick([8, 10, 12, 15, 20]), D = pick([6, 8, 10, 12, 15]), V = t * D; return { q: 'Un robinet a un débit de ' + D + ' L/min. Combien de minutes pour remplir une baignoire de ' + V + ' L ?', a: t, how: V + ' ÷ ' + D + ' = ' + t + ' min' }; },
+    function () { var r = pick([0.5, 0.9, 2.5, 2.7, 7.9, 11.3]), V = pick([10, 20, 50, 100]), m = r * V; return { q: 'Un objet de ' + V + ' cm³ a une masse de ' + fmt(m) + ' g. Quelle est sa masse volumique (en g/cm³) ?', a: r, how: fmt(m) + ' ÷ ' + V + ' = ' + fmt(r) + ' g/cm³' }; },
+    function () { var P = pick([500, 1000, 1500, 2000]), h = pick([1, 2, 3, 4, 5]), e = P * h / 1000; return { q: 'Un radiateur de ' + fmt(P) + ' W fonctionne ' + h + ' h. Combien de kWh consomme-t-il ?', a: e, how: fmt(P / 1000) + ' kW × ' + h + ' h = ' + fmt(e) + ' kWh' }; },
+    function () { var k = pick([100, 150, 200, 250, 300]), p = pick([0.2, 0.25, 0.3]), c = k * p; return { q: 'Un foyer consomme ' + k + ' kWh dans le mois. Le kWh coûte ' + money(p) + ' €. Combien paie-t-il (en €) ?', a: c, how: k + ' × ' + fmt(p) + ' = ' + money(c) + ' €' }; },
+    function () { var c = pick([4, 5, 6, 7, 8]), d = pick([50, 150, 200, 250, 300, 450]), L = c * d / 100; return { q: 'Une voiture consomme ' + c + ' L/100 km. Combien de litres pour ' + d + ' km ?', a: L, how: c + ' × ' + d + ' ÷ 100 = ' + fmt(L) + ' L' }; },
+    function () { var a = pick([20, 25, 40, 50, 80]), d = pick([30, 60, 120, 250, 400, 1500]), p = a * d; return { q: 'Une île de ' + a + ' km² compte ' + fmt(p) + ' habitants. Quelle est sa densité (en hab/km²) ?', a: d, how: fmt(p) + ' ÷ ' + a + ' = ' + fmt(d) + ' hab/km²' }; },
+    function () { var g = pick([200, 250, 400, 500, 750]), p = pick([2, 4, 6, 8, 10, 12]), pr = p * g / 1000; return { q: 'Un paquet de ' + g + ' g coûte ' + money(pr) + ' €. Quel est le prix au kilo (en €) ?', a: p, how: g + ' g = ' + fmt(g / 1000) + ' kg, et ' + money(pr) + ' ÷ ' + fmt(g / 1000) + ' = ' + fmt(p) + ' €/kg' }; },
+    function () {
+      var t = Math.floor(Math.random() * 3);
+      if (t === 0) { var r = pick([0.9, 1.03, 2.7, 7.9, 11.3]); return { q: 'Convertis ' + fmt(r) + ' g/cm³ en kg/m³.', a: r * 1000, how: fmt(r) + ' × 1 000 = ' + fmt(r * 1000) + ' kg/m³' }; }
+      if (t === 1) { var x = pick([5, 10, 12, 20, 25, 50]); return { q: 'Convertis ' + x + ' L/min en m³/h.', a: x * 0.06, how: x + ' × 60 ÷ 1 000 = ' + fmt(x * 0.06) + ' m³/h' }; }
+      var s = pick([5, 10, 20, 25]); return { q: 'Convertis ' + s + ' m/s en km/h.', a: s * 3.6, how: s + ' × 3,6 = ' + fmt(s * 3.6) + ' km/h' };
+    }
+  ];
+  var quiz = $('quiz'), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ''; done = [];
+    for (var k = 0; k < 8; k++) {
+      var Q = QTYPES[k](), li = document.createElement('li');
+      li.innerHTML = '<span>' + Q.q + '</span><input type="text" id="qa' + k + '" inputmode="decimal" autocomplete="off" aria-label="Ta réponse à la question ' + (k + 1) + '"><button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+      quiz.appendChild(li);
+      (function (k, Q) {
+        function check() {
+          var fb = $('qf' + k), x = num($('qa' + k).value);
+          if (isNaN(x)) { fb.className = 'fb'; fb.textContent = 'Écris un nombre.'; return; }
+          if (Math.abs(x - Q.a) < 0.006) { fb.className = 'fb ok'; fb.textContent = 'Bravo, c\'est juste !'; done[k] = true; }
+          else { done[k] = false; fb.className = 'fb no'; fb.innerHTML = 'Pas tout à fait : la réponse est ' + fmt(Q.a, 2) + '.<span>' + Q.how + '</span>'; }
+          $('score').textContent = done.filter(Boolean).length + ' / 8';
+        }
+        $('qb' + k).addEventListener('click', check);
+        $('qa' + k).addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+      })(k, Q);
+    }
+    $('score').textContent = '0 / 8';
+  }
+  $('newQuiz').addEventListener('click', newQuiz);
+  newQuiz();
+
+  window.__gc = {
+    flowTime: flowTime, levelAt: levelAt, lminToM3h: lminToM3h, m3hToLmin: m3hToLmin, rho: rho, floatState: floatState,
+    crownVolume: crownVolume, energyKWh: energyKWh, monthly: monthly, carLitres: carLitres, autonomy: autonomy,
+    density: density, unitPrice: unitPrice, convert: convert, classify: classify, fmt: fmt, num: num
+  };
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,903 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>La dérivée expliquée simplement</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, encre bordeaux, marge rouge. Les courbes, les sécantes et les tangentes sont au centre. */
+:root {
+  --paper: #faf6f7;
+  --grid: #eee2e5;
+  --card: #ffffff;
+  --ink: #2a1219;
+  --ink-soft: #6e4a55;
+  --acc: #9f1239;
+  --acc-soft: #fde4ea;
+  --two: #1c64c8;
+  --two-soft: #dbe8fa;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #fff0a3;
+  --line: #e6d3d8;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #150b0e; --grid: #23141a; --card: #1c1014; --ink: #f6eaee; --ink-soft: #c4a5b0;
+    --acc: #f68aa5; --acc-soft: #45111f; --two: #7fb0ff; --two-soft: #1a2a45;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #3a2229;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #150b0e; --grid: #23141a; --card: #1c1014; --ink: #f6eaee; --ink-soft: #c4a5b0;
+  --acc: #f68aa5; --acc-soft: #45111f; --two: #7fb0ff; --two-soft: #1a2a45;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #3a2229;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+@media (max-width: 420px) { .box { padding: 14px; } }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 6px 12px; min-height: 40px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+input[type="text"] { font: inherit; font-family: var(--f-mono); font-size: 1.05rem; padding: 8px 10px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; }
+input[type="range"] { width: 100%; accent-color: var(--acc); min-height: 32px; }
+.param { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.param label { font-weight: 700; }
+.params { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px 18px; }
+
+.graph svg { width: 100%; height: auto; display: block; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; }
+svg.drag { touch-action: none; cursor: grab; }
+.duo { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+.readout { font-family: var(--f-mono); font-size: .98rem; display: flex; flex-direction: column; gap: 4px; overflow-wrap: anywhere; }
+.readout b { color: var(--acc); }
+.c-acc { color: var(--acc); font-weight: 700; }
+.c-two { color: var(--two); font-weight: 700; }
+.c-ok { color: var(--ok); font-weight: 700; }
+.verdict { border-radius: 8px; padding: 12px 14px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; background: var(--paper); }
+.verdict.yes { background: var(--ok-soft); color: var(--ok); }
+.verdict.no { background: var(--red-soft); color: var(--red); }
+.verdict.flat { background: var(--two-soft); color: var(--two); }
+.verdict span { font-weight: 400; color: var(--ink); }
+
+.ptable { border-collapse: separate; border-spacing: 0; width: 100%; font-variant-numeric: tabular-nums; }
+.ptable th, .ptable td { border: 1.5px solid var(--ink); padding: 6px 8px; text-align: center; font-family: var(--f-mono); font-size: .98rem; }
+.ptable th { font-family: var(--f-display); background: var(--paper); }
+.ptable td.last { background: var(--acc-soft); font-weight: 600; color: var(--acc); }
+.scroll { overflow-x: auto; max-width: 100%; }
+
+.vartab { display: flex; flex-wrap: wrap; gap: 6px; }
+.vartab span { font-family: var(--f-mono); font-size: .9rem; padding: 4px 10px; border-radius: 999px; border: 1.5px solid currentColor; }
+.vartab .up { color: var(--ok); }
+.vartab .down { color: var(--red); }
+.vartab .top { color: var(--two); }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.rule { font-family: var(--f-mono); font-size: 1.1rem; font-weight: 600; color: var(--acc); }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
+.tag.ok { color: var(--ok); }
+.tag.two { color: var(--two); }
+
+.predict { display: grid; grid-template-columns: minmax(0, 1fr) 110px; gap: 10px; align-items: center; }
+@media (max-width: 420px) { .predict { grid-template-columns: 1fr; } }
+
+.errs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.errs li { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--paper); }
+.errs .bad { font-family: var(--f-mono); color: var(--red); text-decoration: line-through; overflow-wrap: anywhere; }
+.errs .good { font-family: var(--f-mono); color: var(--ok); font-weight: 600; overflow-wrap: anywhere; }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 110px auto; gap: 10px; align-items: center; }
+.quiz li > span:first-child { overflow-wrap: anywhere; min-width: 0; }
+.quiz input[type="text"] { font-size: 1rem; padding: 6px 8px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb:empty { display: none; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc); }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 120px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+<style id="tnav-css">
+.tnav-top { display: flex; margin: 0 0 4px; }
+.tnav-home { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font-weight: 700; font-size: .95rem; text-decoration: none; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tnav-home:hover, .tnav-home:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.tnav-bottom { margin-top: 8px; display: flex; flex-direction: column; gap: 12px; }
+.tnav-bottom h2 { margin: 0; }
+.tnav-pn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tnav-pn a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--ink, #222); border-radius: 10px;
+  background: var(--card, #fff); color: var(--ink, #222); text-decoration: none; box-shadow: 3px 3px 0 var(--ink, #222); min-width: 0; }
+.tnav-pn a span { font-size: .85rem; color: var(--ink-soft, #666); }
+.tnav-pn a strong { overflow-wrap: anywhere; }
+.tnav-pn a.next { text-align: right; grid-column: 2; }
+.tnav-bottom .tnav-home { align-self: center; }
+@media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
+</style>
+</head>
+<body>
+<main class="page">
+<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="index.html">← Tous les tutoriels</a></nav><!--/tnav-->
+
+
+  <header class="hero">
+    <span class="eyebrow">Tutoriel de maths · niveau lycée · avant-goût</span>
+    <h1>La dérivée expliquée simplement</h1>
+    <p class="lead">Sur un trajet, ta vitesse change sans arrêt. Le compteur de la voiture, lui, donne la vitesse <em>à cet instant précis</em>. La dérivée, c'est exactement ça : la vitesse à laquelle une quantité change, à un instant donné. Et sur un dessin, c'est la pente d'une droite qui frôle une courbe.</p>
+    <div class="box">
+      <div class="graph">
+        <svg viewBox="0 0 400 220" role="img" aria-label="Une courbe, des sécantes de plus en plus proches et la tangente en un point">
+          <path d="M20 200 Q 200 200 380 20" fill="none" stroke="var(--ink)" stroke-width="3"/>
+          <line x1="30" y1="247" x2="390" y2="32" stroke="var(--two)" stroke-width="2" stroke-dasharray="6 5" opacity=".45"/>
+          <line x1="30" y1="239" x2="390" y2="50" stroke="var(--two)" stroke-width="2" stroke-dasharray="6 5" opacity=".7"/>
+          <line x1="30" y1="219" x2="390" y2="93" stroke="var(--acc)" stroke-width="3"/>
+          <circle cx="146" cy="178" r="7" fill="var(--acc)" stroke="var(--card)" stroke-width="2"/>
+          <text x="290" y="150" font-size="15" font-weight="600" style="fill:var(--acc)">tangente</text>
+          <text x="190" y="70" font-size="14" style="fill:var(--two)">sécantes</text>
+        </svg>
+      </div>
+      <span class="soft">Les droites bleues passent par deux points de la courbe. Quand on rapproche les deux points, elles deviennent la droite bordeaux : la <strong>tangente</strong>. Sa pente, c'est la dérivée.</span>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · L'idée</span>
+    <h2>Le compteur et la vitesse moyenne</h2>
+    <p>Dans le tutoriel sur <a class="tlink" href="la-vitesse.html">la vitesse</a>, tu as vu la <strong>vitesse moyenne</strong> : distance ÷ durée. Si tu fais 45 km en 1 heure, ta vitesse moyenne est 45 km/h. Mais pendant ce trajet, tu as démarré, accéléré, ralenti… Le compteur n'a presque jamais affiché 45 !</p>
+    <p>Le compteur montre la <strong>vitesse instantanée</strong> : la vitesse à cet instant précis. Fais avancer le temps et compare les deux aiguilles.</p>
+    <div class="box">
+      <div class="graph"><svg id="gauge" viewBox="0 0 400 240" role="img" aria-label="Compteur de vitesse avec deux aiguilles et barre du trajet"></svg></div>
+      <div class="param">
+        <label for="tripT">Temps écoulé : <span class="mono" id="tripTOut">20</span> min</label>
+        <input id="tripT" type="range" min="0" max="60" step="1" value="20">
+      </div>
+      <div class="btns"><button type="button" id="tripGo">Faire le trajet</button></div>
+      <div class="readout" id="tripOut" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">La grande question</span>
+      <span>Comment calculer une vitesse « à un instant précis » ? En 0 seconde, on parcourt 0 mètre, et 0 ÷ 0 ne veut rien dire. L'astuce des mathématiciens : prendre une durée <strong>de plus en plus petite</strong>. C'est toute l'idée de la dérivée.</span>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · La pente d'une droite</span>
+    <h2>De combien ça monte quand on avance de 1 ?</h2>
+    <p>Dans le tutoriel sur <a class="tlink" href="les-fonctions.html">les fonctions</a>, la droite y = ax + b a un <strong>coefficient directeur</strong> a. On l'appelle aussi la <strong>pente</strong> : quand x avance de 1, y monte de a (ou descend, si a est négatif).</p>
+    <div class="box">
+      <div class="graph"><svg id="lineSvg" viewBox="0 0 400 300" role="img" aria-label="Droite y = ax + b avec le petit escalier de pente"></svg></div>
+      <div class="params">
+        <div class="param"><label for="la">Pente a : <span class="mono" id="laOut">2</span></label><input id="la" type="range" min="-3" max="3" step="0.5" value="2"></div>
+        <div class="param"><label for="lb">b : <span class="mono" id="lbOut">−1</span></label><input id="lb" type="range" min="-3" max="3" step="1" value="-1"></div>
+      </div>
+      <div class="readout" id="lineOut" aria-live="polite"></div>
+    </div>
+    <p>Avec deux points A et B d'une droite, on calcule la pente ainsi :</p>
+    <div class="note"><span class="note-title">Pente entre deux points</span><span class="mono">pente = (y<sub>B</sub> − y<sub>A</sub>) ÷ (x<sub>B</sub> − x<sub>A</sub>)</span><span>« De combien on monte » divisé par « de combien on avance ». Pour une droite, on trouve le même nombre quels que soient les deux points choisis.</span></div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Le zoom</span>
+    <h2>De la sécante à la tangente</h2>
+    <p>Une courbe n'a pas une pente unique : elle monte plus ou moins fort selon l'endroit. Prenons la courbe de f(x) = x². On choisit un point A, et un deuxième point B un peu plus loin, à une distance <strong>h</strong>. La droite (AB) s'appelle une <strong>sécante</strong>. Sa pente, c'est le <strong>taux de variation moyen</strong> entre A et B — comme une vitesse moyenne.</p>
+    <p>Maintenant, rapproche B de A : h devient minuscule… et la sécante se colle à la courbe.</p>
+    <div class="box">
+      <div class="graph"><svg id="secSvg" viewBox="0 0 400 300" role="img" aria-label="Parabole y = x², sécante passant par A et B"></svg></div>
+      <div class="params">
+        <div class="param"><label for="secA">Abscisse de A : <span class="mono" id="secAOut">1</span></label><input id="secA" type="range" min="-2" max="2" step="0.5" value="1"></div>
+        <div class="param"><label for="secH">Écart h entre A et B : <span class="mono" id="secHOut">1,5</span></label><input id="secH" type="range" min="0" max="300" step="1" value="0"></div>
+      </div>
+      <div class="btns"><button type="button" id="secGo">Rapprocher B de A</button><button type="button" id="secBack">Éloigner B</button></div>
+      <div class="readout" id="secOut" aria-live="polite"></div>
+      <div class="scroll"><table class="ptable" id="secTable" aria-label="Pente de la sécante pour h de plus en plus petit"></table></div>
+    </div>
+    <h3>Et si on zoome sur la courbe ?</h3>
+    <p>Voici une autre façon de voir la même chose. Zoome autour du point (1 ; 1) de la courbe y = x². Plus tu zoomes, plus la courbe ressemble à une <strong>droite</strong>. Cette droite, c'est la tangente.</p>
+    <div class="box">
+      <div class="graph"><svg id="zoomSvg" viewBox="0 0 400 300" role="img" aria-label="Zoom sur la courbe y = x² autour du point (1 ; 1)"></svg></div>
+      <div class="param"><label for="zoomS">Zoom : × <span class="mono" id="zoomOut">1</span></label><input id="zoomS" type="range" min="0" max="200" step="1" value="0"></div>
+      <div class="btns"><button type="button" id="zoomTan" aria-pressed="false">Montrer la tangente</button></div>
+      <div class="readout" id="zoomInfo" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · Le nombre dérivé</span>
+    <h2>f′(a) : la pente de la tangente</h2>
+    <p>La pente de la tangente au point d'abscisse a s'appelle le <strong>nombre dérivé</strong> de f en a. On l'écrit <strong>f′(a)</strong> et on lit « f prime de a ». Il dit à quelle vitesse f(x) change quand x passe par a.</p>
+    <p>Choisis une courbe, puis <strong>fais glisser le point</strong> sur le dessin (ou utilise le curseur).</p>
+    <div class="box">
+      <div class="btns" id="fnBtns" role="group" aria-label="Choix de la fonction"></div>
+      <div class="graph"><svg id="tanSvg" class="drag" viewBox="0 0 400 300" role="img" aria-label="Courbe avec un point mobile et sa tangente"></svg></div>
+      <div class="param"><label for="tanA">a = <span class="mono" id="tanAOut">1</span></label><input id="tanA" type="range" min="-2.5" max="2.5" step="0.01" value="1"></div>
+      <div class="readout" id="tanOut" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Ce que veut dire f′(a) = 2</span>
+      <span>Tout près de a, quand x augmente d'un tout petit peu, f(x) augmente environ <strong>2 fois plus</strong>. Si x avance de 0,01, f(x) monte d'environ 0,02. C'est comme une vitesse : « 2 unités de f par unité de x ».</span>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Monter, descendre</span>
+    <h2>Le signe de f′ et les sommets</h2>
+    <p>La tangente te dit tout de suite si la courbe monte ou descend :</p>
+    <div class="cards">
+      <div class="box"><span class="tag ok">f′(a) &gt; 0</span><strong>Ça monte</strong><span class="soft">La tangente monte : la fonction est <strong>croissante</strong> à cet endroit.</span></div>
+      <div class="box"><span class="tag" style="color:var(--red)">f′(a) &lt; 0</span><strong>Ça descend</strong><span class="soft">La tangente descend : la fonction est <strong>décroissante</strong>.</span></div>
+      <div class="box"><span class="tag two">f′(a) = 0</span><strong>C'est plat</strong><span class="soft">Tangente horizontale. Souvent, c'est un <strong>sommet</strong> (le plus haut) ou un <strong>creux</strong> (le plus bas).</span></div>
+    </div>
+    <p>Dans le tutoriel sur <a class="tlink" href="le-second-degre.html">le second degré</a>, tu as vu que chaque parabole a un sommet. Le voici : c'est l'endroit où f′ vaut 0. Promène le point et regarde la couleur de la tangente.</p>
+    <div class="box">
+      <div class="btns" id="sgnBtns" role="group" aria-label="Choix de la courbe"></div>
+      <div class="graph"><svg id="sgnSvg" class="drag" viewBox="0 0 400 300" role="img" aria-label="Courbe avec un point mobile, tangente colorée selon le signe de la pente"></svg></div>
+      <div class="param"><label for="sgnA">a = <span class="mono" id="sgnAOut">0</span></label><input id="sgnA" type="range" min="-1" max="5" step="0.01" value="0"></div>
+      <div class="verdict" id="sgnOut" aria-live="polite"></div>
+      <div class="vartab" id="sgnTab"></div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · Les règles</span>
+    <h2>Un motif qui se répète</h2>
+    <p>Calculer un zoom à chaque fois, c'est long. Alors on regarde les résultats et on cherche un <strong>motif</strong>. Choisis une fonction : la page calcule f′(a) avec un zoom énorme (h = 0,000 001) pour plusieurs valeurs de a. Devine la règle, puis vérifie-la sur a = 10.</p>
+    <div class="box">
+      <div class="btns" id="ruleBtns" role="group" aria-label="Choix de la fonction"></div>
+      <div class="scroll"><table class="ptable" id="ruleTable" aria-label="Valeurs de f′(a) pour plusieurs a"></table></div>
+      <div class="predict">
+        <label for="rulePred"><strong id="rulePredLabel">Sans zoom, devine f′(10) :</strong></label>
+        <input id="rulePred" type="text" inputmode="decimal" autocomplete="off">
+      </div>
+      <div class="btns"><button type="button" id="ruleCheck">Vérifier</button><button type="button" id="ruleHint">Un indice</button></div>
+      <div class="verdict" id="ruleOut" aria-live="polite"></div>
+    </div>
+    <p>Voici les motifs qu'on découvre. Ce ne sont pas des règles magiques : chacune résume ce que donne le zoom.</p>
+    <div class="cards">
+      <div class="box"><span class="rule">5 → 0</span><span class="soft">Une constante ne change jamais : sa courbe est plate, pente 0.</span></div>
+      <div class="box"><span class="rule">ax + b → a</span><span class="soft">Une droite a la même pente partout : sa tangente, c'est elle-même.</span></div>
+      <div class="box"><span class="rule">x² → 2x</span><span class="soft">En a = 3, la pente vaut 6. Plus on va loin, plus ça monte fort.</span></div>
+      <div class="box"><span class="rule">x³ → 3x²</span><span class="soft">L'exposant descend devant, et il diminue de 1.</span></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Pourquoi x² → 2x ? Un petit calcul</span>
+      <span>Pente de la sécante entre a et a + h : ((a + h)² − a²) ÷ h. Avec les identités remarquables, (a + h)² = a² + 2ah + h². Donc la pente vaut (2ah + h²) ÷ h = <strong>2a + h</strong>. Quand h devient minuscule, il reste <strong>2a</strong>. C'est ce que montrait le tableau de l'étape 3 : 3 ; 2,1 ; 2,01 ; 2,001… → 2.</span>
+      <span>On peut aussi multiplier et additionner : la dérivée de 3x² est 3 × 2x = 6x, et celle de x² + 5x est 2x + 5.</span>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Dans la vraie vie</span>
+    <h2>La vitesse d'une bille qui tombe</h2>
+    <p>Lâche une bille (sans frottement de l'air). Après t secondes, elle est tombée d'environ <strong>d = 4,9 × t²</strong> mètres. La règle x² → 2x donne sa vitesse instantanée : <strong>v = 4,9 × 2t = 9,8 × t</strong> mètres par seconde.</p>
+    <div class="box">
+      <div class="graph"><svg id="fallSvg" viewBox="0 0 400 300" role="img" aria-label="Bille qui tombe et courbe de la distance en fonction du temps"></svg></div>
+      <div class="param"><label for="fallT">Temps t : <span class="mono" id="fallTOut">2</span> s</label><input id="fallT" type="range" min="0" max="4" step="0.1" value="2"></div>
+      <div class="btns"><button type="button" id="fallGo">Lâcher la bille</button></div>
+      <div class="readout" id="fallOut" aria-live="polite"></div>
+    </div>
+    <p>Remarque : la vitesse moyenne depuis le départ (la pente de la sécante en pointillés) vaut toujours <strong>la moitié</strong> de la vitesse instantanée (la pente de la tangente). La bille accélère sans arrêt.</p>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Faire le meilleur choix</span>
+    <h2>La boîte la plus grande</h2>
+    <p>Tu as un carton carré de 20 cm de côté. Tu découpes un petit carré de côté x dans chaque coin, puis tu replies les bords : ça fait une boîte sans couvercle. Quel x donne le <strong>plus grand volume</strong> ? Trop petit, la boîte est plate. Trop grand, il ne reste plus de fond !</p>
+    <div class="box">
+      <div class="duo">
+        <div class="graph"><svg id="netSvg" viewBox="0 0 220 220" role="img" aria-label="Carton avec les coins découpés"></svg></div>
+        <div class="graph"><svg id="volSvg" viewBox="0 0 400 300" role="img" aria-label="Courbe du volume en fonction de x"></svg></div>
+      </div>
+      <div class="param"><label for="boxX">Côté x des coins : <span class="mono" id="boxXOut">2</span> cm</label><input id="boxX" type="range" min="0" max="10" step="0.1" value="2"></div>
+      <div class="btns"><button type="button" id="boxBest">Trouver le meilleur x</button></div>
+      <div class="readout" id="boxOut" aria-live="polite"></div>
+      <div class="verdict" id="boxVerdict" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">La méthode des ingénieurs</span>
+      <span>Le volume vaut V(x) = x × (20 − 2x)². Au lycée, avec les règles de dérivation, on trouve V′(x) = (20 − 2x)(20 − 6x). Le maximum est là où la tangente est horizontale : V′(x) = 0, donc x = 20 ÷ 6 ≈ 3,33 cm. On trouve le meilleur choix <strong>sans essayer toutes les valeurs</strong>.</span>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Un peu d'histoire</span>
+    <h2>Deux inventeurs et une dispute</h2>
+    <ol class="timeline">
+      <li><span class="when">Antiquité</span><div class="what"><strong>Les Grecs et les tangentes</strong><span>Archimède sait déjà tracer la tangente à certaines courbes, comme sa célèbre spirale. Mais chaque courbe demande une astuce différente.</span></div></li>
+      <li><span class="when">XVII<sup>e</sup> siècle</span><div class="what"><strong>Fermat, en France</strong><span>Pierre de Fermat trouve des maximums et des tangentes avec une méthode très proche de la nôtre : il compare f(a) et f(a + h) pour un h très petit.</span></div></li>
+      <li><span class="when">XVII<sup>e</sup> siècle</span><div class="what"><strong>Isaac Newton, en Angleterre</strong><span>Il invente sa « méthode des fluxions » pour étudier le mouvement : la vitesse des planètes, la chute des objets. Mais il la publie très tard.</span></div></li>
+      <li><span class="when">fin du XVII<sup>e</sup> siècle</span><div class="what"><strong>Gottfried Leibniz, en Allemagne</strong><span>De son côté, il invente la même chose avec d'autres notations (dx, dy) et publie le premier. Ses notations sont si pratiques qu'on les utilise encore.</span></div></li>
+      <li><span class="when">début du XVIII<sup>e</sup> siècle</span><div class="what"><strong>La grande querelle</strong><span>Les partisans de Newton accusent Leibniz de l'avoir copié. La dispute devient très violente. Aujourd'hui, les historiens pensent en général que les deux ont trouvé l'idée <strong>chacun de leur côté</strong>.</span></div></li>
+      <li><span class="when">fin du XVIII<sup>e</sup> siècle</span><div class="what"><strong>Le petit « prime »</strong><span>La notation f′ est attribuée à Joseph-Louis Lagrange.</span></div></li>
+    </ol>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · Attention</span>
+    <h2>Les erreurs fréquentes</h2>
+    <div class="box">
+      <ul class="errs">
+        <li><span class="bad">f′(a) = f(a)</span><span class="good">f′(a) est une pente, f(a) une hauteur</span><span class="soft">Pour x² en a = 3 : f(3) = 9, mais f′(3) = 6.</span></li>
+        <li><span class="bad">dérivée de x² = x</span><span class="good">dérivée de x² = 2x</span><span class="soft">L'exposant 2 descend devant : 2 × x¹ = 2x.</span></li>
+        <li><span class="bad">dérivée de x³ = 3x³</span><span class="good">dérivée de x³ = 3x²</span><span class="soft">L'exposant descend devant ET diminue de 1.</span></li>
+        <li><span class="bad">dérivée de 5 = 5</span><span class="good">dérivée de 5 = 0</span><span class="soft">Une constante ne change pas : sa vitesse de changement est 0.</span></li>
+        <li><span class="bad">dérivée de 3x + 1 = 3x</span><span class="good">dérivée de 3x + 1 = 3</span><span class="soft">Une droite a la même pente partout : c'est un nombre, pas une expression en x.</span></li>
+        <li><span class="bad">f′(a) = 0, donc c'est forcément un sommet</span><span class="good">souvent, mais pas toujours</span><span class="soft">Pour x³ en 0, la tangente est horizontale, mais la courbe continue de monter des deux côtés.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Écris un nombre (tu peux utiliser une virgule).</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Nouvelles questions</button>
+    </div>
+  </section>
+
+  <!-- 12 -->
+  <section>
+    <span class="eyebrow">Étape 12 · À toi de jouer</span>
+    <h2>Six exercices</h2>
+    <div class="exos">
+      <details>
+        <summary>Une pente<span class="q">Une droite passe par A(2 ; 5) et B(6 ; 13). Quelle est sa pente ?</span></summary>
+        <div><span>(13 − 5) ÷ (6 − 2) = 8 ÷ 4 = <strong>2</strong>. Quand x avance de 1, y monte de 2.</span></div>
+      </details>
+      <details>
+        <summary>Une sécante<span class="q">Pour f(x) = x², calcule la pente de la sécante entre x = 3 et x = 3,1. Vers quel nombre va-t-elle si on rapproche les points ?</span></summary>
+        <div><span>f(3,1) = 9,61 et f(3) = 9. Pente = (9,61 − 9) ÷ 0,1 = <strong>6,1</strong>.</span><span>En rapprochant, on tend vers 2 × 3 = <strong>6</strong> : c'est f′(3).</span></div>
+      </details>
+      <details>
+        <summary>Avec x³<span class="q">Pour f(x) = x³, calcule f′(2). Que veut dire ce nombre ?</span></summary>
+        <div><span>f′(x) = 3x², donc f′(2) = 3 × 4 = <strong>12</strong>.</span><span>Près de x = 2, si x augmente d'un tout petit peu, f(x) augmente environ 12 fois plus. Vérifie : 2,01³ ≈ 8,1206, soit environ 0,12 de plus que 2³ = 8.</span></div>
+      </details>
+      <details>
+        <summary>La chute<span class="q">Une pierre tombe pendant 3 secondes. De combien est-elle tombée, et à quelle vitesse va-t-elle à ce moment ?</span></summary>
+        <div><span>d = 4,9 × 3² = 4,9 × 9 = <strong>44,1 m</strong>.</span><span>v = 9,8 × 3 = <strong>29,4 m/s</strong>, soit environ 29,4 × 3,6 ≈ 106 km/h.</span></div>
+      </details>
+      <details>
+        <summary>Le creux d'une parabole<span class="q">f(x) = x² − 6x + 5. Où la tangente est-elle horizontale ? Quelle est la valeur de f à cet endroit ?</span></summary>
+        <div><span>f′(x) = 2x − 6. On résout 2x − 6 = 0 : <strong>x = 3</strong>.</span><span>f(3) = 9 − 18 + 5 = <strong>−4</strong>. Cette parabole est tournée vers le haut, donc c'est son point le plus bas : le sommet (3 ; −4).</span></div>
+      </details>
+      <details>
+        <summary>Une plus grande boîte<span class="q">Même boîte qu'à l'étape 8, mais avec un carton de 30 cm de côté. Le meilleur x est le côté ÷ 6. Calcule x et le volume.</span></summary>
+        <div><span>x = 30 ÷ 6 = <strong>5 cm</strong>. Le fond mesure 30 − 2 × 5 = 20 cm.</span><span>V = 5 × 20 × 20 = <strong>2 000 cm³</strong>, soit 2 litres.</span></div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• La <strong>pente</strong> d'une droite : de combien y monte quand x avance de 1. Entre deux points : (y<sub>B</sub> − y<sub>A</sub>) ÷ (x<sub>B</sub> − x<sub>A</sub>).</span>
+      <span>• La pente d'une <strong>sécante</strong> est un taux moyen, comme une vitesse moyenne. En rapprochant les deux points, la sécante devient la <strong>tangente</strong>.</span>
+      <span>• Le <strong>nombre dérivé f′(a)</strong> est la pente de la tangente en a : la vitesse à laquelle f change à cet endroit.</span>
+      <span>• f′ &gt; 0 : ça monte. f′ &lt; 0 : ça descend. f′ = 0 : tangente horizontale, souvent un sommet ou un creux.</span>
+      <span>• Motifs : constante → 0 ; ax + b → a ; x² → 2x ; x³ → 3x².</span>
+      <span>• Exemples : d = 4,9t² donne v = 9,8t ; on trouve un maximum en cherchant où la dérivée vaut 0.</span>
+    </div>
+  </section>
+
+  <!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"><a class="prev" href="les-suites.html"><span>← Précédent</span><strong>Les suites</strong></a><a class="next" href="les-nombres-complexes.html"><span>Suivant →</span><strong>Les nombres complexes</strong></a></div><a class="tnav-home" href="index.html">⌂ Tous les tutoriels</a></nav><!--/tnav-->
+<footer>Fiche de révision · La dérivée expliquée simplement</footer>
+</main>
+
+<script>
+(function () {
+  /* Test hooks (window.__der) :
+     f(name, x)            -> number : valeur de la fonction du catalogue ('sq' x², 'cube' x³, 'sqrt' √x, 'inv' 1/x,
+                                        'hill' −0,5x² + 2x + 1, 'coaster' x³ − 3x, 'c5' 5, 'lin' 3x + 1, 'linm' −2x + 4, 'sq3' 3x²)
+     df(name, x)           -> number : dérivée exacte, ex. df('sq', 3) = 6, df('inv', 2) = −0,25
+     secant(name, a, h)    -> number : (f(a + h) − f(a)) ÷ h, ex. secant('sq', 1, 0.1) ≈ 2,1
+     numDeriv(name, a, h?) -> number : idem avec h = 1e-6 par défaut
+     zoomGap(z)            -> number : écart courbe/tangente au bord de la fenêtre, en % de sa hauteur (x² en 1, zoom × z) = 40 / z
+     tripSpeed(t)          -> km/h : vitesse au compteur au temps t (min), 45(1 − cos(2πt/60))
+     tripDist(t)           -> km    : distance parcourue ; tripDist(60) = 45
+     tripAvg(t)            -> km/h  : vitesse moyenne depuis le départ (NaN si t = 0)
+     lin(a, b)             -> string : 'y = 2x − 1' etc.
+     fall(t)               -> { d, vAvg, v, kmh } : chute libre, d = 4,9t², v = 9,8t
+     boxV(x, c?)           -> cm³ : x(c − 2x)², c = 20 par défaut (0 hors de [0 ; c/2])
+     boxDV(x, c?)          -> (c − 2x)(c − 6x)
+     boxBest(c?)           -> { x: c/6, v } ; boxBest(20).v ≈ 592,59
+     fmt(x, d?)            -> string : format français
+  */
+  var NS = 'http://www.w3.org/2000/svg';
+  function $(id) { return document.getElementById(id); }
+  function fmt(x, d) { var r = Math.round(x * 1e6) / 1e6; var p = Math.pow(10, d == null ? 3 : d); r = Math.round(r * p) / p; if (Object.is(r, -0)) r = 0; return r.toLocaleString('fr-FR', { maximumFractionDigits: d == null ? 3 : d }).replace('-', '−'); }
+  function par(x, d) { var s = fmt(x, d); return x < 0 && s !== '0' ? '(' + s + ')' : s; }
+  function num(s) { var t = String(s).replace(/\s/g, '').replace(/[−–]/g, '-').replace(',', '.'); if (t === '') return NaN; var x = Number(t); return isFinite(x) ? x : NaN; }
+  function mk(parent, name, attrs, text) { var e = document.createElementNS(NS, name); for (var a in attrs) e.setAttribute(a, attrs[a]); if (text != null) e.textContent = text; parent.appendChild(e); return e; }
+  function clear(svg) { while (svg.firstChild) svg.removeChild(svg.firstChild); }
+  function clamp(x, lo, hi) { return Math.max(lo, Math.min(hi, x)); }
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- Catalogue de fonctions ---------- */
+  var FN = {
+    sq:      { label: 'x²', f: function (x) { return x * x; }, d: function (x) { return 2 * x; } },
+    cube:    { label: 'x³', f: function (x) { return x * x * x; }, d: function (x) { return 3 * x * x; } },
+    sqrt:    { label: '√x', f: function (x) { return x >= 0 ? Math.sqrt(x) : NaN; }, d: function (x) { return x > 0 ? 1 / (2 * Math.sqrt(x)) : NaN; } },
+    inv:     { label: '1/x', f: function (x) { return x !== 0 ? 1 / x : NaN; }, d: function (x) { return x !== 0 ? -1 / (x * x) : NaN; } },
+    hill:    { label: '−0,5x² + 2x + 1', f: function (x) { return -0.5 * x * x + 2 * x + 1; }, d: function (x) { return -x + 2; } },
+    coaster: { label: 'x³ − 3x', f: function (x) { return x * x * x - 3 * x; }, d: function (x) { return 3 * x * x - 3; } },
+    c5:      { label: '5', f: function () { return 5; }, d: function () { return 0; } },
+    lin:     { label: '3x + 1', f: function (x) { return 3 * x + 1; }, d: function () { return 3; } },
+    linm:    { label: '−2x + 4', f: function (x) { return -2 * x + 4; }, d: function () { return -2; } },
+    sq3:     { label: '3x²', f: function (x) { return 3 * x * x; }, d: function (x) { return 6 * x; } }
+  };
+  function f(name, x) { return FN[name].f(x); }
+  function df(name, x) { return FN[name].d(x); }
+  function secant(name, a, h) { return (FN[name].f(a + h) - FN[name].f(a)) / h; }
+  function numDeriv(name, a, h) { return secant(name, a, h == null ? 1e-6 : h); }
+
+  /* ---------- Repère ---------- */
+  function frame(svg, v) {
+    clear(svg);
+    var vb = svg.viewBox.baseVal, W = vb.width, H = vb.height;
+    var L = v.L != null ? v.L : 36, R = 10, T = 10, B = v.noTicks ? 10 : 28;
+    var pw = W - L - R, ph = H - T - B;
+    function X(x) { return L + (x - v.x0) / (v.x1 - v.x0) * pw; }
+    function Y(y) { return T + (v.y1 - y) / (v.y1 - v.y0) * ph; }
+    function ix(px) { return v.x0 + (px - L) / pw * (v.x1 - v.x0); }
+    var cid = svg.id + '-clip';
+    var defs = mk(svg, 'defs', {}), cp = mk(defs, 'clipPath', { id: cid });
+    mk(cp, 'rect', { x: L, y: T, width: pw, height: ph });
+    mk(svg, 'rect', { x: L, y: T, width: pw, height: ph, fill: 'var(--card)', stroke: 'var(--line)' });
+    var i;
+    if (v.noTicks) {
+      for (i = 1; i < 8; i++) {
+        mk(svg, 'line', { x1: L + pw * i / 8, y1: T, x2: L + pw * i / 8, y2: T + ph, stroke: 'var(--line)', 'stroke-width': 1 });
+        mk(svg, 'line', { x1: L, y1: T + ph * i / 8, x2: L + pw, y2: T + ph * i / 8, stroke: 'var(--line)', 'stroke-width': 1 });
+      }
+    } else {
+      var sx = v.sx || 1, sy = v.sy || 1;
+      for (i = Math.ceil(v.x0 / sx - 1e-9); i * sx <= v.x1 + 1e-9; i++) {
+        var gx = i * sx;
+        mk(svg, 'line', { x1: X(gx), y1: T, x2: X(gx), y2: T + ph, stroke: 'var(--line)', 'stroke-width': 1 });
+        mk(svg, 'text', { x: X(gx), y: T + ph + 19, 'text-anchor': 'middle', 'font-size': 14 }, fmt(gx));
+      }
+      for (i = Math.ceil(v.y0 / sy - 1e-9); i * sy <= v.y1 + 1e-9; i++) {
+        var gy = i * sy;
+        mk(svg, 'line', { x1: L, y1: Y(gy), x2: L + pw, y2: Y(gy), stroke: 'var(--line)', 'stroke-width': 1 });
+        mk(svg, 'text', { x: L - 5, y: Y(gy) + 5, 'text-anchor': 'end', 'font-size': 14 }, fmt(gy));
+      }
+      if (v.y0 <= 0 && v.y1 >= 0) mk(svg, 'line', { x1: L, y1: Y(0), x2: L + pw, y2: Y(0), stroke: 'var(--ink)', 'stroke-width': 1.5 });
+      if (v.x0 <= 0 && v.x1 >= 0) mk(svg, 'line', { x1: X(0), y1: T, x2: X(0), y2: T + ph, stroke: 'var(--ink)', 'stroke-width': 1.5 });
+    }
+    var g = mk(svg, 'g', { 'clip-path': 'url(#' + cid + ')' });
+    return { X: X, Y: Y, ix: ix, g: g, v: v, L: L, T: T, pw: pw, ph: ph };
+  }
+  function curvePath(fn, lo, hi, P) {
+    var v = P.v, span = v.y1 - v.y0, d = '', pen = false, n = 240;
+    for (var i = 0; i <= n; i++) {
+      var x = lo + (hi - lo) * i / n, y = fn(x);
+      if (!isFinite(y) || y > v.y1 + 2 * span || y < v.y0 - 2 * span) { pen = false; continue; }
+      d += (pen ? 'L' : 'M') + P.X(x).toFixed(2) + ' ' + P.Y(y).toFixed(2) + ' ';
+      pen = true;
+    }
+    return d;
+  }
+  function drawLine(P, a, fa, m, attrs) {
+    var v = P.v, x0 = v.x0, x1 = v.x1;
+    var at = { x1: P.X(x0), y1: P.Y(fa + m * (x0 - a)), x2: P.X(x1), y2: P.Y(fa + m * (x1 - a)) };
+    for (var k in attrs) at[k] = attrs[k];
+    return mk(P.g, 'line', at);
+  }
+  function dot(P, x, y, color, r) { return mk(P.g, 'circle', { cx: P.X(x), cy: P.Y(y), r: r || 7, fill: color, stroke: 'var(--card)', 'stroke-width': 2 }); }
+  function draggable(svg, getP, onX) {
+    var on = false;
+    function at(e) { var r = svg.getBoundingClientRect(), vb = svg.viewBox.baseVal; if (!r.width) return; onX(getP().ix((e.clientX - r.left) / r.width * vb.width)); }
+    svg.addEventListener('pointerdown', function (e) { on = true; try { svg.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ } at(e); e.preventDefault(); });
+    svg.addEventListener('pointermove', function (e) { if (on) at(e); });
+    svg.addEventListener('pointerup', function () { on = false; });
+    svg.addEventListener('pointercancel', function () { on = false; });
+  }
+  function animate(ms, step, done) {
+    var t0 = null;
+    if (reduce) { step(1); if (done) done(); return; }
+    function fr(ts) { if (t0 === null) t0 = ts; var p = Math.min(1, (ts - t0) / ms); step(p); if (p < 1) requestAnimationFrame(fr); else if (done) done(); }
+    requestAnimationFrame(fr);
+  }
+  function lin(a, b) {
+    var s = 'y = ';
+    if (a === 0) return s + fmt(b);
+    s += a === 1 ? 'x' : a === -1 ? '−x' : fmt(a) + 'x';
+    if (b > 0) s += ' + ' + fmt(b); else if (b < 0) s += ' − ' + fmt(-b);
+    return s;
+  }
+
+  /* ---------- Étape 1 : compteur ---------- */
+  function tripSpeed(t) { return 45 * (1 - Math.cos(2 * Math.PI * t / 60)); }
+  function tripDist(t) { return 0.75 * (t - 60 / (2 * Math.PI) * Math.sin(2 * Math.PI * t / 60)); }
+  function tripAvg(t) { return t > 0 ? tripDist(t) / (t / 60) : NaN; }
+  var tripT = $('tripT');
+  function drawTrip() {
+    var t = Number(tripT.value), v = tripSpeed(t), d = tripDist(t), m = tripAvg(t), svg = $('gauge');
+    $('tripTOut').textContent = t;
+    clear(svg);
+    var cx = 200, cy = 150, r = 120, VMAX = 120;
+    function ang(s) { return Math.PI - clamp(s, 0, VMAX) / VMAX * Math.PI; }
+    mk(svg, 'path', { d: 'M' + (cx - r) + ' ' + cy + ' A' + r + ' ' + r + ' 0 0 1 ' + (cx + r) + ' ' + cy, fill: 'none', stroke: 'var(--ink)', 'stroke-width': 3 });
+    for (var s = 0; s <= VMAX; s += 20) {
+      var a = ang(s), c = Math.cos(a), sn = Math.sin(a);
+      mk(svg, 'line', { x1: cx + (r - 10) * c, y1: cy - (r - 10) * sn, x2: cx + r * c, y2: cy - r * sn, stroke: 'var(--ink)', 'stroke-width': 2 });
+      mk(svg, 'text', { x: cx + (r - 28) * c, y: cy - (r - 28) * sn + 5, 'text-anchor': 'middle', 'font-size': 14 }, String(s));
+    }
+    mk(svg, 'text', { x: cx, y: cy + 22, 'text-anchor': 'middle', 'font-size': 14 }, 'km/h');
+    if (!isNaN(m)) { var am = ang(m); mk(svg, 'line', { x1: cx, y1: cy, x2: cx + (r - 14) * Math.cos(am), y2: cy - (r - 14) * Math.sin(am), stroke: 'var(--two)', 'stroke-width': 3, 'stroke-dasharray': '7 5', 'stroke-linecap': 'round' }); }
+    var av = ang(v);
+    mk(svg, 'line', { x1: cx, y1: cy, x2: cx + (r - 8) * Math.cos(av), y2: cy - (r - 8) * Math.sin(av), stroke: 'var(--acc)', 'stroke-width': 4, 'stroke-linecap': 'round' });
+    mk(svg, 'circle', { cx: cx, cy: cy, r: 7, fill: 'var(--ink)' });
+    var x0 = 30, x1 = 370, ry = 205;
+    mk(svg, 'line', { x1: x0, y1: ry, x2: x1, y2: ry, stroke: 'var(--line)', 'stroke-width': 8, 'stroke-linecap': 'round' });
+    mk(svg, 'line', { x1: x0, y1: ry, x2: x0 + (x1 - x0) * d / 45, y2: ry, stroke: 'var(--acc)', 'stroke-width': 8, 'stroke-linecap': 'round' });
+    mk(svg, 'circle', { cx: x0 + (x1 - x0) * d / 45, cy: ry, r: 9, fill: 'var(--acc)', stroke: 'var(--card)', 'stroke-width': 2 });
+    mk(svg, 'text', { x: x0, y: ry + 28, 'font-size': 14 }, 'départ');
+    mk(svg, 'text', { x: x1, y: ry + 28, 'font-size': 14, 'text-anchor': 'end' }, 'arrivée : 45 km');
+    var lines = [
+      'Distance parcourue : ' + fmt(d, 1) + ' km',
+      '<span class="c-acc">Compteur (vitesse instantanée) : ' + fmt(v, 0) + ' km/h</span>',
+      '<span class="c-two">Vitesse moyenne depuis le départ : ' + (isNaN(m) ? '— (on n\'a pas encore roulé)' : fmt(d, 1) + ' km ÷ ' + fmt(t / 60, 2) + ' h ≈ ' + fmt(m, 0) + ' km/h') + '</span>'
+    ];
+    if (t === 0) lines.push('À l\'arrêt : 0 km/h au compteur.');
+    else if (Math.abs(v - m) < 3) lines.push('En ce moment, les deux aiguilles sont presque au même endroit.');
+    else lines.push(v > m ? 'Tu roules plus vite que ta moyenne.' : 'Tu roules moins vite que ta moyenne.');
+    $('tripOut').innerHTML = lines.map(function (l) { return '<span>' + l + '</span>'; }).join('');
+  }
+  tripT.addEventListener('input', drawTrip);
+  $('tripGo').addEventListener('click', function () { animate(9000, function (p) { tripT.value = Math.round(60 * p); drawTrip(); }); });
+  drawTrip();
+
+  /* ---------- Étape 2 : pente d'une droite ---------- */
+  var la = $('la'), lb = $('lb');
+  function drawLineW() {
+    var a = Number(la.value), b = Number(lb.value);
+    $('laOut').textContent = fmt(a); $('lbOut').textContent = fmt(b);
+    var P = frame($('lineSvg'), { x0: -4, x1: 4, y0: -6, y1: 6, sx: 1, sy: 2 });
+    drawLine(P, 0, b, a, { stroke: 'var(--acc)', 'stroke-width': 3 });
+    mk(P.g, 'line', { x1: P.X(0), y1: P.Y(b), x2: P.X(1), y2: P.Y(b), stroke: 'var(--two)', 'stroke-width': 3 });
+    if (a !== 0) mk(P.g, 'line', { x1: P.X(1), y1: P.Y(b), x2: P.X(1), y2: P.Y(a + b), stroke: 'var(--ok)', 'stroke-width': 3 });
+    mk(P.g, 'text', { x: P.X(0.5), y: P.Y(b) + (a > 0 ? 20 : -8), 'text-anchor': 'middle', 'font-size': 15, 'font-weight': 600, style: 'fill:var(--two)' }, '+1');
+    if (a !== 0) mk(P.g, 'text', { x: P.X(1) + 8, y: P.Y(b + a / 2) + 5, 'font-size': 15, 'font-weight': 600, style: 'fill:var(--ok)' }, (a > 0 ? '+' : '') + fmt(a));
+    dot(P, 0, b, 'var(--ink)', 5); dot(P, 1, a + b, 'var(--acc)', 6);
+    var txt = a > 0 ? 'quand x avance de 1, y <b>monte de ' + fmt(a) + '</b>' : a < 0 ? 'quand x avance de 1, y <b>descend de ' + fmt(-a) + '</b>' : 'quand x avance de 1, y <b>ne bouge pas</b> : la droite est horizontale';
+    $('lineOut').innerHTML = '<span>' + lin(a, b) + '</span><span>Pente = ' + fmt(a) + ' : ' + txt + '.</span>';
+  }
+  la.addEventListener('input', drawLineW); lb.addEventListener('input', drawLineW); drawLineW();
+
+  /* ---------- Étape 3 : sécante -> tangente ---------- */
+  var secA = $('secA'), secH = $('secH');
+  function hOf(s) { return 1.5 * Math.pow(10, -s / 100); }
+  function drawSec() {
+    var a = Number(secA.value), h = hOf(Number(secH.value)), b = a + h, fa = a * a, fb = b * b, m = secant('sq', a, h);
+    $('secAOut').textContent = fmt(a); $('secHOut').textContent = fmt(h, 4);
+    var P = frame($('secSvg'), { x0: -3, x1: 4, y0: -1, y1: 13, sx: 1, sy: 2 });
+    mk(P.g, 'path', { d: curvePath(FN.sq.f, -3, 4, P), fill: 'none', stroke: 'var(--ink)', 'stroke-width': 3 });
+    if (h < 0.02) drawLine(P, a, fa, 2 * a, { stroke: 'var(--acc)', 'stroke-width': 5, opacity: 0.35 });
+    drawLine(P, a, fa, m, { stroke: 'var(--two)', 'stroke-width': 2.5 });
+    dot(P, b, fb, 'var(--two)', 6); dot(P, a, fa, 'var(--acc)', 7);
+    mk(P.g, 'text', { x: P.X(a) - 12, y: P.Y(fa) - 10, 'text-anchor': 'end', 'font-size': 15, 'font-weight': 600, style: 'fill:var(--acc)' }, 'A');
+    if (h > 0.25) mk(P.g, 'text', { x: P.X(b) + 10, y: P.Y(fb) + 18, 'font-size': 15, 'font-weight': 600, style: 'fill:var(--two)' }, 'B');
+    $('secOut').innerHTML = '<span>A(' + fmt(a) + ' ; ' + fmt(fa) + ') et B(' + fmt(b, 4) + ' ; ' + fmt(fb, 6) + ')</span>' +
+      '<span class="c-two">Pente de (AB) = (' + fmt(fb, 6) + ' − ' + par(fa) + ') ÷ ' + fmt(h, 4) + ' ≈ ' + fmt(m, 4) + '</span>' +
+      '<span>' + (h < 0.02 ? 'B est collé à A : la sécante est devenue (presque) la <b>tangente</b>, de pente ' + fmt(2 * a) + '.' : 'Rapproche B de A et regarde la pente.') + '</span>';
+    var hs = [1, 0.1, 0.01, 0.001];
+    $('secTable').innerHTML = '<tr><th>h</th><th>x<sub>B</sub> = ' + fmt(a) + ' + h</th><th>pente de (AB)</th></tr>' +
+      hs.map(function (hh) { return '<tr><td>' + fmt(hh, 3) + '</td><td>' + fmt(a + hh, 3) + '</td><td>' + fmt(secant('sq', a, hh), 4) + '</td></tr>'; }).join('') +
+      '<tr><td>→ 0</td><td>→ ' + fmt(a) + '</td><td class="last">→ ' + fmt(2 * a) + '</td></tr>';
+  }
+  secA.addEventListener('input', drawSec); secH.addEventListener('input', drawSec);
+  $('secGo').addEventListener('click', function () { var s0 = Number(secH.value); animate(2500, function (p) { secH.value = Math.round(s0 + (300 - s0) * p); drawSec(); }); });
+  $('secBack').addEventListener('click', function () { secH.value = 0; drawSec(); });
+  drawSec();
+
+  /* Zoom */
+  var zoomS = $('zoomS'), zoomTanOn = false;
+  function zoomGap(z) { return 40 / z; }
+  function drawZoom() {
+    var z = Math.pow(10, Number(zoomS.value) / 100), w = 2 / z;
+    $('zoomOut').textContent = fmt(z, z < 10 ? 1 : 0);
+    var P = frame($('zoomSvg'), { x0: 1 - w, x1: 1 + w, y0: 1 - 2.5 * w, y1: 1 + 2.5 * w, noTicks: true, L: 10 });
+    if (zoomTanOn) drawLine(P, 1, 1, 2, { stroke: 'var(--acc)', 'stroke-width': 2.5, 'stroke-dasharray': '8 6' });
+    mk(P.g, 'path', { d: curvePath(FN.sq.f, 1 - w, 1 + w, P), fill: 'none', stroke: 'var(--ink)', 'stroke-width': 3 });
+    dot(P, 1, 1, 'var(--acc)', 6);
+    var gap = zoomGap(z);
+    $('zoomInfo').innerHTML = '<span>Largeur de la fenêtre : ' + fmt(2 * w, 4) + '</span><span>Écart entre la courbe et sa tangente au bord de la fenêtre : environ ' + fmt(gap, gap < 1 ? 2 : 1) + ' % de la hauteur.</span><span>' + (z > 30 ? 'On ne voit presque plus la différence : la courbe « est » une droite de pente <b>2</b>.' : 'Zoome encore !') + '</span>';
+  }
+  zoomS.addEventListener('input', drawZoom);
+  $('zoomTan').addEventListener('click', function () { zoomTanOn = !zoomTanOn; this.setAttribute('aria-pressed', zoomTanOn ? 'true' : 'false'); drawZoom(); });
+  drawZoom();
+
+  /* ---------- Étape 4 : nombre dérivé ---------- */
+  var TAN = [
+    { key: 'sq', dom: [-2.5, 2.5], view: { x0: -3, x1: 3, y0: -1, y1: 7, sx: 1, sy: 1 }, draw: [-3, 3], a0: 1, rule: 'f′(x) = 2x', calc: function (a) { return '2 × ' + par(a, 2); } },
+    { key: 'cube', dom: [-1.6, 1.6], view: { x0: -2, x1: 2, y0: -5, y1: 5, sx: 1, sy: 1 }, draw: [-2, 2], a0: 1, rule: 'f′(x) = 3x²', calc: function (a) { return '3 × ' + par(a, 2) + '²'; } },
+    { key: 'sqrt', dom: [0.1, 6], view: { x0: -0.5, x1: 7, y0: -0.5, y1: 3.5, sx: 1, sy: 1 }, draw: [0, 7], a0: 1, rule: 'f′(x) = 1 ÷ (2√x)', calc: function (a) { return '1 ÷ (2 × √' + fmt(a, 2) + ')'; } },
+    { key: 'inv', dom: [0.25, 4], view: { x0: -0.5, x1: 5, y0: -0.5, y1: 4.5, sx: 1, sy: 1 }, draw: [0.05, 5], a0: 1, rule: 'f′(x) = −1 ÷ x²', calc: function (a) { return '−1 ÷ ' + fmt(a, 2) + '²'; } }
+  ];
+  var tanI = 0, tanA = $('tanA'), tanP = null, tanSvg = $('tanSvg');
+  TAN.forEach(function (T, i) {
+    var b = document.createElement('button'); b.type = 'button'; b.id = 'fn' + i; b.textContent = 'f(x) = ' + FN[T.key].label;
+    b.addEventListener('click', function () { setTan(i); });
+    $('fnBtns').appendChild(b);
+  });
+  function setTan(i) {
+    tanI = i; var T = TAN[i];
+    tanA.min = T.dom[0]; tanA.max = T.dom[1]; tanA.value = T.a0;
+    TAN.forEach(function (q, j) { $('fn' + j).setAttribute('aria-pressed', j === i ? 'true' : 'false'); });
+    drawTan();
+  }
+  function drawTan() {
+    var T = TAN[tanI], F = FN[T.key], a = clamp(Number(tanA.value), T.dom[0], T.dom[1]), fa = F.f(a), m = F.d(a);
+    $('tanAOut').textContent = fmt(a, 2);
+    var P = tanP = frame(tanSvg, T.view);
+    mk(P.g, 'path', { d: curvePath(F.f, T.draw[0], T.draw[1], P), fill: 'none', stroke: 'var(--ink)', 'stroke-width': 3 });
+    drawLine(P, a, fa, m, { stroke: 'var(--acc)', 'stroke-width': 3 });
+    dot(P, a, fa, 'var(--acc)', 9);
+    var num6 = secant(T.key, a, 0.001), mean;
+    if (Math.abs(m) < 0.005) mean = 'Tout près de x = ' + fmt(a, 2) + ', f(x) ne change presque pas : la tangente est horizontale.';
+    else if (m > 0) mean = 'Tout près de x = ' + fmt(a, 2) + ', si x augmente un tout petit peu, f(x) <b>augmente</b> environ ' + fmt(m, 2) + ' fois plus.';
+    else mean = 'Tout près de x = ' + fmt(a, 2) + ', si x augmente un tout petit peu, f(x) <b>diminue</b> environ ' + fmt(-m, 2) + ' fois plus.';
+    $('tanOut').innerHTML = '<span>f(' + fmt(a, 2) + ') ≈ ' + fmt(fa, 3) + '</span>' +
+      '<span><b>f′(' + fmt(a, 2) + ') ≈ ' + fmt(m, 3) + '</b> (pente de la tangente)</span>' +
+      '<span class="soft">Règle : ' + T.rule + ', donc f′(' + fmt(a, 2) + ') = ' + T.calc(a) + ' ≈ ' + fmt(m, 3) + '</span>' +
+      '<span class="soft">Vérification par le zoom, h = 0,001 : (f(a + h) − f(a)) ÷ h ≈ ' + fmt(num6, 3) + '</span>' +
+      '<span>' + mean + '</span>';
+  }
+  tanA.addEventListener('input', drawTan);
+  draggable(tanSvg, function () { return tanP; }, function (x) { var T = TAN[tanI]; tanA.value = clamp(Math.round(x * 100) / 100, T.dom[0], T.dom[1]); drawTan(); });
+  setTan(0);
+
+  /* ---------- Étape 5 : signe de f′ ---------- */
+  var SGN = [
+    { key: 'hill', name: 'La colline', dom: [-1, 5], view: { x0: -1.5, x1: 5.5, y0: -2.5, y1: 4.5, sx: 1, sy: 1 }, a0: 0, crit: [2],
+      tab: '<span class="up">x &lt; 2 : f′ &gt; 0, ça monte ↗</span><span class="top">x = 2 : f′ = 0, sommet (2 ; 3)</span><span class="down">x &gt; 2 : f′ &lt; 0, ça descend ↘</span>' },
+    { key: 'coaster', name: 'Les montagnes russes', dom: [-2.1, 2.1], view: { x0: -2.5, x1: 2.5, y0: -4.5, y1: 4.5, sx: 1, sy: 1 }, a0: -1.8, crit: [-1, 1],
+      tab: '<span class="up">x &lt; −1 : ↗</span><span class="top">x = −1 : sommet (−1 ; 2)</span><span class="down">−1 &lt; x &lt; 1 : ↘</span><span class="top">x = 1 : creux (1 ; −2)</span><span class="up">x &gt; 1 : ↗</span>' }
+  ];
+  var sgnI = 0, sgnA = $('sgnA'), sgnP = null, sgnSvg = $('sgnSvg');
+  SGN.forEach(function (S, i) {
+    var b = document.createElement('button'); b.type = 'button'; b.id = 'sg' + i; b.textContent = S.name;
+    b.addEventListener('click', function () { setSgn(i); });
+    $('sgnBtns').appendChild(b);
+  });
+  function setSgn(i) {
+    sgnI = i; var S = SGN[i];
+    sgnA.min = S.dom[0]; sgnA.max = S.dom[1]; sgnA.value = S.a0;
+    SGN.forEach(function (q, j) { $('sg' + j).setAttribute('aria-pressed', j === i ? 'true' : 'false'); });
+    $('sgnTab').innerHTML = S.tab;
+    drawSgn();
+  }
+  function snapSgn(a) { var S = SGN[sgnI]; for (var k = 0; k < S.crit.length; k++) if (Math.abs(a - S.crit[k]) < 0.06) return S.crit[k]; return a; }
+  function drawSgn() {
+    var S = SGN[sgnI], F = FN[S.key], a = snapSgn(clamp(Number(sgnA.value), S.dom[0], S.dom[1])), fa = F.f(a), m = F.d(a);
+    $('sgnAOut').textContent = fmt(a, 2);
+    var P = sgnP = frame(sgnSvg, S.view);
+    mk(P.g, 'path', { d: curvePath(F.f, S.view.x0, S.view.x1, P), fill: 'none', stroke: 'var(--ink)', 'stroke-width': 3 });
+    var col = Math.abs(m) < 1e-9 ? 'var(--two)' : m > 0 ? 'var(--ok)' : 'var(--red)';
+    drawLine(P, a, fa, m, { stroke: col, 'stroke-width': 3 });
+    dot(P, a, fa, col, 9);
+    var out = $('sgnOut'), head = 'f′(' + fmt(a, 2) + ') = ' + fmt(m, 2);
+    if (Math.abs(m) < 1e-9) {
+      var isTop = S.key === 'hill' || a < 0;
+      out.className = 'verdict flat'; out.innerHTML = head + ' : tangente horizontale !<span>Tu es sur ' + (isTop ? 'un <strong>sommet</strong> : la courbe montait, puis elle descend.' : 'un <strong>creux</strong> : la courbe descendait, puis elle remonte.') + '</span>';
+    } else if (m > 0) { out.className = 'verdict yes'; out.innerHTML = head + ' &gt; 0 : ça monte.<span>La fonction est croissante ici.</span>'; }
+    else { out.className = 'verdict no'; out.innerHTML = head + ' &lt; 0 : ça descend.<span>La fonction est décroissante ici.</span>'; }
+  }
+  sgnA.addEventListener('input', drawSgn);
+  draggable(sgnSvg, function () { return sgnP; }, function (x) { var S = SGN[sgnI]; sgnA.value = clamp(Math.round(x * 100) / 100, S.dom[0], S.dom[1]); drawSgn(); });
+  setSgn(0);
+
+  /* ---------- Étape 6 : les règles ---------- */
+  var RULES = [
+    { key: 'c5', rule: 'f′(x) = 0', hint: 'Regarde la dernière ligne : est-ce que le nombre change quand a change ?' },
+    { key: 'lin', rule: 'f′(x) = 3', hint: 'Tous les nombres de la dernière ligne sont-ils pareils ? Regarde le nombre devant x.' },
+    { key: 'linm', rule: 'f′(x) = −2', hint: 'Une droite a la même pente partout. Quel nombre est devant x ?' },
+    { key: 'sq', rule: 'f′(x) = 2x', hint: 'Compare f′(a) avec a : pour a = 3, on trouve 6. Combien de fois a ?' },
+    { key: 'cube', rule: 'f′(x) = 3x²', hint: 'Pour a = 2, on trouve 12 = 3 × 4 = 3 × 2². Essaie 3 × a².' },
+    { key: 'sq3', rule: 'f′(x) = 6x', hint: 'C\'est 3 fois x² : la dérivée est 3 fois celle de x², donc 3 × 2a.' }
+  ];
+  var ruleI = 0, ruleAs = [-2, -1, 0, 1, 2, 3];
+  RULES.forEach(function (R, i) {
+    var b = document.createElement('button'); b.type = 'button'; b.id = 'rl' + i; b.textContent = 'f(x) = ' + FN[R.key].label;
+    b.addEventListener('click', function () { setRule(i); });
+    $('ruleBtns').appendChild(b);
+  });
+  function setRule(i) {
+    ruleI = i; var R = RULES[i];
+    RULES.forEach(function (q, j) { $('rl' + j).setAttribute('aria-pressed', j === i ? 'true' : 'false'); });
+    $('ruleTable').innerHTML = '<tr><th>a</th>' + ruleAs.map(function (a) { return '<td>' + fmt(a) + '</td>'; }).join('') + '</tr>' +
+      '<tr><th>f(a)</th>' + ruleAs.map(function (a) { return '<td>' + fmt(f(R.key, a)) + '</td>'; }).join('') + '</tr>' +
+      '<tr><th>f′(a)</th>' + ruleAs.map(function (a) { return '<td class="last">' + fmt(numDeriv(R.key, a), 2) + '</td>'; }).join('') + '</tr>';
+    $('rulePredLabel').textContent = 'Pour f(x) = ' + FN[R.key].label + ', devine f′(10) :';
+    $('rulePred').value = '';
+    var o = $('ruleOut'); o.className = 'verdict'; o.innerHTML = '<span>Regarde la ligne f′(a) et cherche le lien avec a.</span>';
+  }
+  function checkRule() {
+    var R = RULES[ruleI], x = num($('rulePred').value), ans = df(R.key, 10), o = $('ruleOut');
+    if (isNaN(x)) { o.className = 'verdict'; o.innerHTML = '<span>Écris un nombre.</span>'; return; }
+    if (Math.abs(x - ans) < 1e-6) { o.className = 'verdict yes'; o.innerHTML = 'Bravo ! f′(10) = ' + fmt(ans) + '.<span>Tu as trouvé le motif : ' + R.rule + '.</span>'; }
+    else { o.className = 'verdict no'; o.innerHTML = 'Pas tout à fait : f′(10) = ' + fmt(ans) + '.<span>Le motif est ' + R.rule + '. Essaie une autre fonction !</span>'; }
+  }
+  $('ruleCheck').addEventListener('click', checkRule);
+  $('rulePred').addEventListener('keydown', function (e) { if (e.key === 'Enter') checkRule(); });
+  $('ruleHint').addEventListener('click', function () { var o = $('ruleOut'); o.className = 'verdict'; o.innerHTML = '<span>Indice : ' + RULES[ruleI].hint + '</span>'; });
+  setRule(3);
+
+  /* ---------- Étape 7 : chute ---------- */
+  function fall(t) { var d = 4.9 * t * t, v = 9.8 * t; return { d: d, vAvg: t > 0 ? d / t : 0, v: v, kmh: v * 3.6 }; }
+  var fallT = $('fallT');
+  function drawFall(tt) {
+    var t = tt == null ? Number(fallT.value) : tt, F = fall(t);
+    $('fallTOut').textContent = fmt(t, 1);
+    var svg = $('fallSvg'), P = frame(svg, { x0: 0, x1: 4.2, y0: 0, y1: 85, sx: 1, sy: 20, L: 150 });
+    mk(P.g, 'path', { d: curvePath(function (x) { return 4.9 * x * x; }, 0, 4.2, P), fill: 'none', stroke: 'var(--ink)', 'stroke-width': 3 });
+    if (t > 0) mk(P.g, 'line', { x1: P.X(0), y1: P.Y(0), x2: P.X(t), y2: P.Y(F.d), stroke: 'var(--two)', 'stroke-width': 2.5, 'stroke-dasharray': '7 5' });
+    drawLine(P, t, F.d, F.v, { stroke: 'var(--acc)', 'stroke-width': 3 });
+    dot(P, t, F.d, 'var(--acc)', 7);
+    mk(svg, 'text', { x: P.L + P.pw - 4, y: P.T + P.ph - 8, 'text-anchor': 'end', 'font-size': 13 }, 't (s)');
+    mk(svg, 'text', { x: P.L + 6, y: P.T + 16, 'font-size': 13 }, 'd (m)');
+    /* colonne de chute : 0 m en haut, 85 m en bas */
+    var cx = 95, top = P.T, ph = P.ph;
+    mk(svg, 'rect', { x: cx - 22, y: top, width: 44, height: ph, fill: 'var(--card)', stroke: 'var(--line)', rx: 6 });
+    [0, 20, 40, 60, 80].forEach(function (mtr) { var y = top + mtr / 85 * ph; mk(svg, 'line', { x1: cx - 22, y1: y, x2: cx - 14, y2: y, stroke: 'var(--ink)', 'stroke-width': 1.5 }); mk(svg, 'text', { x: cx - 26, y: y + 5, 'text-anchor': 'end', 'font-size': 12 }, mtr + ' m'); });
+    mk(svg, 'circle', { cx: cx, cy: top + clamp(F.d, 0, 85) / 85 * ph, r: 9, fill: 'var(--acc)', stroke: 'var(--card)', 'stroke-width': 2 });
+    $('fallOut').innerHTML = '<span>Distance : d = 4,9 × ' + fmt(t, 1) + '² ≈ ' + fmt(F.d, 1) + ' m</span>' +
+      '<span class="c-two">Vitesse moyenne depuis le départ : ' + (t > 0 ? fmt(F.d, 2) + ' ÷ ' + fmt(t, 1) + ' ≈ ' + fmt(F.vAvg, 1) + ' m/s' : '—') + '</span>' +
+      '<span class="c-acc">Vitesse instantanée : v = 9,8 × ' + fmt(t, 1) + ' ≈ ' + fmt(F.v, 1) + ' m/s, soit environ ' + fmt(F.kmh, 0) + ' km/h</span>';
+  }
+  fallT.addEventListener('input', function () { drawFall(); });
+  $('fallGo').addEventListener('click', function () { animate(4000, function (p) { var t = 4 * p; fallT.value = Math.round(t * 10) / 10; drawFall(p === 1 ? 4 : t); }); });
+  drawFall();
+
+  /* ---------- Étape 8 : la boîte ---------- */
+  function boxV(x, c) { c = c || 20; if (x < 0 || x > c / 2) return 0; return x * (c - 2 * x) * (c - 2 * x); }
+  function boxDV(x, c) { c = c || 20; return (c - 2 * x) * (c - 6 * x); }
+  function boxBest(c) { c = c || 20; return { x: c / 6, v: boxV(c / 6, c) }; }
+  var boxX = $('boxX'), boxState = 2;
+  function drawBox() {
+    var x = boxState, V = boxV(x), dV = boxDV(x), side = 20 - 2 * x;
+    $('boxXOut').textContent = fmt(x, 2);
+    var net = $('netSvg'); clear(net);
+    var o = 10, s = 200, k = s / 20, c = x * k;
+    mk(net, 'rect', { x: o, y: o, width: s, height: s, fill: 'var(--acc-soft)', stroke: 'var(--ink)', 'stroke-width': 2 });
+    [[o, o], [o + s - c, o], [o, o + s - c], [o + s - c, o + s - c]].forEach(function (p) { if (c > 0) mk(net, 'rect', { x: p[0], y: p[1], width: c, height: c, fill: 'var(--paper)', stroke: 'var(--red)', 'stroke-width': 1.5, 'stroke-dasharray': '4 3' }); });
+    if (c > 0 && side > 0) mk(net, 'rect', { x: o + c, y: o + c, width: s - 2 * c, height: s - 2 * c, fill: 'none', stroke: 'var(--acc)', 'stroke-width': 1.5, 'stroke-dasharray': '6 4' });
+    if (side > 0) mk(net, 'text', { x: o + s / 2, y: o + s / 2 + 5, 'text-anchor': 'middle', 'font-size': 14 }, 'fond ' + fmt(side, 2) + ' cm');
+    if (c > 14) mk(net, 'text', { x: o + c / 2, y: o + c / 2 + 5, 'text-anchor': 'middle', 'font-size': 13, style: 'fill:var(--red)' }, 'x');
+    var P = frame($('volSvg'), { x0: 0, x1: 10, y0: 0, y1: 650, sx: 1, sy: 100, L: 44 });
+    mk(P.g, 'path', { d: curvePath(function (t) { return boxV(t); }, 0, 10, P), fill: 'none', stroke: 'var(--ink)', 'stroke-width': 3 });
+    var flat = Math.abs(dV) < 1e-6, col = flat ? 'var(--two)' : dV > 0 ? 'var(--ok)' : 'var(--red)';
+    drawLine(P, x, V, dV, { stroke: col, 'stroke-width': 2.5 });
+    dot(P, x, V, col, 7);
+    $('boxOut').innerHTML = '<span>Fond : ' + fmt(side, 2) + ' × ' + fmt(side, 2) + ' cm, hauteur : ' + fmt(x, 2) + ' cm</span><span><b>V = ' + fmt(x, 2) + ' × ' + fmt(side, 2) + ' × ' + fmt(side, 2) + ' ≈ ' + fmt(V, 1) + ' cm³</b></span><span class="soft">V′(' + fmt(x, 2) + ') = (20 − ' + fmt(2 * x, 2) + ')(20 − ' + fmt(6 * x, 2) + ') ≈ ' + fmt(dV, 1) + '</span>';
+    var vd = $('boxVerdict');
+    if (x === 0) { vd.className = 'verdict'; vd.innerHTML = 'x = 0 : pas de bords, la boîte est plate.<span>Volume 0. Coupe des coins !</span>'; }
+    else if (side <= 0) { vd.className = 'verdict'; vd.innerHTML = 'x = 10 : il ne reste plus de fond !<span>Volume 0.</span>'; }
+    else if (flat) { vd.className = 'verdict flat'; vd.innerHTML = 'Tangente horizontale : c\'est le volume maximal !<span>x = 20 ÷ 6 ≈ 3,33 cm donne environ ' + fmt(V, 1) + ' cm³.</span>'; }
+    else if (dV > 0) { vd.className = 'verdict yes'; vd.innerHTML = 'V′ &gt; 0 : la courbe monte.<span>Si tu coupes un peu plus, le volume augmente encore.</span>'; }
+    else { vd.className = 'verdict no'; vd.innerHTML = 'V′ &lt; 0 : la courbe descend.<span>Tu as dépassé le meilleur choix : coupe un peu moins.</span>'; }
+  }
+  boxX.addEventListener('input', function () { var x = Number(boxX.value); boxState = Math.abs(x - 10 / 3) < 0.06 ? 10 / 3 : x; drawBox(); });
+  $('boxBest').addEventListener('click', function () { boxState = 10 / 3; boxX.value = 3.3; drawBox(); });
+  drawBox();
+
+  /* ---------- Quiz ---------- */
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  function rnd(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+  function makeQ(t) {
+    var a, b, m, x1, y1, dx, k, h;
+    if (t === 0) { a = pick([-4, -3, -2, -1, 2, 3, 4, 5]); b = rnd(-6, 6); return { q: 'Quelle est la pente de la droite ' + lin(a, b) + ' ?', a: a, how: 'C\'est le nombre devant x : ' + fmt(a) }; }
+    if (t === 1) { x1 = rnd(-3, 3); y1 = rnd(-4, 5); dx = rnd(1, 4); m = pick([-3, -2, -1, 1, 2, 3, 4]); return { q: 'Une droite passe par A(' + fmt(x1) + ' ; ' + fmt(y1) + ') et B(' + fmt(x1 + dx) + ' ; ' + fmt(y1 + m * dx) + '). Quelle est sa pente ?', a: m, how: '(' + fmt(y1 + m * dx) + ' − ' + par(y1) + ') ÷ (' + fmt(x1 + dx) + ' − ' + par(x1) + ') = ' + fmt(m * dx) + ' ÷ ' + dx + ' = ' + fmt(m) }; }
+    if (t === 2) { a = pick([-5, -4, -3, -2, -1, 2, 3, 4, 5, 6, 7]); return { q: 'f(x) = x². Combien vaut f′(' + fmt(a) + ') ?', a: 2 * a, how: 'f′(x) = 2x, donc f′(' + fmt(a) + ') = 2 × ' + par(a) + ' = ' + fmt(2 * a) }; }
+    if (t === 3) { a = pick([-3, -2, -1, 1, 2, 3, 4]); return { q: 'f(x) = x³. Combien vaut f′(' + fmt(a) + ') ?', a: 3 * a * a, how: 'f′(x) = 3x², donc f′(' + fmt(a) + ') = 3 × ' + par(a) + '² = 3 × ' + (a * a) + ' = ' + (3 * a * a) }; }
+    if (t === 4) { b = rnd(2, 12); a = rnd(-5, 8); return { q: 'f(x) = ' + b + ' pour tout x. Quelle est la pente de la tangente en x = ' + fmt(a) + ' ?', a: 0, how: 'Une fonction constante ne change jamais : sa courbe est une droite horizontale, pente 0' }; }
+    if (t === 5) { k = pick([1, 2, 3, 5, 0.5, 1.5]); return { q: 'Une bille tombe : d = 4,9 t². Quelle est sa vitesse (en m/s) après ' + fmt(k) + ' s ?', a: 9.8 * k, how: 'v = 9,8 × t = 9,8 × ' + fmt(k) + ' = ' + fmt(9.8 * k, 2) + ' m/s' }; }
+    if (t === 6) { k = pick([2, 4, 6, 8, 10, 12]); return { q: 'f(x) = x² − ' + k + 'x. Pour quelle valeur de x la tangente est-elle horizontale ?', a: k / 2, how: 'f′(x) = 2x − ' + k + ' = 0 donne x = ' + k + ' ÷ 2 = ' + fmt(k / 2) }; }
+    a = rnd(1, 4); h = pick([1, 0.5, 0.1]);
+    return { q: 'f(x) = x². Quelle est la pente de la sécante entre x = ' + fmt(a) + ' et x = ' + fmt(a + h) + ' ?', a: 2 * a + h, how: '(' + fmt((a + h) * (a + h), 4) + ' − ' + (a * a) + ') ÷ ' + fmt(h) + ' = ' + fmt(2 * a + h) + ' (c\'est 2a + h)' };
+  }
+  var quiz = $('quiz'), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ''; done = [];
+    for (var k = 0; k < 8; k++) {
+      var Q = makeQ(k), li = document.createElement('li');
+      li.innerHTML = '<span>' + Q.q + '</span><input type="text" id="qa' + k + '" inputmode="decimal" autocomplete="off" aria-label="Ta réponse à la question ' + (k + 1) + '"><button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+      quiz.appendChild(li);
+      (function (k, Q) {
+        function check() {
+          var fb = $('qf' + k), x = num($('qa' + k).value);
+          if (isNaN(x)) { fb.className = 'fb'; fb.textContent = 'Écris un nombre.'; return; }
+          if (Math.abs(x - Q.a) < 0.006) { fb.className = 'fb ok'; fb.textContent = 'Bravo, c\'est juste !'; done[k] = true; }
+          else { done[k] = false; fb.className = 'fb no'; fb.innerHTML = 'Pas tout à fait : la réponse est ' + fmt(Q.a, 2) + '.<span>' + Q.how + '</span>'; }
+          $('score').textContent = done.filter(Boolean).length + ' / 8';
+        }
+        $('qb' + k).addEventListener('click', check);
+        $('qa' + k).addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+      })(k, Q);
+    }
+    $('score').textContent = '0 / 8';
+  }
+  $('newQuiz').addEventListener('click', newQuiz);
+  newQuiz();
+
+  window.__der = { f: f, df: df, secant: secant, numDeriv: numDeriv, zoomGap: zoomGap, tripSpeed: tripSpeed, tripDist: tripDist, tripAvg: tripAvg, lin: lin, fall: fall, boxV: boxV, boxDV: boxDV, boxBest: boxBest, fmt: fmt };
+})();
+</script>
+</body>
+</html>

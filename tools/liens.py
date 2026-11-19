@@ -16,6 +16,36 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 
 TOPICS = [
+    ("la sphère et la boule", "la-sphere-et-la-boule.html"),
+    ("la sphère", "la-sphere-et-la-boule.html"),
+    ("les droites remarquables", "les-droites-remarquables.html"),
+    ("les quadrilatères", "les-quadrilateres.html"),
+    ("la démonstration", "la-demonstration.html"),
+    ("l'équation produit nul", "l-equation-produit-nul-et-les-systemes.html"),
+    ("les systèmes", "l-equation-produit-nul-et-les-systemes.html"),
+    ("les arrondis", "les-arrondis-et-ordres-de-grandeur.html"),
+    ("les grandeurs composées", "les-grandeurs-composees.html"),
+    ("le second degré", "le-second-degre.html"),
+    ("les vecteurs", "les-vecteurs.html"),
+    ("les suites", "les-suites.html"),
+    ("la dérivée", "la-derivee.html"),
+    ("les nombres complexes", "les-nombres-complexes.html"),
+    ("les formes géométriques", "les-formes-geometriques.html"),
+    ("les angles et les triangles", "les-angles-et-triangles.html"),
+    ("la trigonométrie", "la-trigonometrie.html"),
+    ("les racines carrées", "les-racines-carrees.html"),
+    ("les nombres premiers", "les-nombres-premiers.html"),
+    ("les statistiques", "les-statistiques.html"),
+    ("les probabilités", "les-probabilites.html"),
+    ("les inéquations", "les-inequations.html"),
+    ("les conversions", "les-conversions.html"),
+    ("les échelles", "les-echelles.html"),
+    ("le repérage", "le-reperage.html"),
+    ("l'algorithmique", "l-algorithmique.html"),
+    ("le nombre d'or", "le-nombre-d-or.html"),
+    ("l'infini", "les-grands-nombres-et-l-infini.html"),
+    ("les grands nombres et l'infini", "les-grands-nombres-et-l-infini.html"),
+    ("le nombre π", "le-nombre-pi.html"),
     ("le théorème de Pythagore", "le-theoreme-de-pythagore.html"),
     ("Pythagore", "le-theoreme-de-pythagore.html"),
     ("le théorème de Thalès", "le-theoreme-de-thales.html"),
@@ -38,7 +68,7 @@ TOPICS = [
     ("π", "le-nombre-pi.html"),
     ("e", "le-nombre-e.html"),
 ]
-T = "|".join(re.escape(n) for n, _ in TOPICS)
+T = "|".join(re.escape(n) for n, _ in sorted(TOPICS, key=lambda t: -len(t[0])))  # longest first
 MENTION = re.compile(r"(tutoriels? sur )(" + T + r")(?!\w)(\s*\([^)<]*\))?(?:(\s+et sur )(" + T + r")(?!\w))?")
 FILE = dict(TOPICS)
 

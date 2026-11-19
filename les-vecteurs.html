@@ -1,0 +1,1206 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Les vecteurs</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, encre bleu cobalt (comme une flèche tracée au stylo), marge rouge. Les flèches sur quadrillage sont au centre. */
+:root {
+  --paper: #f6f8fc;
+  --grid: #e2e8f4;
+  --card: #ffffff;
+  --ink: #14213d;
+  --ink-soft: #4f5d7c;
+  --acc: #1e40af;
+  --acc-soft: #dde6fb;
+  --two: #c2410c;
+  --two-soft: #fde7da;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --four: #7c3aed;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #fff0a3;
+  --line: #d3dbea;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0d1220; --grid: #182038; --card: #121a2e; --ink: #e9eefb; --ink-soft: #a9b5d3;
+    --acc: #8fb0ff; --acc-soft: #1b2a52; --two: #fdab74; --two-soft: #3d2416;
+    --ok: #6fd39f; --ok-soft: #173a29; --four: #c4a5ff; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #2a3556;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0d1220; --grid: #182038; --card: #121a2e; --ink: #e9eefb; --ink-soft: #a9b5d3;
+  --acc: #8fb0ff; --acc-soft: #1b2a52; --two: #fdab74; --two-soft: #3d2416;
+  --ok: #6fd39f; --ok-soft: #173a29; --four: #c4a5ff; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #2a3556;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+
+/* Notation vecteur : une petite flèche au-dessus des lettres */
+.v { position: relative; display: inline-block; line-height: 1; padding-top: .34em; font-style: normal; white-space: nowrap; }
+.v::before { content: ""; position: absolute; left: .06em; right: .12em; top: .1em; border-top: .085em solid currentColor; }
+.v::after { content: ""; position: absolute; right: .03em; top: -.01em; width: .22em; height: .22em; border-top: .085em solid currentColor; border-right: .085em solid currentColor; transform: rotate(45deg); }
+.nrm { white-space: nowrap; }
+
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+svg text.halo { paint-order: stroke; stroke: var(--paper); stroke-width: 6px; stroke-linejoin: round; }
+.fig svg { width: 100%; height: auto; display: block; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; user-select: none; -webkit-user-select: none; }
+.drag { cursor: grab; touch-action: none; }
+.drag:focus { outline: none; }
+.drag:focus-visible circle:last-child { stroke: var(--red); }
+svg.dragging, svg.dragging .drag { cursor: grabbing; }
+.hint { font-size: .95rem; color: var(--ink-soft); }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 8px 14px; min-height: 44px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+button:disabled { opacity: .45; cursor: default; transform: none; }
+button.tc { font-family: var(--f-mono); font-weight: 600; border-width: 3px; }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+input[type="text"] { font: inherit; font-family: var(--f-mono); font-size: 1.05rem; padding: 8px 10px; min-height: 44px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; }
+input[type="range"] { width: 100%; accent-color: var(--acc); min-height: 32px; }
+.param { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.param label { font-weight: 700; }
+.sliders { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px 18px; }
+.inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px 14px; align-items: end; }
+.inputs label { font-weight: 700; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+
+.results { display: flex; flex-direction: column; gap: 8px; font-variant-numeric: tabular-nums; }
+.res { border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 12px; display: grid; grid-template-columns: minmax(0, auto) minmax(0, 1fr); gap: 2px 12px; align-items: baseline; }
+.res-name { font-family: var(--f-display); font-weight: 700; }
+.res-val { font-family: var(--f-mono); font-weight: 600; color: var(--acc); font-size: 1rem; text-align: right; overflow-wrap: anywhere; }
+.res-calc { grid-column: 1 / -1; font-family: var(--f-mono); font-size: .9rem; color: var(--ink-soft); overflow-wrap: anywhere; }
+.res.total { border-color: var(--ok); background: var(--ok-soft); }
+.res.total .res-val { color: var(--ok); }
+.steps { display: flex; flex-direction: column; gap: 6px; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; padding: 12px 14px; font-family: var(--f-mono); font-size: 1rem; overflow-wrap: anywhere; min-width: 0; }
+.steps b { color: var(--acc); }
+.steps .why { font-family: var(--f-body); font-size: .95rem; color: var(--ink-soft); }
+.formula { font-family: var(--f-mono); font-weight: 600; font-size: 1.15rem; color: var(--acc); text-align: center; padding: 12px; border: 2px dashed var(--acc); border-radius: 10px; overflow-wrap: anywhere; }
+.err { color: var(--red); font-weight: 700; font-family: var(--f-body); }
+.ca { color: var(--acc); font-weight: 700; }
+.cb { color: var(--two); font-weight: 700; }
+.cc { color: var(--ok); font-weight: 700; }
+.cd { color: var(--four); font-weight: 700; }
+
+.verdict { border-radius: 8px; padding: 12px 14px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+.verdict:empty { display: none; }
+.verdict.yes { background: var(--ok-soft); color: var(--ok); }
+.verdict.no { background: var(--red-soft); color: var(--red); }
+.verdict.info { background: var(--acc-soft); color: var(--acc); }
+.verdict span { font-weight: 400; color: var(--ink); overflow-wrap: anywhere; }
+
+.legend { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: .95rem; align-items: center; }
+.legend span { display: inline-flex; align-items: center; gap: 8px; }
+.chip { display: inline-block; width: 22px; height: 6px; border-radius: 3px; flex: none; }
+.chip.a { background: var(--acc); } .chip.b { background: var(--two); } .chip.c { background: var(--ok); } .chip.d { background: var(--four); } .chip.s { background: var(--ink-soft); }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.cards .m { font-family: var(--f-mono); font-size: .95rem; overflow-wrap: anywhere; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
+.tag.ok { color: var(--ok); }
+.tag.no { color: var(--red); }
+.tag.a { color: var(--acc); }
+.tag.b { color: var(--two); }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 110px auto; gap: 10px; align-items: center; }
+.quiz li > span:first-child { overflow-wrap: anywhere; min-width: 0; }
+.quiz input[type="text"] { font-size: 1rem; padding: 6px 8px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb:empty { display: none; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc); }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 120px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.errs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.errs li { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--paper); }
+.errs .bad { font-family: var(--f-mono); color: var(--red); text-decoration: line-through; overflow-wrap: anywhere; }
+.errs .good { font-family: var(--f-mono); color: var(--ok); font-weight: 600; overflow-wrap: anywhere; }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); overflow-wrap: anywhere; }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+<style id="tnav-css">
+.tnav-top { display: flex; margin: 0 0 4px; }
+.tnav-home { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font-weight: 700; font-size: .95rem; text-decoration: none; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tnav-home:hover, .tnav-home:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.tnav-bottom { margin-top: 8px; display: flex; flex-direction: column; gap: 12px; }
+.tnav-bottom h2 { margin: 0; }
+.tnav-pn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tnav-pn a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--ink, #222); border-radius: 10px;
+  background: var(--card, #fff); color: var(--ink, #222); text-decoration: none; box-shadow: 3px 3px 0 var(--ink, #222); min-width: 0; }
+.tnav-pn a span { font-size: .85rem; color: var(--ink-soft, #666); }
+.tnav-pn a strong { overflow-wrap: anywhere; }
+.tnav-pn a.next { text-align: right; grid-column: 2; }
+.tnav-bottom .tnav-home { align-self: center; }
+@media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
+</style>
+</head>
+<body>
+<main class="page">
+<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="index.html">← Tous les tutoriels</a></nav><!--/tnav-->
+
+
+  <header class="hero">
+    <span class="eyebrow">Tutoriel de maths · niveau lycée · avant-goût</span>
+    <h1>Les vecteurs</h1>
+    <p class="lead">Une flèche qui dit où aller : dans quelle direction, dans quel sens et de combien. Avec les vecteurs, on décrit des déplacements, on additionne des chemins, et on comprend pourquoi un avion avance de travers quand il y a du vent.</p>
+    <div class="fig">
+      <svg viewBox="0 0 600 220" role="img" aria-label="Une flèche de A vers B, posée sur une droite en pointillés : la direction, le sens et la longueur">
+        <line x1="30" y1="191" x2="580" y2="24" stroke="var(--ink-soft)" stroke-width="2" stroke-dasharray="7 7"/>
+        <line x1="100" y1="170" x2="409" y2="76" stroke="var(--acc)" stroke-width="6" stroke-linecap="round"/>
+        <polygon points="430,70 410.5,88.5 403.5,65.5" fill="var(--acc)"/>
+        <circle cx="100" cy="170" r="7" fill="var(--acc)"/>
+        <text x="84" y="200" font-size="26" font-weight="700" text-anchor="middle">A</text>
+        <text x="436" y="108" font-size="26" font-weight="700" text-anchor="middle">B</text>
+        <text class="halo" x="520" y="32" font-size="20" text-anchor="middle" transform="rotate(-16.9 520 32)" style="fill:var(--ink-soft)">direction</text>
+        <text class="halo" x="300" y="96" font-size="20" font-weight="700" text-anchor="middle" transform="rotate(-16.9 300 96)" style="fill:var(--acc)">sens : de A vers B →</text>
+        <text class="halo" x="250" y="160" font-size="20" font-weight="700" text-anchor="middle" transform="rotate(-16.9 250 160)" style="fill:var(--two)">longueur</text>
+      </svg>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · L'idée</span>
+    <h2>Un vecteur, c'est un déplacement</h2>
+    <p>Tu es au point A et tu vas au point B. Ce trajet en ligne droite se dessine avec une flèche : c'est le <strong>vecteur</strong> <span class="v">AB</span>. On écrit les deux lettres avec une petite flèche au-dessus, et on lit « vecteur AB ». La première lettre est le <strong>départ</strong>, la deuxième l'<strong>arrivée</strong>.</p>
+    <p>Un vecteur donne <span class="hl">trois informations</span> :</p>
+    <div class="cards">
+      <div class="box"><span class="tag a">1 · Direction</span><strong>Sur quelle route ?</strong><span class="soft">C'est la droite qui porte la flèche : horizontale, verticale, penchée…</span></div>
+      <div class="box"><span class="tag a">2 · Sens</span><strong>Dans quel sens ?</strong><span class="soft">Sur une même route, on peut aller dans deux sens. La pointe de la flèche dit lequel.</span></div>
+      <div class="box"><span class="tag a">3 · Longueur</span><strong>De combien ?</strong><span class="soft">C'est la distance parcourue, la longueur de la flèche.</span></div>
+    </div>
+    <p>Dans le tutoriel sur <a class="tlink" href="les-transformations.html">les transformations</a>, tu as vu la <strong>translation</strong> : on fait glisser une figure sans la tourner. Tous les points suivent <strong>la même flèche</strong>. Cette flèche, c'est un vecteur ! Fais glisser les points A et B : la maison glisse en suivant <span class="v">AB</span>.</p>
+    <div class="box">
+      <div class="fig"><svg id="svA" role="group" aria-label="Quadrillage : la flèche AB et la maison qui glisse en suivant cette flèche"></svg></div>
+      <p class="hint">Fais glisser les ronds A et B avec la souris ou le doigt (ou sélectionne-les et utilise les flèches du clavier).</p>
+      <div class="legend"><span><i class="chip a"></i>le vecteur <span class="v">AB</span></span><span><i class="chip s"></i>chaque coin suit la même flèche</span></div>
+      <div class="results" id="outA" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · Vecteurs égaux</span>
+    <h2>Deux flèches identiques, à deux endroits</h2>
+    <p>Deux vecteurs sont <strong>égaux</strong> quand ils ont <strong>la même direction, le même sens et la même longueur</strong>. Ils peuvent être dessinés à des endroits différents : ce qui compte, c'est le déplacement, pas le point de départ. Comme deux personnes qui font « 3 pas à droite, 2 pas en avant », chacune depuis sa place.</p>
+    <div class="note">
+      <span class="note-title">Le parallélogramme caché</span>
+      <span>Si <span class="v">AB</span> = <span class="v">CD</span>, alors les quatre points forment le parallélogramme <strong>ABDC</strong>. Attention à l'ordre des lettres : A, B, puis D, puis C (on « tourne » autour de la figure).</span>
+    </div>
+    <div class="box">
+      <h3>Rends les deux flèches égales</h3>
+      <div class="fig"><svg id="svB" role="group" aria-label="Quadrillage : les flèches AB et CD, dont on déplace les extrémités"></svg></div>
+      <div class="legend"><span><i class="chip a"></i><span class="v">AB</span></span><span><i class="chip b"></i><span class="v">CD</span></span><span><i class="chip c"></i>parallélogramme ABDC</span></div>
+      <div class="btns"><button type="button" id="bNew">Nouvel essai</button><button type="button" id="bFix">Montre-moi</button></div>
+      <div class="verdict" id="outB" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Les coordonnées</span>
+    <h2>Compter les carreaux</h2>
+    <p>Dans un repère (comme dans le tutoriel sur <a class="tlink" href="le-reperage.html">le repérage</a>), on décrit un vecteur avec deux nombres : de combien on avance <strong>en x</strong> (vers la droite si c'est positif, vers la gauche si c'est négatif) et de combien on monte <strong>en y</strong> (vers le haut si c'est positif, vers le bas si c'est négatif). Ce sont les <strong>coordonnées du vecteur</strong>.</p>
+    <p class="formula">A(x<sub>A</sub> ; y<sub>A</sub>) et B(x<sub>B</sub> ; y<sub>B</sub>) donnent <span class="v">AB</span> = (x<sub>B</sub> − x<sub>A</sub> ; y<sub>B</sub> − y<sub>A</sub>)</p>
+    <p>Retiens : <span class="hl">arrivée moins départ</span>. Exemple : A(1 ; 2) et B(4 ; 7) donnent <span class="v">AB</span> = (4 − 1 ; 7 − 2) = (3 ; 5). Deux vecteurs sont égaux exactement quand ils ont <strong>les mêmes coordonnées</strong>.</p>
+    <div class="box">
+      <h3>À toi : trouve les coordonnées de <span class="v">AB</span></h3>
+      <p class="mono" id="cPts"></p>
+      <div class="fig"><svg id="svC" role="img" aria-label="Repère avec les points A et B et la flèche AB"></svg></div>
+      <div class="inputs">
+        <label for="cx">x de <span class="v">AB</span><input id="cx" type="text" inputmode="decimal" autocomplete="off"></label>
+        <label for="cy">y de <span class="v">AB</span><input id="cy" type="text" inputmode="decimal" autocomplete="off"></label>
+      </div>
+      <div class="btns"><button type="button" id="cCheck">Vérifier</button><button type="button" id="cHint">Indice</button><button type="button" id="cNew">Nouveaux points</button></div>
+      <div class="verdict" id="outC" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · La longueur</span>
+    <h2>La norme, grâce à Pythagore</h2>
+    <p>La longueur d'un vecteur s'appelle sa <strong>norme</strong>. On l'écrit avec deux doubles barres : <span class="nrm">‖<span class="v">AB</span>‖</span>. Les deux coordonnées x et y forment les deux côtés d'un triangle rectangle, et la flèche en est l'hypoténuse. Le théorème de Pythagore (vu dans le tutoriel sur <a class="tlink" href="le-theoreme-de-pythagore.html">Pythagore</a>) donne :</p>
+    <p class="formula">si <span class="v">u</span> = (x ; y), alors ‖<span class="v">u</span>‖ = √(x² + y²)</p>
+    <p>Exemple : <span class="v">u</span> = (3 ; 4) donne √(9 + 16) = √25 = 5. Un nombre négatif au carré devient positif : (−3)² = 9. Une norme n'est donc <strong>jamais négative</strong>.</p>
+    <div class="box">
+      <div class="fig"><svg id="svG" role="group" aria-label="Quadrillage : la flèche AB et le triangle rectangle formé par ses coordonnées"></svg></div>
+      <div class="steps" id="outG" aria-live="polite"></div>
+      <div class="verdict info" id="gDefi" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="gNext" disabled>Défi suivant</button></div>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Additionner</span>
+    <h2>La relation de Chasles et la chasse au trésor</h2>
+    <p>Aller de A à B, puis de B à C, c'est comme aller directement de A à C. On l'écrit :</p>
+    <p class="formula"><span class="v">AB</span> + <span class="v">BC</span> = <span class="v">AC</span></p>
+    <p>C'est la <strong>relation de Chasles</strong>. Quand l'arrivée du premier vecteur est le départ du second, la lettre du milieu « disparaît ». En coordonnées, c'est simple : <span class="hl">on additionne les x entre eux et les y entre eux</span>.</p>
+    <div class="box">
+      <h3>Déplace A, B et C</h3>
+      <div class="fig"><svg id="svD" role="group" aria-label="Quadrillage : les flèches AB, BC et AC"></svg></div>
+      <div class="legend"><span><i class="chip a"></i><span class="v">AB</span></span><span><i class="chip b"></i><span class="v">BC</span></span><span><i class="chip c"></i><span class="v">AC</span> (le raccourci)</span></div>
+      <div class="steps" id="outD" aria-live="polite"></div>
+    </div>
+    <div class="box">
+      <h3>La carte au trésor</h3>
+      <p>Pars de S et atteins le trésor T en enchaînant les vecteurs des cartes. Tu peux utiliser une carte plusieurs fois. Astuce : la somme de tes vecteurs doit être égale à <span class="v">ST</span>.</p>
+      <div class="fig"><svg id="svT" role="img" aria-label="Carte au trésor : le départ S, le trésor T et le chemin déjà parcouru"></svg></div>
+      <p class="mono" id="tGoal"></p>
+      <div class="btns" id="tCards" role="group" aria-label="Cartes de déplacement"></div>
+      <div class="btns"><button type="button" id="tUndo">↶ Annuler</button><button type="button" id="tReset">Recommencer</button><button type="button" id="tNew">Nouvelle carte</button></div>
+      <div class="verdict" id="outT" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · L'autre façon d'additionner</span>
+    <h2>La règle du parallélogramme</h2>
+    <p>Et si les deux vecteurs partent du <strong>même point</strong> O ? On construit le parallélogramme qui a ces deux flèches comme côtés. La somme <span class="v">u</span> + <span class="v">v</span> est la <strong>diagonale</strong> qui part de O. C'est la même chose que Chasles : en pointillés, on a recopié <span class="v">v</span> au bout de <span class="v">u</span>.</p>
+    <div class="box">
+      <div class="fig"><svg id="svE" role="group" aria-label="Quadrillage : les vecteurs u et v partant de O, le parallélogramme et la diagonale u + v"></svg></div>
+      <div class="legend"><span><i class="chip a"></i><span class="v">u</span></span><span><i class="chip b"></i><span class="v">v</span></span><span><i class="chip c"></i><span class="v">u</span> + <span class="v">v</span></span></div>
+      <div class="steps" id="outE" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Multiplier par un nombre</span>
+    <h2>Étirer, rétrécir, retourner</h2>
+    <p>Multiplier un vecteur <span class="v">u</span> par un nombre k, c'est garder sa direction et multiplier sa longueur. On multiplie les deux coordonnées par k : <strong>k·<span class="v">u</span> = (k × x ; k × y)</strong>. Si k est <strong>négatif</strong>, la flèche se <strong>retourne</strong>.</p>
+    <div class="box">
+      <div class="param">
+        <label for="kS">k = <span class="mono" id="kOut">2</span></label>
+        <input id="kS" type="range" min="-3" max="3" step="0.5" value="2">
+      </div>
+      <div class="fig"><svg id="svF" role="group" aria-label="Quadrillage : le vecteur u et le vecteur k fois u partant du même point O"></svg></div>
+      <div class="legend"><span><i class="chip a"></i><span class="v">u</span> (déplace sa pointe)</span><span><i class="chip c"></i>k·<span class="v">u</span></span></div>
+      <div class="results" id="outF" aria-live="polite"></div>
+    </div>
+    <div class="cards">
+      <div class="box"><span class="tag a">k = 0</span><strong>Le vecteur nul</strong><span class="soft">0·<span class="v">u</span> = <span class="v">0</span> = (0 ; 0). C'est le « déplacement » où l'on ne bouge pas : <span class="v">AA</span> = <span class="v">0</span>. Sa longueur est 0 et il n'a pas de direction.</span></div>
+      <div class="box"><span class="tag a">k = −1</span><strong>L'opposé</strong><span class="soft">−<span class="v">u</span> a la même direction et la même longueur que <span class="v">u</span>, mais le sens contraire. Faire le chemin à l'envers : <span class="v">BA</span> = −<span class="v">AB</span>, et <span class="v">AB</span> + <span class="v">BA</span> = <span class="v">AA</span> = <span class="v">0</span>.</span></div>
+    </div>
+    <p>Deux vecteurs sont <strong>colinéaires</strong> quand l'un est un multiple de l'autre : ils ont la même direction (leurs flèches sont parallèles). Pour le tester, on calcule <span class="mono">x × y′ − y × x′</span> : s'il vaut 0, ils sont colinéaires.</p>
+    <div class="box">
+      <h3>Le testeur de colinéarité</h3>
+      <div class="inputs">
+        <label for="co1">x de <span class="v">u</span><input id="co1" type="text" inputmode="decimal" autocomplete="off" value="2"></label>
+        <label for="co2">y de <span class="v">u</span><input id="co2" type="text" inputmode="decimal" autocomplete="off" value="3"></label>
+        <label for="co3">x′ de <span class="v">v</span><input id="co3" type="text" inputmode="decimal" autocomplete="off" value="−4"></label>
+        <label for="co4">y′ de <span class="v">v</span><input id="co4" type="text" inputmode="decimal" autocomplete="off" value="−6"></label>
+      </div>
+      <div class="verdict" id="outCo" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Dans la vraie vie</span>
+    <h2>Forces, vent et courant</h2>
+    <p>Les physiciens dessinent des vecteurs partout. Une <strong>force</strong> (une poussée, une traction) a une direction, un sens et une intensité : c'est un vecteur. Une <strong>vitesse</strong> aussi : elle dit où l'on va et à quelle allure.</p>
+    <div class="cards">
+      <div class="box"><strong>Deux personnes tirent une caisse</strong><span class="soft">Chacune tire avec une corde dans sa direction. La caisse part dans la direction de la <strong>somme</strong> des deux forces, la diagonale du parallélogramme.</span></div>
+      <div class="box"><strong>Le tir à la corde</strong><span class="soft">Deux équipes tirent aussi fort l'une que l'autre, en sens contraires. Les forces sont opposées, leur somme est le vecteur nul : la corde ne bouge pas.</span></div>
+      <div class="box"><strong>Les jeux vidéo</strong><span class="soft">À chaque image, le jeu ajoute le vecteur vitesse à la position du personnage. C'est une translation, des dizaines de fois par seconde !</span></div>
+    </div>
+    <div class="box">
+      <h3>L'avion et le vent</h3>
+      <p>L'avion vise l'est. Mais l'air qui le porte bouge : sa vitesse par rapport au sol est la <strong>somme</strong> de sa vitesse dans l'air et de la vitesse du vent. Il avance un peu de travers : c'est la <strong>dérive</strong>.</p>
+      <div class="sliders">
+        <div class="param"><label for="hV">Vitesse de l'avion : <span class="mono" id="hVo"></span></label><input id="hV" type="range" min="100" max="900" step="50" value="300"></div>
+        <div class="param"><label for="hW">Vitesse du vent : <span class="mono" id="hWo"></span></label><input id="hW" type="range" min="0" max="200" step="10" value="80"></div>
+        <div class="param"><label for="hA">Le vent pousse vers : <span class="mono" id="hAo"></span></label><input id="hA" type="range" min="0" max="315" step="45" value="90"></div>
+      </div>
+      <div class="fig"><svg id="svH" viewBox="0 0 640 360" role="img" aria-label="La vitesse de l'avion, celle du vent, et leur somme : le trajet réel"></svg></div>
+      <div class="legend"><span><i class="chip a"></i>avion (dans l'air)</span><span><i class="chip b"></i>vent</span><span><i class="chip c"></i>trajet réel (somme)</span></div>
+      <div class="results" id="outH" aria-live="polite"></div>
+    </div>
+    <div class="box">
+      <h3>Le bateau qui traverse la rivière</h3>
+      <p>La rivière fait 120 m de large et le courant pousse vers la droite. Le bateau avance dans l'eau, mais l'eau elle-même avance : il arrive plus loin que prévu. Pour arriver pile en face, il doit viser un peu vers l'amont (contre le courant).</p>
+      <div class="sliders">
+        <div class="param"><label for="rB">Vitesse du bateau dans l'eau : <span class="mono" id="rBo"></span></label><input id="rB" type="range" min="1" max="4" step="0.5" value="2"></div>
+        <div class="param"><label for="rC">Vitesse du courant : <span class="mono" id="rCo"></span></label><input id="rC" type="range" min="0" max="3" step="0.5" value="1.5"></div>
+      </div>
+      <div class="btns" role="group" aria-label="Où vise le bateau"><button type="button" id="rM0" aria-pressed="true">Viser tout droit</button><button type="button" id="rM1" aria-pressed="false">Viser contre le courant</button></div>
+      <div class="fig"><svg id="svR" viewBox="0 0 640 380" role="img" aria-label="La rivière, le trajet du bateau et ses vecteurs vitesse"></svg></div>
+      <div class="results" id="outR" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Un peu d'histoire</span>
+    <h2>Des flèches pour calculer</h2>
+    <ol class="timeline">
+      <li><span class="when">XVI<sup>e</sup>–XVII<sup>e</sup> siècle</span><div class="what"><strong>Le parallélogramme des forces</strong><span>Des savants comme le Flamand Simon Stevin, puis Isaac Newton, expliquent comment deux forces se combinent avec un parallélogramme. Le mot « vecteur » n'existe pas encore.</span></div></li>
+      <li><span class="when">XIX<sup>e</sup> siècle</span><div class="what"><strong>Grassmann et Hamilton</strong><span>Vers le milieu du siècle, l'Allemand Hermann Grassmann et l'Irlandais William Rowan Hamilton inventent, chacun de son côté, des calculs avec des grandeurs « orientées ». Hamilton répand le mot <em>vecteur</em>, du latin <em>vector</em> : « celui qui transporte ».</span></div></li>
+      <li><span class="when">XIX<sup>e</sup> siècle</span><div class="what"><strong>Michel Chasles</strong><span>La relation <span class="v">AB</span> + <span class="v">BC</span> = <span class="v">AC</span> porte le nom de ce géomètre français. On l'appelle surtout ainsi en France.</span></div></li>
+      <li><span class="when">fin du XIX<sup>e</sup> siècle</span><div class="what"><strong>Gibbs et Heaviside</strong><span>L'Américain Josiah Willard Gibbs et l'Anglais Oliver Heaviside simplifient ces idées. Leur calcul vectoriel est encore celui des physiciens aujourd'hui, par exemple pour l'électricité et le magnétisme.</span></div></li>
+      <li><span class="when">aujourd'hui</span><div class="what"><strong>Partout</strong><span>Jeux vidéo, GPS, prévisions du vent, robots, dessins vectoriels sur ordinateur : les vecteurs sont partout.</span></div></li>
+    </ol>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · Attention</span>
+    <h2>Les erreurs fréquentes</h2>
+    <div class="box">
+      <ul class="errs">
+        <li><span class="bad"><span class="v">AB</span> = (x<sub>A</sub> − x<sub>B</sub> ; y<sub>A</sub> − y<sub>B</sub>)</span><span class="good"><span class="v">AB</span> = (x<sub>B</sub> − x<sub>A</sub> ; y<sub>B</sub> − y<sub>A</sub>)</span><span class="soft">C'est toujours arrivée moins départ.</span></li>
+        <li><span class="bad"><span class="v">BA</span> = <span class="v">AB</span></span><span class="good"><span class="v">BA</span> = −<span class="v">AB</span></span><span class="soft">Même direction, même longueur, mais sens contraire.</span></li>
+        <li><span class="bad"><span class="v">AB</span> = 5</span><span class="good">‖<span class="v">AB</span>‖ = 5</span><span class="soft">Un vecteur n'est pas un nombre. Sa longueur, oui.</span></li>
+        <li><span class="bad">‖<span class="v">u</span>‖ = √(3² + 4²) = 3 + 4 = 7</span><span class="good">‖<span class="v">u</span>‖ = √(9 + 16) = √25 = 5</span><span class="soft">La racine d'une somme n'est pas la somme des racines.</span></li>
+        <li><span class="bad">‖<span class="v">u</span> + <span class="v">v</span>‖ = ‖<span class="v">u</span>‖ + ‖<span class="v">v</span>‖</span><span class="good">(3 ; 0) + (0 ; 4) = (3 ; 4), de longueur 5, pas 3 + 4 = 7</span><span class="soft">Le raccourci est plus court que le détour (sauf si les flèches vont dans le même sens).</span></li>
+        <li><span class="bad"><span class="v">AB</span> = <span class="v">CD</span> donc ABCD est un parallélogramme</span><span class="good"><span class="v">AB</span> = <span class="v">CD</span> donc ABDC est un parallélogramme</span><span class="soft">Fais un dessin : l'ordre des lettres compte.</span></li>
+        <li><span class="bad"><span class="v">AB</span> + <span class="v">CD</span> = <span class="v">AD</span></span><span class="good"><span class="v">AB</span> + <span class="v">BD</span> = <span class="v">AD</span></span><span class="soft">Chasles ne marche que si l'arrivée du premier est le départ du second.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Écris un nombre (entier ou décimal, positif ou négatif).</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Nouvelles questions</button>
+    </div>
+  </section>
+
+  <!-- 12 -->
+  <section>
+    <span class="eyebrow">Étape 12 · À toi de jouer</span>
+    <h2>Six exercices</h2>
+    <div class="exos">
+      <details>
+        <summary>Coordonnées et longueur<span class="q">A(−1 ; 4) et B(3 ; 1). Calcule les coordonnées de <span class="v">AB</span>, puis sa longueur.</span></summary>
+        <div><span><span class="v">AB</span> = (3 − (−1) ; 1 − 4) = <strong>(4 ; −3)</strong>.</span><span>‖<span class="v">AB</span>‖ = √(4² + (−3)²) = √(16 + 9) = √25 = <strong>5</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Le quatrième sommet<span class="q">A(1 ; 1), B(4 ; 2) et C(2 ; 4). Trouve D pour que ABDC soit un parallélogramme.</span></summary>
+        <div><span>Il faut <span class="v">CD</span> = <span class="v">AB</span> = (3 ; 1). On part de C et on fait ce déplacement : D = (2 + 3 ; 4 + 1) = <strong>(5 ; 5)</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Chasles<span class="q">Simplifie <span class="v">AC</span> + <span class="v">CB</span>, puis <span class="v">AB</span> + <span class="v">BC</span> + <span class="v">CA</span>.</span></summary>
+        <div><span><span class="v">AC</span> + <span class="v">CB</span> = <strong><span class="v">AB</span></strong> (le C du milieu disparaît).</span><span><span class="v">AB</span> + <span class="v">BC</span> + <span class="v">CA</span> = <span class="v">AC</span> + <span class="v">CA</span> = <span class="v">AA</span> = <strong><span class="v">0</span></strong> : on revient au point de départ.</span></div>
+      </details>
+      <details>
+        <summary>Colinéaires ?<span class="q"><span class="v">u</span>(4 ; −6) et <span class="v">v</span>(−2 ; 3) sont-ils colinéaires ?</span></summary>
+        <div><span>4 × 3 − (−6) × (−2) = 12 − 12 = 0 : <strong>oui</strong>.</span><span>En effet <span class="v">v</span> = −0,5·<span class="v">u</span> : <span class="v">v</span> est deux fois plus court et va dans l'autre sens.</span></div>
+      </details>
+      <details>
+        <summary>Multiplier<span class="q"><span class="v">u</span>(2 ; −3). Calcule les coordonnées de −3<span class="v">u</span>. Que devient la longueur ?</span></summary>
+        <div><span>−3<span class="v">u</span> = (−3 × 2 ; −3 × (−3)) = <strong>(−6 ; 9)</strong>.</span><span>La longueur est multipliée par 3 (on ne garde pas le signe moins) et le sens est inversé.</span></div>
+      </details>
+      <details>
+        <summary>L'avion<span class="q">Un avion vole à 240 km/h vers l'est. Un vent de 70 km/h pousse vers le nord. Quelle est sa vitesse par rapport au sol ?</span></summary>
+        <div><span>Vitesse au sol : (240 ; 0) + (0 ; 70) = (240 ; 70).</span><span>Sa norme : √(240² + 70²) = √(57 600 + 4 900) = √62 500 = <strong>250 km/h</strong>. Il dérive d'environ 16° vers le nord.</span></div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• Un <strong>vecteur</strong> est un déplacement : une <strong>direction</strong>, un <strong>sens</strong> et une <strong>longueur</strong>. Une translation fait suivre le même vecteur à tous les points.</span>
+      <span>• <span class="v">AB</span> = <span class="v">CD</span> quand les flèches sont identiques ; alors ABDC est un parallélogramme.</span>
+      <span>• Coordonnées : <span class="v">AB</span> = (x<sub>B</sub> − x<sub>A</sub> ; y<sub>B</sub> − y<sub>A</sub>), arrivée moins départ. Norme : √(x² + y²).</span>
+      <span>• Chasles : <span class="v">AB</span> + <span class="v">BC</span> = <span class="v">AC</span>. Pour additionner, on ajoute les x entre eux et les y entre eux (ou on trace le parallélogramme).</span>
+      <span>• k·<span class="v">u</span> = (k × x ; k × y) : longueur multipliée par |k|, sens inversé si k est négatif. <span class="v">0</span> est le vecteur nul, −<span class="v">u</span> l'opposé.</span>
+      <span>• <span class="v">u</span> et <span class="v">v</span> sont colinéaires si x × y′ − y × x′ = 0.</span>
+    </div>
+  </section>
+
+  <!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"><a class="prev" href="le-second-degre.html"><span>← Précédent</span><strong>Le second degré</strong></a><a class="next" href="les-suites.html"><span>Suivant →</span><strong>Les suites</strong></a></div><a class="tnav-home" href="index.html">⌂ Tous les tutoriels</a></nav><!--/tnav-->
+<footer>Fiche de révision · Les vecteurs</footer>
+</main>
+
+<script>
+(function () {
+  /* Test hooks (window.__vec) — un point ou un vecteur est un tableau [x, y] :
+     vec(A, B)               -> [x, y]  : coordonnées de AB = (xB − xA ; yB − yA)
+     add(u, v)               -> [x, y]  : u + v
+     scale(k, u)             -> [x, y]  : k·u
+     opp(u)                  -> [x, y]  : −u
+     norm(u)                 -> number  : √(x² + y²)
+     normText(u)             -> string  : '5', '√13 ≈ 3,61', '0', ou '≈ 2,12' si x² + y² n'est pas entier
+     equal(u, v)             -> boolean
+     compare(A, B, C, D)     -> { u, v, equal, zeroU, zeroV, sameDir, sameSens, sameLen, flat } pour AB et CD
+     colinear(u, v)          -> { col, det, k } : det = x·y′ − y·x′ ; k tel que v = k·u (null si u nul ou non colinéaires)
+     chasles(points)         -> [x, y]  : P0P1 + P1P2 + … (= P0Pn)
+     plane(V, W, angle)      -> { x, y, speed, drift } : (V ; 0) + vent W poussant vers angle (degrés, 0 = est, 90 = nord) ; drift en degrés
+     boat(b, c, width, mode) -> { ok, bx, by, vx, vy, speed, time, drift, aim } : mode 'droit' ou 'remonter' ; ok = false si impossible
+     fmtVec(u)               -> string  : '(4 ; −3)'
+     puzzle()                -> { S, T, cards, sol } : carte au trésor 14 × 9 solvable (S + somme des cards[sol[i]] = T)
+  */
+  var NS = 'http://www.w3.org/2000/svg';
+  function $(id) { return document.getElementById(id); }
+  function fmt(x, d) { var r = Math.round(x * 1e6) / 1e6; if (Object.is(r, -0)) r = 0; return r.toLocaleString('fr-FR', { maximumFractionDigits: d == null ? 3 : d }).replace('-', '−'); }
+  function num(s) { var t = String(s).replace(/\s/g, '').replace(/[−–]/g, '-').replace(',', '.'); if (t === '') return NaN; var x = Number(t); return isFinite(x) ? x : NaN; }
+  function par(x) { return x < 0 ? '(' + fmt(x) + ')' : fmt(x); }
+  function mk(parent, name, attrs, text) { var e = document.createElementNS(NS, name); for (var a in attrs) e.setAttribute(a, attrs[a]); if (text != null) e.textContent = text; parent.appendChild(e); return e; }
+  function clear(g) { while (g.firstChild) g.removeChild(g.firstChild); }
+  function rnd(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  function V(s) { return "<span class='v'>" + s + '</span>'; }
+  function fmtP(p) { return fmt(p[0]) + ' ; ' + fmt(p[1]); }
+  function fmtVec(u) { return '(' + fmtP(u) + ')'; }
+  function res(name, val, calc, cls) { return "<div class='res" + (cls ? ' ' + cls : '') + "'><span class='res-name'>" + name + "</span><span class='res-val'>" + val + '</span>' + (calc ? "<span class='res-calc'>" + calc + '</span>' : '') + '</div>'; }
+
+  /* ---------- Les maths ---------- */
+  function vec(A, B) { return [B[0] - A[0], B[1] - A[1]]; }
+  function add(u, v) { return [u[0] + v[0], u[1] + v[1]]; }
+  function scale(k, u) { return [k * u[0], k * u[1]]; }
+  function opp(u) { return [-u[0], -u[1]]; }
+  function norm(u) { return Math.sqrt(u[0] * u[0] + u[1] * u[1]); }
+  function close(a, b) { return Math.abs(a - b) < 1e-9; }
+  function equal(u, v) { return close(u[0], v[0]) && close(u[1], v[1]); }
+  function isZero(u) { return close(u[0], 0) && close(u[1], 0); }
+  function cross(u, v) { return u[0] * v[1] - u[1] * v[0]; }
+  function dotp(u, v) { return u[0] * v[0] + u[1] * v[1]; }
+  function normText(u) {
+    var n2 = Math.round((u[0] * u[0] + u[1] * u[1]) * 1e6) / 1e6, r = Math.sqrt(n2);
+    if (close(r, Math.round(r))) return fmt(Math.round(r));
+    if (Number.isInteger(n2)) return '√' + fmt(n2) + ' ≈ ' + fmt(r, 2);
+    return '≈ ' + fmt(r, 2);
+  }
+  function eqn(t) { return (t.charAt(0) === '≈' ? ' ' : ' = ') + t; }
+  function compare(A, B, C, D) {
+    var u = vec(A, B), v = vec(C, D), zu = isZero(u), zv = isZero(v);
+    var r = { u: u, v: v, equal: equal(u, v), zeroU: zu, zeroV: zv, sameDir: false, sameSens: false, sameLen: close(norm(u), norm(v)), flat: false };
+    if (!zu && !zv) { r.sameDir = close(cross(u, v), 0); r.sameSens = r.sameDir && dotp(u, v) > 0; }
+    if (r.equal && !zu) r.flat = close(cross(u, vec(A, C)), 0);
+    return r;
+  }
+  function colinear(u, v) {
+    var d = cross(u, v), tol = 1e-9 * Math.max(1, norm(u) * norm(v)), col = Math.abs(d) < tol, k = null;
+    if (col && !isZero(u)) k = Math.abs(u[0]) > 1e-12 ? v[0] / u[0] : v[1] / u[1];
+    return { col: col, det: d, k: k };
+  }
+  function chasles(pts) { var s = [0, 0]; for (var i = 1; i < pts.length; i++) s = add(s, vec(pts[i - 1], pts[i])); return s; }
+  function plane(Vp, W, ang) {
+    var a = ang * Math.PI / 180, wx = W * Math.cos(a), wy = W * Math.sin(a);
+    if (close(wx, 0)) wx = 0; if (close(wy, 0)) wy = 0;
+    var x = Vp + wx, y = wy;
+    return { wx: wx, wy: wy, x: x, y: y, speed: Math.sqrt(x * x + y * y), drift: Math.atan2(y, x) * 180 / Math.PI };
+  }
+  function boat(b, c, width, mode) {
+    if (mode === 'remonter') {
+      if (c >= b) return { ok: false, bx: -b, by: 0, vx: c - b, vy: 0, speed: c - b, time: Infinity, drift: Infinity, aim: 90 };
+      var vy = Math.sqrt(b * b - c * c);
+      return { ok: true, bx: -c, by: vy, vx: 0, vy: vy, speed: vy, time: width / vy, drift: 0, aim: Math.asin(c / b) * 180 / Math.PI };
+    }
+    var t = width / b;
+    return { ok: true, bx: 0, by: b, vx: c, vy: b, speed: Math.sqrt(b * b + c * c), time: t, drift: c * t, aim: 0 };
+  }
+  function puzzle() {
+    var BX = 14, BY = 9;
+    for (var tries = 0; tries < 800; tries++) {
+      var cards = [];
+      while (cards.length < 4) {
+        var c = [rnd(-3, 3), rnd(-3, 3)];
+        if (isZero(c) || cards.some(function (d) { return close(cross(c, d), 0); })) continue;
+        cards.push(c);
+      }
+      var S = [rnd(1, BX - 1), rnd(1, BY - 1)], p = S.slice(), sol = [], ok = true, n = rnd(3, 4);
+      for (var i = 0; i < n; i++) {
+        var j = rnd(0, 3); p = add(p, cards[j]);
+        if (p[0] < 0 || p[0] > BX || p[1] < 0 || p[1] > BY) { ok = false; break; }
+        sol.push(j);
+      }
+      if (!ok) continue;
+      var st = vec(S, p);
+      if (Math.abs(st[0]) + Math.abs(st[1]) < 5) continue;
+      if (cards.some(function (d) { return colinear(d, st).col; })) continue;
+      return { S: S, T: p, cards: cards, sol: sol };
+    }
+    return { S: [2, 2], T: [9, 6], cards: [[3, 1], [1, 2], [-1, 1], [2, -1]], sol: [0, 1, 0] };
+  }
+  window.__vec = { vec: vec, add: add, scale: scale, opp: opp, norm: norm, normText: normText, equal: equal, compare: compare, colinear: colinear, chasles: chasles, plane: plane, boat: boat, fmtVec: fmtVec, puzzle: puzzle };
+
+  /* ---------- Dessin : quadrillage avec poignées à faire glisser ---------- */
+  function txt(g, x, y, s, o) {
+    o = o || {};
+    var a = { x: x, y: y, 'font-size': o.size || 24, 'text-anchor': o.anchor || 'middle', 'class': 'halo' };
+    if (o.weight) a['font-weight'] = o.weight;
+    if (o.fill) a.style = 'fill:' + o.fill;
+    return mk(g, 'text', a, s);
+  }
+  function vlab(g, x, y, s, col, size, idx) {
+    /* idx : indices des lettres qui portent une flèche (par défaut : une seule flèche sur tout le nom) */
+    size = size || 24;
+    var cw = size * 0.6, x0 = x - s.length * cw / 2, ty = y - size * 0.95;
+    var spans = idx ? idx.map(function (i) { return [i, i + 1]; }) : [[0, s.length]];
+    txt(g, x, y, s, { size: size, weight: 700, fill: col });
+    spans.forEach(function (sp) {
+      var xa = x0 + sp[0] * cw + 1, xb = x0 + sp[1] * cw - 1;
+      mk(g, 'line', { x1: xa, y1: ty, x2: xb - 1, y2: ty, stroke: col, 'stroke-width': 2.5 });
+      mk(g, 'polyline', { points: (xb - 6) + ',' + (ty - 4.5) + ' ' + xb + ',' + ty + ' ' + (xb - 6) + ',' + (ty + 4.5), fill: 'none', stroke: col, 'stroke-width': 2.5 });
+    });
+  }
+  function arrowPx(g, x1, y1, x2, y2, col, w, dash) {
+    w = w || 4;
+    var dx = x2 - x1, dy = y2 - y1, L = Math.sqrt(dx * dx + dy * dy);
+    if (L < 1) { mk(g, 'circle', { cx: x1, cy: y1, r: w + 3, fill: col }); return; }
+    var ux = dx / L, uy = dy / L, h = Math.min(12 + 2.5 * w, L * 0.6), bw = h * 0.5, bx = x2 - ux * h, by = y2 - uy * h;
+    var a = { x1: x1, y1: y1, x2: bx + ux, y2: by + uy, stroke: col, 'stroke-width': w, 'stroke-linecap': dash ? 'butt' : 'round' };
+    if (dash) a['stroke-dasharray'] = dash;
+    mk(g, 'line', a);
+    mk(g, 'polygon', { points: x2 + ',' + y2 + ' ' + (bx - uy * bw) + ',' + (by + ux * bw) + ' ' + (bx + uy * bw) + ',' + (by - ux * bw), fill: col });
+  }
+  function board(svg, o) {
+    var c = o.c, m = o.m || 18, W = (o.x1 - o.x0) * c + 2 * m, H = (o.y1 - o.y0) * c + 2 * m;
+    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+    function X(x) { return m + (x - o.x0) * c; }
+    function Y(y) { return H - m - (y - o.y0) * c; }
+    var gg = mk(svg, 'g', {}), gd = mk(svg, 'g', {}), gh = mk(svg, 'g', {});
+    for (var x = o.x0; x <= o.x1; x++) mk(gg, 'line', { x1: X(x), y1: Y(o.y0), x2: X(x), y2: Y(o.y1), stroke: 'var(--line)', 'stroke-width': 1.5 });
+    for (var y = o.y0; y <= o.y1; y++) mk(gg, 'line', { x1: X(o.x0), y1: Y(y), x2: X(o.x1), y2: Y(y), stroke: 'var(--line)', 'stroke-width': 1.5 });
+    if (o.axes) {
+      mk(gg, 'line', { x1: X(o.x0), y1: Y(0), x2: X(o.x1), y2: Y(0), stroke: 'var(--ink-soft)', 'stroke-width': 2.5 });
+      mk(gg, 'line', { x1: X(0), y1: Y(o.y0), x2: X(0), y2: Y(o.y1), stroke: 'var(--ink-soft)', 'stroke-width': 2.5 });
+      for (var i = o.x0; i <= o.x1; i++) if (i !== 0 && i % 2 === 0) txt(gg, X(i), Y(0) + 24, fmt(i), { size: 20, fill: 'var(--ink-soft)' });
+      for (var j = o.y0; j <= o.y1; j++) if (j !== 0 && j % 2 === 0) txt(gg, X(0) - 8, Y(j) + 7, fmt(j), { size: 20, anchor: 'end', fill: 'var(--ink-soft)' });
+      txt(gg, X(0) - 10, Y(0) + 24, 'O', { size: 20, anchor: 'end', fill: 'var(--ink-soft)' });
+      txt(gg, X(o.x1) - 6, Y(0) - 10, 'x', { size: 20, anchor: 'end', fill: 'var(--ink-soft)' });
+      txt(gg, X(0) + 10, Y(o.y1) + 22, 'y', { size: 20, anchor: 'start', fill: 'var(--ink-soft)' });
+    }
+    var B = { X: X, Y: Y, W: W, H: H, g: gd, o: o, h: {}, onDrag: null };
+    B.clear = function () { clear(gd); };
+    B.inside = function (p) { return p[0] >= o.x0 && p[0] <= o.x1 && p[1] >= o.y0 && p[1] <= o.y1; };
+    function send(id, p) {
+      p = [Math.min(o.x1, Math.max(o.x0, p[0])), Math.min(o.y1, Math.max(o.y0, p[1]))];
+      var h = B.h[id];
+      if (p[0] === h.p[0] && p[1] === h.p[1]) return;
+      if (B.onDrag) B.onDrag(id, p);
+    }
+    B.handle = function (id, col) {
+      var g = mk(gh, 'g', { 'data-h': id, 'class': 'drag', tabindex: '0', role: 'button', 'aria-label': 'Point ' + id + ' : fais-le glisser, ou utilise les flèches du clavier' });
+      mk(g, 'circle', { r: Math.max(30, c * 0.72), fill: 'transparent' });
+      mk(g, 'circle', { r: 11, fill: 'var(--card)', stroke: col, 'stroke-width': 4 });
+      B.h[id] = { g: g, p: [0, 0] };
+      g.addEventListener('keydown', function (e) {
+        var d = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, 1], ArrowDown: [0, -1] }[e.key];
+        if (!d) return;
+        e.preventDefault();
+        var p = B.h[id].p; send(id, [p[0] + d[0], p[1] + d[1]]);
+      });
+    };
+    B.place = function (id, p) { var h = B.h[id]; h.p = p.slice(); h.g.setAttribute('transform', 'translate(' + X(p[0]) + ' ' + Y(p[1]) + ')'); };
+    var drag = null;
+    svg.addEventListener('pointerdown', function (e) {
+      var t = e.target.closest ? e.target.closest('[data-h]') : null;
+      if (!t) return;
+      drag = t.getAttribute('data-h');
+      try { svg.setPointerCapture(e.pointerId); } catch (er) {}
+      e.preventDefault(); t.focus({ preventScroll: true });
+      svg.classList.add('dragging');
+    });
+    svg.addEventListener('pointermove', function (e) {
+      if (!drag) return;
+      var pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY;
+      var q = pt.matrixTransform(svg.getScreenCTM().inverse());
+      send(drag, [Math.round(o.x0 + (q.x - m) / c), Math.round(o.y0 + (H - m - q.y) / c)]);
+    });
+    function end() { drag = null; svg.classList.remove('dragging'); }
+    svg.addEventListener('pointerup', end);
+    svg.addEventListener('pointercancel', end);
+    svg.addEventListener('touchstart', function (e) { if (e.target.closest && e.target.closest('[data-h]')) e.preventDefault(); }, { passive: false });
+    return B;
+  }
+  function arrow(B, p, q, col, w, dash) { arrowPx(B.g, B.X(p[0]), B.Y(p[1]), B.X(q[0]), B.Y(q[1]), col, w, dash); }
+  function labAt(B, p, q, s, col, side, dist) {
+    var x1 = B.X(p[0]), y1 = B.Y(p[1]), x2 = B.X(q[0]), y2 = B.Y(q[1]), dx = x2 - x1, dy = y2 - y1, L = Math.sqrt(dx * dx + dy * dy);
+    if (L < 1) return;
+    var k = (side || 1) * (dist || 30);
+    vlab(B.g, (x1 + x2) / 2 + dy / L * k, (y1 + y2) / 2 - dx / L * k + 9, s, col);
+  }
+  function point(B, p, name, col, dx, dy) {
+    mk(B.g, 'circle', { cx: B.X(p[0]), cy: B.Y(p[1]), r: 6, fill: col });
+    if (!name) return;
+    var lx = Math.min(B.W - 12, Math.max(12, B.X(p[0]) + (dx == null ? -20 : dx))), ly = B.Y(p[1]) + (dy == null ? -16 : dy);
+    if (ly < 26) ly = B.Y(p[1]) + 34;
+    if (ly > B.H - 4) ly = B.Y(p[1]) - 16;
+    txt(B.g, lx, ly, name, { size: 26, weight: 700, fill: col });
+  }
+  function poly(B, pts, fill, stroke, dash) {
+    var a = { points: pts.map(function (p) { return B.X(p[0]) + ',' + B.Y(p[1]); }).join(' '), fill: fill, stroke: stroke || 'none', 'stroke-width': 2 };
+    if (dash) a['stroke-dasharray'] = dash;
+    return mk(B.g, 'polygon', a);
+  }
+  function carreaux(n) { return fmt(n) + (Math.abs(n) >= 2 ? ' carreaux' : ' carreau'); }
+  function moveParts(u) {
+    var p = [];
+    if (u[0] > 0) p.push(carreaux(u[0]) + ' vers la droite'); else if (u[0] < 0) p.push(carreaux(-u[0]) + ' vers la gauche');
+    if (u[1] > 0) p.push(carreaux(u[1]) + ' vers le haut'); else if (u[1] < 0) p.push(carreaux(-u[1]) + ' vers le bas');
+    return p;
+  }
+  function dirText(u) {
+    if (isZero(u)) return 'aucune (vecteur nul)';
+    if (u[1] === 0) return 'horizontale —';
+    if (u[0] === 0) return 'verticale |';
+    return u[0] * u[1] > 0 ? 'oblique, penchée comme /' : 'oblique, penchée comme \\';
+  }
+  function sensText(u) {
+    var p = [];
+    if (u[0] > 0) p.push('vers la droite'); else if (u[0] < 0) p.push('vers la gauche');
+    if (u[1] > 0) p.push('vers le haut'); else if (u[1] < 0) p.push('vers le bas');
+    return p.join(' et ');
+  }
+  function lenText(u) { var t = normText(u); return (t === '1' ? '1 carreau' : t + ' carreaux'); }
+
+  /* ---------- Étape 1 : le déplacement et la translation ---------- */
+  (function () {
+    var B = board($('svA'), { x0: 0, x1: 12, y0: 0, y1: 8, c: 50 });
+    var st = { A: [5, 1], B: [8, 3] }, house = [[1, 1], [3, 1], [3, 2.5], [2, 3.5], [1, 2.5]];
+    B.handle('A', 'var(--acc)'); B.handle('B', 'var(--acc)');
+    B.onDrag = function (id, p) { st[id] = p; draw(); };
+    function draw() {
+      B.clear();
+      var u = vec(st.A, st.B), img = house.map(function (q) { return add(q, u); });
+      poly(B, house, 'var(--line)', 'var(--ink-soft)');
+      poly(B, img, 'var(--acc-soft)', 'var(--acc)');
+      if (!isZero(u)) house.forEach(function (q) { arrow(B, q, add(q, u), 'var(--ink-soft)', 2, '6 6'); });
+      arrow(B, st.A, st.B, 'var(--acc)', 5);
+      point(B, st.A, 'A', 'var(--acc)'); point(B, st.B, 'B', 'var(--acc)', 20);
+      B.place('A', st.A); B.place('B', st.B);
+      var out = $('outA');
+      if (isZero(u)) { out.innerHTML = res('Déplacement', 'aucun', 'A et B sont au même endroit : c\'est le vecteur nul. La maison ne bouge pas.'); return; }
+      out.innerHTML = res('Déplacement', moveParts(u).join(', puis ')) + res('Direction', dirText(u)) + res('Sens', 'de A vers B : ' + sensText(u)) + res('Longueur', lenText(u));
+    }
+    draw();
+  })();
+
+  /* ---------- Étape 2 : vecteurs égaux ---------- */
+  (function () {
+    var B = board($('svB'), { x0: 0, x1: 12, y0: 0, y1: 8, c: 50 });
+    var st = { A: [1, 2], B: [4, 4], C: [6, 1], D: [9, 4] };
+    ['A', 'B'].forEach(function (k) { B.handle(k, 'var(--acc)'); });
+    ['C', 'D'].forEach(function (k) { B.handle(k, 'var(--two)'); });
+    B.onDrag = function (id, p) { st[id] = p; draw(); };
+    function draw() {
+      B.clear();
+      var r = compare(st.A, st.B, st.C, st.D), out = $('outB');
+      if (r.equal && !r.zeroU) poly(B, [st.A, st.B, st.D, st.C], 'var(--ok-soft)', 'var(--ok)', '8 6');
+      arrow(B, st.A, st.B, 'var(--acc)', 5); arrow(B, st.C, st.D, 'var(--two)', 5);
+      point(B, st.A, 'A', 'var(--acc)'); point(B, st.B, 'B', 'var(--acc)', 20);
+      point(B, st.C, 'C', 'var(--two)'); point(B, st.D, 'D', 'var(--two)', 20);
+      ['A', 'B', 'C', 'D'].forEach(function (k) { B.place(k, st[k]); });
+      var mu = moveParts(r.u).join(', ') || 'aucun déplacement', mv = moveParts(r.v).join(', ') || 'aucun déplacement';
+      var detail = '<span>' + V('AB') + ' : ' + mu + '.<br>' + V('CD') + ' : ' + mv + '.</span>';
+      if (r.equal && r.zeroU) { out.className = 'verdict yes'; out.innerHTML = 'Les deux vecteurs sont nuls : ils sont égaux.<span>Mais c\'est moins drôle ! Écarte un peu les points.</span>'; return; }
+      if (r.equal) {
+        out.className = 'verdict yes';
+        out.innerHTML = 'Bravo, ' + V('AB') + ' = ' + V('CD') + ' !' + detail + '<span>' + (r.flat ? 'Les quatre points sont alignés : le parallélogramme ABDC est « aplati ».' : 'Même direction, même sens, même longueur : ABDC est un parallélogramme (en vert).') + '</span>';
+        return;
+      }
+      var lines;
+      if (r.zeroU || r.zeroV) lines = 'Un seul des deux est le vecteur nul : ils ne peuvent pas être égaux.';
+      else {
+        lines = 'Direction : ' + (r.sameDir ? '✓ la même' : '✗ différente') + '<br>Sens : ' + (r.sameDir ? (r.sameSens ? '✓ le même' : '✗ contraire') : '— (on ne peut pas comparer)') + '<br>Longueur : ' + (r.sameLen ? '✓ la même' : '✗ ' + normText(r.u) + ' et ' + normText(r.v));
+      }
+      out.className = 'verdict no';
+      out.innerHTML = 'Pas encore égaux.' + detail + '<span>' + lines + '</span>';
+    }
+    function inb(p) { return B.inside(p); }
+    $('bNew').addEventListener('click', function () {
+      for (var i = 0; i < 300; i++) {
+        var A = [rnd(0, 12), rnd(0, 8)], u = [rnd(-4, 4), rnd(-4, 4)];
+        if (isZero(u)) continue;
+        var Bq = add(A, u); if (!inb(Bq)) continue;
+        var C = [rnd(0, 12), rnd(0, 8)]; if (equal(C, A) || equal(C, Bq)) continue;
+        var v = rnd(0, 2) === 0 ? opp(u) : add(u, pick([[1, 0], [0, 1], [-1, 0], [0, -1], [1, 1]]));
+        if (isZero(v) || equal(v, u)) continue;
+        var D = add(C, v); if (!inb(D)) continue;
+        st = { A: A, B: Bq, C: C, D: D }; break;
+      }
+      draw();
+    });
+    $('bFix').addEventListener('click', function () {
+      var u = vec(st.A, st.B), C = st.C.slice();
+      C[0] = Math.min(Math.max(C[0], Math.max(0, -u[0])), Math.min(12, 12 - u[0]));
+      C[1] = Math.min(Math.max(C[1], Math.max(0, -u[1])), Math.min(8, 8 - u[1]));
+      st.C = C; st.D = add(C, u); draw();
+    });
+    draw();
+  })();
+
+  /* ---------- Étape 3 : coordonnées ---------- */
+  (function () {
+    var B = board($('svC'), { x0: -6, x1: 6, y0: -4, y1: 4, c: 48, axes: true });
+    var A, P, hint = 0;
+    function lab(p, name) {
+      var x = B.X(p[0]), y = B.Y(p[1]), right = x > B.W / 2, top = p[1] >= 3;
+      txt(B.g, x + (right ? -12 : 12), y + (top ? 32 : -14), name + '(' + fmtP(p) + ')', { size: 22, weight: 700, anchor: right ? 'end' : 'start', fill: 'var(--acc)' });
+    }
+    function calc() {
+      var u = vec(A, P);
+      return "<span class='mono'>x = x<sub>B</sub> − x<sub>A</sub> = " + fmt(P[0]) + ' − ' + par(A[0]) + ' = ' + fmt(u[0]) + '<br>y = y<sub>B</sub> − y<sub>A</sub> = ' + fmt(P[1]) + ' − ' + par(A[1]) + ' = ' + fmt(u[1]) + '</span>';
+    }
+    function draw() {
+      B.clear();
+      var K = [P[0], A[1]];
+      if (hint >= 1) {
+        if (K[0] !== A[0]) arrow(B, A, K, 'var(--two)', 3, '8 6');
+        if (K[1] !== P[1]) arrow(B, K, P, 'var(--ok)', 3, '8 6');
+      }
+      arrow(B, A, P, 'var(--acc)', 5);
+      point(B, A, null, 'var(--acc)'); point(B, P, null, 'var(--acc)');
+      lab(A, 'A'); lab(P, 'B');
+      $('cPts').innerHTML = 'A(' + fmtP(A) + ') et B(' + fmtP(P) + ')';
+    }
+    function nw() {
+      do { A = [rnd(-5, 5), rnd(-3, 3)]; P = [rnd(-5, 5), rnd(-3, 3)]; } while (Math.abs(A[0] - P[0]) + Math.abs(A[1] - P[1]) < 3);
+      hint = 0; $('cx').value = ''; $('cy').value = ''; $('outC').className = 'verdict'; $('outC').innerHTML = '';
+      draw();
+    }
+    function check() {
+      var x = num($('cx').value), y = num($('cy').value), u = vec(A, P), out = $('outC');
+      if (isNaN(x) || isNaN(y)) { out.className = 'verdict no'; out.innerHTML = 'Écris deux nombres.<span>Par exemple 3 et −2.</span>'; return; }
+      if (close(x, u[0]) && close(y, u[1])) { out.className = 'verdict yes'; out.innerHTML = 'Bravo ! ' + V('AB') + ' = ' + fmtVec(u) + '.' + calc(); return; }
+      out.className = 'verdict no';
+      if (close(x, -u[0]) && close(y, -u[1])) { out.innerHTML = 'Attention au sens !<span>Tu as calculé départ moins arrivée (c\'est ' + V('BA') + '). Il faut arrivée moins départ : B moins A.</span>'; return; }
+      out.innerHTML = 'Pas encore.<span>' + (close(x, u[0]) ? 'Ton x est juste. ' : 'Ton x n\'est pas juste. ') + (close(y, u[1]) ? 'Ton y est juste. ' : 'Ton y n\'est pas juste. ') + 'Clique sur « Indice » si tu veux de l\'aide.</span>';
+    }
+    $('cCheck').addEventListener('click', check);
+    ['cx', 'cy'].forEach(function (id) { $(id).addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); }); });
+    $('cHint').addEventListener('click', function () {
+      hint = Math.min(2, hint + 1); draw();
+      var out = $('outC');
+      out.className = 'verdict info';
+      out.innerHTML = hint === 1 ? 'Indice 1<span>Suis les pointillés : d\'abord on avance en x (orange), puis on monte ou on descend en y (vert). Compte les carreaux, avec un signe moins si on va à gauche ou en bas.</span>' : 'Indice 2 : le calcul' + calc();
+    });
+    $('cNew').addEventListener('click', nw);
+    nw();
+  })();
+
+  /* ---------- Étape 4 : la norme ---------- */
+  (function () {
+    var B = board($('svG'), { x0: 0, x1: 12, y0: 0, y1: 9, c: 48 });
+    var st = { A: [2, 1], B: [4, 2] }, targets = [5, 10, 13], ti = 0, won = false;
+    B.handle('A', 'var(--acc)'); B.handle('B', 'var(--acc)');
+    B.onDrag = function (id, p) { st[id] = p; draw(); };
+    function sq(x) { return (x < 0 ? '(' + fmt(x) + ')' : fmt(x)) + '²'; }
+    function draw() {
+      B.clear();
+      var u = vec(st.A, st.B), K = [st.B[0], st.A[1]];
+      if (u[0] !== 0 && u[1] !== 0) {
+        var sx = u[0] > 0 ? -1 : 1, sy = u[1] > 0 ? 1 : -1, kx = B.X(K[0]), ky = B.Y(K[1]), s = 16;
+        mk(B.g, 'polyline', { points: (kx + sx * s) + ',' + ky + ' ' + (kx + sx * s) + ',' + (ky - sy * s) + ' ' + kx + ',' + (ky - sy * s), fill: 'none', stroke: 'var(--ink-soft)', 'stroke-width': 2 });
+      }
+      if (u[0] !== 0) { mk(B.g, 'line', { x1: B.X(st.A[0]), y1: B.Y(st.A[1]), x2: B.X(K[0]), y2: B.Y(K[1]), stroke: 'var(--two)', 'stroke-width': 3, 'stroke-dasharray': '8 6' }); txt(B.g, (B.X(st.A[0]) + B.X(K[0])) / 2, B.Y(K[1]) + (u[1] > 0 ? 30 : -14), fmt(Math.abs(u[0])), { size: 24, weight: 700, fill: 'var(--two)' }); }
+      if (u[1] !== 0) { mk(B.g, 'line', { x1: B.X(K[0]), y1: B.Y(K[1]), x2: B.X(st.B[0]), y2: B.Y(st.B[1]), stroke: 'var(--ok)', 'stroke-width': 3, 'stroke-dasharray': '8 6' }); txt(B.g, B.X(K[0]) + (u[0] > 0 ? 14 : -14), (B.Y(K[1]) + B.Y(st.B[1])) / 2 + 8, fmt(Math.abs(u[1])), { size: 24, weight: 700, anchor: u[0] > 0 ? 'start' : 'end', fill: 'var(--ok)' }); }
+      arrow(B, st.A, st.B, 'var(--acc)', 5);
+      point(B, st.A, 'A', 'var(--acc)'); point(B, st.B, 'B', 'var(--acc)', 20);
+      B.place('A', st.A); B.place('B', st.B);
+      var n2 = u[0] * u[0] + u[1] * u[1], r = Math.sqrt(n2), t = normText(u);
+      $('outG').innerHTML = '<span>' + V('AB') + ' = ' + fmtVec(u) + '</span><span>‖' + V('AB') + '‖ = √(' + sq(u[0]) + ' + ' + sq(u[1]) + ') = √(' + fmt(u[0] * u[0]) + ' + ' + fmt(u[1] * u[1]) + ') = <b>√' + fmt(n2) + (close(r, Math.round(r)) ? ' = ' + fmt(r) : ' ≈ ' + fmt(r, 2)) + '</b></span><span class="why">' + (isZero(u) ? 'A et B sont confondus : la longueur est 0.' : (u[0] === 0 || u[1] === 0) ? 'Flèche horizontale ou verticale : pas besoin de Pythagore, il suffit de compter les carreaux.' : 'Les côtés de l\'angle droit mesurent ' + fmt(Math.abs(u[0])) + ' et ' + fmt(Math.abs(u[1])) + ' carreaux.') + '</span>';
+      defi(u);
+    }
+    function defi(u) {
+      var d = $('gDefi'), T = targets[ti];
+      if (ti >= targets.length) { d.className = 'verdict yes'; d.innerHTML = 'Tous les défis sont réussis, bravo !<span>(3 ; 4), (6 ; 8), (12 ; 5)… ces nombres entiers qui vont ensemble s\'appellent des triplets de Pythagore.</span>'; $('gNext').disabled = true; return; }
+      var hit = close(norm(u), T);
+      won = hit && u[0] !== 0 && u[1] !== 0;
+      $('gNext').disabled = !won;
+      if (won) { d.className = 'verdict yes'; d.innerHTML = 'Défi ' + (ti + 1) + ' réussi ! ' + fmtVec(u) + ' mesure bien ' + T + '.<span>' + (ti < targets.length - 1 ? 'Clique sur « Défi suivant ».' : 'Clique sur « Défi suivant » pour terminer.') + '</span>'; return; }
+      d.className = 'verdict info';
+      d.innerHTML = 'Défi ' + (ti + 1) + ' / ' + targets.length + ' : place A et B pour que ‖' + V('AB') + '‖ = ' + T + ', avec une flèche oblique.<span>' + (hit ? 'C\'est bien ' + T + ', mais en ligne droite sur le quadrillage : trop facile ! Cherche une flèche penchée.' : T === 13 ? 'Indice : 5² + 12² = 25 + 144 = 169 = 13².' : T === 10 ? 'Indice : pense au défi précédent, en deux fois plus grand.' : 'Indice : cherche deux nombres dont les carrés font 25 en tout.') + '</span>';
+    }
+    $('gNext').addEventListener('click', function () { if (!won) return; ti++; won = false; draw(); });
+    draw();
+  })();
+
+  /* ---------- Étape 5 : Chasles ---------- */
+  (function () {
+    var B = board($('svD'), { x0: 0, x1: 12, y0: 0, y1: 8, c: 50 });
+    var st = { A: [1, 1], B: [5, 6], C: [10, 2] };
+    B.handle('A', 'var(--acc)'); B.handle('B', 'var(--acc)'); B.handle('C', 'var(--two)');
+    B.onDrag = function (id, p) { st[id] = p; draw(); };
+    function draw() {
+      B.clear();
+      var ab = vec(st.A, st.B), bc = vec(st.B, st.C), ac = vec(st.A, st.C), s = add(ab, bc);
+      arrow(B, st.A, st.C, 'var(--ok)', 6);
+      arrow(B, st.A, st.B, 'var(--acc)', 4); arrow(B, st.B, st.C, 'var(--two)', 4);
+      point(B, st.A, 'A', 'var(--ink)'); point(B, st.B, 'B', 'var(--ink)', 20); point(B, st.C, 'C', 'var(--ink)', 20);
+      ['A', 'B', 'C'].forEach(function (k) { B.place(k, st[k]); });
+      $('outD').innerHTML = '<span><span class="ca">' + V('AB') + ' = ' + fmtVec(ab) + '</span> et <span class="cb">' + V('BC') + ' = ' + fmtVec(bc) + '</span></span>' +
+        '<span>' + V('AB') + ' + ' + V('BC') + ' = (' + fmt(ab[0]) + ' + ' + par(bc[0]) + ' ; ' + fmt(ab[1]) + ' + ' + par(bc[1]) + ') = <b>' + fmtVec(s) + '</b></span>' +
+        '<span class="cc">' + V('AC') + ' = ' + fmtVec(ac) + (equal(s, ac) ? ' ✓ c\'est pareil !' : '') + '</span>' +
+        '<span class="why">Le détour par B mesure environ ' + fmt(norm(ab), 1) + ' + ' + fmt(norm(bc), 1) + ' = ' + fmt(norm(ab) + norm(bc), 1) + ' carreaux, le raccourci environ ' + fmt(norm(ac), 1) + ' : on additionne les déplacements, pas les longueurs.</span>';
+    }
+    draw();
+  })();
+
+  /* ---------- Étape 5 : la carte au trésor ---------- */
+  (function () {
+    var B = board($('svT'), { x0: 0, x1: 14, y0: 0, y1: 9, c: 44 });
+    var COLS = ['var(--acc)', 'var(--two)', 'var(--ok)', 'var(--four)'], NAMES = ['u', 'v', 'w', 'z'];
+    var P, path = [], msg = '', btns = [];
+    function pos() { var p = P.S.slice(); path.forEach(function (j) { p = add(p, P.cards[j]); }); return p; }
+    function draw() {
+      B.clear();
+      var p = P.S.slice(), here = pos(), won = equal(here, P.T), out = $('outT');
+      var tx = B.X(P.T[0]), ty = B.Y(P.T[1]);
+      mk(B.g, 'circle', { cx: tx, cy: ty, r: 20, fill: 'var(--red-soft)', stroke: 'var(--red)', 'stroke-width': 2 });
+      mk(B.g, 'line', { x1: tx - 10, y1: ty - 10, x2: tx + 10, y2: ty + 10, stroke: 'var(--red)', 'stroke-width': 4, 'stroke-linecap': 'round' });
+      mk(B.g, 'line', { x1: tx - 10, y1: ty + 10, x2: tx + 10, y2: ty - 10, stroke: 'var(--red)', 'stroke-width': 4, 'stroke-linecap': 'round' });
+      txt(B.g, tx, ty + (P.T[1] >= 8 ? 46 : -26), 'T', { size: 26, weight: 700, fill: 'var(--red)' });
+      if (won) arrow(B, P.S, P.T, 'var(--ok)', 4, '10 7');
+      path.forEach(function (j) { var q = add(p, P.cards[j]); arrow(B, p, q, COLS[j], 5); p = q; });
+      point(B, P.S, null, 'var(--ink)');
+      txt(B.g, B.X(P.S[0]), B.Y(P.S[1]) + (P.S[1] >= 8 ? 36 : -16), 'S', { size: 26, weight: 700, fill: 'var(--ink)' });
+      mk(B.g, 'circle', { cx: B.X(here[0]), cy: B.Y(here[1]), r: 10, fill: 'var(--card)', stroke: 'var(--ink)', 'stroke-width': 4 });
+      var st = vec(P.S, P.T), sum = vec(P.S, here), rest = vec(here, P.T);
+      var expr = path.length ? path.map(function (j) { return V(NAMES[j]); }).join(' + ') + ' = ' + fmtVec(sum) : 'aucun déplacement pour l\'instant';
+      $('tGoal').innerHTML = 'But : ' + V('ST') + ' = ' + fmtVec(st) + '<br>Ta somme : ' + expr + (won ? '' : '<br>Il te reste : ' + fmtVec(rest));
+      btns.forEach(function (b) { b.disabled = won; });
+      $('tUndo').disabled = path.length === 0;
+      if (won) {
+        out.className = 'verdict yes';
+        out.innerHTML = 'Trésor trouvé en ' + path.length + ' déplacements !<span>Par Chasles, tout ton chemin revient au vecteur ' + V('ST') + ' = ' + fmtVec(st) + ' (la flèche verte en pointillés).' + (path.length > P.sol.length ? ' Il existe un chemin en ' + P.sol.length + ' déplacements : sauras-tu le trouver ?' : '') + '</span>';
+      } else if (msg) { out.className = 'verdict no'; out.innerHTML = msg; }
+      else { out.className = 'verdict'; out.innerHTML = ''; }
+      msg = '';
+    }
+    function nw() {
+      P = puzzle(); path = [];
+      var box = $('tCards'); box.innerHTML = ''; btns = [];
+      P.cards.forEach(function (c, j) {
+        var b = document.createElement('button');
+        b.type = 'button'; b.className = 'tc'; b.style.borderColor = COLS[j]; b.style.color = COLS[j];
+        b.innerHTML = V(NAMES[j]) + ' ' + fmtVec(c);
+        b.setAttribute('aria-label', 'Ajouter le vecteur ' + NAMES[j] + ' ' + fmtVec(c));
+        b.addEventListener('click', function () {
+          var q = add(pos(), c);
+          if (!B.inside(q)) msg = 'Ce déplacement sortirait de la carte !<span>Essaie une autre carte.</span>';
+          else if (path.length >= 12) msg = 'Ça fait beaucoup de déplacements !<span>Clique sur « Recommencer » et réfléchis avec les coordonnées.</span>';
+          else path.push(j);
+          draw();
+        });
+        box.appendChild(b); btns.push(b);
+      });
+      draw();
+    }
+    $('tUndo').addEventListener('click', function () { path.pop(); draw(); });
+    $('tReset').addEventListener('click', function () { path = []; draw(); });
+    $('tNew').addEventListener('click', nw);
+    nw();
+  })();
+
+  /* ---------- Étape 6 : parallélogramme ---------- */
+  (function () {
+    var B = board($('svE'), { x0: 0, x1: 12, y0: 0, y1: 8, c: 50 });
+    var O = [4, 3], st = { U: [8, 4], W: [5, 6] };
+    B.handle('U', 'var(--acc)'); B.handle('W', 'var(--two)');
+    B.h.U.g.setAttribute('aria-label', 'Pointe du vecteur u : fais-la glisser, ou utilise les flèches du clavier');
+    B.h.W.g.setAttribute('aria-label', 'Pointe du vecteur v : fais-la glisser, ou utilise les flèches du clavier');
+    B.onDrag = function (id, p) { st[id] = p; draw(); };
+    function draw() {
+      B.clear();
+      var u = vec(O, st.U), v = vec(O, st.W), s = add(u, v), S = add(O, s);
+      if (!close(cross(u, v), 0)) poly(B, [O, st.U, S, st.W], 'var(--ok-soft)', 'none');
+      arrow(B, st.U, S, 'var(--two)', 3, '8 6'); arrow(B, st.W, S, 'var(--acc)', 3, '8 6');
+      arrow(B, O, S, 'var(--ok)', 6);
+      arrow(B, O, st.U, 'var(--acc)', 5); arrow(B, O, st.W, 'var(--two)', 5);
+      point(B, O, 'O', 'var(--ink)', -20, 30);
+      if (!isZero(u)) labAt(B, O, st.U, 'u', 'var(--acc)', -1);
+      if (!isZero(v)) labAt(B, O, st.W, 'v', 'var(--two)', 1);
+      if (!isZero(s) && B.inside(S)) { var sx = B.X(S[0]), sy = B.Y(S[1]); vlab(B.g, sx + (sx > B.W - 90 ? -50 : 50), sy + (sy < 40 ? 40 : -10), 'u+v', 'var(--ok)', 24, [0, 2]); }
+      B.place('U', st.U); B.place('W', st.W);
+      var nu = norm(u), nv = norm(v), ns = norm(s);
+      $('outE').innerHTML = '<span><span class="ca">' + V('u') + ' = ' + fmtVec(u) + '</span> et <span class="cb">' + V('v') + ' = ' + fmtVec(v) + '</span></span>' +
+        '<span>' + V('u') + ' + ' + V('v') + ' = (' + fmt(u[0]) + ' + ' + par(v[0]) + ' ; ' + fmt(u[1]) + ' + ' + par(v[1]) + ') = <b>' + fmtVec(s) + '</b></span>' +
+        (B.inside(S) ? '' : '<span class="why">La pointe de ' + V('u') + ' + ' + V('v') + ' sort du quadrillage : rapproche les flèches.</span>') +
+        '<span class="why">Longueurs : ‖' + V('u') + '‖ ≈ ' + fmt(nu, 2) + ', ‖' + V('v') + '‖ ≈ ' + fmt(nv, 2) + ', ‖' + V('u') + ' + ' + V('v') + '‖ ≈ ' + fmt(ns, 2) + (close(ns, nu + nv) ? ' : ici c\'est égal à la somme, car les flèches vont dans le même sens.' : ' : c\'est moins que ' + fmt(nu, 2) + ' + ' + fmt(nv, 2) + ' ≈ ' + fmt(nu + nv, 2) + '.') + '</span>';
+    }
+    draw();
+  })();
+
+  /* ---------- Étape 7 : k·u ---------- */
+  (function () {
+    var B = board($('svF'), { x0: 0, x1: 14, y0: 0, y1: 9, c: 44 });
+    var O = [7, 4], U = [9, 5], kS = $('kS');
+    B.handle('U', 'var(--acc)');
+    B.h.U.g.setAttribute('aria-label', 'Pointe du vecteur u : fais-la glisser, ou utilise les flèches du clavier');
+    B.onDrag = function (id, p) { U = [Math.min(O[0] + 4, Math.max(O[0] - 4, p[0])), Math.min(O[1] + 4, Math.max(O[1] - 4, p[1]))]; draw(); };
+    function kname(k) { return k === 1 ? 'u' : k === -1 ? '−u' : k === 0 ? '0' : fmt(k) + 'u'; }
+    function draw() {
+      var k = +kS.value, u = vec(O, U), ku = scale(k, u), K = add(O, ku);
+      $('kOut').textContent = fmt(k);
+      B.clear();
+      arrow(B, O, K, 'var(--ok)', 11);
+      arrow(B, O, U, 'var(--acc)', 4);
+      point(B, O, 'O', 'var(--ink)', -20, 30);
+      if (!isZero(ku) && k !== 1) { var kx = B.X(K[0]), ky = B.Y(K[1]); vlab(B.g, Math.min(B.W - 40, Math.max(40, kx + (ku[0] >= 0 ? 34 : -34))), Math.min(B.H - 14, Math.max(44, ky + (ku[1] >= 0 ? -16 : 40))), kname(k), 'var(--ok)', 24, [kname(k).length - 1]); }
+      if (!isZero(u)) labAt(B, O, U, 'u', 'var(--acc)', k < 0 ? 1 : -1, 26);
+      B.place('U', U);
+      var out = $('outF');
+      if (isZero(u)) { out.innerHTML = res('Attention', V('u') + ' est nul', 'Si ' + V('u') + ' = ' + V('0') + ', alors k·' + V('u') + ' = ' + V('0') + ' pour tous les k. Déplace la pointe de ' + V('u') + '.'); return; }
+      var sens = k > 0 ? 'le même que ' + V('u') : k < 0 ? 'contraire : la flèche se retourne !' : '— (vecteur nul)';
+      var special = k === 1 ? 'C\'est ' + V('u') + ' lui-même.' : k === -1 ? 'C\'est l\'opposé de ' + V('u') + ', noté −' + V('u') + '.' : k === 0 ? 'C\'est le vecteur nul ' + V('0') + ' : on ne bouge plus.' : k === 0.5 ? 'C\'est la moitié de ' + V('u') + '.' : k === 2 ? 'C\'est ' + V('u') + ' + ' + V('u') + ' : deux fois le même pas.' : '';
+      out.innerHTML = res('k·' + V('u'), fmtVec(ku), fmt(k) + ' × ' + fmtVec(u) + ' = (' + fmt(k) + ' × ' + par(u[0]) + ' ; ' + fmt(k) + ' × ' + par(u[1]) + ') = ' + fmtVec(ku), 'total') +
+        res('Direction', k === 0 ? '—' : 'la même que ' + V('u')) + res('Sens', sens) +
+        res('Longueur', 'multipliée par ' + fmt(Math.abs(k)), '‖' + V('u') + '‖' + eqn(normText(u)) + ' ; ‖k·' + V('u') + '‖' + eqn(normText(ku)) + (special ? '. ' + special : '') + (B.inside(K) ? '' : ' (La flèche verte dépasse du cadre.)'));
+    }
+    kS.addEventListener('input', draw);
+    draw();
+  })();
+
+  /* ---------- Étape 7 : colinéarité ---------- */
+  (function () {
+    var ids = ['co1', 'co2', 'co3', 'co4'];
+    function run() {
+      var a = ids.map(function (id) { return num($(id).value); }), out = $('outCo');
+      if (a.some(isNaN)) { out.className = 'verdict'; out.innerHTML = '<span>Écris les quatre coordonnées.</span>'; return; }
+      var u = [a[0], a[1]], v = [a[2], a[3]], r = colinear(u, v);
+      var test = 'x × y′ − y × x′ = ' + fmt(a[0]) + ' × ' + par(a[3]) + ' − ' + par(a[1]) + ' × ' + par(a[2]) + ' = ' + fmt(a[0] * a[3]) + ' − ' + par(a[1] * a[2]) + ' = ' + fmt(r.col ? 0 : r.det);
+      if (isZero(u) || isZero(v)) { out.className = 'verdict yes'; out.innerHTML = 'Oui, colinéaires.<span>Un des deux est le vecteur nul ' + V('0') + ' : il est colinéaire à tous les vecteurs (0 fois n\'importe quel vecteur donne ' + V('0') + ').</span>'; return; }
+      if (r.col) {
+        var kt = Math.abs(r.k * 1000 - Math.round(r.k * 1000)) < 1e-6 ? '= ' + fmt(r.k) : '≈ ' + fmt(r.k);
+        out.className = 'verdict yes';
+        out.innerHTML = 'Oui, ' + V('u') + ' et ' + V('v') + ' sont colinéaires.<span class="mono">' + test + '</span><span>' + V('v') + ' = k·' + V('u') + ' avec k ' + kt + (r.k < 0 ? ' : ils vont en sens contraires.' : ' : ils vont dans le même sens.') + '</span>';
+        return;
+      }
+      out.className = 'verdict no';
+      out.innerHTML = 'Non, ils ne sont pas colinéaires.<span class="mono">' + test + ' ≠ 0</span><span>Leurs flèches ne sont pas parallèles.</span>';
+    }
+    ids.forEach(function (id) { $(id).addEventListener('input', run); });
+    run();
+  })();
+
+  /* ---------- Étape 8 : l'avion et le vent ---------- */
+  (function () {
+    var svg = $('svH'), hV = $('hV'), hW = $('hW'), hA = $('hA');
+    var TO = ['l\'est', 'le nord-est', 'le nord', 'le nord-ouest', 'l\'ouest', 'le sud-ouest', 'le sud', 'le sud-est'];
+    var FROM = ['de l\'ouest', 'du sud-ouest', 'du sud', 'du sud-est', 'de l\'est', 'du nord-est', 'du nord', 'du nord-ouest'];
+    for (var gx = 0; gx <= 640; gx += 40) mk(svg, 'line', { x1: gx, y1: 0, x2: gx, y2: 360, stroke: 'var(--line)', 'stroke-width': 1 });
+    for (var gy = 0; gy <= 360; gy += 40) mk(svg, 'line', { x1: 0, y1: gy, x2: 640, y2: gy, stroke: 'var(--line)', 'stroke-width': 1 });
+    arrowPx(svg, 590, 90, 590, 40, 'var(--ink-soft)', 3); txt(svg, 590, 30, 'N', { size: 20, weight: 700, fill: 'var(--ink-soft)' });
+    arrowPx(svg, 590, 90, 630, 90, 'var(--ink-soft)', 3); txt(svg, 612, 118, 'E', { size: 20, weight: 700, fill: 'var(--ink-soft)' });
+    var g = mk(svg, 'g', {});
+    function draw() {
+      var Vp = +hV.value, W = +hW.value, ang = +hA.value, r = plane(Vp, W, ang), s = 0.48, ox = 60, oy = 200, i = Math.round(ang / 45) % 8;
+      $('hVo').textContent = fmt(Vp) + ' km/h'; $('hWo').textContent = fmt(W) + ' km/h'; $('hAo').textContent = TO[i];
+      clear(g);
+      var px = ox + Vp * s, wx = r.wx * s, wy = -r.wy * s;
+      if (W > 0) {
+        mk(g, 'polygon', { points: ox + ',' + oy + ' ' + px + ',' + oy + ' ' + (px + wx) + ',' + (oy + wy) + ' ' + (ox + wx) + ',' + (oy + wy), fill: 'var(--ok-soft)', opacity: 0.7 });
+        arrowPx(g, ox, oy, ox + wx, oy + wy, 'var(--two)', 2.5, '7 6');
+        arrowPx(g, ox + wx, oy + wy, px + wx, oy + wy, 'var(--acc)', 2.5, '7 6');
+      }
+      arrowPx(g, ox, oy, px, oy, 'var(--acc)', 5);
+      if (W > 0) arrowPx(g, px, oy, px + wx, oy + wy, 'var(--two)', 5);
+      arrowPx(g, ox, oy, ox + r.x * s, oy - r.y * s, 'var(--ok)', 6);
+      mk(g, 'polygon', { points: '16,0 4,-3 -2,-16 -7,-16 -4,-3 -13,-3 -17,-8 -20,-8 -18,0 -20,8 -17,8 -13,3 -4,3 -7,16 -2,16 4,3', fill: 'var(--ink)', transform: 'translate(' + ox + ' ' + oy + ')' });
+      txt(g, (ox + px) / 2, oy + (r.y >= 0 ? 32 : -16) , 'avion', { size: 20, weight: 700, fill: 'var(--acc)' });
+      if (W > 0) txt(g, px + wx / 2 + 12, oy + wy / 2 + 6, 'vent', { size: 20, weight: 700, fill: 'var(--two)', anchor: 'start' });
+      txt(g, ox + r.x * s * 0.55 + (r.y >= 0 ? -10 : 10), oy - r.y * s * 0.55 + (r.y >= 0 ? -14 : 28), 'trajet réel', { size: 20, weight: 700, fill: 'var(--ok)', anchor: r.y >= 0 ? 'end' : 'start' });
+      var exact = function (x) { return close(x, Math.round(x)); };
+      var wtxt = '(' + (exact(r.wx) ? fmt(r.wx) : '≈ ' + fmt(r.wx, 1)) + ' ; ' + (exact(r.wy) ? fmt(r.wy) : '≈ ' + fmt(r.wy, 1)) + ')';
+      var gtxt = '(' + (exact(r.x) ? fmt(r.x) : '≈ ' + fmt(r.x, 1)) + ' ; ' + (exact(r.y) ? fmt(r.y) : '≈ ' + fmt(r.y, 1)) + ')';
+      var drift;
+      if (close(r.y, 0)) drift = r.x > 0 ? 'aucune : le vent est dans l\'axe' : r.x < 0 ? 'l\'avion recule !' : 'l\'avion fait du surplace !';
+      else drift = '≈ ' + fmt(Math.abs(r.drift), 1) + '° vers ' + (r.y > 0 ? 'le nord' : 'le sud');
+      var note = '';
+      if (W > 0 && (i === 2 || i === 6)) note = 'Le vent est perpendiculaire : Pythagore donne √(' + fmt(Vp) + '² + ' + fmt(W) + '²).';
+      if (W > 0 && i === 0) note = 'Vent arrière : les vitesses s\'ajoutent, l\'avion va plus vite.';
+      if (W > 0 && i === 4) note = r.x < 0 ? 'Vent de face plus fort que l\'avion : par rapport au sol, il recule !' : 'Vent de face : l\'avion va moins vite par rapport au sol.';
+      if (W === 0) note = 'Sans vent, l\'avion va exactement où il vise.';
+      $('outH').innerHTML = res('Avion (dans l\'air)', '(' + fmt(Vp) + ' ; 0)', 'Il vise l\'est.') +
+        res('Vent', W > 0 ? wtxt : '(0 ; 0)', W > 0 ? 'Il pousse vers ' + TO[i] + ' (il vient ' + FROM[i] + ').' : 'Pas de vent.') +
+        res('Vitesse par rapport au sol', (exact(r.speed) ? '' : '≈ ') + fmt(r.speed, 1) + ' km/h', 'Somme : ' + gtxt + '. ' + note, 'total') +
+        res('Dérive', drift);
+    }
+    [hV, hW, hA].forEach(function (e) { e.addEventListener('input', draw); });
+    draw();
+  })();
+
+  /* ---------- Étape 8 : le bateau ---------- */
+  (function () {
+    var svg = $('svR'), rB = $('rB'), rC = $('rC'), mode = 'droit', g = mk(svg, 'g', {}), WIDTH = 120;
+    function draw() {
+      var b = +rB.value, c = +rC.value, r = boat(b, c, WIDTH, mode);
+      $('rBo').textContent = fmt(b) + ' m/s'; $('rCo').textContent = fmt(c) + ' m/s';
+      clear(g);
+      var s = r.ok ? Math.min(2, 520 / Math.max(r.drift, 1)) : 2, top = 40, bot = top + WIDTH * s, x0 = 60;
+      mk(g, 'rect', { x: 0, y: 0, width: 640, height: top, fill: 'var(--ok-soft)' });
+      mk(g, 'rect', { x: 0, y: bot, width: 640, height: 380 - bot, fill: 'var(--ok-soft)' });
+      mk(g, 'rect', { x: 0, y: top, width: 640, height: bot - top, fill: 'var(--acc-soft)' });
+      if (c > 0) for (var cx = 120; cx < 600; cx += 150) for (var cy = top + 30; cy < bot - 10; cy += 70) arrowPx(g, cx, cy, cx + 30 + 10 * c, cy, 'var(--two)', 2);
+      mk(g, 'line', { x1: 12, y1: top, x2: 12, y2: bot, stroke: 'var(--ink-soft)', 'stroke-width': 2 });
+      mk(g, 'line', { x1: 5, y1: top, x2: 19, y2: top, stroke: 'var(--ink-soft)', 'stroke-width': 2 });
+      mk(g, 'line', { x1: 5, y1: bot, x2: 19, y2: bot, stroke: 'var(--ink-soft)', 'stroke-width': 2 });
+      txt(g, 36, (top + bot) / 2, '120 m', { size: 18, fill: 'var(--ink-soft)' }).setAttribute('transform', 'rotate(-90 36 ' + (top + bot) / 2 + ')');
+      mk(g, 'circle', { cx: x0, cy: top, r: 7, fill: 'none', stroke: 'var(--ink)', 'stroke-width': 2.5 });
+      txt(g, x0 + 12, top - 12, 'en face', { size: 18, anchor: 'start', fill: 'var(--ink)' });
+      mk(g, 'circle', { cx: x0, cy: bot, r: 7, fill: 'var(--ink)' });
+      txt(g, x0 + 12, bot + 26, 'départ', { size: 18, anchor: 'start', fill: 'var(--ink)' });
+      if (r.ok) {
+        var ax = x0 + r.drift * s;
+        arrowPx(g, x0, bot, ax, top, 'var(--ok)', 4, '10 7');
+        mk(g, 'circle', { cx: ax, cy: top, r: 7, fill: 'var(--ok)' });
+        if (r.drift > 0) txt(g, Math.min(ax, 600), top - 12, 'arrivée', { size: 18, weight: 700, anchor: ax > 520 ? 'end' : 'middle', fill: 'var(--ok)' });
+      }
+      var ix = 440, iy = 228, iw = 192, ih = 146, sc = 24, qx = ix + 100, qy = iy + ih - 14;
+      mk(g, 'rect', { x: ix, y: iy, width: iw, height: ih, rx: 8, fill: 'var(--card)', stroke: 'var(--line)', 'stroke-width': 2 });
+      txt(g, ix + 10, iy + 22, 'vitesses', { size: 16, anchor: 'start', fill: 'var(--ink-soft)' });
+      if (r.by > 0 || r.bx !== 0) arrowPx(g, qx, qy, qx + r.bx * sc, qy - r.by * sc, 'var(--acc)', 4);
+      if (c > 0) arrowPx(g, qx + r.bx * sc, qy - r.by * sc, qx + r.bx * sc + c * sc, qy - r.by * sc, 'var(--two)', 4);
+      if (r.ok) arrowPx(g, qx, qy, qx + r.vx * sc, qy - r.vy * sc, 'var(--ok)', 4);
+      var out = $('outR');
+      if (!r.ok) {
+        out.innerHTML = res('Impossible !', 'courant ≥ bateau', 'Le courant (' + fmt(c) + ' m/s) est au moins aussi rapide que le bateau (' + fmt(b) + ' m/s). Même en remontant le courant, le bateau ne peut pas arriver en face : il sera toujours emporté. Augmente sa vitesse ou vise tout droit.');
+        return;
+      }
+      var sp = close(r.speed, Math.round(r.speed)) ? fmt(r.speed) : '≈ ' + fmt(r.speed, 2);
+      var ap = function (x, d) { return close(x, Math.round(x)) ? fmt(x) : '≈ ' + fmt(x, d); };
+      var calc = mode === 'droit' ? 'Bateau (0 ; ' + fmt(b) + ') + courant (' + fmt(c) + ' ; 0) = (' + fmt(c) + ' ; ' + fmt(b) + '), norme √(' + fmt(c) + '² + ' + fmt(b) + '²)' : (c === 0 ? 'Pas de courant : viser tout droit suffit.' : 'Le bateau vise (' + fmt(-c) + ' ; ' + ap(r.by, 2) + ') : le courant (' + fmt(c) + ' ; 0) annule sa partie en x. Pythagore : √(' + fmt(b) + '² − ' + fmt(c) + '²)');
+      out.innerHTML = res('Vitesse réelle', sp + ' m/s', calc, 'total') +
+        res('Durée de la traversée', (close(r.time, Math.round(r.time)) ? '' : '≈ ') + fmt(r.time, 1) + ' s', '120 ÷ ' + (mode === 'droit' ? fmt(b) : ap(r.vy, 2)) + ' (seule la partie qui traverse compte)') +
+        res('Décalage à l\'arrivée', (close(r.drift, Math.round(r.drift)) ? '' : '≈ ') + fmt(r.drift, 1) + ' m', mode === 'droit' ? (c > 0 ? 'Pendant la traversée, le courant l\'emporte de ' + fmt(c) + ' m chaque seconde.' : 'Pas de courant : il arrive pile en face.') : 'Il arrive pile en face, en visant ≈ ' + fmt(r.aim, 0) + '° vers l\'amont. Mais la traversée est plus lente.');
+    }
+    function setMode(m) { mode = m; $('rM0').setAttribute('aria-pressed', m === 'droit' ? 'true' : 'false'); $('rM1').setAttribute('aria-pressed', m === 'remonter' ? 'true' : 'false'); draw(); }
+    $('rM0').addEventListener('click', function () { setMode('droit'); });
+    $('rM1').addEventListener('click', function () { setMode('remonter'); });
+    [rB, rC].forEach(function (e) { e.addEventListener('input', draw); });
+    draw();
+  })();
+
+  /* ---------- Quiz ---------- */
+  function nz(a, b) { var x; do { x = rnd(a, b); } while (x === 0); return x; }
+  function makeQ(t) {
+    var A, P, u, v, k;
+    if (t === 0 || t === 1) {
+      A = [rnd(-6, 6), rnd(-6, 6)]; P = [rnd(-6, 6), rnd(-6, 6)];
+      while (P[t] === A[t]) P[t] = rnd(-6, 6);
+      var c = t === 0 ? 'x' : 'y';
+      return { q: 'A(' + fmtP(A) + ') et B(' + fmtP(P) + '). Quelle est la coordonnée ' + c + ' du vecteur ' + V('AB') + ' ?', a: P[t] - A[t], how: c + ' = ' + c + 'B − ' + c + 'A = ' + fmt(P[t]) + ' − ' + par(A[t]) + ' = ' + fmt(P[t] - A[t]) };
+    }
+    if (t === 2) {
+      var tr = pick([[3, 4], [6, 8], [5, 12], [0, 7], [8, 15], [9, 12]]);
+      u = rnd(0, 1) ? [tr[0], tr[1]] : [tr[1], tr[0]];
+      u = [u[0] * pick([1, -1]), u[1] * pick([1, -1])];
+      var n = norm(u);
+      return { q: 'Quelle est la longueur (norme) du vecteur ' + V('u') + fmtVec(u) + ' ?', a: n, how: '√(' + par(u[0]) + '² + ' + par(u[1]) + '²) = √(' + fmt(u[0] * u[0]) + ' + ' + fmt(u[1] * u[1]) + ') = √' + fmt(u[0] * u[0] + u[1] * u[1]) + ' = ' + fmt(n) };
+    }
+    if (t === 3) {
+      u = [rnd(-6, 6), nz(-6, 6)]; v = [rnd(-6, 6), nz(-6, 6)];
+      return { q: V('u') + fmtVec(u) + ' et ' + V('v') + fmtVec(v) + '. Quelle est la coordonnée y de ' + V('u') + ' + ' + V('v') + ' ?', a: u[1] + v[1], how: 'y = ' + fmt(u[1]) + ' + ' + par(v[1]) + ' = ' + fmt(u[1] + v[1]) };
+    }
+    if (t === 4) {
+      k = pick([-3, -2, -1, 2, 3, -0.5]);
+      var a = k === -0.5 ? 2 * nz(-3, 3) : nz(-5, 5);
+      u = [a, rnd(-5, 5)];
+      return { q: V('u') + fmtVec(u) + '. Quelle est la coordonnée x de ' + (k === -1 ? '−' : fmt(k)) + V('u') + ' ?', a: k * a, how: fmt(k) + ' × ' + par(a) + ' = ' + fmt(k * a) };
+    }
+    if (t === 5) {
+      A = [rnd(-5, 5), rnd(-5, 5)]; u = [rnd(-5, 5), nz(-5, 5)];
+      return { q: 'A(' + fmtP(A) + ') et ' + V('AB') + ' = ' + fmtVec(u) + '. Quelle est la coordonnée y du point B ?', a: A[1] + u[1], how: 'On part de A et on se déplace : yB = ' + fmt(A[1]) + ' + ' + par(u[1]) + ' = ' + fmt(A[1] + u[1]) };
+    }
+    if (t === 6) {
+      u = [nz(-4, 4), nz(-4, 4)]; k = pick([2, 3, -2, -1, -3, 4]);
+      return { q: V('u') + fmtVec(u) + ' et ' + V('v') + '(' + fmt(k * u[0]) + ' ; y) sont colinéaires. Combien vaut y ?', a: k * u[1], how: 'k = ' + fmt(k * u[0]) + ' ÷ ' + par(u[0]) + ' = ' + fmt(k) + ', donc y = ' + fmt(k) + ' × ' + par(u[1]) + ' = ' + fmt(k * u[1]) };
+    }
+    A = [rnd(-5, 5), rnd(-5, 5)]; P = [rnd(-5, 5), rnd(-5, 5)]; var C = [rnd(-5, 5), rnd(-5, 5)];
+    while (P[0] === A[0]) P[0] = rnd(-5, 5);
+    return { q: 'A(' + fmtP(A) + '), B(' + fmtP(P) + ') et C(' + fmtP(C) + '). On veut ' + V('CD') + ' = ' + V('AB') + '. Quelle est la coordonnée x du point D ?', a: C[0] + P[0] - A[0], how: 'x de ' + V('AB') + ' : ' + fmt(P[0]) + ' − ' + par(A[0]) + ' = ' + fmt(P[0] - A[0]) + ', donc xD = ' + fmt(C[0]) + ' + ' + par(P[0] - A[0]) + ' = ' + fmt(C[0] + P[0] - A[0]) };
+  }
+  var quiz = $('quiz'), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ''; done = [];
+    for (var k = 0; k < 8; k++) {
+      var Q = makeQ(k), li = document.createElement('li');
+      li.innerHTML = '<span>' + Q.q + '</span><input type="text" id="qa' + k + '" inputmode="decimal" autocomplete="off" aria-label="Ta réponse à la question ' + (k + 1) + '"><button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+      quiz.appendChild(li);
+      (function (k, Q) {
+        function check() {
+          var fb = $('qf' + k), x = num($('qa' + k).value);
+          if (isNaN(x)) { fb.className = 'fb'; fb.textContent = 'Écris un nombre.'; return; }
+          if (Math.abs(x - Q.a) < 0.006) { fb.className = 'fb ok'; fb.textContent = 'Bravo, c\'est juste !'; done[k] = true; }
+          else { done[k] = false; fb.className = 'fb no'; fb.innerHTML = 'Pas tout à fait : la réponse est ' + fmt(Q.a, 2) + '.<span>' + Q.how + '</span>'; }
+          $('score').textContent = done.filter(Boolean).length + ' / 8';
+        }
+        $('qb' + k).addEventListener('click', check);
+        $('qa' + k).addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+      })(k, Q);
+    }
+    $('score').textContent = '0 / 8';
+  }
+  $('newQuiz').addEventListener('click', newQuiz);
+  newQuiz();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1033 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Les arrondis et les ordres de grandeur</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, encre cuivre (comme une pièce de 1 centime), marge rouge. La droite graduée et le zoom sont au centre. */
+:root {
+  --paper: #faf7f4;
+  --grid: #ece4dc;
+  --card: #ffffff;
+  --ink: #2a1a10;
+  --ink-soft: #6b5546;
+  --acc: #c2410c;
+  --acc-soft: #fde6d8;
+  --two: #1c64c8;
+  --two-soft: #dbe8fa;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #fff0a3;
+  --line: #e3d6cb;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #15100c; --grid: #221a14; --card: #1c1510; --ink: #f4ece5; --ink-soft: #c0aa9a;
+    --acc: #fb9a63; --acc-soft: #47251a; --two: #7fb0ff; --two-soft: #1a2a45;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #382a20;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #15100c; --grid: #221a14; --card: #1c1510; --ink: #f4ece5; --ink-soft: #c0aa9a;
+  --acc: #fb9a63; --acc-soft: #47251a; --two: #7fb0ff; --two-soft: #1a2a45;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #382a20;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+.big-eq { font-family: var(--f-mono); font-weight: 600; font-size: clamp(1.35rem, 6vw, 2.1rem); overflow-wrap: anywhere; color: var(--acc); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+@media (max-width: 420px) { .box { padding: 16px 14px; } }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note.blue { border-left-color: var(--two); background: var(--two-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+svg text.a { fill: var(--acc); }
+svg text.b { fill: var(--two); }
+svg text.g { fill: var(--ok); }
+svg text.s { fill: var(--ink-soft); }
+.fig svg { width: 100%; height: auto; display: block; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; }
+.fig.drag svg { touch-action: pan-y; cursor: ew-resize; }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 8px 14px; min-height: 44px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button.ex { font-family: var(--f-mono); font-weight: 600; font-size: .95rem; }
+button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+button:disabled { opacity: .45; cursor: default; transform: none; }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.btns.small button { padding: 6px 10px; font-size: .95rem; }
+input[type="text"] { font: inherit; font-family: var(--f-mono); font-size: 1.05rem; padding: 8px 10px; min-height: 44px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; }
+input[type="range"] { width: 100%; accent-color: var(--acc); min-height: 32px; }
+.param { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.param label { font-weight: 700; }
+.lbl { font-weight: 700; }
+
+.results { display: flex; flex-direction: column; gap: 8px; font-variant-numeric: tabular-nums; }
+.res { border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 12px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; align-items: baseline; }
+.res-name { font-family: var(--f-display); font-weight: 700; }
+.res-val { font-family: var(--f-mono); font-weight: 600; color: var(--acc); font-size: 1.05rem; white-space: nowrap; }
+.res-calc { grid-column: 1 / -1; font-family: var(--f-mono); font-size: .9rem; color: var(--ink-soft); overflow-wrap: anywhere; }
+.res.wrap .res-val { white-space: normal; grid-column: 1 / -1; overflow-wrap: anywhere; }
+.res.total { border-color: var(--ok); background: var(--ok-soft); }
+.res.total .res-val { color: var(--ok); }
+.res.bad { border-color: var(--red); background: var(--red-soft); }
+.res.bad .res-val { color: var(--red); }
+.steps { display: flex; flex-direction: column; gap: 6px; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; padding: 12px 14px; font-size: 1rem; overflow-wrap: anywhere; min-width: 0; }
+.steps b { color: var(--acc); }
+.steps .warn { color: var(--two); font-weight: 700; }
+.err { color: var(--red); font-weight: 700; font-family: var(--f-body); }
+
+.verdict { border-radius: 8px; padding: 12px 14px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+.verdict:empty { display: none; }
+.verdict.yes { background: var(--ok-soft); color: var(--ok); }
+.verdict.no { background: var(--red-soft); color: var(--red); }
+.verdict.info { background: var(--acc-soft); color: var(--acc); }
+.verdict span { font-weight: 400; color: var(--ink); overflow-wrap: anywhere; }
+
+/* Tableau d'exemples */
+.ptable { border-collapse: separate; border-spacing: 0; width: 100%; font-variant-numeric: tabular-nums; }
+.ptable th, .ptable td { border: 1.5px solid var(--ink); padding: 7px 8px; text-align: center; font-family: var(--f-mono); font-size: .98rem; }
+.ptable th { font-family: var(--f-display); background: var(--paper); }
+.ptable td:first-child { font-family: var(--f-body); font-weight: 700; text-align: left; }
+.ptable td.t { color: var(--two); }
+.ptable td.r { color: var(--acc); font-weight: 600; }
+.scroll { overflow-x: auto; }
+
+/* Tuiles du tableau de numération */
+.tiles { display: flex; flex-wrap: wrap; gap: 6px; align-items: flex-end; }
+.tile { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 56px; padding: 6px 4px; box-shadow: 2px 2px 0 var(--ink); }
+.tile .dg { font-family: var(--f-mono); font-size: 1.6rem; font-weight: 600; line-height: 1.1; }
+.tile .rg { font-family: var(--f-body); font-weight: 400; font-size: .7rem; line-height: 1.15; max-width: 64px; text-align: center; }
+.tile.int { border-color: var(--two); }
+.tile.dec { border-color: var(--acc); }
+.comma { font-family: var(--f-mono); font-size: 2rem; font-weight: 700; padding: 0 2px 18px; color: var(--red); }
+
+/* Chiffres significatifs */
+.sig { font-family: var(--f-mono); font-size: clamp(1.4rem, 6vw, 2rem); overflow-wrap: anywhere; letter-spacing: .02em; }
+.sig .z { color: var(--ink-soft); opacity: .6; }
+.sig .k { color: var(--acc); font-weight: 600; background: var(--acc-soft); border-radius: 4px; }
+.sig .x { color: var(--ink-soft); text-decoration: line-through; }
+
+/* Jeu d'estimation */
+.game-q { font-family: var(--f-mono); font-weight: 600; font-size: clamp(1.4rem, 6vw, 2rem); color: var(--acc); overflow-wrap: anywhere; }
+.row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: center; }
+.meter { height: 12px; border-radius: 999px; background: var(--paper); border: 1.5px solid var(--line); overflow: hidden; }
+.meter span { display: block; height: 100%; background: var(--acc); width: 0; transition: width .3s ease; }
+@media (prefers-reduced-motion: reduce) { .meter span { transition: none; } }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.cards .m { font-family: var(--f-mono); font-size: .95rem; overflow-wrap: anywhere; }
+.cards .m b { color: var(--acc); }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
+.tag.a { color: var(--acc); }
+.tag.b { color: var(--two); }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 110px auto; gap: 10px; align-items: center; }
+.quiz li > span:first-child { overflow-wrap: anywhere; min-width: 0; }
+.quiz input[type="text"] { font-size: 1rem; padding: 6px 8px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb:empty { display: none; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc); }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 120px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.errs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.errs li { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--paper); }
+.errs .bad { font-family: var(--f-mono); color: var(--red); text-decoration: line-through; overflow-wrap: anywhere; }
+.errs .good { font-family: var(--f-mono); color: var(--ok); font-weight: 600; overflow-wrap: anywhere; }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+<style id="tnav-css">
+.tnav-top { display: flex; margin: 0 0 4px; }
+.tnav-home { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font-weight: 700; font-size: .95rem; text-decoration: none; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tnav-home:hover, .tnav-home:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.tnav-bottom { margin-top: 8px; display: flex; flex-direction: column; gap: 12px; }
+.tnav-bottom h2 { margin: 0; }
+.tnav-pn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tnav-pn a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--ink, #222); border-radius: 10px;
+  background: var(--card, #fff); color: var(--ink, #222); text-decoration: none; box-shadow: 3px 3px 0 var(--ink, #222); min-width: 0; }
+.tnav-pn a span { font-size: .85rem; color: var(--ink-soft, #666); }
+.tnav-pn a strong { overflow-wrap: anywhere; }
+.tnav-pn a.next { text-align: right; grid-column: 2; }
+.tnav-bottom .tnav-home { align-self: center; }
+@media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
+</style>
+</head>
+<body>
+<main class="page">
+<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="index.html">← Tous les tutoriels</a></nav><!--/tnav-->
+
+
+  <header class="hero">
+    <span class="eyebrow">Tutoriel de maths · niveau 6<sup>e</sup>–4<sup>e</sup></span>
+    <h1>Les arrondis et les ordres de grandeur</h1>
+    <p class="lead">Ton ticket de cantine coûte 3,72 € ? Tu dis « à peu près 4 € ». Une ville a 98 436 habitants ? On dit « environ 100 000 ». Arrondir, c'est remplacer un nombre compliqué par un nombre plus simple et très proche. Et l'ordre de grandeur, c'est l'arme secrète pour vérifier un calcul en deux secondes.</p>
+    <div class="box">
+      <div class="fig">
+        <svg viewBox="0 0 400 130" role="img" aria-label="Droite graduée de 3 à 4 : le nombre 3,7 est plus près de 4 que de 3, donc 3,7 arrondi à l'unité vaut 4.">
+          <rect x="50" y="62" width="150" height="20" fill="var(--two-soft)"/>
+          <rect x="200" y="62" width="150" height="20" fill="var(--acc-soft)"/>
+          <line x1="50" y1="72" x2="350" y2="72" stroke="var(--ink)" stroke-width="2.5"/>
+          <g stroke="var(--ink)" stroke-width="1.5">
+            <line x1="50" y1="62" x2="50" y2="82"/><line x1="80" y1="67" x2="80" y2="77"/><line x1="110" y1="67" x2="110" y2="77"/><line x1="140" y1="67" x2="140" y2="77"/><line x1="170" y1="67" x2="170" y2="77"/>
+            <line x1="200" y1="58" x2="200" y2="86" stroke-dasharray="3 3"/><line x1="230" y1="67" x2="230" y2="77"/><line x1="260" y1="67" x2="260" y2="77"/><line x1="290" y1="67" x2="290" y2="77"/><line x1="320" y1="67" x2="320" y2="77"/><line x1="350" y1="62" x2="350" y2="82"/>
+          </g>
+          <line x1="260" y1="98" x2="340" y2="98" stroke="var(--ok)" stroke-width="3"/>
+          <polygon points="350,98 338,92 338,104" fill="var(--ok)"/>
+          <circle cx="260" cy="72" r="8" fill="var(--acc)" stroke="var(--card)" stroke-width="2"/>
+          <text x="260" y="46" text-anchor="middle" font-size="16" font-weight="600" class="a">3,7</text>
+          <text x="50" y="112" text-anchor="middle" font-size="16" font-weight="600">3</text>
+          <text x="350" y="122" text-anchor="middle" font-size="16" font-weight="600">4</text>
+          <text x="200" y="112" text-anchor="middle" font-size="13" class="s">milieu 3,5</text>
+          <text x="300" y="122" text-anchor="middle" font-size="13" class="g">plus près</text>
+        </svg>
+      </div>
+      <span class="big-eq">3,7 ≈ 4 &nbsp;·&nbsp; π ≈ 3,14</span>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · Le rang des chiffres</span>
+    <h2>Chaque chiffre a sa place</h2>
+    <p>Dans <span class="mono">3 527,84</span>, le chiffre 5 ne vaut pas 5 : il vaut <strong>5 centaines</strong>, soit 500. Sa valeur dépend de sa <strong>place</strong>, qu'on appelle son <strong>rang</strong>.</p>
+    <p>À gauche de la virgule : unités, dizaines, centaines, milliers… À droite : <strong>dixièmes</strong> (1 dixième = 1 ÷ 10 = 0,1), <strong>centièmes</strong> (0,01), <strong>millièmes</strong> (0,001). <span class="hl">Chaque rang vaut 10 fois plus que celui de sa droite.</span></p>
+    <div class="box">
+      <h3>Le tableau de numération</h3>
+      <div class="param">
+        <label for="rx">Écris un nombre</label>
+        <input id="rx" type="text" inputmode="decimal" autocomplete="off" value="3 527,84">
+      </div>
+      <p class="soft">Touche un chiffre pour connaître son rang et sa valeur.</p>
+      <div class="tiles" id="rtiles" role="group" aria-label="Les chiffres du nombre"></div>
+      <div class="verdict info" id="rinfo" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Pourquoi c'est important ?</span>
+      <span>Pour arrondir « au dixième », il faut d'abord savoir <strong>où</strong> est le chiffre des dixièmes. C'est le premier chiffre après la virgule. Le chiffre des dizaines, lui, est le deuxième <strong>avant</strong> la virgule. Attention à ne pas confondre dizaine et dixième !</span>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · Tronquer ou arrondir</span>
+    <h2>Couper, ou choisir le plus proche</h2>
+    <p>Il y a deux façons de raccourcir un nombre à un certain rang.</p>
+    <div class="cards">
+      <div class="box"><span class="tag b">Troncature</span><strong>On coupe, sans réfléchir</strong><span class="soft">On garde les chiffres jusqu'au rang choisi, et on efface tout le reste.</span><span class="m">3,78 tronqué au dixième → <b>3,7</b></span></div>
+      <div class="box"><span class="tag a">Arrondi</span><strong>On prend le plus proche</strong><span class="soft">Parmi les deux nombres « ronds » qui entourent le nombre, on prend celui qui est le plus près.</span><span class="m">3,78 arrondi au dixième → <b>3,8</b></span></div>
+    </div>
+    <p>Avec le même nombre <span class="mono">2 468,357</span>, voici ce que donnent les deux méthodes à différents rangs :</p>
+    <div class="scroll">
+      <table class="ptable" aria-label="Troncature et arrondi de 2 468,357 à différents rangs">
+        <tr><th>Rang</th><th>Troncature</th><th>Arrondi</th></tr>
+        <tr><td>au millier</td><td class="t">2 000</td><td class="r">2 000</td></tr>
+        <tr><td>à la centaine</td><td class="t">2 400</td><td class="r">2 500</td></tr>
+        <tr><td>à la dizaine</td><td class="t">2 460</td><td class="r">2 470</td></tr>
+        <tr><td>à l'unité</td><td class="t">2 468</td><td class="r">2 468</td></tr>
+        <tr><td>au dixième</td><td class="t">2 468,3</td><td class="r">2 468,4</td></tr>
+        <tr><td>au centième</td><td class="t">2 468,35</td><td class="r">2 468,36</td></tr>
+      </table>
+    </div>
+    <div class="note">
+      <span class="note-title">La règle du 5</span>
+      <span>Pour arrondir à un rang, on regarde <strong>le chiffre juste à sa droite</strong> (un seul !) :</span>
+      <span>• si c'est 0, 1, 2, 3 ou 4 → on garde le chiffre du rang (comme la troncature) ;</span>
+      <span>• si c'est 5, 6, 7, 8 ou 9 → on <strong>ajoute 1</strong> au chiffre du rang.</span>
+      <span>Pour les entiers, on remplace par des 0 les chiffres effacés : 347 à la dizaine donne 350, pas 35.</span>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Le zoom</span>
+    <h2>Le nombre entre ses deux voisins</h2>
+    <p>Arrondir, c'est regarder le nombre sur une droite graduée. On zoome entre ses deux « voisins ronds » au rang choisi, puis on regarde de quel côté du <strong>milieu</strong> il se trouve. Le milieu est le cas « 5 » : par convention, on va alors vers le voisin du dessus.</p>
+    <div class="box">
+      <div class="param">
+        <label for="zx">Un nombre positif</label>
+        <input id="zx" type="text" inputmode="decimal" autocomplete="off" value="4,37">
+      </div>
+      <div class="btns small" id="zprec" role="group" aria-label="Rang de l'arrondi"></div>
+      <div class="fig drag"><svg id="zsvg" viewBox="0 0 400 150" role="img" aria-label="Zoom sur la droite graduée entre les deux voisins du nombre"></svg></div>
+      <div class="param">
+        <label for="zk">Déplace le nombre (ou fais glisser le point) : <span class="mono" id="zkOut"></span></label>
+        <input id="zk" type="range" min="0" max="100" step="1" value="70">
+      </div>
+      <div class="verdict" id="zout" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · Par défaut, par excès</span>
+    <h2>Un peu moins, un peu plus</h2>
+    <p>Les deux voisins du zoom ont un nom :</p>
+    <div class="cards">
+      <div class="box"><span class="tag b">Par défaut</span><strong>Le voisin du dessous</strong><span class="soft">Une valeur approchée <strong>par défaut</strong> est un peu plus petite que le nombre (ou égale).</span><span class="m">π ≈ <b>3,14</b> par défaut au centième</span></div>
+      <div class="box"><span class="tag a">Par excès</span><strong>Le voisin du dessus</strong><span class="soft">Une valeur approchée <strong>par excès</strong> est un peu plus grande que le nombre (ou égale).</span><span class="m">π ≈ <b>3,15</b> par excès au centième</span></div>
+    </div>
+    <p>En les écrivant de chaque côté, on obtient un <strong>encadrement</strong> : <span class="mono hl">3,14 &lt; π &lt; 3,15</span>. On dit que c'est un encadrement « à 0,01 près », car l'écart entre les deux bornes est 0,01.</p>
+    <p>L'<strong>arrondi</strong> est toujours l'une des deux : celle qui est la plus proche. Ici π = 3,14159… donc l'arrondi au centième est 3,14, la valeur par défaut. Pour un nombre positif, la troncature est égale à la valeur par défaut.</p>
+    <h3>L'arrondisseur : toutes les valeurs approchées d'un coup</h3>
+    <p>Écris un nombre et choisis un rang : la machine donne la troncature, l'arrondi, les valeurs par défaut et par excès, l'encadrement, et explique la règle du 5.</p>
+    <div class="box">
+      <div class="param">
+        <label for="ax">Le nombre</label>
+        <input id="ax" type="text" inputmode="decimal" autocomplete="off" value="2,675">
+      </div>
+      <div class="btns small" id="apre" role="group" aria-label="Exemples"></div>
+      <span class="lbl">Arrondir…</span>
+      <div class="btns small" id="aprec" role="group" aria-label="Rang choisi"></div>
+      <div class="results" id="aout" aria-live="polite"></div>
+      <div class="steps" id="asteps"></div>
+      <div class="verdict" id="anaive"></div>
+    </div>
+    <div class="note blue">
+      <span class="note-title">Même les ordinateurs se trompent</span>
+      <span>Un ordinateur range les nombres en binaire (avec des 0 et des 1). Il ne peut pas stocker 2,675 exactement : il garde 2,674999999… un tout petit peu moins. Un calcul trop naïf arrondit alors 2,675 en 2,67 au lieu de 2,68 ! Cette page fait ses arrondis chiffre par chiffre, comme toi sur ta feuille, pour éviter ce piège.</span>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Les chiffres significatifs</span>
+    <h2>Garder les chiffres qui comptent</h2>
+    <p>Les scientifiques arrondissent souvent d'une autre façon : ils gardent un certain nombre de <strong>chiffres significatifs</strong>. On compte les chiffres <strong>à partir du premier chiffre qui n'est pas 0</strong>. Les zéros du début ne comptent pas : ils servent juste à placer la virgule.</p>
+    <p>Exemple : <span class="mono">0,003 852</span> avec 2 chiffres significatifs donne <span class="mono">0,003 9</span> (on garde 3 et 8, et le chiffre suivant, 5, fait monter le 8).</p>
+    <div class="box">
+      <div class="param">
+        <label for="sx">Le nombre</label>
+        <input id="sx" type="text" inputmode="decimal" autocomplete="off" value="0,003852">
+      </div>
+      <div class="btns small" id="spre" role="group" aria-label="Exemples"></div>
+      <div class="param">
+        <label for="sn">Chiffres significatifs gardés : <span class="mono" id="snOut">2</span></label>
+        <input id="sn" type="range" min="1" max="6" step="1" value="2">
+      </div>
+      <div class="sig" id="sdigits" aria-live="polite"></div>
+      <div class="verdict info" id="sres" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · Vérifier un calcul</span>
+    <h2>L'ordre de grandeur, le détecteur d'erreurs</h2>
+    <p>Un <strong>ordre de grandeur</strong> d'un résultat, c'est une valeur très simple et assez proche, qu'on trouve <strong>de tête</strong>. On arrondit chaque nombre à un seul chiffre non nul, puis on calcule.</p>
+    <div class="cards">
+      <div class="box"><strong>48 × 21</strong><span class="m">≈ 50 × 20 = <b>1 000</b></span><span class="soft">Le vrai résultat est 1 008. Très proche !</span></div>
+      <div class="box"><strong>Léa trouve 312,5 × 9 = 28 125</strong><span class="m">≈ 300 × 10 = <b>3 000</b></span><span class="soft">28 125 est 10 fois trop grand : elle a dû se tromper de virgule. Le bon résultat est 2 812,5.</span></div>
+    </div>
+    <div class="box">
+      <h3>Le jeu de l'estimation</h3>
+      <p class="soft">Cinq calculs. Ne les pose pas ! Donne une estimation de tête. Plus tu es proche, plus tu gagnes de points : 3 points à 5 % près, 2 points à 15 % près, 1 point à 30 % près.</p>
+      <div class="row"><span class="mono soft" id="ground">Calcul 1 / 5</span><span class="score" id="gscore">0 / 15</span></div>
+      <div class="meter" aria-hidden="true"><span id="gbar"></span></div>
+      <div class="game-q" id="gq" aria-live="polite"></div>
+      <div class="row">
+        <input id="gin" type="text" inputmode="decimal" autocomplete="off" aria-label="Ton estimation">
+        <button id="gok" type="button">Valider</button>
+      </div>
+      <div class="verdict" id="gfb" aria-live="polite"></div>
+      <div class="btns"><button id="gnext" type="button" disabled>Calcul suivant</button></div>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Dans la vraie vie</span>
+    <h2>Du cheveu au Soleil</h2>
+    <p>Les ordres de grandeur aident à comparer des choses très différentes. Pour les très grands et très petits nombres, on utilise la <strong>notation scientifique</strong> (vue dans le tutoriel sur <a class="tlink" href="les-puissances.html">les puissances</a>) : un nombre entre 1 et 10, multiplié par une puissance de 10. Sur la règle ci-dessous, chaque graduation multiplie par 10.</p>
+    <div class="box">
+      <div class="btns small" id="lcat" role="group" aria-label="Catégorie"></div>
+      <div class="fig"><svg id="lsvg" viewBox="0 0 400 130" role="img" aria-label="Règle des puissances de 10"></svg></div>
+      <div class="btns small" id="litems" role="group" aria-label="Exemples à placer"></div>
+      <div class="verdict info" id="linfo" aria-live="polite"></div>
+    </div>
+    <p class="soft">Les valeurs sont des ordres de grandeur arrondis (« environ ») : la population change chaque année, et une fourmi n'a pas une taille unique !</p>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Les pièges de l'argent</span>
+    <h2>La somme des arrondis n'est pas l'arrondi de la somme</h2>
+    <p>Trois amis partagent 10 €. Chacun reçoit 10 ÷ 3 = 3,333… €, arrondi à <strong>3,33 €</strong>. Mais 3 × 3,33 = 9,99 € : il manque 1 centime ! Quand on arrondit chaque morceau, les petites erreurs s'additionnent.</p>
+    <p>Même piège avec les pourcentages. Une classe vote pour le menu de la fête. Chaque pourcentage est arrondi à l'unité. Est-ce que le total fait toujours 100 % ?</p>
+    <div class="box">
+      <div class="btns small" id="vpre" role="group" aria-label="Exemples de votes"></div>
+      <div class="param"><label for="v0">Pizza : <span class="mono" id="v0Out"></span> voix</label><input id="v0" type="range" min="0" max="20" step="1" value="1"></div>
+      <div class="param"><label for="v1">Crêpes : <span class="mono" id="v1Out"></span> voix</label><input id="v1" type="range" min="0" max="20" step="1" value="1"></div>
+      <div class="param"><label for="v2">Tacos : <span class="mono" id="v2Out"></span> voix</label><input id="v2" type="range" min="0" max="20" step="1" value="1"></div>
+      <div class="results" id="vOut" aria-live="polite"></div>
+    </div>
+    <div class="note red">
+      <span class="note-title">Le bon réflexe</span>
+      <span>Calcule avec les valeurs exactes, et <strong>arrondis seulement à la fin</strong>. Si un journal affiche 33 % + 33 % + 33 % = 99 %, ce n'est pas une erreur : c'est l'effet des arrondis. Tu le verras aussi dans le tutoriel sur <a class="tlink" href="les-pourcentages.html">les pourcentages</a>.</span>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Attention</span>
+    <h2>Les erreurs fréquentes</h2>
+    <div class="box">
+      <ul class="errs">
+        <li><span>Arrondir en plusieurs fois</span><span class="bad">2,449 → 2,45 → 2,5 au dixième</span><span class="good">2,449 au dixième : le chiffre des centièmes est 4 → 2,4</span></li>
+        <li><span>Regarder le mauvais chiffre</span><span class="bad">5,38 au dixième : « le 3 est &lt; 5 » → 5,3</span><span class="good">On regarde le chiffre juste à droite des dixièmes : 8 ≥ 5 → 5,4</span></li>
+        <li><span>Tronquer au lieu d'arrondir</span><span class="bad">3,79 arrondi à l'unité = 3</span><span class="good">3,79 arrondi à l'unité = 4 (la troncature, elle, vaut 3)</span></li>
+        <li><span>Oublier les zéros des entiers</span><span class="bad">347 arrondi à la dizaine = 35</span><span class="good">347 arrondi à la dizaine = 350</span></li>
+        <li><span>Oublier la retenue</span><span class="bad">4,96 au dixième = 4,10</span><span class="good">4,96 au dixième = 5,0 (9 + 1 = 10 : on pose 0 et on retient 1)</span></li>
+        <li><span>Écrire « = » au lieu de « ≈ »</span><span class="bad">10 ÷ 3 = 3,33</span><span class="good">10 ÷ 3 ≈ 3,33 (le résultat exact a une infinité de 3)</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Écris ta réponse avec une virgule si besoin (par exemple 12,4).</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Nouvelles questions</button>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · Un peu d'histoire</span>
+    <h2>Des encadrements d'Archimède aux centimes</h2>
+    <ol class="timeline">
+      <li><span class="when">vers −250</span><div class="what"><strong>Archimède encadre π</strong><span>En dessinant des polygones autour d'un cercle, il montre que π est entre 3 + 10/71 et 3 + 1/7, soit environ entre 3,1408 et 3,1429. Un encadrement, déjà !</span></div></li>
+      <li><span class="when">fin du XVI<sup>e</sup> s.</span><div class="what"><strong>Simon Stevin</strong><span>Dans un petit livre, <em>La Disme</em>, ce Flamand explique aux marchands comment calculer avec des nombres décimaux, au lieu de fractions compliquées.</span></div></li>
+      <li><span class="when">fin du XVIII<sup>e</sup> s.</span><div class="what"><strong>Le franc et ses centimes</strong><span>Pendant la Révolution française, on adopte le système métrique et un franc divisé en 100 centimes. Arrondir au centime devient un geste de tous les jours.</span></div></li>
+      <li><span class="when">début des années 1980</span><div class="what"><strong>La Bourse de Vancouver</strong><span>Un indice boursier était recalculé des milliers de fois par jour et, à chaque fois, <strong>tronqué</strong> au millième au lieu d'être arrondi. Après moins de deux ans, il affichait environ 525 points au lieu d'environ 1 099 ! Les toutes petites erreurs s'étaient accumulées.</span></div></li>
+      <li><span class="when">1999 – 2002</span><div class="what"><strong>Le passage à l'euro</strong><span>Le taux est fixé à 1 € = 6,559 57 francs, avec 6 chiffres significatifs. Les prix convertis sont ensuite arrondis au centime.</span></div></li>
+      <li><span class="when">aujourd'hui</span><div class="what"><strong>Adieu les petites pièces</strong><span>Dans certains pays de la zone euro, comme la Finlande ou les Pays-Bas, le total payé en espèces est arrondi aux 5 centimes les plus proches : les pièces de 1 et 2 centimes y servent très peu.</span></div></li>
+    </ol>
+  </section>
+
+  <!-- 12 -->
+  <section>
+    <span class="eyebrow">Étape 12 · À toi de jouer</span>
+    <h2>Six exercices</h2>
+    <div class="exos">
+      <details>
+        <summary>Le piège de la cascade<span class="q">Arrondis 12,3456 au centième, puis (en repartant de 12,3456) au dixième.</span></summary>
+        <div><span>Au centième : le chiffre des millièmes est 5 → <strong>12,35</strong>.</span><span>Au dixième : le chiffre des centièmes est 4 → <strong>12,3</strong>. Il ne faut surtout pas arrondir 12,35, sinon on trouverait 12,4, ce qui est faux.</span></div>
+      </details>
+      <details>
+        <summary>Encadrer π<span class="q">π = 3,141 59… Donne un encadrement de π au millième, puis l'arrondi au millième.</span></summary>
+        <div><span>Par défaut 3,141 et par excès 3,142 : <strong>3,141 &lt; π &lt; 3,142</strong>.</span><span>Le chiffre des dix-millièmes est 5 → l'arrondi au millième est <strong>3,142</strong> (la valeur par excès).</span></div>
+      </details>
+      <details>
+        <summary>Un ordre de grandeur<span class="q">Donne un ordre de grandeur de 398 × 51, puis compare avec le vrai résultat.</span></summary>
+        <div><span>398 ≈ 400 et 51 ≈ 50, donc 398 × 51 ≈ 400 × 50 = <strong>20 000</strong>.</span><span>Le vrai résultat est 20 298 : l'estimation est très bonne.</span></div>
+      </details>
+      <details>
+        <summary>Les yaourts<span class="q">Un pack de 3 yaourts coûte 2 €. Quel est le prix d'un yaourt, arrondi au centime ? Combien coûteraient 3 yaourts à ce prix arrondi ?</span></summary>
+        <div><span>2 ÷ 3 = 0,666… € ; le chiffre des millièmes est 6 → <strong>0,67 €</strong>.</span><span>3 × 0,67 = <strong>2,01 €</strong> : un centime de plus que le pack, à cause de l'arrondi.</span></div>
+      </details>
+      <details>
+        <summary>Chiffres significatifs<span class="q">Écris 0,004 58 avec 2 chiffres significatifs.</span></summary>
+        <div><span>Les zéros du début ne comptent pas. On garde 4 et 5 ; le chiffre suivant est 8 → le 5 devient 6 : <strong>0,004 6</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Calcul suspect<span class="q">Tom calcule 23,8 × 4,1 et trouve 975,8. Est-ce possible ?</span></summary>
+        <div><span>23,8 × 4,1 ≈ 24 × 4 ≈ 100 (ou 20 × 4 = 80). 975,8 est environ 10 fois trop grand : <strong>non</strong>, Tom s'est trompé de virgule.</span><span>Le vrai résultat est 97,58.</span></div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• Le <strong>rang</strong> d'un chiffre : unités, dizaines, centaines… et après la virgule dixièmes, centièmes, millièmes.</span>
+      <span>• <strong>Tronquer</strong>, c'est couper. <strong>Arrondir</strong>, c'est prendre la valeur la plus proche.</span>
+      <span>• <strong>Règle du 5</strong> : on regarde le chiffre juste à droite du rang. De 0 à 4, on garde ; de 5 à 9, on ajoute 1.</span>
+      <span>• Valeur approchée <strong>par défaut</strong> (un peu moins) et <strong>par excès</strong> (un peu plus) forment un <strong>encadrement</strong> : 3,14 &lt; π &lt; 3,15.</span>
+      <span>• Un <strong>ordre de grandeur</strong> se calcule de tête en arrondissant chaque nombre à un seul chiffre non nul. Il sert à vérifier un résultat.</span>
+      <span>• On arrondit <strong>à la fin</strong> d'un calcul, pas au milieu, et on écrit « ≈ ».</span>
+    </div>
+  </section>
+
+  <!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"><a class="prev" href="les-grands-nombres-et-l-infini.html"><span>← Précédent</span><strong>Les grands nombres et l&#x27;infini</strong></a><a class="next" href="le-calcul-litteral.html"><span>Suivant →</span><strong>Le calcul littéral</strong></a></div><a class="tnav-home" href="index.html">⌂ Tous les tutoriels</a></nav><!--/tnav-->
+<footer>Fiche de révision · Les arrondis et les ordres de grandeur</footer>
+</main>
+
+<script>
+(function () {
+  /* Hooks de test : window.__arr
+     Les nombres x peuvent être des chaînes ("2,675", "1 234,5", "-2.35", "1e-7") ou des nombres JS (convertis via String).
+     Le rang p est un entier (puissance de 10 : 3 millier, 2 centaine, 1 dizaine, 0 unité, -1 dixième, -2 centième, -3 millième)
+     ou un nom ('millier', 'centaine', 'dizaine', 'unité', 'dixième', 'centième', 'millième').
+     Tous les calculs sont faits en décimal exact (BigInt), jamais en virgule flottante.
+       parse(x)            -> { neg, d: BigInt, s } (valeur = ±d / 10^s) ou null
+       tronquer(x, p)      -> chaîne française, ex. tronquer('2,675', -2) = '2,67'
+       arrondir(x, p)      -> ex. arrondir('2,675', -2) = '2,68' ; arrondir(1.005, -2) = '1,01' ; arrondir('-2,35', -1) = '−2,4'
+       defaut(x, p)        -> valeur approchée par défaut (≤ x), ex. defaut('-2,35', -1) = '−2,4'
+       exces(x, p)         -> valeur approchée par excès (≥ x)
+       encadrement(x, p)   -> [defaut, exces]
+       chiffre(x, p)       -> chiffre (0–9) du rang p, ex. chiffre('3527,84', 2) = 5
+       signif(x, n)        -> arrondi à n chiffres significatifs, ex. signif('0,003852', 2) = '0,0039'
+       ordre(x)            -> ordre de grandeur (1 chiffre significatif), ex. ordre(48) = '50'
+       estimer(a, op, b)   -> { estimation, exact } pour op '×', '+', '÷' (a, b entiers positifs)
+       points(est, exact)  -> 3, 2, 1 ou 0 selon l'écart relatif (5 %, 15 %, 30 %)
+       pourcentages(voix)  -> { exacts: [..], arrondis: [..], somme } (pourcentages arrondis à l'unité)
+     Les chaînes françaises utilisent la virgule, l'espace fine insécable (U+202F) pour les milliers et le signe − (U+2212). */
+
+  var NS = 'http://www.w3.org/2000/svg';
+  var NB = ' ';
+  function $(id) { return document.getElementById(id); }
+  function mk(svg, name, attrs, text) { var e = document.createElementNS(NS, name); for (var a in attrs) e.setAttribute(a, attrs[a]); if (text != null) e.textContent = text; svg.appendChild(e); return e; }
+  function clear(el) { while (el.firstChild) el.removeChild(el.firstChild); }
+  function frN(x, d) { var r = Math.round(x * 1e6) / 1e6; if (Object.is(r, -0)) r = 0; return r.toLocaleString('fr-FR', { maximumFractionDigits: d == null ? 3 : d }).replace('-', '−'); }
+  function num(s) { var t = String(s).replace(/\s/g, '').replace(/[−–]/g, '-').replace(',', '.'); if (t === '') return NaN; var x = Number(t); return isFinite(x) ? x : NaN; }
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  function rnd(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+
+  /* ---------- Décimaux exacts ---------- */
+  function pow10(n) { return BigInt('1' + '0'.repeat(n)); }
+  function parse(x) {
+    if (x && typeof x === 'object' && typeof x.d === 'bigint') return x;
+    var t = String(x).replace(/\s/g, '').replace(/[−–]/g, '-').replace(',', '.');
+    var m = /^([+-]?)(\d*)(?:\.(\d*))?(?:[eE]([+-]?\d+))?$/.exec(t);
+    if (!m) return null;
+    var ip = m[2] || '', fp = m[3] || '';
+    if (ip === '' && fp === '') return null;
+    var e = m[4] ? parseInt(m[4], 10) : 0, digits = ip + fp, s = fp.length - e;
+    if (Math.abs(e) > 60 || digits.length > 60) return null;
+    if (s < 0) { digits += '0'.repeat(-s); s = 0; }
+    var d = BigInt(digits.replace(/^0+(?=\d)/, '') || '0');
+    return { neg: m[1] === '-' && d !== 0n, d: d, s: s };
+  }
+  /* v : BigInt signé représentant v / 10^D */
+  function fmtBig(v, D, plain) {
+    var neg = v < 0n, a = (neg ? -v : v).toString();
+    while (a.length <= D) a = '0' + a;
+    var ip = a.slice(0, a.length - D), fp = a.slice(a.length - D);
+    if (plain) return (neg ? '-' : '') + ip + (D ? '.' + fp : '');
+    ip = ip.replace(/\B(?=(\d{3})+(?!\d))/g, NB);
+    return (neg ? '−' : '') + ip + (D ? ',' + fp : '');
+  }
+  function show(D) { return fmtBig(D.neg ? -D.d : D.d, D.s); }
+  function core(x, p) {
+    var D = parse(x); if (!D) return null;
+    var S = Math.max(D.s, -p, 0), V = D.d * pow10(S - D.s), u = pow10(S + p), q = V / u, r = V % u;
+    var nd = S + p - 1 >= 0 ? Number((V / pow10(S + p - 1)) % 10n) : 0;
+    var T = q * u, U = r > 0n ? T + u : T, R = 2n * r >= u ? T + u : T;
+    var res = D.neg ? { tr: -T, df: -U, ex: -T, ar: -R } : { tr: T, df: T, ex: U, ar: R };
+    return { D: D, p: p, S: S, V: V, u: u, q: q, r: r, nd: nd, cd: Number(q % 10n), res: res, dec: Math.max(0, -p) };
+  }
+  function out(c, key, plain) { return fmtBig(c.res[key] / pow10(c.S - c.dec), c.dec, plain); }
+  var PNAME = { 'millier': 3, 'centaine': 2, 'dizaine': 1, 'unité': 0, 'unite': 0, 'dixième': -1, 'dixieme': -1, 'centième': -2, 'centieme': -2, 'millième': -3, 'millieme': -3 };
+  function prec(p) {
+    if (typeof p === 'string') { if (PNAME.hasOwnProperty(p)) return PNAME[p]; p = Number(p); }
+    return typeof p === 'number' && Number.isInteger(p) && p >= -20 && p <= 20 ? p : null;
+  }
+  function hook(key) { return function (x, p) { var q = prec(p); if (q === null) return null; var c = core(x, q); return c ? out(c, key) : null; }; }
+  function signifCore(x, n) {
+    var D = parse(x); if (!D || !(n >= 1)) return null;
+    if (D.d === 0n) return { zero: true, D: D };
+    var top = D.d.toString().length - 1 - D.s;
+    return { zero: false, D: D, c: core(D, top - n + 1) };
+  }
+  function signif(x, n, plain) { var r = signifCore(x, n); if (!r) return null; return r.zero ? '0' : out(r.c, 'ar', plain); }
+  function eqDec(a, b) {
+    var A = parse(a), B = parse(b); if (!A || !B) return false;
+    var S = Math.max(A.s, B.s), va = A.d * pow10(S - A.s), vb = B.d * pow10(S - B.s);
+    return (A.neg ? -va : va) === (B.neg ? -vb : vb);
+  }
+  function og1(n) { var e = String(n).length - 1, p = Math.pow(10, e); return Math.round(n / p) * p; } /* entier positif → 1 chiffre significatif */
+  function points(est, exact) { var rel = Math.abs(est - exact) / Math.abs(exact); return rel <= 0.05 + 1e-12 ? 3 : rel <= 0.15 + 1e-12 ? 2 : rel <= 0.30 + 1e-12 ? 1 : 0; }
+  function pourcentages(v) {
+    var n = v.reduce(function (a, b) { return a + b; }, 0);
+    if (!n) return null;
+    var ex = v.map(function (k) { return 100 * k / n; });
+    var ar = ex.map(function (e) { return Number(signifSafeUnit(e)); });
+    return { exacts: ex, arrondis: ar, somme: ar.reduce(function (a, b) { return a + b; }, 0) };
+  }
+  function signifSafeUnit(e) { return out(core(String(e), 0), 'ar', true); }
+  function estimer(a, op, b) {
+    if (op === '×' || op === '*') return { estimation: og1(a) * og1(b), exact: a * b };
+    if (op === '+') return { estimation: og1(a) + og1(b), exact: a + b };
+    if (op === '÷' || op === '/') { var b0 = og1(b), a0 = b0 * Math.round(a / b0); return { estimation: a0 / b0, exact: a / b }; }
+    return null;
+  }
+
+  window.__arr = {
+    parse: parse,
+    tronquer: hook('tr'), arrondir: hook('ar'), defaut: hook('df'), exces: hook('ex'),
+    encadrement: function (x, p) { return [hook('df')(x, p), hook('ex')(x, p)]; },
+    chiffre: function (x, p) { var q = prec(p); if (q === null) return null; var c = core(x, q); return c ? c.cd : null; },
+    signif: function (x, n) { return signif(x, n); },
+    ordre: function (x) { return signif(x, 1); },
+    estimer: estimer, points: points, pourcentages: pourcentages
+  };
+
+  /* ---------- Noms des rangs ---------- */
+  var RANG = { '9': 'milliards', '8': 'centaines de millions', '7': 'dizaines de millions', '6': 'millions', '5': 'centaines de mille', '4': 'dizaines de mille', '3': 'unités de mille', '2': 'centaines', '1': 'dizaines', '0': 'unités', '-1': 'dixièmes', '-2': 'centièmes', '-3': 'millièmes', '-4': 'dix-millièmes', '-5': 'cent-millièmes', '-6': 'millionièmes' };
+  var PREC = { '3': 'au millier', '2': 'à la centaine', '1': 'à la dizaine', '0': 'à l’unité', '-1': 'au dixième', '-2': 'au centième', '-3': 'au millième' };
+  function rang(p) { return RANG[p] || ('rang 10^' + p); }
+  function sing(name) { return name.replace(/s(?= |$)/, ''); }
+  function step(p) { return p < 0 ? fmtBig(1n, -p) : fmtBig(pow10(p), 0); }
+
+  /* ---------- 1. Tableau de numération ---------- */
+  var rx = $('rx'), rsel = null;
+  function rTiles() {
+    var box = $('rtiles'), info = $('rinfo'), D = parse(rx.value);
+    clear(box);
+    if (!D) { info.className = 'verdict no'; info.innerHTML = '<span>Écris un nombre, par exemple 3 527,84.</span>'; return; }
+    if (D.d.toString().length > 14) { info.className = 'verdict no'; info.innerHTML = '<span>Ce nombre est trop long pour le tableau : 14 chiffres au maximum.</span>'; return; }
+    var a = D.d.toString(); while (a.length <= D.s) a = '0' + a;
+    var ip = a.slice(0, a.length - D.s), fp = a.slice(a.length - D.s), tiles = [];
+    function add(ch, pw) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'tile ' + (pw >= 0 ? 'int' : 'dec');
+      b.innerHTML = '<span class="dg">' + ch + '</span><span class="rg">' + rang(pw) + '</span>';
+      b.setAttribute('aria-label', 'Chiffre ' + ch + ', rang des ' + rang(pw));
+      b.addEventListener('click', function () { rsel = pw; rPick(); });
+      b.dataset.pw = pw; b.dataset.dg = ch; box.appendChild(b); tiles.push(b);
+    }
+    for (var i = 0; i < ip.length; i++) add(ip[i], ip.length - 1 - i);
+    if (fp.length) { var c = document.createElement('span'); c.className = 'comma'; c.textContent = ','; c.setAttribute('aria-hidden', 'true'); box.appendChild(c); }
+    for (var j = 0; j < fp.length; j++) add(fp[j], -(j + 1));
+    var pws = tiles.map(function (t) { return Number(t.dataset.pw); });
+    if (rsel === null || pws.indexOf(rsel) < 0) rsel = pws.indexOf(-1) >= 0 ? -1 : 0;
+    rPick();
+  }
+  function rPick() {
+    var tiles = $('rtiles').querySelectorAll('.tile'), info = $('rinfo'), dg = null;
+    for (var i = 0; i < tiles.length; i++) { var on = Number(tiles[i].dataset.pw) === rsel; tiles[i].setAttribute('aria-pressed', on ? 'true' : 'false'); if (on) dg = Number(tiles[i].dataset.dg); }
+    if (dg === null) return;
+    var nm = dg <= 1 ? sing(rang(rsel)) : rang(rsel);
+    var val = rsel >= 0 ? fmtBig(BigInt(dg) * pow10(rsel), 0) : fmtBig(BigInt(dg), -rsel);
+    var extra = rsel < 0 ? ' (' + dg + ' ÷ ' + fmtBig(pow10(-rsel), 0) + ')' : '';
+    info.className = 'verdict info';
+    info.innerHTML = 'Le ' + dg + ' est le chiffre des ' + rang(rsel) + '.<span>Il vaut ' + dg + ' ' + nm + ', soit <strong class="mono">' + val + '</strong>' + extra + '.</span>';
+  }
+  rx.addEventListener('input', rTiles); rTiles();
+
+  /* ---------- 3. Zoom sur la droite graduée ---------- */
+  var zx = $('zx'), zk = $('zk'), zp = -1, ZX0 = 50, ZX1 = 350;
+  [[2, 'centaine'], [1, 'dizaine'], [0, 'unité'], [-1, 'dixième'], [-2, 'centième']].forEach(function (o) {
+    var b = document.createElement('button'); b.type = 'button'; b.textContent = o[1]; b.dataset.p = o[0];
+    b.addEventListener('click', function () { zp = o[0]; zRender(); });
+    $('zprec').appendChild(b);
+  });
+  function zSet(k) {
+    var D = parse(zx.value); if (!D || D.neg) return;
+    var c = core(D, zp), S2 = Math.max(0, -zp) + 2;
+    var v = c.q * pow10(S2 + zp) + BigInt(k) * pow10(Math.max(zp, 0));
+    zx.value = trimFr(fmtBig(v, S2)); zRender();
+  }
+  function trimFr(s) { return s.indexOf(',') >= 0 ? s.replace(/0+$/, '').replace(/,$/, '') : s; }
+  function zRender() {
+    var btns = $('zprec').querySelectorAll('button');
+    for (var i = 0; i < btns.length; i++) btns[i].setAttribute('aria-pressed', Number(btns[i].dataset.p) === zp ? 'true' : 'false');
+    var svg = $('zsvg'), outEl = $('zout'), D = parse(zx.value);
+    clear(svg);
+    if (!D || D.neg) { outEl.className = 'verdict no'; outEl.innerHTML = '<span>Écris un nombre positif, par exemple 4,37.</span>'; return; }
+    var c = core(D, zp), A = c.q * c.u, B = A + c.u;
+    var As = fmtBig(A / pow10(c.S - c.dec), c.dec), Bs = fmtBig(B / pow10(c.S - c.dec), c.dec);
+    var md = Math.max(0, 1 - zp), Ms = fmtBig((A * 10n + 5n * c.u) / pow10(c.S + 1 - md), md);
+    var f = Number(c.r * 10000n / c.u) / 10000, up = 2n * c.r >= c.u, pile = c.r === 0n, mid = 2n * c.r === c.u;
+    var X = function (t) { return ZX0 + t * (ZX1 - ZX0); }, Y = 78;
+    zk.value = Math.round(f * 100); $('zkOut').textContent = show(D);
+    mk(svg, 'rect', { x: X(0), y: Y - 11, width: (ZX1 - ZX0) / 2, height: 22, fill: 'var(--two-soft)' });
+    mk(svg, 'rect', { x: X(0.5), y: Y - 11, width: (ZX1 - ZX0) / 2, height: 22, fill: 'var(--acc-soft)' });
+    mk(svg, 'line', { x1: X(0) - 14, y1: Y, x2: X(1) + 14, y2: Y, stroke: 'var(--ink)', 'stroke-width': 2.5 });
+    for (var t = 0; t <= 10; t++) {
+      var h = t === 0 || t === 10 ? 12 : t === 5 ? 16 : 6;
+      mk(svg, 'line', { x1: X(t / 10), y1: Y - h, x2: X(t / 10), y2: Y + h, stroke: 'var(--ink)', 'stroke-width': t === 5 ? 1.5 : 1.5, 'stroke-dasharray': t === 5 ? '3 3' : 'none' });
+    }
+    mk(svg, 'text', { x: X(0), y: 122, 'text-anchor': 'middle', 'font-size': 16, 'font-weight': 600, 'class': 'b' }, As);
+    mk(svg, 'text', { x: X(1), y: 122, 'text-anchor': 'middle', 'font-size': 16, 'font-weight': 600, 'class': 'a' }, Bs);
+    mk(svg, 'text', { x: X(0.5), y: 122, 'text-anchor': 'middle', 'font-size': 13, 'class': 's' }, 'milieu ' + Ms);
+    mk(svg, 'text', { x: X(0), y: 142, 'text-anchor': 'middle', 'font-size': 12, 'class': 's' }, 'par défaut');
+    mk(svg, 'text', { x: X(1), y: 142, 'text-anchor': 'middle', 'font-size': 12, 'class': 's' }, 'par excès');
+    if (!pile) {
+      var xe = up ? X(1) : X(0), xs = X(f), dir = up ? 1 : -1;
+      if (Math.abs(xe - xs) > 16) {
+        mk(svg, 'line', { x1: xs, y1: Y + 22, x2: xe - dir * 10, y2: Y + 22, stroke: 'var(--ok)', 'stroke-width': 3 });
+        mk(svg, 'polygon', { points: xe + ',' + (Y + 22) + ' ' + (xe - dir * 12) + ',' + (Y + 16) + ' ' + (xe - dir * 12) + ',' + (Y + 28), fill: 'var(--ok)' });
+      }
+    }
+    mk(svg, 'circle', { cx: X(f), cy: Y, r: 9, fill: 'var(--acc)', stroke: 'var(--card)', 'stroke-width': 2 });
+    var lx = Math.min(Math.max(X(f), 60), 340);
+    mk(svg, 'text', { x: lx, y: 40, 'text-anchor': 'middle', 'font-size': 16, 'font-weight': 600, 'class': 'a' }, show(D));
+    var nm = rang(zp - 1), res = out(c, 'ar');
+    if (pile) { outEl.className = 'verdict yes'; outEl.innerHTML = show(D) + ' tombe pile sur une graduation.<span>Rien à arrondir : ' + PREC[zp] + ', il vaut déjà ' + res + '.</span>'; return; }
+    outEl.className = 'verdict yes';
+    outEl.innerHTML = show(D) + ' ≈ ' + res + ' (arrondi ' + PREC[zp] + ')' +
+      '<span>Il est entre ' + As + ' et ' + Bs + '. Le chiffre des ' + nm + ' est ' + c.nd + (c.nd >= 5 ? ' ≥ 5' : ' &lt; 5') + '. ' +
+      (mid ? 'Il est pile au milieu : par convention (règle du 5), on prend le voisin du dessus.' : up ? 'Il est après le milieu : il est plus près de ' + Bs + '.' : 'Il est avant le milieu : il est plus près de ' + As + '.') + '</span>';
+  }
+  zx.addEventListener('input', zRender);
+  zk.addEventListener('input', function () { zSet(parseInt(zk.value, 10)); });
+  (function () {
+    var svg = $('zsvg'), drag = false;
+    function at(e) { var r = svg.getBoundingClientRect(); var vx = (e.clientX - r.left) / r.width * 400; zSet(Math.round(Math.min(1, Math.max(0, (vx - ZX0) / (ZX1 - ZX0))) * 100)); }
+    svg.addEventListener('pointerdown', function (e) { drag = true; try { svg.setPointerCapture(e.pointerId); } catch (err) {} at(e); });
+    svg.addEventListener('pointermove', function (e) { if (drag) at(e); });
+    svg.addEventListener('pointerup', function () { drag = false; });
+    svg.addEventListener('pointercancel', function () { drag = false; });
+  })();
+  zRender();
+
+  /* ---------- 5. Arrondisseur ---------- */
+  var ax = $('ax'), ap = -2;
+  [[3, 'au millier'], [2, 'à la centaine'], [1, 'à la dizaine'], [0, 'à l’unité'], [-1, 'au dixième'], [-2, 'au centième'], [-3, 'au millième']].forEach(function (o) {
+    var b = document.createElement('button'); b.type = 'button'; b.textContent = o[1]; b.dataset.p = o[0];
+    b.addEventListener('click', function () { ap = o[0]; aRender(); });
+    $('aprec').appendChild(b);
+  });
+  [['2,675', -2], ['1,005', -2], ['9,996', -2], ['3,14159', -3], ['12 345,6', 2], ['−2,35', -1]].forEach(function (o) {
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'ex'; b.textContent = o[0];
+    b.addEventListener('click', function () { ax.value = o[0]; ap = o[1]; aRender(); });
+    $('apre').appendChild(b);
+  });
+  function aRender() {
+    var btns = $('aprec').querySelectorAll('button');
+    for (var i = 0; i < btns.length; i++) btns[i].setAttribute('aria-pressed', Number(btns[i].dataset.p) === ap ? 'true' : 'false');
+    var o = $('aout'), st = $('asteps'), nv = $('anaive'), c = core(ax.value, ap);
+    nv.className = 'verdict'; nv.innerHTML = '';
+    if (!c) { o.innerHTML = '<p class="err">Écris un nombre, par exemple 2,675.</p>'; st.innerHTML = ''; return; }
+    var x = show(c.D), pile = c.r === 0n, E = step(ap);
+    function row(name, val, calc, cls) { return '<div class="res' + (cls ? ' ' + cls : '') + '"><span class="res-name">' + name + '</span><span class="res-val">' + val + '</span>' + (calc ? '<span class="res-calc">' + calc + '</span>' : '') + '</div>'; }
+    o.innerHTML =
+      row('Troncature', out(c, 'tr'), 'on coupe après les ' + rang(ap)) +
+      row('Arrondi', out(c, 'ar'), 'la valeur la plus proche', 'total') +
+      row('Par défaut', out(c, 'df'), 'la valeur juste en dessous (≤ ' + x + ')') +
+      row('Par excès', out(c, 'ex'), 'la valeur juste au-dessus (≥ ' + x + ')') +
+      row('Encadrement', pile ? x + ' = ' + out(c, 'ar') : out(c, 'df') + ' &lt; ' + x + ' &lt; ' + out(c, 'ex'), pile ? 'le nombre tombe pile : pas besoin d’encadrer' : 'à ' + E + ' près', 'wrap');
+    var L = [];
+    L.push('1. On arrondit ' + PREC[ap] + ' : le chiffre des ' + rang(ap) + ' est <b>' + c.cd + '</b>.');
+    L.push('2. Le chiffre juste à sa droite (les ' + rang(ap - 1) + ') est <b>' + c.nd + '</b>.');
+    if (pile) L.push('3. Après ce rang, il n’y a que des 0 : le nombre est déjà « rond », toutes les valeurs sont égales.');
+    else if (c.nd >= 5) {
+      L.push('3. ' + c.nd + ' ≥ 5 → on ajoute 1 au chiffre des ' + rang(ap) + ' : l’arrondi est <b>' + out(c, 'ar') + '</b>' + (c.D.neg ? ' (la valeur par défaut, car le nombre est négatif).' : ' (la valeur par excès).'));
+      if (c.cd === 9) L.push('<span class="warn">Attention à la retenue : 9 + 1 = 10, on pose 0 et on retient 1 sur le chiffre de gauche.</span>');
+    } else L.push('3. ' + c.nd + ' &lt; 5 → on garde le ' + c.cd + ' : l’arrondi est <b>' + out(c, 'ar') + '</b>, comme la troncature.');
+    if (c.D.neg) L.push('<span class="warn">Nombre négatif : on arrondit sans le signe, puis on remet le signe. Attention, la valeur par défaut est alors la plus « loin » de zéro (elle est plus petite).</span>');
+    st.innerHTML = L.join('<br>');
+    /* Ce que donnerait un calcul naïf en virgule flottante */
+    var n = Number(fmtBig(c.D.d, c.D.s, true));
+    if (!c.D.neg && n < 1e15 && ap < 0) {
+      var f = Math.pow(10, -ap), naive = fmtBig(BigInt(Math.round(n * f)), -ap);
+      if (naive !== out(c, 'ar')) { nv.className = 'verdict no'; nv.innerHTML = 'Un calcul naïf sur ordinateur donnerait ' + naive + ' !<span>Math.round(' + fmtBig(c.D.d, c.D.s, true) + ' × ' + f + ') ÷ ' + f + ' se trompe, car l’ordinateur ne stocke pas ce nombre exactement (il garde une valeur très légèrement différente). La bonne réponse est ' + out(c, 'ar') + '.</span>'; }
+    }
+  }
+  ax.addEventListener('input', aRender); aRender();
+
+  /* ---------- 6. Chiffres significatifs ---------- */
+  var sx = $('sx'), sn = $('sn');
+  [['0,003852', 2], ['299 792 458', 3], ['3,14159265', 4], ['6,559 57', 3], ['9,96', 2]].forEach(function (o) {
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'ex'; b.textContent = o[0];
+    b.addEventListener('click', function () { sx.value = o[0]; sn.value = o[1]; sRender(); });
+    $('spre').appendChild(b);
+  });
+  function sRender() {
+    var n = parseInt(sn.value, 10), D = parse(sx.value), dg = $('sdigits'), res = $('sres');
+    $('snOut').textContent = n;
+    if (!D) { dg.innerHTML = ''; res.className = 'verdict no'; res.innerHTML = '<span>Écris un nombre.</span>'; return; }
+    if (D.d === 0n) { dg.textContent = '0'; res.className = 'verdict info'; res.innerHTML = '0 n’a aucun chiffre significatif.<span>Il n’y a rien à arrondir.</span>'; return; }
+    var txt = show(D), lead = true, k = 0, html = '';
+    for (var i = 0; i < txt.length; i++) {
+      var ch = txt[i];
+      if (!/\d/.test(ch)) { html += ch === NB ? '<span class="z"> </span>' : ch; continue; }
+      if (lead && ch !== '0') lead = false;
+      if (lead) html += '<span class="z">' + ch + '</span>';
+      else { html += '<span class="' + (k < n ? 'k' : 'x') + '">' + ch + '</span>'; k++; }
+    }
+    dg.innerHTML = html;
+    var r = signifCore(D, n);
+    var nd = r.c.nd, more = k > n;
+    res.className = 'verdict info';
+    res.innerHTML = txt + ' ≈ ' + out(r.c, 'ar') + ' (' + n + ' chiffre' + (n > 1 ? 's' : '') + ' significatif' + (n > 1 ? 's' : '') + ')' +
+      '<span>' + (more ? 'Le premier chiffre enlevé est ' + nd + (nd >= 5 ? ' ≥ 5 : on ajoute 1 au dernier chiffre gardé.' : ' &lt; 5 : on garde les chiffres tels quels.') : 'Le nombre n’a pas plus de ' + n + ' chiffre' + (n > 1 ? 's' : '') + ' significatif' + (n > 1 ? 's' : '') + ' : on complète avec des 0 si besoin.') + ' Cela revient à arrondir ' + (PREC[r.c.p] || 'au rang des ' + rang(r.c.p)) + '.</span>';
+  }
+  sx.addEventListener('input', sRender); sn.addEventListener('input', sRender); sRender();
+
+  /* ---------- 7. Jeu de l'estimation ---------- */
+  var G = { i: 0, pts: 0, cur: null, done: false };
+  function gGen() {
+    var t = rnd(0, 3), a, b;
+    if (t === 0 || t === 1) {
+      a = t === 0 ? rnd(12, 98) : rnd(102, 989); b = rnd(12, 98);
+      if (a % 10 === 0) a++; if (b % 10 === 0) b++;
+      var e = estimer(a, '×', b);
+      return { q: frN(a) + ' × ' + frN(b), exact: e.exact, model: frN(og1(a)) + ' × ' + frN(og1(b)) + ' = ' + frN(e.estimation), est: e.estimation };
+    }
+    if (t === 2) {
+      var xs = [rnd(101, 999), rnd(101, 999), rnd(101, 999)];
+      var ex = xs[0] + xs[1] + xs[2], es = og1(xs[0]) + og1(xs[1]) + og1(xs[2]);
+      return { q: xs.map(frN).join(' + '), exact: ex, model: xs.map(function (v) { return frN(og1(v)); }).join(' + ') + ' = ' + frN(es), est: es };
+    }
+    var b0 = pick([20, 30, 40, 50, 60, 70, 80, 90]), q0 = pick([20, 30, 40, 50, 60, 70, 80, 90]);
+    a = b0 * q0 + rnd(-Math.floor(b0 / 3), Math.floor(b0 / 3)); b = b0 + rnd(-3, 3);
+    var d = estimer(a, '÷', b);
+    return { q: frN(a) + ' ÷ ' + frN(b), exact: d.exact, model: frN(b0 * Math.round(a / b0)) + ' ÷ ' + frN(b0) + ' = ' + frN(d.estimation), est: d.estimation };
+  }
+  function gRound() {
+    G.cur = gGen(); G.done = false;
+    $('gq').textContent = G.cur.q + ' ≈ ?';
+    $('ground').textContent = 'Calcul ' + (G.i + 1) + ' / 5';
+    $('gin').value = ''; $('gin').disabled = false; $('gok').disabled = false;
+    $('gfb').className = 'verdict'; $('gfb').innerHTML = '';
+    $('gnext').disabled = true; $('gnext').textContent = G.i < 4 ? 'Calcul suivant' : 'Voir mon score';
+  }
+  function gCheck() {
+    if (G.done) return;
+    var v = num($('gin').value), fb = $('gfb');
+    if (isNaN(v)) { fb.className = 'verdict no'; fb.innerHTML = '<span>Écris un nombre.</span>'; return; }
+    var sc = points(v, G.cur.exact), rel = Math.abs(v - G.cur.exact) / G.cur.exact;
+    G.done = true; G.pts += sc;
+    var exs = Number.isInteger(G.cur.exact) ? '= ' + frN(G.cur.exact) : '≈ ' + frN(G.cur.exact, 1);
+    var msg = ['Trop loin…', 'Pas mal !', 'Très proche !', 'Dans le mille !'][sc];
+    fb.className = 'verdict ' + (sc > 0 ? 'yes' : 'no');
+    fb.innerHTML = msg + ' +' + sc + ' point' + (sc > 1 ? 's' : '') +
+      '<span>Résultat exact : ' + G.cur.q + ' ' + exs + '. Ton écart : ' + (rel < 0.005 ? 'moins de 1 %' : 'environ ' + Math.round(rel * 100) + ' %') + '.</span>' +
+      '<span>De tête : ' + G.cur.model + '.</span>';
+    $('gscore').textContent = G.pts + ' / 15'; $('gbar').style.width = (G.pts / 15 * 100) + '%';
+    $('gin').disabled = true; $('gok').disabled = true; $('gnext').disabled = false; $('gnext').focus();
+  }
+  function gNext() {
+    if (G.i >= 4) {
+      if (G.i === 4) {
+        G.i = 5; var fb = $('gfb');
+        $('gq').textContent = 'Score final : ' + G.pts + ' / 15';
+        fb.className = 'verdict info';
+        fb.innerHTML = (G.pts >= 12 ? 'Champion de l’estimation !' : G.pts >= 8 ? 'Très bien, tu as le coup d’œil.' : 'Entraîne-toi : arrondis chaque nombre à un seul chiffre non nul.') + '<span>Rejoue pour de nouveaux calculs.</span>';
+        $('gnext').textContent = 'Rejouer'; return;
+      }
+      G.i = 0; G.pts = 0; $('gscore').textContent = '0 / 15'; $('gbar').style.width = '0%'; gRound(); return;
+    }
+    G.i++; gRound();
+  }
+  $('gok').addEventListener('click', gCheck);
+  $('gin').addEventListener('keydown', function (e) { if (e.key === 'Enter') gCheck(); });
+  $('gnext').addEventListener('click', gNext);
+  gRound();
+
+  /* ---------- 8. Règle des puissances de 10 ---------- */
+  var SUP = { '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '-': '⁻' };
+  function p10(n) { return '10' + String(n).split('').map(function (c) { return SUP[c]; }).join(''); }
+  function sci(v) {
+    var e = Math.floor(Math.log10(v)), m = Math.round(v / Math.pow(10, e) * 10) / 10;
+    if (m >= 10) { m = m / 10; e++; }
+    if (m < 1) { m = Math.round(m * 100) / 10; e--; }
+    return String(m).replace('.', ',') + ' × ' + p10(e);
+  }
+  var LIFE = {
+    'Populations': { unit: 'personnes', items: [
+      ['Ta classe', 25, 'environ 25 élèves'], ['Ton collège', 600, 'environ 600 élèves'], ['Un grand stade', 8e4, 'environ 80 000 places'],
+      ['Une ville moyenne', 1e5, 'environ 100 000 habitants'], ['Paris', 2.1e6, 'environ 2,1 millions d’habitants'],
+      ['La France', 6.8e7, 'environ 68 millions d’habitants'], ['La Terre', 8.1e9, 'environ 8,1 milliards d’humains']] },
+    'Distances': { unit: 'mètres', items: [
+      ['Un cheveu (épaisseur)', 7e-5, 'environ 0,07 mm'], ['Une fourmi', 5e-3, 'environ 5 mm'], ['Toi', 1.6, 'environ 1,6 m'],
+      ['La tour Eiffel', 330, 'environ 330 m'], ['Paris – Marseille', 6.6e5, 'environ 660 km à vol d’oiseau'],
+      ['Le tour de la Terre', 4e7, 'environ 40 000 km'], ['La Terre – la Lune', 3.84e8, 'environ 384 000 km'],
+      ['La Terre – le Soleil', 1.5e11, 'environ 150 millions de km']] },
+    'Durées': { unit: 'secondes', items: [
+      ['Un clin d’œil', 0.3, 'environ 0,3 s'], ['Un battement de cœur', 1, 'environ 1 s'], ['Une heure', 3600, '3 600 s'],
+      ['Une journée', 86400, '86 400 s'], ['Une année', 3.15e7, 'environ 31,5 millions de secondes'],
+      ['Une vie de 80 ans', 2.5e9, 'environ 2,5 milliards de secondes'], ['Depuis les pyramides de Gizeh', 1.4e11, 'environ 4 500 ans'],
+      ['L’âge de la Terre', 1.4e17, 'environ 4,5 milliards d’années']] }
+  };
+  var lcat = 'Populations', lsel = 0;
+  Object.keys(LIFE).forEach(function (k) {
+    var b = document.createElement('button'); b.type = 'button'; b.textContent = k; b.dataset.k = k;
+    b.addEventListener('click', function () { lcat = k; lsel = 0; lItems(); });
+    $('lcat').appendChild(b);
+  });
+  function lItems() {
+    var cb = $('lcat').querySelectorAll('button');
+    for (var i = 0; i < cb.length; i++) cb[i].setAttribute('aria-pressed', cb[i].dataset.k === lcat ? 'true' : 'false');
+    var box = $('litems'); clear(box);
+    LIFE[lcat].items.forEach(function (it, j) {
+      var b = document.createElement('button'); b.type = 'button'; b.textContent = it[0]; b.dataset.j = j;
+      b.addEventListener('click', function () { lsel = j; lDraw(); });
+      box.appendChild(b);
+    });
+    lDraw();
+  }
+  function lDraw() {
+    var ib = $('litems').querySelectorAll('button');
+    for (var i = 0; i < ib.length; i++) ib[i].setAttribute('aria-pressed', Number(ib[i].dataset.j) === lsel ? 'true' : 'false');
+    var C = LIFE[lcat], items = C.items, svg = $('lsvg'); clear(svg);
+    var logs = items.map(function (it) { return Math.log10(it[1]); });
+    var lo = Math.floor(Math.min.apply(null, logs)), hi = Math.ceil(Math.max.apply(null, logs));
+    if (hi === lo) hi = lo + 1;
+    var stepL = Math.ceil((hi - lo) / 6), X = function (l) { return 24 + (l - lo) / (hi - lo) * 352; }, Y = 74;
+    mk(svg, 'line', { x1: 16, y1: Y, x2: 384, y2: Y, stroke: 'var(--ink)', 'stroke-width': 2 });
+    for (var e = lo; e <= hi; e++) {
+      var lab = (e - lo) % stepL === 0;
+      mk(svg, 'line', { x1: X(e), y1: Y - (lab ? 8 : 5), x2: X(e), y2: Y + (lab ? 8 : 5), stroke: 'var(--ink)', 'stroke-width': 1.5 });
+      if (lab) mk(svg, 'text', { x: X(e), y: Y + 28, 'text-anchor': 'middle', 'font-size': 14 }, p10(e));
+    }
+    items.forEach(function (it, j) {
+      if (j === lsel) return;
+      var c = mk(svg, 'circle', { cx: X(logs[j]), cy: Y, r: 6, fill: 'var(--two)', stroke: 'var(--card)', 'stroke-width': 1.5, style: 'cursor:pointer' });
+      c.addEventListener('click', function () { lsel = j; lDraw(); });
+    });
+    var sx0 = X(logs[lsel]);
+    mk(svg, 'line', { x1: sx0, y1: Y - 30, x2: sx0, y2: Y, stroke: 'var(--acc)', 'stroke-width': 2 });
+    mk(svg, 'circle', { cx: sx0, cy: Y, r: 10, fill: 'var(--acc)', stroke: 'var(--card)', 'stroke-width': 2 });
+    mk(svg, 'text', { x: Math.min(Math.max(sx0, 90), 310), y: Y - 38, 'text-anchor': 'middle', 'font-size': 14, 'font-weight': 600, 'class': 'a' }, items[lsel][0]);
+    mk(svg, 'text', { x: 200, y: 124, 'text-anchor': 'middle', 'font-size': 12, 'class': 's' }, 'en ' + C.unit + ' · chaque graduation = × 10');
+    var it = items[lsel], v = it[1], near = Math.round(logs[lsel]);
+    var prev = lsel > 0 ? items[lsel - 1] : null, ratio = prev ? v / prev[1] : 0;
+    $('linfo').innerHTML = it[0] + ' : ' + it[2] +
+      '<span>En ' + C.unit + ' : ≈ <strong class="mono">' + sci(v) + '</strong>. Sur la règle, c’est près de ' + p10(near) + '.</span>' +
+      (prev ? '<span>' + (ratio < 1.5 ? 'C’est un peu plus que' : 'C’est environ ' + frN(og1(Math.round(ratio))) + ' fois plus que') + ' « ' + prev[0] + ' ».</span>' : '');
+  }
+  lItems();
+
+  /* ---------- 9. Pourcentages arrondis ---------- */
+  var vs = [$('v0'), $('v1'), $('v2')], VN = ['Pizza', 'Crêpes', 'Tacos'];
+  [['1 – 1 – 1', [1, 1, 1]], ['3 – 3 – 2', [3, 3, 2]], ['7 – 5 – 8', [7, 5, 8]], ['10 – 5 – 5', [10, 5, 5]]].forEach(function (o) {
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'ex'; b.textContent = o[0];
+    b.addEventListener('click', function () { vs.forEach(function (s, i) { s.value = o[1][i]; }); vRender(); });
+    $('vpre').appendChild(b);
+  });
+  function vRender() {
+    var v = vs.map(function (s) { return parseInt(s.value, 10); }), o = $('vOut');
+    v.forEach(function (k, i) { $('v' + i + 'Out').textContent = k; });
+    var P = pourcentages(v);
+    if (!P) { o.innerHTML = '<p class="err">Personne n’a voté : mets au moins une voix.</p>'; return; }
+    var n = v[0] + v[1] + v[2], html = '';
+    v.forEach(function (k, i) {
+      var exact = P.exacts[i], ex = Number.isInteger(exact) ? '= ' + frN(exact) : '≈ ' + out(core(String(exact), -2), 'ar');
+      html += '<div class="res"><span class="res-name">' + VN[i] + '</span><span class="res-val">' + P.arrondis[i] + ' %</span><span class="res-calc">' + k + ' ÷ ' + n + ' × 100 ' + ex + ' % → arrondi à l’unité : ' + P.arrondis[i] + ' %</span></div>';
+    });
+    var okk = P.somme === 100;
+    html += '<div class="res ' + (okk ? 'total' : 'bad') + '"><span class="res-name">Total des arrondis</span><span class="res-val">' + P.somme + ' %</span><span class="res-calc">' +
+      (okk ? 'Cette fois, ça tombe juste : 100 %.' : 'Ce n’est pas 100 % ! Les pourcentages exacts font bien 100 %, mais leurs arrondis font ' + P.somme + ' %.') + '</span></div>';
+    o.innerHTML = html;
+  }
+  vs.forEach(function (s) { s.addEventListener('input', vRender); }); vRender();
+
+  /* ---------- 11. Quiz ---------- */
+  function setDigit(str, pw, dg) { /* str = "ip.fp" */
+    var dot = str.indexOf('.'), idx = pw >= 0 ? dot - 1 - pw : dot - pw;
+    if (idx < 0 || idx >= str.length || idx === dot) return str;
+    return str.slice(0, idx) + dg + str.slice(idx + 1);
+  }
+  function makeNum(big) {
+    var ip = big ? rnd(100, 9999) : rnd(1, pick([9, 99, 999])), fp = String(rnd(0, 999));
+    while (fp.length < 3) fp = '0' + fp;
+    return ip + '.' + fp;
+  }
+  function makeQ() {
+    var t = rnd(0, 3), p, x, c;
+    if (t === 0) {
+      p = pick([-2, -1, -1, 0, 1, 2]); x = makeNum(p >= 1);
+      if (Math.random() < 0.35) x = setDigit(x, p - 1, 5);
+      c = core(x, p);
+      return { q: 'Arrondis ' + show(c.D) + ' ' + PREC[p] + '.', a: out(c, 'ar', true), show: out(c, 'ar'),
+        how: 'Chiffre des ' + rang(p) + ' : ' + c.cd + '. Chiffre suivant : ' + c.nd + (c.nd >= 5 ? ' ≥ 5 → on ajoute 1' : ' < 5 → on garde') + ' → ' + out(c, 'ar') };
+    }
+    if (t === 1) {
+      p = pick([-2, -1, 0]); x = makeNum(false); x = setDigit(x, p - 1, rnd(5, 9)); c = core(x, p);
+      return { q: 'Donne la troncature de ' + show(c.D) + ' ' + PREC[p] + '.', a: out(c, 'tr', true), show: out(c, 'tr'),
+        how: 'On coupe après les ' + rang(p) + ', sans regarder la suite → ' + out(c, 'tr') };
+    }
+    if (t === 2) {
+      p = pick([-2, -1, 0]); x = makeNum(false); c = core(x, p);
+      var exc = Math.random() < 0.5, key = exc ? 'ex' : 'df';
+      return { q: 'Donne la valeur approchée par ' + (exc ? 'excès' : 'défaut') + ' de ' + show(c.D) + ' ' + PREC[p] + '.', a: out(c, key, true), show: out(c, key),
+        how: show(c.D) + ' est entre ' + out(c, 'df') + ' et ' + out(c, 'ex') + ' ; par ' + (exc ? 'excès, on prend celle du dessus' : 'défaut, on prend celle du dessous') + ' → ' + out(c, key) };
+    }
+    p = pick([-3, -2, -1, 1, 2]); x = makeNum(p >= 1); c = core(x, p);
+    return { q: 'Quel est le chiffre des ' + rang(p) + ' dans ' + show(c.D) + ' ?', a: String(c.cd), show: String(c.cd),
+      how: (p < 0 ? 'Le ' + (-p) + (p === -1 ? 'er' : 'e') + ' chiffre après la virgule' : 'Le ' + (p + 1) + 'e chiffre avant la virgule') + ' → ' + c.cd };
+  }
+  var quiz = $('quiz'), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ''; done = [];
+    for (var k = 0; k < 8; k++) {
+      var Q = makeQ(), li = document.createElement('li');
+      li.innerHTML = '<span>' + Q.q + '</span><input type="text" id="qa' + k + '" inputmode="decimal" autocomplete="off" aria-label="Ta réponse à la question ' + (k + 1) + '"><button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+      quiz.appendChild(li);
+      (function (k, Q) {
+        function check() {
+          var fb = $('qf' + k), raw = $('qa' + k).value;
+          if (!parse(raw)) { fb.className = 'fb'; fb.textContent = 'Écris un nombre.'; return; }
+          if (eqDec(raw, Q.a)) { fb.className = 'fb ok'; fb.textContent = 'Bravo, c’est juste !'; done[k] = true; }
+          else { done[k] = false; fb.className = 'fb no'; fb.innerHTML = 'Pas tout à fait : la réponse est ' + Q.show + '.<span>' + Q.how.replace(/</g, '&lt;') + '</span>'; }
+          $('score').textContent = done.filter(Boolean).length + ' / 8';
+        }
+        $('qb' + k).addEventListener('click', check);
+        $('qa' + k).addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+      })(k, Q);
+    }
+    $('score').textContent = '0 / 8';
+  }
+  $('newQuiz').addEventListener('click', newQuiz);
+  newQuiz();
+})();
+</script>
+</body>
+</html>

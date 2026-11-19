@@ -1,0 +1,974 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>La sphère et la boule</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, encre bleu-vert (comme la Terre vue de l'espace), marge rouge. La sphère, son centre et ses cercles sont au centre. */
+:root {
+  --paper: #f6faf9;
+  --grid: #dfecea;
+  --card: #ffffff;
+  --ink: #10292b;
+  --ink-soft: #4e6567;
+  --acc: #0f766e;
+  --acc-soft: #d3efe9;
+  --two: #1c64c8;
+  --two-soft: #dbe8fa;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #fff0a3;
+  --line: #cfe0dd;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0c1615; --grid: #15231f; --card: #112120; --ink: #e6f3f1; --ink-soft: #9bb8b4;
+    --acc: #4fd1c0; --acc-soft: #12352f; --two: #7fb0ff; --two-soft: #1a2a45;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #24403b;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0c1615; --grid: #15231f; --card: #112120; --ink: #e6f3f1; --ink-soft: #9bb8b4;
+  --acc: #4fd1c0; --acc-soft: #12352f; --two: #7fb0ff; --two-soft: #1a2a45;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #24403b;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+.hero-fig { display: grid; grid-template-columns: minmax(0, 160px) minmax(0, 1fr); gap: 18px; align-items: center; }
+.hero-fig svg { width: 100%; height: auto; }
+.hero-fig .idf { font-family: var(--f-mono); font-size: 1.1rem; font-weight: 600; color: var(--acc); }
+@media (max-width: 420px) { .hero-fig { grid-template-columns: 1fr; } .hero-fig svg { max-width: 170px; margin: 0 auto; } }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+@media (max-width: 420px) { .box { padding: 14px; } }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+.fig svg { width: 100%; height: auto; display: block; }
+.figs { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+.figs > div { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.cap { font-size: .9rem; color: var(--ink-soft); text-align: center; }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 6px 12px; min-height: 44px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.btns .lbl { font-weight: 700; width: 100%; }
+input[type="text"] { font: inherit; font-family: var(--f-mono); font-size: 1.05rem; padding: 8px 10px; min-height: 44px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; }
+input[type="range"] { width: 100%; accent-color: var(--acc); min-height: 32px; }
+.param { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.param label { font-weight: 700; }
+.sliders { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px 18px; }
+
+.results { display: flex; flex-direction: column; gap: 8px; font-variant-numeric: tabular-nums; }
+.res { border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 12px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; align-items: baseline; }
+.res-name { font-family: var(--f-display); font-weight: 700; }
+.res-val { font-family: var(--f-mono); font-weight: 600; color: var(--acc); font-size: 1.05rem; text-align: right; overflow-wrap: anywhere; }
+.res-calc { grid-column: 1 / -1; font-family: var(--f-mono); font-size: .9rem; color: var(--ink-soft); overflow-wrap: anywhere; }
+.res.total { border-color: var(--ok); background: var(--ok-soft); }
+.res.total .res-val { color: var(--ok); }
+.steps { display: flex; flex-direction: column; gap: 6px; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; padding: 12px 14px; font-family: var(--f-mono); font-size: 1rem; overflow-wrap: anywhere; min-width: 0; }
+.steps b { color: var(--acc); font-size: 1.1rem; }
+.steps .why { font-family: var(--f-body); font-size: .95rem; color: var(--ink-soft); margin-top: 6px; }
+.steps .why:first-child { margin-top: 0; }
+.err { color: var(--red); font-weight: 700; font-family: var(--f-body); }
+
+.verdict { border-radius: 8px; padding: 12px 14px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+.verdict:empty { display: none; }
+.verdict.yes { background: var(--ok-soft); color: var(--ok); }
+.verdict.no { background: var(--red-soft); color: var(--red); }
+.verdict.info { background: var(--acc-soft); color: var(--acc); }
+.verdict span { font-weight: 400; color: var(--ink); overflow-wrap: anywhere; }
+
+.bars { display: flex; flex-direction: column; gap: 8px; }
+.bar { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 10px; align-items: center; font-size: .95rem; }
+.bar .track { height: 26px; border: 1.5px solid var(--ink); border-radius: 6px; overflow: hidden; background: var(--paper); }
+.bar .fill { height: 100%; background: var(--acc); display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; color: var(--card); font-family: var(--f-mono); font-weight: 600; font-size: .85rem; }
+.bar .fill.two { background: var(--two); }
+.bar .fill.red { background: var(--red); }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
+.tag.acc { color: var(--acc); }
+.tag.two { color: var(--two); }
+.formula { font-family: var(--f-mono); font-size: 1.25rem; font-weight: 600; color: var(--acc); text-align: center; padding: 10px; border: 2px dashed var(--acc); border-radius: 10px; overflow-wrap: anywhere; }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 110px auto; gap: 10px; align-items: center; }
+.quiz li > span:first-child { overflow-wrap: anywhere; min-width: 0; }
+.quiz input[type="text"] { font-size: 1rem; padding: 6px 8px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb:empty { display: none; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc); }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 120px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.errs { display: flex; flex-direction: column; gap: 10px; }
+.errs > div { display: flex; flex-direction: column; gap: 2px; }
+.errs .bad { font-family: var(--f-mono); color: var(--red); text-decoration: line-through; overflow-wrap: anywhere; }
+.errs .good { font-family: var(--f-mono); color: var(--ok); font-weight: 600; overflow-wrap: anywhere; }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+<style id="tnav-css">
+.tnav-top { display: flex; margin: 0 0 4px; }
+.tnav-home { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font-weight: 700; font-size: .95rem; text-decoration: none; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tnav-home:hover, .tnav-home:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.tnav-bottom { margin-top: 8px; display: flex; flex-direction: column; gap: 12px; }
+.tnav-bottom h2 { margin: 0; }
+.tnav-pn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tnav-pn a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--ink, #222); border-radius: 10px;
+  background: var(--card, #fff); color: var(--ink, #222); text-decoration: none; box-shadow: 3px 3px 0 var(--ink, #222); min-width: 0; }
+.tnav-pn a span { font-size: .85rem; color: var(--ink-soft, #666); }
+.tnav-pn a strong { overflow-wrap: anywhere; }
+.tnav-pn a.next { text-align: right; grid-column: 2; }
+.tnav-bottom .tnav-home { align-self: center; }
+@media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
+</style>
+</head>
+<body>
+<main class="page">
+<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="index.html">← Tous les tutoriels</a></nav><!--/tnav-->
+
+
+  <header class="hero">
+    <span class="eyebrow">Tutoriel de maths · niveau 3<sup>e</sup></span>
+    <h1>La sphère et la boule</h1>
+    <p class="lead">Une bille, un ballon, une bulle de savon, la Terre… Ce sont presque des boules parfaites. Avec un seul nombre, le rayon, on peut calculer leur surface et ce qu'elles contiennent.</p>
+    <div class="box hero-fig">
+      <svg viewBox="0 0 160 160" role="img" aria-label="Une sphère avec son centre O, un rayon r et l'équateur">
+        <defs>
+          <radialGradient id="gHero" cx="35%" cy="32%" r="75%">
+            <stop offset="0" style="stop-color:var(--card)"/>
+            <stop offset=".55" style="stop-color:var(--acc-soft)"/>
+            <stop offset="1" style="stop-color:var(--acc)"/>
+          </radialGradient>
+        </defs>
+        <circle cx="80" cy="80" r="70" fill="url(#gHero)" stroke="var(--ink)" stroke-width="2.5"/>
+        <path d="M10 80 A70 20 0 0 1 150 80" fill="none" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="5 4" opacity=".6"/>
+        <path d="M10 80 A70 20 0 0 0 150 80" fill="none" stroke="var(--ink)" stroke-width="2"/>
+        <line x1="80" y1="80" x2="129.5" y2="30.5" stroke="var(--red)" stroke-width="3"/>
+        <circle cx="80" cy="80" r="4" fill="var(--ink)"/>
+        <text x="66" y="76" font-size="15" font-weight="600">O</text>
+        <text x="108" y="66" font-size="16" font-weight="600" style="fill:var(--red)">r</text>
+      </svg>
+      <div style="display:flex;flex-direction:column;gap:8px;min-width:0">
+        <span><strong>Aire de la sphère</strong></span>
+        <span class="idf">A = 4 × π × r²</span>
+        <span><strong>Volume de la boule</strong></span>
+        <span class="idf">V = 4/3 × π × r³</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · Deux mots différents</span>
+    <h2>La peau ou le plein ?</h2>
+    <p>On confond souvent les deux mots, mais ils ne veulent pas dire la même chose :</p>
+    <div class="cards">
+      <div class="box"><span class="tag acc">La sphère</span><strong>Seulement la surface</strong><span class="soft">C'est la « peau », très fine. Une bulle de savon ou l'enveloppe d'un ballon de baudruche ressemblent à une sphère. On mesure son <strong>aire</strong>, en cm² ou en m².</span></div>
+      <div class="box"><span class="tag two">La boule</span><strong>La surface et tout l'intérieur</strong><span class="soft">C'est le solide plein. Une bille en verre, une orange ou une boule de glace ressemblent à une boule. On mesure son <strong>volume</strong>, en cm³ ou en litres.</span></div>
+    </div>
+    <div class="box">
+      <h3>Coupe-la en deux pour voir la différence</h3>
+      <div class="btns" role="group" aria-label="Choisir sphère ou boule">
+        <button type="button" id="sbS" aria-pressed="true">La sphère</button>
+        <button type="button" id="sbB" aria-pressed="false">La boule</button>
+      </div>
+      <div class="fig">
+        <svg id="sbSvg" viewBox="0 0 360 200" role="img" aria-label="À gauche l'objet entier, à droite l'objet coupé en deux">
+          <defs>
+            <radialGradient id="gFull" cx="35%" cy="32%" r="75%">
+              <stop offset="0" style="stop-color:var(--card)"/>
+              <stop offset=".5" style="stop-color:var(--acc-soft)"/>
+              <stop offset="1" style="stop-color:var(--acc)"/>
+            </radialGradient>
+          </defs>
+          <circle id="sbWhole" cx="90" cy="95" r="70" fill="url(#gFull)" stroke="var(--ink)" stroke-width="2.5"/>
+          <path id="sbEqBack" d="M20 95 A70 20 0 0 1 160 95" fill="none" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="5 4" opacity=".55"/>
+          <path d="M20 95 A70 20 0 0 0 160 95" fill="none" stroke="var(--ink)" stroke-width="1.5" opacity=".7"/>
+          <text x="90" y="190" text-anchor="middle" font-size="14">entière</text>
+          <circle id="sbCut" cx="270" cy="95" r="70" fill="none" stroke="var(--acc)" stroke-width="5"/>
+          <circle cx="270" cy="95" r="3.5" fill="var(--ink)"/>
+          <text id="sbCutTxt" x="270" y="190" text-anchor="middle" font-size="14">coupée : un cercle</text>
+        </svg>
+      </div>
+      <div class="verdict info" id="sbOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · Le vocabulaire</span>
+    <h2>Centre, rayon, diamètre, grand cercle</h2>
+    <p>Une <strong>sphère</strong> de centre O et de rayon r, c'est l'ensemble de tous les points de l'espace qui sont <span class="hl">exactement à la distance r du point O</span>. C'est comme un cercle, mais en 3 dimensions. La <strong>boule</strong>, ce sont tous les points à une distance <strong>inférieure ou égale</strong> à r.</p>
+    <div class="box">
+      <h3>Clique sur un mot pour le voir sur la figure</h3>
+      <div class="btns" id="vocBtns" role="group" aria-label="Éléments de la sphère"></div>
+      <div class="fig">
+        <svg id="vocSvg" viewBox="0 0 360 280" role="img" aria-label="Sphère avec son centre, un rayon, un diamètre, un grand cercle et un petit cercle">
+          <circle cx="180" cy="140" r="110" fill="url(#gFull)" stroke="var(--ink)" stroke-width="2.5" opacity=".9"/>
+          <g id="v-grand" class="part">
+            <path d="M70 140 A110 33 0 0 1 290 140" fill="none" stroke="var(--ink)" stroke-width="2" stroke-dasharray="6 5"/>
+            <path d="M70 140 A110 33 0 0 0 290 140" fill="none" stroke="var(--ink)" stroke-width="2.5"/>
+            <text x="296" y="160" font-size="14">grand</text><text x="296" y="176" font-size="14">cercle</text>
+          </g>
+          <g id="v-petit" class="part">
+            <path d="M95.15 73.2 A84.85 25.5 0 0 1 264.85 73.2" fill="none" stroke="var(--ink)" stroke-width="2" stroke-dasharray="6 5"/>
+            <path d="M95.15 73.2 A84.85 25.5 0 0 0 264.85 73.2" fill="none" stroke="var(--ink)" stroke-width="2.5"/>
+            <text x="355" y="46" font-size="14" text-anchor="end">petit cercle</text>
+          </g>
+          <g id="v-diam" class="part">
+            <line x1="180" y1="30" x2="180" y2="250" stroke="var(--ink)" stroke-width="2.5"/>
+            <circle cx="180" cy="30" r="4" fill="var(--ink)"/><circle cx="180" cy="250" r="4" fill="var(--ink)"/>
+            <text x="150" y="232" font-size="15" text-anchor="end">d = 2r</text>
+          </g>
+          <g id="v-rayon" class="part">
+            <line x1="180" y1="140" x2="264.3" y2="210.7" stroke="var(--ink)" stroke-width="2.5"/>
+            <circle cx="264.3" cy="210.7" r="4" fill="var(--ink)"/>
+            <text x="230" y="168" font-size="16" font-weight="600">r</text>
+          </g>
+          <g id="v-centre" class="part">
+            <circle cx="180" cy="140" r="5" fill="var(--ink)"/>
+            <text x="160" y="132" font-size="16" font-weight="600">O</text>
+          </g>
+        </svg>
+      </div>
+      <div class="verdict info" id="vocOut" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Le lien avec le cercle</span>
+      <span>Le cercle, c'est la « sphère » d'un monde plat : tous les points d'un plan à la même distance du centre. Le disque, c'est la « boule » plate. Les mots rayon, diamètre et centre veulent dire la même chose dans les deux cas.</span>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · L'aire de la sphère</span>
+    <h2>4 × π × r² : quatre disques</h2>
+    <p>L'aire d'une sphère de rayon r est :</p>
+    <div class="formula">A = 4 × π × r²</div>
+    <p>Un disque de rayon r a une aire de π × r². La surface d'une sphère vaut donc <span class="hl">exactement 4 disques de même rayon</span>. On peut le tester avec une orange : sa peau, découpée en petits morceaux, recouvre à peu près 4 disques tracés autour de l'orange.</p>
+    <p>Archimède a trouvé une image encore plus belle. Mets la sphère dans un cylindre qui la touche partout : même rayon r, et une hauteur égale au diamètre 2r. Alors l'aire de la sphère est <strong>égale à l'aire du tube du cylindre</strong> (sans les couvercles) : 2 × π × r × 2r = 4 × π × r².</p>
+    <div class="box">
+      <h3>La sphère dans son cylindre</h3>
+      <div class="btns" role="group" aria-label="Comparer les aires ou les volumes">
+        <button type="button" id="arA" aria-pressed="true">Comparer les aires</button>
+        <button type="button" id="arV" aria-pressed="false">Comparer les volumes</button>
+      </div>
+      <div class="param">
+        <label for="arR">Rayon r : <span class="mono" id="arROut">3</span> cm</label>
+        <input id="arR" type="range" min="1" max="10" step="0.5" value="3">
+      </div>
+      <div class="fig">
+        <svg id="arSvg" viewBox="0 0 320 300" role="img" aria-label="Une sphère dans un cylindre de même rayon et de hauteur égale au diamètre">
+          <rect id="arTube" x="60" y="50" width="200" height="200" fill="var(--two-soft)" stroke="none"/>
+          <path d="M60 250 A100 25 0 0 1 260 250" fill="none" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="5 4" opacity=".6"/>
+          <circle id="arBall" cx="160" cy="150" r="100" fill="url(#gFull)" stroke="var(--ink)" stroke-width="2.5"/>
+          <path d="M60 150 A100 25 0 0 0 260 150" fill="none" stroke="var(--ink)" stroke-width="1.2" opacity=".6"/>
+          <g id="arCone">
+            <line x1="160" y1="50" x2="60" y2="250" stroke="var(--red)" stroke-width="2.5" stroke-dasharray="7 5"/>
+            <line x1="160" y1="50" x2="260" y2="250" stroke="var(--red)" stroke-width="2.5" stroke-dasharray="7 5"/>
+          </g>
+          <line x1="60" y1="50" x2="60" y2="250" stroke="var(--two)" stroke-width="3"/>
+          <line x1="260" y1="50" x2="260" y2="250" stroke="var(--two)" stroke-width="3"/>
+          <ellipse cx="160" cy="50" rx="100" ry="25" fill="var(--two-soft)" fill-opacity=".5" stroke="var(--two)" stroke-width="3"/>
+          <path d="M60 250 A100 25 0 0 0 260 250" fill="none" stroke="var(--two)" stroke-width="3"/>
+          <line x1="160" y1="150" x2="260" y2="150" stroke="var(--ink)" stroke-width="2"/>
+          <text x="205" y="143" font-size="15" font-weight="600">r</text>
+          <line x1="285" y1="50" x2="285" y2="250" stroke="var(--ink)" stroke-width="1.5"/>
+          <text x="292" y="155" font-size="15" font-weight="600">2r</text>
+        </svg>
+      </div>
+      <div class="results" id="arOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · Le volume de la boule</span>
+    <h2>4/3 × π × r³</h2>
+    <p>Le volume d'une boule de rayon r est :</p>
+    <div class="formula">V = 4/3 × π × r³</div>
+    <p>Attention à l'ordre : on calcule d'abord r³ (r × r × r), puis on multiplie par π, puis par 4, puis on divise par 3. Le « 4/3 » se tape <span class="mono">4 ÷ 3</span> ou on fait × 4 puis ÷ 3.</p>
+    <p>Encore Archimède : dans le cylindre de l'étape 3, la boule occupe <span class="hl">exactement les 2/3</span> du volume. Le cylindre a un volume de π × r² × 2r = 2 × π × r³. Les 2/3 de 2 × π × r³, c'est bien 4/3 × π × r³. Et le cône qui a la même base et la même hauteur occupe 1/3 du cylindre. Cône, boule, cylindre : leurs volumes sont dans le rapport <strong>1, 2, 3</strong>.</p>
+    <div class="note">
+      <span class="note-title">Vérifie avec le bouton « Comparer les volumes »</span>
+      <span>Remonte à l'étape 3 et clique dessus : les barres montrent que le cône vaut 1 part, la boule 2 parts et le cylindre 3 parts, quel que soit le rayon.</span>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · La calculatrice</span>
+    <h2>Un seul nombre suffit</h2>
+    <p>Connais-tu le rayon, le diamètre, l'aire ou le volume ? Avec un seul de ces nombres, on retrouve tous les autres. Pour revenir en arrière, on utilise la racine carrée (√) ou la racine cubique (∛), le nombre qui, multiplié 3 fois par lui-même, redonne le nombre de départ.</p>
+    <div class="box">
+      <div class="btns" id="calcQ" role="group" aria-label="Ce que tu connais"><span class="lbl">Je connais…</span></div>
+      <div class="btns" id="calcU" role="group" aria-label="Unité de longueur"><span class="lbl">Unité de longueur</span></div>
+      <div class="param">
+        <label for="calcIn" id="calcLbl">Rayon (cm)</label>
+        <input id="calcIn" type="text" inputmode="decimal" autocomplete="off" value="5">
+      </div>
+      <div class="results" id="calcOut" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Les conversions utiles</span>
+      <span>1 dm³ = 1 L &nbsp;·&nbsp; 1 cm³ = 1 mL &nbsp;·&nbsp; 1 000 cm³ = 1 L &nbsp;·&nbsp; 1 m³ = 1 000 L. Pour les aires : 1 m² = 10 000 cm². Le tutoriel sur <a class="tlink" href="les-conversions.html">les conversions</a> explique pourquoi on multiplie par 1 000 (et pas par 10) d'une unité de volume à la suivante.</span>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · Agrandir une boule</span>
+    <h2>Rayon × k, aire × k², volume × k³</h2>
+    <p>Si on double le rayon, l'aire n'est pas doublée : elle est multipliée par 2² = 4. Et le volume est multiplié par 2³ = 8 ! C'est logique : r est au carré dans l'aire et au cube dans le volume.</p>
+    <div class="box">
+      <div class="param">
+        <label for="kR">Coefficient k : <span class="mono" id="kOut">2</span></label>
+        <input id="kR" type="range" min="0.5" max="5" step="0.5" value="2">
+      </div>
+      <div class="fig">
+        <svg id="kSvg" viewBox="0 0 360 200" role="img" aria-label="Une petite boule de rayon 2 cm et une grande boule de rayon k fois plus grand"></svg>
+      </div>
+      <div class="results" id="kRes" aria-live="polite"></div>
+      <div class="verdict yes" id="kVerdict" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Couper une sphère</span>
+    <h2>La section par un plan</h2>
+    <p>Coupe une orange avec un couteau bien droit : la coupe est toujours un <strong>disque</strong>. Pour une sphère (la peau), la section est un <strong>cercle</strong>. Son centre H est le point du plan le plus proche de O. Plus le plan est loin du centre, plus le cercle est petit.</p>
+    <p>Pour calculer son rayon, on utilise le <strong>théorème de Pythagore</strong> (vu dans le tutoriel sur <a class="tlink" href="le-theoreme-de-pythagore.html">Pythagore</a>) dans le triangle OHM, rectangle en H : r² = d² + ρ². On lit « rho » la lettre grecque ρ ; c'est le rayon de la section.</p>
+    <div class="box">
+      <div class="sliders">
+        <div class="param">
+          <label for="secR">Rayon de la sphère r : <span class="mono" id="secROut">5</span> cm</label>
+          <input id="secR" type="range" min="1" max="10" step="0.5" value="5">
+        </div>
+        <div class="param">
+          <label for="secD">Distance du plan au centre d : <span class="mono" id="secDOut">3</span> cm</label>
+          <input id="secD" type="range" min="0" max="12" step="0.1" value="3">
+        </div>
+      </div>
+      <div class="fig">
+        <svg id="secSvg" viewBox="0 0 440 270" role="img" aria-label="Vue de côté de la sphère coupée par un plan, et section vue de dessus"></svg>
+      </div>
+      <div class="steps" id="secSteps" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · La Terre</span>
+    <h2>Parallèles, méridiens et coordonnées</h2>
+    <p>La Terre est presque une boule, de rayon R ≈ 6 371 km. Pour se repérer à sa surface, on la quadrille avec deux sortes de cercles (le tutoriel sur <a class="tlink" href="le-reperage.html">le repérage</a> en parle aussi) :</p>
+    <div class="cards">
+      <div class="box"><span class="tag two">Les parallèles</span><span class="soft">Des cercles « horizontaux ». Le plus grand est l'<strong>Équateur</strong> : c'est un grand cercle. Les autres rapetissent vers les pôles. La <strong>latitude</strong> dit de combien de degrés on est au nord (N) ou au sud (S) de l'Équateur, de 0° à 90°.</span></div>
+      <div class="box"><span class="tag acc">Les méridiens</span><span class="soft">Des demi-cercles qui vont d'un pôle à l'autre. Tous sont des moitiés de grands cercles. Le méridien de référence passe par <strong>Greenwich</strong>, près de Londres. La <strong>longitude</strong> dit de combien de degrés on est à l'est (E) ou à l'ouest (O), de 0° à 180°.</span></div>
+    </div>
+    <div class="box">
+      <div class="btns" id="geoCities" role="group" aria-label="Lieux"></div>
+      <div class="sliders">
+        <div class="param">
+          <label for="geoLat">Latitude : <span class="mono" id="geoLatOut"></span></label>
+          <input id="geoLat" type="range" min="-90" max="90" step="1" value="49">
+        </div>
+        <div class="param">
+          <label for="geoLon">Longitude : <span class="mono" id="geoLonOut"></span></label>
+          <input id="geoLon" type="range" min="-180" max="180" step="1" value="2">
+        </div>
+      </div>
+      <div class="figs">
+        <div class="fig">
+          <svg id="geoSvg" viewBox="0 0 320 320" role="img" aria-label="Globe avec l'Équateur, le méridien de Greenwich et le point choisi"></svg>
+          <span class="cap">Le globe (sans les continents)</span>
+        </div>
+        <div class="fig">
+          <svg id="geoSide" viewBox="0 0 320 260" role="img" aria-label="Coupe de la Terre montrant l'angle de latitude et le parallèle"></svg>
+          <span class="cap">Coupe : l'angle de latitude se lit au centre</span>
+        </div>
+      </div>
+      <div class="results" id="geoOut" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Bonus : la longueur d'un parallèle</span>
+      <span>L'Équateur mesure 2 × π × R ≈ 40 000 km. Un parallèle est un cercle plus petit. Sur la coupe, son rayon est le côté adjacent d'un triangle rectangle d'hypoténuse R : il vaut R × cos(latitude) (voir le tutoriel sur <a class="tlink" href="la-trigonometrie.html">la trigonométrie</a>). Sa longueur est donc 2 × π × R × cos(latitude). À 60° de latitude, cos(60°) = 0,5 : le parallèle est deux fois plus court que l'Équateur.</span>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Du ballon à la planète</span>
+    <h2>Combien de billes dans un ballon ?</h2>
+    <p>Choisis un petit objet et un grand. La page compare leurs diamètres, puis leurs volumes. Si le grand est k fois plus large, il est k³ fois plus volumineux (on imagine qu'on fond les petits pour remplir le grand, sans laisser de trous).</p>
+    <div class="box">
+      <div class="btns" id="cmpA" role="group" aria-label="Le petit objet"><span class="lbl">Le petit</span></div>
+      <div class="btns" id="cmpB" role="group" aria-label="Le grand objet"><span class="lbl">Le grand</span></div>
+      <div class="results" id="cmpOut" aria-live="polite"></div>
+    </div>
+    <p class="soft">Les diamètres sont des valeurs moyennes, arrondies. Ces objets ne sont pas des boules parfaites : la Terre, par exemple, est un peu aplatie aux pôles.</p>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · Attention</span>
+    <h2>Les erreurs fréquentes</h2>
+    <div class="box errs">
+      <div><strong>Prendre le diamètre pour le rayon</strong><span class="bad">ballon de 22 cm : V = 4/3 × π × 22³</span><span class="good">r = 22 ÷ 2 = 11 cm, puis V = 4/3 × π × 11³</span></div>
+      <div><strong>Mélanger les deux formules</strong><span class="bad">A = 4 × π × r³ &nbsp;ou&nbsp; V = 4/3 × π × r²</span><span class="good">aire → r² (des cm²) ; volume → r³ (des cm³)</span></div>
+      <div><strong>Confondre r³ et 3 × r</strong><span class="bad">5³ = 15</span><span class="good">5³ = 5 × 5 × 5 = 125</span></div>
+      <div><strong>Croire que tout double</strong><span class="bad">rayon × 2 → volume × 2</span><span class="good">rayon × 2 → aire × 4 et volume × 8</span></div>
+      <div><strong>Se tromper dans la conversion en litres</strong><span class="bad">1 L = 100 cm³</span><span class="good">1 L = 1 dm³ = 1 000 cm³</span></div>
+      <div><strong>Confondre sphère et boule</strong><span class="bad">« le volume de la sphère »</span><span class="good">la sphère a une aire, la boule a un volume</span></div>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · Un peu d'histoire</span>
+    <h2>Archimède et sa tombe</h2>
+    <ol class="timeline">
+      <li><span class="when">vers −300</span><div class="what"><strong>Euclide, à Alexandrie</strong><span>Dans ses <em>Éléments</em>, il démontre que les volumes de deux boules sont dans le même rapport que les cubes de leurs diamètres. Mais il ne donne pas de formule du volume.</span></div></li>
+      <li><span class="when">IIIᵉ s. av. J.-C.</span><div class="what"><strong>Archimède, à Syracuse (Sicile)</strong><span>Dans son livre <em>De la sphère et du cylindre</em>, il démontre que l'aire de la sphère vaut 4 grands disques, et que la boule occupe les 2/3 du cylindre qui l'entoure. Il considérait ce résultat comme l'un de ses plus beaux.</span></div></li>
+      <li><span class="when">−212</span><div class="what"><strong>La mort d'Archimède</strong><span>Il est tué pendant la prise de Syracuse par les Romains. Selon l'historien grec Plutarque, il avait demandé que l'on grave sur sa tombe une sphère dans un cylindre.</span></div></li>
+      <li><span class="when">vers −75</span><div class="what"><strong>Cicéron retrouve la tombe</strong><span>L'orateur romain, en mission en Sicile, raconte avoir retrouvé la tombe oubliée, envahie de broussailles. Il l'a reconnue grâce à la petite colonne portant la sphère et le cylindre. Aujourd'hui, cette tombe est perdue.</span></div></li>
+      <li><span class="when">IIᵉ siècle</span><div class="what"><strong>Ptolémée</strong><span>Ce savant d'Alexandrie dresse une liste de milliers de lieux repérés par leur latitude et leur longitude sur la sphère terrestre.</span></div></li>
+      <li><span class="when">Vᵉ–VIᵉ siècle</span><div class="what"><strong>Zu Chongzhi et son fils Zu Geng, en Chine</strong><span>Sans connaître les travaux grecs, ils retrouvent le volume de la boule, en comparant des tranches de solides.</span></div></li>
+    </ol>
+  </section>
+
+  <!-- 12 -->
+  <section>
+    <span class="eyebrow">Étape 12 · Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Utilise ta calculatrice (touche π). Quand on demande un arrondi, donne-le comme indiqué.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Nouvelles questions</button>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À toi de jouer</span>
+    <h2>Six problèmes</h2>
+    <div class="exos">
+      <details>
+        <summary>Le ballon de foot<span class="q">Un ballon de foot a un diamètre d'environ 22 cm. Calcule l'aire de sa surface et son volume (en litres), arrondis au dixième.</span></summary>
+        <div><span>Le rayon est 22 ÷ 2 = 11 cm.</span><span>Aire : 4 × π × 11² = 484π ≈ <strong>1 520,5 cm²</strong>.</span><span>Volume : 4/3 × π × 11³ ≈ 5 575,3 cm³, soit environ <strong>5,6 L</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Retrouver le rayon<span class="q">Une boule a un volume de 36π cm³. Quel est son rayon ?</span></summary>
+        <div><span>4/3 × π × r³ = 36π, donc 4/3 × r³ = 36, donc r³ = 36 × 3 ÷ 4 = 27.</span><span>Quel nombre, multiplié 3 fois par lui-même, donne 27 ? 3 × 3 × 3 = 27, donc <strong>r = 3 cm</strong>.</span></div>
+      </details>
+      <details>
+        <summary>La tranche de melon<span class="q">On coupe une sphère de rayon 10 cm par un plan situé à 6 cm du centre. Quel est le rayon de la section ?</span></summary>
+        <div><span>Pythagore dans le triangle rectangle : ρ² = r² − d² = 100 − 36 = 64.</span><span>Donc ρ = √64 = <strong>8 cm</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Les billes fondues<span class="q">On fond des petites billes de rayon 1 cm pour fabriquer une grosse bille de rayon 3 cm. Combien de petites billes faut-il ?</span></summary>
+        <div><span>Le rayon est multiplié par 3, donc le volume est multiplié par 3³ = 27.</span><span>Il faut <strong>27 petites billes</strong> (et non 3 !).</span></div>
+      </details>
+      <details>
+        <summary>Les boules de glace<span class="q">Une boule de glace a un diamètre de 5 cm. Combien de boules entières peut-on faire avec un bac de 1 L ?</span></summary>
+        <div><span>r = 2,5 cm, donc V = 4/3 × π × 2,5³ ≈ 65,4 cm³.</span><span>1 L = 1 000 cm³, et 1 000 ÷ 65,4 ≈ 15,3. On peut faire <strong>15 boules</strong> (en théorie : en vrai, la cuillère laisse des trous).</span></div>
+      </details>
+      <details>
+        <summary>Le tour de la Terre (bonus)<span class="q">Avec R ≈ 6 371 km, calcule la longueur de l'Équateur, puis celle du parallèle situé à 60° N.</span></summary>
+        <div><span>Équateur : 2 × π × 6 371 ≈ <strong>40 030 km</strong>.</span><span>À 60° : 2 × π × 6 371 × cos(60°) = 40 030 × 0,5 ≈ <strong>20 015 km</strong>.</span></div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• La <strong>sphère</strong> est la surface (la peau) ; la <strong>boule</strong> est le solide plein. Diamètre = 2 × rayon.</span>
+      <span>• Aire de la sphère : <strong>A = 4 × π × r²</strong> (en unités²). Volume de la boule : <strong>V = 4/3 × π × r³</strong> (en unités³).</span>
+      <span>• Archimède : la boule occupe les <strong>2/3</strong> du cylindre qui l'entoure, et la sphère a la même aire que le tube de ce cylindre.</span>
+      <span>• Rayon × k → aire × <strong>k²</strong> et volume × <strong>k³</strong>.</span>
+      <span>• Une section par un plan à la distance d du centre est un cercle de rayon <strong>√(r² − d²)</strong> (Pythagore). Si d = 0, c'est un grand cercle.</span>
+      <span>• Sur la Terre : <strong>latitude</strong> (N ou S, par rapport à l'Équateur) et <strong>longitude</strong> (E ou O, par rapport au méridien de Greenwich).</span>
+      <span>• 1 dm³ = 1 L et 1 cm³ = 1 mL.</span>
+    </div>
+  </section>
+
+  <!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"><a class="prev" href="les-formes-geometriques.html"><span>← Précédent</span><strong>Les formes géométriques</strong></a><a class="next" href="les-angles-et-triangles.html"><span>Suivant →</span><strong>Les angles et les triangles</strong></a></div><a class="tnav-home" href="index.html">⌂ Tous les tutoriels</a></nav><!--/tnav-->
+<footer>Fiche de révision · La sphère et la boule</footer>
+</main>
+
+<script>
+(function () {
+  /* Crochets de test : window.__sph
+     aire(r)              → 4πr²
+     volume(r)            → 4/3 πr³
+     rayonDepuisAire(A)   → √(A / 4π)
+     rayonDepuisVolume(V) → ∛(3V / 4π)
+     section(r, d)        → √(r² − d²), NaN si |d| > r
+     facteurs(k)          → { rayon: k, aire: k², volume: k³ }
+     parallele(R, lat)    → 2πR·cos(lat en degrés)
+     enLitres(v, unite)   → volume v (en unite³, unite ∈ mm, cm, dm, m, km) converti en litres
+     coord(lat, lon)      → texte « (48,9° N ; 2,4° E) »
+     fmt(x, d), nombre(x) → mise en forme française */
+  var NS = 'http://www.w3.org/2000/svg', PI = Math.PI, DEG = PI / 180;
+  function fmt(x, d) { var r = Math.round(x * 1e6) / 1e6; if (Object.is(r, -0)) r = 0; return r.toLocaleString('fr-FR', { maximumFractionDigits: d == null ? 3 : d }).replace('-', '−'); }
+  function num(s) { var t = String(s).replace(/\s/g, '').replace(/[−–]/g, '-').replace(',', '.'); if (t === '') return NaN; var x = Number(t); return isFinite(x) ? x : NaN; }
+  function mk(svg, name, attrs, text) { var e = document.createElementNS(NS, name); for (var a in attrs) e.setAttribute(a, attrs[a]); if (text != null) e.textContent = text; svg.appendChild(e); return e; }
+  function clear(svg) { while (svg.firstChild) svg.removeChild(svg.firstChild); }
+  function sup(n) { var m = { '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '-': '⁻' }; return String(n).split('').map(function (c) { return m[c]; }).join(''); }
+  /* nombre : arrondi « intelligent » (4 chiffres significatifs environ), notation × 10ⁿ pour les très grands ou très petits nombres */
+  function nombre(x) {
+    if (!isFinite(x)) return '—';
+    var a = Math.abs(x);
+    if (a === 0) return '0';
+    if (a >= 1e9 || a < 1e-4) {
+      var e = Math.floor(Math.log10(a)), m = Math.round(x / Math.pow(10, e) * 100) / 100;
+      if (Math.abs(m) >= 10) { m = m / 10; e++; }
+      return fmt(m, 2) + ' × 10' + sup(e);
+    }
+    var d = a >= 1000 ? 0 : a >= 1 ? 2 : Math.min(7, 3 - Math.floor(Math.log10(a)));
+    return fmt(x, d);
+  }
+  function exact(x) { return Math.abs(x * 1000 - Math.round(x * 1000)) < 1e-6; }
+  function eqs(x) { return exact(x) ? '= ' : '≈ '; }
+  function press(ids, on) { ids.forEach(function (id) { document.getElementById(id).setAttribute('aria-pressed', id === on ? 'true' : 'false'); }); }
+
+  var LIT = { mm: 1e-6, cm: 1e-3, dm: 1, m: 1e3, km: 1e12 };
+  var api = {
+    aire: function (r) { return 4 * PI * r * r; },
+    volume: function (r) { return 4 / 3 * PI * r * r * r; },
+    rayonDepuisAire: function (A) { return A < 0 ? NaN : Math.sqrt(A / (4 * PI)); },
+    rayonDepuisVolume: function (V) { return V < 0 ? NaN : Math.cbrt(3 * V / (4 * PI)); },
+    section: function (r, d) { d = Math.abs(d); if (d > r + 1e-12) return NaN; return Math.sqrt(Math.max(0, r * r - d * d)); },
+    facteurs: function (k) { return { rayon: k, aire: k * k, volume: k * k * k }; },
+    parallele: function (R, lat) { return 2 * PI * R * Math.cos(lat * DEG); },
+    enLitres: function (v, u) { return LIT[u] == null ? NaN : v * LIT[u]; },
+    coord: function (lat, lon) { return '(' + latTxt(lat) + ' ; ' + lonTxt(lon) + ')'; },
+    fmt: fmt, nombre: nombre
+  };
+  function latTxt(lat) { return fmt(Math.abs(lat), 1) + '°' + (lat > 0 ? ' N' : lat < 0 ? ' S' : ''); }
+  function lonTxt(lon) { return fmt(Math.abs(lon), 1) + '°' + (lon > 0 && lon < 180 ? ' E' : lon < 0 && lon > -180 ? ' O' : ''); }
+  window.__sph = api;
+
+  /* ---------- Étape 1 : sphère ou boule ---------- */
+  function sb(mode) {
+    press(['sbS', 'sbB'], mode === 's' ? 'sbS' : 'sbB');
+    var whole = document.getElementById('sbWhole'), cut = document.getElementById('sbCut');
+    if (mode === 's') {
+      whole.setAttribute('fill-opacity', '.35');
+      cut.setAttribute('fill', 'none');
+      document.getElementById('sbCutTxt').textContent = 'coupée : un cercle';
+      document.getElementById('sbOut').innerHTML = 'La sphère est creuse : seulement une surface.<span>Coupée en deux, on ne voit que son bord : un cercle. On mesure son aire.</span>';
+    } else {
+      whole.setAttribute('fill-opacity', '1');
+      cut.setAttribute('fill', 'var(--acc)');
+      cut.setAttribute('fill-opacity', '.75');
+      document.getElementById('sbCutTxt').textContent = 'coupée : un disque plein';
+      document.getElementById('sbOut').innerHTML = 'La boule est pleine.<span>Coupée en deux, on voit un disque plein. On mesure son volume.</span>';
+    }
+  }
+  document.getElementById('sbS').addEventListener('click', function () { sb('s'); });
+  document.getElementById('sbB').addEventListener('click', function () { sb('b'); });
+  sb('s');
+
+  /* ---------- Étape 2 : vocabulaire ---------- */
+  var voc = [
+    ['centre', 'Le centre', 'Le centre O est le milieu de la sphère. Tous les points de la sphère sont à la même distance de lui.'],
+    ['rayon', 'Le rayon', 'Le rayon r relie le centre O à un point de la sphère. Le mot désigne aussi sa longueur.'],
+    ['diam', 'Le diamètre', 'Le diamètre traverse la sphère en passant par le centre. Il mesure 2 fois le rayon : d = 2r. Ses deux bouts sont « diamétralement opposés », comme les pôles Nord et Sud.'],
+    ['grand', 'Un grand cercle', 'Un grand cercle est un cercle tracé sur la sphère qui a le même centre O et le même rayon r. Il coupe la sphère en deux moitiés égales. L\'Équateur en est un.'],
+    ['petit', 'Un petit cercle', 'Un cercle tracé sur la sphère dont le centre n\'est pas O. Son rayon est plus petit que r. Les parallèles de la Terre (sauf l\'Équateur) sont des petits cercles.'],
+    ['tout', 'Tout voir', 'Voici tous les éléments ensemble.']
+  ];
+  var vocBtns = document.getElementById('vocBtns');
+  voc.forEach(function (v) {
+    var b = document.createElement('button'); b.type = 'button'; b.id = 'voc-' + v[0]; b.textContent = v[1];
+    b.addEventListener('click', function () { showVoc(v[0]); });
+    vocBtns.appendChild(b);
+  });
+  function showVoc(key) {
+    press(voc.map(function (v) { return 'voc-' + v[0]; }), 'voc-' + key);
+    ['centre', 'rayon', 'diam', 'grand', 'petit'].forEach(function (k) {
+      var g = document.getElementById('v-' + k), on = key === 'tout' || key === k;
+      g.setAttribute('opacity', on ? '1' : '.12');
+      Array.prototype.forEach.call(g.querySelectorAll('line,path'), function (el) { el.setAttribute('stroke', on && key !== 'tout' ? 'var(--red)' : 'var(--ink)'); el.setAttribute('stroke-width', on && key !== 'tout' ? '4' : '2.5'); });
+      Array.prototype.forEach.call(g.querySelectorAll('circle'), function (el) { el.setAttribute('fill', on && key !== 'tout' ? 'var(--red)' : 'var(--ink)'); });
+    });
+    var v = voc.filter(function (x) { return x[0] === key; })[0];
+    document.getElementById('vocOut').innerHTML = v[1] + '<span>' + v[2] + '</span>';
+  }
+  showVoc('tout');
+
+  /* ---------- Étape 3 : Archimède ---------- */
+  var arMode = 'A', arR = document.getElementById('arR');
+  function arch() {
+    var r = parseFloat(arR.value), out = document.getElementById('arOut');
+    document.getElementById('arROut').textContent = fmt(r);
+    press(['arA', 'arV'], arMode === 'A' ? 'arA' : 'arV');
+    document.getElementById('arCone').setAttribute('opacity', arMode === 'V' ? '1' : '0');
+    document.getElementById('arTube').setAttribute('fill-opacity', arMode === 'A' ? '1' : '.5');
+    var r2 = fmt(r * r), r3 = fmt(r * r * r);
+    if (arMode === 'A') {
+      var A = api.aire(r);
+      out.innerHTML =
+        '<div class="res"><span class="res-name">Tube du cylindre</span><span class="res-val">≈ ' + nombre(A) + ' cm²</span><span class="res-calc">périmètre × hauteur = 2 × π × ' + fmt(r) + ' × ' + fmt(2 * r) + ' = ' + fmt(4 * r * r) + 'π</span></div>' +
+        '<div class="res total"><span class="res-name">Sphère</span><span class="res-val">≈ ' + nombre(A) + ' cm²</span><span class="res-calc">4 × π × ' + fmt(r) + '² = 4 × π × ' + r2 + ' = ' + fmt(4 * r * r) + 'π : la même aire !</span></div>' +
+        '<p class="soft">Avec les deux couvercles (2 × π × ' + fmt(r) + '² chacun), le cylindre a une aire totale de ' + fmt(6 * r * r) + 'π : la sphère en couvre les 2/3.</p>';
+    } else {
+      var Vc = 2 * PI * r * r * r, Vb = api.volume(r), Vk = Vc / 3;
+      out.innerHTML =
+        '<div class="res"><span class="res-name">Cylindre</span><span class="res-val">≈ ' + nombre(Vc) + ' cm³</span><span class="res-calc">π × ' + r2 + ' × ' + fmt(2 * r) + ' = ' + fmt(2 * r * r * r) + 'π</span></div>' +
+        '<div class="res total"><span class="res-name">Boule</span><span class="res-val">≈ ' + nombre(Vb) + ' cm³</span><span class="res-calc">4/3 × π × ' + r3 + ' = 2/3 du cylindre</span></div>' +
+        '<div class="res"><span class="res-name">Cône (en rouge)</span><span class="res-val">≈ ' + nombre(Vk) + ' cm³</span><span class="res-calc">1/3 × π × ' + r2 + ' × ' + fmt(2 * r) + ' = 1/3 du cylindre</span></div>' +
+        '<div class="bars">' +
+        '<div class="bar"><span>Cône</span><div class="track"><div class="fill red" style="width:33.33%">1</div></div></div>' +
+        '<div class="bar"><span>Boule</span><div class="track"><div class="fill" style="width:66.67%">2</div></div></div>' +
+        '<div class="bar"><span>Cylindre</span><div class="track"><div class="fill two" style="width:100%">3</div></div></div></div>';
+    }
+  }
+  document.getElementById('arA').addEventListener('click', function () { arMode = 'A'; arch(); });
+  document.getElementById('arV').addEventListener('click', function () { arMode = 'V'; arch(); });
+  arR.addEventListener('input', arch); arch();
+
+  /* ---------- Étape 5 : calculatrice ---------- */
+  var cQ = [['r', 'le rayon'], ['d', 'le diamètre'], ['A', 'l\'aire'], ['V', 'le volume']], cU = ['mm', 'cm', 'dm', 'm', 'km'];
+  var calc = { q: 'r', u: 'cm' }, cIn = document.getElementById('calcIn');
+  cQ.forEach(function (q) { var b = document.createElement('button'); b.type = 'button'; b.id = 'cq-' + q[0]; b.textContent = q[1]; b.addEventListener('click', function () { calc.q = q[0]; calcRun(); }); document.getElementById('calcQ').appendChild(b); });
+  cU.forEach(function (u) { var b = document.createElement('button'); b.type = 'button'; b.id = 'cu-' + u; b.textContent = u; b.addEventListener('click', function () { calc.u = u; calcRun(); }); document.getElementById('calcU').appendChild(b); });
+  function calcRun() {
+    press(cQ.map(function (q) { return 'cq-' + q[0]; }), 'cq-' + calc.q);
+    press(cU.map(function (u) { return 'cu-' + u; }), 'cu-' + calc.u);
+    var u = calc.u, names = { r: 'Rayon (' + u + ')', d: 'Diamètre (' + u + ')', A: 'Aire (' + u + '²)', V: 'Volume (' + u + '³)' };
+    document.getElementById('calcLbl').textContent = names[calc.q];
+    var x = num(cIn.value), out = document.getElementById('calcOut');
+    if (isNaN(x)) { out.innerHTML = '<p class="err">Écris un nombre.</p>'; return; }
+    if (x <= 0) { out.innerHTML = '<p class="err">Une longueur, une aire ou un volume doit être strictement positif.</p>'; return; }
+    var r, how;
+    if (calc.q === 'r') { r = x; how = 'donné'; }
+    else if (calc.q === 'd') { r = x / 2; how = fmt(x) + ' ÷ 2'; }
+    else if (calc.q === 'A') { r = api.rayonDepuisAire(x); how = '√(' + nombre(x) + ' ÷ (4 × π))'; }
+    else { r = api.rayonDepuisVolume(x); how = '∛(3 × ' + nombre(x) + ' ÷ (4 × π))'; }
+    var A = api.aire(r), V = api.volume(r), L = api.enLitres(V, u);
+    var given = function (k) { return calc.q === k ? ' total' : ''; };
+    var rTxt = nombre(r), approxR = calc.q === 'A' || calc.q === 'V' ? '≈ ' : '';
+    out.innerHTML =
+      '<div class="res' + given('r') + '"><span class="res-name">Rayon</span><span class="res-val">' + approxR + rTxt + ' ' + u + '</span><span class="res-calc">r = ' + how + '</span></div>' +
+      '<div class="res' + given('d') + '"><span class="res-name">Diamètre</span><span class="res-val">' + approxR + nombre(2 * r) + ' ' + u + '</span><span class="res-calc">d = 2 × r</span></div>' +
+      '<div class="res' + given('A') + '"><span class="res-name">Aire de la sphère</span><span class="res-val">' + (calc.q === 'A' ? '' : '≈ ') + nombre(A) + ' ' + u + '²</span><span class="res-calc">A = 4 × π × r²' + (calc.q === 'r' || calc.q === 'd' ? ' = 4 × π × ' + fmt(r) + '² = ' + nombre(4 * r * r) + 'π' : '') + '</span></div>' +
+      '<div class="res' + given('V') + '"><span class="res-name">Volume de la boule</span><span class="res-val">' + (calc.q === 'V' ? '' : '≈ ') + nombre(V) + ' ' + u + '³</span><span class="res-calc">V = 4/3 × π × r³' + (calc.q === 'r' || calc.q === 'd' ? ' = 4/3 × π × ' + fmt(r) + '³' : '') + '</span></div>' +
+      '<div class="res"><span class="res-name">Contenance</span><span class="res-val">≈ ' + nombre(L) + ' L</span><span class="res-calc">' + (u === 'dm' ? '1 dm³ = 1 L' : u === 'cm' ? '1 000 cm³ = 1 L, donc on divise par 1 000' : u === 'mm' ? '1 000 000 mm³ = 1 L' : u === 'm' ? '1 m³ = 1 000 L, donc on multiplie par 1 000' : '1 km³ = 1 000 000 000 000 L') + '</span></div>';
+  }
+  cIn.addEventListener('input', calcRun); calcRun();
+
+  /* ---------- Étape 6 : coefficient k ---------- */
+  var kR = document.getElementById('kR');
+  function kRun() {
+    var k = parseFloat(kR.value), f = api.facteurs(k), r0 = 2, svg = document.getElementById('kSvg');
+    document.getElementById('kOut').textContent = fmt(k);
+    clear(svg);
+    var px = 16, ground = 192;
+    mk(svg, 'line', { x1: 5, y1: ground, x2: 355, y2: ground, stroke: 'var(--line)', 'stroke-width': 2 });
+    mk(svg, 'circle', { cx: 40, cy: ground - px, r: px, fill: 'url(#gFull)', stroke: 'var(--ink)', 'stroke-width': 2 });
+    mk(svg, 'text', { x: 40, y: ground - 2 * px - 8, 'text-anchor': 'middle', 'font-size': 13 }, 'r = 2');
+    var R = px * k, cx = 100 + R;
+    mk(svg, 'circle', { cx: cx, cy: ground - R, r: R, fill: 'url(#gFull)', stroke: 'var(--acc)', 'stroke-width': 2.5 });
+    mk(svg, 'line', { x1: cx, y1: ground - R, x2: cx + R, y2: ground - R, stroke: 'var(--red)', 'stroke-width': 2.5 });
+    var lx = Math.min(cx + R + 8, 290);
+    mk(svg, 'text', { x: lx, y: Math.max(16, ground - 2 * R + 14), 'font-size': 14, 'font-weight': 600 }, 'r = ' + fmt(2 * k));
+    var A0 = 4 * r0 * r0; // aire de la petite sphère = 16π ; son volume = 32/3 π
+    document.getElementById('kRes').innerHTML =
+      '<div class="res"><span class="res-name">Rayon × ' + fmt(k) + '</span><span class="res-val">2 → ' + fmt(2 * k) + ' cm</span></div>' +
+      '<div class="res"><span class="res-name">Aire × ' + fmt(k) + '² = × ' + fmt(f.aire) + '</span><span class="res-val">≈ ' + nombre(api.aire(2)) + ' → ' + nombre(api.aire(2 * k)) + ' cm²</span><span class="res-calc">' + fmt(A0) + 'π × ' + fmt(f.aire) + ' = ' + fmt(A0 * f.aire) + 'π</span></div>' +
+      '<div class="res total"><span class="res-name">Volume × ' + fmt(k) + '³ = × ' + fmt(f.volume) + '</span><span class="res-val">≈ ' + nombre(api.volume(2)) + ' → ' + nombre(api.volume(2 * k)) + ' cm³</span><span class="res-calc">32/3 π × ' + fmt(f.volume) + '</span></div>';
+    var v = document.getElementById('kVerdict');
+    if (k === 1) v.innerHTML = 'k = 1 : rien ne change.<span>Les deux boules sont identiques.</span>';
+    else if (k < 1) v.innerHTML = 'On réduit : le volume est multiplié par ' + fmt(f.volume) + ', donc divisé par ' + fmt(1 / f.volume) + '.<span>Avec la matière de la petite boule de rayon 2 cm, on pourrait fabriquer ' + fmt(1 / f.volume) + ' boules de rayon ' + fmt(2 * k) + ' cm.</span>';
+    else v.innerHTML = 'Il faudrait ' + fmt(f.volume) + ' petites boules (fondues) pour fabriquer la grande.<span>Le rayon n\'est que ' + fmt(k) + ' fois plus grand, mais le volume est ' + fmt(f.volume) + ' fois plus grand, et la surface ' + fmt(f.aire) + ' fois plus grande.</span>';
+  }
+  kR.addEventListener('input', kRun); kRun();
+
+  /* ---------- Étape 7 : section ---------- */
+  var sR = document.getElementById('secR'), sD = document.getElementById('secD');
+  function secRun() {
+    var r = parseFloat(sR.value), d = parseFloat(sD.value), svg = document.getElementById('secSvg'), st = document.getElementById('secSteps');
+    document.getElementById('secROut').textContent = fmt(r);
+    document.getElementById('secDOut').textContent = fmt(d);
+    var rho = api.section(r, d), s = 100 / r, cx = 120, cy = 140, pyRaw = cy - d * s, py = Math.max(8, pyRaw);
+    clear(svg);
+    mk(svg, 'text', { x: cx, y: 264, 'text-anchor': 'middle', 'font-size': 13 }, 'vue de côté');
+    mk(svg, 'circle', { cx: cx, cy: cy, r: 100, fill: 'url(#gFull)', stroke: 'var(--ink)', 'stroke-width': 2.5 });
+    mk(svg, 'line', { x1: 4, y1: py, x2: 236, y2: py, stroke: 'var(--two)', 'stroke-width': 2.5 });
+    mk(svg, 'text', { x: 6, y: py - 6, 'font-size': 13, style: 'fill:var(--two)' }, 'plan');
+    mk(svg, 'circle', { cx: cx, cy: cy, r: 4, fill: 'var(--ink)' });
+    mk(svg, 'text', { x: cx - 18, y: cy + 18, 'font-size': 15, 'font-weight': 600 }, 'O');
+    var tx = 330, ty = 140;
+    mk(svg, 'text', { x: tx, y: 264, 'text-anchor': 'middle', 'font-size': 13 }, 'vue de dessus');
+    mk(svg, 'circle', { cx: tx, cy: ty, r: 100, fill: 'none', stroke: 'var(--line)', 'stroke-width': 2, 'stroke-dasharray': '6 5' });
+    if (!isNaN(rho)) {
+      var w = rho * s;
+      if (w > 0.5) mk(svg, 'ellipse', { cx: cx, cy: py, rx: w, ry: w * 0.22, fill: 'var(--acc)', 'fill-opacity': '.45', stroke: 'var(--acc)', 'stroke-width': 2 });
+      if (d > 0) {
+        mk(svg, 'line', { x1: cx, y1: cy, x2: cx, y2: py, stroke: 'var(--red)', 'stroke-width': 2.5 });
+        mk(svg, 'text', { x: cx - 8, y: (cy + py) / 2 + 5, 'text-anchor': 'end', 'font-size': 15, 'font-weight': 600, style: 'fill:var(--red)' }, 'd');
+      }
+      if (w > 0.5) {
+        mk(svg, 'line', { x1: cx, y1: py, x2: cx + w, y2: py, stroke: 'var(--acc)', 'stroke-width': 3 });
+        mk(svg, 'line', { x1: cx, y1: cy, x2: cx + w, y2: py, stroke: 'var(--ink)', 'stroke-width': 2, 'stroke-dasharray': '5 4' });
+        mk(svg, 'text', { x: cx + w / 2, y: py - 8, 'text-anchor': 'middle', 'font-size': 15, 'font-weight': 600, style: 'fill:var(--acc)' }, 'ρ');
+        mk(svg, 'text', { x: cx + w / 2 + 10, y: (cy + py) / 2 + 16, 'font-size': 15, 'font-weight': 600 }, 'r');
+        mk(svg, 'circle', { cx: cx + w, cy: py, r: 4, fill: 'var(--ink)' });
+        mk(svg, 'text', { x: cx + w + 6, y: py + (d > 0 ? -6 : 18), 'font-size': 14 }, 'M');
+        if (d > 0 && w > 12 && cy - py > 12) mk(svg, 'path', { d: 'M' + (cx + 9) + ' ' + py + ' V' + (py + 9) + ' H' + cx, fill: 'none', stroke: 'var(--ink)', 'stroke-width': 1.5 });
+        mk(svg, 'circle', { cx: tx, cy: ty, r: w, fill: 'var(--acc)', 'fill-opacity': '.45', stroke: 'var(--acc)', 'stroke-width': 2.5 });
+        mk(svg, 'line', { x1: tx, y1: ty, x2: tx + w, y2: ty, stroke: 'var(--acc)', 'stroke-width': 2.5 });
+        mk(svg, 'text', { x: tx + w / 2, y: ty - 8, 'text-anchor': 'middle', 'font-size': 15, 'font-weight': 600, style: 'fill:var(--acc)' }, 'ρ');
+      } else {
+        mk(svg, 'circle', { cx: cx, cy: py, r: 5, fill: 'var(--acc)' });
+        mk(svg, 'circle', { cx: tx, cy: ty, r: 5, fill: 'var(--acc)' });
+      }
+      if (d > 0) mk(svg, 'text', { x: cx - 18, y: py + 18, 'font-size': 14 }, 'H');
+      mk(svg, 'circle', { cx: tx, cy: ty, r: 3, fill: 'var(--ink)' });
+    } else {
+      mk(svg, 'line', { x1: cx, y1: cy, x2: cx, y2: py, stroke: 'var(--red)', 'stroke-width': 2.5, 'stroke-dasharray': '5 4' });
+      mk(svg, 'text', { x: tx, y: ty + 5, 'text-anchor': 'middle', 'font-size': 14 }, 'pas de section');
+    }
+    var r2 = r * r, d2 = d * d;
+    if (isNaN(rho)) {
+      st.innerHTML = '<span class="why">d = ' + fmt(d) + ' cm est plus grand que r = ' + fmt(r) + ' cm.</span><b>Le plan passe à côté de la sphère : pas de section.</b>';
+      return;
+    }
+    if (Math.abs(d - r) < 1e-9) {
+      st.innerHTML = '<span class="why">d = r : le plan touche la sphère en un seul point.</span><span>ρ² = ' + fmt(r2) + ' − ' + fmt(d2) + ' = 0</span><b>ρ = 0 : la section est un point. On dit que le plan est tangent à la sphère.</b>';
+      return;
+    }
+    var html = '<span class="why">Pythagore dans le triangle OHM rectangle en H :</span><span>r² = d² + ρ², donc ρ² = r² − d²</span>' +
+      '<span>ρ² = ' + fmt(r) + '² − ' + fmt(d) + '² = ' + fmt(r2) + ' − ' + fmt(d2) + ' = ' + fmt(r2 - d2) + '</span>' +
+      '<b>ρ = √' + fmt(r2 - d2) + ' ' + eqs(rho) + fmt(rho, 2) + ' cm</b>' +
+      '<span class="why">Aire du disque de la coupe : π × ρ² ≈ ' + nombre(PI * rho * rho) + ' cm².</span>';
+    if (d === 0) html += '<span class="why">d = 0 : le plan passe par le centre. La section est un <strong>grand cercle</strong>, de même rayon que la sphère.</span>';
+    st.innerHTML = html;
+  }
+  sR.addEventListener('input', secRun); sD.addEventListener('input', secRun); secRun();
+
+  /* ---------- Étape 8 : la Terre ---------- */
+  var RT = 6371;
+  var cities = [['Paris', 48.9, 2.4], ['Quito', -0.2, -78.5], ['Le Cap', -33.9, 18.4], ['Tokyo', 35.7, 139.7], ['New York', 40.7, -74], ['Pôle Nord', 90, 0]];
+  var geo = { lat: 48.9, lon: 2.4 }, gLat = document.getElementById('geoLat'), gLon = document.getElementById('geoLon');
+  cities.forEach(function (c, i) {
+    var b = document.createElement('button'); b.type = 'button'; b.id = 'city' + i; b.textContent = c[0];
+    b.addEventListener('click', function () { geo.lat = c[1]; geo.lon = c[2]; gLat.value = Math.round(c[1]); gLon.value = Math.round(c[2]); geoRun(i); });
+    document.getElementById('geoCities').appendChild(b);
+  });
+  gLat.addEventListener('input', function () { geo.lat = parseFloat(gLat.value); geoRun(-1); });
+  gLon.addEventListener('input', function () { geo.lon = parseFloat(gLon.value); geoRun(-1); });
+  function geoRun(ci) {
+    press(cities.map(function (c, i) { return 'city' + i; }), 'city' + ci);
+    var lat = geo.lat, lon = geo.lon;
+    document.getElementById('geoLatOut').textContent = latTxt(lat);
+    document.getElementById('geoLonOut').textContent = lonTxt(lon);
+    /* globe en projection orthographique, centré sur la longitude du point et incliné de lat/2 */
+    var svg = document.getElementById('geoSvg'), C = 160, R = 140, p0 = lat / 2 * DEG, l0 = lon;
+    clear(svg);
+    function P(phi, lam) {
+      var p = phi * DEG, l = (lam - l0) * DEG;
+      var cosc = Math.sin(p0) * Math.sin(p) + Math.cos(p0) * Math.cos(p) * Math.cos(l);
+      var x = Math.cos(p) * Math.sin(l), y = Math.cos(p0) * Math.sin(p) - Math.sin(p0) * Math.cos(p) * Math.cos(l);
+      return [C + R * x, C - R * y, cosc >= -1e-9];
+    }
+    function curve(pts, attrs) {
+      var d = '', prev = false;
+      pts.forEach(function (q) { if (q[2]) { d += (prev ? 'L' : 'M') + q[0].toFixed(1) + ' ' + q[1].toFixed(1); prev = true; } else prev = false; });
+      if (d) { attrs.d = d; attrs.fill = 'none'; mk(svg, 'path', attrs); }
+    }
+    function par(phi, attrs) { var a = []; for (var t = -180; t <= 180; t += 3) a.push(P(phi, t)); curve(a, attrs); }
+    function mer(lam, attrs) { var a = []; for (var t = -90; t <= 90; t += 3) a.push(P(t, lam)); curve(a, attrs); }
+    mk(svg, 'circle', { cx: C, cy: C, r: R, fill: 'var(--acc-soft)', stroke: 'var(--ink)', 'stroke-width': 2.5 });
+    [-60, -30, 30, 60].forEach(function (f) { par(f, { stroke: 'var(--ink-soft)', 'stroke-width': 1, opacity: '.55' }); });
+    for (var m = -180; m < 180; m += 30) if (m !== 0) mer(m, { stroke: 'var(--ink-soft)', 'stroke-width': 1, opacity: '.55' });
+    par(0, { stroke: 'var(--two)', 'stroke-width': 3 });
+    mer(0, { stroke: 'var(--red)', 'stroke-width': 3 });
+    if (Math.abs(lat) < 90) {
+      if (lat !== 0) par(lat, { stroke: 'var(--acc)', 'stroke-width': 3, 'stroke-dasharray': '7 5' });
+      if (lon !== 0) mer(lon, { stroke: 'var(--acc)', 'stroke-width': 2.5, 'stroke-dasharray': '7 5' });
+    }
+    var N = P(90, 0), S = P(-90, 0), E = P(0, l0 + 60), G = P(Math.max(-60, Math.min(60, lat - 25)), 0);
+    if (N[2]) { mk(svg, 'circle', { cx: N[0], cy: N[1], r: 3.5, fill: 'var(--ink)' }); mk(svg, 'text', { x: N[0] + 7, y: N[1] - 4, 'font-size': 14, 'font-weight': 600 }, 'N'); }
+    if (S[2]) { mk(svg, 'circle', { cx: S[0], cy: S[1], r: 3.5, fill: 'var(--ink)' }); mk(svg, 'text', { x: S[0] + 7, y: S[1] + 14, 'font-size': 14, 'font-weight': 600 }, 'S'); }
+    if (E[2]) mk(svg, 'text', { x: E[0], y: E[1] + 18, 'font-size': 12, 'text-anchor': 'middle', style: 'fill:var(--two)' }, 'Équateur');
+    if (G[2] && Math.abs(G[0] - C) < 110) mk(svg, 'text', { x: G[0] > C ? G[0] - 5 : G[0] + 5, y: G[1], 'font-size': 12, 'text-anchor': G[0] > C ? 'end' : 'start', style: 'fill:var(--red)' }, 'Greenwich');
+    var Pt = P(lat, lon);
+    mk(svg, 'circle', { cx: Pt[0], cy: Pt[1], r: 7, fill: 'var(--red)', stroke: 'var(--card)', 'stroke-width': 2.5 });
+
+    /* coupe : angle de latitude */
+    var sv = document.getElementById('geoSide'), ox = 140, oy = 130, Rs = 100, a = lat * DEG;
+    clear(sv);
+    var px = ox + Rs * Math.cos(a), py = oy - Rs * Math.sin(a);
+    mk(sv, 'circle', { cx: ox, cy: oy, r: Rs, fill: 'var(--acc-soft)', stroke: 'var(--ink)', 'stroke-width': 2.5 });
+    mk(sv, 'line', { x1: ox - Rs, y1: oy, x2: ox + Rs, y2: oy, stroke: 'var(--two)', 'stroke-width': 2.5 });
+    mk(sv, 'text', { x: ox - Rs + 4, y: oy + 18, 'font-size': 12, style: 'fill:var(--two)' }, 'Équateur');
+    mk(sv, 'line', { x1: ox, y1: oy - Rs - 8, x2: ox, y2: oy + Rs + 8, stroke: 'var(--ink-soft)', 'stroke-width': 1.5, 'stroke-dasharray': '4 4' });
+    mk(sv, 'text', { x: ox + 6, y: oy - Rs - 6, 'font-size': 13, 'font-weight': 600 }, 'N');
+    mk(sv, 'text', { x: ox + 6, y: oy + Rs + 18, 'font-size': 13, 'font-weight': 600 }, 'S');
+    if (Math.abs(lat) < 90) {
+      mk(sv, 'line', { x1: ox - (px - ox), y1: py, x2: px, y2: py, stroke: 'var(--acc)', 'stroke-width': 3, 'stroke-dasharray': '7 5' });
+      mk(sv, 'line', { x1: ox, y1: py, x2: px, y2: py, stroke: 'var(--acc)', 'stroke-width': 3.5 });
+    }
+    mk(sv, 'line', { x1: ox, y1: oy, x2: px, y2: py, stroke: 'var(--ink)', 'stroke-width': 2.5 });
+    mk(sv, 'text', { x: (ox + px) / 2 - 14, y: (oy + py) / 2 + (lat >= 0 ? -4 : 16), 'font-size': 14, 'font-weight': 600 }, 'R');
+    if (lat !== 0) {
+      var ar = 34, ax = ox + ar * Math.cos(a), ay = oy - ar * Math.sin(a);
+      mk(sv, 'path', { d: 'M' + (ox + ar) + ' ' + oy + ' A' + ar + ' ' + ar + ' 0 0 ' + (lat > 0 ? 0 : 1) + ' ' + ax.toFixed(1) + ' ' + ay.toFixed(1), fill: 'none', stroke: 'var(--red)', 'stroke-width': 2.5 });
+      var mid = a / 2;
+      mk(sv, 'text', { x: ox + 42 * Math.cos(mid) + 2, y: oy - 42 * Math.sin(mid) + 5, 'font-size': 13, 'font-weight': 600, style: 'fill:var(--red)' }, fmt(Math.abs(lat), 1) + '°');
+    }
+    mk(sv, 'circle', { cx: ox, cy: oy, r: 3.5, fill: 'var(--ink)' });
+    mk(sv, 'circle', { cx: px, cy: py, r: 6, fill: 'var(--red)', stroke: 'var(--card)', 'stroke-width': 2 });
+
+    var where = [];
+    where.push(lat > 0 ? 'hémisphère Nord' : lat < 0 ? 'hémisphère Sud' : 'sur l\'Équateur');
+    if (Math.abs(lat) < 90) where.push(lon === 0 ? 'sur le méridien de Greenwich' : Math.abs(lon) === 180 ? 'à l\'opposé de Greenwich' : lon > 0 ? 'à l\'est de Greenwich' : 'à l\'ouest de Greenwich');
+    var Lp = api.parallele(RT, lat);
+    document.getElementById('geoOut').innerHTML =
+      '<div class="res total"><span class="res-name">Coordonnées</span><span class="res-val">' + api.coord(lat, lon) + '</span><span class="res-calc">' + where.join(', ') + (Math.abs(lat) === 90 ? '. Au pôle, tous les méridiens se rejoignent : la longitude ne sert plus à rien.' : '') + '</span></div>' +
+      '<div class="res"><span class="res-name">Distance à l\'Équateur</span><span class="res-val">≈ ' + fmt(Math.round(Math.abs(lat) * 111.19)) + ' km</span><span class="res-calc">le long d\'un méridien, 1° de latitude ≈ 111 km</span></div>' +
+      '<div class="res"><span class="res-name">Longueur de ce parallèle (bonus)</span><span class="res-val">≈ ' + fmt(Math.round(Math.abs(Lp) < 1e-6 ? 0 : Lp)) + ' km</span><span class="res-calc">2 × π × 6 371 × cos(' + fmt(Math.abs(lat), 1) + '°)' + (Math.abs(lat) === 90 ? ' = 0 : le parallèle est réduit à un point' : '') + '</span></div>';
+  }
+  document.getElementById('city0').click();
+
+  /* ---------- Étape 9 : comparaisons ---------- */
+  /* [nom, diamètre en m, pluriel, « le volume … »] */
+  var objs = [['Bille', 0.016, 'billes', "d'une bille"], ['Balle de ping-pong', 0.04, 'balles de ping-pong', "d'une balle de ping-pong"], ['Balle de tennis', 0.067, 'balles de tennis', "d'une balle de tennis"], ['Ballon de foot', 0.22, 'ballons de foot', "d'un ballon de foot"], ['Ballon de basket', 0.24, 'ballons de basket', "d'un ballon de basket"], ['Lune', 3474e3, 'Lunes', 'de la Lune'], ['Terre', 12742e3, 'Terres', 'de la Terre'], ['Soleil', 1392700e3, 'Soleils', 'du Soleil']];
+  var cmp = { a: 0, b: 3 };
+  objs.forEach(function (o, i) {
+    ['a', 'b'].forEach(function (s) {
+      var b = document.createElement('button'); b.type = 'button'; b.id = 'cmp' + s + i; b.textContent = o[0];
+      b.addEventListener('click', function () { cmp[s] = i; cmpRun(); });
+      document.getElementById(s === 'a' ? 'cmpA' : 'cmpB').appendChild(b);
+    });
+  });
+  function descr(o) {
+    var d = o[1], r = d / 2;
+    if (d < 10) return { d: fmt(d * 100, 1) + ' cm', v: nombre(api.volume(r * 100)) + ' cm³ ≈ ' + nombre(api.volume(r * 10)) + ' L' };
+    return { d: nombre(d / 1000) + ' km', v: nombre(api.volume(r / 1000)) + ' km³' };
+  }
+  function cmpRun() {
+    press(objs.map(function (o, i) { return 'cmpa' + i; }), 'cmpa' + cmp.a);
+    press(objs.map(function (o, i) { return 'cmpb' + i; }), 'cmpb' + cmp.b);
+    var A = objs[cmp.a], B = objs[cmp.b], out = document.getElementById('cmpOut');
+    var dA = descr(A), dB = descr(B);
+    var html = '<div class="res"><span class="res-name">' + A[0] + '</span><span class="res-val">⌀ ' + dA.d + '</span><span class="res-calc">volume ≈ ' + dA.v + '</span></div>' +
+      '<div class="res"><span class="res-name">' + B[0] + '</span><span class="res-val">⌀ ' + dB.d + '</span><span class="res-calc">volume ≈ ' + dB.v + '</span></div>';
+    if (cmp.a === cmp.b) { out.innerHTML = html + '<div class="verdict info">C\'est le même objet !<span>Choisis deux objets différents.</span></div>'; return; }
+    var small = A[1] <= B[1] ? A : B, big = small === A ? B : A, k = big[1] / small[1], k3 = k * k * k;
+    html += '<div class="res"><span class="res-name">Rapport des diamètres k</span><span class="res-val">≈ ' + nombre(k) + '</span><span class="res-calc">' + big[0] + ' : ' + nombre(big[1] * 100) + ' cm ÷ ' + nombre(small[1] * 100) + ' cm</span></div>' +
+      '<div class="res total"><span class="res-name">Rapport des volumes k³</span><span class="res-val">≈ ' + nombre(k3 >= 100 ? Math.round(k3) : k3) + '</span><span class="res-calc">(' + nombre(k) + ')³</span></div>' +
+      '<div class="verdict yes">Il faudrait environ ' + nombre(k3 >= 100 ? Math.round(k3) : Math.round(k3 * 10) / 10) + ' ' + small[2] + ' pour avoir le volume ' + big[3] + '.<span>' + (small === B ? 'Tu as choisi le grand en premier : la page les a remis dans l\'ordre. ' : '') + 'Le diamètre n\'est que ' + nombre(k) + ' fois plus grand, mais le volume est ' + nombre(k3 >= 100 ? Math.round(k3) : k3) + ' fois plus grand.</span></div>';
+    out.innerHTML = html;
+  }
+  cmpRun();
+
+  /* ---------- Quiz ---------- */
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  function rnd(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+  var makers = [
+    function () { var D = rnd(3, 40); return { q: 'Une boule a un diamètre de ' + D + ' cm. Quel est son rayon (en cm) ?', a: D / 2, show: fmt(D / 2), how: D + ' ÷ 2 = ' + fmt(D / 2) + ' cm' }; },
+    function () { var r = rnd(1, 10), A = api.aire(r); return { q: 'Aire d\'une sphère de rayon ' + r + ' cm, arrondie à l\'unité (en cm²) ?', a: A, tol: 0.51, show: fmt(Math.round(A)), how: '4 × π × ' + r + '² = ' + (4 * r * r) + 'π ≈ ' + fmt(A, 2) + ' cm²' }; },
+    function () { var r = rnd(1, 6), V = api.volume(r); return { q: 'Volume d\'une boule de rayon ' + r + ' cm, arrondi à l\'unité (en cm³) ?', a: V, tol: 0.51, show: fmt(Math.round(V)), how: '4/3 × π × ' + r + '³ = 4/3 × π × ' + (r * r * r) + ' ≈ ' + fmt(V, 2) + ' cm³' }; },
+    function () { var k = pick([2, 3, 4, 5, 10]); return { q: 'On multiplie le rayon d\'une boule par ' + k + '. Par combien son volume est-il multiplié ?', a: k * k * k, show: fmt(k * k * k), how: k + '³ = ' + k + ' × ' + k + ' × ' + k + ' = ' + fmt(k * k * k) }; },
+    function () { var k = pick([2, 3, 4, 5, 10]); return { q: 'On multiplie le diamètre d\'une sphère par ' + k + '. Par combien son aire est-elle multipliée ?', a: k * k, show: fmt(k * k), how: 'le rayon est aussi multiplié par ' + k + ', donc l\'aire par ' + k + '² = ' + (k * k) }; },
+    function () { var t = pick([[5, 3, 4], [5, 4, 3], [10, 6, 8], [10, 8, 6], [13, 5, 12], [13, 12, 5], [17, 8, 15], [15, 9, 12], [25, 7, 24]]); return { q: 'Une sphère de rayon ' + t[0] + ' cm est coupée par un plan à ' + t[1] + ' cm du centre. Rayon de la section (en cm) ?', a: t[2], show: fmt(t[2]), how: 'ρ² = ' + t[0] + '² − ' + t[1] + '² = ' + (t[0] * t[0]) + ' − ' + (t[1] * t[1]) + ' = ' + (t[2] * t[2]) + ', donc ρ = ' + t[2] + ' cm' }; },
+    function () {
+      if (Math.random() < 0.5) { var v = pick([500, 750, 1500, 2000, 4200, 12000, 250]); return { q: 'Une boule a un volume de ' + fmt(v) + ' cm³. Combien de litres est-ce ?', a: v / 1000, show: fmt(v / 1000), how: '1 L = 1 000 cm³, donc ' + fmt(v) + ' ÷ 1 000 = ' + fmt(v / 1000) + ' L' }; }
+      var w = pick([0.5, 1.2, 2, 3.5, 0.25]); return { q: 'Une cuve sphérique a un volume de ' + fmt(w) + ' m³. Combien de litres est-ce ?', a: w * 1000, show: fmt(w * 1000), how: '1 m³ = 1 000 L, donc ' + fmt(w) + ' × 1 000 = ' + fmt(w * 1000) + ' L' };
+    },
+    function () { var V = 3 * rnd(10, 200); return { q: 'Une boule tient exactement dans un cylindre (même rayon, hauteur = diamètre) de volume ' + V + ' cm³. Volume de la boule (en cm³) ?', a: 2 * V / 3, show: fmt(2 * V / 3), how: 'Archimède : la boule occupe les 2/3 du cylindre, ' + V + ' × 2 ÷ 3 = ' + fmt(2 * V / 3) + ' cm³' }; }
+  ];
+  var quiz = document.getElementById('quiz'), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ''; done = [];
+    for (var k = 0; k < 8; k++) {
+      var Q = makers[k](), li = document.createElement('li');
+      li.innerHTML = '<span>' + Q.q + '</span><input type="text" id="qa' + k + '" inputmode="decimal" autocomplete="off" aria-label="Ta réponse à la question ' + (k + 1) + '"><button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+      quiz.appendChild(li);
+      (function (k, Q) {
+        function check() {
+          var fb = document.getElementById('qf' + k), x = num(document.getElementById('qa' + k).value);
+          if (isNaN(x)) { fb.className = 'fb'; fb.textContent = 'Écris un nombre.'; return; }
+          if (Math.abs(x - Q.a) < (Q.tol || 0.006)) { fb.className = 'fb ok'; fb.textContent = 'Bravo, c\'est juste !'; done[k] = true; }
+          else { done[k] = false; fb.className = 'fb no'; fb.innerHTML = 'Pas tout à fait : la réponse est ' + Q.show + '.<span>' + Q.how + '</span>'; }
+          document.getElementById('score').textContent = done.filter(Boolean).length + ' / 8';
+        }
+        document.getElementById('qb' + k).addEventListener('click', check);
+        document.getElementById('qa' + k).addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+      })(k, Q);
+    }
+    document.getElementById('score').textContent = '0 / 8';
+  }
+  document.getElementById('newQuiz').addEventListener('click', newQuiz);
+  newQuiz();
+})();
+</script>
+</body>
+</html>

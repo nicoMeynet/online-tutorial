@@ -39,6 +39,18 @@ Chaque tutoriel est une seule page HTML, sans installation. Il suffit de l'ouvri
 | [L'algorithmique](l-algorithmique.html) | Un robot à programmer avec des blocs, boucles et polygones, conditions et nombre mystère (dichotomie), variables, somme de Gauss, un quiz. |
 | [Le nombre d'or](le-nombre-d-or.html) | Fibonacci, le rapport qui tend vers φ, le rectangle et la spirale d'or, le tournesol, le pentagone, mythes et réalités, un quiz. |
 | [Les grands nombres et l'infini](les-grands-nombres-et-l-infini.html) | Compter très loin, la croissance exponentielle, l'hôtel de Hilbert, autant de pairs que d'entiers, Cantor, les sommes infinies, un quiz. |
+| [La sphère et la boule](la-sphere-et-la-boule.html) | Aire 4πr² et volume, Archimède et le cylindre, l'effet du rayon, les sections, la Terre (parallèles et méridiens), un quiz. |
+| [Les droites remarquables du triangle](les-droites-remarquables.html) | Médiatrices, hauteurs, médianes, bissectrices, leurs points de concours et cercles sur un triangle à déformer, la droite d'Euler, un quiz. |
+| [Les quadrilatères](les-quadrilateres.html) | La famille des quadrilatères, les propriétés du parallélogramme, du rectangle, du losange et du carré, un quadrilatère à déformer qui se reconnaît, un quiz. |
+| [La démonstration](la-demonstration.html) | Pourquoi des exemples ne suffisent pas, si… alors, réciproque, contre-exemple, la structure d'une preuve, des preuves avec des lettres, un quiz. |
+| [L'équation produit nul et les systèmes](l-equation-produit-nul-et-les-systemes.html) | A × B = 0, x² = a, factoriser pour résoudre, les systèmes (substitution, combinaison) et leur lecture graphique, un quiz. |
+| [Les arrondis et les ordres de grandeur](les-arrondis-et-ordres-de-grandeur.html) | Troncature et arrondi, valeurs approchées et encadrements, chiffres significatifs, estimer un calcul, les pièges des arrondis, un quiz. |
+| [Les grandeurs composées](les-grandeurs-composees.html) | Débit, masse volumique, énergie en kWh, consommation, densité de population, prix unitaire et conversions, un quiz. |
+| [Le second degré](le-second-degre.html) | Avant-goût du lycée : la parabole et ses curseurs, la forme canonique, le discriminant et les solutions de ax² + bx + c = 0, un quiz. |
+| [Les vecteurs](les-vecteurs.html) | Avant-goût du lycée : déplacement, égalité, coordonnées, relation de Chasles, multiplication par un nombre, norme, l'avion dans le vent, un quiz. |
+| [Les suites](les-suites.html) | Avant-goût du lycée : suites arithmétiques et géométriques, croissance linéaire contre exponentielle, limites, la conjecture de Syracuse, un quiz. |
+| [La dérivée](la-derivee.html) | Avant-goût du lycée : de la vitesse moyenne à la vitesse instantanée, de la sécante à la tangente, le sens de variation, un quiz. |
+| [Les nombres complexes](les-nombres-complexes.html) | Avant-goût du lycée : i² = −1, le plan complexe, addition et rotation, module, résoudre x² + 1 = 0, Mandelbrot, un quiz. |
 
 ## Ajouter un tutoriel
 
