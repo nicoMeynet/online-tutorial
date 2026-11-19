@@ -22,6 +22,7 @@ Chaque tutoriel est une seule page HTML, sans installation. Il suffit de l'ouvri
 | [La proportionnalité](la-proportionnalite.html) | Le coefficient de proportionnalité, un détecteur avec tableau et graphique, la quatrième proportionnelle (coefficient, passage à l'unité, produit en croix), une recette à adapter, les échelles, les pièges et un quiz. |
 | [Les puissances](les-puissances.html) | aⁿ, les puissances de 10 et le zoom de l'atome à l'univers, la notation scientifique dans les deux sens, les règles de calcul, la légende de l'échiquier, un quiz. |
 | [Le calcul littéral](le-calcul-litteral.html) | Substituer, réduire avec des tuiles, développer (simple et double distributivité), les identités remarquables, factoriser, prouver avec des lettres, un quiz. |
+| [Les identités remarquables](les-identites-remarquables.html) | (a + b)², (a − b)² et (a + b)(a − b) : la preuve avec des carrés, le piège a² + b², développer pas à pas, le calcul mental (99², 102 × 98), factoriser, (a + b)³ et le triangle de Pascal, un quiz. |
 | [Les fonctions](les-fonctions.html) | La machine à nombres, image et antécédent, tableau de valeurs et courbe, fonctions linéaires et affines, comparer deux forfaits, un quiz. |
 | [Les statistiques](les-statistiques.html) | Effectifs et fréquences, moyenne, médiane, étendue, moyenne pondérée, valeurs extrêmes, graphiques et graphiques trompeurs, un quiz. |
 | [Les probabilités](les-probabilites.html) | Vocabulaire, l'urne, la loi des grands nombres simulée, deux épreuves (arbre, somme de deux dés), les pièges, le Loto, un quiz. |

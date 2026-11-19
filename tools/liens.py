@@ -20,6 +20,8 @@ TOPICS = [
     ("Pythagore", "le-theoreme-de-pythagore.html"),
     ("le théorème de Thalès", "le-theoreme-de-thales.html"),
     ("Thalès", "le-theoreme-de-thales.html"),
+    ("les identités remarquables", "les-identites-remarquables.html"),
+    ("le calcul littéral", "le-calcul-litteral.html"),
     ("les ensembles de nombres", "les-ensembles-de-nombres.html"),
     ("les priorités de calcul", "les-priorites-de-calcul.html"),
     ("les nombres relatifs", "les-nombres-relatifs.html"),
@@ -86,7 +88,9 @@ def linkify(text, self_name):
 def process(path, order):
     src = path.read_text(encoding="utf-8")
     src = re.sub(r'<style id="tnav-css">.*?</style>\n', "", src, flags=re.S)
-    src = re.sub(r"<!--tnav-->.*?<!--/tnav-->\n?", "", src, flags=re.S)
+    # exact inverse of the insertions below, so reruns don't add blank lines
+    src = re.sub(r'\n<!--tnav--><nav class="tnav-top".*?<!--/tnav-->\n', "", src, flags=re.S)
+    src = re.sub(r'<!--tnav--><nav class="tnav-bottom".*?<!--/tnav-->\n', "", src, flags=re.S)
     assert src.count('<main class="page">') == 1 and src.count("</main>") == 1, path.name
 
     cut = src.rfind("<script>")
