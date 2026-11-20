@@ -41,14 +41,28 @@ TRACKS = [
         "les-transformations-chimiques", "les-acides-et-les-bases", "les-forces", "le-poids-et-la-masse", "la-gravitation",
         "les-formes-d-energie", "l-energie-cinetique-et-la-securite-routiere", "la-loi-d-ohm",
         "la-puissance-et-l-energie-electrique", "les-signaux-et-la-communication", "revisions-brevet-physique"]),
-    ("securite", "numerique", "Se protéger en ligne", "secondaire I", "Repérer les arnaques et garder ses comptes en sécurité.", [
-        "reperer-les-arnaques", "les-mots-de-passe"]),
+    ("securite", "numerique", "Se protéger en ligne", "9H–10H", "Comprendre la manipulation, repérer les arnaques, protéger ses comptes, ses appareils et sa vie privée.", [
+        "comment-on-te-manipule", "reperer-les-arnaques", "les-mots-de-passe", "les-virus-et-les-mises-a-jour",
+        "naviguer-en-securite", "les-donnees-personnelles", "le-cyberharcelement"]),
+    ("sinformer", "numerique", "S'informer à l'ère de l'IA", "9H–11H", "Vraies et fausses infos, images truquées, réseaux sociaux et intelligence artificielle.", [
+        "vraie-ou-fausse-info", "les-images-truquees-et-les-deepfakes", "les-reseaux-sociaux-et-les-algorithmes",
+        "bien-utiliser-l-ia", "comment-une-ia-ecrit"]),
+    ("machines", "numerique", "Comprendre les machines", "9H–10H", "Internet, les octets, les images et la programmation.", [
+        "comment-marche-internet", "les-octets-et-le-stockage", "les-pixels-et-la-compression", "programmer-pas-a-pas"]),
+    ("ecrans", "numerique", "Bien vivre avec les écrans", "9H", "Ton temps, ton attention et ton argent dans les jeux.", [
+        "le-temps-d-ecran-et-l-attention", "les-achats-dans-les-jeux"]),
     ("pcurio", "physique", "Physique et curiosités", "tous niveaux", "La physique du ciel, du sport et du climat.", [
         "le-ciel-bleu-et-l-arc-en-ciel", "la-physique-du-sport", "le-climat-et-l-effet-de-serre"]),
 ]
 
 # Ce qu'il vaut mieux connaître avant (seulement les liens importants).
 PRE = {
+    "naviguer-en-securite": ["reperer-les-arnaques"],
+    "les-images-truquees-et-les-deepfakes": ["vraie-ou-fausse-info"],
+    "comment-une-ia-ecrit": ["bien-utiliser-l-ia"],
+    "les-pixels-et-la-compression": ["les-octets-et-le-stockage"],
+    "comment-marche-internet": ["les-octets-et-le-stockage"],
+    "vraie-ou-fausse-info": ["comment-on-te-manipule"],
     "les-fractions": ["les-priorites-de-calcul"],
     "la-proportionnalite": ["les-fractions"],
     "les-pourcentages": ["la-proportionnalite", "les-fractions"],

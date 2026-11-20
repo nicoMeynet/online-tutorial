@@ -1,0 +1,1140 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Le temps d'écran et l'attention</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, marge rouge. Accent émeraude (#059669), avec ambre, orange, rouge et bleu pour les activités et les pièges. Toutes les applis, personnes et jeux des exemples sont inventés. Rien de ce qui est tapé ou réglé n'est envoyé ni enregistré. */
+:root {
+  --paper: #f5faf7;
+  --grid: #dcede4;
+  --card: #ffffff;
+  --ink: #12291f;
+  --ink-soft: #4d6a5d;
+  --acc: #059669;
+  --acc-soft: #d1f5e4;
+  --warn: #d97706;
+  --warn-soft: #fdf0d6;
+  --warn-ink: #92400e;
+  --org: #ea580c;
+  --org-soft: #fde4d4;
+  --blue: #2563eb;
+  --blue-soft: #dce7fd;
+  --vio: #7c3aed;
+  --vio-soft: #ece3fd;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #fff0a3;
+  --line: #d1e4da;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0c1712; --grid: #15251d; --card: #11201a; --ink: #e6f4ec; --ink-soft: #a1bdb0;
+    --acc: #34d399; --acc-soft: #0f3527; --warn: #f5a524; --warn-soft: #3d2a0c; --warn-ink: #fbbf5a;
+    --org: #fb923c; --org-soft: #3d2210; --blue: #7aa7ff; --blue-soft: #16264a; --vio: #b794ff; --vio-soft: #2a1d48;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #29403a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0c1712; --grid: #15251d; --card: #11201a; --ink: #e6f4ec; --ink-soft: #a1bdb0;
+  --acc: #34d399; --acc-soft: #0f3527; --warn: #f5a524; --warn-soft: #3d2a0c; --warn-ink: #fbbf5a;
+  --org: #fb923c; --org-soft: #3d2210; --blue: #7aa7ff; --blue-soft: #16264a; --vio: #b794ff; --vio-soft: #2a1d48;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #29403a;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--acc); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note.warn { border-left-color: var(--warn); background: var(--warn-soft); }
+.note.ok { border-left-color: var(--ok); background: var(--ok-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+.fig svg { width: 100%; height: auto; display: block; }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 8px 12px; min-height: 44px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+button:disabled { opacity: .5; cursor: default; transform: none; }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+input[type="text"] { font: inherit; font-size: 1rem; padding: 8px 10px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; }
+input[type="range"] { width: 100%; accent-color: var(--acc); min-height: 32px; }
+select { font: inherit; font-size: 1rem; padding: 8px 8px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; min-height: 44px; }
+.param { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.param label { font-weight: 700; display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.param label output { font-family: var(--f-mono); font-weight: 600; color: var(--acc); }
+.params { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px 18px; }
+.privacy { font-size: .9rem; color: var(--ok); font-weight: 700; display: flex; gap: 6px; align-items: flex-start; }
+.privacy::before { content: "🔒"; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
+.tag.ok { color: var(--ok); }
+.tag.no { color: var(--red); }
+.tag.warn { color: var(--warn-ink); }
+.tag.acc { color: var(--acc); }
+
+.verdict { border-radius: 8px; padding: 12px 14px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+.verdict.yes { background: var(--ok-soft); color: var(--ok); }
+.verdict.no { background: var(--red-soft); color: var(--red); }
+.verdict.mid { background: var(--warn-soft); color: var(--warn-ink); }
+.verdict span { font-weight: 400; color: var(--ink); }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.stat { background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 10px; min-width: 0; }
+.stat b { display: block; font-family: var(--f-mono); font-size: 1.05rem; overflow-wrap: anywhere; }
+.stat small { color: var(--ink-soft); font-size: .85rem; }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-family: var(--f-mono); font-size: .82rem; border: 1.5px solid var(--line); border-radius: 999px; padding: 2px 10px; color: var(--ink-soft); display: inline-flex; align-items: center; gap: 6px; }
+.chip i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+
+/* Calculateur */
+.rows { display: flex; flex-direction: column; gap: 10px; }
+.row { display: grid; grid-template-columns: minmax(0, 190px) minmax(0, 1fr); gap: 4px 12px; align-items: center; }
+.row .lab { font-weight: 700; font-size: .95rem; }
+.row .bar { height: 18px; border-radius: 4px; background: var(--acc); min-width: 2px; transition: width .25s; }
+.row .val { grid-column: 2; font-family: var(--f-mono); font-size: .85rem; color: var(--ink-soft); overflow-wrap: anywhere; }
+@media (max-width: 520px) { .row { grid-template-columns: minmax(0, 1fr); } .row .val { grid-column: 1; } }
+.stack { display: flex; height: 22px; border-radius: 6px; overflow: hidden; border: 1.5px solid var(--line); background: var(--paper); }
+.stack span { display: block; height: 100%; transition: width .25s; }
+
+/* Fausse appli */
+.trap-grid { display: grid; grid-template-columns: minmax(0, 290px) minmax(0, 1fr); gap: 18px; align-items: start; }
+@media (max-width: 640px) { .trap-grid { grid-template-columns: minmax(0, 1fr); } }
+.phone { border: 2.5px solid var(--ink); border-radius: 26px; padding: 14px 10px 16px; background: var(--paper); display: flex; flex-direction: column; gap: 8px; max-width: 300px; width: 100%; margin: 0 auto; min-width: 0; }
+.phone .notch { width: 60px; height: 6px; border-radius: 3px; background: var(--line); align-self: center; }
+.phone .appbar { display: flex; justify-content: space-between; align-items: center; gap: 6px; font-family: var(--f-display); font-weight: 800; }
+.post { background: var(--card); border: 1.5px solid var(--line); border-radius: 12px; padding: 8px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.post .pic { height: 92px; border-radius: 8px; background: linear-gradient(135deg, var(--acc-soft), var(--blue-soft)); display: grid; place-items: center; font-size: 2rem; }
+.hot { font-family: var(--f-body); font-weight: 700; font-size: .9rem; min-height: 40px; padding: 6px 10px; border: 2px dashed var(--acc); border-radius: 10px; background: var(--card); box-shadow: none; text-align: left; overflow-wrap: anywhere; }
+.hot:hover { box-shadow: none; transform: none; background: var(--acc-soft); }
+.hot.seen { border-style: solid; }
+.hot.off { opacity: .45; text-decoration: line-through; border-color: var(--line); }
+.hot.sel { outline: 3px solid var(--warn); outline-offset: 2px; }
+.badge { background: var(--red); color: #fff; border-radius: 999px; padding: 0 7px; font-size: .8rem; font-family: var(--f-mono); }
+.hot.off .badge { background: var(--line); color: var(--ink-soft); }
+.trap-panel { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.trap-panel .what { display: flex; flex-direction: column; gap: 6px; }
+
+/* Récompense au hasard */
+.feeds { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+.feed { border: 1.5px solid var(--line); border-radius: 10px; padding: 10px 12px; background: var(--paper); display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.cells { display: flex; flex-wrap: wrap; gap: 3px; min-height: 22px; }
+.cells i { width: 18px; height: 18px; border-radius: 4px; background: var(--line); display: grid; place-items: center; font-style: normal; font-size: .7rem; color: #fff; }
+.cells i.win { background: var(--warn); }
+.cells i.last { outline: 2px solid var(--ink); outline-offset: 1px; }
+
+/* Jeu d'attention */
+.stage { position: relative; border: 2px solid var(--ink); border-radius: 12px; background: var(--paper); min-height: 270px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; overflow: hidden; padding: 12px; }
+.stage .sym { font-size: 4.5rem; line-height: 1; height: 80px; color: var(--ink); font-family: "Segoe UI Symbol", var(--f-body); }
+.stage .sym.star { color: var(--warn); }
+.stage .cnt { font-family: var(--f-mono); font-size: .85rem; color: var(--ink-soft); }
+.toast { position: absolute; left: 10px; right: 10px; top: 10px; background: var(--card); border: 1.5px solid var(--ink); border-radius: 12px; padding: 6px 10px; font-size: .9rem; box-shadow: 3px 3px 0 var(--ink); display: flex; gap: 8px; align-items: center; animation: drop .25s ease-out; overflow-wrap: anywhere; }
+.toast b { font-family: var(--f-display); }
+.toast.bot { top: auto; bottom: 10px; }
+@keyframes drop { from { transform: translateY(-14px); opacity: 0; } to { transform: none; opacity: 1; } }
+.stepper { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.stepper output { font-family: var(--f-mono); font-size: 1.6rem; font-weight: 600; min-width: 2.5ch; text-align: center; }
+.stepper button { min-width: 48px; font-size: 1.3rem; }
+
+/* Sommeil */
+.tl { position: relative; height: 34px; border-radius: 6px; border: 1.5px solid var(--line); background: var(--paper); overflow: hidden; }
+.tl span { position: absolute; top: 0; bottom: 0; transition: left .2s, width .2s; }
+.tl .s-ecran { background: var(--blue); }
+.tl .s-calme { background: var(--warn); }
+.tl .s-dodo { background: var(--vio); }
+.tl-axis { display: flex; justify-content: space-between; font-family: var(--f-mono); font-size: .75rem; color: var(--ink-soft); }
+.chk { display: flex; gap: 10px; align-items: flex-start; cursor: pointer; min-height: 40px; }
+.chk input { width: 22px; height: 22px; margin-top: 3px; accent-color: var(--acc); flex: none; }
+
+/* Scénarios */
+.scen { display: flex; flex-direction: column; gap: 10px; }
+.scen .btns button { text-align: left; flex: 1 1 200px; font-family: var(--f-body); }
+
+/* Plan perso */
+.rules { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 8px; }
+.rules li { border: 1.5px solid var(--line); border-radius: 10px; padding: 6px 10px; background: var(--card); min-width: 0; }
+.plan-card { border: 3px solid var(--acc); border-radius: 14px; padding: 18px 20px; background: var(--card); display: flex; flex-direction: column; gap: 8px; }
+.plan-card h3 { color: var(--acc); }
+.plan-card ol { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 4px; overflow-wrap: anywhere; }
+.plan-card .sign { border-top: 1.5px dashed var(--line); padding-top: 8px; font-size: .9rem; color: var(--ink-soft); }
+.idea { font-family: var(--f-display); font-weight: 700; font-size: 1.25rem; color: var(--acc); background: var(--paper); border: 2px dashed var(--acc); border-radius: 10px; padding: 12px; text-align: center; }
+html.print-plan body * { visibility: hidden; }
+html.print-plan #planCard, html.print-plan #planCard * { visibility: visible; }
+@media print { html.print-plan #planCard { position: absolute; left: 0; top: 0; width: 100%; } }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 220px auto; gap: 10px; align-items: center; }
+.quiz li > span:first-child { min-width: 0; overflow-wrap: anywhere; }
+.quiz select { font-size: .95rem; padding: 6px 6px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb:empty { display: none; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 140px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+details ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+<!--ticons--><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Tutoriels"><script src="progress.js" defer></script><!--/ticons-->
+<style id="tnav-css">
+.tnav-top { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin: 0 0 4px; }
+.tnav-home { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font-weight: 700; font-size: .95rem; text-decoration: none; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tnav-home:hover, .tnav-home:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.tnav-bottom { margin-top: 8px; display: flex; flex-direction: column; gap: 12px; }
+.tnav-bottom h2 { margin: 0; }
+.tnav-pn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tnav-pn a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--ink, #222); border-radius: 10px;
+  background: var(--card, #fff); color: var(--ink, #222); text-decoration: none; box-shadow: 3px 3px 0 var(--ink, #222); min-width: 0; }
+.tnav-pn a span { font-size: .85rem; color: var(--ink-soft, #666); }
+.tnav-pn a strong { overflow-wrap: anywhere; }
+.tnav-pn a.next { text-align: right; grid-column: 2; }
+.tnav-bottom .tnav-home { align-self: center; }
+@media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
+.diff { font: 700 .72rem/1.2 var(--f-mono, monospace); padding: 2px 8px; border-radius: 99px; border: 1.5px solid; white-space: nowrap; }
+.diff.d1 { color: #15803d; border-color: #15803d; background: #dcf3e3; }
+.diff.d2 { color: #a15c07; border-color: #b45309; background: #fbe7cf; }
+.diff.d3 { color: #b91c1c; border-color: #b91c1c; background: #fde2e2; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root:not([data-theme="light"]) .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root:not([data-theme="light"]) .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; } }
+:root[data-theme="dark"] .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root[data-theme="dark"] .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root[data-theme="dark"] .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; }
+</style>
+</head>
+<body>
+<main class="page">
+<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="numerique.html">← Tous les tutoriels numériques</a><span class="diff d1" title="Difficulté : facile">Facile</span></nav><!--/tnav-->
+
+
+  <header class="hero">
+    <span class="eyebrow">Tutoriel numérique · niveau 9H</span>
+    <h1>Le temps d'écran et l'attention</h1>
+    <p class="lead">Les écrans, c'est génial : on y joue, on apprend, on rigole avec ses amis. Mais certaines applis sont fabriquées pour que tu <strong>ne t'arrêtes jamais</strong>. Ici, tu vas compter ton temps, démasquer les astuces qui te retiennent et construire tes propres règles. Le but n'est pas d'arrêter les écrans : c'est de <strong>choisir</strong> plutôt que d'être tiré·e.</p>
+    <div class="box fig">
+      <svg viewBox="0 0 360 180" role="img" aria-label="Un téléphone avec un fil de vidéos sans fin et une cloche de notification, à côté d'une main qui appuie sur un grand bouton pause">
+        <rect x="40" y="12" width="96" height="160" rx="16" fill="var(--card)" stroke="var(--ink)" stroke-width="3"/>
+        <rect x="74" y="20" width="28" height="5" rx="2.5" fill="var(--line)"/>
+        <rect x="52" y="34" width="72" height="36" rx="6" fill="var(--acc-soft)" stroke="var(--acc)" stroke-width="2"/>
+        <rect x="52" y="78" width="72" height="36" rx="6" fill="var(--acc-soft)" stroke="var(--acc)" stroke-width="2"/>
+        <rect x="52" y="122" width="72" height="36" rx="6" fill="var(--acc-soft)" stroke="var(--acc)" stroke-width="2" stroke-dasharray="4 3"/>
+        <path d="M88 162 v6 m-5 -4 l5 5 l5 -5" stroke="var(--ink-soft)" stroke-width="2" fill="none"/>
+        <g transform="translate(140 22)">
+          <path d="M0 18 a10 10 0 0 1 20 0 v8 l4 5 h-28 l4 -5 z" fill="var(--warn-soft)" stroke="var(--warn)" stroke-width="2.5"/>
+          <circle cx="22" cy="6" r="8" fill="var(--red)"/>
+          <text x="22" y="10" font-size="10" text-anchor="middle" style="fill:#fff">9</text>
+        </g>
+        <circle cx="270" cy="90" r="56" fill="var(--acc-soft)" stroke="var(--acc)" stroke-width="4"/>
+        <rect x="252" y="66" width="12" height="48" rx="3" fill="var(--acc)"/>
+        <rect x="276" y="66" width="12" height="48" rx="3" fill="var(--acc)"/>
+        <text x="270" y="170" font-size="13" text-anchor="middle">c'est toi qui choisis</text>
+        <path d="M150 100 q40 -30 64 -10" stroke="var(--ink-soft)" stroke-width="2" fill="none" stroke-dasharray="5 4"/>
+        <path d="M210 84 l6 7 l-9 3" stroke="var(--ink-soft)" stroke-width="2" fill="none"/>
+      </svg>
+    </div>
+    <p class="soft">Toutes les applis, personnes et jeux de cette page sont <strong>inventés</strong>. Tout ce que tu règles ou tapes reste dans ta page : <strong>rien n'est envoyé ni enregistré</strong>.</p>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · Pas pour ou contre</span>
+    <h2>Les écrans ne sont pas des méchants</h2>
+    <p>Un écran, c'est un outil. Comme un vélo : super pour aller loin, moins super si on ne peut plus en descendre. La question n'est donc pas « écran : oui ou non ? », mais <span class="hl">« est-ce que c'est moi qui ai décidé ? »</span></p>
+    <div class="cards">
+      <div class="box"><span class="tag ok">Créer</span><strong>Faire des choses</strong><span class="soft">Monter une vidéo, composer de la musique, programmer un petit jeu, dessiner.</span></div>
+      <div class="box"><span class="tag ok">Apprendre</span><strong>Comprendre le monde</strong><span class="soft">Un tuto pour réparer son vélo, une vidéo de sciences, une langue étrangère.</span></div>
+      <div class="box"><span class="tag ok">Se parler</span><strong>Garder le contact</strong><span class="soft">Avec un copain qui a déménagé, avec ta grand-mère, avec ton équipe.</span></div>
+      <div class="box"><span class="tag ok">Jouer</span><strong>Se détendre</strong><span class="soft">Une partie entre amis après une longue journée, c'est du vrai plaisir.</span></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Deux façons d'utiliser un écran</span>
+      <span>• <strong>Choisir</strong> : « Je regarde l'épisode de ma série, puis je vais au foot. » Tu sais ce que tu fais et quand tu t'arrêtes.</span>
+      <span>• <strong>Être tiré·e</strong> : « Je voulais juste regarder l'heure… et 40 minutes ont passé. » Ce n'est pas un défaut de ta part : c'est souvent l'appli qui est fabriquée pour ça. On va voir comment.</span>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · Calculateur</span>
+    <h2>Mon temps d'écran, en vrai</h2>
+    <p>Règle les curseurs pour un <strong>jour d'école habituel</strong>. Sois honnête : personne ne voit tes réponses. Beaucoup de téléphones ont aussi un écran « temps d'écran » dans les réglages, pour comparer avec la réalité.</p>
+    <div class="box">
+      <div class="params" id="calcSliders"></div>
+      <span class="privacy">Rien n'est envoyé ni enregistré : le calcul se fait dans ta page.</span>
+      <div class="stats">
+        <div class="stat"><small>Par jour d'école</small><b id="cDay">—</b></div>
+        <div class="stat"><small>Par semaine</small><b id="cWeek">—</b></div>
+        <div class="stat"><small>Par année</small><b id="cYear">—</b></div>
+        <div class="stat"><small>En jours entiers (24 h)</small><b id="cDays">—</b></div>
+      </div>
+      <div class="stack" id="cStack" aria-hidden="true"></div>
+      <div class="chips" id="cLegend"></div>
+      <h3>Comparé au reste de ta journée</h3>
+      <div class="param"><label for="cSport">Sport, dehors, jeux sans écran <output id="cSportV"></output></label><input type="range" id="cSport" min="0" max="240" step="15" value="60"></div>
+      <div class="rows" id="cRows"></div>
+      <p id="cMsg"></p>
+      <p class="soft">Les valeurs de comparaison sont des <strong>ordres de grandeur</strong> : à ton âge, les spécialistes conseillent souvent de dormir <strong>environ 9 h et plus</strong> par nuit, et un jour d'école dure environ 6 h selon les horaires.</p>
+    </div>
+    <div class="note warn">
+      <span class="note-title">Toutes les minutes ne se valent pas</span>
+      <span>Une heure à créer une vidéo avec tes amis et une heure à faire défiler sans savoir pourquoi, ce n'est pas pareil. Il n'y a pas de « bon chiffre » magique. Les vraies questions : <strong>est-ce que j'ai choisi ce temps ?</strong> Est-ce qu'il reste assez de place pour dormir, bouger, voir des gens, et parfois… ne rien faire ?</span>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · L'économie de l'attention</span>
+    <h2>Si c'est gratuit, qu'est-ce qu'on paie ?</h2>
+    <p>Beaucoup d'applis sont gratuites. Pourtant, elles coûtent cher à fabriquer. Comment gagnent-elles de l'argent ? Souvent avec la <strong>publicité</strong> : plus tu restes longtemps, plus elles peuvent te montrer de pubs, et plus elles en apprennent sur tes goûts. Ton <strong>temps</strong> et ton <strong>attention</strong> ont donc de la valeur. On appelle ça <strong>l'économie de l'attention</strong>.</p>
+    <div class="box fig">
+      <svg viewBox="0 0 520 170" role="img" aria-label="Un cycle : plus tu restes, plus l'appli montre de publicités, plus elle gagne d'argent, plus elle invente d'astuces pour que tu restes">
+        <g font-size="13">
+          <rect x="10" y="20" width="140" height="50" rx="10" fill="var(--acc-soft)" stroke="var(--acc)" stroke-width="2"/>
+          <text x="80" y="42" text-anchor="middle">tu restes</text><text x="80" y="60" text-anchor="middle">plus longtemps</text>
+          <rect x="190" y="20" width="140" height="50" rx="10" fill="var(--warn-soft)" stroke="var(--warn)" stroke-width="2"/>
+          <text x="260" y="42" text-anchor="middle">plus de pubs</text><text x="260" y="60" text-anchor="middle">montrées</text>
+          <rect x="370" y="20" width="140" height="50" rx="10" fill="var(--blue-soft)" stroke="var(--blue)" stroke-width="2"/>
+          <text x="440" y="42" text-anchor="middle">l'appli gagne</text><text x="440" y="60" text-anchor="middle">plus d'argent</text>
+          <rect x="190" y="110" width="140" height="50" rx="10" fill="var(--red-soft)" stroke="var(--red)" stroke-width="2"/>
+          <text x="260" y="132" text-anchor="middle">nouvelles astuces</text><text x="260" y="150" text-anchor="middle">pour te retenir</text>
+        </g>
+        <g stroke="var(--ink-soft)" stroke-width="2" fill="none">
+          <path d="M150 45 h34 m-7 -6 l7 6 l-7 6"/>
+          <path d="M330 45 h34 m-7 -6 l7 6 l-7 6"/>
+          <path d="M440 70 v65 h-104 m7 -6 l-7 6 l7 6"/>
+          <path d="M190 135 h-110 v-59 m-6 7 l6 -7 l6 7"/>
+        </g>
+      </svg>
+    </div>
+    <p>Ce n'est pas illégal, et ces applis ne sont pas « méchantes » : elles font leur métier. Mais <strong>leur but et le tien ne sont pas toujours les mêmes</strong>. Elles veulent que tu restes ; toi, tu veux peut-être aussi finir tes devoirs, dormir et voir tes amis.</p>
+    <div class="note">
+      <span class="note-title">Ton cerveau et les « j'aime »</span>
+      <span>Un like, un cœur, un message qui arrive : ton cerveau aime ça, comme un petit bonbon. À l'adolescence, le cerveau est souvent <strong>encore plus sensible</strong> à ces signes d'approbation des autres. C'est normal, c'est l'âge où le groupe compte beaucoup. Mais ça veut aussi dire que les compteurs de likes ont plus de pouvoir sur toi. Le savoir, c'est déjà reprendre un peu la main. Le tutoriel sur <a class="tlink" href="les-reseaux-sociaux-et-les-algorithmes.html">les réseaux sociaux</a> en parle plus en détail.</span>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · Démasque les pièges</span>
+    <h2>Six astuces cachées dans une appli</h2>
+    <p>Voici <strong>Flikko</strong>, une appli de vidéos inventée. Elle contient six astuces de design faites pour te garder. Touche chaque élément entouré de pointillés pour comprendre le piège, puis <strong>neutralise-le</strong>.</p>
+    <div class="box">
+      <div class="trap-grid">
+        <div class="phone" id="phone">
+          <span class="notch" aria-hidden="true"></span>
+          <div class="appbar"><span>Flikko</span><button type="button" class="hot" data-t="notif">🔔 <span class="badge">12</span></button></div>
+          <button type="button" class="hot" data-t="hasard">↻ Tire vers le bas : peut-être une surprise !</button>
+          <div class="post">
+            <div class="pic" aria-hidden="true">🛹</div>
+            <span class="soft" style="font-size:.85rem">@sam_ride · Saut au skatepark</span>
+            <div class="btns" style="gap:6px">
+              <button type="button" class="hot" data-t="likes">♥ 1 204</button>
+              <button type="button" class="hot" data-t="flamme">🔥 47 jours avec Noa</button>
+            </div>
+          </div>
+          <button type="button" class="hot" data-t="autoplay">▶ Vidéo suivante dans 3…</button>
+          <button type="button" class="hot" data-t="infini">↓ Encore plus de vidéos pour toi…</button>
+        </div>
+        <div class="trap-panel">
+          <div class="stats">
+            <div class="stat"><small>Pièges compris</small><b id="tSeen">0 / 6</b></div>
+            <div class="stat"><small>Pièges neutralisés</small><b id="tOff">0 / 6</b></div>
+          </div>
+          <div class="what" id="tInfo" aria-live="polite"><p class="soft">Touche un élément de l'écran de Flikko pour commencer.</p></div>
+          <div class="btns">
+            <button type="button" id="tToggle" disabled>Neutraliser ce piège</button>
+            <button type="button" id="tReset">Recommencer</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="note ok">
+      <span class="note-title">Dans la vraie vie</span>
+      <span>Certains pièges se coupent dans les réglages (notifications, lecture automatique, parfois les compteurs de likes). D'autres ne se coupent pas (défilement infini, récompenses au hasard) : là, ta meilleure arme, c'est de <strong>décider avant</strong> combien de temps tu restes, et de mettre une alarme.</span>
+    </div>
+    <div class="box">
+      <h3>Le savais-tu ?</h3>
+      <ol class="timeline">
+        <li><span class="when">depuis toujours</span><div class="what"><strong>On a toujours eu peur du nouveau</strong><span>Les romans, puis la radio, puis la télévision ont tous été accusés, à leur époque, d'abîmer la jeunesse. Ça aide à garder la tête froide : un nouveau média n'est pas forcément dangereux.</span></div></li>
+        <li><span class="when">années 1950–1960</span><div class="what"><strong>La télé entre dans les salons</strong><span>Dans beaucoup de familles, on débat déjà du « temps de télé » des enfants. Mais un programme finissait, et l'écran s'arrêtait.</span></div></li>
+        <li><span class="when">années 2000</span><div class="what"><strong>Le défilement infini et le bouton « j'aime »</strong><span>Des pages qui se rechargent toutes seules en bas, puis des petits compteurs d'approbation. Fini le « bas de page » qui disait « tu as tout vu ». On raconte que l'inventeur du défilement infini a dit plus tard qu'il regrettait un peu l'usage qu'on en a fait.</span></div></li>
+        <li><span class="when">aujourd'hui</span><div class="what"><strong>Des outils pour reprendre la main</strong><span>La plupart des téléphones proposent maintenant un compteur de temps d'écran, un mode concentration et un mode nuit. Ils sont là : à toi de t'en servir.</span></div></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Simulation</span>
+    <h2>La récompense au hasard</h2>
+    <p>Pourquoi a-t-on envie de rafraîchir son fil « juste encore une fois » ? Compare deux fils. Dans le fil <strong>A</strong>, une super vidéo arrive <strong>toutes les 5 fois</strong>, pile. Dans le fil <strong>B</strong>, elle arrive <strong>au hasard</strong>, avec une chance sur 5 à chaque fois. En moyenne, c'est la même chose. Mais ça ne se ressent pas du tout pareil.</p>
+    <div class="box">
+      <div class="btns">
+        <button type="button" id="rStep">Rafraîchir une fois (pas à pas)</button>
+        <button type="button" id="rMany">100 rafraîchissements d'un coup</button>
+        <button type="button" id="rReset">Remettre à zéro</button>
+      </div>
+      <div class="feeds">
+        <div class="feed"><strong>Fil A · prévisible</strong><div class="cells" id="rA" aria-label="Résultats du fil A"></div><span class="soft" id="rAs"></span></div>
+        <div class="feed"><strong>Fil B · au hasard</strong><div class="cells" id="rB" aria-label="Résultats du fil B"></div><span class="soft" id="rBs"></span></div>
+      </div>
+      <p class="soft">Carré orange : une super vidéo. Carré gris : une vidéo bof.</p>
+      <p id="rMsg" aria-live="polite"></p>
+    </div>
+    <div class="note">
+      <span class="note-title">Pourquoi le hasard accroche</span>
+      <span>Avec le fil A, juste après une super vidéo, tu sais qu'il ne se passera rien pendant 4 fois : facile de poser le téléphone. Avec le fil B, <strong>la prochaine fois, c'est peut-être la bonne</strong>. Alors on tire, et on retire. C'est exactement le principe des machines à sous, des « coffres surprises » et des cartes à collectionner dans les jeux. Le tutoriel sur <a class="tlink" href="les-achats-dans-les-jeux.html">les achats dans les jeux</a> explique comment ce même mécanisme peut aussi coûter de l'argent.</span>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · Jeu d'attention</span>
+    <h2>Compter les étoiles… avec ou sans notifications</h2>
+    <p>Des symboles vont défiler un par un. <strong>Compte les étoiles pleines ★</strong> (pas les autres, attention au ☆ vide et au ✦). Joue une manche <strong>sans interruption</strong>, puis une manche <strong>avec des notifications</strong> qui surgissent. Tu n'as pas besoin de les toucher : elles sont là pour te distraire.</p>
+    <div class="box">
+      <div class="btns">
+        <button type="button" id="gR1">Manche 1 : sans interruption</button>
+        <button type="button" id="gR2">Manche 2 : avec notifications</button>
+      </div>
+      <div class="stage" id="gStage" aria-live="off">
+        <span class="sym" id="gSym" aria-hidden="true"></span>
+        <span class="cnt" id="gCnt">Choisis une manche pour commencer.</span>
+      </div>
+      <div id="gAnswer" hidden>
+        <p><strong>Combien d'étoiles pleines ★ as-tu comptées ?</strong></p>
+        <div class="stepper">
+          <button type="button" id="gMinus" aria-label="Une de moins">−</button>
+          <output id="gVal">0</output>
+          <button type="button" id="gPlus" aria-label="Une de plus">+</button>
+          <button type="button" id="gOk">Valider</button>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="stat"><small>Manche 1 · sans interruption</small><b id="gS1">pas encore jouée</b></div>
+        <div class="stat"><small>Manche 2 · avec notifications</small><b id="gS2">pas encore jouée</b></div>
+      </div>
+      <p id="gMsg" aria-live="polite"></p>
+      <span class="privacy">Tes résultats restent dans ta page et s'effacent quand tu la fermes.</span>
+    </div>
+    <div class="note">
+      <span class="note-title">Le multitâche, un mythe ?</span>
+      <span>Ton cerveau ne fait pas vraiment deux choses qui demandent de l'attention en même temps : il <strong>saute</strong> de l'une à l'autre. Chaque saut coûte un peu de temps et d'énergie, et on perd le fil. Un seul essai ne prouve rien (on peut avoir de la chance, ou être fatigué·e), mais beaucoup d'expériences vont dans ce sens. C'est pour ça qu'on travaille mieux <strong>téléphone hors de vue</strong>, pas seulement retourné.</span>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Écrans et sommeil</span>
+    <h2>La nuit, ton cerveau range</h2>
+    <p>Pendant que tu dors, ton cerveau trie ce que tu as appris, ton corps grandit et se répare. Les écrans le soir peuvent gêner ça de trois façons :</p>
+    <div class="cards">
+      <div class="box"><span class="tag warn">Lumière</span><strong>« Il fait encore jour ? »</strong><span class="soft">La lumière forte d'un écran près des yeux peut faire croire à ton cerveau que ce n'est pas encore l'heure de dormir.</span></div>
+      <div class="box"><span class="tag warn">Excitation</span><strong>Le cerveau reste allumé</strong><span class="soft">Un jeu serré, une dispute dans le groupe, une vidéo qui fait peur : après, difficile de s'endormir.</span></div>
+      <div class="box"><span class="tag warn">Réveils</span><strong>Ça vibre la nuit</strong><span class="soft">Une notification à minuit, et le sommeil est coupé, même si tu ne t'en souviens pas le matin.</span></div>
+    </div>
+    <div class="box">
+      <h3>Ma soirée</h3>
+      <div class="params">
+        <div class="param"><label for="sOff">J'éteins les écrans à <output id="sOffV"></output></label><input type="range" id="sOff" min="1140" max="1500" step="15" value="1320"></div>
+        <div class="param"><label for="sSleep">Je m'endors vers <output id="sSleepV"></output></label><input type="range" id="sSleep" min="1200" max="1530" step="15" value="1350"></div>
+        <div class="param"><label for="sWake">Je me lève à <output id="sWakeV"></output></label><input type="range" id="sWake" min="330" max="540" step="15" value="405"></div>
+      </div>
+      <label class="chk"><input type="checkbox" id="sRoom"><span>Mon téléphone dort dans ma chambre</span></label>
+      <div class="tl" id="sTl" aria-hidden="true"><span class="s-ecran"></span><span class="s-calme"></span><span class="s-dodo"></span></div>
+      <div class="tl-axis" aria-hidden="true"><span>19 h</span><span>22 h</span><span>1 h</span><span>4 h</span><span>7 h</span><span>10 h</span></div>
+      <div class="chips"><span class="chip"><i style="background:var(--blue)"></i>écrans</span><span class="chip"><i style="background:var(--warn)"></i>moment calme sans écran</span><span class="chip"><i style="background:var(--vio)"></i>sommeil</span></div>
+      <div id="sOut" aria-live="polite"></div>
+    </div>
+    <div class="note ok">
+      <span class="note-title">L'astuce qui change tout</span>
+      <span>Le chargeur du téléphone <strong>hors de la chambre</strong>. Pour te réveiller, un vrai réveil (même tout simple) fait très bien l'affaire. Plus besoin de volonté : le téléphone n'est juste pas là.</span>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Que fais-tu ?</span>
+    <h2>Quatre situations</h2>
+    <p>Choisis ce que tu ferais. Chaque réponse a une explication, même les moins bonnes.</p>
+    <div class="box">
+      <div id="scens" class="exos"></div>
+      <span class="score" id="scScore">0 / 4 bons réflexes</span>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Mon plan</span>
+    <h2>Construis tes propres règles</h2>
+    <p>Les règles qui marchent le mieux sont <strong>simples</strong>, <strong>peu nombreuses</strong> et <strong>choisies par toi</strong> (encore mieux : discutées avec ta famille, car les adultes aussi sont tirés par leurs écrans !). Coche 2 ou 3 règles pour commencer.</p>
+    <div class="box">
+      <ul class="rules" id="plRules"></ul>
+      <div class="params">
+        <div class="param"><label for="plSoir">Écrans éteints avant de dormir</label>
+          <select id="plSoir"><option value="30">30 minutes avant</option><option value="60" selected>1 heure avant</option></select>
+        </div>
+        <div class="param"><label for="plWho">J'en parle avec</label>
+          <select id="plWho"><option value="ma famille">ma famille</option><option value="un parent">un parent</option><option value="un·e ami·e">un·e ami·e</option><option value="mon ou ma prof">mon ou ma prof</option><option value="moi-même">moi-même (pour l'instant)</option></select>
+        </div>
+      </div>
+      <div class="param"><label for="plCustom">Ma règle à moi (facultatif)</label><input type="text" id="plCustom" maxlength="90" autocomplete="off" placeholder="par exemple : le dimanche matin, pas de téléphone"></div>
+      <span class="privacy">Ce que tu tapes reste dans ta page : rien n'est envoyé ni enregistré.</span>
+      <div class="btns">
+        <button type="button" id="plMake">Créer ma carte</button>
+        <button type="button" id="plPrint" disabled>Imprimer la carte</button>
+        <button type="button" id="plClear">Tout effacer</button>
+      </div>
+      <p id="plMsg" aria-live="polite"></p>
+      <div id="planCard" class="plan-card" hidden></div>
+    </div>
+    <div class="box">
+      <h3>Et sans écran, on fait quoi ?</h3>
+      <p>Parfois, on prend le téléphone simplement parce qu'on s'ennuie. L'ennui n'est pas un problème : c'est souvent là que les idées arrivent. Mais si tu cherches une idée :</p>
+      <div class="idea" id="idea" aria-live="polite">Appuie sur le bouton !</div>
+      <div class="btns"><button type="button" id="ideaBtn">Une idée au hasard</button></div>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · Attention</span>
+    <h2>Les erreurs fréquentes</h2>
+    <div class="cards">
+      <div class="box"><span class="tag no">Faux</span><strong>« Je n'ai aucune volonté. »</strong><span class="soft">Des équipes entières travaillent pour que tu restes. Ce n'est pas un combat à armes égales : change plutôt ton environnement (réglages, chargeur ailleurs).</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« Je fais mes devoirs et je réponds aux messages en même temps, je gère. »</strong><span class="soft">Le cerveau saute d'une tâche à l'autre : les devoirs prennent plus de temps et on retient moins bien.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« Le téléphone retourné sur la table, ça suffit. »</strong><span class="soft">Une partie de ton attention le surveille encore. Dans une autre pièce, c'est beaucoup plus efficace.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« Si je casse ma série de flammes, mon ami·e va m'en vouloir. »</strong><span class="soft">Une amitié ne se mesure pas à un compteur. Parlez-en : vous êtes sûrement deux à en avoir marre.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« Tous les écrans, c'est pareil. »</strong><span class="soft">Créer, apprendre ou appeler sa grand-mère, ce n'est pas comme faire défiler sans but. Regarde ce que tu fais, pas seulement combien.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« Il faut tout arrêter d'un coup. »</strong><span class="soft">Les grandes résolutions tiennent rarement. Deux petites règles qui tiennent valent mieux que dix qu'on oublie.</span></div>
+    </div>
+    <div class="note ok">
+      <span class="note-title">Quand ça devient trop lourd</span>
+      <span>Si tu n'arrives plus à t'arrêter alors que tu le voudrais, si tu dors mal, si tu te sens mal après avoir regardé ton téléphone ou si tes notes en souffrent, ce n'est pas une honte : parles-en à un adulte de confiance (parent, enseignant·e, infirmier·ère scolaire). En Suisse, <strong>Pro Juventute, le 147</strong>, répond gratuitement aux jeunes par téléphone, SMS ou chat.</span>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Choisis ta réponse, puis vérifie.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Recommencer</button>
+    </div>
+  </section>
+
+  <!-- 12 -->
+  <section>
+    <span class="eyebrow">Étape 12 · À toi de jouer</span>
+    <h2>Exercices</h2>
+    <div class="exos">
+      <details>
+        <summary>1. Une année d'écran<span class="q">Lina passe 2 h 30 par jour sur des écrans pour ses loisirs. Combien d'heures cela fait-il en une année de 365 jours ? Et combien de jours entiers (de 24 h) ?</span></summary>
+        <div>
+          <span>2 h 30 = 2,5 h. 2,5 × 365 = <strong>912,5 h</strong> par an.</span>
+          <span>912,5 ÷ 24 ≈ <strong>38 jours entiers</strong>, soit plus d'un mois sans dormir ni manger. Ce n'est pas forcément « trop » : la question est de savoir si Lina a choisi ce temps.</span>
+        </div>
+      </details>
+      <details>
+        <summary>2. Chasse aux pièges<span class="q">L'appli inventée Zoomo affiche : « 🔥 Ta série de 30 jours va s'éteindre ce soir ! », une vidéo qui démarre seule à la fin de la précédente, et un fil qui ne finit jamais. Nomme les trois pièges et une parade pour chacun.</span></summary>
+        <div>
+          <ul>
+            <li>La <strong>série à ne pas perdre</strong> (peur de perdre) : en parler avec l'ami·e, décider ensemble que ce n'est pas grave.</li>
+            <li>La <strong>lecture automatique</strong> : la désactiver dans les réglages, ou décider avant combien de vidéos.</li>
+            <li>Le <strong>défilement infini</strong> : se fixer une durée et mettre une alarme.</li>
+          </ul>
+        </div>
+      </details>
+      <details>
+        <summary>3. Une chance sur cinq<span class="q">Dans un fil, une super vidéo arrive au hasard avec une chance sur 5. Combien de rafraîchissements faut-il en moyenne ? Est-on sûr·e de l'avoir en 5 essais ?</span></summary>
+        <div>
+          <span>En moyenne, <strong>5 rafraîchissements</strong>. Mais ce n'est <strong>pas garanti</strong> : parfois elle arrive du premier coup, parfois il faut 10 ou 15 essais. C'est justement ce « peut-être la prochaine fois » qui donne envie de continuer.</span>
+        </div>
+      </details>
+      <details>
+        <summary>4. La nuit de Malik<span class="q">Malik s'endort vers 22 h 45 et se lève à 6 h 45. Combien d'heures dort-il ? Que pourrait-il changer ?</span></summary>
+        <div>
+          <span>De 22 h 45 à 6 h 45 : <strong>8 h</strong>. C'est moins que les « environ 9 h et plus » souvent conseillées à son âge.</span>
+          <span>Il pourrait éteindre les écrans plus tôt pour s'endormir vers 21 h 45, et laisser son téléphone se charger hors de sa chambre.</span>
+        </div>
+      </details>
+      <details>
+        <summary>5. Ta règle « si… alors… »<span class="q">Les règles marchent mieux quand elles disent quand et quoi. Transforme « je vais moins regarder mon téléphone » en une règle précise.</span></summary>
+        <div>
+          <span>Exemples : « <strong>Si</strong> je commence mes devoirs, <strong>alors</strong> je mets mon téléphone dans la cuisine. » « <strong>Quand</strong> j'ouvre l'appli de vidéos, <strong>alors</strong> je décide d'abord : trois vidéos. » « <strong>À</strong> 21 h, le téléphone va au chargeur du salon. »</span>
+          <span>Une règle précise est facile à vérifier : tu sais si tu l'as tenue ou non.</span>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• Les écrans ne sont ni bons ni mauvais : la question est <strong>« est-ce que j'ai choisi ? »</strong></span>
+      <span>• Beaucoup d'applis gratuites vivent de ton <strong>attention</strong> : plus tu restes, plus elles gagnent.</span>
+      <span>• Les pièges de design : <strong>défilement infini, lecture automatique, notifications, séries à ne pas perdre, récompenses au hasard, compteurs de likes</strong>.</span>
+      <span>• La <strong>récompense au hasard</strong> (« peut-être la prochaine fois ») est ce qui donne envie de rafraîchir sans fin.</span>
+      <span>• Le multitâche fait sauter le cerveau d'une tâche à l'autre : pour se concentrer, <strong>téléphone hors de vue</strong>.</span>
+      <span>• Dormir compte : à ton âge, <strong>environ 9 h et plus</strong> ; écrans éteints un moment avant, <strong>chargeur hors de la chambre</strong>.</span>
+      <span>• Change ton environnement plutôt que de compter sur ta volonté : réglages, mode concentration, <strong>2 ou 3 règles simples</strong> choisies par toi.</span>
+      <span>• Si les écrans te prennent trop de place ou te rendent mal, parles-en à un adulte de confiance, ou au 147 (Pro Juventute).</span>
+    </div>
+  </section>
+
+  <!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"><a class="prev" href="programmer-pas-a-pas.html"><span>← Précédent</span><strong>Programmer pas à pas</strong></a><a class="next" href="les-achats-dans-les-jeux.html"><span>Suivant →</span><strong>Les achats dans les jeux</strong></a></div><a class="tnav-home" href="numerique.html">⌂ Tous les tutoriels numériques</a></nav><!--/tnav-->
+<footer>Fiche de révision · Le temps d'écran et l'attention</footer>
+</main>
+
+<script>
+(function () {
+  /*
+   * Hooks de test : window.__ecr
+   *   calcScreen(o)            -> {day, week, year, yearHours, yearDays, awakePct}
+   *                               o = {jeux, videos, reseaux, messages, devoirs, weekend} en minutes ;
+   *                               weekend = minutes EN PLUS par jour de week-end.
+   *                               day = somme ; week = 7·day + 2·weekend ; year = 365·day + 104·weekend (minutes)
+   *                               yearHours = year / 60 ; yearDays = year / 1440 ; awakePct = day / (15 h) × 100
+   *   acts, refs               -> activités du calculateur ; repères (sommeil 540 min, école 360 min, éveil 900 min)
+   *   tricks                   -> [{id, name, how, fix, real}] les 6 pièges de la fausse appli
+   *   trapState()              -> {seen:[ids], off:[ids]}
+   *   rng(seed)                -> générateur pseudo-aléatoire (mulberry32) renvoyant des nombres dans [0, 1)
+   *   simulate(n, mode, seed)  -> {cells:[bool], hits, longestDry, waits:[int]}
+   *                               mode 'fixe' : succès à chaque 5e essai ; mode 'hasard' : succès si rng() < 0,2
+   *                               longestDry = plus longue suite d'essais sans succès ; waits = essais pour chaque succès
+   *   makeRound(seed, notifs)  -> {items:[symboles], truth (nombre de ★), notifs:[indices]} (24 symboles, 6 notifications si notifs)
+   *   gap(answer, truth)       -> |answer − truth|
+   *   sleepPlan(off, sleep, wake) -> {sleepMin, gapMin, enough} ; heures en minutes depuis minuit
+   *                               (off et sleep peuvent dépasser 1440 = après minuit ; wake est le matin suivant)
+   *                               sleepMin = wake + 1440 − sleep ; gapMin = sleep − off ; enough = sleepMin ≥ 540
+   *   scenarios, scenarioScore() -> nombre de situations où le choix actuel est le bon réflexe
+   *   rules, buildPlan(ids, opts) -> [lignes] ; opts = {soir: 30|60, custom: texte}
+   *   ideas, quiz
+   * Rien n'est envoyé, enregistré ni affiché dans la console : tout reste dans la page.
+   */
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function fmtNum(x, d) { return Number(x).toLocaleString('fr-FR', { maximumFractionDigits: d || 0, minimumFractionDigits: 0 }).replace(/[   ]/g, ' '); }
+  function fmtHM(min) {
+    min = Math.round(min);
+    var h = Math.floor(min / 60), m = min % 60;
+    if (!h) return m + ' min';
+    return h + ' h' + (m ? ' ' + (m < 10 ? '0' : '') + m : '');
+  }
+  function fmtClock(min) {
+    var t = ((Math.round(min) % 1440) + 1440) % 1440, h = Math.floor(t / 60), m = t % 60;
+    return h + ' h ' + (m < 10 ? '0' : '') + m;
+  }
+
+  /* ---------- Hasard reproductible ---------- */
+  function rng(seed) {
+    var a = seed >>> 0;
+    return function () {
+      a = (a + 0x6D2B79F5) >>> 0;
+      var t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function newSeed() { return Math.floor(Math.random() * 4294967295); }
+
+  /* ---------- Calculateur ---------- */
+  var ACTS = [
+    { id: 'jeux', label: 'Jeux vidéo', def: 60, col: 'var(--blue)' },
+    { id: 'videos', label: 'Vidéos et séries', def: 60, col: 'var(--red)' },
+    { id: 'reseaux', label: 'Réseaux sociaux', def: 45, col: 'var(--vio)' },
+    { id: 'messages', label: 'Messages', def: 30, col: 'var(--warn)' },
+    { id: 'devoirs', label: 'Devoirs sur écran', def: 30, col: 'var(--acc)' }
+  ];
+  var REFS = { sleep: 540, school: 360, awake: 900 };
+  function num(v) { v = Number(v); return isFinite(v) && v > 0 ? v : 0; }
+  function calcScreen(o) {
+    o = o || {};
+    var day = 0;
+    ACTS.forEach(function (a) { day += num(o[a.id]); });
+    var we = num(o.weekend);
+    var week = 7 * day + 2 * we, year = 365 * day + 104 * we;
+    return { day: day, week: week, year: year, yearHours: year / 60, yearDays: year / 1440, awakePct: day / REFS.awake * 100 };
+  }
+  var sl = ACTS.map(function (a) {
+    return '<div class="param"><label for="c_' + a.id + '">' + esc(a.label) + ' <output id="c_' + a.id + 'V"></output></label><input type="range" id="c_' + a.id + '" min="0" max="300" step="15" value="' + a.def + '"></div>';
+  }).join('');
+  sl += '<div class="param"><label for="c_weekend">Le week-end, en plus par jour <output id="c_weekendV"></output></label><input type="range" id="c_weekend" min="0" max="240" step="15" value="60"></div>';
+  $('calcSliders').innerHTML = sl;
+  $('cLegend').innerHTML = ACTS.map(function (a) { return '<span class="chip"><i style="background:' + a.col + '"></i>' + esc(a.label) + '</span>'; }).join('');
+  function readCalc() {
+    var o = {};
+    ACTS.forEach(function (a) { o[a.id] = num($('c_' + a.id).value); });
+    o.weekend = num($('c_weekend').value);
+    return o;
+  }
+  function drawCalc() {
+    var o = readCalc(), r = calcScreen(o), sport = num($('cSport').value);
+    ACTS.forEach(function (a) { $('c_' + a.id + 'V').textContent = fmtHM(o[a.id]); });
+    $('c_weekendV').textContent = '+ ' + fmtHM(o.weekend);
+    $('cSportV').textContent = fmtHM(sport);
+    $('cDay').textContent = fmtHM(r.day);
+    $('cWeek').textContent = '≈ ' + fmtNum(r.week / 60, 1) + ' h';
+    $('cYear').textContent = '≈ ' + fmtNum(r.yearHours) + ' h';
+    $('cDays').textContent = '≈ ' + fmtNum(r.yearDays, 1) + ' jours';
+    $('cStack').innerHTML = r.day ? ACTS.map(function (a) { return '<span style="width:' + (o[a.id] / r.day * 100) + '%;background:' + a.col + '"></span>'; }).join('') : '';
+    var rows = [
+      ['Mes écrans (total)', r.day, 'var(--blue)', fmtHM(r.day)],
+      ['Sommeil conseillé', REFS.sleep, 'var(--vio)', 'environ 9 h et plus'],
+      ['École', REFS.school, 'var(--warn)', 'environ 6 h un jour d’école'],
+      ['Sport et dehors', sport, 'var(--acc)', fmtHM(sport)]
+    ];
+    var mx = Math.max(REFS.sleep, r.day, sport, 1);
+    $('cRows').innerHTML = rows.map(function (w) {
+      return '<div class="row"><span class="lab">' + esc(w[0]) + '</span><span class="bar" style="width:' + (w[1] / mx * 100) + '%;background:' + w[2] + '"></span><span class="val">' + esc(w[3]) + '</span></div>';
+    }).join('');
+    var msg;
+    if (!r.day) msg = 'Zéro écran un jour d’école ? Bravo pour la franchise… ou alors vérifie les réglages de ton téléphone !';
+    else {
+      msg = 'Sur une année, tes écrans font environ ' + fmtNum(r.yearDays, 1) + ' jours entiers, 24 h sur 24 (dont ' + fmtHM(o.devoirs) + ' par jour pour les devoirs). ';
+      msg += 'Les jours d’école, ça représente environ ' + fmtNum(r.awakePct) + ' % de ton temps éveillé. ';
+      if (r.awakePct >= 40) msg += 'C’est une grosse part de ta journée : est-ce que tout ce temps est choisi ? Il reste combien pour dormir, bouger, voir des gens ?';
+      else if (sport < 30) msg += 'Et si tu ajoutais un moment pour bouger ? Même 30 minutes dehors, ça compte.';
+      else msg += 'Ce n’est ni bien ni mal en soi : la vraie question, c’est de savoir si tu as choisi ce temps.';
+    }
+    $('cMsg').textContent = msg;
+  }
+  $('calcSliders').addEventListener('input', drawCalc);
+  $('cSport').addEventListener('input', drawCalc);
+  drawCalc();
+
+  /* ---------- Pièges de la fausse appli ---------- */
+  var TRICKS = [
+    { id: 'notif', name: 'Les notifications', how: 'Le petit rond rouge avec un chiffre attire l’œil et donne l’impression qu’il faut agir vite. Beaucoup de notifications ne viennent pas d’une personne, mais de l’appli qui veut te faire revenir.', fix: 'Dans les réglages, garde seulement les notifications des vraies personnes (famille, amis) et coupe celles des applis.', real: 'Se coupe dans les réglages du téléphone ou de l’appli.' },
+    { id: 'hasard', name: 'La récompense au hasard', how: 'Tirer pour rafraîchir, c’est comme une machine à sous : parfois il y a quelque chose de génial, souvent non. Comme tu ne sais jamais, tu as envie de réessayer.', fix: 'Sache que c’est un mécanisme. Décide avant combien de temps tu restes. Quand tu te surprends à rafraîchir sans raison, c’est le signal pour poser le téléphone.', real: 'Ne se coupe pas : on le neutralise en le reconnaissant.' },
+    { id: 'likes', name: 'Le compteur de likes', how: 'Le chiffre donne envie de comparer et de revenir voir s’il monte. On finit par publier pour les likes, plus pour le plaisir.', fix: 'Certaines applis permettent de masquer les compteurs. Rappelle-toi qu’un chiffre ne dit pas ce que tu vaux.', real: 'Parfois masquable dans les réglages.' },
+    { id: 'flamme', name: 'La série à ne pas perdre', how: 'Les flammes ou les séries de jours te font revenir chaque jour, pas parce que tu en as envie, mais par peur de perdre ton compteur.', fix: 'Parle-en avec ton ami·e : votre amitié ne dépend pas d’un chiffre. Vous pouvez décider ensemble d’arrêter.', real: 'Ne se coupe pas : on en parle et on décide ensemble.' },
+    { id: 'autoplay', name: 'La lecture automatique', how: 'La vidéo suivante démarre toute seule. Pour t’arrêter, tu dois faire un effort ; pour continuer, tu n’as rien à faire. Le choix est fait pour toi.', fix: 'Désactive la lecture automatique dans les réglages, ou décide avant : « trois vidéos, puis j’arrête ».', real: 'Se coupe souvent dans les réglages.' },
+    { id: 'infini', name: 'Le défilement infini', how: 'Il n’y a jamais de fin. Sans point d’arrêt naturel (fin de chapitre, fin d’épisode), ton cerveau ne reçoit pas le signal « c’est fini ».', fix: 'Crée toi-même le point d’arrêt : une alarme, une limite de temps dans les réglages, ou « jusqu’à la fin de ma pause ».', real: 'Ne se coupe pas : on ajoute une limite de temps.' }
+  ];
+  var tSeen = {}, tOff = {}, tSel = null;
+  var hots = Array.prototype.slice.call(document.querySelectorAll('#phone .hot'));
+  function trick(id) { return TRICKS.filter(function (t) { return t.id === id; })[0]; }
+  function drawTraps() {
+    hots.forEach(function (b) {
+      var id = b.getAttribute('data-t');
+      b.classList.toggle('seen', !!tSeen[id]);
+      b.classList.toggle('off', !!tOff[id]);
+      b.classList.toggle('sel', id === tSel);
+      b.setAttribute('aria-label', trick(id).name + (tOff[id] ? ' (neutralisé)' : ''));
+    });
+    var nS = Object.keys(tSeen).length, nO = Object.keys(tOff).length;
+    $('tSeen').textContent = nS + ' / 6';
+    $('tOff').textContent = nO + ' / 6';
+    var tg = $('tToggle');
+    if (!tSel) { tg.disabled = true; tg.textContent = 'Neutraliser ce piège'; tg.setAttribute('aria-pressed', 'false'); }
+    else {
+      tg.disabled = false;
+      tg.textContent = tOff[tSel] ? 'Piège neutralisé ✓ (annuler)' : 'Neutraliser ce piège';
+      tg.setAttribute('aria-pressed', tOff[tSel] ? 'true' : 'false');
+    }
+    if (tSel) {
+      var t = trick(tSel);
+      var h = '<h3>' + esc(t.name) + '</h3><p><strong>Comment ça t’accroche :</strong> ' + esc(t.how) + '</p><p><strong>Ce que tu peux faire :</strong> ' + esc(t.fix) + '</p><p class="soft">' + esc(t.real) + '</p>';
+      if (nO === 6) h += '<div class="verdict yes">Bravo, les six pièges sont neutralisés !<span>Flikko est devenue une appli que tu utilises, et plus une appli qui t’utilise.</span></div>';
+      $('tInfo').innerHTML = h;
+    }
+  }
+  hots.forEach(function (b) {
+    b.addEventListener('click', function () { tSel = b.getAttribute('data-t'); tSeen[tSel] = true; drawTraps(); });
+  });
+  $('tToggle').addEventListener('click', function () {
+    if (!tSel) return;
+    if (tOff[tSel]) delete tOff[tSel]; else tOff[tSel] = true;
+    drawTraps();
+  });
+  $('tReset').addEventListener('click', function () {
+    tSeen = {}; tOff = {}; tSel = null;
+    $('tInfo').innerHTML = '<p class="soft">Touche un élément de l’écran de Flikko pour commencer.</p>';
+    drawTraps();
+  });
+  drawTraps();
+  function trapState() { return { seen: Object.keys(tSeen), off: Object.keys(tOff) }; }
+
+  /* ---------- Récompense au hasard ---------- */
+  function simulate(n, mode, seed) {
+    var r = rng(seed == null ? 1 : seed), cells = [], hits = 0, dry = 0, longestDry = 0, since = 0, waits = [];
+    for (var i = 0; i < n; i++) {
+      var win = mode === 'fixe' ? ((i + 1) % 5 === 0) : (r() < 0.2);
+      cells.push(win); since++;
+      if (win) { hits++; waits.push(since); since = 0; dry = 0; }
+      else { dry++; if (dry > longestDry) longestDry = dry; }
+    }
+    return { cells: cells, hits: hits, longestDry: longestDry, waits: waits };
+  }
+  var MAXR = 100, rA = [], rB = [], rRand = rng(newSeed());
+  function statsOf(cells) {
+    var hits = 0, dry = 0, longest = 0;
+    cells.forEach(function (w) { if (w) { hits++; dry = 0; } else { dry++; if (dry > longest) longest = dry; } });
+    return { hits: hits, longest: longest };
+  }
+  function cellsHtml(cells) {
+    return cells.map(function (w, k) { return '<i class="' + (w ? 'win' : '') + (k === cells.length - 1 ? ' last' : '') + '">' + (w ? '★' : '') + '</i>'; }).join('');
+  }
+  function drawRew() {
+    $('rA').innerHTML = cellsHtml(rA);
+    $('rB').innerHTML = cellsHtml(rB);
+    var a = statsOf(rA), b = statsOf(rB);
+    $('rAs').textContent = rA.length + ' essais · ' + a.hits + ' super vidéos · plus longue attente : ' + a.longest + ' vidéos bof';
+    $('rBs').textContent = rB.length + ' essais · ' + b.hits + ' super vidéos · plus longue attente : ' + b.longest + ' vidéos bof';
+    var full = rA.length >= MAXR;
+    $('rStep').disabled = full; $('rMany').disabled = full;
+    var m;
+    if (!rA.length) m = 'Appuie sur « Rafraîchir une fois » plusieurs fois, et regarde ce que tu ressens en attendant la prochaine super vidéo.';
+    else if (rA.length < 20) {
+      var lastB = rB[rB.length - 1];
+      m = lastB ? 'Fil B : une super vidéo ! Et la prochaine ? Impossible de savoir… alors on a envie de continuer.' : 'Fil B : rien cette fois. Mais peut-être au prochain coup ?';
+    } else m = 'Les deux fils donnent à peu près le même nombre de super vidéos. Mais dans le fil B, les attentes sont irrégulières (parfois très longues, parfois très courtes) : on ne sait jamais quand s’arrêter. C’est ce qui rend le hasard si accrocheur.';
+    if (full) m += ' (Maximum de 100 essais atteint : remets à zéro pour recommencer.)';
+    $('rMsg').textContent = m;
+  }
+  function rewStep() {
+    if (rA.length >= MAXR) return;
+    rA.push((rA.length + 1) % 5 === 0);
+    rB.push(rRand() < 0.2);
+  }
+  $('rStep').addEventListener('click', function () { rewStep(); drawRew(); });
+  $('rMany').addEventListener('click', function () { while (rA.length < MAXR) rewStep(); drawRew(); });
+  $('rReset').addEventListener('click', function () { rA = []; rB = []; rRand = rng(newSeed()); drawRew(); });
+  drawRew();
+
+  /* ---------- Jeu d'attention ---------- */
+  var NITEMS = 24, SHOW = 650, BLANK = 250;
+  var DISTRACT = ['☆', '●', '▲', '■', '✦'];
+  var NOTIFS = [
+    ['Léa', 't’as vu ce qu’a posté Sam ???'],
+    ['Flikko', '🔥 Ta série avec Noa va s’éteindre !'],
+    ['Groupe 9H2', '14 nouveaux messages'],
+    ['Flikko', 'Quelqu’un a aimé ta photo ♥'],
+    ['Jeu Astrobloc', 'Ton coffre gratuit est prêt 🎁'],
+    ['Noa', 'tu viens ce soir ?'],
+    ['Flikko', 'Une vidéo que tu vas adorer'],
+    ['Maman', 'N’oublie pas ton sac de gym']
+  ];
+  function makeRound(seed, withNotifs) {
+    var r = rng(seed), items = [], truth = 0, notifs = [];
+    for (var i = 0; i < NITEMS; i++) {
+      var s = r() < 0.3 ? '★' : DISTRACT[Math.floor(r() * DISTRACT.length)];
+      if (s === '★') truth++;
+      items.push(s);
+    }
+    if (withNotifs) {
+      var pool = [];
+      for (var k = 2; k < NITEMS - 1; k++) pool.push(k);
+      while (notifs.length < 6) {
+        var j = Math.floor(r() * pool.length);
+        notifs.push(pool.splice(j, 1)[0]);
+      }
+      notifs.sort(function (x, y) { return x - y; });
+    }
+    return { items: items, truth: truth, notifs: notifs };
+  }
+  function gap(answer, truth) { return Math.abs(num(answer) - num(truth)); }
+  var gTimers = [], gRound = null, gCur = null, gVal = 0, gRes = {}, gRunning = false;
+  function gClear() {
+    gTimers.forEach(clearTimeout); gTimers = [];
+    Array.prototype.slice.call(document.querySelectorAll('#gStage .toast')).forEach(function (t) { t.remove(); });
+  }
+  function gLater(fn, ms) { gTimers.push(setTimeout(fn, ms)); }
+  function gToast(k) {
+    var n = NOTIFS[k % NOTIFS.length], d = document.createElement('div');
+    d.className = 'toast' + (k % 2 ? ' bot' : '');
+    d.innerHTML = '<span aria-hidden="true">💬</span><span><b>' + esc(n[0]) + '</b> · ' + esc(n[1]) + '</span>';
+    $('gStage').appendChild(d);
+    gLater(function () { d.remove(); }, 1700);
+  }
+  function gStart(which) {
+    if (gRunning) return;
+    gClear();
+    gRunning = true; gRound = which; gCur = makeRound(newSeed(), which === 2);
+    $('gAnswer').hidden = true; $('gMsg').textContent = '';
+    $('gR1').disabled = true; $('gR2').disabled = true;
+    var sym = $('gSym'), cnt = $('gCnt'), nk = 0;
+    cnt.textContent = 'Prêt·e ? Ça commence…';
+    sym.textContent = ''; sym.className = 'sym';
+    var t0 = 1200;
+    gCur.items.forEach(function (s, i) {
+      var at = t0 + i * (SHOW + BLANK);
+      gLater(function () {
+        sym.textContent = s; sym.className = 'sym' + (s === '★' ? ' star' : '');
+        cnt.textContent = 'Symbole ' + (i + 1) + ' / ' + NITEMS;
+        if (gCur.notifs.indexOf(i) >= 0) { gToast(nk); nk++; }
+      }, at);
+      gLater(function () { sym.textContent = ''; }, at + SHOW);
+    });
+    gLater(function () {
+      gRunning = false;
+      cnt.textContent = 'Terminé ! Combien d’étoiles pleines ?';
+      sym.textContent = '?'; sym.className = 'sym';
+      gVal = 0; $('gVal').textContent = '0';
+      $('gAnswer').hidden = false; $('gOk').disabled = false;
+      $('gR1').disabled = false; $('gR2').disabled = false;
+    }, t0 + NITEMS * (SHOW + BLANK) + 300);
+  }
+  $('gR1').addEventListener('click', function () { gStart(1); });
+  $('gR2').addEventListener('click', function () { gStart(2); });
+  $('gMinus').addEventListener('click', function () { gVal = Math.max(0, gVal - 1); $('gVal').textContent = gVal; });
+  $('gPlus').addEventListener('click', function () { gVal = Math.min(30, gVal + 1); $('gVal').textContent = gVal; });
+  $('gOk').addEventListener('click', function () {
+    if (!gCur || gRunning) return;
+    var g = gap(gVal, gCur.truth);
+    gRes[gRound] = { truth: gCur.truth, answer: gVal, gap: g };
+    $('gS' + gRound).textContent = 'vraie réponse ' + gCur.truth + ' · toi ' + gVal + ' · écart ' + g;
+    $('gOk').disabled = true;
+    $('gAnswer').hidden = true;
+    $('gCnt').textContent = g === 0 ? 'Exact, bravo !' : 'Il y avait ' + gCur.truth + ' étoiles pleines (écart de ' + g + ').';
+    var m;
+    if (gRes[1] && gRes[2]) {
+      if (gRes[2].gap > gRes[1].gap) m = 'Avec les notifications, tu t’es davantage trompé·e : chaque interruption a volé un peu de ton attention.';
+      else if (gRes[2].gap === gRes[1].gap) m = 'Même écart dans les deux manches. Peut-être as-tu réussi à ignorer les notifications, mais as-tu senti l’effort que ça demandait ?';
+      else m = 'Tu as fait mieux avec les notifications ! Ça arrive : un essai unique dépend aussi de la chance et de l’entraînement. Rejoue pour voir.';
+      m += ' Dans la vraie vie, une notification ne dure pas une seconde : on la lit, on répond, et il faut ensuite du temps pour se reconcentrer.';
+    } else m = 'Joue maintenant l’autre manche pour comparer.';
+    $('gMsg').textContent = m;
+  });
+
+  /* ---------- Sommeil ---------- */
+  var TL0 = 1140, TL1 = 2040;
+  function sleepPlan(off, sleep, wake) {
+    off = num(off); sleep = num(sleep); wake = num(wake);
+    var dur = wake + 1440 - sleep;
+    return { sleepMin: dur, gapMin: sleep - off, enough: dur >= REFS.sleep };
+  }
+  function pctT(m) { return Math.max(0, Math.min(100, (m - TL0) / (TL1 - TL0) * 100)); }
+  function seg(el, a, b) { var l = pctT(a), r = pctT(b); el.style.left = l + '%'; el.style.width = Math.max(0, r - l) + '%'; }
+  function drawSleep() {
+    var off = num($('sOff').value), sleep = num($('sSleep').value), wake = num($('sWake').value), room = $('sRoom').checked;
+    $('sOffV').textContent = fmtClock(off); $('sSleepV').textContent = fmtClock(sleep); $('sWakeV').textContent = fmtClock(wake);
+    var p = sleepPlan(off, sleep, wake), s = $('sTl').children;
+    seg(s[0], TL0, Math.min(off, sleep));
+    seg(s[1], Math.min(off, sleep), sleep);
+    seg(s[2], sleep, wake + 1440);
+    var cls = p.enough ? 'yes' : (p.sleepMin >= 480 ? 'mid' : 'no');
+    var head = 'Tu dors environ ' + fmtHM(p.sleepMin) + '.';
+    var tips = [];
+    tips.push(p.enough ? 'C’est dans les « environ 9 h et plus » souvent conseillées à ton âge.' : 'C’est moins que les « environ 9 h et plus » souvent conseillées à ton âge. Essaie de t’endormir un peu plus tôt.');
+    if (p.gapMin <= 0) tips.push('Tu regardes un écran jusqu’au moment de t’endormir : ton cerveau n’a pas le temps de ralentir. Essaie de t’arrêter au moins 30 minutes à 1 heure avant.');
+    else if (p.gapMin < 30) tips.push('Seulement ' + fmtHM(p.gapMin) + ' sans écran avant de dormir : un peu plus long serait mieux (souvent conseillé : 30 minutes à 1 heure).');
+    else tips.push('Bien : ' + fmtHM(p.gapMin) + ' de calme sans écran avant de dormir (lire, discuter, préparer son sac, se doucher).');
+    if (room) tips.push('Le téléphone dans la chambre, c’est la tentation et les vibrations la nuit. Mets-le à charger ailleurs, avec un vrai réveil pour le matin.');
+    $('sOut').innerHTML = '<div class="verdict ' + cls + '">' + esc(head) + tips.map(function (t) { return '<span>' + esc(t) + '</span>'; }).join('') + '</div>';
+  }
+  ['sOff', 'sSleep', 'sWake'].forEach(function (id) { $(id).addEventListener('input', drawSleep); });
+  $('sRoom').addEventListener('change', drawSleep);
+  drawSleep();
+
+  /* ---------- Scénarios ---------- */
+  var SCEN = [
+    { q: '22 h 40, contrôle de maths demain. Le groupe de classe vibre sans arrêt.', o: [
+      ['a', 'Je lis tout pour ne rien rater.', 'no', 'Tu vas rester éveillé·e et énervé·e. Demain matin, tu rattraperas l’essentiel en deux minutes.'],
+      ['b', 'Je mets le mode nuit et je pose le téléphone hors de ma chambre.', 'yes', 'Le bon réflexe : les messages attendront, ton sommeil non. Rien ne disparaît pendant la nuit.'],
+      ['c', 'Je réponds vite fait à tout le monde, puis je dors.', 'mid', 'Chaque réponse appelle d’autres réponses… et on y est encore à minuit.']] },
+    { q: 'Tu pars en vacances sans réseau. Ta série de flammes de 200 jours avec Noa va s’éteindre.', o: [
+      ['a', 'Je donne mon mot de passe à ma cousine pour qu’elle garde la série.', 'no', 'Ne donne jamais ton mot de passe, même pour ça : elle aurait accès à tous tes messages.'],
+      ['b', 'J’en parle avec Noa : notre amitié ne dépend pas d’un compteur.', 'yes', 'Bravo. La série est un piège de design. Noa sera sûrement soulagé·e aussi, et vous pourrez en recommencer une… ou pas.'],
+      ['c', 'Je stresse et je cherche du réseau toute la journée.', 'mid', 'Tu gâches tes vacances pour un chiffre. C’est exactement ce que la série cherche à provoquer.']] },
+    { q: 'Tu fais tes devoirs. Le téléphone, posé à côté, vibre toutes les deux minutes.', o: [
+      ['a', 'Je regarde à chaque fois, ça ne prend que deux secondes.', 'no', 'Ce n’est jamais deux secondes : il faut ensuite du temps pour retrouver le fil. Les devoirs durent deux fois plus longtemps.'],
+      ['b', 'Mode concentration, téléphone dans une autre pièce pendant 25 minutes, puis une pause.', 'yes', 'Le bon réflexe : tu finis plus vite et la pause est méritée. Le téléphone hors de vue, c’est plus efficace que retourné.'],
+      ['c', 'Je retourne le téléphone sur la table.', 'mid', 'C’est un début, mais une partie de ton attention continue de le surveiller. Plus loin, c’est mieux.']] },
+    { q: 'Tu voulais regarder « une » vidéo. Cinquante minutes plus tard, la lecture automatique continue.', o: [
+      ['a', 'Je me dis que je suis nul·le, je n’ai aucune volonté.', 'no', 'Ce n’est pas ta faute : la lecture automatique est faite pour ça. Pas besoin de te juger, change plutôt le réglage.'],
+      ['b', 'J’arrête maintenant. La prochaine fois, je décide avant combien de vidéos et je coupe la lecture automatique.', 'yes', 'Le bon réflexe : tu reprends la main sans te faire de reproches, et tu prépares la prochaine fois.'],
+      ['c', 'Je supprime l’appli pour toujours, plus jamais de vidéos !', 'mid', 'Les grandes résolutions tiennent rarement. Et les vidéos ne sont pas un problème en soi : l’important est de choisir.']] }
+  ];
+  var scChoice = {};
+  $('scens').innerHTML = SCEN.map(function (S, k) {
+    return '<div class="scen"><strong>' + (k + 1) + '. ' + esc(S.q) + '</strong><div class="btns" role="group" aria-label="Choix pour la situation ' + (k + 1) + '">' +
+      S.o.map(function (o) { return '<button type="button" data-s="' + k + '" data-o="' + o[0] + '" aria-pressed="false">' + esc(o[1]) + '</button>'; }).join('') +
+      '</div><div id="scF' + k + '" aria-live="polite"></div></div>';
+  }).join('');
+  function scenarioScore() {
+    var n = 0;
+    Object.keys(scChoice).forEach(function (k) {
+      var o = SCEN[k].o.filter(function (x) { return x[0] === scChoice[k]; })[0];
+      if (o && o[2] === 'yes') n++;
+    });
+    return n;
+  }
+  $('scens').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-s]');
+    if (!b) return;
+    var k = Number(b.getAttribute('data-s')), id = b.getAttribute('data-o');
+    scChoice[k] = id;
+    Array.prototype.slice.call(document.querySelectorAll('button[data-s="' + k + '"]')).forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+    var o = SCEN[k].o.filter(function (x) { return x[0] === id; })[0];
+    var lab = o[2] === 'yes' ? 'Bon réflexe !' : (o[2] === 'mid' ? 'Pas mal, mais il y a mieux.' : 'Pas le meilleur choix.');
+    $('scF' + k).innerHTML = '<div class="verdict ' + o[2] + '">' + esc(lab) + '<span>' + esc(o[3]) + '</span></div>';
+    $('scScore').textContent = scenarioScore() + ' / 4 bons réflexes';
+  });
+
+  /* ---------- Plan perso ---------- */
+  var RULES = [
+    { id: 'table', t: 'Pas d’écran à table : les repas, c’est pour discuter.' },
+    { id: 'devoirs', t: 'Pendant les devoirs : mode concentration et téléphone dans une autre pièce.' },
+    { id: 'chargeur', t: 'Mon chargeur dort hors de ma chambre.' },
+    { id: 'soir', t: 'Écrans éteints {soir} avant de dormir.' },
+    { id: 'notifs', t: 'Je garde seulement les notifications des vraies personnes.' },
+    { id: 'decide', t: 'Avant d’ouvrir une appli, je décide combien de temps (ou combien de vidéos).' },
+    { id: 'autoplay', t: 'Je coupe la lecture automatique des vidéos.' },
+    { id: 'matin', t: 'Pas de téléphone le matin avant d’être prêt·e.' },
+    { id: 'pause', t: 'Après 1 heure de jeu, je me lève et je bouge 5 minutes.' },
+    { id: 'dehors', t: 'Chaque jour, un moment sans écran que j’aime (sport, musique, dessin, dehors…).' }
+  ];
+  $('plRules').innerHTML = RULES.map(function (r) {
+    return '<li><label class="chk"><input type="checkbox" value="' + r.id + '"><span>' + esc(r.t.replace('{soir}', '1 heure')) + '</span></label></li>';
+  }).join('');
+  function buildPlan(ids, opts) {
+    opts = opts || {};
+    var soir = Number(opts.soir) === 30 ? '30 minutes' : '1 heure';
+    var lines = RULES.filter(function (r) { return (ids || []).indexOf(r.id) >= 0; }).map(function (r) { return r.t.replace('{soir}', soir); });
+    var c = String(opts.custom || '').trim().slice(0, 90);
+    if (c) lines.push(c);
+    return lines;
+  }
+  function plIds() { return Array.prototype.slice.call(document.querySelectorAll('#plRules input:checked')).map(function (x) { return x.value; }); }
+  function syncSoirLabel() {
+    var lab = document.querySelector('#plRules input[value="soir"]').parentNode.querySelector('span');
+    lab.textContent = RULES[3].t.replace('{soir}', $('plSoir').value === '30' ? '30 minutes' : '1 heure');
+  }
+  $('plSoir').addEventListener('change', syncSoirLabel);
+  $('plMake').addEventListener('click', function () {
+    var lines = buildPlan(plIds(), { soir: $('plSoir').value, custom: $('plCustom').value });
+    var card = $('planCard');
+    if (!lines.length) { $('plMsg').textContent = 'Choisis au moins une règle (ou écris la tienne).'; card.hidden = true; $('plPrint').disabled = true; return; }
+    $('plMsg').textContent = lines.length > 4 ? 'C’est beaucoup ! Les plans qui tiennent commencent souvent par 2 ou 3 règles. Tu pourras en ajouter plus tard.' : 'Belle carte ! Essaie-la une semaine, puis regarde ce qui marche.';
+    card.innerHTML = '<h3>Mon plan écran</h3><ol>' + lines.map(function (l) { return '<li>' + esc(l) + '</li>'; }).join('') + '</ol>' +
+      '<p class="sign">J’en parle avec ' + esc($('plWho').value) + '. Je fais le point dans une semaine : qu’est-ce qui a marché ? Qu’est-ce que je change ?</p>';
+    card.hidden = false;
+    $('plPrint').disabled = false;
+  });
+  $('plPrint').addEventListener('click', function () {
+    if ($('planCard').hidden) return;
+    var html = document.documentElement;
+    html.classList.add('print-plan');
+    function done() { html.classList.remove('print-plan'); window.removeEventListener('afterprint', done); }
+    window.addEventListener('afterprint', done);
+    try { window.print(); } catch (e) { /* impression indisponible */ }
+    setTimeout(done, 1500);
+  });
+  $('plClear').addEventListener('click', function () {
+    Array.prototype.slice.call(document.querySelectorAll('#plRules input')).forEach(function (x) { x.checked = false; });
+    $('plCustom').value = ''; $('plSoir').value = '60'; syncSoirLabel();
+    $('planCard').hidden = true; $('planCard').innerHTML = ''; $('plMsg').textContent = ''; $('plPrint').disabled = true;
+  });
+
+  /* ---------- Idées sans écran ---------- */
+  var IDEAS = ['Faire un tour à vélo', 'Dessiner une BD de 4 cases', 'Jouer à un jeu de société en famille', 'Cuisiner une recette de crêpes', 'Lire un chapitre d’un livre ou d’une BD', 'Jouer au foot ou au basket dehors', 'Construire une cabane ou un circuit de billes', 'Apprendre un tour de cartes', 'Écrire une lettre à quelqu’un', 'Jouer d’un instrument', 'Promener le chien (le tien ou celui du voisin)', 'Faire un puzzle', 'Inventer une chorégraphie', 'Aller à la piscine ou à la patinoire', 'Ranger ta chambre en musique… sur une vraie radio', 'Ne rien faire et regarder les nuages'];
+  var lastIdea = -1;
+  $('ideaBtn').addEventListener('click', function () {
+    var k;
+    do { k = Math.floor(Math.random() * IDEAS.length); } while (k === lastIdea);
+    lastIdea = k;
+    $('idea').textContent = IDEAS[k];
+  });
+
+  /* ---------- Quiz ---------- */
+  var QZ = [
+    { q: 'Comment beaucoup d’applis gratuites gagnent-elles de l’argent ?', o: [['a', 'grâce aux dons des utilisateurs'], ['b', 'avec la publicité : plus tu restes, plus elles gagnent'], ['c', 'elles ne gagnent rien']], a: 'b', how: 'C’est l’économie de l’attention : ton temps et ton attention ont de la valeur.' },
+    { q: 'Pourquoi a-t-on envie de rafraîchir son fil encore et encore ?', o: [['a', 'parce que la récompense arrive au hasard'], ['b', 'parce que le téléphone est lent'], ['c', 'parce que les vidéos sont toujours nulles']], a: 'a', how: 'Comme une machine à sous : « peut-être la prochaine fois », alors on recommence.' },
+    { q: 'Lequel de ces éléments est un piège de design ?', o: [['a', 'le bouton pour éteindre le téléphone'], ['b', 'la lecture automatique de la vidéo suivante'], ['c', 'le réglage de la luminosité']], a: 'b', how: 'Pour continuer, tu n’as rien à faire ; pour t’arrêter, il faut un effort. Elle se coupe souvent dans les réglages.' },
+    { q: 'Pour bien te concentrer sur tes devoirs, le téléphone…', o: [['a', 'retourné sur la table'], ['b', 'en silencieux dans ta poche'], ['c', 'dans une autre pièce, en mode concentration']], a: 'c', how: 'Hors de vue, il ne vole plus ton attention. Retourné, une partie de toi le surveille encore.' },
+    { q: 'Combien d’heures de sommeil conseille-t-on souvent à ton âge ?', o: [['a', 'environ 6 h'], ['b', 'environ 9 h et plus'], ['c', 'peu importe']], a: 'b', how: 'Pendant le sommeil, ton cerveau range ce que tu as appris et ton corps grandit.' },
+    { q: 'Ta série de flammes avec un ami va s’éteindre. Le meilleur réflexe ?', o: [['a', 'en parler avec lui : l’amitié ne dépend pas d’un compteur'], ['b', 'donner ton mot de passe à quelqu’un pour la garder'], ['c', 'te lever la nuit pour envoyer une photo']], a: 'a', how: 'Les séries jouent sur la peur de perdre. Ne donne jamais ton mot de passe.' },
+    { q: 'Vrai ou faux : si je n’arrive pas à poser mon téléphone, c’est que je n’ai aucune volonté.', o: [['v', 'Vrai'], ['f', 'Faux']], a: 'f', how: 'Les applis sont fabriquées pour te retenir. Change plutôt ton environnement : réglages, chargeur hors de la chambre.' },
+    { q: 'Quel plan a le plus de chances de tenir ?', o: [['a', 'dix règles strictes dès demain'], ['b', 'plus jamais d’écran'], ['c', 'deux ou trois règles simples, choisies par moi']], a: 'c', how: 'Peu de règles, claires et choisies : c’est ce qui marche le mieux.' }
+  ];
+  var quiz = $('quiz'), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ''; done = [];
+    QZ.forEach(function (Q, k) {
+      var li = document.createElement('li');
+      li.innerHTML = '<span>' + esc(Q.q) + '</span><select id="qa' + k + '" aria-label="Ta réponse à la question ' + (k + 1) + '"><option value="">…</option>' + Q.o.map(function (o) { return '<option value="' + o[0] + '">' + esc(o[1]) + '</option>'; }).join('') + '</select><button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+      quiz.appendChild(li);
+      function check() {
+        var fb = $('qf' + k), v = $('qa' + k).value;
+        if (!v) { fb.className = 'fb'; fb.textContent = 'Choisis une réponse.'; return; }
+        if (v === Q.a) { fb.className = 'fb ok'; fb.innerHTML = 'Bravo, c’est juste !<span>' + esc(Q.how) + '</span>'; done[k] = true; }
+        else {
+          done[k] = false;
+          var good = Q.o.filter(function (o) { return o[0] === Q.a; })[0][1];
+          fb.className = 'fb no'; fb.innerHTML = 'Pas tout à fait : la bonne réponse est « ' + esc(good) + ' ».<span>' + esc(Q.how) + '</span>';
+        }
+        $('score').textContent = done.filter(Boolean).length + ' / 8';
+      }
+      $('qb' + k).addEventListener('click', check);
+      $('qa' + k).addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+    });
+    $('score').textContent = '0 / 8';
+  }
+  $('newQuiz').addEventListener('click', newQuiz);
+  newQuiz();
+
+  window.__ecr = { calcScreen: calcScreen, acts: ACTS, refs: REFS, tricks: TRICKS, trapState: trapState, rng: rng, simulate: simulate, makeRound: makeRound, gap: gap, sleepPlan: sleepPlan, scenarios: SCEN, scenarioScore: scenarioScore, rules: RULES, buildPlan: buildPlan, ideas: IDEAS, quiz: QZ };
+})();
+</script>
+</body>
+</html>

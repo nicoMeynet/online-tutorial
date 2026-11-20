@@ -1,0 +1,1024 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Les achats dans les jeux</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, marge rouge. Accent ambre foncé (#b45309), avec bleu, violet et ambre pour la rareté des objets, vert pour les bons réflexes. Tous les jeux, monnaies, prix et sites des exemples sont inventés (domaines en .exemple). Rien de ce qui est réglé ou tapé n'est envoyé ni enregistré. */
+:root {
+  --paper: #fbf8f4;
+  --grid: #efe5d8;
+  --card: #ffffff;
+  --ink: #2a1d10;
+  --ink-soft: #6b5843;
+  --acc: #b45309;
+  --acc-soft: #fbead3;
+  --warn: #ca8a04;
+  --warn-soft: #fdf3cf;
+  --warn-ink: #854d0e;
+  --blue: #2563eb;
+  --blue-soft: #dfe8fd;
+  --vio: #7c3aed;
+  --vio-soft: #ece3fd;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #fff0a3;
+  --line: #e4d6c4;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #17120c; --grid: #241c13; --card: #1e1710; --ink: #f5ece1; --ink-soft: #c4b19b;
+    --acc: #f6b25a; --acc-soft: #3d2810; --warn: #facc15; --warn-soft: #3a300c; --warn-ink: #fcd968;
+    --blue: #7aa7ff; --blue-soft: #1a2846; --vio: #b79cff; --vio-soft: #2c1f4a;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #3b2f22;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #17120c; --grid: #241c13; --card: #1e1710; --ink: #f5ece1; --ink-soft: #c4b19b;
+  --acc: #f6b25a; --acc-soft: #3d2810; --warn: #facc15; --warn-soft: #3a300c; --warn-ink: #fcd968;
+  --blue: #7aa7ff; --blue-soft: #1a2846; --vio: #b79cff; --vio-soft: #2c1f4a;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #3b2f22;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--acc); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note.warn { border-left-color: var(--warn); background: var(--warn-soft); }
+.note.ok { border-left-color: var(--ok); background: var(--ok-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+.fig svg { width: 100%; height: auto; display: block; }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 8px 12px; min-height: 44px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+button:disabled { opacity: .5; cursor: default; transform: none; }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+input[type="range"] { width: 100%; accent-color: var(--acc); min-height: 32px; }
+select { font: inherit; font-size: 1rem; padding: 8px 8px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; min-height: 44px; }
+.param { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.param label { font-weight: 700; }
+.params { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.privacy { font-size: .9rem; color: var(--ok); font-weight: 700; display: flex; gap: 6px; align-items: flex-start; }
+.privacy::before { content: "🔒"; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
+.tag.ok { color: var(--ok); }
+.tag.no { color: var(--red); }
+.tag.warn { color: var(--warn-ink); }
+.tag.acc { color: var(--acc); }
+.formula { font-family: var(--f-mono); font-size: 1.1rem; text-align: center; background: var(--paper); border: 1.5px dashed var(--line); border-radius: 8px; padding: 10px; overflow-wrap: anywhere; }
+
+.verdict { border-radius: 8px; padding: 12px 14px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+.verdict.yes { background: var(--ok-soft); color: var(--ok); }
+.verdict.no { background: var(--red-soft); color: var(--red); }
+.verdict.mid { background: var(--warn-soft); color: var(--warn-ink); }
+.verdict span { font-weight: 400; color: var(--ink); }
+
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.stat { background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 10px; min-width: 0; }
+.stat b { display: block; font-family: var(--f-mono); font-size: 1.05rem; overflow-wrap: anywhere; }
+.stat small { color: var(--ink-soft); font-size: .85rem; }
+
+/* Tri « rien n'est gratuit » et leviers */
+.sort { display: flex; flex-direction: column; gap: 10px; }
+.item { border: 1.5px solid var(--line); border-radius: 10px; padding: 10px 12px; background: var(--card); display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.item > strong { overflow-wrap: anywhere; }
+.item .btns button { min-width: 0; }
+.item .fbk { font-size: .95rem; }
+.item .fbk:empty { display: none; }
+.item .fbk.ok { color: var(--ok); font-weight: 700; }
+.item .fbk.no { color: var(--red); font-weight: 700; }
+.item .fbk span { color: var(--ink); font-weight: 400; }
+.item.lev { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 200px) auto; gap: 10px; align-items: center; }
+.item.lev .fbk { grid-column: 1 / -1; }
+@media (max-width: 560px) { .item.lev { grid-template-columns: minmax(0, 1fr) auto; } .item.lev > strong { grid-column: 1 / -1; } }
+.shopmsg { font-family: var(--f-mono); font-size: .92rem; }
+.count { font-family: var(--f-display); font-weight: 800; font-size: 1.2rem; color: var(--acc); }
+
+/* Packs de gemmes */
+.packs { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+.pack { border: 2px solid var(--acc); background: var(--acc-soft); border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 2px; align-items: center; text-align: center; min-width: 0; }
+.pack b { font-family: var(--f-display); font-size: 1.15rem; }
+.pack .pr { font-family: var(--f-mono); font-weight: 600; }
+.pack small { color: var(--ink-soft); font-size: .8rem; }
+.pack.used { box-shadow: 0 0 0 3px var(--ok); }
+.gembar { display: flex; height: 26px; border-radius: 6px; overflow: hidden; border: 1.5px solid var(--ink); }
+.gembar i { display: block; height: 100%; }
+.gembar .use { background: var(--acc); }
+.gembar .left { background: repeating-linear-gradient(45deg, var(--red-soft) 0 6px, var(--red) 6px 9px); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: .9rem; color: var(--ink-soft); }
+.legend i { display: inline-block; width: 14px; height: 14px; border-radius: 3px; vertical-align: -2px; margin-right: 6px; }
+
+/* Coffres */
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-family: var(--f-mono); font-size: .8rem; border: 1.5px solid var(--line); border-radius: 999px; padding: 2px 10px; color: var(--ink-soft); background: var(--paper); }
+.chip.r-rare { color: var(--blue); border-color: var(--blue); background: var(--blue-soft); }
+.chip.r-epique { color: var(--vio); border-color: var(--vio); background: var(--vio-soft); }
+.chip.r-legendaire { color: var(--acc); border-color: var(--acc); background: var(--acc-soft); font-weight: 700; }
+.chest-out { min-height: 36px; }
+
+/* Compte à rebours */
+.shop { border: 2.5px solid var(--ink); border-radius: 16px; padding: 16px; background: var(--paper); display: flex; flex-direction: column; gap: 8px; align-items: center; text-align: center; }
+.shop .badge { background: var(--red); color: var(--card); font-family: var(--f-display); font-weight: 800; padding: 2px 10px; border-radius: 999px; font-size: .9rem; }
+.shop .old { text-decoration: line-through; color: var(--ink-soft); font-family: var(--f-mono); }
+.shop .new { font-family: var(--f-display); font-weight: 800; font-size: 1.6rem; color: var(--acc); }
+.timer { font-family: var(--f-mono); font-weight: 600; font-size: clamp(1.6rem, 7vw, 2.2rem); color: var(--red); letter-spacing: .05em; }
+
+/* Pas à pas et budget */
+.log { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.log li { border-left: 4px solid var(--acc); background: var(--paper); border-radius: 0 8px 8px 0; padding: 6px 10px; font-size: .95rem; overflow-wrap: anywhere; }
+.log li.bad { border-left-color: var(--red); }
+.log li b.m { font-family: var(--f-mono); }
+.bud { display: flex; height: 30px; border-radius: 6px; overflow: hidden; border: 1.5px solid var(--ink); background: var(--paper); }
+.bud i { display: block; height: 100%; transition: width .2s; }
+.c0 { background: var(--ok); } .c1 { background: var(--blue); } .c2 { background: var(--acc); } .c3 { background: var(--vio); } .c4 { background: var(--ink-soft); }
+
+.steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; counter-reset: st; }
+.steps li { counter-increment: st; display: grid; grid-template-columns: 34px 1fr; gap: 10px; align-items: start; border: 1.5px solid var(--line); border-radius: 10px; padding: 8px 10px; background: var(--card); }
+.steps li::before { content: counter(st); width: 30px; height: 30px; border-radius: 50%; background: var(--acc); color: var(--card); display: grid; place-items: center; font-family: var(--f-display); font-weight: 800; }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 220px auto; gap: 10px; align-items: center; }
+.quiz li > span:first-child { min-width: 0; overflow-wrap: anywhere; }
+.quiz select { font-size: .95rem; padding: 6px 6px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb:empty { display: none; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc); }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 140px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+<!--ticons--><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Tutoriels"><script src="progress.js" defer></script><!--/ticons-->
+<style id="tnav-css">
+.tnav-top { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin: 0 0 4px; }
+.tnav-home { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font-weight: 700; font-size: .95rem; text-decoration: none; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tnav-home:hover, .tnav-home:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.tnav-bottom { margin-top: 8px; display: flex; flex-direction: column; gap: 12px; }
+.tnav-bottom h2 { margin: 0; }
+.tnav-pn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tnav-pn a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--ink, #222); border-radius: 10px;
+  background: var(--card, #fff); color: var(--ink, #222); text-decoration: none; box-shadow: 3px 3px 0 var(--ink, #222); min-width: 0; }
+.tnav-pn a span { font-size: .85rem; color: var(--ink-soft, #666); }
+.tnav-pn a strong { overflow-wrap: anywhere; }
+.tnav-pn a.next { text-align: right; grid-column: 2; }
+.tnav-bottom .tnav-home { align-self: center; }
+@media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
+.diff { font: 700 .72rem/1.2 var(--f-mono, monospace); padding: 2px 8px; border-radius: 99px; border: 1.5px solid; white-space: nowrap; }
+.diff.d1 { color: #15803d; border-color: #15803d; background: #dcf3e3; }
+.diff.d2 { color: #a15c07; border-color: #b45309; background: #fbe7cf; }
+.diff.d3 { color: #b91c1c; border-color: #b91c1c; background: #fde2e2; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root:not([data-theme="light"]) .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root:not([data-theme="light"]) .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; } }
+:root[data-theme="dark"] .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root[data-theme="dark"] .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root[data-theme="dark"] .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; }
+</style>
+</head>
+<body>
+<main class="page">
+<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="numerique.html">← Tous les tutoriels numériques</a><span class="diff d1" title="Difficulté : facile">Facile</span></nav><!--/tnav-->
+
+
+  <header class="hero">
+    <span class="eyebrow">Tutoriel numérique · niveau 9H</span>
+    <h1>Les achats dans les jeux</h1>
+    <p class="lead">Gemmes, pièces, coffres, pass de saison, « offre du jour »… Dans beaucoup de jeux, une boutique est cachée derrière chaque écran. Ici, tu vas <strong>calculer le vrai prix</strong> de ce que tu achètes, voir ce que cachent les coffres au hasard, repérer les pièges de la boutique, et faire ton propre budget.</p>
+    <div class="box fig">
+      <svg viewBox="0 0 360 170" role="img" aria-label="Une gemme, un coffre au trésor et une étiquette de prix en francs suisses">
+        <polygon points="70,40 100,40 118,62 85,112 52,62" fill="var(--blue-soft)" stroke="var(--blue)" stroke-width="3" stroke-linejoin="round"/>
+        <polyline points="52,62 118,62" fill="none" stroke="var(--blue)" stroke-width="2"/>
+        <polyline points="70,40 78,62 85,112 92,62 100,40" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linejoin="round"/>
+        <rect x="145" y="80" width="90" height="60" rx="6" fill="var(--acc-soft)" stroke="var(--acc)" stroke-width="3"/>
+        <path d="M145 86 Q190 40 235 86" fill="var(--acc-soft)" stroke="var(--acc)" stroke-width="3"/>
+        <rect x="181" y="92" width="18" height="22" rx="3" fill="var(--acc)"/>
+        <text x="190" y="160" font-size="13" text-anchor="middle">? ? ?</text>
+        <g transform="rotate(-12 300 90)">
+          <rect x="258" y="68" width="88" height="44" rx="8" fill="var(--card)" stroke="var(--ink)" stroke-width="2.5"/>
+          <circle cx="270" cy="90" r="5" fill="none" stroke="var(--ink)" stroke-width="2"/>
+          <text x="310" y="96" font-size="15" font-weight="600" text-anchor="middle">9,90</text>
+        </g>
+        <text x="302" y="142" font-size="13" text-anchor="middle">CHF</text>
+        <text x="85" y="140" font-size="13" text-anchor="middle">1 200</text>
+        <text x="85" y="157" font-size="13" text-anchor="middle">gemmes</text>
+      </svg>
+    </div>
+    <p class="soft">Tous les jeux, monnaies, prix et sites de cette page sont <strong>inventés</strong> (les adresses finissent par <span class="mono">.exemple</span>). Les calculs se font dans ta page : <strong>rien n'est envoyé ni enregistré</strong>. Et ici, tous les achats sont faux : aucun vrai franc n'est dépensé !</p>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · « Gratuit »… vraiment ?</span>
+    <h2>Rien n'est gratuit</h2>
+    <p>Un jeu coûte cher à fabriquer : des dessinateurs, des programmeurs, des serveurs allumés jour et nuit. Quand un jeu est « gratuit » (on dit <strong>free-to-play</strong>, « gratuit pour jouer »), l'entreprise doit quand même gagner de l'argent. Elle le fait de trois façons, souvent mélangées :</p>
+    <div class="cards">
+      <div class="box"><span class="tag acc">Argent</span><strong>Les achats dans le jeu</strong><span class="soft">Gemmes, tenues, coffres, pass… Souvent, une petite partie des joueurs paie beaucoup, et ça paie le jeu pour tous les autres.</span></div>
+      <div class="box"><span class="tag warn">Temps et attention</span><strong>La publicité</strong><span class="soft">Une pub entre deux niveaux, ou « regarde une vidéo pour doubler ta récompense ». Ton temps devant l'écran a de la valeur pour les annonceurs.</span></div>
+      <div class="box"><span class="tag no">Données</span><strong>Ce que le jeu apprend sur toi</strong><span class="soft">Quand tu joues, combien de temps, ce que tu regardes dans la boutique : ces informations servent à te proposer la bonne offre au bon moment.</span></div>
+    </div>
+    <p>Ce n'est pas forcément malhonnête : c'est un <strong>modèle économique</strong>, comme un journal gratuit payé par la pub. Tu peux très bien jouer sans jamais rien payer. Il faut juste savoir <span class="hl">qui paie, et avec quoi</span>.</p>
+    <div class="box">
+      <h3>Avec quoi tu paies ? Trie les situations</h3>
+      <p class="soft">Pour chaque situation de « Galaxie Quest », un jeu inventé, choisis ce que tu donnes vraiment.</p>
+      <div class="sort" id="freeSort"></div>
+      <p><span class="count" id="freeScore">0 / 6</span> <span class="soft">bonnes réponses</span></p>
+      <div class="btns"><button type="button" id="freeReset">Recommencer</button></div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · Les monnaies virtuelles</span>
+    <h2>Les packs ne tombent jamais juste</h2>
+    <p>Dans la boutique, les prix ne sont presque jamais en francs. Ils sont en <strong>gemmes</strong>, en <strong>pièces</strong> ou en cristaux. Tu achètes d'abord des gemmes avec de l'argent réel, puis tu dépenses les gemmes. Ce détour a deux effets :</p>
+    <div class="cards">
+      <div class="box"><span class="tag warn">Effet 1</span><strong>Le prix devient flou</strong><span class="soft">« 750 gemmes », ça fait combien de francs ? Difficile à dire de tête. Et quand on ne sent plus le prix, on dépense plus facilement.</span></div>
+      <div class="box"><span class="tag warn">Effet 2</span><strong>Il reste toujours des gemmes</strong><span class="soft">Les gemmes se vendent par packs. Souvent, l'objet coûte un peu plus qu'un pack : tu dois acheter trop, et le reste « t'appelle » à racheter.</span></div>
+    </div>
+    <div class="box">
+      <h3>La boutique de gemmes de Galaxie Quest</h3>
+      <div class="packs" id="packs"></div>
+      <div class="param"><label for="gemR">Prix de l'objet : <span id="gemV" class="mono">750</span> gemmes</label><input type="range" id="gemR" min="50" max="8000" step="50" value="750"></div>
+      <div class="btns" id="gemPresets" role="group" aria-label="Choisir un objet">
+        <button type="button" data-g="750">Tenue Comète (750)</button>
+        <button type="button" data-g="950">Pass de saison (950)</button>
+        <button type="button" data-g="1300">Monture Lynx (1 300)</button>
+        <button type="button" data-g="3300">Vaisseau Nova (3 300)</button>
+      </div>
+      <div class="stats">
+        <div class="stat"><small>Packs les moins chers</small><b id="gBuy">—</b></div>
+        <div class="stat"><small>Tu paies vraiment</small><b id="gPay">—</b></div>
+        <div class="stat"><small>Gemmes achetées</small><b id="gGot">—</b></div>
+        <div class="stat"><small>Gemmes qui restent</small><b id="gLeft">—</b></div>
+      </div>
+      <div class="gembar" aria-hidden="true"><i class="use" id="barUse"></i><i class="left" id="barLeft"></i></div>
+      <div class="legend"><span><i style="background:var(--acc)"></i>gemmes utilisées pour l'objet</span><span><i style="background:var(--red)"></i>gemmes payées qui restent</span></div>
+      <p id="gMsg" aria-live="polite"></p>
+    </div>
+    <div class="note">
+      <span class="note-title">Le réflexe : traduire en francs</span>
+      <span>Avant d'acheter, demande-toi : <strong>« Combien de francs je dois vraiment sortir ? »</strong> et <strong>« Est-ce que je paierais ce prix pour ça dans un vrai magasin ? »</strong> Les gros packs donnent plus de gemmes par franc, mais ce n'est une bonne affaire que si tu avais vraiment besoin de toutes ces gemmes.</span>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Les coffres</span>
+    <h2>Ouvrir des coffres : tu paies le hasard</h2>
+    <p>Un <strong>coffre</strong> (on dit aussi <em>loot box</em>, « boîte à butin ») contient un objet <strong>tiré au hasard</strong>. Tu paies d'abord, et tu découvres ensuite ce que tu as gagné. Les objets rares ont une toute petite probabilité. Dans Galaxie Quest, un coffre coûte 200 gemmes, <strong>environ 2 CHF</strong>.</p>
+    <div class="box">
+      <h3>Simulateur de coffres</h3>
+      <div class="param"><label for="pSel">Probabilité d'un objet légendaire</label>
+        <select id="pSel">
+          <option value="0.005">0,5 % (1 chance sur 200)</option>
+          <option value="0.01" selected>1 % (1 chance sur 100)</option>
+          <option value="0.02">2 % (1 chance sur 50)</option>
+          <option value="0.05">5 % (1 chance sur 20)</option>
+        </select>
+      </div>
+      <p class="soft" id="pInfo"></p>
+      <div class="btns">
+        <button type="button" id="ch1">Ouvrir 1 coffre</button>
+        <button type="button" id="ch10">Ouvrir 10 coffres</button>
+        <button type="button" id="chLeg">Ouvrir jusqu'au légendaire</button>
+        <button type="button" id="chReset">Tout remettre à zéro</button>
+      </div>
+      <div class="stats">
+        <div class="stat"><small>Coffres ouverts</small><b id="cN">0</b></div>
+        <div class="stat"><small>Argent dépensé</small><b id="cCost">0,00 CHF</b></div>
+        <div class="stat"><small>Légendaires</small><b id="cLeg">0</b></div>
+        <div class="stat"><small>1<sup>er</sup> légendaire</small><b id="cFirst">pas encore</b></div>
+      </div>
+      <p class="soft" id="cCounts"></p>
+      <div class="chips chest-out" id="cLast" aria-live="polite"></div>
+      <p id="cMsg"></p>
+    </div>
+    <div class="note warn">
+      <span class="note-title">Ça ressemble beaucoup à un jeu d'argent</span>
+      <span>Payer pour un résultat au hasard, avec l'envie de « rejouer encore une fois », c'est le principe des machines à sous. Les jeux d'argent comme le casino sont réservés aux adultes. Pour les coffres, les règles changent selon les pays : <strong>certains pays les encadrent</strong>, ou obligent les jeux à afficher les probabilités, et des spécialistes demandent de mieux protéger les jeunes. Si un jeu affiche les chances, lis-les !</span>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · Combien de coffres en moyenne ?</span>
+    <h2>Une chance sur 100, ça fait combien d'essais ?</h2>
+    <p>Si un légendaire a une probabilité <strong>p</strong>, il faut ouvrir <strong>en moyenne 1 ÷ p</strong> coffres pour en avoir un. Avec 1 % = 0,01 : 1 ÷ 0,01 = <strong>100 coffres</strong>, donc environ <strong>200 CHF</strong>. « En moyenne » : certains ont de la chance tôt, d'autres attendent beaucoup plus longtemps. Le tutoriel sur <a class="tlink" href="les-probabilites.html">les probabilités</a> explique ces calculs.</p>
+    <div class="formula">nombre moyen d'essais = 1 ÷ p</div>
+    <div class="box">
+      <h3>1 000 joueurs ouvrent des coffres jusqu'à leur légendaire</h3>
+      <p class="soft">Chaque barre montre combien de joueurs ont eu leur premier légendaire dans cette tranche de coffres. La ligne pointillée marque la moyenne théorique 1 ÷ p. La probabilité choisie est celle du simulateur ci-dessus.</p>
+      <div class="btns"><button type="button" id="histGo">Nouvelle simulation de 1 000 joueurs</button></div>
+      <div class="fig" id="hist"></div>
+      <div class="stats">
+        <div class="stat"><small>Moyenne théorique 1 ÷ p</small><b id="hTh">—</b></div>
+        <div class="stat"><small>Moyenne simulée</small><b id="hMean">—</b></div>
+        <div class="stat"><small>Médiane (la moitié a fini avant)</small><b id="hMed">—</b></div>
+        <div class="stat"><small>Joueurs qui ont dû payer plus du double</small><b id="hOver">—</b></div>
+      </div>
+      <p id="hMsg"></p>
+    </div>
+    <div class="note">
+      <span class="note-title">Le hasard n'a pas de mémoire</span>
+      <span>Après 80 coffres sans légendaire, on se dit « ça doit arriver bientôt ». <strong>Faux</strong> : chaque coffre a toujours la même chance, 1 %. Les coffres déjà ouverts ne « rapprochent » de rien. (Certains jeux ajoutent une « garantie » après un certain nombre d'essais : c'est alors écrit dans les règles, et c'est souvent très loin.)</span>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Les pièges de la boutique</span>
+    <h2>Pass de saison, offres limitées, « dernier jour ! »</h2>
+    <p>Un <strong>pass de saison</strong> coûte par exemple 950 gemmes (environ 10 CHF) et débloque des récompenses quand tu montes de niveau pendant quelques semaines. Pour tout obtenir, il faut jouer <strong>presque tous les jours</strong>. Si tu es en retard, le jeu te propose… d'acheter des niveaux. À la fin de la saison, ce qui n'est pas débloqué est perdu.</p>
+    <p>La boutique utilise les mêmes leviers que les arnaques et les fausses infos : elle cherche à te faire <strong>réagir avant de réfléchir</strong>. Le tutoriel sur <a class="tlink" href="comment-on-te-manipule.html">comment on te manipule</a> les présente tous.</p>
+    <div class="box">
+      <h3>L'offre « exceptionnelle »</h3>
+      <div class="shop" aria-live="polite">
+        <span class="badge">OFFRE LIMITÉE</span>
+        <strong>Pack Dragon · 2 600 gemmes + tenue</strong>
+        <span class="old">79,90 CHF</span>
+        <span class="new">23,90 CHF</span>
+        <span class="timer" id="tmr">00:00:30</span>
+        <span id="tmrMsg" class="soft">Plus que quelques secondes !</span>
+      </div>
+      <div class="btns">
+        <button type="button" id="tmrGo">Regarder la boutique</button>
+        <button type="button" id="tmrFast">Avancer de 10 secondes</button>
+        <button type="button" id="tmrStop">Arrêter</button>
+      </div>
+      <p id="tmrInfo" class="soft">Lance la boutique, et regarde ce qui se passe quand le compte à rebours arrive à zéro.</p>
+    </div>
+    <div class="box">
+      <h3>Quel levier ? Repère la ficelle</h3>
+      <p class="soft">Chaque message de boutique tire sur une ficelle de ton cerveau. Laquelle ?</p>
+      <div class="sort" id="levSort"></div>
+      <p><span class="count" id="levScore">0 / 6</span> <span class="soft">bonnes réponses</span></p>
+    </div>
+    <div class="note ok">
+      <span class="note-title">La règle d'or</span>
+      <span><strong>Ce qui veut te faire acheter avant de réfléchir cherche à te manipuler.</strong> Respire 5 à 10 secondes. Pose-toi la question : « Pourquoi maintenant ? » Une offre qui « disparaît » revient presque toujours, sous un autre nom. Et le piège le plus dangereux, c'est de croire qu'on ne se fera jamais avoir : ces techniques marchent sur tout le monde, adultes compris.</span>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · Abonnements et essais gratuits</span>
+    <h2>Petit prix par mois, gros prix par an</h2>
+    <p>« Seulement 6,90 CHF par mois ! » Un abonnement semble pas cher, car on ne voit qu'un mois. Mais il se paie <strong>tout seul, chaque mois</strong>, jusqu'à ce qu'on le résilie. Et un <strong>essai gratuit</strong> devient souvent payant automatiquement si on oublie de l'arrêter à temps.</p>
+    <div class="box">
+      <h3>Galaxie Quest Plus : l'essai gratuit, pas à pas</h3>
+      <div class="btns"><button type="button" id="trNext">Pas suivant</button><button type="button" id="trReset">Recommencer</button></div>
+      <ol class="log" id="trLog" aria-live="polite"></ol>
+    </div>
+    <div class="box">
+      <h3>Calculateur d'abonnement</h3>
+      <div class="params">
+        <div class="param"><label for="subR">Prix par mois : <span id="subV" class="mono">6,90 CHF</span></label><input type="range" id="subR" min="100" max="2990" step="10" value="690"></div>
+        <div class="param"><label for="subM">Durée avant de résilier : <span id="subMV" class="mono">12 mois</span></label><input type="range" id="subM" min="1" max="36" step="1" value="12"></div>
+      </div>
+      <div class="stats">
+        <div class="stat"><small>Par an (× 12)</small><b id="subY">—</b></div>
+        <div class="stat"><small>Sur toute la durée</small><b id="subT">—</b></div>
+        <div class="stat"><small>Avec 20 CHF d'argent de poche par mois</small><b id="subP">—</b></div>
+      </div>
+      <p id="subMsg"></p>
+    </div>
+    <div class="note">
+      <span class="note-title">Avant de dire oui à un essai gratuit</span>
+      <span>Demande d'abord à tes parents (c'est souvent leur carte). Notez ensemble <strong>la date de fin de l'essai</strong> dans un calendrier, avec un rappel la veille. Et vérifiez de temps en temps la liste des abonnements dans le magasin d'applis.</span>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Mon budget</span>
+    <h2>Mon argent de poche, mon plan</h2>
+    <p>Le meilleur moyen de ne pas se faire piéger, c'est de <strong>décider avant</strong> combien tu veux dépenser dans les jeux, quand tu es calme, pas devant la boutique. Règle ton budget du mois. Le tutoriel sur <a class="tlink" href="les-pourcentages.html">les pourcentages</a> t'aide à lire les parts.</p>
+    <div class="box">
+      <div class="param"><label for="bInc">Argent de poche par mois : <span id="bIncV" class="mono">30 CHF</span></label><input type="range" id="bInc" min="0" max="150" step="1" value="30"></div>
+      <div class="params" id="bParts"></div>
+      <div class="bud" id="bBar" aria-hidden="true"></div>
+      <div class="legend" id="bLeg"></div>
+      <div class="stats">
+        <div class="stat"><small>Total prévu</small><b id="bTot">—</b></div>
+        <div class="stat"><small>Il reste</small><b id="bLeft">—</b></div>
+        <div class="stat"><small>Part pour les jeux</small><b id="bGame">—</b></div>
+      </div>
+      <div class="param"><label for="bGoal">Mon objectif d'épargne : <span id="bGoalV" class="mono">59 CHF</span></label><input type="range" id="bGoal" min="10" max="300" step="1" value="59"></div>
+      <p id="bMsg" aria-live="polite"></p>
+      <span class="privacy">Rien n'est envoyé ni enregistré : c'est juste un brouillon dans ta page.</span>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Arnaques et paiements</span>
+    <h2>Gemmes gratuites, comptes vendus, triche : attention</h2>
+    <p>Partout où il y a de l'argent, il y a des escrocs. Dans les jeux, ils jouent sur <strong>l'appât du gain</strong> : « gemmes gratuites », « compte niveau 100 pas cher », « logiciel de triche ». Le but est presque toujours de <strong>voler ton compte</strong> ou ton argent. Le tutoriel sur <a class="tlink" href="reperer-les-arnaques.html">les arnaques</a> t'apprend à repérer les faux messages et les faux sites.</p>
+    <div class="cards">
+      <div class="box"><span class="tag no">Piège</span><strong>Le « générateur de gemmes »</strong><span class="soft">Ça n'existe pas : tes gemmes sont gardées sur les ordinateurs du jeu, personne ne peut en « générer ». Le site veut ton pseudo et ton mot de passe.</span></div>
+      <div class="box"><span class="tag no">Piège</span><strong>Le compte à vendre</strong><span class="soft">Souvent un compte volé, interdit par les règles du jeu. Le vrai propriétaire peut le récupérer, et ton argent est perdu.</span></div>
+      <div class="box"><span class="tag no">Piège</span><strong>Le logiciel de triche</strong><span class="soft">Il peut contenir un virus qui vole tes mots de passe. Et le jeu peut bannir ton compte pour toujours.</span></div>
+      <div class="box"><span class="tag no">Piège</span><strong>Le code de carte cadeau</strong><span class="soft">Un code de carte cadeau, c'est de l'argent. Personne d'honnête ne te demande de le lui envoyer.</span></div>
+    </div>
+    <div class="box">
+      <h3>Que fais-tu ?</h3>
+      <div class="btns" id="scTabs" role="group" aria-label="Choisir une situation"></div>
+      <p id="scText"></p>
+      <div class="btns" id="scChoices" role="group" aria-label="Ta réaction"></div>
+      <div id="scOut" aria-live="polite"></div>
+    </div>
+    <h3>Payer, oui, mais avec tes parents</h3>
+    <div class="cards">
+      <div class="box"><span class="tag ok">Toujours</span><strong>Demande avant</strong><span class="soft">Aucun achat sans l'accord de tes parents, même petit. Utiliser leur carte sans demander, c'est grave, même si c'est « pour 2 francs ».</span></div>
+      <div class="box"><span class="tag ok">Protection</span><strong>Un mot de passe pour chaque achat</strong><span class="soft">Avec tes parents, activez le réglage qui demande un mot de passe ou leur accord à chaque achat (le « contrôle parental » du téléphone ou de la console).</span></div>
+      <div class="box"><span class="tag ok">Plafond</span><strong>La carte cadeau</strong><span class="soft">Une carte cadeau avec un montant fixe, c'est un plafond : quand elle est vide, c'est fini. Pas de surprise sur la facture.</span></div>
+      <div class="box"><span class="tag warn">Oups</span><strong>Achat par erreur ?</strong><span class="soft">Parles-en tout de suite à tes parents. Selon le magasin d'applis, on peut parfois demander un remboursement, surtout si on réagit vite.</span></div>
+    </div>
+    <div class="note ok">
+      <span class="note-title">Où trouver de l'aide, en Suisse</span>
+      <span>• Parles-en à un <strong>adulte de confiance</strong> (parent, enseignant·e, infirmier·ère scolaire). Tu ne seras pas jugé·e : tout le monde peut se faire avoir.</span>
+      <span>• <strong>Pro Juventute, le 147</strong> : conseil gratuit pour les jeunes, par téléphone, SMS ou chat.</span>
+      <span>• <strong>L'OFCS</strong> (Office fédéral de la cybersécurité, ncsc.admin.ch) : pour signaler une arnaque, avec un adulte.</span>
+      <span>• <strong>La police, le 117</strong> : en cas de chantage ou de menace. En cas d'urgence : 112, 117 ou 144.</span>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Attention</span>
+    <h2>Les erreurs fréquentes</h2>
+    <div class="cards">
+      <div class="box"><span class="tag no">Faux</span><strong>« C'est gratuit, donc je ne paie rien. »</strong><span class="soft">Tu paies peut-être avec ton temps, ton attention (les pubs) ou tes données. Et la boutique est là pour te tenter.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« 750 gemmes, c'est pas cher. »</strong><span class="soft">Traduis en francs : avec des packs de 500 à 4,90 CHF, il faut en acheter 2, soit 9,80 CHF, et il reste 250 gemmes.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« J'ai ouvert 80 coffres, le légendaire arrive. »</strong><span class="soft">Le hasard n'a pas de mémoire : la chance reste 1 % à chaque coffre.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« 1 % sur 100 coffres, c'est sûr d'en avoir un. »</strong><span class="soft">Non : 1 − 0,99¹⁰⁰ ≈ 63 %. Plus d'un joueur sur trois n'a toujours rien après 100 coffres.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« Dernier jour, je dois me décider maintenant ! »</strong><span class="soft">L'urgence est fabriquée. Les offres reviennent. Si tu hésites, la réponse est « non, pas maintenant ».</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« Juste 6,90 par mois. »</strong><span class="soft">6,90 × 12 = 82,80 CHF par an, et ça continue tant qu'on ne résilie pas.</span></div>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Choisis ta réponse, puis vérifie.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Recommencer</button>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · Le savais-tu ?</span>
+    <h2>De la pièce de monnaie au pass de saison</h2>
+    <ol class="timeline">
+      <li><span class="when">années 1970–1980</span><div class="what"><strong>Une pièce, une partie</strong><span>Dans les salles d'arcade, on glissait une pièce pour jouer une partie. Perdre trop vite, c'était remettre une pièce : déjà un petit paiement répété !</span></div></li>
+      <li><span class="when">bien avant les jeux vidéo</span><div class="what"><strong>Les pochettes surprises</strong><span>Les images et cartes à collectionner vendues en pochettes fermées marchent comme un coffre : on paie sans savoir ce qu'on aura, et les cartes rares sont… rares.</span></div></li>
+      <li><span class="when">années 1990–2000</span><div class="what"><strong>On achète le jeu, une fois</strong><span>La plupart des jeux se vendent en boîte, sur cartouche ou sur disque. Le prix est connu d'avance.</span></div></li>
+      <li><span class="when">années 2000</span><div class="what"><strong>Les jeux gratuits avec boutique</strong><span>Des jeux en ligne deviennent gratuits et vendent des objets virtuels. Le modèle se répand peu à peu.</span></div></li>
+      <li><span class="when">années 2010</span><div class="what"><strong>Les téléphones, les coffres, les pass</strong><span>Avec les smartphones, le « free-to-play » devient très courant. Coffres, monnaies virtuelles puis pass de saison se multiplient, et plusieurs pays commencent à débattre des coffres payants.</span></div></li>
+    </ol>
+  </section>
+
+  <!-- 12 -->
+  <section>
+    <span class="eyebrow">Étape 12 · À toi de jouer</span>
+    <h2>Exercices</h2>
+    <div class="exos">
+      <details>
+        <summary>1. La monture Lynx<span class="q">Elle coûte 1 300 gemmes. Les packs : 500 gemmes = 4,90 CHF et 1 200 gemmes = 9,90 CHF. Quelle est la façon la moins chère de l'acheter ? Combien de gemmes restent ?</span></summary>
+        <div>
+          <span>3 packs de 500 : 1 500 gemmes pour 3 × 4,90 = <strong>14,70 CHF</strong>, il reste <strong>200 gemmes</strong>.</span>
+          <span>1 200 + 500 : 1 700 gemmes pour 14,80 CHF (il en reste 400). 2 × 1 200 : 19,80 CHF. Donc 14,70 CHF est le moins cher. 1 300 gemmes, juste un peu plus qu'un pack de 1 200 : ce n'est sans doute pas un hasard !</span>
+        </div>
+      </details>
+      <details>
+        <summary>2. Au moins un légendaire<span class="q">La chance d'un légendaire est 1 % par coffre. Quelle est la probabilité d'en avoir au moins un en 10 coffres ? En 100 coffres ?</span></summary>
+        <div>
+          <span>On calcule d'abord la chance de n'en avoir <strong>aucun</strong> : 0,99 à chaque coffre, donc 0,99¹⁰ ≈ 0,904 pour 10 coffres.</span>
+          <span>Au moins un : 1 − 0,904 ≈ <strong>9,6 %</strong> (et pas 10 %). Pour 100 coffres : 1 − 0,99¹⁰⁰ ≈ 1 − 0,366 ≈ <strong>63 %</strong>. Après 200 CHF de coffres, plus d'un joueur sur trois n'a rien.</span>
+        </div>
+      </details>
+      <details>
+        <summary>3. Trois abonnements<span class="q">Léa a trois abonnements : 4,90 CHF, 6,90 CHF et 9,90 CHF par mois. Combien paie-t-elle par mois ? Par an ?</span></summary>
+        <div>
+          <span>Par mois : 4,90 + 6,90 + 9,90 = <strong>21,70 CHF</strong>.</span>
+          <span>Par an : 21,70 × 12 = <strong>260,40 CHF</strong>.</span>
+        </div>
+      </details>
+      <details>
+        <summary>4. Économiser pour un jeu<span class="q">Noé reçoit 25 CHF par mois et met 10 CHF de côté. Combien de mois lui faut-il pour s'offrir un jeu à 59,90 CHF ?</span></summary>
+        <div>
+          <span>59,90 ÷ 10 = 5,99. Après 5 mois, il a 50 CHF : pas assez. Il lui faut donc <strong>6 mois</strong> (60 CHF).</span>
+        </div>
+      </details>
+      <details>
+        <summary>5. Le faux rabais<span class="q">Le Pack Dragon affiche 79,90 CHF barré, puis 23,90 CHF. Quel est le pourcentage de réduction ? Pourquoi faut-il s'en méfier ?</span></summary>
+        <div>
+          <span>Réduction : 79,90 − 23,90 = 56 CHF. 56 ÷ 79,90 ≈ 0,70, soit environ <strong>70 %</strong>.</span>
+          <span>Mais le prix barré n'a peut-être <strong>jamais existé</strong> : il est là pour donner l'impression d'une bonne affaire (l'appât du gain). La vraie question reste : « Est-ce que je voulais ce pack à 23,90 CHF avant de voir l'offre ? »</span>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• Un jeu « gratuit » gagne de l'argent avec <strong>tes achats, ton attention (les pubs) ou tes données</strong> : rien n'est gratuit.</span>
+      <span>• Traduis toujours les gemmes <strong>en francs</strong>. Les packs ne tombent jamais juste : il reste des gemmes payées.</span>
+      <span>• Un coffre, c'est payer le hasard. Avec une probabilité p, il faut <strong>en moyenne 1 ÷ p</strong> essais (1 % → 100 coffres), et le hasard n'a pas de mémoire.</span>
+      <span>• Compte à rebours, « dernier jour », stock limité, faux rabais : ce sont des <strong>leviers de manipulation</strong>. Respire 5 à 10 secondes avant d'acheter.</span>
+      <span>• Un abonnement se calcule <strong>par an</strong> : 6,90 CHF par mois = 82,80 CHF par an. Note la fin des essais gratuits.</span>
+      <span>• Décide ton <strong>budget à l'avance</strong>, au calme, pas devant la boutique.</span>
+      <span>• « Gemmes gratuites », comptes vendus, triche : ce sont des arnaques pour voler ton compte. Ne donne jamais ton mot de passe ni un code de carte cadeau.</span>
+      <span>• Aucun achat sans tes parents ; activez ensemble un mot de passe pour chaque achat. En cas de souci, parles-en : en Suisse, le 147 peut t'aider.</span>
+    </div>
+  </section>
+
+  <!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"><a class="prev" href="le-temps-d-ecran-et-l-attention.html"><span>← Précédent</span><strong>Le temps d&#x27;écran et l&#x27;attention</strong></a></div><a class="tnav-home" href="numerique.html">⌂ Tous les tutoriels numériques</a></nav><!--/tnav-->
+<footer>Fiche de révision · Les achats dans les jeux</footer>
+</main>
+
+<script>
+(function () {
+  /*
+   * Hooks de test : window.__ach
+   *   packs                          -> [{gems, price}] packs de gemmes (500 = 4,90 ; 1 200 = 9,90 ; 2 600 = 19,90 ; 6 500 = 44,90)
+   *   realCost(gems, packs?)         -> {gems, cents, total (CHF), bought, leftover, leftoverValue (CHF), counts:[n par pack], list:[{gems, price, count}]}
+   *                                     combinaison de packs LA MOINS CHÈRE avec au moins `gems` gemmes ; à prix égal, le moins de restes.
+   *                                     ex. realCost(750) -> 2 × 500, 9,80 CHF, 1 000 achetées, 250 restent
+   *   openChests(n, p, seed)         -> {n, p, seed, counts:{commun, rare, epique, legendaire}, firstLegendary (rang 1…n ou null), cost (CHF, 2 CHF/coffre), results:[…]}
+   *                                     tirage seedé (mulberry32) : r < p légendaire ; < p+0,05 épique ; < p+0,20 rare ; sinon commun
+   *   expectedTries(p)               -> 1 / p (nombre moyen de coffres jusqu’au premier légendaire)
+   *   probAtLeastOne(n, p)           -> 1 − (1 − p)^n
+   *   simulatePlayers(players, p, seed, cap?) -> {tries:[…], mean, median, overDouble (part > 2/p), capped}
+   *   yearly(monthly)                -> prix annuel en CHF (12 × monthly, arrondi au centime) ; yearly(6.9) = 82.8
+   *   budget(income, parts)          -> {total, left, pct:[…] (% du revenu, 1 décimale), over (bool)}
+   *   monthsToSave(goal, perMonth)   -> nombre de mois entiers (Infinity si perMonth ≤ 0)
+   *   fmtCHF(x), free, levers, scenarios, trial, quiz
+   * Rien n’est envoyé ni enregistré : tout reste dans la page.
+   */
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function group(intStr) { return intStr.replace(/\B(?=(\d{3})+(?!\d))/g, ' '); }
+  function fmtNum(x, dec) {
+    if (!isFinite(x)) return '∞';
+    var neg = x < 0, s = Math.abs(x).toFixed(dec || 0), parts = s.split('.');
+    return (neg ? '−' : '') + group(parts[0]) + (parts[1] ? ',' + parts[1] : '');
+  }
+  function fmtCHF(x) { return fmtNum(Math.round(x * 100) / 100, 2) + ' CHF'; }
+  function fmtPct(x) { return fmtNum(Math.round(x * 10) / 10, 1).replace(/,0$/, '') + ' %'; }
+
+  /* ---------- Hasard seedé ---------- */
+  function mulberry32(a) {
+    return function () {
+      a |= 0; a = a + 0x6D2B79F5 | 0;
+      var t = Math.imul(a ^ a >>> 15, 1 | a);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+
+  /* ---------- Étape 1 : avec quoi tu paies ---------- */
+  var KINDS = [['argent', 'Argent'], ['temps', 'Temps et attention'], ['donnees', 'Données']];
+  var FREE = [
+    { t: 'Regarder une pub de 30 secondes pour doubler tes pièces.', a: 'temps', why: 'Tu « paies » avec ton attention : l’annonceur paie le jeu pour que tu regardes sa pub.' },
+    { t: 'Acheter le pass de saison avec des gemmes payées environ 10 CHF.', a: 'argent', why: 'Là, c’est de l’argent réel, même s’il passe par des gemmes.' },
+    { t: 'Se connecter avec son compte de réseau social « pour aller plus vite ».', a: 'donnees', why: 'Le jeu peut alors recevoir des informations sur toi (nom, amis, photo…).' },
+    { t: 'Le jeu demande l’accès à tes contacts pour « inviter des amis ».', a: 'donnees', why: 'Tes contacts sont des données personnelles, les tiennes et celles de tes amis. Tu peux refuser.' },
+    { t: 'Revenir chaque jour pour la « récompense quotidienne ».', a: 'temps', why: 'Le jeu achète ton temps : plus tu reviens, plus tu as de chances d’acheter un jour.' },
+    { t: 'Le pack de démarrage « spécial débutant » à 0,99 CHF.', a: 'argent', why: 'Un tout petit prix pour faire le premier pas : après le premier achat, le deuxième semble plus facile.' }
+  ];
+  var freeAns = [];
+  function freeBuild() {
+    freeAns = [];
+    $('freeSort').innerHTML = FREE.map(function (f, i) {
+      return '<div class="item"><strong>' + esc(f.t) + '</strong><div class="btns" role="group" aria-label="Avec quoi tu paies">' +
+        KINDS.map(function (k) { return '<button type="button" data-i="' + i + '" data-k="' + k[0] + '" aria-pressed="false">' + esc(k[1]) + '</button>'; }).join('') +
+        '</div><span class="fbk" id="ff' + i + '" aria-live="polite"></span></div>';
+    }).join('');
+    freeScore();
+  }
+  function freeScore() {
+    var n = 0; FREE.forEach(function (f, i) { if (freeAns[i] === f.a) n++; });
+    $('freeScore').textContent = n + ' / ' + FREE.length;
+  }
+  $('freeSort').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-k]'); if (!b) return;
+    var i = +b.getAttribute('data-i'), k = b.getAttribute('data-k'), f = FREE[i];
+    freeAns[i] = k;
+    b.parentNode.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+    var fb = $('ff' + i), good = KINDS.filter(function (x) { return x[0] === f.a; })[0][1];
+    if (k === f.a) { fb.className = 'fbk ok'; fb.innerHTML = 'Juste ! <span>' + esc(f.why) + '</span>'; }
+    else { fb.className = 'fbk no'; fb.innerHTML = 'Pas tout à fait : c’est plutôt « ' + esc(good) + ' ». <span>' + esc(f.why) + '</span>'; }
+    freeScore();
+  });
+  $('freeReset').addEventListener('click', freeBuild);
+  freeBuild();
+
+  /* ---------- Étape 2 : le vrai prix ---------- */
+  var PACKS = [{ gems: 500, price: 4.90 }, { gems: 1200, price: 9.90 }, { gems: 2600, price: 19.90 }, { gems: 6500, price: 44.90 }];
+  function gcd(a, b) { while (b) { var t = b; b = a % b; a = t; } return a; }
+  function realCost(gems, packs) {
+    packs = packs || PACKS;
+    gems = Math.max(0, Math.ceil(Number(gems) || 0));
+    var g = 0, maxS = 0;
+    packs.forEach(function (p) { g = gcd(g, p.gems); });
+    var units = packs.map(function (p) { var u = p.gems / g; if (u > maxS) maxS = u; return u; });
+    var cents = packs.map(function (p) { return Math.round(p.price * 100); });
+    var T = Math.ceil(gems / g), M = T + maxS, dp = [0], prev = [-1], a, j;
+    for (a = 1; a <= M; a++) {
+      dp[a] = Infinity; prev[a] = -1;
+      for (j = 0; j < packs.length; j++) {
+        if (units[j] <= a && dp[a - units[j]] + cents[j] < dp[a]) { dp[a] = dp[a - units[j]] + cents[j]; prev[a] = j; }
+      }
+    }
+    var best = -1;
+    for (a = T; a <= M; a++) { if (dp[a] < Infinity && (best < 0 || dp[a] < dp[best])) best = a; }
+    var counts = packs.map(function () { return 0; }), cur = best;
+    while (cur > 0) { counts[prev[cur]]++; cur -= units[prev[cur]]; }
+    var bought = best * g, c = dp[best], left = bought - gems;
+    return {
+      gems: gems, cents: c, total: c / 100, bought: bought, leftover: left,
+      leftoverValue: bought ? Math.round(left * c / bought) / 100 : 0,
+      counts: counts,
+      list: packs.map(function (p, k) { return { gems: p.gems, price: p.price, count: counts[k] }; }).filter(function (x) { return x.count > 0; })
+    };
+  }
+  $('packs').innerHTML = PACKS.map(function (p, k) {
+    return '<div class="pack" id="pk' + k + '"><b>' + fmtNum(p.gems) + ' gemmes</b><span class="pr">' + fmtCHF(p.price) + '</span><small>≈ ' + fmtCHF(p.price / p.gems * 100) + ' les 100 gemmes</small></div>';
+  }).join('');
+  function gemShow(v) {
+    v = +v; $('gemR').value = v; $('gemV').textContent = fmtNum(v);
+    var r = realCost(v);
+    $('gBuy').textContent = r.list.map(function (x) { return x.count + ' × ' + fmtNum(x.gems); }).join(' + ') || '—';
+    $('gPay').textContent = fmtCHF(r.total);
+    $('gGot').textContent = fmtNum(r.bought);
+    $('gLeft').textContent = fmtNum(r.leftover);
+    PACKS.forEach(function (p, k) { $('pk' + k).classList.toggle('used', r.counts[k] > 0); });
+    var used = r.bought ? r.gems / r.bought * 100 : 0;
+    $('barUse').style.width = used + '%'; $('barLeft').style.width = (100 - used) + '%';
+    var msg = 'L’objet affiche ' + fmtNum(r.gems) + ' gemmes, mais tu dois sortir <strong>' + fmtCHF(r.total) + '</strong>. ';
+    if (r.leftover > 0) msg += 'Il te reste ' + fmtNum(r.leftover) + ' gemmes déjà payées (environ ' + fmtCHF(r.leftoverValue) + ') : trop peu pour un autre objet, juste assez pour te donner envie de racheter un pack…';
+    else msg += 'Ici, les packs tombent juste : c’est rare !';
+    $('gMsg').innerHTML = msg;
+    document.querySelectorAll('#gemPresets button').forEach(function (b) { b.setAttribute('aria-pressed', +b.getAttribute('data-g') === v ? 'true' : 'false'); });
+  }
+  $('gemR').addEventListener('input', function () { gemShow(this.value); });
+  $('gemPresets').addEventListener('click', function (e) { var b = e.target.closest('button[data-g]'); if (b) gemShow(b.getAttribute('data-g')); });
+  gemShow(750);
+
+  /* ---------- Étape 3 : coffres ---------- */
+  var CHEST = 2; // CHF par coffre (200 gemmes, arrondi)
+  var RAR = { commun: 'commun', rare: 'rare', epique: 'épique', legendaire: 'légendaire' };
+  function rarity(r, p) { return r < p ? 'legendaire' : r < p + 0.05 ? 'epique' : r < p + 0.20 ? 'rare' : 'commun'; }
+  function openChests(n, p, seed) {
+    n = Math.max(0, Math.floor(Number(n) || 0)); p = Number(p) || 0;
+    var rng = mulberry32(seed >>> 0), counts = { commun: 0, rare: 0, epique: 0, legendaire: 0 }, first = null, res = [];
+    for (var i = 0; i < n; i++) {
+      var k = rarity(rng(), p); counts[k]++; res.push(k);
+      if (k === 'legendaire' && first === null) first = i + 1;
+    }
+    return { n: n, p: p, seed: seed, counts: counts, firstLegendary: first, cost: n * CHEST, results: res };
+  }
+  function expectedTries(p) { p = Number(p); return p > 0 ? 1 / p : Infinity; }
+  function probAtLeastOne(n, p) { return 1 - Math.pow(1 - p, n); }
+
+  var ch = {};
+  function chReset() {
+    ch = { p: +$('pSel').value, rng: mulberry32((Date.now() ^ 0x9e3779b9) >>> 0), n: 0, counts: { commun: 0, rare: 0, epique: 0, legendaire: 0 }, first: null, last: [] };
+    $('pInfo').textContent = 'Chances par coffre : légendaire ' + fmtPct(ch.p * 100) + ', épique 5 %, rare 15 %, commun ' + fmtPct((1 - ch.p - 0.2) * 100) + '. En moyenne, ' + fmtNum(expectedTries(ch.p)) + ' coffres pour un légendaire, soit environ ' + fmtCHF(expectedTries(ch.p) * CHEST) + '.';
+    chShow();
+  }
+  function chOpen(k) {
+    for (var i = 0; i < k; i++) {
+      var r = rarity(ch.rng(), ch.p); ch.n++; ch.counts[r]++;
+      if (r === 'legendaire' && ch.first === null) ch.first = ch.n;
+      ch.last.push(r); if (ch.last.length > 20) ch.last.shift();
+    }
+    chShow();
+  }
+  function chShow() {
+    $('cN').textContent = fmtNum(ch.n);
+    $('cCost').textContent = fmtCHF(ch.n * CHEST);
+    $('cLeg').textContent = fmtNum(ch.counts.legendaire);
+    $('cFirst').textContent = ch.first === null ? 'pas encore' : 'au coffre n° ' + fmtNum(ch.first);
+    $('cCounts').textContent = ch.n ? 'Communs : ' + ch.counts.commun + ' · rares : ' + ch.counts.rare + ' · épiques : ' + ch.counts.epique + ' · légendaires : ' + ch.counts.legendaire : 'Aucun coffre ouvert.';
+    $('cLast').innerHTML = ch.last.length ? ch.last.map(function (r) { return '<span class="chip r-' + r + '">' + RAR[r] + '</span>'; }).join('') : '';
+    var m = '';
+    if (ch.n && ch.first === null) m = 'Toujours pas de légendaire après ' + fmtNum(ch.n) + ' coffres, soit ' + fmtCHF(ch.n * CHEST) + '. Tu sens l’envie de « juste encore un » ? C’est exactement ce que la boutique espère.';
+    else if (ch.first !== null) m = 'Premier légendaire au coffre n° ' + fmtNum(ch.first) + ' : il t’aurait coûté ' + fmtCHF(ch.first * CHEST) + '. La moyenne est de ' + fmtNum(expectedTries(ch.p)) + ' coffres. Recommence plusieurs fois : le résultat change beaucoup.';
+    $('cMsg').textContent = m;
+  }
+  $('ch1').addEventListener('click', function () { chOpen(1); });
+  $('ch10').addEventListener('click', function () { chOpen(10); });
+  $('chLeg').addEventListener('click', function () {
+    var start = ch.counts.legendaire, guard = 0;
+    while (ch.counts.legendaire === start && guard < 5000) { chOpen(1); guard++; }
+  });
+  $('chReset').addEventListener('click', chReset);
+  $('pSel').addEventListener('change', function () { chReset(); histRun(); });
+  chReset();
+
+  /* ---------- Étape 4 : histogramme ---------- */
+  function simulatePlayers(players, p, seed, cap) {
+    cap = cap || 5000;
+    var rng = mulberry32(seed >>> 0), tries = [], capped = 0, sum = 0;
+    for (var i = 0; i < players; i++) {
+      var t = 1;
+      while (rng() >= p && t < cap) t++;
+      if (t >= cap) capped++;
+      tries.push(t); sum += t;
+    }
+    var sorted = tries.slice().sort(function (a, b) { return a - b; });
+    var med = players ? (players % 2 ? sorted[(players - 1) / 2] : (sorted[players / 2 - 1] + sorted[players / 2]) / 2) : 0;
+    var over = tries.filter(function (t) { return t > 2 / p; }).length;
+    return { tries: tries, mean: players ? sum / players : 0, median: med, overDouble: players ? over / players : 0, capped: capped };
+  }
+  var histSeed = 1;
+  function histRun() {
+    var p = +$('pSel').value, S = simulatePlayers(1000, p, histSeed, 5000);
+    var B = 12, w = Math.max(1, Math.round(1 / p / 4)), bins = [], i;
+    for (i = 0; i <= B; i++) bins[i] = 0;
+    S.tries.forEach(function (t) { var b = Math.floor((t - 1) / w); bins[b > B ? B : b]++; });
+    var max = Math.max.apply(null, bins) || 1;
+    var W = 600, H = 260, L = 44, R = 10, T = 14, Bt = 46, bw = (W - L - R) / (B + 1);
+    var s = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Histogramme du nombre de coffres ouverts avant le premier légendaire, pour 1 000 joueurs simulés">';
+    s += '<line x1="' + L + '" y1="' + (H - Bt) + '" x2="' + (W - R) + '" y2="' + (H - Bt) + '" stroke="var(--ink)" stroke-width="1.5"/>';
+    s += '<text x="' + (L - 6) + '" y="' + (T + 10) + '" font-size="13" text-anchor="end">' + max + '</text>';
+    s += '<text x="' + (L - 6) + '" y="' + (H - Bt) + '" font-size="13" text-anchor="end">0</text>';
+    for (i = 0; i <= B; i++) {
+      var h = bins[i] / max * (H - Bt - T), x = L + i * bw + 2;
+      s += '<rect x="' + x.toFixed(1) + '" y="' + (H - Bt - h).toFixed(1) + '" width="' + (bw - 4).toFixed(1) + '" height="' + h.toFixed(1) + '" rx="2" fill="' + (i === B ? 'var(--red)' : 'var(--acc)') + '"/>';
+      if (i % 3 === 0 || i === B) s += '<text x="' + (L + i * bw + bw / 2).toFixed(1) + '" y="' + (H - Bt + 18) + '" font-size="13" text-anchor="middle">' + (i === B ? '>' + (B * w) : (i * w + 1)) + '</text>';
+    }
+    var mx = L + (1 / p) / w * bw;
+    s += '<line x1="' + mx.toFixed(1) + '" y1="' + T + '" x2="' + mx.toFixed(1) + '" y2="' + (H - Bt) + '" stroke="var(--ink)" stroke-width="2" stroke-dasharray="6 5"/>';
+    s += '<text x="' + (mx + 6).toFixed(1) + '" y="' + (T + 12) + '" font-size="13">1 ÷ p = ' + Math.round(1 / p) + '</text>';
+    s += '<text x="' + ((L + W - R) / 2) + '" y="' + (H - 6) + '" font-size="13" text-anchor="middle">coffres ouverts jusqu’au 1er légendaire</text>';
+    s += '</svg>';
+    $('hist').innerHTML = s;
+    $('hTh').textContent = fmtNum(1 / p) + ' coffres';
+    $('hMean').textContent = fmtNum(S.mean, 1) + ' coffres';
+    $('hMed').textContent = fmtNum(S.median, 1).replace(/,0$/, '') + ' coffres';
+    $('hOver').textContent = fmtPct(S.overDouble * 100);
+    $('hMsg').innerHTML = 'Beaucoup de joueurs ont de la chance assez tôt (la médiane est plus petite que la moyenne), mais environ <strong>' + fmtPct(S.overDouble * 100) + '</strong> des joueurs ont dû ouvrir plus de ' + fmtNum(2 / p) + ' coffres, soit plus de ' + fmtCHF(2 / p * CHEST) + '. La barre rouge regroupe ceux qui ont dépassé ' + fmtNum(B * w) + ' coffres. En théorie, la part qui dépasse 2 ÷ p est (1 − p)<sup>2 ÷ p</sup> ≈ ' + fmtPct(Math.pow(1 - p, 2 / p) * 100) + '.';
+  }
+  $('histGo').addEventListener('click', function () { histSeed++; histRun(); });
+  histRun();
+
+  /* ---------- Étape 5 : compte à rebours ---------- */
+  var tm = { s: 30, id: null, restarts: 0, ended: false };
+  function tmShow() {
+    var s = Math.max(0, tm.s);
+    $('tmr').textContent = '00:00:' + (s < 10 ? '0' : '') + s;
+    $('tmrMsg').textContent = tm.ended ? 'Offre terminée…' : (tm.restarts ? '« Nouvelle offre exceptionnelle ! »' : 'Plus que quelques secondes !');
+    $('tmrInfo').textContent = tm.restarts ? 'Le compte à rebours a déjà recommencé ' + tm.restarts + ' fois, avec la même offre. L’urgence était fabriquée : elle sert à t’empêcher de réfléchir.' : 'Lance la boutique, et regarde ce qui se passe quand le compte à rebours arrive à zéro.';
+  }
+  function tmTick() {
+    if (tm.ended) { tm.ended = false; tm.s = 30; tm.restarts++; }
+    else { tm.s--; if (tm.s <= 0) { tm.s = 0; tm.ended = true; } }
+    tmShow();
+  }
+  $('tmrGo').addEventListener('click', function () { if (tm.id === null) tm.id = setInterval(tmTick, 1000); });
+  $('tmrFast').addEventListener('click', function () {
+    if (tm.ended) { tmTick(); return; }
+    tm.s = Math.max(0, tm.s - 10); if (tm.s === 0) tm.ended = true; tmShow();
+  });
+  $('tmrStop').addEventListener('click', function () { if (tm.id !== null) { clearInterval(tm.id); tm.id = null; } });
+  tmShow();
+
+  var LEVS = [['urgence', 'Urgence'], ['rarete', 'Rareté'], ['gain', 'Appât du gain'], ['groupe', 'Appartenance au groupe'], ['flatterie', 'Flatterie'], ['perte', 'Peur de perdre']];
+  var LEV = [
+    { t: '« Plus que 02:59:59 pour profiter de l’offre ! »', a: 'urgence', why: 'Le temps qui file te pousse à décider vite, sans réfléchir.' },
+    { t: '« Tenue Comète : seulement 500 exemplaires dans tout le jeu. »', a: 'rarete', why: 'Ce qui est rare paraît précieux. Et pour un objet virtuel, la « rareté » est décidée par le jeu.' },
+    { t: '« Pack Dragon : 79,90 CHF → 23,90 CHF (−70 %) ! »', a: 'gain', why: 'Le prix barré donne l’impression de gagner de l’argent. Mais tu dépenses quand même 23,90 CHF.' },
+    { t: '« 9 de tes amis ont déjà le pass de saison. »', a: 'groupe', why: 'Personne n’aime être « celui qui ne l’a pas ». C’est le besoin d’appartenance.' },
+    { t: '« Joueur d’élite, tu as été sélectionné·e pour une offre VIP. »', a: 'flatterie', why: 'Le compliment te met de bonne humeur… et l’offre « VIP » est souvent envoyée à des milliers de joueurs.' },
+    { t: '« Ta série de 30 jours sera perdue si tu ne te connectes pas aujourd’hui ! »', a: 'perte', why: 'On déteste perdre ce qu’on a déjà. Le jeu s’en sert pour te faire revenir chaque jour.' }
+  ];
+  var levOk = [];
+  $('levSort').innerHTML = LEV.map(function (l, i) {
+    return '<div class="item lev"><strong class="shopmsg">' + esc(l.t) + '</strong><select id="lv' + i + '" aria-label="Le levier du message ' + (i + 1) + '"><option value="">…</option>' +
+      LEVS.map(function (o) { return '<option value="' + o[0] + '">' + esc(o[1]) + '</option>'; }).join('') +
+      '</select><button type="button" data-lv="' + i + '">Vérifier</button><span class="fbk" id="lf' + i + '" aria-live="polite"></span></div>';
+  }).join('');
+  $('levSort').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-lv]'); if (!b) return;
+    var i = +b.getAttribute('data-lv'), v = $('lv' + i).value, fb = $('lf' + i), l = LEV[i];
+    if (!v) { fb.className = 'fbk'; fb.textContent = 'Choisis un levier.'; return; }
+    var good = LEVS.filter(function (o) { return o[0] === l.a; })[0][1];
+    levOk[i] = v === l.a;
+    if (levOk[i]) { fb.className = 'fbk ok'; fb.innerHTML = 'Bien vu ! <span>' + esc(l.why) + '</span>'; }
+    else { fb.className = 'fbk no'; fb.innerHTML = 'Pas tout à fait : c’est surtout « ' + esc(good) + ' ». <span>' + esc(l.why) + '</span>'; }
+    $('levScore').textContent = levOk.filter(Boolean).length + ' / ' + LEV.length;
+  });
+
+  /* ---------- Étape 6 : abonnements ---------- */
+  function yearly(monthly) { return Math.round(Number(monthly) * 100) * 12 / 100; }
+  var TRIAL = [
+    { t: 'Jour 1', d: 'Tu t’inscris à l’essai gratuit de Galaxie Quest Plus. On demande un moyen de paiement « juste pour vérifier ».', c: 0 },
+    { t: 'Jour 4', d: 'Tu profites des bonus et tu oublies que l’essai a une fin.', c: 0 },
+    { t: 'Jour 8', d: 'L’essai est fini : premier paiement automatique, sans rien te demander.', c: 690, bad: true },
+    { t: 'Mois 2', d: 'Deuxième paiement. Tu joues moins, mais ça continue.', c: 1380, bad: true },
+    { t: 'Mois 6', d: 'Six paiements. Personne n’a regardé les relevés.', c: 4140, bad: true },
+    { t: 'Mois 12', d: 'Un an plus tard : 12 × 6,90 CHF. Il suffisait de résilier avant le jour 8.', c: 8280, bad: true }
+  ];
+  var trStep = 0;
+  function trShow() {
+    $('trLog').innerHTML = TRIAL.slice(0, trStep).map(function (s) {
+      return '<li' + (s.bad ? ' class="bad"' : '') + '><strong>' + esc(s.t) + '</strong> · ' + esc(s.d) + ' Total payé : <b class="m">' + fmtCHF(s.c / 100) + '</b></li>';
+    }).join('');
+    $('trNext').disabled = trStep >= TRIAL.length;
+  }
+  $('trNext').addEventListener('click', function () { if (trStep < TRIAL.length) { trStep++; trShow(); } });
+  $('trReset').addEventListener('click', function () { trStep = 0; trShow(); });
+  trShow();
+
+  function subShow() {
+    var m = +$('subR').value / 100, n = +$('subM').value, total = Math.round(m * 100) * n / 100;
+    $('subV').textContent = fmtCHF(m);
+    $('subMV').textContent = n + ' mois';
+    $('subY').textContent = fmtCHF(yearly(m));
+    $('subT').textContent = fmtCHF(total);
+    $('subP').textContent = fmtNum(total / 20, 1).replace(/,0$/, '') + ' mois d’argent de poche';
+    $('subMsg').innerHTML = fmtCHF(m) + ' × ' + n + ' = <strong>' + fmtCHF(total) + '</strong>. Sur un an : ' + fmtCHF(m) + ' × 12 = ' + fmtCHF(yearly(m)) + '.';
+  }
+  $('subR').addEventListener('input', subShow);
+  $('subM').addEventListener('input', subShow);
+  subShow();
+
+  /* ---------- Étape 7 : budget ---------- */
+  var BPARTS = [['Épargne pour un projet', 10], ['Sorties et snacks', 8], ['Jeux et achats en ligne', 5], ['Cadeaux', 4], ['Autre', 0]];
+  function budget(income, parts) {
+    income = Math.max(0, Number(income) || 0);
+    var total = parts.reduce(function (s, x) { return s + (Number(x) || 0); }, 0);
+    return { income: income, total: total, left: income - total, over: total > income, pct: parts.map(function (x) { return income > 0 ? Math.round((Number(x) || 0) / income * 1000) / 10 : 0; }) };
+  }
+  function monthsToSave(goal, per) { return per > 0 ? Math.ceil(Math.round(goal * 100) / Math.round(per * 100)) : Infinity; }
+  $('bParts').innerHTML = BPARTS.map(function (p, i) {
+    return '<div class="param"><label for="bp' + i + '"><i class="c' + i + '" style="display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px"></i>' + esc(p[0]) + ' : <span class="mono" id="bpv' + i + '">' + p[1] + ' CHF</span></label><input type="range" id="bp' + i + '" min="0" max="100" step="1" value="' + p[1] + '"></div>';
+  }).join('');
+  function bShow() {
+    var inc = +$('bInc').value, vals = BPARTS.map(function (p, i) { return +$('bp' + i).value; }), r = budget(inc, vals);
+    $('bIncV').textContent = inc + ' CHF';
+    vals.forEach(function (v, i) { $('bpv' + i).textContent = v + ' CHF'; });
+    var scale = Math.max(inc, r.total) || 1;
+    $('bBar').innerHTML = vals.map(function (v, i) { return '<i class="c' + i + '" style="width:' + (v / scale * 100) + '%"></i>'; }).join('');
+    $('bLeg').innerHTML = BPARTS.map(function (p, i) { return '<span><i class="c' + i + '"></i>' + esc(p[0]) + ' : ' + (inc > 0 ? fmtPct(r.pct[i]) : '—') + '</span>'; }).join('');
+    $('bTot').textContent = r.total + ' CHF';
+    $('bLeft').textContent = (r.left < 0 ? '−' + (-r.left) : r.left) + ' CHF';
+    $('bGame').textContent = inc > 0 ? fmtPct(r.pct[2]) : '—';
+    var goal = +$('bGoal').value; $('bGoalV').textContent = goal + ' CHF';
+    var m = '';
+    if (r.over) m = '<strong>Attention :</strong> tu prévois ' + r.total + ' CHF alors que tu reçois ' + inc + ' CHF. Il manque ' + (-r.left) + ' CHF : baisse une dépense.';
+    else m = 'Ton plan tient : il reste ' + r.left + ' CHF pour les imprévus. ';
+    var n = monthsToSave(goal, vals[0]);
+    m += vals[0] > 0 ? ' Avec ' + vals[0] + ' CHF d’épargne par mois, ton objectif de ' + goal + ' CHF est atteint en <strong>' + n + ' mois</strong>.' : ' Sans épargne, ton objectif de ' + goal + ' CHF ne sera jamais atteint.';
+    $('bMsg').innerHTML = m;
+  }
+  ['bInc', 'bGoal', 'bp0', 'bp1', 'bp2', 'bp3', 'bp4'].forEach(function (id) { $(id).addEventListener('input', bShow); });
+  bShow();
+
+  /* ---------- Étape 8 : que fais-tu ? ---------- */
+  var SCN = [
+    { name: 'Les gemmes gratuites', text: 'Une vidéo promet : « 10 000 gemmes gratuites pour Galaxie Quest ! Va sur gemmes-gratuites.exemple, entre ton pseudo et ton mot de passe. »',
+      c: [['J’essaie, je n’ai rien à perdre', 'no', 'Tu as ton compte à perdre ! Un « générateur » n’existe pas : les gemmes sont sur les serveurs du jeu. Le site vole ton mot de passe.'],
+          ['Je ne mets rien et je signale la vidéo', 'yes', 'Parfait. Seul le jeu peut te donner des gemmes, dans le jeu lui-même. Et ton mot de passe ne se tape que dans le vrai jeu.'],
+          ['Je mets juste mon pseudo, pas le mot de passe', 'mid', 'Mieux, mais le site peut te demander ensuite un « code de vérification » pour voler le compte. Ne mets rien du tout.']] },
+    { name: 'Le compte à vendre', text: 'Un inconnu t’écrit : « Je vends mon compte niveau 100 avec toutes les tenues, 15 CHF. Paie-moi avec un code de carte cadeau. »',
+      c: [['J’accepte, c’est une super affaire', 'no', 'C’est souvent un compte volé, ou il n’existe pas. Le code de carte cadeau, une fois envoyé, est perdu pour toujours.'],
+          ['Je refuse et je n’envoie aucun code', 'yes', 'Bon réflexe. Acheter un compte est en général interdit par les règles du jeu, et l’appât du gain est le levier préféré des escrocs.'],
+          ['Je demande une photo du compte d’abord', 'mid', 'Une capture d’écran se truque facilement. Mieux vaut refuser tout de suite.']] },
+    { name: 'Le logiciel de triche', text: 'Dans le chat du jeu, un joueur partage « un logiciel pour voir à travers les murs, gratuit, télécharge vite ».',
+      c: [['Je le télécharge pour essayer', 'no', 'Il peut contenir un virus qui vole tes mots de passe, et ton compte peut être banni pour triche.'],
+          ['Je ne télécharge rien et je préviens un adulte', 'yes', 'Exactement. Ne télécharge des programmes que depuis les magasins officiels, avec l’accord de tes parents.']] },
+    { name: 'Le dernier jour', text: 'La tenue Comète part « ce soir à minuit ». Elle coûte 9,90 CHF. Tes parents dorment, et leur carte est enregistrée sur la console.',
+      c: [['Je l’achète vite, je leur dirai demain', 'no', 'Payer avec leur argent sans demander, ce n’est pas permis, même pour un petit montant. Et l’urgence est fabriquée.'],
+          ['Je respire, je ferme la boutique et j’en parle demain', 'yes', 'Bravo : tu as déjoué l’urgence. Si tu la veux encore demain au calme, tu en parles. Souvent, l’envie est passée.'],
+          ['Je demande à un ami de me l’offrir', 'mid', 'Ça déplace le problème : ton ami se fait piéger par la même urgence. Mieux : attendre et en parler.']] },
+    { name: 'L’achat par erreur', text: 'Ton petit frère a appuyé sur « Acheter » : 44,90 CHF de gemmes sont partis avec la carte de tes parents.',
+      c: [['Je ne dis rien, j’ai peur de me faire gronder', 'no', 'Plus on attend, plus c’est difficile à arranger. Un accident, ça arrive.'],
+          ['Je préviens mes parents tout de suite', 'yes', 'Oui : ils peuvent demander un remboursement au magasin d’applis (c’est parfois possible si on réagit vite) et activer un mot de passe pour chaque achat.']] }
+  ];
+  SCN.forEach(function (s, i) {
+    var b = document.createElement('button'); b.type = 'button'; b.id = 'scT' + i; b.textContent = s.name;
+    b.addEventListener('click', function () { scShow(i); }); $('scTabs').appendChild(b);
+  });
+  function scShow(i) {
+    SCN.forEach(function (s, j) { $('scT' + j).setAttribute('aria-pressed', j === i ? 'true' : 'false'); });
+    $('scText').textContent = SCN[i].text; $('scOut').innerHTML = ''; $('scChoices').innerHTML = '';
+    SCN[i].c.forEach(function (c) {
+      var b = document.createElement('button'); b.type = 'button'; b.textContent = c[0];
+      b.addEventListener('click', function () {
+        var t = c[1] === 'yes' ? 'Bon réflexe !' : c[1] === 'mid' ? 'Pas suffisant…' : 'Attention, piège !';
+        $('scOut').innerHTML = '<div class="verdict ' + c[1] + '">' + t + '<span>' + esc(c[2]) + '</span></div>';
+      });
+      $('scChoices').appendChild(b);
+    });
+  }
+  scShow(0);
+
+  /* ---------- Quiz ---------- */
+  var QZ = [
+    { q: 'Un objet coûte 750 gemmes. Les packs font 500 gemmes (4,90 CHF). Combien de packs, et combien de gemmes restent ?', o: [['a', '1 pack, 0 gemme'], ['b', '2 packs, 250 gemmes'], ['c', '2 packs, 750 gemmes']], a: 'b', how: '2 × 500 = 1 000 gemmes pour 9,80 CHF ; 1 000 − 750 = 250 gemmes restent.' },
+    { q: 'Un légendaire a 1 % de chance par coffre. Combien de coffres faut-il ouvrir en moyenne ?', o: [['a', '10'], ['b', '50'], ['c', '100']], a: 'c', how: 'En moyenne 1 ÷ p = 1 ÷ 0,01 = 100 coffres.' },
+    { q: 'Après 50 coffres sans légendaire, la chance au coffre suivant est…', o: [['a', 'plus grande'], ['b', 'toujours 1 %'], ['c', 'plus petite']], a: 'b', how: 'Le hasard n’a pas de mémoire : chaque coffre est un nouveau tirage.' },
+    { q: 'Un abonnement coûte 6,90 CHF par mois. Combien par an ?', o: [['a', '69,00 CHF'], ['b', '82,80 CHF'], ['c', '75,90 CHF']], a: 'b', how: '6,90 × 12 = 82,80 CHF.' },
+    { q: '« Dernier jour ! Plus que 02:00:00 ! » Quel levier ?', o: [['a', 'l’urgence'], ['b', 'la flatterie'], ['c', 'l’appartenance']], a: 'a', how: 'Le compte à rebours te pousse à décider avant de réfléchir.' },
+    { q: 'Un site promet des gemmes gratuites si tu donnes ton mot de passe. C’est…', o: [['a', 'une astuce connue'], ['b', 'une arnaque pour voler ton compte'], ['c', 'un cadeau du jeu']], a: 'b', how: 'Personne ne peut « générer » des gemmes. Ton mot de passe ne se tape que dans le vrai jeu.' },
+    { q: 'Comment un jeu gratuit gagne-t-il de l’argent ?', o: [['a', 'il n’en gagne pas'], ['b', 'avec les achats, les pubs et les données'], ['c', 'seulement avec les pubs']], a: 'b', how: 'Rien n’est gratuit : on paie avec de l’argent, de l’attention ou des données.' },
+    { q: 'Tu as acheté des gemmes par erreur avec la carte de tes parents. Que fais-tu ?', o: [['a', 'je le leur dis tout de suite'], ['b', 'je n’en parle pas'], ['c', 'j’achète autre chose pour compenser']], a: 'a', how: 'En réagissant vite, un remboursement est parfois possible. Et vous pouvez activer un mot de passe pour les achats.' }
+  ];
+  var quiz = $('quiz'), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ''; done = [];
+    QZ.forEach(function (Q, k) {
+      var li = document.createElement('li');
+      li.innerHTML = '<span>' + esc(Q.q) + '</span><select id="qa' + k + '" aria-label="Ta réponse à la question ' + (k + 1) + '"><option value="">…</option>' + Q.o.map(function (o) { return '<option value="' + o[0] + '">' + esc(o[1]) + '</option>'; }).join('') + '</select><button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+      quiz.appendChild(li);
+      function check() {
+        var fb = $('qf' + k), v = $('qa' + k).value;
+        if (!v) { fb.className = 'fb'; fb.textContent = 'Choisis une réponse.'; return; }
+        if (v === Q.a) { fb.className = 'fb ok'; fb.innerHTML = 'Bravo, c’est juste !<span>' + esc(Q.how) + '</span>'; done[k] = true; }
+        else {
+          done[k] = false;
+          var good = Q.o.filter(function (o) { return o[0] === Q.a; })[0][1];
+          fb.className = 'fb no'; fb.innerHTML = 'Pas tout à fait : la bonne réponse est « ' + esc(good) + ' ».<span>' + esc(Q.how) + '</span>';
+        }
+        $('score').textContent = done.filter(Boolean).length + ' / 8';
+      }
+      $('qb' + k).addEventListener('click', check);
+      $('qa' + k).addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+    });
+    $('score').textContent = '0 / 8';
+  }
+  $('newQuiz').addEventListener('click', newQuiz);
+  newQuiz();
+
+  window.__ach = { packs: PACKS, realCost: realCost, openChests: openChests, expectedTries: expectedTries, probAtLeastOne: probAtLeastOne, simulatePlayers: simulatePlayers, yearly: yearly, budget: budget, monthsToSave: monthsToSave, fmtCHF: fmtCHF, free: FREE, levers: LEV, scenarios: SCN, trial: TRIAL, quiz: QZ };
+})();
+</script>
+</body>
+</html>

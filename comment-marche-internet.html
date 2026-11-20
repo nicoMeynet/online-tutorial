@@ -1,0 +1,1235 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Comment marche Internet</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, marge rouge. Accent bleu océan (#0369a1). Tous les noms, sites et adresses des exemples sont inventés (domaines en .exemple, adresses IP réservées aux exemples). Rien de ce qui est tapé n'est envoyé ni enregistré. */
+:root {
+  --paper: #f5f9fc;
+  --grid: #dde9f2;
+  --card: #ffffff;
+  --ink: #0f2233;
+  --ink-soft: #4d6577;
+  --acc: #0369a1;
+  --acc-soft: #dbeefa;
+  --warn: #d97706;
+  --warn-soft: #fdf0d6;
+  --warn-ink: #92400e;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #fff0a3;
+  --line: #d0dfea;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0b141b; --grid: #15222d; --card: #101c26; --ink: #e6f1f8; --ink-soft: #9fb6c6;
+    --acc: #7dd3fc; --acc-soft: #0c2d44; --warn: #f5a524; --warn-soft: #3d2a0c; --warn-ink: #fbbf5a;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #283b49;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0b141b; --grid: #15222d; --card: #101c26; --ink: #e6f1f8; --ink-soft: #9fb6c6;
+  --acc: #7dd3fc; --acc-soft: #0c2d44; --warn: #f5a524; --warn-soft: #3d2a0c; --warn-ink: #fbbf5a;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #283b49;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); overflow-wrap: anywhere; }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--acc); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note.warn { border-left-color: var(--warn); background: var(--warn-soft); }
+.note.ok { border-left-color: var(--ok); background: var(--ok-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+.fig svg { width: 100%; height: auto; display: block; }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 8px 12px; min-height: 44px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+button:disabled { opacity: .5; cursor: default; transform: none; }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+input[type="text"], input[type="number"] { font: inherit; font-family: var(--f-mono); font-size: 1rem; padding: 8px 10px; min-height: 44px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; }
+input[type="range"] { width: 100%; accent-color: var(--acc); min-height: 40px; }
+select { font: inherit; font-size: 1rem; padding: 8px 8px; min-height: 44px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; }
+.param { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.param label { font-weight: 700; }
+.params { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.privacy { font-size: .9rem; color: var(--ok); font-weight: 700; display: flex; gap: 6px; align-items: flex-start; }
+.privacy::before { content: "🔒"; }
+.small-btns button { font-size: .9rem; padding: 6px 10px; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
+.tag.ok { color: var(--ok); }
+.tag.no { color: var(--red); }
+.tag.warn { color: var(--warn-ink); }
+.tag.acc { color: var(--acc); }
+.formula { font-family: var(--f-mono); font-size: 1.1rem; text-align: center; background: var(--paper); border: 1.5px dashed var(--line); border-radius: 8px; padding: 10px; overflow-wrap: anywhere; }
+
+.verdict { border-radius: 8px; padding: 12px 14px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; overflow-wrap: anywhere; }
+.verdict:empty { display: none; }
+.verdict.yes { background: var(--ok-soft); color: var(--ok); }
+.verdict.no { background: var(--red-soft); color: var(--red); }
+.verdict.mid { background: var(--warn-soft); color: var(--warn-ink); }
+.verdict span { font-weight: 400; color: var(--ink); }
+
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.stat { background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 10px; min-width: 0; }
+.stat b { display: block; font-family: var(--f-mono); font-size: 1.05rem; overflow-wrap: anywhere; }
+.stat small { color: var(--ink-soft); font-size: .85rem; }
+
+/* Le voyage d'un message */
+.hops { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; counter-reset: hp; }
+.hops li { counter-increment: hp; border: 1.5px solid var(--line); border-radius: 10px; padding: 8px 10px; background: var(--card); display: flex; gap: 8px; align-items: center; font-weight: 700; font-size: .95rem; min-width: 0; overflow-wrap: anywhere; }
+.hops li::before { content: counter(hp); flex: none; width: 28px; height: 28px; border-radius: 50%; background: var(--line); color: var(--ink); display: grid; place-items: center; font-family: var(--f-display); }
+.hops li.on { border: 2px solid var(--acc); background: var(--acc-soft); }
+.hops li.on::before { background: var(--acc); color: var(--card); }
+.hops li.past::before { content: "✓"; background: var(--ok); color: var(--card); }
+.explain { min-height: 3.4em; }
+
+/* Jeux de tri */
+.sorter { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.sorter li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.sorter li > strong { overflow-wrap: anywhere; }
+.sorter .opts { display: flex; flex-wrap: wrap; gap: 8px; }
+.sorter .opts button { font-size: .92rem; padding: 6px 10px; box-shadow: 2px 2px 0 var(--ink); }
+.sorter .opts button.good { background: var(--ok-soft); border-color: var(--ok); color: var(--ok); }
+.sorter .opts button.bad { background: var(--red-soft); border-color: var(--red); color: var(--red); }
+.sfb { font-size: .95rem; font-weight: 700; }
+.sfb:empty { display: none; }
+.sfb.ok { color: var(--ok); }
+.sfb.no { color: var(--red); }
+.sfb span { display: block; font-weight: 400; color: var(--ink-soft); }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc); }
+
+/* Adresse IP */
+.ipparts { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; }
+.ippart { background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 10px; text-align: center; min-width: 0; }
+.ippart b { display: block; font-family: var(--f-mono); font-size: 1.3rem; overflow-wrap: anywhere; }
+.ippart small { font-family: var(--f-mono); font-size: .85rem; color: var(--ink-soft); overflow-wrap: anywhere; }
+.ippart.good { border-color: var(--ok); }
+.ippart.bad { border-color: var(--red); background: var(--red-soft); }
+.bigip { font-family: var(--f-mono); font-size: clamp(1.2rem, 5vw, 1.7rem); font-weight: 600; color: var(--acc); text-align: center; overflow-wrap: anywhere; }
+
+/* Journaux */
+.log { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.log:empty { display: none; }
+.log li { border-left: 4px solid var(--acc); background: var(--paper); border-radius: 0 8px 8px 0; padding: 6px 10px; font-size: .95rem; overflow-wrap: anywhere; }
+.log li .who { display: block; font-family: var(--f-display); font-weight: 700; color: var(--acc); }
+.log li.bad { border-left-color: var(--red); }
+.log li.good { border-left-color: var(--ok); }
+.log li.warn { border-left-color: var(--warn); }
+
+/* Réseau de paquets */
+.net .edge { stroke: var(--ink-soft); stroke-width: 3; opacity: .7; }
+.net .edge.off { stroke: var(--red); stroke-dasharray: 6 6; opacity: .45; }
+.net .node circle { fill: var(--card); stroke: var(--acc); stroke-width: 3; }
+.net .node.end circle { fill: var(--acc-soft); }
+.net .node.router { cursor: pointer; }
+.net .node.broken circle { fill: var(--red-soft); stroke: var(--red); }
+.net .node .x { display: none; stroke: var(--red); stroke-width: 4; stroke-linecap: round; }
+.net .node.broken .x { display: inline; }
+.net .node text { font-size: 15px; font-weight: 600; text-anchor: middle; dominant-baseline: central; }
+.net .pkt { transition: transform .45s ease; }
+.net .pkt circle { fill: var(--acc); stroke: var(--card); stroke-width: 2; }
+.net .pkt.wait circle { fill: var(--ink-soft); }
+.net .pkt.resend circle { fill: var(--warn); }
+.net .pkt text { fill: var(--card); font-size: 13px; font-weight: 600; text-anchor: middle; dominant-baseline: central; }
+@media (prefers-reduced-motion: reduce) { .net .pkt { transition: none; } }
+.routers button { min-width: 64px; }
+.routers button[aria-pressed="true"] { background: var(--red); border-color: var(--red); color: var(--card); }
+.slots { display: flex; flex-wrap: wrap; gap: 6px; }
+.slot { font-family: var(--f-mono); font-size: .9rem; border: 1.5px dashed var(--line); border-radius: 8px; padding: 4px 8px; background: var(--paper); white-space: pre-wrap; overflow-wrap: anywhere; min-width: 0; max-width: 100%; }
+.slot b { color: var(--ink-soft); margin-right: 4px; }
+.slot.got { border-style: solid; border-color: var(--acc); background: var(--acc-soft); }
+.slot.got b { color: var(--acc); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: .88rem; color: var(--ink-soft); }
+.legend i { display: inline-block; width: 14px; height: 14px; border-radius: 50%; vertical-align: -2px; margin-right: 4px; }
+
+/* Scénarios */
+.scen { display: flex; flex-direction: column; gap: 10px; }
+.scen .opts { display: flex; flex-direction: column; gap: 8px; }
+.scen .opts button { text-align: left; font-family: var(--f-body); font-weight: 400; }
+.scen .opts button.good { background: var(--ok-soft); border-color: var(--ok); }
+.scen .opts button.bad { background: var(--red-soft); border-color: var(--red); }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 220px auto; gap: 10px; align-items: center; }
+.quiz li > span:first-child { min-width: 0; overflow-wrap: anywhere; }
+.quiz select { font-size: .95rem; padding: 6px 6px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb:empty { display: none; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 160px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+details ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+<!--ticons--><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Tutoriels"><script src="progress.js" defer></script><!--/ticons-->
+<style id="tnav-css">
+.tnav-top { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin: 0 0 4px; }
+.tnav-home { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font-weight: 700; font-size: .95rem; text-decoration: none; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tnav-home:hover, .tnav-home:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.tnav-bottom { margin-top: 8px; display: flex; flex-direction: column; gap: 12px; }
+.tnav-bottom h2 { margin: 0; }
+.tnav-pn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tnav-pn a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--ink, #222); border-radius: 10px;
+  background: var(--card, #fff); color: var(--ink, #222); text-decoration: none; box-shadow: 3px 3px 0 var(--ink, #222); min-width: 0; }
+.tnav-pn a span { font-size: .85rem; color: var(--ink-soft, #666); }
+.tnav-pn a strong { overflow-wrap: anywhere; }
+.tnav-pn a.next { text-align: right; grid-column: 2; }
+.tnav-bottom .tnav-home { align-self: center; }
+@media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
+.diff { font: 700 .72rem/1.2 var(--f-mono, monospace); padding: 2px 8px; border-radius: 99px; border: 1.5px solid; white-space: nowrap; }
+.diff.d1 { color: #15803d; border-color: #15803d; background: #dcf3e3; }
+.diff.d2 { color: #a15c07; border-color: #b45309; background: #fbe7cf; }
+.diff.d3 { color: #b91c1c; border-color: #b91c1c; background: #fde2e2; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root:not([data-theme="light"]) .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root:not([data-theme="light"]) .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; } }
+:root[data-theme="dark"] .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root[data-theme="dark"] .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root[data-theme="dark"] .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; }
+</style>
+</head>
+<body>
+<main class="page">
+<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="numerique.html">← Tous les tutoriels numériques</a><span class="diff d2" title="Difficulté : moyen">Moyen</span></nav><!--/tnav-->
+
+
+  <header class="hero">
+    <span class="eyebrow">Tutoriel numérique · niveau 10H</span>
+    <h1>Comment marche Internet</h1>
+    <p class="lead">Tu envoies un message, il arrive à l'autre bout du monde en moins d'une seconde. Mais par où passe-t-il ? Ici, tu vas suivre son voyage : les adresses, l'annuaire, les petits paquets qui se perdent et se retrouvent, la vitesse… et même où se cache « le cloud ».</p>
+    <div class="box fig">
+      <svg viewBox="0 0 360 180" role="img" aria-label="Un téléphone relié à une box, puis à un globe traversé de câbles, puis à un bâtiment rempli de serveurs">
+        <rect x="14" y="58" width="40" height="70" rx="8" fill="var(--acc-soft)" stroke="var(--acc)" stroke-width="3"/>
+        <circle cx="34" cy="118" r="4" fill="var(--acc)"/>
+        <path d="M66 70 a18 18 0 0 1 0 26 M76 62 a30 30 0 0 1 0 42" fill="none" stroke="var(--acc)" stroke-width="3" stroke-linecap="round"/>
+        <rect x="92" y="96" width="46" height="26" rx="5" fill="var(--card)" stroke="var(--ink)" stroke-width="2.5"/>
+        <circle cx="104" cy="109" r="3" fill="var(--ok)"/><circle cx="114" cy="109" r="3" fill="var(--ok)"/>
+        <line x1="138" y1="109" x2="150" y2="100" stroke="var(--ink-soft)" stroke-width="3"/>
+        <circle cx="190" cy="90" r="42" fill="var(--acc-soft)" stroke="var(--acc)" stroke-width="3"/>
+        <ellipse cx="190" cy="90" rx="18" ry="42" fill="none" stroke="var(--acc)" stroke-width="2"/>
+        <line x1="148" y1="90" x2="232" y2="90" stroke="var(--acc)" stroke-width="2"/>
+        <path d="M156 66 Q190 52 224 66 M156 114 Q190 128 224 114" fill="none" stroke="var(--acc)" stroke-width="2"/>
+        <circle cx="166" cy="70" r="5" fill="var(--red)"/><circle cx="214" cy="104" r="5" fill="var(--red)"/><circle cx="196" cy="62" r="5" fill="var(--red)"/>
+        <path d="M166 70 L196 62 L214 104" fill="none" stroke="var(--red)" stroke-width="2.5" stroke-dasharray="5 4"/>
+        <line x1="232" y1="96" x2="258" y2="104" stroke="var(--ink-soft)" stroke-width="3"/>
+        <rect x="260" y="50" width="86" height="96" rx="6" fill="var(--card)" stroke="var(--ink)" stroke-width="2.5"/>
+        <rect x="272" y="62" width="62" height="14" rx="3" fill="var(--line)"/><rect x="272" y="84" width="62" height="14" rx="3" fill="var(--line)"/><rect x="272" y="106" width="62" height="14" rx="3" fill="var(--line)"/>
+        <circle cx="326" cy="69" r="3" fill="var(--ok)"/><circle cx="326" cy="91" r="3" fill="var(--ok)"/><circle cx="326" cy="113" r="3" fill="var(--ok)"/>
+        <text x="34" y="150" font-size="14" text-anchor="middle">toi</text>
+        <text x="115" y="150" font-size="14" text-anchor="middle">box</text>
+        <text x="190" y="162" font-size="14" text-anchor="middle">réseaux</text>
+        <text x="303" y="168" font-size="14" text-anchor="middle">datacenter</text>
+      </svg>
+    </div>
+    <p class="soft">Les écoles, sites, noms et adresses de cette page sont <strong>inventés</strong> (les noms finissent par <span class="mono">.exemple</span>, et les adresses IP sont des adresses réservées aux exemples, comme le numéro 079 000 00 00). Ce que tu tapes reste dans ta page : <strong>rien n'est envoyé ni enregistré</strong>.</p>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · Un réseau de réseaux</span>
+    <h2>Le voyage d'une photo jusqu'au Canada</h2>
+    <p>Internet n'est pas une seule machine, ni un seul câble. C'est <strong>un réseau de réseaux</strong> : le réseau de ta maison, celui de ton école, ceux de dizaines de milliers d'entreprises, tous branchés les uns aux autres. Personne ne possède Internet en entier : chacun gère son morceau, et tous suivent les mêmes règles pour s'échanger des données.</p>
+    <div class="box">
+      <h3>Suis la photo pas à pas</h3>
+      <p class="soft">Léa, à Lausanne, envoie une photo de son chat à sa cousine Zoé, à Montréal, avec une messagerie.</p>
+      <ol class="hops" id="hops"></ol>
+      <div class="note explain" id="hopText" aria-live="polite"><span>Appuie sur « Étape suivante » pour faire partir la photo.</span></div>
+      <div class="btns">
+        <button type="button" id="hopNext">Étape suivante</button>
+        <button type="button" id="hopReset">Recommencer</button>
+      </div>
+    </div>
+    <div class="note">
+      <span class="note-title">Câbles ou satellites ?</span>
+      <span>On imagine souvent des satellites. En réalité, <strong>la plupart des données entre continents passent par des câbles sous-marins</strong> en fibre optique, posés au fond des océans. Dans la fibre, les 0 et les 1 voyagent sous forme d'impulsions de lumière (le tutoriel sur <a class="tlink" href="les-signaux-et-la-communication.html">les signaux</a> l'explique en détail). Les satellites servent surtout là où il n'y a pas de câble : en mer, en montagne, dans des régions isolées.</span>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · Internet n'est pas le web</span>
+    <h2>Le web, un service parmi d'autres</h2>
+    <p>Internet, ce sont les <strong>routes</strong> : les câbles, les box, les routeurs qui transportent les données. Le <strong>web</strong>, c'est un des <strong>services</strong> qui roulent sur ces routes : les pages et les sites que tu ouvres dans un navigateur, reliés par des liens. Mais il y a d'autres services : l'e-mail, les jeux en ligne, les appels vidéo, les messageries…</p>
+    <div class="formula">Internet = les routes · le web = un des véhicules</div>
+    <div class="box">
+      <h3>Trie : web, autre service, ou pas Internet du tout ?</h3>
+      <ul class="sorter" id="webSort"></ul>
+      <div class="btns">
+        <span class="score" id="webScore">0 / 8</span>
+        <button type="button" id="webReset">Recommencer</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Les adresses IP</span>
+    <h2>Chaque appareil a une adresse</h2>
+    <p>Pour qu'un paquet arrive au bon endroit, il faut une adresse, comme sur une lettre. Sur Internet, c'est l'<strong>adresse IP</strong> (IP = <em>Internet Protocol</em>, « les règles d'Internet »). Le format le plus connu, <strong>IPv4</strong>, c'est <strong>4 nombres de 0 à 255</strong>, séparés par des points :</p>
+    <div class="bigip">203.0.113.42</div>
+    <p>Pourquoi 255 ? Chaque nombre est rangé dans <strong>un octet</strong>, c'est-à-dire 8 bits (8 chiffres 0 ou 1). Avec 8 bits, on peut écrire 2<sup>8</sup> = <strong>256 valeurs</strong>, de 0 à 255 (si tu veux savoir comment, va voir le tutoriel sur <a class="tlink" href="le-binaire-et-les-bases.html">le binaire</a>).</p>
+    <div class="box">
+      <h3>Vérifie une adresse IPv4</h3>
+      <div class="param"><label for="ipIn">Adresse à tester</label><input type="text" id="ipIn" value="192.168.1.12" maxlength="45" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" inputmode="decimal"></div>
+      <div class="btns small-btns" id="ipPresets">
+        <button type="button" data-ip="192.168.1.12">192.168.1.12</button>
+        <button type="button" data-ip="256.10.3.4">256.10.3.4</button>
+        <button type="button" data-ip="10.0.0">10.0.0</button>
+        <button type="button" data-ip="203.0.113.42">203.0.113.42</button>
+        <button type="button" data-ip="127.0.0.1">127.0.0.1</button>
+        <button type="button" data-ip="12.07.5.9">12.07.5.9</button>
+      </div>
+      <div class="ipparts" id="ipParts"></div>
+      <div class="verdict" id="ipRes" aria-live="polite"></div>
+      <span class="privacy">Rien n'est envoyé : la vérification se fait dans ta page.</span>
+    </div>
+    <div class="note warn">
+      <span class="note-title">Plus assez d'adresses !</span>
+      <span>Avec 4 octets, il y a 256 × 256 × 256 × 256 = 256<sup>4</sup> ≈ <strong>4,3 milliards</strong> d'adresses. Ça paraît beaucoup, mais il y a plus d'appareils connectés que ça dans le monde ! Deux solutions : à la maison, la box donne des <strong>adresses privées</strong> (souvent 192.168.…) à tes appareils et les cache tous derrière <strong>une seule</strong> adresse publique. Et un nouveau format, <strong>IPv6</strong>, beaucoup plus long (avec des lettres et des « : »), offre un nombre gigantesque d'adresses.</span>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · Le DNS</span>
+    <h2>L'annuaire d'Internet</h2>
+    <p>Personne n'a envie de retenir 203.0.113.42. On tape plutôt un <strong>nom de domaine</strong>, comme <span class="mono">ecole-du-lac.exemple</span>. Mais les routeurs, eux, ne comprennent que les adresses IP. Il faut donc un <strong>annuaire</strong> qui traduit le nom en adresse : c'est le <strong>DNS</strong> (<em>Domain Name System</em>, le « système des noms de domaine »). C'est comme le répertoire de ton téléphone : tu touches « Mamie », il compose le numéro.</p>
+    <div class="box">
+      <h3>Cherche un nom dans l'annuaire</h3>
+      <p class="soft">Invente un nom qui finit par <span class="mono">.exemple</span> (lettres sans accent, chiffres, tirets), par exemple <span class="mono">club-de-foot.exemple</span> ou <span class="mono">www.ecole-du-lac.exemple</span>.</p>
+      <div class="param"><label for="dnsName">Nom à chercher</label><input type="text" id="dnsName" value="ecole-du-lac.exemple" maxlength="70" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"></div>
+      <div class="btns">
+        <button type="button" id="dnsGo">Chercher</button>
+        <button type="button" id="dnsNext" disabled>Étape suivante</button>
+        <button type="button" id="dnsClear">Vider la mémoire</button>
+      </div>
+      <ol class="log" id="dnsLog" aria-live="polite"></ol>
+      <div class="verdict" id="dnsRes"></div>
+      <p class="soft" id="dnsMem">Mémoire (cache) de ton appareil : vide.</p>
+      <span class="privacy">Simulation : rien ne part sur Internet. Le vrai annuaire mondial ne connaît d'ailleurs pas les noms en .exemple.</span>
+    </div>
+    <p>Cherche deux fois le même nom : la deuxième fois, c'est immédiat, car la réponse est gardée en mémoire un moment. C'est une des raisons pour lesquelles un site déjà visité s'ouvre souvent plus vite.</p>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Les paquets</span>
+    <h2>Un message découpé en petits morceaux</h2>
+    <p>Un message, une photo ou une vidéo ne voyagent pas d'un seul bloc. Ils sont <strong>découpés en paquets</strong>. Chaque paquet porte l'adresse de départ, l'adresse d'arrivée et un <strong>numéro</strong>. À chaque carrefour, un <strong>routeur</strong> choisit par où l'envoyer. Deux paquets du même message peuvent donc prendre <strong>des chemins différents</strong>, et arriver dans le désordre. À l'arrivée, grâce aux numéros, on les remet dans l'ordre.</p>
+    <div class="box">
+      <h3>Envoie un message en paquets</h3>
+      <div class="param"><label for="pkMsg">Ton message (court)</label><input type="text" id="pkMsg" value="On se retrouve à 14 h devant l’école !" maxlength="48" autocomplete="off" spellcheck="false"></div>
+      <div class="btns">
+        <button type="button" id="pkPrep">Découper le message</button>
+        <button type="button" id="pkStep">Pas à pas ▶</button>
+        <button type="button" id="pkLose">Perdre un paquet</button>
+      </div>
+      <div class="fig">
+        <svg class="net" id="netSvg" viewBox="0 0 520 300" role="img" aria-label="Réseau : ton appareil à gauche, le site à droite, et sept routeurs R1 à R7 entre les deux, reliés par des câbles. Des pastilles numérotées représentent les paquets."></svg>
+      </div>
+      <div class="legend"><span><i style="background:var(--ink-soft)"></i>pas encore parti</span><span><i style="background:var(--acc)"></i>en route</span><span><i style="background:var(--warn)"></i>renvoyé</span><span><i style="background:var(--red)"></i>routeur en panne</span></div>
+      <div>
+        <strong>Casse ou répare un routeur :</strong>
+        <div class="btns routers" id="pkRouters" style="margin-top:6px"></div>
+      </div>
+      <div class="stats">
+        <div class="stat"><small>Étape</small><b id="pkT">0</b></div>
+        <div class="stat"><small>Ordre d'arrivée</small><b id="pkOrder">–</b></div>
+      </div>
+      <div><strong>Chez le site, les paquets reçus :</strong><div class="slots" id="pkSlots" style="margin-top:6px"></div></div>
+      <div class="verdict" id="pkRes" aria-live="polite"></div>
+      <ol class="log" id="pkLog"></ol>
+      <span class="privacy">Rien n'est envoyé : tout se passe dans ta page.</span>
+    </div>
+    <div class="note">
+      <span class="note-title">Pourquoi c'est malin</span>
+      <span>Si un routeur tombe en panne, les paquets passent <strong>par un autre chemin</strong>. Si un paquet se perd, on en redemande <strong>juste un</strong>, pas tout le message. Internet a été pensé comme ça : sans centre unique, il continue de marcher même si des morceaux cassent.</span>
+    </div>
+    <div class="note warn">
+      <span class="note-title">Les paquets passent chez des inconnus</span>
+      <span>Ton paquet traverse des routeurs qui appartiennent à plein d'entreprises différentes. C'est pour ça que les sites sérieux <strong>chiffrent</strong> les données (le petit cadenas, <span class="mono">https</span>) : même si quelqu'un regarde passer le paquet, il ne peut pas le lire. Pour en savoir plus, lis le tutoriel sur <a class="tlink" href="naviguer-en-securite.html">naviguer en sécurité</a>.</span>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · Débit et latence</span>
+    <h2>Rapide… mais rapide comment ?</h2>
+    <p>Une connexion « rapide » peut vouloir dire deux choses différentes. Imagine une autoroute :</p>
+    <div class="cards">
+      <div class="box"><span class="tag acc">Débit</span><strong>Combien passe par seconde</strong><span class="soft">Le nombre de voies de l'autoroute. Plus il y en a, plus de voitures passent en même temps. On le mesure en <strong>bits par seconde</strong> : Mbit/s (millions de bits par seconde).</span></div>
+      <div class="box"><span class="tag warn">Latence</span><strong>Combien de temps dure le trajet</strong><span class="soft">Le temps pour qu'<em>une</em> voiture aille d'un bout à l'autre. Le <strong>ping</strong>, c'est le temps d'un aller-retour d'un petit paquet, en millisecondes (ms).</span></div>
+    </div>
+    <div class="note red">
+      <span class="note-title">Attention au piège : octets et bits</span>
+      <span>Les fichiers se mesurent en <strong>octets</strong> (Mo = mégaoctet), le débit en <strong>bits</strong> par seconde (Mbit/s). Or <strong>1 octet = 8 bits</strong>. Une connexion à 100 Mbit/s télécharge donc environ 100 ÷ 8 = <strong>12,5 Mo par seconde</strong>, pas 100 ! Pour Ko, Mo et Go, regarde le tutoriel sur <a class="tlink" href="les-octets-et-le-stockage.html">les octets</a>. Ici, on arrondit : 1 Mo ≈ 1 000 000 octets.</span>
+    </div>
+    <div class="box">
+      <h3>Calcule le temps de téléchargement</h3>
+      <div class="params">
+        <div class="param"><label for="fsz">Taille du fichier</label><input type="number" id="fsz" value="5" min="0" step="any" inputmode="decimal"></div>
+        <div class="param"><label for="fun">Unité</label><select id="fun"><option value="ko">Ko (kilooctets)</option><option value="mo" selected>Mo (mégaoctets)</option><option value="go">Go (gigaoctets)</option></select></div>
+        <div class="param"><label for="fbw">Débit (Mbit/s)</label><input type="number" id="fbw" value="100" min="0" step="any" inputmode="decimal"></div>
+      </div>
+      <div class="btns small-btns" id="filePresets">
+        <button type="button" data-s="3" data-u="mo">une photo (3 Mo)</button>
+        <button type="button" data-s="5" data-u="mo">une chanson (5 Mo)</button>
+        <button type="button" data-s="1" data-u="go">un film (1 Go)</button>
+        <button type="button" data-s="50" data-u="go">un gros jeu (50 Go)</button>
+      </div>
+      <div class="btns small-btns" id="bwPresets">
+        <button type="button" data-b="10">10 Mbit/s</button>
+        <button type="button" data-b="100">100 Mbit/s</button>
+        <button type="button" data-b="1000">1 000 Mbit/s</button>
+      </div>
+      <div class="formula" id="fCalc">–</div>
+      <div class="verdict" id="fRes" aria-live="polite"></div>
+    </div>
+    <div class="box">
+      <h3>La latence minimale selon la distance</h3>
+      <p>Même avec un débit énorme, rien ne va plus vite que la lumière. Dans une fibre optique, la lumière parcourt environ <strong>200 000 km par seconde</strong> (un peu moins vite que dans le vide).</p>
+      <div class="param"><label for="dist">Distance à vol d'oiseau : <span id="distV">250 km</span></label><input type="range" id="dist" min="0" max="20000" step="50" value="250"></div>
+      <div class="btns small-btns" id="distPresets">
+        <button type="button" data-d="60">Lausanne → Genève (≈ 60 km)</button>
+        <button type="button" data-d="250">Genève → Zurich (≈ 250 km)</button>
+        <button type="button" data-d="6200">Suisse → New York (≈ 6 200 km)</button>
+        <button type="button" data-d="16500">Suisse → Sydney (≈ 16 500 km)</button>
+      </div>
+      <div class="stats">
+        <div class="stat"><small>Aller simple, au minimum</small><b id="dOne">–</b></div>
+        <div class="stat"><small>Aller-retour (ping), au minimum</small><b id="dPing">–</b></div>
+      </div>
+      <p class="soft">En vrai, le ping est presque toujours <strong>plus grand</strong> : les câbles ne vont pas tout droit, et chaque routeur et ta box prennent un peu de temps. C'est une limite qu'aucune connexion ne peut battre, pas une mesure.</p>
+    </div>
+    <div class="box">
+      <h3>Débit ou latence : qu'est-ce qui compte le plus ?</h3>
+      <ul class="sorter" id="spdSort"></ul>
+      <div class="btns">
+        <span class="score" id="spdScore">0 / 6</span>
+        <button type="button" id="spdReset">Recommencer</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Le cloud</span>
+    <h2>Le cloud, c'est l'ordinateur de quelqu'un d'autre</h2>
+    <p>« Mes photos sont dans le cloud » (le nuage, en anglais). Ça sonne léger et magique. En réalité, tes photos sont copiées sur des <strong>disques durs</strong>, dans un <strong>datacenter</strong> : un grand bâtiment rempli de milliers d'ordinateurs (des <strong>serveurs</strong>), avec de la climatisation et des gardiens. Ce bâtiment appartient à une entreprise, parfois dans un autre pays.</p>
+    <div class="cards">
+      <div class="box"><span class="tag ok">Pratique</span><strong>Les avantages</strong><span class="soft">Si ton téléphone tombe à l'eau, tes photos sont toujours là. Tu les retrouves sur un autre appareil. Tu peux travailler à plusieurs sur un même document.</span></div>
+      <div class="box"><span class="tag warn">À savoir</span><strong>Les questions à se poser</strong><span class="soft">Qui peut voir mes fichiers ? Sont-ils partagés avec quelqu'un ? Que fait l'entreprise de mes données ? Mon compte a-t-il un mot de passe solide ?</span></div>
+      <div class="box"><span class="tag acc">Sans Internet</span><strong>Pas de connexion, pas de cloud</strong><span class="soft">Pour ouvrir un fichier qui est seulement dans le cloud, il faut une connexion. Dans le train sous un tunnel… rien.</span></div>
+    </div>
+    <div class="box">
+      <h3>Que fais-tu ?</h3>
+      <div id="cloudScen" class="exos"></div>
+    </div>
+    <p>Si tu ne sais pas comment un service de cloud est réglé, <strong>parles-en à un adulte de confiance</strong> (parent, enseignant·e, infirmier·ère scolaire) : regarder ensemble les réglages de partage prend cinq minutes.</p>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Internet et l'énergie</span>
+    <h2>Internet n'est pas immatériel</h2>
+    <p>Tout ce voyage a besoin de <strong>matériel</strong> et d'<strong>électricité</strong> : les datacenters (qu'il faut aussi refroidir), les routeurs, les câbles, les antennes, ta box, et bien sûr nos appareils. Les chiffres exacts sont difficiles à mesurer et varient beaucoup selon les études, mais tous les spécialistes sont d'accord : <strong>le numérique consomme de l'énergie et des ressources</strong>, et sa part augmente.</p>
+    <div class="cards">
+      <div class="box"><span class="tag ok">Le plus efficace</span><strong>Garder ses appareils longtemps</strong><span class="soft">Fabriquer un téléphone demande beaucoup de métaux et d'énergie. Selon de nombreuses études, c'est souvent une grande partie de son impact total. Le garder, le réparer, le protéger avec une coque, ça compte.</span></div>
+      <div class="box"><span class="tag ok">Facile</span><strong>Ne pas faire tourner pour rien</strong><span class="soft">Une vidéo qui joue en arrière-plan sans que tu regardes, une lecture automatique qui enchaîne les épisodes : ça transporte des données pour rien.</span></div>
+      <div class="box"><span class="tag ok">Facile</span><strong>Adapter la qualité</strong><span class="soft">Sur un petit écran, une vidéo en qualité moyenne se voit très bien et transporte beaucoup moins de données qu'en très haute qualité.</span></div>
+    </div>
+    <p class="soft">Pas de panique ni de culpabilité : il ne s'agit pas d'arrêter Internet, mais de l'utiliser sans gaspiller.</p>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Le savais-tu ?</span>
+    <h2>Une petite histoire d'Internet</h2>
+    <ol class="timeline">
+      <li><span class="when">XIXe siècle</span><div class="what"><strong>Le premier câble sous l'océan</strong><span>Bien avant Internet, on pose des câbles de télégraphe au fond de l'Atlantique pour envoyer des messages en code Morse entre l'Europe et l'Amérique.</span></div></li>
+      <li><span class="when">fin des années 1960</span><div class="what"><strong>Les premiers réseaux d'ordinateurs</strong><span>Aux États-Unis, des universités et des centres de recherche relient leurs ordinateurs. L'idée des paquets qui peuvent prendre plusieurs chemins est déjà là.</span></div></li>
+      <li><span class="when">années 1970–1980</span><div class="what"><strong>Les règles communes</strong><span>Des chercheurs inventent des règles (des « protocoles ») pour que des réseaux différents puissent se parler : c'est la naissance d'Internet, le réseau des réseaux. L'e-mail existe déjà.</span></div></li>
+      <li><span class="when">vers 1990</span><div class="what"><strong>Le web naît… près de Genève !</strong><span>Au CERN, le grand laboratoire de physique à la frontière franco-suisse, Tim Berners-Lee invente le web : des pages reliées par des liens, qu'on ouvre avec un navigateur. Il voulait aider les chercheurs à partager leurs documents.</span></div></li>
+      <li><span class="when">années 2000</span><div class="what"><strong>Le Wi-Fi et les smartphones</strong><span>Internet sort des ordinateurs de bureau : on se connecte sans fil, puis partout avec son téléphone.</span></div></li>
+      <li><span class="when">aujourd'hui</span><div class="what"><strong>Des milliards d'appareils</strong><span>Téléphones, consoles, montres, voitures, frigos… On parle parfois de « l'Internet des objets ». D'où le besoin des adresses IPv6.</span></div></li>
+    </ol>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · Attention</span>
+    <h2>Les erreurs fréquentes</h2>
+    <div class="cards">
+      <div class="box"><span class="tag no">Faux</span><strong>« Internet et le web, c'est pareil. »</strong><span class="soft">Internet, c'est le réseau. Le web n'est qu'un de ses services, comme l'e-mail ou les jeux en ligne.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« Le Wi-Fi, c'est Internet. »</strong><span class="soft">Le Wi-Fi, c'est seulement la liaison radio entre ton appareil et la box. Si la box n'est plus reliée au fournisseur, tu as du Wi-Fi… mais pas d'Internet.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« Internet passe surtout par les satellites. »</strong><span class="soft">La plupart des données entre continents passent par des câbles sous-marins en fibre optique.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« 100 Mbit/s, c'est 100 Mo par seconde. »</strong><span class="soft">1 octet = 8 bits : 100 Mbit/s ≈ 12,5 Mo/s. Il faut diviser par 8.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« Avec la fibre, il n'y a plus aucun délai. »</strong><span class="soft">Le débit augmente, mais la lumière met quand même du temps à faire le trajet : environ 200 000 km par seconde dans une fibre.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« Le cloud, c'est dans le ciel. »</strong><span class="soft">Ce sont des ordinateurs bien réels, dans des bâtiments, qui appartiennent à quelqu'un d'autre.</span></div>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Choisis ta réponse, puis vérifie.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Recommencer</button>
+    </div>
+  </section>
+
+  <!-- 12 -->
+  <section>
+    <span class="eyebrow">Étape 12 · À toi de jouer</span>
+    <h2>Six exercices</h2>
+    <div class="exos">
+      <details>
+        <summary>1. Le gros jeu<span class="q">Tu télécharges un jeu de 30 Go avec une connexion à 50 Mbit/s. Combien de temps faut-il, au mieux ?</span></summary>
+        <div>
+          <span>30 Go = 30 000 Mo (en arrondissant) = 30 000 × 8 = <strong>240 000 Mbit</strong>.</span>
+          <span>240 000 ÷ 50 = <strong>4 800 secondes</strong>, soit 4 800 ÷ 60 = <strong>80 minutes</strong> = 1 h 20 min. Et souvent un peu plus en vrai.</span>
+        </div>
+      </details>
+      <details>
+        <summary>2. Vraies ou fausses adresses ?<span class="q">Lesquelles sont des adresses IPv4 valides : a) 172.16.0.1 b) 300.1.1.1 c) 45.12.7 d) 203.0.113.255 ?</span></summary>
+        <div>
+          <ul>
+            <li>a) <strong>Valide</strong> (c'est même une adresse privée, utilisée derrière une box).</li>
+            <li>b) Non : 300 dépasse 255.</li>
+            <li>c) Non : il n'y a que 3 nombres, il en faut 4.</li>
+            <li>d) <strong>Valide</strong> : 4 nombres entre 0 et 255.</li>
+          </ul>
+        </div>
+      </details>
+      <details>
+        <summary>3. Le ping vers l'Australie<span class="q">Il y a environ 16 000 km entre la Suisse et Sydney. Quelle est la latence minimale d'un aller-retour dans une fibre (200 000 km/s) ?</span></summary>
+        <div>
+          <span>Aller : 16 000 ÷ 200 000 = 0,08 s = <strong>80 ms</strong>. Aller-retour : <strong>160 ms</strong>.</span>
+          <span>En vrai, c'est plus, car le câble fait des détours. Pour un jeu en ligne rapide, c'est déjà beaucoup : c'est pour ça que les jeux ont des serveurs sur plusieurs continents.</span>
+        </div>
+      </details>
+      <details>
+        <summary>4. Combien d'adresses ?<span class="q">Une adresse IPv4, c'est 4 octets. Combien d'adresses différentes peut-on écrire ? Pourquoi est-ce un problème ?</span></summary>
+        <div>
+          <span>Chaque nombre a 256 valeurs (0 à 255) : 256 × 256 × 256 × 256 = <strong>4 294 967 296</strong>, environ 4,3 milliards.</span>
+          <span>Il y a plus d'appareils connectés que ça. D'où les adresses privées derrière les box, et le nouveau format IPv6.</span>
+        </div>
+      </details>
+      <details>
+        <summary>5. Le paquet manquant<span class="q">Un message est coupé en 6 paquets. Le site reçoit, dans cet ordre : 3, 1, 6, 2, 5. Que se passe-t-il ?</span></summary>
+        <div>
+          <span>Il manque le <strong>paquet n°4</strong>. Le site attend un peu, puis le <strong>redemande</strong> (seulement lui).</span>
+          <span>Quand il arrive, le site remet tout dans l'ordre grâce aux numéros : 1, 2, 3, 4, 5, 6. Le désordre d'arrivée n'est pas un problème.</span>
+        </div>
+      </details>
+      <details>
+        <summary>6. Mo/s ou Mbit/s ?<span class="q">Ton application de téléchargement affiche « 10 Mo/s ». Combien de Mbit/s est-ce ?</span></summary>
+        <div>
+          <span>1 octet = 8 bits, donc 10 Mo/s = 10 × 8 = <strong>80 Mbit/s</strong>.</span>
+          <span>Dans l'autre sens, on divise par 8. Regarde toujours si l'unité est un <strong>o</strong> (octet) ou un <strong>bit</strong>.</span>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• Internet est un <strong>réseau de réseaux</strong> : Wi-Fi, box, fournisseur d'accès, câbles (même sous les océans), datacenters.</span>
+      <span>• Le <strong>web</strong> (les pages dans un navigateur) n'est qu'<strong>un service</strong> d'Internet, comme l'e-mail, les jeux en ligne ou les appels vidéo.</span>
+      <span>• Une <strong>adresse IPv4</strong>, c'est 4 nombres de 0 à 255 (4 octets), par exemple 203.0.113.42.</span>
+      <span>• Le <strong>DNS</strong> est l'annuaire : il traduit un nom (ecole-du-lac.exemple) en adresse IP.</span>
+      <span>• Les données voyagent en <strong>paquets numérotés</strong> qui peuvent prendre des chemins différents ; on les remet dans l'ordre et on redemande ceux qui sont perdus.</span>
+      <span>• <strong>Débit</strong> = combien passe par seconde (Mbit/s) ; <strong>latence</strong> = durée du trajet (ping en ms). <strong>1 octet = 8 bits</strong> : temps = taille × 8 ÷ débit.</span>
+      <span>• Rien ne va plus vite que la lumière : environ 200 000 km/s dans une fibre.</span>
+      <span>• Le <strong>cloud</strong>, c'est l'ordinateur de quelqu'un d'autre : pratique, mais vérifie qui peut voir tes fichiers.</span>
+      <span>• Internet consomme de l'énergie : garder ses appareils longtemps et éviter le gaspillage, ça aide.</span>
+    </div>
+  </section>
+
+  <!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"><a class="prev" href="comment-une-ia-ecrit.html"><span>← Précédent</span><strong>Comment une IA écrit un texte</strong></a><a class="next" href="les-octets-et-le-stockage.html"><span>Suivant →</span><strong>Les octets et le stockage</strong></a></div><a class="tnav-home" href="numerique.html">⌂ Tous les tutoriels numériques</a></nav><!--/tnav-->
+<footer>Fiche de révision · Comment marche Internet</footer>
+</main>
+
+<script>
+(function () {
+  /*
+   * Hooks de test : window.__net
+   *   hops                              -> les 8 étapes du voyage de la photo [{t, d}]
+   *   webItems, webCats                 -> tri « web / autre service / pas Internet » [{x, a, why}], [[code, libellé]]
+   *   speedItems, speedCats             -> tri « débit / latence »
+   *   validateIP(s)                     -> {input, ok, parts:[...], nums?:[4 nombres], errors:[texte], ipv6?, kind?:{code, text}}
+   *                                        règles : 4 morceaux séparés par « . », chiffres seulement, pas de zéro inutile devant, 0 ≤ n ≤ 255
+   *                                        kind.code : 'publique' | 'privee' | 'loop' | 'exemple' | 'special' | 'multi' | 'reserve'
+   *   ipKind([a,b,c,d]), toBinary8(n)   -> type d'adresse ; n en 8 bits ('11000000')
+   *   checkName(nom)                    -> {ok, name, error?} ; le nom doit finir par .exemple, morceaux [a-z0-9-]
+   *   fakeIP(nom)                       -> adresse IP inventée, stable, dans une plage réservée aux exemples (192.0.2.x, 198.51.100.x, 203.0.113.x)
+   *   dnsLookup(nom, cache?)            -> {ok, name, ip, cached, steps:[{who, text}]} ou {ok:false, error, steps:[]} ; ne modifie pas le cache
+   *   dnsCache                          -> mémoire utilisée par le widget (objet nom -> ip)
+   *   nodes, edges, routes              -> réseau du simulateur (A = toi, B = le site, R1…R7 = routeurs)
+   *   bfs(depuis, vers, cassés?)        -> plus court chemin (liste des nœuds suivants, sans le départ) en évitant les routeurs cassés, ou null
+   *   splitMessage(texte, max?)         -> morceaux (au plus max = 8 paquets, au moins 3 caractères chacun)
+   *   sim.reset(msg?), sim.step(), sim.toggleRouter('R4'), sim.loseOne(), sim.done(), sim.state()
+   *                                        le paquet i part à l'étape floor(i/2)+1, avance d'un nœud par étape ;
+   *                                        routeur cassé : les paquets qui s'y trouvent sont perdus, les autres changent de chemin ;
+   *                                        un paquet perdu est redemandé 3 étapes plus tard (nouvelle copie depuis A)
+   *   transferTime(taille, 'ko'|'mo'|'go', mbits) -> {octets, bits, seconds, wrongSeconds (sans le × 8), text} ou null
+   *   fmtDuration(s), minDelay(km)      -> texte ; {oneWayMs, pingMs} à 200 000 km/s
+   *   cloudScenarios, quiz
+   * Rien n'est envoyé ni enregistré : tout reste dans la page.
+   */
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function fmtNum(x, d) {
+    if (!isFinite(x)) return '–';
+    return Number(x).toLocaleString('fr-FR', { maximumFractionDigits: d == null ? 2 : d }).replace(/[   ]/g, ' ');
+  }
+
+  /* ---------- 1. Le voyage d'une photo ---------- */
+  var HOPS = [
+    { t: 'Le téléphone de Léa', d: 'Léa appuie sur « Envoyer ». La photo devient une longue suite de 0 et de 1, découpée en petits paquets numérotés.' },
+    { t: 'Le Wi-Fi', d: 'Les paquets partent par ondes radio jusqu’à la box, à quelques mètres. Le Wi-Fi, c’est seulement ce tout petit bout du trajet.' },
+    { t: 'La box', d: 'La box relie le réseau de la maison au reste du monde. C’est le premier routeur : elle envoie les paquets vers le fournisseur d’accès.' },
+    { t: 'Le fournisseur d’accès', d: 'L’entreprise à qui la famille paie l’abonnement. Son réseau de câbles (souvent de la fibre optique) amène les paquets vers de grands carrefours.' },
+    { t: 'Un carrefour d’Internet', d: 'Dans de grandes villes, les réseaux de nombreuses entreprises se branchent les uns aux autres pour s’échanger des paquets. C’est ça, un réseau de réseaux.' },
+    { t: 'Le câble sous-marin', d: 'Pour traverser l’Atlantique, les paquets voyagent sous forme de lumière dans des fibres posées au fond de l’océan, sur des milliers de kilomètres.' },
+    { t: 'Le datacenter', d: 'Un grand bâtiment plein d’ordinateurs (des serveurs) : ceux de la messagerie. Ils reçoivent la photo, la gardent un moment et la font suivre à Zoé.' },
+    { t: 'Le téléphone de Zoé', d: 'Dernier bout : le réseau d’un fournisseur canadien, une box, un Wi-Fi… et la photo du chat s’affiche à Montréal. Tout ça en une seconde ou deux !' }
+  ];
+  var hopI = -1;
+  function renderHops() {
+    $('hops').innerHTML = HOPS.map(function (h, i) { return '<li class="' + (i === hopI ? 'on' : (i < hopI ? 'past' : '')) + '">' + esc(h.t) + '</li>'; }).join('');
+    if (hopI < 0) $('hopText').innerHTML = '<span>Appuie sur « Étape suivante » pour faire partir la photo.</span>';
+    else $('hopText').innerHTML = '<span class="note-title">' + (hopI + 1) + ' · ' + esc(HOPS[hopI].t) + '</span><span>' + esc(HOPS[hopI].d) + '</span>';
+    $('hopNext').disabled = hopI >= HOPS.length - 1;
+  }
+  $('hopNext').addEventListener('click', function () { if (hopI < HOPS.length - 1) { hopI++; renderHops(); } });
+  $('hopReset').addEventListener('click', function () { hopI = -1; renderHops(); });
+  renderHops();
+
+  /* ---------- Jeu de tri générique ---------- */
+  function makeSorter(listId, scoreId, resetId, items, cats) {
+    var ans = [];
+    function score() { var n = 0; ans.forEach(function (v, k) { if (v && v === items[k].a) n++; }); $(scoreId).textContent = n + ' / ' + items.length; }
+    function build() {
+      ans = [];
+      $(listId).innerHTML = items.map(function (it, k) {
+        return '<li><strong>' + esc(it.x) + '</strong><div class="opts">' + cats.map(function (c) { return '<button type="button" data-k="' + k + '" data-c="' + c[0] + '">' + esc(c[1]) + '</button>'; }).join('') + '</div><span class="sfb" id="' + listId + '-f' + k + '" aria-live="polite"></span></li>';
+      }).join('');
+      score();
+    }
+    $(listId).addEventListener('click', function (e) {
+      var b = e.target.closest ? e.target.closest('button[data-k]') : null;
+      if (!b) return;
+      var k = +b.getAttribute('data-k'), c = b.getAttribute('data-c'), it = items[k];
+      ans[k] = c;
+      var btns = b.parentNode.querySelectorAll('button');
+      for (var i = 0; i < btns.length; i++) btns[i].className = '';
+      var ok = c === it.a;
+      b.className = ok ? 'good' : 'bad';
+      var good = cats.filter(function (x) { return x[0] === it.a; })[0][1];
+      var f = $(listId + '-f' + k);
+      f.className = 'sfb ' + (ok ? 'ok' : 'no');
+      f.innerHTML = (ok ? 'Juste !' : 'Pas tout à fait : c’est « ' + esc(good) + ' ».') + '<span>' + esc(it.why) + '</span>';
+      score();
+    });
+    $(resetId).addEventListener('click', build);
+    build();
+  }
+
+  /* ---------- 2. Web ou pas web ---------- */
+  var WEB_CATS = [['web', 'Le web'], ['autre', 'Autre service d’Internet'], ['non', 'Pas Internet']];
+  var WEB = [
+    { x: 'Lire un article de Wikipédia dans ton navigateur', a: 'web', why: 'Une page avec des liens, ouverte dans un navigateur : c’est exactement le web.' },
+    { x: 'Envoyer un e-mail avec une appli d’e-mail', a: 'autre', why: 'L’e-mail utilise Internet, mais c’est un service à part, plus ancien que le web. (Si tu lis tes e-mails sur un site, dans le navigateur, tu passes par le web pour y accéder.)' },
+    { x: 'Jouer à un jeu en ligne avec des amis', a: 'autre', why: 'Le jeu échange des paquets avec un serveur par Internet, sans passer par des pages web.' },
+    { x: 'Un appel vidéo avec ta grand-mère', a: 'autre', why: 'Le son et l’image voyagent en paquets sur Internet : c’est un autre service que le web.' },
+    { x: 'Chercher une recette de crêpes sur un site', a: 'web', why: 'Un site, des pages, un navigateur : c’est le web.' },
+    { x: 'Envoyer un SMS classique', a: 'non', why: 'Un SMS classique passe par le réseau téléphonique mobile, pas par Internet. (Les messageries modernes, elles, passent par Internet.)' },
+    { x: 'Écouter sur un casque Bluetooth une chanson déjà enregistrée dans ton téléphone', a: 'non', why: 'Le Bluetooth relie le casque au téléphone sur quelques mètres, et la chanson est déjà là : pas besoin d’Internet.' },
+    { x: 'Changer de chaîne avec la télécommande', a: 'non', why: 'La télécommande envoie une lumière infrarouge invisible jusqu’à la télé, à travers le salon. Pas d’Internet.' }
+  ];
+  makeSorter('webSort', 'webScore', 'webReset', WEB, WEB_CATS);
+
+  /* ---------- 3. Adresses IP ---------- */
+  function toBinary8(n) { return ('00000000' + (n >>> 0).toString(2)).slice(-8); }
+  function ipKind(n) {
+    var a = n[0], b = n[1], c = n[2], s = n.join('.');
+    if (s === '0.0.0.0') return { code: 'special', text: 'Adresse spéciale : elle veut dire « pas d’adresse précise ». Elle ne désigne aucun appareil.' };
+    if (s === '255.255.255.255') return { code: 'special', text: 'Adresse spéciale : un message « pour tout le monde » sur le réseau de la maison.' };
+    if (a === 127) return { code: 'loop', text: 'Adresse de bouclage : elle veut dire « moi-même ». Un appareil qui écrit à 127.0.0.1 se parle à lui-même.' };
+    if (a === 10 || (a === 172 && b >= 16 && b <= 31) || (a === 192 && b === 168)) return { code: 'privee', text: 'Adresse privée : elle sert à l’intérieur d’une maison ou d’une école, derrière la box. Des millions de maisons utilisent les mêmes, sans problème.' };
+    if ((a === 192 && b === 0 && c === 2) || (a === 198 && b === 51 && c === 100) || (a === 203 && b === 0 && c === 113)) return { code: 'exemple', text: 'Adresse réservée aux exemples (comme le numéro 079 000 00 00) : on l’utilise dans les livres et sur cette page.' };
+    if (a === 0) return { code: 'reserve', text: 'Une adresse qui commence par 0 est réservée : elle ne sert pas pour un appareil.' };
+    if (a >= 224 && a <= 239) return { code: 'multi', text: 'Adresse spéciale de « multidiffusion » : un envoi vers tout un groupe d’appareils.' };
+    if (a >= 240) return { code: 'reserve', text: 'Adresse réservée : elle n’est pas utilisée sur Internet.' };
+    return { code: 'publique', text: 'Adresse publique : le format est correct. Une adresse comme celle-ci peut être celle d’une box ou d’un serveur, quelque part dans le monde.' };
+  }
+  function validateIP(s) {
+    s = String(s == null ? '' : s).trim();
+    var r = { input: s, ok: false, parts: [], errors: [] };
+    if (!s) { r.errors.push('Tape une adresse, par exemple 192.168.1.12.'); return r; }
+    if (s.indexOf(':') >= 0) { r.ipv6 = true; r.errors.push('Il y a des « : » : ça ressemble à une adresse IPv6, un autre format, plus long. Ici, on teste le format IPv4.'); return r; }
+    var p = s.split('.');
+    r.parts = p;
+    if (p.length !== 4) r.errors.push('Il faut exactement 4 nombres séparés par 3 points. Ici, il y a ' + p.length + ' morceau' + (p.length > 1 ? 'x' : '') + '.');
+    p.forEach(function (x, i) {
+      var lab = 'Nombre ' + (i + 1);
+      if (x === '') r.errors.push(lab + ' : vide (deux points de suite, ou un point au début ou à la fin).');
+      else if (!/^[0-9]+$/.test(x)) r.errors.push(lab + ' « ' + x + ' » : seulement des chiffres de 0 à 9, sans espace.');
+      else if (x.length > 1 && x.charAt(0) === '0') r.errors.push(lab + ' « ' + x + ' » : on n’écrit pas de zéro inutile devant (certains programmes le liraient autrement).');
+      else if (parseInt(x, 10) > 255) r.errors.push(lab + ' « ' + x + ' » : trop grand, le maximum est 255.');
+    });
+    if (r.errors.length) return r;
+    r.nums = p.map(function (x) { return parseInt(x, 10); });
+    r.ok = true;
+    r.kind = ipKind(r.nums);
+    return r;
+  }
+  function partOk(x) { return /^[0-9]+$/.test(x) && !(x.length > 1 && x.charAt(0) === '0') && parseInt(x, 10) <= 255; }
+  function renderIP() {
+    var r = validateIP($('ipIn').value);
+    $('ipParts').innerHTML = r.parts.slice(0, 8).map(function (x, i) {
+      var ok = partOk(x);
+      return '<div class="ippart ' + (ok ? 'good' : 'bad') + '"><b>' + (x === '' ? '∅' : esc(x)) + '</b><small>' + (ok ? toBinary8(parseInt(x, 10)) : 'pas valide') + '</small></div>';
+    }).join('');
+    var v = $('ipRes');
+    if (r.ok) { v.className = 'verdict yes'; v.innerHTML = 'Adresse IPv4 valide ✓<span>' + esc(r.kind.text) + '</span><span class="soft">Sous chaque nombre : son écriture en 8 bits (un octet).</span>'; }
+    else { v.className = 'verdict no'; v.innerHTML = 'Adresse pas valide ✗' + r.errors.map(function (e) { return '<span>• ' + esc(e) + '</span>'; }).join(''); }
+  }
+  $('ipIn').addEventListener('input', renderIP);
+  $('ipPresets').addEventListener('click', function (e) {
+    var b = e.target.closest ? e.target.closest('button[data-ip]') : null;
+    if (!b) return;
+    $('ipIn').value = b.getAttribute('data-ip'); renderIP();
+  });
+  renderIP();
+
+  /* ---------- 4. DNS ---------- */
+  var dnsCache = {};
+  function normName(s) {
+    s = String(s == null ? '' : s).trim().toLowerCase();
+    s = s.replace(/^[a-z]+:\/\//, '');
+    var cut = s.search(/[\/?#]/);
+    if (cut >= 0) s = s.slice(0, cut);
+    return s.replace(/\.$/, '');
+  }
+  function checkName(raw) {
+    var name = normName(raw);
+    if (!name) return { ok: false, name: name, error: 'Tape un nom, par exemple ecole-du-lac.exemple.' };
+    if (/\s/.test(name)) return { ok: false, name: name, error: 'Il ne peut pas y avoir d’espace dans un nom de domaine.' };
+    var labels = name.split('.');
+    if (labels.length < 2 || labels[labels.length - 1] !== 'exemple') return { ok: false, name: name, error: 'Sur cette page, on n’invente que des noms qui finissent par .exemple (par exemple club-de-foot.exemple).' };
+    if (name.length > 253) return { ok: false, name: name, error: 'Ce nom est trop long.' };
+    for (var i = 0; i < labels.length; i++) {
+      var l = labels[i];
+      if (l === '') return { ok: false, name: name, error: 'Il y a deux points de suite, ou un point au début.' };
+      if (!/^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$/.test(l)) return { ok: false, name: name, error: 'Le morceau « ' + l + ' » ne va pas : ici, seulement des lettres sans accent, des chiffres et des tirets (pas au début ni à la fin).' };
+    }
+    return { ok: true, name: name };
+  }
+  function fakeIP(name) {
+    name = normName(name);
+    var h = 7;
+    for (var i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
+    var pre = ['192.0.2.', '198.51.100.', '203.0.113.'][h % 3];
+    return pre + (1 + (Math.floor(h / 3) % 254));
+  }
+  function dnsLookup(raw, cache) {
+    cache = cache || dnsCache;
+    var c = checkName(raw);
+    if (!c.ok) return { ok: false, error: c.error, steps: [] };
+    var name = c.name, labels = name.split('.'), zone = labels.slice(-2).join('.'), ip = fakeIP(name);
+    if (Object.prototype.hasOwnProperty.call(cache, name)) {
+      return { ok: true, name: name, ip: cache[name], cached: true, steps: [{ who: 'Ton appareil', text: 'Il regarde dans sa mémoire (le « cache »)… Il connaît déjà ' + name + ' : réponse immédiate, ' + cache[name] + ' ! Pas besoin de demander à qui que ce soit.' }] };
+    }
+    var steps = [
+      { who: 'Ton appareil', text: 'Il regarde dans sa mémoire (le « cache ») : il ne connaît pas encore ' + name + '.' },
+      { who: 'Le résolveur DNS', text: 'Ton appareil demande au résolveur (souvent celui de la box ou du fournisseur d’accès) : « Quelle est l’adresse IP de ' + name + ' ? » Le résolveur ne la connaît pas non plus : il va chercher.' },
+      { who: 'Un serveur racine', text: 'Le résolveur demande à un serveur racine, tout en haut de l’annuaire. Réponse : « Je ne sais pas, mais demande au serveur qui s’occupe des noms en .exemple. »' },
+      { who: 'Le serveur de .exemple', text: '« Je ne connais pas l’adresse, mais demande au serveur qui s’occupe de ' + zone + '. »' },
+      { who: 'Le serveur de ' + zone, text: '« Je connais ! ' + name + ' a l’adresse ' + ip + '. »' },
+      { who: 'Le résolveur DNS', text: 'Il te renvoie la réponse et la garde en mémoire un moment, pour aller plus vite la prochaine fois. Ton navigateur peut maintenant contacter ' + ip + '.' }
+    ];
+    return { ok: true, name: name, ip: ip, cached: false, steps: steps };
+  }
+  var dnsCur = null, dnsShown = 0;
+  function renderMem() {
+    var k = Object.keys(dnsCache);
+    $('dnsMem').textContent = 'Mémoire (cache) de ton appareil : ' + (k.length ? k.map(function (n) { return n + ' → ' + dnsCache[n]; }).join(' ; ') : 'vide') + '.';
+  }
+  function dnsShowStep() {
+    var s = dnsCur.steps[dnsShown];
+    var li = document.createElement('li');
+    li.innerHTML = '<span class="who">' + esc(s.who) + '</span>' + esc(s.text);
+    $('dnsLog').appendChild(li);
+    dnsShown++;
+    if (dnsShown >= dnsCur.steps.length) {
+      dnsCache[dnsCur.name] = dnsCur.ip;
+      li.className = 'good';
+      $('dnsRes').className = 'verdict yes';
+      $('dnsRes').innerHTML = esc(dnsCur.name) + ' → ' + esc(dnsCur.ip) + '<span>' + (dnsCur.cached ? 'Trouvé tout de suite dans la mémoire : 1 étape.' : 'Trouvé en ' + dnsCur.steps.length + ' étapes. Cherche-le encore une fois pour voir la différence !') + '</span>';
+      $('dnsNext').disabled = true;
+      renderMem();
+    } else {
+      $('dnsNext').disabled = false;
+    }
+  }
+  function dnsStart() {
+    $('dnsLog').innerHTML = ''; $('dnsRes').innerHTML = ''; $('dnsRes').className = 'verdict';
+    dnsCur = dnsLookup($('dnsName').value); dnsShown = 0;
+    if (!dnsCur.ok) { $('dnsRes').className = 'verdict no'; $('dnsRes').innerHTML = 'Nom pas valide<span>' + esc(dnsCur.error) + '</span>'; $('dnsNext').disabled = true; dnsCur = null; return; }
+    dnsShowStep();
+  }
+  $('dnsGo').addEventListener('click', dnsStart);
+  $('dnsName').addEventListener('keydown', function (e) { if (e.key === 'Enter') dnsStart(); });
+  $('dnsNext').addEventListener('click', function () { if (dnsCur && dnsShown < dnsCur.steps.length) dnsShowStep(); });
+  $('dnsClear').addEventListener('click', function () {
+    Object.keys(dnsCache).forEach(function (k) { delete dnsCache[k]; });
+    renderMem();
+  });
+  renderMem();
+
+  /* ---------- 5. Paquets ---------- */
+  var DEFAULT_MSG = 'On se retrouve à 14 h devant l’école !';
+  var NODES = {
+    A: { x: 46, y: 150, label: 'toi' }, R1: { x: 140, y: 80, label: 'R1' }, R2: { x: 140, y: 220, label: 'R2' },
+    R3: { x: 260, y: 56, label: 'R3' }, R4: { x: 260, y: 150, label: 'R4' }, R5: { x: 260, y: 244, label: 'R5' },
+    R6: { x: 380, y: 90, label: 'R6' }, R7: { x: 380, y: 210, label: 'R7' }, B: { x: 474, y: 150, label: 'site' }
+  };
+  var ROUTERS = ['R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R7'];
+  var EDGES = [['A', 'R1'], ['A', 'R2'], ['R1', 'R3'], ['R1', 'R4'], ['R2', 'R4'], ['R2', 'R5'], ['R3', 'R6'], ['R4', 'R6'], ['R4', 'R7'], ['R5', 'R7'], ['R6', 'R7'], ['R6', 'B'], ['R7', 'B']];
+  var ROUTES = [
+    ['R2', 'R5', 'R7', 'R4', 'R6', 'B'],
+    ['R1', 'R3', 'R6', 'B'],
+    ['R2', 'R4', 'R7', 'B'],
+    ['R1', 'R4', 'R6', 'B'],
+    ['R2', 'R5', 'R7', 'R6', 'B']
+  ];
+  var ADJ = {};
+  Object.keys(NODES).forEach(function (n) { ADJ[n] = []; });
+  EDGES.forEach(function (e) { ADJ[e[0]].push(e[1]); ADJ[e[1]].push(e[0]); });
+  function bfs(from, to, broken) {
+    broken = broken || {};
+    if (from === to) return [];
+    var prev = {}, seen = {}, q = [from];
+    seen[from] = true;
+    while (q.length) {
+      var u = q.shift();
+      for (var i = 0; i < ADJ[u].length; i++) {
+        var v = ADJ[u][i];
+        if (seen[v] || broken[v]) continue;
+        seen[v] = true; prev[v] = u;
+        if (v === to) {
+          var path = [v], w = v;
+          while (prev[w] !== from) { w = prev[w]; path.unshift(w); }
+          return path;
+        }
+        q.push(v);
+      }
+    }
+    return null;
+  }
+  function splitMessage(text, maxPackets) {
+    var t = String(text == null ? '' : text).replace(/\s+/g, ' ').trim();
+    if (!t) t = DEFAULT_MSG;
+    maxPackets = maxPackets || 8;
+    var chars = Array.from ? Array.from(t) : t.split('');
+    var size = Math.max(3, Math.ceil(chars.length / maxPackets));
+    var out = [];
+    for (var i = 0; i < chars.length; i += size) out.push(chars.slice(i, i + size).join(''));
+    return out;
+  }
+  var sim = { t: 0, packets: [], broken: {}, received: {}, arrivals: [], lost: {}, log: [], chunks: [], n: 0 };
+  function addLog(text, cls) { sim.log.unshift({ t: sim.t, text: text, cls: cls || '' }); if (sim.log.length > 40) sim.log.length = 40; }
+  function pathOk(path) { for (var i = 0; i < path.length; i++) if (sim.broken[path[i]]) return false; return path.length > 0 && path[path.length - 1] === 'B'; }
+  function where(id) { return id === 'A' ? 'chez toi' : 'au routeur ' + id; }
+  function simDone() { return sim.n > 0 && Object.keys(sim.received).length === sim.n; }
+  function simReset(msg) {
+    sim.t = 0; sim.broken = {}; sim.received = {}; sim.arrivals = []; sim.lost = {}; sim.log = [];
+    sim.chunks = splitMessage(msg); sim.n = sim.chunks.length;
+    sim.packets = sim.chunks.map(function (c, i) {
+      return { id: i, n: i + 1, text: c, status: 'wait', node: 'A', path: ROUTES[i % ROUTES.length].slice(), depart: Math.floor(i / 2) + 1, resend: false, blocked: false };
+    });
+    addLog('Message découpé en ' + sim.n + ' paquets numérotés. Appuie sur « Pas à pas ».');
+    pktEls = {};
+    while (pktLayer && pktLayer.firstChild) pktLayer.removeChild(pktLayer.firstChild);
+    render();
+    return sim;
+  }
+  function loseAt(p, why) {
+    p.status = 'lost';
+    if (!sim.received[p.n]) sim.lost[p.n] = { at: sim.t + 3, text: p.text };
+    addLog(why + ' Le paquet n°' + p.n + ' est perdu !', 'bad');
+  }
+  function simStep() {
+    if (simDone() || sim.t >= 200) return sim;
+    sim.t++;
+    var t = sim.t;
+    sim.packets.forEach(function (p) {
+      if (p.status !== 'go') return;
+      if (!pathOk(p.path)) {
+        var np = bfs(p.node, 'B', sim.broken);
+        if (!np) {
+          if (!p.blocked) addLog('Paquet n°' + p.n + ' bloqué ' + where(p.node) + ' : plus aucun chemin. Répare un routeur !', 'warn');
+          p.blocked = true; return;
+        }
+        if (p.path.length) addLog('Paquet n°' + p.n + ' : panne sur sa route ! Il repart par un autre chemin (' + where(p.node) + ').', 'warn');
+        p.path = np;
+      }
+      p.blocked = false;
+      p.node = p.path.shift();
+      if (p.node === 'B') {
+        p.status = 'arrived'; p.at = t;
+        if (!sim.received[p.n]) { sim.received[p.n] = p.text; sim.arrivals.push(p.n); }
+        addLog('Paquet n°' + p.n + ' arrivé chez le site.', 'good');
+      }
+    });
+    sim.packets.forEach(function (p) {
+      if (p.status === 'wait' && p.depart === t) { p.status = 'go'; p.node = 'A'; }
+    });
+    var leaving = sim.packets.filter(function (p) { return p.status === 'go' && p.node === 'A' && p.depart === t && !p.resend; }).map(function (p) { return p.n; });
+    if (leaving.length) addLog('Paquet' + (leaving.length > 1 ? 's' : '') + ' n°' + leaving.join(' et ') + ' prêt' + (leaving.length > 1 ? 's' : '') + ' à partir.');
+    Object.keys(sim.lost).forEach(function (k) {
+      var L = sim.lost[k];
+      if (L.at !== t) return;
+      delete sim.lost[k];
+      if (sim.received[k]) return;
+      addLog('Le site n’a toujours pas reçu le paquet n°' + k + ' : il le redemande. Une nouvelle copie part.', 'warn');
+      sim.packets.push({ id: sim.packets.length, n: +k, text: L.text, status: 'go', node: 'A', path: [], depart: t, resend: true, blocked: false });
+    });
+    if (simDone()) addLog('Tous les paquets sont arrivés en ' + t + ' étapes.', 'good');
+    render();
+    return sim;
+  }
+  function toggleRouter(id) {
+    if (ROUTERS.indexOf(id) < 0) return sim;
+    if (sim.broken[id]) { delete sim.broken[id]; addLog('Le routeur ' + id + ' est réparé.', 'good'); }
+    else {
+      sim.broken[id] = true;
+      addLog('Le routeur ' + id + ' tombe en panne.', 'bad');
+      sim.packets.forEach(function (p) { if (p.status === 'go' && p.node === id) loseAt(p, 'Il était sur ' + id + ' :'); });
+    }
+    render();
+    return sim;
+  }
+  function loseOne() {
+    var p = sim.packets.filter(function (q) { return q.status === 'go' && ROUTERS.indexOf(q.node) >= 0; })[0];
+    if (!p) { addLog('Aucun paquet sur un routeur pour l’instant : avance d’une étape avec « Pas à pas ».'); render(); return null; }
+    loseAt(p, 'Un câble grésille sur ' + p.node + '.');
+    render();
+    return p.n;
+  }
+
+  var SVGNS = 'http://www.w3.org/2000/svg';
+  var svg = $('netSvg'), pktLayer, pktEls = {};
+  function mk(tag, attrs) { var e = document.createElementNS(SVGNS, tag); for (var k in attrs) e.setAttribute(k, attrs[k]); return e; }
+  (function buildNet() {
+    EDGES.forEach(function (e) {
+      var a = NODES[e[0]], b = NODES[e[1]];
+      svg.appendChild(mk('line', { x1: a.x, y1: a.y, x2: b.x, y2: b.y, 'class': 'edge', 'data-a': e[0], 'data-b': e[1] }));
+    });
+    Object.keys(NODES).forEach(function (id) {
+      var n = NODES[id], isR = ROUTERS.indexOf(id) >= 0;
+      var g = mk('g', { 'class': 'node ' + (isR ? 'router' : 'end'), 'data-id': id });
+      g.appendChild(mk('circle', { cx: n.x, cy: n.y, r: 22 }));
+      var tx = mk('text', { x: n.x, y: n.y }); tx.textContent = n.label; g.appendChild(tx);
+      g.appendChild(mk('path', { d: 'M' + (n.x - 14) + ' ' + (n.y - 14) + ' L' + (n.x + 14) + ' ' + (n.y + 14) + ' M' + (n.x + 14) + ' ' + (n.y - 14) + ' L' + (n.x - 14) + ' ' + (n.y + 14), 'class': 'x' }));
+      if (isR) { g.addEventListener('click', function () { toggleRouter(id); }); }
+      svg.appendChild(g);
+    });
+    pktLayer = mk('g', {});
+    svg.appendChild(pktLayer);
+  })();
+  $('pkRouters').innerHTML = ROUTERS.map(function (r) { return '<button type="button" data-r="' + r + '" aria-pressed="false" aria-label="Routeur ' + r + ' : casser ou réparer">' + r + '</button>'; }).join('');
+  $('pkRouters').addEventListener('click', function (e) {
+    var b = e.target.closest ? e.target.closest('button[data-r]') : null;
+    if (b) toggleRouter(b.getAttribute('data-r'));
+  });
+
+  function render() {
+    var edges = svg.querySelectorAll('.edge');
+    for (var i = 0; i < edges.length; i++) {
+      var off = sim.broken[edges[i].getAttribute('data-a')] || sim.broken[edges[i].getAttribute('data-b')];
+      edges[i].setAttribute('class', 'edge' + (off ? ' off' : ''));
+    }
+    var nodes = svg.querySelectorAll('.node');
+    for (i = 0; i < nodes.length; i++) {
+      var id = nodes[i].getAttribute('data-id'), isR = ROUTERS.indexOf(id) >= 0;
+      nodes[i].setAttribute('class', 'node ' + (isR ? 'router' : 'end') + (sim.broken[id] ? ' broken' : ''));
+    }
+    var rb = $('pkRouters').querySelectorAll('button');
+    for (i = 0; i < rb.length; i++) rb[i].setAttribute('aria-pressed', sim.broken[rb[i].getAttribute('data-r')] ? 'true' : 'false');
+    // paquets
+    var count = {}, seenIds = {};
+    sim.packets.forEach(function (p) {
+      var show = p.status === 'go' || p.status === 'wait';
+      var el = pktEls[p.id];
+      if (!show) { if (el && el.parentNode) el.parentNode.removeChild(el); delete pktEls[p.id]; return; }
+      var k = count[p.node] || 0; count[p.node] = k + 1;
+      var ang = (-90 + k * 45) * Math.PI / 180, R = 34;
+      var x = NODES[p.node].x + R * Math.cos(ang), y = NODES[p.node].y + R * Math.sin(ang);
+      if (!el) {
+        el = mk('g', { 'class': 'pkt' });
+        el.appendChild(mk('circle', { cx: 0, cy: 0, r: 11 }));
+        var tx = mk('text', { x: 0, y: 0 }); tx.textContent = p.n; el.appendChild(tx);
+        el.style.transform = 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px)';
+        pktLayer.appendChild(el); pktEls[p.id] = el;
+      } else {
+        el.style.transform = 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px)';
+      }
+      el.setAttribute('class', 'pkt' + (p.status === 'wait' ? ' wait' : '') + (p.resend ? ' resend' : ''));
+      seenIds[p.id] = true;
+    });
+    Object.keys(pktEls).forEach(function (id) { if (!seenIds[id]) { var e = pktEls[id]; if (e.parentNode) e.parentNode.removeChild(e); delete pktEls[id]; } });
+    // panneau
+    $('pkT').textContent = sim.t;
+    $('pkOrder').textContent = sim.arrivals.length ? sim.arrivals.join(', ') : '–';
+    var html = '';
+    for (var n = 1; n <= sim.n; n++) {
+      var got = Object.prototype.hasOwnProperty.call(sim.received, n);
+      html += '<span class="slot' + (got ? ' got' : '') + '"><b>' + n + '</b>' + (got ? esc(sim.received[n]) : '?') + '</span>';
+    }
+    $('pkSlots').innerHTML = html;
+    var res = $('pkRes');
+    if (simDone()) {
+      var ordered = sim.arrivals.slice().sort(function (a, b) { return a - b; });
+      var inOrder = sim.arrivals.join(',') === ordered.join(',');
+      res.className = 'verdict yes';
+      res.innerHTML = 'Message reçu et remis dans l’ordre !<span class="mono">« ' + esc(sim.chunks.join('')) + ' »</span><span>' + (inOrder ? 'Cette fois, les paquets sont arrivés dans l’ordre.' : 'Ils sont arrivés dans le désordre (' + esc(sim.arrivals.join(', ')) + '), mais grâce aux numéros, le site les a remis en ordre.') + '</span>';
+    } else { res.className = 'verdict'; res.innerHTML = ''; }
+    $('pkStep').disabled = simDone();
+    $('pkLog').innerHTML = sim.log.slice(0, 6).map(function (l) { return '<li class="' + l.cls + '"><span class="who">Étape ' + l.t + '</span>' + esc(l.text) + '</li>'; }).join('');
+  }
+  $('pkPrep').addEventListener('click', function () { simReset($('pkMsg').value); });
+  $('pkMsg').addEventListener('keydown', function (e) { if (e.key === 'Enter') simReset($('pkMsg').value); });
+  $('pkStep').addEventListener('click', simStep);
+  $('pkLose').addEventListener('click', loseOne);
+  simReset($('pkMsg').value);
+
+  /* ---------- 6. Débit et latence ---------- */
+  var UNITS = { ko: 1e3, mo: 1e6, go: 1e9 };
+  var UNAME = { ko: 'Ko', mo: 'Mo', go: 'Go' };
+  function fmtDuration(s) {
+    if (!isFinite(s) || s < 0) return '–';
+    if (s === 0) return '0 s';
+    if (s < 0.001) return 'moins d’un millième de seconde';
+    if (s < 1) return fmtNum(s, 3) + ' s (moins d’une seconde)';
+    if (s < 60) return fmtNum(s, 1) + ' s';
+    if (s < 3600) {
+      var m = Math.floor(s / 60), r = Math.round(s - m * 60);
+      if (r === 60) { m++; r = 0; }
+      return m + ' min' + (r ? ' ' + r + ' s' : '');
+    }
+    var h = Math.floor(s / 3600), mm = Math.round((s - h * 3600) / 60);
+    if (mm === 60) { h++; mm = 0; }
+    return fmtNum(h, 0) + ' h' + (mm ? ' ' + mm + ' min' : '');
+  }
+  function transferTime(size, unit, mbps) {
+    size = Number(size); mbps = Number(mbps);
+    var u = UNITS[String(unit).toLowerCase()];
+    if (!isFinite(size) || size < 0 || !u || !isFinite(mbps) || mbps <= 0) return null;
+    var octets = size * u, bits = octets * 8, s = bits / (mbps * 1e6);
+    return { octets: octets, bits: bits, seconds: s, wrongSeconds: s / 8, text: fmtDuration(s) };
+  }
+  function minDelay(km) {
+    km = Number(km);
+    if (!isFinite(km) || km < 0) return null;
+    var one = km / 200000 * 1000;
+    return { oneWayMs: one, pingMs: 2 * one };
+  }
+  function renderFile() {
+    var sz = $('fsz').value, un = $('fun').value, bw = $('fbw').value;
+    var r = transferTime(sz === '' ? NaN : sz, un, bw === '' ? NaN : bw);
+    if (!r) {
+      $('fCalc').textContent = '–';
+      $('fRes').className = 'verdict no';
+      $('fRes').innerHTML = 'Il manque quelque chose<span>Mets une taille (0 ou plus) et un débit plus grand que 0.</span>';
+      return;
+    }
+    var mbit = r.bits / 1e6;
+    $('fCalc').textContent = fmtNum(Number(sz), 3) + ' ' + UNAME[un] + ' × 8 = ' + fmtNum(mbit, 3) + ' Mbit  ;  ' + fmtNum(mbit, 3) + ' ÷ ' + fmtNum(Number(bw), 3) + ' = ' + fmtNum(r.seconds, 3) + ' s';
+    $('fRes').className = 'verdict yes';
+    $('fRes').innerHTML = 'Au mieux : ' + esc(r.text) + '<span>Ce débit fait environ ' + fmtNum(Number(bw) / 8, 2) + ' Mo par seconde.</span><span class="soft">Si on oubliait le × 8, on trouverait ' + esc(fmtDuration(r.wrongSeconds)) + ' : 8 fois trop peu ! Et en vrai, c’est souvent un peu plus long que le calcul.</span>';
+  }
+  ['fsz', 'fbw'].forEach(function (id) { $(id).addEventListener('input', renderFile); });
+  $('fun').addEventListener('change', renderFile);
+  $('filePresets').addEventListener('click', function (e) {
+    var b = e.target.closest ? e.target.closest('button[data-s]') : null;
+    if (!b) return;
+    $('fsz').value = b.getAttribute('data-s'); $('fun').value = b.getAttribute('data-u'); renderFile();
+  });
+  $('bwPresets').addEventListener('click', function (e) {
+    var b = e.target.closest ? e.target.closest('button[data-b]') : null;
+    if (!b) return;
+    $('fbw').value = b.getAttribute('data-b'); renderFile();
+  });
+  renderFile();
+  function fmtMs(ms) { return fmtNum(ms, ms < 10 ? 2 : (ms < 100 ? 1 : 0)) + ' ms'; }
+  function renderDist() {
+    var km = Number($('dist').value), d = minDelay(km);
+    $('distV').textContent = fmtNum(km, 0) + ' km';
+    $('dOne').textContent = fmtMs(d.oneWayMs);
+    $('dPing').textContent = fmtMs(d.pingMs);
+  }
+  $('dist').addEventListener('input', renderDist);
+  $('distPresets').addEventListener('click', function (e) {
+    var b = e.target.closest ? e.target.closest('button[data-d]') : null;
+    if (!b) return;
+    $('dist').value = b.getAttribute('data-d'); renderDist();
+  });
+  renderDist();
+
+  var SPEED_CATS = [['debit', 'Le débit'], ['latence', 'La latence']];
+  var SPEED = [
+    { x: 'Télécharger un jeu de 40 Go le plus vite possible', a: 'debit', why: 'Il faut faire passer énormément de données : c’est le nombre de bits par seconde qui compte.' },
+    { x: 'Un jeu de tir en ligne où il faut réagir en une fraction de seconde', a: 'latence', why: 'Les paquets sont petits, mais ils doivent faire l’aller-retour très vite : un ping bas compte plus que tout.' },
+    { x: 'Regarder une vidéo en haute qualité sans qu’elle s’arrête', a: 'debit', why: 'Une vidéo envoie beaucoup de données en continu : il faut assez de débit.' },
+    { x: 'Un appel vidéo où ton ami te répond avec un décalage gênant', a: 'latence', why: 'Le décalage, c’est le temps du trajet aller-retour : c’est la latence.' },
+    { x: 'Envoyer 300 photos de vacances dans le cloud', a: 'debit', why: 'Beaucoup de données à envoyer : le débit (ici, dans le sens « envoi ») décide du temps.' },
+    { x: 'Appuyer sur un bouton dans une appli et voir la réponse tout de suite', a: 'latence', why: 'Une petite question, une petite réponse : ce qui compte, c’est le temps de l’aller-retour.' }
+  ];
+  makeSorter('spdSort', 'spdScore', 'spdReset', SPEED, SPEED_CATS);
+
+  /* ---------- 7. Scénarios cloud ---------- */
+  var CLOUD = [
+    { q: 'Ta tablette est pleine. Une appli te propose : « Mets toutes tes photos dans le cloud ! » Que fais-tu ?', o: [
+      { t: 'J’accepte tout de suite, le cloud c’est fait pour ça.', ok: false, why: 'Ce n’est pas forcément une mauvaise idée, mais tes photos iront sur les ordinateurs d’une entreprise. Il vaut mieux savoir lesquelles, et qui pourra les voir.' },
+      { t: 'J’en parle à un adulte : quel service, qui peut voir les photos, sont-elles partagées, le compte a-t-il un bon mot de passe ?', ok: true, why: 'Bonne idée : le cloud peut être très pratique, à condition de connaître les réglages et de bien protéger le compte.' },
+      { t: 'J’efface toutes mes photos pour faire de la place, sans les copier nulle part.', ok: false, why: 'Tu les perdrais pour toujours. Avant d’effacer, il faut une copie quelque part (cloud, ordinateur de la famille, disque).' }
+    ] },
+    { q: 'Ton téléphone est synchronisé avec le cloud. Tu effaces une photo sur ton téléphone. Est-elle effacée partout ?', o: [
+      { t: 'Oui, toujours, et tout de suite.', ok: false, why: 'Pas forcément : selon le service, elle peut rester dans le cloud, ou dans une corbeille pendant un moment.' },
+      { t: 'Non, jamais : le cloud garde tout pour toujours.', ok: false, why: 'Pas forcément non plus : avec la synchronisation, effacer sur le téléphone efface souvent aussi dans le cloud.' },
+      { t: 'Ça dépend des réglages : je vérifie (et je regarde la corbeille).', ok: true, why: 'Exact. Chaque service fonctionne un peu différemment. Et si tu as partagé la photo avec quelqu’un, sa copie à lui, elle, ne s’efface pas.' }
+    ] }
+  ];
+  (function buildCloud() {
+    $('cloudScen').innerHTML = CLOUD.map(function (s, i) {
+      return '<div class="scen"><strong>' + esc(s.q) + '</strong><div class="opts">' + s.o.map(function (o, j) { return '<button type="button" data-s="' + i + '" data-o="' + j + '">' + esc(o.t) + '</button>'; }).join('') + '</div><div class="verdict" id="cs' + i + '" aria-live="polite"></div></div>';
+    }).join('');
+    $('cloudScen').addEventListener('click', function (e) {
+      var b = e.target.closest ? e.target.closest('button[data-s]') : null;
+      if (!b) return;
+      var i = +b.getAttribute('data-s'), j = +b.getAttribute('data-o'), o = CLOUD[i].o[j];
+      var bs = b.parentNode.querySelectorAll('button');
+      for (var k = 0; k < bs.length; k++) bs[k].className = '';
+      b.className = o.ok ? 'good' : 'bad';
+      var v = $('cs' + i);
+      v.className = 'verdict ' + (o.ok ? 'yes' : 'no');
+      v.innerHTML = (o.ok ? 'Bon réflexe !' : 'Hmm, pas idéal.') + '<span>' + esc(o.why) + '</span>';
+    });
+  })();
+
+  /* ---------- Quiz ---------- */
+  var QZ = [
+    { q: 'Internet, c’est…', o: [['a', 'un seul énorme ordinateur'], ['b', 'un réseau de réseaux reliés entre eux'], ['c', 'le Wi-Fi de la maison']], a: 'b', how: 'Des dizaines de milliers de réseaux branchés les uns aux autres, qui suivent les mêmes règles.' },
+    { q: 'Laquelle est une adresse IPv4 valide ?', o: [['a', '192.168.1.300'], ['b', '10.0.0.25'], ['c', '12.34.56']], a: 'b', how: '4 nombres de 0 à 255. 300 est trop grand, et 12.34.56 n’a que 3 nombres.' },
+    { q: 'Le DNS sert à…', o: [['a', 'traduire un nom (ecole-du-lac.exemple) en adresse IP'], ['b', 'rendre le Wi-Fi plus rapide'], ['c', 'protéger contre les virus']], a: 'a', how: 'C’est l’annuaire d’Internet : nom → adresse IP.' },
+    { q: 'Pourquoi les paquets d’un message arrivent-ils parfois dans le désordre ?', o: [['a', 'ils prennent des chemins différents'], ['b', 'l’ordinateur les mélange exprès'], ['c', 'le message est trop court']], a: 'a', how: 'Chaque routeur choisit un chemin ; à l’arrivée, les numéros permettent de tout remettre dans l’ordre.' },
+    { q: 'Un fichier de 50 Mo, avec une connexion à 100 Mbit/s, prend au mieux environ…', o: [['a', '0,5 seconde'], ['b', '4 secondes'], ['c', '50 secondes']], a: 'b', how: '50 Mo × 8 = 400 Mbit ; 400 ÷ 100 = 4 secondes.' },
+    { q: 'Pour un jeu en ligne très rapide, le plus important est…', o: [['a', 'une faible latence (un ping bas)'], ['b', 'un très gros disque dur'], ['c', 'beaucoup de photos dans le cloud']], a: 'a', how: 'Les paquets d’un jeu sont petits, mais ils doivent faire l’aller-retour très vite.' },
+    { q: '« Le cloud », c’est…', o: [['a', 'des données qui flottent dans les nuages'], ['b', 'des ordinateurs dans des datacenters, qui appartiennent à quelqu’un d’autre'], ['c', 'la mémoire de ton téléphone']], a: 'b', how: 'Tes fichiers sont copiés sur des disques bien réels, dans les bâtiments d’une entreprise.' },
+    { q: 'Vrai ou faux : le web et Internet, c’est la même chose.', o: [['v', 'Vrai'], ['f', 'Faux']], a: 'f', how: 'Internet est le réseau ; le web est un de ses services, comme l’e-mail ou les jeux en ligne.' }
+  ];
+  var quiz = $('quiz'), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ''; done = [];
+    QZ.forEach(function (Q, k) {
+      var li = document.createElement('li');
+      li.innerHTML = '<span>' + esc(Q.q) + '</span><select id="qa' + k + '" aria-label="Ta réponse à la question ' + (k + 1) + '"><option value="">…</option>' + Q.o.map(function (o) { return '<option value="' + o[0] + '">' + esc(o[1]) + '</option>'; }).join('') + '</select><button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+      quiz.appendChild(li);
+      function check() {
+        var fb = $('qf' + k), v = $('qa' + k).value;
+        if (!v) { fb.className = 'fb'; fb.textContent = 'Choisis une réponse.'; return; }
+        if (v === Q.a) { fb.className = 'fb ok'; fb.innerHTML = 'Bravo, c’est juste !<span>' + esc(Q.how) + '</span>'; done[k] = true; }
+        else {
+          done[k] = false;
+          var good = Q.o.filter(function (o) { return o[0] === Q.a; })[0][1];
+          fb.className = 'fb no'; fb.innerHTML = 'Pas tout à fait : la bonne réponse est « ' + esc(good) + ' ».<span>' + esc(Q.how) + '</span>';
+        }
+        $('score').textContent = done.filter(Boolean).length + ' / 8';
+      }
+      $('qb' + k).addEventListener('click', check);
+      $('qa' + k).addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+    });
+    $('score').textContent = '0 / 8';
+  }
+  $('newQuiz').addEventListener('click', newQuiz);
+  newQuiz();
+
+  window.__net = {
+    hops: HOPS, webItems: WEB, webCats: WEB_CATS, speedItems: SPEED, speedCats: SPEED_CATS,
+    validateIP: validateIP, ipKind: ipKind, toBinary8: toBinary8,
+    checkName: checkName, fakeIP: fakeIP, dnsLookup: dnsLookup, dnsCache: dnsCache,
+    nodes: NODES, edges: EDGES, routes: ROUTES, bfs: bfs, splitMessage: splitMessage,
+    sim: { reset: simReset, step: simStep, toggleRouter: toggleRouter, loseOne: loseOne, done: simDone, state: function () { return sim; } },
+    transferTime: transferTime, fmtDuration: fmtDuration, minDelay: minDelay,
+    cloudScenarios: CLOUD, quiz: QZ
+  };
+})();
+</script>
+</body>
+</html>

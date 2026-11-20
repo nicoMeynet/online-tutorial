@@ -1,0 +1,1077 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Les réseaux sociaux et les algorithmes</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, marge rouge. Accent framboise. Six couleurs de thèmes (--t1 à --t6) pour le fil simulé. Tous les comptes, jeux, marques et posts sont inventés. */
+:root {
+  --paper: #fbf7f8;
+  --grid: #f1e2e7;
+  --card: #ffffff;
+  --ink: #2b1820;
+  --ink-soft: #6e5560;
+  --acc: #e11d48;
+  --acc-soft: #ffe4ea;
+  --warn: #d97706;
+  --warn-soft: #fdf0d6;
+  --warn-ink: #92400e;
+  --two: #1c64c8;
+  --two-soft: #dbe8fa;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #fff0a3;
+  --line: #edd9df;
+  --t1: #2563eb; --t2: #7c3aed; --t3: #16a34a; --t4: #ea580c; --t5: #b45309; --t6: #0891b2;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #170e12; --grid: #26181e; --card: #1f1419; --ink: #f7ecef; --ink-soft: #c7aab4;
+    --acc: #fb7185; --acc-soft: #4a1424; --warn: #f5a524; --warn-soft: #3d2a0c; --warn-ink: #fbbf5a;
+    --two: #7fb0ff; --two-soft: #1a2a45;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #3d2a31;
+    --t1: #7fb0ff; --t2: #b794f6; --t3: #6fd39f; --t4: #fb923c; --t5: #facc15; --t6: #67e8f9;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #170e12; --grid: #26181e; --card: #1f1419; --ink: #f7ecef; --ink-soft: #c7aab4;
+  --acc: #fb7185; --acc-soft: #4a1424; --warn: #f5a524; --warn-soft: #3d2a0c; --warn-ink: #fbbf5a;
+  --two: #7fb0ff; --two-soft: #1a2a45;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #3d2a31;
+  --t1: #7fb0ff; --t2: #b794f6; --t3: #6fd39f; --t4: #fb923c; --t5: #facc15; --t6: #67e8f9;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--acc); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note.warn { border-left-color: var(--warn); background: var(--warn-soft); }
+.note.ok { border-left-color: var(--ok); background: var(--ok-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+.fig svg { width: 100%; height: auto; display: block; }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 8px 12px; min-height: 44px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+button:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+input[type="range"] { width: 100%; accent-color: var(--acc); }
+select { font: inherit; font-size: 1rem; padding: 8px 8px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); min-width: 0; min-height: 44px; }
+.param { display: flex; flex-direction: column; gap: 2px; }
+.param label { font-weight: 700; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
+.tag.ok { color: var(--ok); }
+.tag.no { color: var(--acc); }
+.tag.warn { color: var(--warn-ink); }
+
+.verdict { border-radius: 8px; padding: 12px 14px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+.verdict.yes { background: var(--ok-soft); color: var(--ok); }
+.verdict.no { background: var(--acc-soft); color: var(--acc); }
+.verdict.mid { background: var(--warn-soft); color: var(--warn-ink); }
+.verdict span { font-weight: 400; color: var(--ink); }
+
+/* Fil simulé */
+.phone { border: 2px solid var(--ink); border-radius: 18px; padding: 12px; background: var(--paper); display: flex; flex-direction: column; gap: 12px; max-width: 460px; width: 100%; align-self: center; min-width: 0; }
+.post { background: var(--card); border: 1.5px solid var(--line); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.post-head { display: flex; gap: 10px; align-items: center; min-width: 0; }
+.avatar { width: 40px; height: 40px; border-radius: 50%; flex: none; display: grid; place-items: center; font-family: var(--f-display); font-weight: 800; color: #fff; }
+.post-who { display: flex; flex-direction: column; min-width: 0; }
+.post-who strong { font-family: var(--f-mono); font-size: .92rem; overflow-wrap: anywhere; }
+.post-txt { font-size: 1.05rem; overflow-wrap: anywhere; }
+.post-img { height: 70px; border-radius: 8px; opacity: .25; }
+.acts button { flex: 1 1 120px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-family: var(--f-mono); font-size: .78rem; padding: 3px 9px; border-radius: 999px; border: 2px solid currentColor; background: var(--card); }
+.bars { display: flex; flex-direction: column; gap: 6px; }
+.bar-row { display: grid; grid-template-columns: 90px 1fr 52px; gap: 8px; align-items: center; font-size: .92rem; }
+.bar-track { height: 16px; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 6px 0 0 6px; transition: width .3s; }
+.bar-row .num { font-family: var(--f-mono); text-align: right; font-variant-numeric: tabular-nums; }
+.meter { height: 22px; background: var(--paper); border: 2px solid var(--ink); border-radius: 11px; overflow: hidden; }
+.meter-fill { height: 100%; transition: width .3s, background-color .3s; }
+.panel { border: 1.5px dashed var(--ink-soft); border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 10px; background: var(--paper); }
+.bubble-tools { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.bubble-tools select { flex: 1 1 140px; }
+
+/* Classement */
+.rank { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.rank li { display: grid; grid-template-columns: 38px 1fr; gap: 10px; align-items: start; border: 1.5px solid var(--line); border-radius: 10px; padding: 10px; background: var(--card); }
+.rank .pos { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--ink); color: var(--card); font-family: var(--f-display); font-weight: 800; }
+.rank .r-body { display: flex; flex-direction: column; gap: 4px; min-width: 0; overflow-wrap: anywhere; }
+.rank .meta { font-family: var(--f-mono); font-size: .8rem; color: var(--ink-soft); }
+.emo { font-family: var(--f-mono); font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; padding: 1px 7px; border-radius: 999px; border: 1.5px solid currentColor; margin-right: 6px; }
+.emo.hot { color: var(--acc); }
+.emo.calm { color: var(--ok); }
+
+/* Groupe de discussion */
+.chat { display: flex; flex-direction: column; gap: 8px; }
+.msg { background: var(--card); border: 1.5px solid var(--line); border-radius: 14px 14px 14px 4px; padding: 8px 12px; max-width: 90%; overflow-wrap: anywhere; }
+.msg b { font-family: var(--f-display); display: block; font-size: .9rem; }
+.msg.reveal { border-color: var(--ok); background: var(--ok-soft); max-width: 100%; border-radius: 10px; }
+
+/* Commentaires */
+.comments { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.cmt { border: 1.5px solid var(--line); border-radius: 10px; padding: 10px 12px; background: var(--card); display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.cmt.gone { opacity: .35; }
+.cmt-head { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; }
+.cmt-head strong { font-family: var(--f-mono); font-size: .9rem; overflow-wrap: anywhere; }
+.pic { width: 34px; height: 34px; border-radius: 50%; flex: none; display: grid; place-items: center; font-weight: 800; font-family: var(--f-display); color: #fff; }
+.pic.none { background: var(--line); color: var(--ink-soft); }
+.cmt-info { font-family: var(--f-mono); font-size: .78rem; color: var(--ink-soft); }
+.cmt .btns button { min-width: 110px; }
+.cmt-fb { font-size: .92rem; }
+.cmt-fb.good { color: var(--ok); }
+.cmt-fb.bad { color: var(--acc); }
+.cmt-fb span { color: var(--ink); font-weight: 400; }
+
+/* Vitrine */
+.vit { display: grid; grid-template-columns: minmax(0, 220px) minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 600px) { .vit { grid-template-columns: minmax(0, 1fr); } .vit .fig { max-width: 240px; margin: 0 auto; width: 100%; } }
+.toggles { display: flex; flex-direction: column; gap: 8px; }
+.toggles label { display: flex; gap: 10px; align-items: center; border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 10px; background: var(--card); cursor: pointer; min-height: 44px; }
+.toggles input { width: 22px; height: 22px; accent-color: var(--acc); flex: none; }
+
+/* Tri des pubs, réglages */
+.sort { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.sort li { border: 1.5px solid var(--line); border-radius: 10px; padding: 10px 12px; background: var(--card); display: flex; flex-direction: column; gap: 8px; }
+.sort li.good { border-color: var(--ok); }
+.sort li.bad { border-color: var(--acc); }
+.sort .btns button { flex: 1 1 130px; }
+.sort .fbk { font-size: .92rem; }
+.steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.steps li { border: 1.5px solid var(--line); border-radius: 10px; padding: 8px 10px; background: var(--card); }
+.steps li.done { border-color: var(--ok); background: var(--ok-soft); }
+.steps label { display: flex; gap: 10px; align-items: flex-start; cursor: pointer; }
+.steps input { width: 22px; height: 22px; margin-top: 3px; accent-color: var(--ok); flex: none; }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 220px auto; gap: 10px; align-items: center; }
+.quiz li > span:first-child { min-width: 0; overflow-wrap: anywhere; }
+.quiz select { font-size: .95rem; padding: 6px 6px; width: 100%; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb:empty { display: none; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc); }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 160px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--acc); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--acc); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); }
+details .q { display: block; margin-top: 8px; font-weight: 400; background: var(--paper); border: 1.5px dashed var(--line); border-radius: 8px; padding: 8px 10px; overflow-wrap: anywhere; color: var(--ink); }
+details ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+<!--ticons--><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Tutoriels"><script src="progress.js" defer></script><!--/ticons-->
+<style id="tnav-css">
+.tnav-top { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin: 0 0 4px; }
+.tnav-home { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font-weight: 700; font-size: .95rem; text-decoration: none; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tnav-home:hover, .tnav-home:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.tnav-bottom { margin-top: 8px; display: flex; flex-direction: column; gap: 12px; }
+.tnav-bottom h2 { margin: 0; }
+.tnav-pn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tnav-pn a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--ink, #222); border-radius: 10px;
+  background: var(--card, #fff); color: var(--ink, #222); text-decoration: none; box-shadow: 3px 3px 0 var(--ink, #222); min-width: 0; }
+.tnav-pn a span { font-size: .85rem; color: var(--ink-soft, #666); }
+.tnav-pn a strong { overflow-wrap: anywhere; }
+.tnav-pn a.next { text-align: right; grid-column: 2; }
+.tnav-bottom .tnav-home { align-self: center; }
+@media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
+.diff { font: 700 .72rem/1.2 var(--f-mono, monospace); padding: 2px 8px; border-radius: 99px; border: 1.5px solid; white-space: nowrap; }
+.diff.d1 { color: #15803d; border-color: #15803d; background: #dcf3e3; }
+.diff.d2 { color: #a15c07; border-color: #b45309; background: #fbe7cf; }
+.diff.d3 { color: #b91c1c; border-color: #b91c1c; background: #fde2e2; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root:not([data-theme="light"]) .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root:not([data-theme="light"]) .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; } }
+:root[data-theme="dark"] .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root[data-theme="dark"] .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root[data-theme="dark"] .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; }
+</style>
+</head>
+<body>
+<main class="page">
+<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="numerique.html">← Tous les tutoriels numériques</a><span class="diff d2" title="Difficulté : moyen">Moyen</span></nav><!--/tnav-->
+
+
+  <header class="hero">
+    <span class="eyebrow">Tutoriel numérique · niveau 10H</span>
+    <h1>Les réseaux sociaux et les algorithmes</h1>
+    <p class="lead">Tu ouvres une appli, tu fais défiler… et chaque vidéo semble faite pour toi. Ce n'est pas de la magie : un programme observe ce que tu fais et choisit la suite. Ici, tu vas le voir travailler, comprendre ce qu'il veut, et apprendre à garder la main sur ton fil.</p>
+    <div class="box fig">
+      <svg viewBox="0 0 360 200" role="img" aria-label="Un téléphone enfermé dans une bulle : à l'intérieur, toujours le même sujet ; dehors, d'autres sujets qui n'entrent pas">
+        <circle cx="180" cy="100" r="88" fill="var(--acc-soft)" stroke="var(--acc)" stroke-width="2.5" stroke-dasharray="6 5"/>
+        <rect x="140" y="30" width="80" height="140" rx="14" fill="var(--card)" stroke="var(--ink)" stroke-width="2.5"/>
+        <rect x="166" y="36" width="28" height="5" rx="2.5" fill="var(--line)"/>
+        <rect x="150" y="50" width="60" height="30" rx="6" fill="var(--t1)" opacity=".85"/>
+        <rect x="150" y="86" width="60" height="30" rx="6" fill="var(--t1)" opacity=".85"/>
+        <rect x="150" y="122" width="60" height="30" rx="6" fill="var(--t1)" opacity=".85"/>
+        <text x="180" y="70" text-anchor="middle" font-size="11" style="fill:#fff">sport</text>
+        <text x="180" y="106" text-anchor="middle" font-size="11" style="fill:#fff">sport</text>
+        <text x="180" y="142" text-anchor="middle" font-size="11" style="fill:#fff">sport</text>
+        <g font-size="12">
+          <rect x="6" y="30" width="74" height="26" rx="13" fill="var(--card)" stroke="var(--t3)" stroke-width="2"/><text x="43" y="47" text-anchor="middle">animaux</text>
+          <rect x="16" y="140" width="74" height="26" rx="13" fill="var(--card)" stroke="var(--t4)" stroke-width="2"/><text x="53" y="157" text-anchor="middle">musique</text>
+          <rect x="282" y="40" width="72" height="26" rx="13" fill="var(--card)" stroke="var(--t5)" stroke-width="2"/><text x="318" y="57" text-anchor="middle">cuisine</text>
+          <rect x="276" y="134" width="78" height="26" rx="13" fill="var(--card)" stroke="var(--t2)" stroke-width="2"/><text x="315" y="151" text-anchor="middle">jeux</text>
+        </g>
+        <path d="M82 50 L96 58 M92 146 L100 140 M280 58 L268 64 M274 144 L264 138" stroke="var(--ink-soft)" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <p class="soft">Tous les comptes, jeux, marques et posts de cette page sont <strong>inventés</strong>. Rien de ce que tu fais ici n'est envoyé ni enregistré : la simulation tourne seulement sur ta page.</p>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · L'idée</span>
+    <h2>Un fil trié rien que pour toi</h2>
+    <p>Sur un réseau social, il y a chaque minute des millions de nouvelles publications. Impossible de tout voir. Alors l'appli utilise un <strong>algorithme</strong> : une <strong>recette de calcul</strong> qui choisit, parmi tout ça, ce qu'elle va te montrer en premier.</p>
+    <p>Pour choisir, elle observe tes <strong>signaux</strong> :</p>
+    <div class="cards">
+      <div class="box"><span class="tag no">Tu aimes</span><strong>Les « j'aime »</strong><span class="soft">Un cœur, un pouce : signal fort. « Il veut encore ça. »</span></div>
+      <div class="box"><span class="tag no">Tu regardes</span><strong>Le temps passé</strong><span class="soft">Même sans liker, si tu regardes une vidéo jusqu'au bout ou deux fois, l'appli le note.</span></div>
+      <div class="box"><span class="tag no">Tu réagis</span><strong>Commentaires et partages</strong><span class="soft">Commenter, partager, envoyer à un ami : encore plus fort qu'un like.</span></div>
+      <div class="box"><span class="tag no">Tu passes</span><strong>Le défilement rapide</strong><span class="soft">Si tu passes vite, le sujet perd des points. Il reviendra moins.</span></div>
+    </div>
+    <h3>Pourquoi l'appli est-elle gratuite ?</h3>
+    <p>Une grande partie des réseaux sociaux gagnent de l'argent avec la <strong>publicité</strong>. Plus tu restes longtemps, plus tu vois de pubs, plus l'appli gagne. Ce que l'appli « vend » aux marques, c'est en partie <strong>ton attention</strong>. C'est pour ça que l'algorithme cherche surtout ce qui te garde devant l'écran, pas forcément ce qui est bon pour toi.</p>
+    <div class="box">
+      <h3>Combien de pubs pour ton temps ?</h3>
+      <p class="soft">Dans notre exemple inventé, une pub apparaît environ toutes les 2 minutes de défilement. Les vrais chiffres changent selon l'appli.</p>
+      <div class="param">
+        <label for="adMin">Temps passé par jour : <span class="mono" id="adMinOut">60 min</span></label>
+        <input type="range" id="adMin" min="10" max="180" step="10" value="60">
+      </div>
+      <div class="cards" id="adOut" aria-live="polite"></div>
+    </div>
+    <p>Pour le temps passé et les astuces pour décrocher, il y a aussi <strong>le tutoriel sur <a class="tlink" href="le-temps-d-ecran-et-l-attention.html">le temps d'écran</a></strong>.</p>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · La simulation</span>
+    <h2>Fabrique ta propre bulle</h2>
+    <p>Voici un fil imaginaire avec six thèmes : sport, jeux vidéo, animaux, musique, cuisine et dessin. Au début, l'algorithme ne sait rien de toi : il montre de tout. Pour chaque post, choisis : <strong>J'aime</strong>, <strong>Je regarde longtemps</strong> ou <strong>Je passe</strong>. Essaie par exemple d'aimer seulement le sport ou les jeux, et regarde ce qui arrive.</p>
+    <div class="box">
+      <div class="phone">
+        <div class="post" id="fPost" aria-live="polite"></div>
+        <div class="btns acts" role="group" aria-label="Ta réaction au post">
+          <button type="button" id="fLike">♥ J'aime</button>
+          <button type="button" id="fLong">Je regarde longtemps</button>
+          <button type="button" id="fSkip">Je passe</button>
+        </div>
+      </div>
+      <div class="btns">
+        <button type="button" id="fAuto">J'aime tout ce qui arrive (× 5)</button>
+      </div>
+      <h3>Les posts que tu as vus</h3>
+      <div class="chips" id="fHist" aria-label="Historique des posts"></div>
+      <div id="fMsg" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="fReveal" aria-pressed="false">Voir ce que l'algorithme calcule</button></div>
+      <div class="panel" id="fPanel" hidden>
+        <strong>Chance que le prochain post parle de…</strong>
+        <div class="bars" id="fBars"></div>
+        <strong>Diversité de ton fil : <span class="mono" id="fDivNum">100 %</span></strong>
+        <div class="meter" role="img" id="fDivMeter" aria-label="Diversité du fil"><div class="meter-fill" id="fDivFill"></div></div>
+        <span class="soft">100 % : tous les thèmes ont la même chance. Près de 0 % : presque tout parle du même sujet.</span>
+        <strong>Les 6 prochains posts prévus :</strong>
+        <div class="chips" id="fPrev"></div>
+        <span class="soft" id="fScoreTxt"></span>
+      </div>
+      <h3>Casser la bulle</h3>
+      <p class="soft">Dans une vraie appli aussi, tu peux élargir ton fil : chercher d'autres sujets, suivre des comptes différents, parfois réinitialiser tes recommandations.</p>
+      <div class="bubble-tools">
+        <label for="fTheme" class="soft">Sujet à chercher :</label>
+        <select id="fTheme"></select>
+        <button type="button" id="fSearch">Chercher ce sujet</button>
+      </div>
+      <div class="btns">
+        <button type="button" id="fFollow">Suivre des comptes différents</button>
+        <button type="button" id="fReset">Tout recommencer</button>
+      </div>
+    </div>
+    <div class="note">
+      <span class="note-title">La boucle</span>
+      <span>Tu aimes un sujet → l'appli t'en montre plus → tu en aimes encore plus → elle t'en montre encore plus… En quelques clics, les autres sujets disparaissent presque. C'est ce qu'on appelle une <strong>bulle</strong> (ou « bulle de filtres ») : tu ne vois plus qu'une petite partie du monde, <span class="hl">sans t'en rendre compte</span>.</span>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Ce qui fait réagir</span>
+    <h2>Le choc monte, le calme descend</h2>
+    <p>L'algorithme ne sait pas si un post est <strong>vrai</strong>. Il voit seulement s'il fait <strong>réagir</strong> : likes, commentaires, partages. Or ce qui nous fait le plus réagir, c'est souvent ce qui nous met en <strong>colère</strong>, nous <strong>choque</strong> ou nous fait <strong>peur</strong>. Résultat : <span class="hl">les algorithmes favorisent la viralité, pas la vérité.</span></p>
+    <div class="box">
+      <h3>Deux façons de classer les mêmes posts</h3>
+      <div class="btns" role="group" aria-label="Choisir le classement">
+        <button type="button" id="rkReact" aria-pressed="true">Par réactions (likes, commentaires, partages)</button>
+        <button type="button" id="rkQual" aria-pressed="false">Par intérêt et fiabilité</button>
+      </div>
+      <p class="soft" id="rkExpl"></p>
+      <ol class="rank" id="rkList"></ol>
+    </div>
+    <div class="box">
+      <h3>Que fais-tu ?</h3>
+      <p>Dans le groupe de ta classe, quelqu'un transfère : « URGENT : la cantine va servir des insectes à tous les repas dès lundi !! Partagez !! » Le message vient d'un compte appelé @info_choc_college.</p>
+      <div class="btns" id="rumChoices" role="group" aria-label="Ta réaction"></div>
+      <div id="rumOut" aria-live="polite"></div>
+    </div>
+    <div class="note red">
+      <span class="note-title">La règle d'or</span>
+      <span><strong>Ce qui veut te faire réagir avant de réfléchir cherche à te manipuler.</strong> Quand un post te met en colère, te fait peur ou te dit « partage vite », <strong>respire 5 à 10 secondes</strong> avant de toucher quoi que ce soit. Dans des tests, une simple pause de quelques secondes fait beaucoup baisser le nombre de partages irréfléchis.</span>
+      <span>Les questions des 10 secondes : <strong>Qui parle ? Pourquoi maintenant ? Est-ce que ça joue sur mes émotions ? Est-ce que je reconnais un piège classique ? Est-ce que j'ai envie que ce soit vrai ?</strong></span>
+    </div>
+    <p>Pour aller plus loin sur les rumeurs et la vérification, regarde <strong>le tutoriel sur <a class="tlink" href="vraie-ou-fausse-info.html">les fausses infos</a></strong>.</p>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · Bulles et chambres d'écho</span>
+    <h2>Quand tout le monde répète la même chose</h2>
+    <p>Notre cerveau aime ce qui va dans son sens : c'est le <strong>biais de confirmation</strong>. Et une info entendue plusieurs fois finit par <strong>sembler vraie</strong>, même si personne ne l'a vérifiée : c'est l'<strong>effet de vérité illusoire</strong>.</p>
+    <p>Une <strong>chambre d'écho</strong>, c'est un groupe (en ligne ou non) où tout le monde pense pareil et se répète. Comme dans une grotte : tu entends ton propre cri revenir plusieurs fois, et tu as l'impression que beaucoup de gens crient.</p>
+    <div class="box">
+      <h3>Une rumeur dans le groupe « 10e B » — pas à pas</h3>
+      <div class="chat" id="echoChat" aria-live="polite"></div>
+      <strong>À quel point le groupe y croit : <span class="mono" id="echoPct">0 %</span></strong>
+      <div class="meter" role="img" id="echoMeter" aria-label="Niveau de croyance du groupe"><div class="meter-fill" id="echoFill" style="background:var(--acc)"></div></div>
+      <span class="soft" id="echoSrc"></span>
+      <div class="btns">
+        <button type="button" id="echoNext">Message suivant</button>
+        <button type="button" id="echoReset">Recommencer</button>
+      </div>
+    </div>
+    <div class="note ok">
+      <span class="note-title">Aider un ami qui est dans une bulle</span>
+      <span>Ne te moque pas de lui et ne lui dis pas « t'es naïf ». Pose-lui plutôt des questions : « D'où ça vient ? », « Qui l'a dit en premier ? », « On vérifie ensemble ? ». Laisse-lui une porte de sortie pour changer d'avis <strong>sans perdre la face</strong>. Tout le monde peut se faire avoir, toi aussi.</span>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Faux comptes et bots</span>
+    <h2>« Tout le monde adore ! » Vraiment ?</h2>
+    <p>Un <strong>bot</strong> est un compte géré par un programme, pas par une personne. Avec des dizaines de faux comptes, quelqu'un peut faire croire qu'un jeu, une idée ou une rumeur plaît à « tout le monde ». C'est le <strong>faux consensus</strong>. Quand c'est organisé exprès pour simuler un mouvement populaire, on parle d'<strong>astroturfing</strong> (du nom d'une marque de gazon artificiel : ça ressemble à de l'herbe, mais c'est du plastique).</p>
+    <p>Aujourd'hui, l'intelligence artificielle peut écrire des milliers de commentaires différents en quelques secondes. Un seul indice ne prouve rien, mais <strong>plusieurs ensemble</strong> doivent te faire douter : compte créé il y a très peu de temps, pas de photo, nom avec plein de chiffres, même message répété, publications toutes les deux minutes, jour et nuit.</p>
+    <div class="box">
+      <h3>Repère les bots sous ce post</h3>
+      <div class="post"><div class="post-head"><span class="avatar" style="background:var(--t2)">G</span><div class="post-who"><strong>@galaxo_officiel</strong><span class="soft">Jeux vidéo</span></div></div><span class="post-txt">Galaxo Kart 3 sort vendredi ! Qu'en pensez-vous ?</span></div>
+      <p class="soft">Pour chaque commentaire, choisis « Humain » ou « Bot ». Puis vérifie.</p>
+      <ul class="comments" id="botList"></ul>
+      <div class="btns">
+        <span class="score" id="botScore">0 / 8</span>
+        <button type="button" id="botCheck">Vérifier</button>
+        <button type="button" id="botHide" aria-pressed="false">Cacher les bots</button>
+        <button type="button" id="botReset">Recommencer</button>
+      </div>
+      <div id="botOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · Likes et confiance en soi</span>
+    <h2>Ce que tu vois, c'est une vitrine</h2>
+    <p>Recevoir des likes fait plaisir, c'est normal : à l'adolescence, le cerveau est particulièrement sensible à ces petits signaux de validation. Mais attention : les photos qu'on voit sont souvent <strong>choisies, retouchées, mises en scène</strong>. Comme une vitrine de magasin : tout est bien rangé devant, le désordre est dans l'arrière-boutique.</p>
+    <div class="box">
+      <h3>Fabrique la photo parfaite</h3>
+      <div class="vit">
+        <div class="fig">
+          <svg viewBox="0 0 220 260" role="img" aria-label="Une photo de profil qui change selon les retouches choisies" id="vitSvg">
+            <rect x="4" y="4" width="212" height="252" rx="18" fill="var(--card)" stroke="var(--ink)" stroke-width="2.5"/>
+            <rect x="16" y="20" width="188" height="200" rx="8" fill="var(--paper)" id="vBg"/>
+            <g id="vClean" display="none"><rect x="16" y="20" width="188" height="200" rx="8" fill="var(--two-soft)"/><circle cx="170" cy="50" r="16" fill="var(--hl)"/></g>
+            <g id="vMess" stroke="var(--ink-soft)" stroke-width="2" fill="none">
+              <rect x="26" y="150" width="40" height="26" rx="3" transform="rotate(-12 46 163)"/>
+              <path d="M150 190 q10 -18 26 -6 q-6 10 -20 14z"/>
+              <rect x="160" y="40" width="30" height="40" rx="2"/><path d="M164 50h22M164 58h22M164 66h14"/>
+              <path d="M30 60 l20 6 l-4 14 l-20 -6z"/>
+            </g>
+            <circle cx="110" cy="112" r="46" fill="#e9b796" stroke="var(--ink)" stroke-width="2"/>
+            <path d="M64 104 q46 -60 92 0 q-10 -30 -46 -32 q-36 2 -46 32z" fill="#5b3a29"/>
+            <g id="vSpots" fill="#c97b5e"><circle cx="90" cy="124" r="2.5"/><circle cx="128" cy="128" r="3"/><circle cx="96" cy="132" r="2"/><circle cx="134" cy="118" r="2"/></g>
+            <g id="vEyesTired" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"><path d="M92 110h10M118 110h10"/></g>
+            <g id="vEyesOpen" display="none" fill="var(--ink)"><circle cx="97" cy="109" r="4"/><circle cx="123" cy="109" r="4"/></g>
+            <path id="vMouthMeh" d="M98 138 h24" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+            <path id="vMouthSmile" display="none" d="M96 134 q14 14 28 0" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+            <g id="vGlow" display="none"><rect x="16" y="20" width="188" height="200" rx="8" fill="#ffb37a" opacity=".22"/><path d="M40 40 l4 10 l10 4 l-10 4 l-4 10 l-4 -10 l-10 -4 l10 -4z" fill="#fff" opacity=".9"/></g>
+            <text x="110" y="244" text-anchor="middle" font-size="13" id="vLikes">♥ 12</text>
+          </svg>
+        </div>
+        <div class="toggles" id="vitToggles"></div>
+      </div>
+      <div id="vitOut" aria-live="polite"></div>
+    </div>
+    <div class="cards">
+      <div class="box"><span class="tag ok">À savoir</span><strong>Un like n'est pas une note</strong><span class="soft">Le nombre de likes dépend de l'heure, de l'algorithme, du nombre d'abonnés… pas de ta valeur.</span></div>
+      <div class="box"><span class="tag ok">Astuce</span><strong>Masquer les compteurs</strong><span class="soft">Certaines applis permettent de cacher le nombre de likes. Ça aide à publier pour soi, pas pour le score.</span></div>
+      <div class="box"><span class="tag ok">Réflexe</span><strong>Comment je me sens ?</strong><span class="soft">Si un compte te donne souvent l'impression de ne pas être « assez », tu as le droit de ne plus le suivre.</span></div>
+    </div>
+    <div class="note ok">
+      <span class="note-title">Si ça ne va pas</span>
+      <span>Si les réseaux te rendent triste, si on se moque de toi ou si tu te compares tout le temps, <strong>parles-en à un adulte de confiance</strong> (parent, enseignant·e, infirmier·ère scolaire). Tu peux aussi appeler ou écrire à <strong>Pro Juventute, le 147</strong> : gratuit et confidentiel, par téléphone, SMS ou chat. En cas d'urgence : 112, 117 (police) ou 144 (ambulance).</span>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Influenceurs et pub déguisée</span>
+    <h2>C'est un avis… ou une pub ?</h2>
+    <p>Un <strong>influenceur</strong> ou une influenceuse, c'est une personne suivie par beaucoup de monde. Souvent, des marques la paient ou lui offrent des produits pour qu'elle en parle. Ce n'est pas interdit, mais en Suisse comme dans beaucoup de pays, <strong>une pub doit être reconnaissable comme une pub</strong>. On voit alors des mentions comme <span class="mono">#pub</span>, <span class="mono">#ad</span>, <span class="mono">#partenariat</span>, « collaboration commerciale » ou « produit offert ».</p>
+    <div class="box">
+      <h3>Trie ces posts</h3>
+      <p class="soft">Pub signalée, pub déguisée (pas signalée), ou pas une pub ?</p>
+      <ul class="sort" id="adList"></ul>
+      <div class="btns">
+        <span class="score" id="adScore">0 / 6</span>
+        <button type="button" id="adReset">Recommencer</button>
+      </div>
+    </div>
+    <p>Pub déguisée, faux avis, flatterie (« toi qui es malin, tu vas adorer »), rareté (« plus que 3 en stock ! ») : ce sont des leviers classiques. Ils sont expliqués dans <strong>le tutoriel sur <a class="tlink" href="comment-on-te-manipule.html">comment on te manipule</a></strong>.</p>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Ton fil, tes règles</span>
+    <h2>Âge, réglages et fil en bonne santé</h2>
+    <p>La plupart des grands réseaux sociaux demandent d'avoir <strong>au moins 13 ans</strong> pour créer un compte, parfois plus selon l'appli et le pays. Lis les conditions de l'appli avec un adulte. Et quel que soit ton âge, quelques réglages changent beaucoup de choses. Coche ceux que tu connais ou que tu as déjà activés :</p>
+    <div class="box">
+      <ul class="steps" id="setList"></ul>
+      <span class="score" id="setScore">0 / 8</span>
+    </div>
+    <h3>Cinq idées pour un fil qui te fait du bien</h3>
+    <div class="cards">
+      <div class="box"><span class="tag ok">1</span><strong>Varie</strong><span class="soft">Suis des comptes de sujets différents : sciences, sport, art, nature, ta région…</span></div>
+      <div class="box"><span class="tag ok">2</span><strong>Dis « pas intéressé »</strong><span class="soft">Sur un post qui te met mal à l'aise, utilise « pas intéressé » ou « masquer » : l'algorithme apprend aussi ça.</span></div>
+      <div class="box"><span class="tag ok">3</span><strong>Ne nourris pas la colère</strong><span class="soft">Commenter un post énervant, même pour dire qu'il est faux, le fait monter. Mieux : passer, ou signaler.</span></div>
+      <div class="box"><span class="tag ok">4</span><strong>Cherche toi-même</strong><span class="soft">Ne laisse pas toujours le fil décider : tape ce qui t'intéresse vraiment dans la recherche.</span></div>
+      <div class="box"><span class="tag ok">5</span><strong>Fais des pauses</strong><span class="soft">Le défilement n'a pas de fin, c'est voulu. C'est toi qui choisis quand t'arrêter.</span></div>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Attention</span>
+    <h2>Les erreurs fréquentes</h2>
+    <div class="box">
+      <h3>Les erreurs fréquentes</h3>
+      <div class="cards">
+        <div class="box"><span class="tag no">Faux</span><strong>« Beaucoup de likes, donc c'est vrai. »</strong><span class="soft">Les likes mesurent les réactions, pas la vérité. Et une partie peut venir de bots.</span></div>
+        <div class="box"><span class="tag no">Faux</span><strong>« Mon fil montre ce qui se passe dans le monde. »</strong><span class="soft">Il montre ce que l'algorithme pense qui va te garder. Ton voisin voit un autre fil.</span></div>
+        <div class="box"><span class="tag no">Faux</span><strong>« Tout le monde le dit. »</strong><span class="soft">Peut-être que 20 comptes répètent une seule source. Ou que ce sont des faux comptes.</span></div>
+        <div class="box"><span class="tag no">Faux</span><strong>« Je commente pour dire que c'est nul. »</strong><span class="soft">Un commentaire, même négatif, est une réaction : le post monte encore plus.</span></div>
+        <div class="box"><span class="tag no">Faux</span><strong>« Ses photos sont parfaites, sa vie aussi. »</strong><span class="soft">Une photo sur trente, avec filtre et bon angle : c'est une vitrine.</span></div>
+        <div class="box"><span class="tag no">Faux</span><strong>« Moi, je ne me fais jamais avoir. »</strong><span class="soft">C'est le piège le plus dangereux : croire qu'on est à l'abri. Tout le monde peut être influencé.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Choisis ta réponse, puis vérifie.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Recommencer</button>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · Un peu d'histoire</span>
+    <h2>Du fil par date au fil calculé</h2>
+    <ol class="timeline">
+      <li><span class="when">années 1990–2000</span><div class="what"><strong>Les forums et les blogs</strong><span>Les messages s'affichent souvent dans l'ordre : le plus récent en haut (ou en bas). Pas de tri « pour toi ».</span></div></li>
+      <li><span class="when">fin des années 2000</span><div class="what"><strong>Le bouton « j'aime »</strong><span>Il se répand sur les réseaux sociaux. Chaque like devient un signal que les programmes peuvent compter.</span></div></li>
+      <li><span class="when">années 2010</span><div class="what"><strong>Le fil trié par algorithme</strong><span>Les grands réseaux passent peu à peu à un fil classé selon ce qui devrait te plaire, et plus seulement par date. Un auteur américain popularise l'expression « bulle de filtres ».</span></div></li>
+      <li><span class="when">fin des années 2010</span><div class="what"><strong>Vidéos courtes et défilement infini</strong><span>Les recommandations deviennent très rapides : quelques vidéos suffisent pour que l'appli « devine » tes goûts. On parle aussi de plus en plus des bots et des faux comptes.</span></div></li>
+      <li><span class="when">aujourd'hui</span><div class="what"><strong>L'IA et de nouveaux réglages</strong><span>L'IA rend les recommandations encore plus fines et peut fabriquer de faux commentaires. En face, certaines applis proposent des réglages : fil par date, limite de temps, réinitialisation des recommandations.</span></div></li>
+    </ol>
+    <div class="note">
+      <span class="note-title">Le savais-tu ?</span>
+      <span>Deux personnes qui tapent la même recherche ou ouvrent la même appli ne voient pas forcément la même chose. Essaie avec un ami (avec l'accord de chacun) : comparez vos cinq premiers posts. Souvent, ils sont très différents.</span>
+    </div>
+  </section>
+
+  <!-- 12 -->
+  <section>
+    <span class="eyebrow">Étape 12 · À toi de jouer</span>
+    <h2>Cinq situations à analyser</h2>
+    <p>Réfléchis d'abord, puis ouvre la correction.</p>
+    <div class="exos">
+      <details>
+        <summary>Le fil de Lucas<span class="q">Lucas a aimé quelques vidéos de foot. Une semaine plus tard, son fil ne montre presque plus que du foot. Il pense que « plus personne ne fait de musique ». Que se passe-t-il, et que peut-il faire ?</span></summary>
+        <div>
+          <span>Lucas est dans une <strong>bulle</strong> : l'algorithme a vu qu'il aimait le foot, lui en a montré plus, et les autres sujets ont presque disparu. La musique existe toujours, elle n'arrive juste plus jusqu'à lui.</span>
+          <span><strong>Que faire :</strong> chercher lui-même d'autres sujets, suivre des comptes variés, utiliser « pas intéressé », ou réinitialiser ses recommandations si l'appli le permet.</span>
+        </div>
+      </details>
+      <details>
+        <summary>Le calcul de l'algorithme<span class="q">Dans la simulation de l'étape 2, chaque thème commence à 10 points. Un like ajoute 30 points. La chance d'un thème se calcule avec ses points au carré. Tu aimes un post de sport : le sport a 40 points, les cinq autres thèmes 10 chacun. Quelle est la chance que le prochain post parle de sport ?</span></summary>
+        <div>
+          <span>Sport : 40 × 40 = 1 600. Chaque autre thème : 10 × 10 = 100, donc 5 × 100 = 500 pour les cinq.</span>
+          <span>Total : 1 600 + 500 = 2 100. Chance du sport : 1 600 ÷ 2 100 ≈ 0,76, soit environ <strong>76 %</strong>. Avec <strong>un seul like</strong>, on passe d'une chance sur six (environ 17 %) à trois chances sur quatre !</span>
+        </div>
+      </details>
+      <details>
+        <summary>Le commentaire répété<span class="q">Sous une vidéo, tu vois 40 fois « Ce jeu est le meilleur, tout le monde l'achète ! », écrit par des comptes comme « kartfan_29381 », « kartfan_29382 »…</span></summary>
+        <div>
+          <span>C'est très probablement un <strong>faux consensus</strong> fabriqué par des bots : même message, noms qui se suivent avec des chiffres. Le nombre de commentaires ne dit rien sur ce que pensent les vrais joueurs.</span>
+          <span><strong>Que faire :</strong> chercher des avis de personnes ou de médias que tu connais, et ne pas te laisser presser.</span>
+        </div>
+      </details>
+      <details>
+        <summary>Le sac de Zoé Pixel<span class="q">L'influenceuse (inventée) Zoé Pixel montre un sac dans trois vidéos : « Je l'adore, foncez, code ZOE20 pour −20 % ! ». Aucune mention de pub ou de partenariat.</span></summary>
+        <div>
+          <span>Un <strong>code promo personnel</strong> veut presque toujours dire que la marque la paie ou lui reverse une partie des ventes. C'est une <strong>pub déguisée</strong> : elle devrait être signalée.</span>
+          <span>Ça ne veut pas dire que le sac est mauvais, mais son avis n'est pas « libre ». Cherche d'autres avis avant d'acheter.</span>
+        </div>
+      </details>
+      <details>
+        <summary>La photo de Nina<span class="q">Ton amie Nina est triste : sa photo n'a eu que 9 likes, alors que celle d'une autre fille de la classe en a eu 80. Que peux-tu lui dire ?</span></summary>
+        <div>
+          <span>Sans te moquer et sans minimiser : « Je comprends que ça fasse quelque chose. » Puis rappelle-lui que les likes dépendent de l'heure, du nombre d'abonnés et de l'algorithme, pas de sa valeur. Et que beaucoup de photos sont retouchées et choisies parmi plein d'autres.</span>
+          <span>Vous pouvez parler de ce qu'elle aime vraiment faire, hors écran. Si elle est souvent triste à cause des réseaux, encourage-la à en parler à un adulte de confiance ou au 147.</span>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• Un <strong>algorithme</strong> de réseau social est une recette de calcul qui choisit ce que tu vois, d'après tes likes, ton temps de visionnage, tes commentaires et tes partages.</span>
+      <span>• Beaucoup d'applis vivent de la <strong>publicité</strong> : elles veulent ton <strong>attention</strong> et ton temps.</span>
+      <span>• Aimer toujours le même sujet crée une <strong>bulle</strong> : les autres sujets disparaissent. Pour la casser : chercher d'autres sujets, suivre des comptes variés.</span>
+      <span>• <strong>Les algorithmes favorisent la viralité, pas la vérité</strong> : la colère et le choc font monter un post.</span>
+      <span>• Ce qui veut te faire réagir avant de réfléchir cherche à te manipuler : <strong>respire 5 à 10 secondes</strong> et vérifie.</span>
+      <span>• Bots et faux comptes fabriquent un <strong>faux consensus</strong> : compte récent, pas de photo, même message répété, publications en rafale.</span>
+      <span>• Les photos sont une <strong>vitrine</strong> ; les likes ne mesurent pas ta valeur. <span class="mono">#pub</span>, <span class="mono">#partenariat</span>, code promo : c'est de la publicité.</span>
+      <span>• Si ça ne va pas : parles-en à un adulte de confiance ou appelle le <strong>147</strong>.</span>
+    </div>
+  </section>
+
+  <!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"><a class="prev" href="les-images-truquees-et-les-deepfakes.html"><span>← Précédent</span><strong>Les images truquées et les deepfakes</strong></a><a class="next" href="bien-utiliser-l-ia.html"><span>Suivant →</span><strong>Bien utiliser l&#x27;IA</strong></a></div><a class="tnav-home" href="numerique.html">⌂ Tous les tutoriels numériques</a></nav><!--/tnav-->
+<footer>Fiche de révision · Les réseaux sociaux et les algorithmes</footer>
+</main>
+
+<script>
+(function () {
+  /*
+   * Hooks de test : window.__res
+   *   themes                    -> [{id, name, c}] les 6 thèmes du fil (sport, jeux, animaux, musique, cuisine, dessin)
+   *   posts                     -> {themeId: [[compte, texte], ...]}
+   *   rules                     -> {START:10, LIKE:30, LONG:20, SKIP:5, MIN:2} (points entiers)
+   *   newFeed()                 -> état neuf {scores, cur, idx, history:[post], current:post}
+   *   act(state, action)        -> applique 'like' | 'long' | 'skip' au post courant, renvoie le nouveau post courant (null si action inconnue)
+   *   breakBubble(state, mode, themeId?) -> mode 'search' (+30 au thème choisi), 'follow' (+25 à chaque thème sous la moyenne),
+   *                                'reset' (état neuf) ; renvoie la diversité (0–100) ou null si mode/thème invalide
+   *   shares(scores)            -> {themeId: pourcentage 0–100 (non arrondi)} ; poids = points²
+   *   diversity(scores)         -> entier 0–100 (entropie normalisée des parts)
+   *   preview(state, n)         -> [themeId] des n prochains posts, sans modifier l'état (tourniquet pondéré déterministe)
+   *   feed                      -> l'état utilisé par la page
+   *   ads(minutes)              -> {perDay, perYear, hoursYear} (1 pub toutes les 2 minutes dans l'exemple)
+   *   ranked                    -> posts du classement {id, txt, who, likes, com, shares, fiab, interet, emo}
+   *   engagement(p), quality(p) -> scores ; rankBy('reactions' | 'qualite') -> [id]
+   *   echo                      -> étapes du pas à pas de la chambre d'écho
+   *   bots, checkBots(answers)  -> answers = {id: 'humain' | 'bot'} -> {correct, answered, total}
+   *   consensus()               -> {all:{pro, total}, humans:{pro, total}}
+   *   vitrine, vitrineCount(flags) ; adsSort, checkAd(id, choice) -> {ok, answer, why} ; settings ; quiz
+   * Tout est fictif. Rien n'est envoyé ni enregistré.
+   */
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function fmt(n) { return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ' '); }
+
+  /* ---------- Étape 1 : les pubs ---------- */
+  function ads(minutes) {
+    var m = Number(minutes);
+    if (!isFinite(m) || m < 0) m = 0;
+    var perDay = Math.round(m / 2);
+    return { perDay: perDay, perYear: perDay * 365, hoursYear: Math.round(m * 365 / 60) };
+  }
+  function adRender() {
+    var m = Number($('adMin').value), r = ads(m);
+    $('adMinOut').textContent = m + ' min';
+    $('adOut').innerHTML =
+      '<div class="box"><span class="tag no">Par jour</span><strong>' + fmt(r.perDay) + ' pubs</strong></div>' +
+      '<div class="box"><span class="tag no">Par an</span><strong>' + fmt(r.perYear) + ' pubs</strong></div>' +
+      '<div class="box"><span class="tag warn">Ton temps par an</span><strong>' + fmt(r.hoursYear) + ' heures</strong><span class="soft">soit environ ' + fmt(r.hoursYear / 24) + ' jours entiers</span></div>';
+  }
+  $('adMin').addEventListener('input', adRender);
+  adRender();
+
+  /* ---------- Étape 2 : le fil simulé ---------- */
+  var THEMES = [
+    { id: 'sport', name: 'Sport', c: 'var(--t1)' },
+    { id: 'jeux', name: 'Jeux vidéo', c: 'var(--t2)' },
+    { id: 'animaux', name: 'Animaux', c: 'var(--t3)' },
+    { id: 'musique', name: 'Musique', c: 'var(--t4)' },
+    { id: 'cuisine', name: 'Cuisine', c: 'var(--t5)' },
+    { id: 'dessin', name: 'Dessin', c: 'var(--t6)' }
+  ];
+  var TH = {};
+  THEMES.forEach(function (t) { TH[t.id] = t; });
+  var POSTS = {
+    sport: [['@foot_du_lac', 'Quel but en finale du tournoi des M15 ! Regarde jusqu’au bout.'], ['@coach_lena', '5 exercices d’échauffement avant un match.'], ['@natation_bourg', 'Record du club battu ce week-end au 100 m nage libre !'], ['@ride_skatepark', 'Le skatepark rouvre samedi : nouvelles rampes !'], ['@basket_junior', 'Tuto : le lancer franc parfait en 3 étapes.']],
+    jeux: [['@pixel_astuces', 'Astuce : le niveau secret de Galaxo Kart.'], ['@duo_manette', 'Top 5 des jeux de plateforme à jouer à deux.'], ['@speed_noa', 'Speedrun : 12 minutes pour finir Pixelia Quest.'], ['@blocville_news', 'Nouvelle saison de Blocville : ce qui change.'], ['@retro_ludo', 'Les jeux de nos parents : on a testé une vieille console.']],
+    animaux: [['@chat_malin', 'Ce chat a appris à ouvrir le frigo.'], ['@petite_science', 'Comment les fourmis retrouvent leur chemin ?'], ['@refuge_tilleuls', 'Le refuge cherche des noms pour 3 chiots.'], ['@nature_jardin', 'Un hérisson dans le jardin : que faire ?'], ['@ferme_ouverte', 'Une chèvre qui fait du trampoline.']],
+    musique: [['@uku_lila', 'Reprise au ukulélé du tube de l’été.'], ['@ecrire_chanson', 'Écrire une chanson en 3 étapes.'], ['@chorale_college', 'La chorale du collège en concert vendredi !'], ['@batteur_max', 'Le rythme de batterie le plus simple du monde.'], ['@piano_debut', 'Ce morceau se joue avec 3 doigts.']],
+    cuisine: [['@cuisine_rapide', 'Crêpes en 10 minutes chrono.'], ['@fondue_club', 'Le secret d’une fondue réussie.'], ['@gateau_facile', 'Gâteau au chocolat sans four.'], ['@gouter_recre', '3 goûters faciles pour la récré.'], ['@soupe_mamie', 'La soupe de légumes qui plaît même à ceux qui n’aiment pas les légumes.']],
+    dessin: [['@dragon_croquis', 'Dessiner un dragon en 5 étapes.'], ['@carnet_amel', 'Mon carnet de croquis de l’année.'], ['@aquarelle_ciel', 'Peindre un coucher de soleil à l’aquarelle.'], ['@bd_bibli', 'Concours de BD à la bibliothèque : à vos crayons !'], ['@manga_trait', 'Dessiner des yeux de manga : les erreurs à éviter.']]
+  };
+  var RULES = { START: 10, LIKE: 30, LONG: 20, SKIP: 5, MIN: 2 };
+
+  function weights(scores) { var w = {}; THEMES.forEach(function (t) { w[t.id] = scores[t.id] * scores[t.id]; }); return w; }
+  function shares(scores) {
+    var w = weights(scores), tot = 0, r = {};
+    THEMES.forEach(function (t) { tot += w[t.id]; });
+    THEMES.forEach(function (t) { r[t.id] = tot > 0 ? 100 * w[t.id] / tot : 100 / THEMES.length; });
+    return r;
+  }
+  function diversity(scores) {
+    var p = shares(scores), h = 0;
+    THEMES.forEach(function (t) { var x = p[t.id] / 100; if (x > 0) h -= x * Math.log(x); });
+    var d = Math.round(100 * h / Math.log(THEMES.length));
+    return Math.max(0, Math.min(100, d));
+  }
+  function pickTheme(st) {
+    var w = weights(st.scores), tot = 0, best = null;
+    THEMES.forEach(function (t) {
+      st.cur[t.id] += w[t.id]; tot += w[t.id];
+      if (best === null || st.cur[t.id] > st.cur[best]) best = t.id;
+    });
+    st.cur[best] -= tot;
+    return best;
+  }
+  function drawPost(st) {
+    var th = pickTheme(st), list = POSTS[th], p = list[st.idx[th] % list.length];
+    st.idx[th]++;
+    return { theme: th, who: p[0], txt: p[1] };
+  }
+  function showNext(st) {
+    var post = drawPost(st);
+    post.n = st.history.length + 1;
+    st.history.push(post);
+    st.current = post;
+    return post;
+  }
+  function newFeed() {
+    var st = { scores: {}, cur: {}, idx: {}, history: [], current: null, actions: 0 };
+    THEMES.forEach(function (t) { st.scores[t.id] = RULES.START; st.cur[t.id] = 0; st.idx[t.id] = 0; });
+    showNext(st);
+    return st;
+  }
+  function act(st, action) {
+    if (!st || !st.current) return null;
+    var th = st.current.theme, s = st.scores;
+    if (action === 'like') s[th] += RULES.LIKE;
+    else if (action === 'long') s[th] += RULES.LONG;
+    else if (action === 'skip') s[th] = Math.max(RULES.MIN, s[th] - RULES.SKIP);
+    else return null;
+    st.actions++;
+    return showNext(st);
+  }
+  function resetState(st) {
+    var f = newFeed();
+    st.scores = f.scores; st.cur = f.cur; st.idx = f.idx; st.history = f.history; st.current = f.current; st.actions = 0;
+  }
+  function breakBubble(st, mode, themeId) {
+    if (!st) return null;
+    if (mode === 'search') {
+      if (!TH[themeId]) return null;
+      st.scores[themeId] += RULES.LIKE;
+      showNext(st);
+    } else if (mode === 'follow') {
+      var sum = 0;
+      THEMES.forEach(function (t) { sum += st.scores[t.id]; });
+      var avg = sum / THEMES.length;
+      THEMES.forEach(function (t) { if (st.scores[t.id] < avg) st.scores[t.id] += 25; });
+      showNext(st);
+    } else if (mode === 'reset') {
+      resetState(st);
+    } else return null;
+    return diversity(st.scores);
+  }
+  function preview(st, n) {
+    var c = { scores: {}, cur: {}, idx: {} }, out = [], k;
+    THEMES.forEach(function (t) { c.scores[t.id] = st.scores[t.id]; c.cur[t.id] = st.cur[t.id]; c.idx[t.id] = st.idx[t.id]; });
+    for (k = 0; k < (n || 0); k++) out.push(pickTheme(c));
+    return out;
+  }
+
+  var FEED = newFeed();
+  var sel = $('fTheme');
+  THEMES.forEach(function (t) { var o = document.createElement('option'); o.value = t.id; o.textContent = t.name; sel.appendChild(o); });
+  function chip(th, label) { var t = TH[th]; return '<span class="chip" style="color:' + t.c + '">' + esc(label || t.name) + '</span>'; }
+  function divColor(d) { return d >= 70 ? 'var(--ok)' : d >= 40 ? 'var(--warn)' : 'var(--acc)'; }
+  function feedRender() {
+    var p = FEED.current, t = TH[p.theme];
+    $('fPost').innerHTML = '<div class="post-head"><span class="avatar" style="background:' + t.c + '">' + esc(t.name.charAt(0)) + '</span><div class="post-who"><strong>' + esc(p.who) + '</strong><span class="soft">' + esc(t.name) + ' · post n° ' + p.n + '</span></div></div><span class="post-txt">' + esc(p.txt) + '</span><div class="post-img" style="background:' + t.c + '"></div>';
+    var last = FEED.history.slice(-14);
+    $('fHist').innerHTML = last.map(function (h) { return chip(h.theme); }).join('');
+    var d = diversity(FEED.scores), sh = shares(FEED.scores), top = THEMES[0].id;
+    THEMES.forEach(function (x) { if (sh[x.id] > sh[top]) top = x.id; });
+    var cls, title, txt;
+    if (FEED.actions === 0) { cls = 'mid'; title = 'L’algorithme ne te connaît pas encore.'; txt = 'Réagis à quelques posts pour voir ton fil changer.'; }
+    else if (d >= 70) { cls = 'yes'; title = 'Ton fil est varié (diversité ' + d + ' %).'; txt = 'Tu vois encore un peu de tout.'; }
+    else if (d >= 40) { cls = 'mid'; title = 'Une bulle commence à se former (diversité ' + d + ' %).'; txt = 'Le thème « ' + TH[top].name + ' » prend de plus en plus de place.'; }
+    else { cls = 'no'; title = 'Tu es dans une bulle (diversité ' + d + ' %).'; txt = 'Environ ' + Math.round(sh[top]) + ' % de chances que le prochain post parle de « ' + TH[top].name + ' ». Essaie de casser la bulle !'; }
+    $('fMsg').innerHTML = '<div class="verdict ' + cls + '">' + esc(title) + '<span>' + esc(txt) + '</span></div>';
+    $('fBars').innerHTML = THEMES.map(function (x) {
+      var v = sh[x.id];
+      return '<div class="bar-row"><span>' + esc(x.name) + '</span><div class="bar-track"><div class="bar-fill" style="width:' + v.toFixed(1) + '%;background:' + x.c + '"></div></div><span class="num">' + Math.round(v) + ' %</span></div>';
+    }).join('');
+    $('fDivNum').textContent = d + ' %';
+    $('fDivFill').style.width = Math.max(2, d) + '%';
+    $('fDivFill').style.backgroundColor = divColor(d);
+    $('fDivMeter').setAttribute('aria-label', 'Diversité du fil : ' + d + ' %');
+    $('fPrev').innerHTML = preview(FEED, 6).map(function (th) { return chip(th); }).join('');
+    $('fScoreTxt').textContent = 'Points cachés : ' + THEMES.map(function (x) { return x.name + ' ' + FEED.scores[x.id]; }).join(' · ') + '. Chance = points au carré, divisé par le total.';
+  }
+  $('fLike').addEventListener('click', function () { act(FEED, 'like'); feedRender(); });
+  $('fLong').addEventListener('click', function () { act(FEED, 'long'); feedRender(); });
+  $('fSkip').addEventListener('click', function () { act(FEED, 'skip'); feedRender(); });
+  $('fAuto').addEventListener('click', function () { for (var i = 0; i < 5; i++) act(FEED, 'like'); feedRender(); });
+  $('fReveal').addEventListener('click', function () {
+    var on = this.getAttribute('aria-pressed') !== 'true';
+    this.setAttribute('aria-pressed', on ? 'true' : 'false');
+    this.textContent = on ? 'Cacher les calculs' : 'Voir ce que l’algorithme calcule';
+    $('fPanel').hidden = !on;
+  });
+  $('fSearch').addEventListener('click', function () { breakBubble(FEED, 'search', sel.value); feedRender(); });
+  $('fFollow').addEventListener('click', function () { breakBubble(FEED, 'follow'); feedRender(); });
+  $('fReset').addEventListener('click', function () { breakBubble(FEED, 'reset'); feedRender(); });
+  feedRender();
+
+  /* ---------- Étape 3 : le classement ---------- */
+  var RANKED = [
+    { id: 'rumeur', who: '@info_choc_college', txt: 'URGENT : la cantine va servir des insectes à tous les repas dès lundi !! Partagez !!', likes: 420, com: 310, shares: 260, fiab: 1, interet: 1, emo: 'choc' },
+    { id: 'menu', who: '@college_tilleuls (compte officiel)', txt: 'Le menu de la semaine prochaine : lasagnes, curry de légumes, poisson pané.', likes: 35, com: 4, shares: 2, fiab: 5, interet: 3, emo: 'calme' },
+    { id: 'bagarre', who: '@sport_clash', txt: 'VIDÉO : un arbitre se fait huer, ça dégénère dans les tribunes !', likes: 380, com: 240, shares: 150, fiab: 3, interet: 1, emo: 'colère' },
+    { id: 'jongle', who: '@coach_lena', txt: 'Tuto : apprendre à jongler avec un ballon en 7 jours.', likes: 120, com: 30, shares: 25, fiab: 4, interet: 5, emo: 'calme' },
+    { id: 'chats', who: '@avis_tranches', txt: 'Ce youtubeur dit que les chats détestent la musique. Il a TORT et il ose le dire !', likes: 260, com: 410, shares: 40, fiab: 2, interet: 2, emo: 'colère' },
+    { id: 'lapin', who: '@refuge_tilleuls', txt: 'Comment bien nourrir un lapin : les conseils de notre vétérinaire.', likes: 60, com: 12, shares: 18, fiab: 5, interet: 4, emo: 'calme' },
+    { id: 'prix', who: '@gamer_scandale', txt: 'Galaxo Kart 3 coûtera 200 CHF ! SCANDALE !!! (aucune source)', likes: 300, com: 280, shares: 120, fiab: 1, interet: 1, emo: 'colère' }
+  ];
+  function engagement(p) { return p.likes + 2 * p.com + 3 * p.shares; }
+  function quality(p) { return 2 * p.fiab + p.interet; }
+  function rankBy(mode) {
+    var f = mode === 'qualite' ? quality : mode === 'reactions' ? engagement : null;
+    if (!f) return null;
+    return RANKED.map(function (p, i) { return { p: p, i: i, v: f(p) }; })
+      .sort(function (a, b) { return b.v - a.v || a.i - b.i; })
+      .map(function (x) { return x.p.id; });
+  }
+  var RK = {};
+  RANKED.forEach(function (p) { RK[p.id] = p; });
+  function stars(n) { var s = ''; for (var i = 0; i < 5; i++) s += i < n ? '★' : '☆'; return s; }
+  function rkRender(mode) {
+    $('rkReact').setAttribute('aria-pressed', mode === 'reactions' ? 'true' : 'false');
+    $('rkQual').setAttribute('aria-pressed', mode === 'qualite' ? 'true' : 'false');
+    $('rkExpl').textContent = mode === 'reactions'
+      ? 'Score = likes + 2 × commentaires + 3 × partages. Les posts qui choquent ou énervent arrivent en haut, même sans source.'
+      : 'Score = 2 × fiabilité + intérêt. Les posts utiles et vérifiés passent devant, même s’ils font moins de bruit.';
+    $('rkList').innerHTML = rankBy(mode).map(function (id, k) {
+      var p = RK[id], hot = p.emo !== 'calme';
+      return '<li><span class="pos">' + (k + 1) + '</span><div class="r-body"><span><span class="emo ' + (hot ? 'hot' : 'calm') + '">' + esc(p.emo) + '</span><strong class="mono">' + esc(p.who) + '</strong></span><span>' + esc(p.txt) + '</span><span class="meta">' + fmt(p.likes) + ' j’aime · ' + fmt(p.com) + ' commentaires · ' + fmt(p.shares) + ' partages · fiabilité ' + stars(p.fiab) + ' · intérêt ' + stars(p.interet) + '</span></div></li>';
+    }).join('');
+  }
+  $('rkReact').addEventListener('click', function () { rkRender('reactions'); });
+  $('rkQual').addEventListener('click', function () { rkRender('qualite'); });
+  rkRender('reactions');
+
+  var RUM = [
+    ['Je partage vite dans tous mes groupes', 'no', 'Attention, piège !', 'C’est exactement ce que veut le message (« Partagez !! »). Tu aiderais une rumeur sans source à se répandre.'],
+    ['J’écris un commentaire en colère', 'no', 'Attention, piège !', 'Ta colère est une réaction : elle fait monter le post encore plus haut dans les fils.'],
+    ['Je respire et je vérifie sur le site de l’école ou auprès d’un adulte', 'yes', 'Bon réflexe !', 'Tu vas à la source officielle. Ici, le vrai menu ne parle pas d’insectes : c’était une rumeur.'],
+    ['Je passe sans rien faire', 'mid', 'Pas mal…', 'Tu ne l’aides pas à se répandre, c’est déjà bien. Tu peux aussi dire calmement au groupe : « Ça vient d’où ? Le site de l’école ne dit rien. »']
+  ];
+  RUM.forEach(function (c) {
+    var b = document.createElement('button'); b.type = 'button'; b.textContent = c[0];
+    b.addEventListener('click', function () { $('rumOut').innerHTML = '<div class="verdict ' + c[1] + '">' + esc(c[2]) + '<span>' + esc(c[3]) + '</span></div>'; });
+    $('rumChoices').appendChild(b);
+  });
+
+  /* ---------- Étape 4 : la chambre d'écho, pas à pas ---------- */
+  var ECHO = [
+    { who: 'Léa', txt: 'Il paraît que le tournoi de foot de samedi est annulé !! (capture d’écran)', belief: 30, sources: 1, info: 'Une capture d’écran, venue d’un compte anonyme.' },
+    { who: 'Noah', txt: 'Ouais, j’ai vu ça aussi !', belief: 45, sources: 1, info: 'Noah a vu… la même capture.' },
+    { who: 'Inès', txt: '(partage la même capture d’écran)', belief: 60, sources: 1, info: 'Toujours la même image.' },
+    { who: 'Sam', txt: 'Tout le monde le dit, c’est sûr.', belief: 75, sources: 1, info: '« Tout le monde » = 3 personnes qui répètent une seule source.' },
+    { who: 'Groupe « Foot Juniors »', txt: '(la capture tourne maintenant dans un autre groupe)', belief: 88, sources: 1, info: 'Plus de monde, mais aucune preuve nouvelle.' },
+    { who: 'Vérification', txt: 'Yanis regarde le site du club et appelle l’entraîneur : le tournoi est maintenu ! La capture venait d’un seul compte anonyme, et tout le monde l’avait répétée.', belief: 5, sources: 1, info: 'Une seule source, jamais vérifiée. La répétition a donné l’impression que c’était vrai.', reveal: true }
+  ];
+  var echoK = 0;
+  function echoRender() {
+    var shown = ECHO.slice(0, echoK), last = shown[shown.length - 1];
+    $('echoChat').innerHTML = shown.length ? shown.map(function (m) {
+      return '<div class="msg' + (m.reveal ? ' reveal' : '') + '"><b>' + esc(m.who) + '</b>' + esc(m.txt) + '</div>';
+    }).join('') : '<span class="soft">Appuie sur « Message suivant » pour voir la rumeur circuler.</span>';
+    var b = last ? last.belief : 0;
+    $('echoPct').textContent = b + ' %';
+    $('echoFill').style.width = b + '%';
+    $('echoFill').style.backgroundColor = last && last.reveal ? 'var(--ok)' : 'var(--acc)';
+    $('echoMeter').setAttribute('aria-label', 'Niveau de croyance du groupe : ' + b + ' %');
+    $('echoSrc').textContent = last ? 'Messages : ' + echoK + ' · vraies sources : ' + last.sources + '. ' + last.info : '';
+    $('echoNext').disabled = echoK >= ECHO.length;
+  }
+  $('echoNext').addEventListener('click', function () { if (echoK < ECHO.length) echoK++; echoRender(); });
+  $('echoReset').addEventListener('click', function () { echoK = 0; echoRender(); });
+  echoRender();
+
+  /* ---------- Étape 5 : les bots ---------- */
+  var BOTS = [
+    { id: 'c1', user: 'Lina_skate', created: 'compte créé il y a 3 ans', photo: true, rhythm: '2 posts par jour', txt: 'J’ai testé la démo : la musique est trop bien, mais les courses sont un peu courtes.', bot: false, pro: false, why: 'Compte ancien, avec photo, avis nuancé et précis : ça ressemble à une vraie personne.' },
+    { id: 'c2', user: 'GalaxoFan84721', created: 'compte créé hier', photo: false, rhythm: '1 commentaire toutes les 2 minutes', txt: 'MEILLEUR JEU DE L’ANNÉE !!! Achetez-le ici →', bot: true, pro: true, why: 'Créé hier, pas de photo, nom plein de chiffres, publie toutes les 2 minutes, lien d’achat.' },
+    { id: 'c3', user: 'GalaxoFan84722', created: 'compte créé hier', photo: false, rhythm: '1 commentaire toutes les 2 minutes', txt: 'MEILLEUR JEU DE L’ANNÉE !!! Achetez-le ici →', bot: true, pro: true, why: 'Exactement le même message que le compte d’avant, et un nom qui le suit : 84721, 84722…' },
+    { id: 'c4', user: 'Tom_dessine', created: 'compte créé il y a 2 ans', photo: true, rhythm: '1 post par semaine', txt: 'Quelqu’un sait s’il y a un mode à deux sur le même écran ?', bot: false, pro: false, why: 'Une vraie question, un compte ancien et calme.' },
+    { id: 'c5', user: 'super_gamer_x7q2', created: 'compte créé il y a 2 jours', photo: false, rhythm: '300 commentaires aujourd’hui', txt: 'Tout le monde l’adore. Si tu ne l’achètes pas, t’es nul.', bot: true, pro: true, why: 'Tout récent, 300 commentaires en une journée, et un message qui fait pression (« t’es nul »).' },
+    { id: 'c6', user: 'Mamie_Jo', created: 'compte créé il y a 5 ans', photo: true, rhythm: '1 post par jour', txt: 'Mon petit-fils l’attend avec impatience, je vais le lui offrir !', bot: false, pro: true, why: 'Enthousiaste, mais compte ancien, photo, message personnel : rien de suspect.' },
+    { id: 'c7', user: 'kart_promo_001', created: 'compte créé hier', photo: false, rhythm: '1 commentaire toutes les 2 minutes, jour et nuit', txt: 'Incroyable, 10/10, achetez-le ici →', bot: true, pro: true, why: 'Créé hier, pas de photo, publie jour et nuit, message publicitaire.' },
+    { id: 'c8', user: 'Yanis.musique', created: 'compte créé il y a 1 an', photo: true, rhythm: '3 posts par semaine', txt: 'Les graphismes ont l’air sympa, j’attends les avis des testeurs.', bot: false, pro: false, why: 'Avis prudent, compte d’un an avec photo : sûrement humain.' }
+  ];
+  var BMAP = {};
+  BOTS.forEach(function (b) { BMAP[b.id] = b; });
+  var botAns = {}, botChecked = false, botHidden = false;
+  function checkBots(answers) {
+    var correct = 0, answered = 0;
+    BOTS.forEach(function (b) {
+      var a = answers ? answers[b.id] : null;
+      if (a === 'humain' || a === 'bot') { answered++; if ((a === 'bot') === b.bot) correct++; }
+    });
+    return { correct: correct, answered: answered, total: BOTS.length };
+  }
+  function consensus() {
+    var r = { all: { pro: 0, total: 0 }, humans: { pro: 0, total: 0 } };
+    BOTS.forEach(function (b) {
+      r.all.total++; if (b.pro) r.all.pro++;
+      if (!b.bot) { r.humans.total++; if (b.pro) r.humans.pro++; }
+    });
+    return r;
+  }
+  function botRender() {
+    $('botList').innerHTML = BOTS.map(function (b, i) {
+      var a = botAns[b.id], fb = '';
+      if (botChecked) {
+        if (!a) fb = '<div class="cmt-fb"><strong>Pas de réponse.</strong> <span>' + esc((b.bot ? 'Bot. ' : 'Humain. ') + b.why) + '</span></div>';
+        else {
+          var ok = (a === 'bot') === b.bot;
+          fb = '<div class="cmt-fb ' + (ok ? 'good' : 'bad') + '"><strong>' + (ok ? 'Juste' : 'Pas tout à fait') + ' : ' + (b.bot ? 'bot' : 'humain') + '.</strong> <span>' + esc(b.why) + '</span></div>';
+        }
+      }
+      var pic = b.photo ? '<span class="pic" style="background:' + THEMES[i % THEMES.length].c + '">' + esc(b.user.charAt(0)) + '</span>' : '<span class="pic none" aria-label="pas de photo">?</span>';
+      return '<li class="cmt' + (botHidden && b.bot ? ' gone' : '') + '"><div class="cmt-head">' + pic + '<strong>' + esc(b.user) + '</strong><span class="cmt-info">' + esc(b.created) + ' · ' + (b.photo ? 'photo' : 'pas de photo') + ' · ' + esc(b.rhythm) + '</span></div><span>' + esc(b.txt) + '</span>' +
+        '<div class="btns" role="group" aria-label="Humain ou bot ?"><button type="button" data-id="' + b.id + '" data-v="humain" aria-pressed="' + (a === 'humain') + '">Humain</button><button type="button" data-id="' + b.id + '" data-v="bot" aria-pressed="' + (a === 'bot') + '">Bot</button></div>' + fb + '</li>';
+    }).join('');
+    var s = checkBots(botAns);
+    $('botScore').textContent = (botChecked ? s.correct : 0) + ' / ' + s.total;
+    $('botHide').setAttribute('aria-pressed', botHidden ? 'true' : 'false');
+    var out = '';
+    if (botChecked) {
+      var c = consensus();
+      out = '<div class="verdict ' + (s.correct === s.total ? 'yes' : 'mid') + '">' + s.correct + ' bonne' + (s.correct > 1 ? 's' : '') + ' réponse' + (s.correct > 1 ? 's' : '') + ' sur ' + s.total + (s.answered < s.total ? ' (' + (s.total - s.answered) + ' sans réponse)' : '') + '.' +
+        '<span>Faux consensus : avec les bots, ' + c.all.pro + ' commentaires sur ' + c.all.total + ' sont enthousiastes (environ ' + Math.round(100 * c.all.pro / c.all.total) + ' %). Chez les vrais humains, seulement ' + c.humans.pro + ' sur ' + c.humans.total + ' (' + Math.round(100 * c.humans.pro / c.humans.total) + ' %). Les autres posent des questions ou sont prudents. Appuie sur « Cacher les bots » pour voir la vraie discussion.</span></div>';
+    }
+    $('botOut').innerHTML = out;
+  }
+  $('botList').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-id]');
+    if (!b) return;
+    botAns[b.getAttribute('data-id')] = b.getAttribute('data-v');
+    botRender();
+  });
+  $('botCheck').addEventListener('click', function () { botChecked = true; botRender(); });
+  $('botHide').addEventListener('click', function () { botHidden = !botHidden; botRender(); });
+  $('botReset').addEventListener('click', function () { botAns = {}; botChecked = false; botHidden = false; botRender(); });
+  botRender();
+
+  /* ---------- Étape 6 : la vitrine ---------- */
+  var VITRINE = [
+    { id: 'best', name: 'Garder la meilleure photo sur 30', hidden: '29 photos effacées : yeux fermés, grimace, cheveux en bataille.', show: ['vEyesOpen', 'vMouthSmile'], hide: ['vEyesTired', 'vMouthMeh'] },
+    { id: 'lisse', name: 'Lisser la peau', hidden: 'Les petits boutons et les taches ont été gommés par l’appli.', show: [], hide: ['vSpots'] },
+    { id: 'fond', name: 'Ranger ou changer le fond', hidden: 'La chambre en désordre est hors du cadre (ou remplacée par un joli fond).', show: ['vClean'], hide: ['vMess'] },
+    { id: 'filtre', name: 'Ajouter un filtre lumière', hidden: 'Lumière dorée et paillettes : ajoutées par un filtre, pas par le soleil.', show: ['vGlow'], hide: [] }
+  ];
+  var vit = {};
+  function vitrineCount(flags) { var n = 0; VITRINE.forEach(function (v) { if (flags && flags[v.id]) n++; }); return n; }
+  $('vitToggles').innerHTML = VITRINE.map(function (v) { return '<label><input type="checkbox" data-v="' + v.id + '"> ' + esc(v.name) + '</label>'; }).join('');
+  function vitRender() {
+    VITRINE.forEach(function (v) {
+      v.show.forEach(function (id) { $(id).setAttribute('display', vit[v.id] ? 'inline' : 'none'); });
+      v.hide.forEach(function (id) { $(id).setAttribute('display', vit[v.id] ? 'none' : 'inline'); });
+    });
+    var n = vitrineCount(vit);
+    $('vLikes').textContent = '♥ ' + (12 + n * 20);
+    var lines = VITRINE.filter(function (v) { return vit[v.id]; }).map(function (v) { return '<span>• ' + esc(v.hidden) + '</span>'; }).join('');
+    $('vitOut').innerHTML = n === 0
+      ? '<div class="verdict mid">La vraie photo, sans retouche.<span>Fatigué·e, un peu de désordre derrière : la vie normale. Coche les retouches pour fabriquer la « photo parfaite ».</span></div>'
+      : '<div class="verdict ' + (n === VITRINE.length ? 'no' : 'mid') + '">' + n + ' retouche' + (n > 1 ? 's' : '') + ' sur ' + VITRINE.length + '. Ce que les autres ne verront pas :' + lines +
+        (n === VITRINE.length ? '<span><strong>La personne n’a pas changé.</strong> Seule la vitrine a changé. Quand tu compares ta vraie vie aux photos des autres, tu compares tes coulisses à leur vitrine.</span>' : '') + '</div>';
+  }
+  $('vitToggles').addEventListener('change', function (e) { var id = e.target.getAttribute('data-v'); if (id) { vit[id] = e.target.checked; vitRender(); } });
+  vitRender();
+
+  /* ---------- Étape 7 : pub ou pas ? ---------- */
+  var CATS = [['signalee', 'Pub signalée'], ['deguisee', 'Pub déguisée'], ['pas', 'Pas une pub']];
+  var ADS = [
+    { id: 'a1', txt: '@leo_sport : « Ma nouvelle gourde ZenBottle me suit partout ! Code LEO10 pour −10 %. #partenariat »', answer: 'signalee', why: 'La mention #partenariat est là : c’est une pub, mais elle est honnête.' },
+    { id: 'a2', txt: '@matin_de_mia : « Ma routine du matin ! » La boîte de céréales Croquifun est bien visible tout le long, et il y a un lien d’achat dans sa bio. Aucune mention.', answer: 'deguisee', why: 'Produit mis en avant, lien d’achat, rien de signalé : ça ressemble fort à une pub déguisée.' },
+    { id: 'a3', txt: '@chat_malin : « Mon chien a enfin appris à faire la roulade ! »', answer: 'pas', why: 'Aucune marque, aucun produit, aucun lien : c’est juste un moment partagé.' },
+    { id: 'a4', txt: '@tech_nora · « Collaboration commerciale avec Pixelia » (affiché par l’appli) : « Je teste leur nouveau casque. »', answer: 'signalee', why: 'L’appli affiche « collaboration commerciale » : la pub est signalée.' },
+    { id: 'a5', txt: '@kev_style : « Ces baskets ont changé ma vie, foncez !! » La marque les lui a envoyées gratuitement, mais il ne le dit pas.', answer: 'deguisee', why: 'Un produit offert compte comme un avantage : il devrait écrire « produit offert » ou #pub.' },
+    { id: 'a6', txt: '@basket_junior : « Le club cherche des joueurs pour les M14. Inscriptions au secrétariat du club. »', answer: 'pas', why: 'C’est une annonce d’un club, sans produit à vendre ni marque qui paie.' }
+  ];
+  var AMAP = {};
+  ADS.forEach(function (a) { AMAP[a.id] = a; });
+  var adAns = {};
+  function checkAd(id, choice) {
+    var a = AMAP[id];
+    if (!a || !CATS.some(function (c) { return c[0] === choice; })) return null;
+    return { ok: a.answer === choice, answer: a.answer, why: a.why };
+  }
+  function catName(k) { var n = ''; CATS.forEach(function (c) { if (c[0] === k) n = c[1]; }); return n; }
+  function adSortRender() {
+    var good = 0;
+    $('adList').innerHTML = ADS.map(function (a) {
+      var ch = adAns[a.id], r = ch ? checkAd(a.id, ch) : null;
+      if (r && r.ok) good++;
+      return '<li class="' + (r ? (r.ok ? 'good' : 'bad') : '') + '"><span>' + esc(a.txt) + '</span><div class="btns" role="group" aria-label="Ton classement">' +
+        CATS.map(function (c) { return '<button type="button" data-id="' + a.id + '" data-c="' + c[0] + '" aria-pressed="' + (ch === c[0]) + '">' + esc(c[1]) + '</button>'; }).join('') + '</div>' +
+        (r ? '<div class="verdict ' + (r.ok ? 'yes' : 'no') + ' fbk">' + (r.ok ? 'Juste !' : 'Non : ' + esc(catName(r.answer)) + '.') + '<span>' + esc(r.why) + '</span></div>' : '') + '</li>';
+    }).join('');
+    $('adScore').textContent = good + ' / ' + ADS.length;
+  }
+  $('adList').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-id]');
+    if (!b) return;
+    adAns[b.getAttribute('data-id')] = b.getAttribute('data-c');
+    adSortRender();
+  });
+  $('adReset').addEventListener('click', function () { adAns = {}; adSortRender(); });
+  adSortRender();
+
+  /* ---------- Étape 8 : réglages ---------- */
+  var SETTINGS = [
+    ['Compte privé', 'seules les personnes que tu acceptes voient tes posts.'],
+    ['Messages privés limités', 'seuls tes amis peuvent t’écrire.'],
+    ['Masquer le nombre de likes', 'si l’appli le permet.'],
+    ['Rappel de pause ou limite de temps', 'l’appli te prévient après le temps que tu choisis.'],
+    ['Notifications coupées la nuit', 'pour dormir tranquille.'],
+    ['« Pas intéressé » sur ce qui te dérange', 'l’algorithme apprend aussi ce que tu ne veux pas.'],
+    ['Réinitialiser les recommandations', 'certaines applis le proposent pour repartir de zéro.'],
+    ['Localisation désactivée', 'personne ne voit où tu es.']
+  ];
+  $('setList').innerHTML = SETTINGS.map(function (s, i) { return '<li><label><input type="checkbox" data-s="' + i + '"><span><strong>' + esc(s[0]) + '</strong> : ' + esc(s[1]) + '</span></label></li>'; }).join('');
+  $('setList').addEventListener('change', function (e) {
+    var li = e.target.closest('li'); if (li) li.classList.toggle('done', e.target.checked);
+    var n = $('setList').querySelectorAll('input:checked').length;
+    $('setScore').textContent = n + ' / ' + SETTINGS.length;
+  });
+
+  /* ---------- Quiz ---------- */
+  var QZ = [
+    { q: 'Un algorithme de réseau social, c’est…', o: [['a', 'une recette de calcul qui choisit ce qu’on te montre'], ['b', 'une personne qui lit tous tes messages'], ['c', 'un virus']], a: 'a', how: 'C’est un programme : il trie les posts d’après tes réactions (likes, temps passé, partages).' },
+    { q: 'Tu as aimé cinq vidéos de chats. Que va probablement faire l’appli ?', o: [['a', 'te montrer encore plus de chats'], ['b', 'te montrer de tout au hasard'], ['c', 'ne plus jamais montrer de chats']], a: 'a', how: 'Chaque like donne des points au thème : il revient de plus en plus souvent. C’est le début d’une bulle.' },
+    { q: 'Vrai ou faux : un post avec beaucoup de likes est forcément vrai.', o: [['v', 'Vrai'], ['f', 'Faux']], a: 'f', how: 'Les likes mesurent les réactions, pas la vérité. Les algorithmes favorisent la viralité, pas la vérité.' },
+    { q: 'Pourquoi beaucoup d’applis veulent-elles que tu restes longtemps ?', o: [['a', 'pour te montrer plus de publicités'], ['b', 'parce que c’est obligatoire'], ['c', 'pour que tu apprennes mieux']], a: 'a', how: 'Plus tu restes, plus tu vois de pubs : ton attention a de la valeur pour elles.' },
+    { q: 'Un compte créé hier, sans photo, qui poste le même message toutes les 2 minutes, c’est probablement…', o: [['a', 'un bot ou un faux compte'], ['b', 'un grand fan très motivé'], ['c', 'le compte officiel du jeu']], a: 'a', how: 'Plusieurs indices ensemble (compte récent, pas de photo, même message, rythme de machine) : sûrement un bot.' },
+    { q: 'Sous une vidéo, tu lis « #partenariat ». Ça veut dire…', o: [['a', 'que la marque a payé ou offert quelque chose : c’est une pub'], ['b', 'que c’est un avis totalement libre'], ['c', 'que la vidéo est vérifiée']], a: 'a', how: 'C’est une pub signalée : honnête, mais l’avis n’est pas neutre.' },
+    { q: 'Pour sortir d’une bulle, tu peux…', o: [['a', 'chercher d’autres sujets et suivre des comptes variés'], ['b', 'liker encore plus les mêmes vidéos'], ['c', 'rien, c’est impossible']], a: 'a', how: 'Tes nouveaux signaux changent les points de l’algorithme : le fil redevient plus varié.' },
+    { q: 'Une rumeur choquante sur ton école circule. Le meilleur réflexe ?', o: [['a', 'la partager vite pour prévenir tout le monde'], ['b', 'respirer quelques secondes et vérifier à la source'], ['c', 'commenter en colère']], a: 'b', how: 'Ce qui veut te faire réagir avant de réfléchir cherche à te manipuler. Vérifie sur le site officiel ou auprès d’un adulte.' }
+  ];
+  var quiz = $('quiz'), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ''; done = [];
+    QZ.forEach(function (Q, k) {
+      var li = document.createElement('li');
+      li.innerHTML = '<span>' + esc(Q.q) + '</span><select id="qa' + k + '" aria-label="Ta réponse à la question ' + (k + 1) + '"><option value="">…</option>' + Q.o.map(function (o) { return '<option value="' + o[0] + '">' + esc(o[1]) + '</option>'; }).join('') + '</select><button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+      quiz.appendChild(li);
+      function check() {
+        var fb = $('qf' + k), v = $('qa' + k).value;
+        if (!v) { fb.className = 'fb'; fb.textContent = 'Choisis une réponse.'; return; }
+        if (v === Q.a) { fb.className = 'fb ok'; fb.innerHTML = 'Bravo, c’est juste !<span>' + esc(Q.how) + '</span>'; done[k] = true; }
+        else {
+          done[k] = false;
+          var good = Q.o.filter(function (o) { return o[0] === Q.a; })[0][1];
+          fb.className = 'fb no'; fb.innerHTML = 'Pas tout à fait : la bonne réponse est « ' + esc(good) + ' ».<span>' + esc(Q.how) + '</span>';
+        }
+        $('score').textContent = done.filter(Boolean).length + ' / 8';
+      }
+      $('qb' + k).addEventListener('click', check);
+      $('qa' + k).addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+    });
+    $('score').textContent = '0 / 8';
+  }
+  $('newQuiz').addEventListener('click', newQuiz);
+  newQuiz();
+
+  window.__res = {
+    themes: THEMES, posts: POSTS, rules: RULES,
+    newFeed: newFeed, act: act, breakBubble: breakBubble, shares: shares, diversity: diversity, preview: preview, feed: FEED,
+    ads: ads,
+    ranked: RANKED, engagement: engagement, quality: quality, rankBy: rankBy,
+    echo: ECHO,
+    bots: BOTS, checkBots: checkBots, consensus: consensus,
+    vitrine: VITRINE, vitrineCount: vitrineCount,
+    adsSort: ADS, checkAd: checkAd,
+    settings: SETTINGS, quiz: QZ
+  };
+})();
+</script>
+</body>
+</html>

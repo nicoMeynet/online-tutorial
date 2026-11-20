@@ -1,0 +1,1180 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Programmer pas à pas</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, marge rouge. Accent orange (#ea580c). Blocs : bleu = mouvement, orange = boucles, violet = conditions ; gemmes roses, drapeau vert. Tous les prénoms sont inventés. Rien n'est envoyé ni enregistré. */
+:root {
+  --paper: #fbf8f5;
+  --grid: #efe4da;
+  --card: #ffffff;
+  --ink: #2a1c12;
+  --ink-soft: #6b5545;
+  --acc: #ea580c;
+  --acc-soft: #fde4d4;
+  --mv: #2563eb;
+  --mv-soft: #dde8fd;
+  --cnd: #7c3aed;
+  --cnd-soft: #ece3fd;
+  --gem: #db2777;
+  --water: #7cc4e8;
+  --wall: #8a7466;
+  --wall-line: #6f5a4d;
+  --warn: #d97706;
+  --warn-soft: #fdf0d6;
+  --warn-ink: #92400e;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #fff0a3;
+  --line: #e6d8cc;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #17110d; --grid: #241b15; --card: #1d1611; --ink: #f6ece4; --ink-soft: #c4ad9c;
+    --acc: #fb923c; --acc-soft: #3d2210; --mv: #7aa7ff; --mv-soft: #16264a; --cnd: #b794ff; --cnd-soft: #2a1d47;
+    --gem: #f472b6; --water: #2f6f93; --wall: #5d4a3e; --wall-line: #7a6455;
+    --warn: #f5a524; --warn-soft: #3d2a0c; --warn-ink: #fbbf5a;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #3a2e25;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #17110d; --grid: #241b15; --card: #1d1611; --ink: #f6ece4; --ink-soft: #c4ad9c;
+  --acc: #fb923c; --acc-soft: #3d2210; --mv: #7aa7ff; --mv-soft: #16264a; --cnd: #b794ff; --cnd-soft: #2a1d47;
+  --gem: #f472b6; --water: #2f6f93; --wall: #5d4a3e; --wall-line: #7a6455;
+  --warn: #f5a524; --warn-soft: #3d2a0c; --warn-ink: #fbbf5a;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #3a2e25;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--acc); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+@media (max-width: 420px) { .box { padding: 14px; } }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note.warn { border-left-color: var(--warn); background: var(--warn-soft); }
+.note.ok { border-left-color: var(--ok); background: var(--ok-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+.fig svg { width: 100%; height: auto; display: block; }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 8px 12px; min-height: 44px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+button:disabled { opacity: .45; cursor: default; transform: none; box-shadow: 3px 3px 0 var(--ink); }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+select { font: inherit; font-size: 1rem; padding: 8px 8px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; min-height: 44px; }
+.chk { display: flex; gap: 8px; align-items: center; font-size: .95rem; cursor: pointer; min-height: 40px; }
+.chk input { width: 22px; height: 22px; accent-color: var(--acc); flex: none; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
+.tag.ok { color: var(--ok); }
+.tag.no { color: var(--red); }
+.tag.warn { color: var(--warn-ink); }
+.tag.acc { color: var(--acc); }
+.results { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
+.res { border: 1.5px solid var(--line); border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; background: var(--paper); min-width: 0; }
+.res strong { font-family: var(--f-display); }
+
+.verdict { border-radius: 8px; padding: 12px 14px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+.verdict:empty { display: none; }
+.verdict.yes { background: var(--ok-soft); color: var(--ok); }
+.verdict.no { background: var(--red-soft); color: var(--red); }
+.verdict.mid { background: var(--warn-soft); color: var(--warn-ink); }
+.verdict span { font-weight: 400; color: var(--ink); }
+
+/* Blocs (affichage statique) */
+.legend { display: flex; flex-wrap: wrap; gap: 8px; }
+.blk { display: inline-block; border-radius: 8px; padding: 3px 10px; font-family: var(--f-display); font-weight: 700; color: var(--card); }
+.blk.mv { background: var(--mv); }
+.blk.ctl { background: var(--acc); }
+.blk.cnd { background: var(--cnd); }
+.sb { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 5px; }
+.sb .sb { margin: 5px 0 2px 14px; padding-left: 10px; border-left: 4px solid var(--acc); }
+.sb .sb.cnd { border-left-color: var(--cnd); }
+.sb .itag { font-family: var(--f-mono); font-size: .8rem; color: var(--cnd); font-weight: 600; }
+
+/* Code texte */
+pre.code { margin: 0; font-family: var(--f-mono); font-size: .92rem; line-height: 1.55; background: var(--paper); border: 1.5px dashed var(--line); border-radius: 8px; padding: 10px 12px; overflow-x: auto; white-space: pre; }
+pre.code .cl { display: inline-block; min-width: 100%; border-radius: 4px; padding: 0 4px; }
+pre.code .cl.cur { background: var(--hl); }
+.kw { color: var(--acc); font-weight: 600; }
+.cm { color: var(--ink-soft); }
+
+/* Atelier du robot */
+.ws-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (min-width: 700px) { .ws-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+.board { width: 100%; height: auto; display: block; border-radius: 8px; }
+.board .cell { fill: var(--card); stroke: var(--line); stroke-width: 2; }
+.board .wall { fill: var(--wall); }
+.board .brick { stroke: var(--wall-line); stroke-width: 3; fill: none; }
+.board .water { fill: var(--water); }
+.board .wave { stroke: var(--card); stroke-width: 3; fill: none; opacity: .7; }
+.board .trail { fill: none; stroke: var(--acc); stroke-width: 6; stroke-dasharray: 2 12; stroke-linecap: round; opacity: .8; }
+.board .gem { fill: var(--gem); stroke: var(--ink); stroke-width: 2.5; }
+.board .flagc { fill: var(--ok); stroke: var(--ink); stroke-width: 2.5; }
+.board .pole { stroke: var(--ink); stroke-width: 5; stroke-linecap: round; }
+.board .rb { fill: var(--acc); stroke: var(--ink); stroke-width: 3; }
+.board .rb.crash { fill: var(--red); }
+.board .eye { fill: #fff; stroke: var(--ink); stroke-width: 2; }
+.board .pup { fill: #1b1b1b; }
+.board .nose { fill: var(--ink); }
+.board .boom { fill: var(--red); stroke: var(--ink); stroke-width: 2.5; }
+.board .lbl { font-size: 22px; fill: var(--ink-soft); }
+.hud { display: flex; flex-wrap: wrap; gap: 6px 14px; font-family: var(--f-mono); font-size: .9rem; margin-top: 8px; }
+.hud b { color: var(--acc); }
+.hud .over { color: var(--red); }
+.side { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.pal { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; }
+.pal button { color: var(--card); border-color: var(--ink); font-size: .95rem; padding: 6px 8px; }
+.pal button.mv { background: var(--mv); }
+.pal button.ctl { background: var(--acc); }
+.pal button.cnd { background: var(--cnd); }
+.lvls button { font-size: .95rem; }
+.lvtext { background: var(--paper); border: 1.5px dashed var(--line); border-radius: 8px; padding: 10px 12px; }
+.prog { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.plist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.pb { border-radius: 8px; border: 2px solid var(--ink); background: var(--card); min-width: 0; }
+.pb > .prow { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; justify-content: space-between; padding: 4px 6px 4px 10px; border-radius: 6px 6px 0 0; }
+.pb.mv > .prow { background: var(--mv-soft); }
+.pb.ctl > .prow { background: var(--acc-soft); }
+.pb.cnd > .prow { background: var(--cnd-soft); }
+.pb.cur { outline: 4px solid var(--hl); outline-offset: 1px; }
+.pb.cur > .prow { box-shadow: inset 6px 0 0 var(--acc); }
+.plab { font-family: var(--f-display); font-weight: 700; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; min-width: 0; }
+.pctl { display: flex; gap: 4px; flex-wrap: wrap; }
+button.mini { min-height: 40px; min-width: 40px; padding: 0 8px; font-size: 1rem; box-shadow: 2px 2px 0 var(--ink); }
+.inner { padding: 6px 6px 8px 10px; display: flex; flex-direction: column; gap: 6px; border-left: 5px solid var(--acc); margin: 0 0 0 8px; }
+.pb.cnd .inner { border-left-color: var(--cnd); }
+.pb.cnd > .inner { border-left-color: var(--cnd); }
+.itag { font-family: var(--f-mono); font-size: .8rem; font-weight: 600; color: var(--cnd); }
+button.slot { min-height: 40px; border: 2px dashed var(--ink-soft); box-shadow: none; background: transparent; color: var(--ink-soft); font-size: .9rem; font-weight: 700; text-align: left; }
+button.slot[aria-pressed="true"] { border-color: var(--acc); color: var(--acc); background: var(--acc-soft); border-style: solid; }
+.journal table { width: 100%; border-collapse: collapse; font-size: .88rem; font-variant-numeric: tabular-nums; }
+.journal th, .journal td { border: 1.5px solid var(--line); padding: 4px 6px; text-align: left; vertical-align: top; }
+.journal th { font-family: var(--f-display); background: var(--paper); }
+.journal td.n { font-family: var(--f-mono); white-space: nowrap; }
+.journal tr.last td { background: var(--hl); }
+.scroll { overflow-x: auto; max-height: 320px; overflow-y: auto; }
+.status { font-family: var(--f-mono); font-size: .92rem; color: var(--ink-soft); min-height: 1.6em; }
+
+/* Robot cuisinier, que fait ce code, trouve le bug */
+.items { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.items > li { border: 1.5px solid var(--line); border-radius: 10px; padding: 10px 12px; background: var(--paper); display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.items .ins { font-weight: 700; overflow-wrap: anywhere; }
+.items .fb { font-size: .95rem; }
+.items .fb:empty { display: none; }
+.items .fb.ok { color: var(--ok); }
+.items .fb.no { color: var(--red); }
+.items .fb span { color: var(--ink); font-weight: 400; }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc); }
+.opts { display: flex; flex-direction: column; gap: 8px; }
+.opts button { text-align: left; font-family: var(--f-body); font-weight: 400; }
+.opts button.good { background: var(--ok-soft); border-color: var(--ok); color: var(--ink); }
+.opts button.bad { background: var(--red-soft); border-color: var(--red); color: var(--ink); }
+.lines { display: flex; flex-direction: column; gap: 4px; }
+.lines button { font-family: var(--f-mono); font-weight: 400; font-size: .92rem; text-align: left; white-space: pre; overflow-x: auto; min-height: 40px; box-shadow: none; border-width: 1.5px; border-color: var(--line); background: var(--card); }
+.lines button.good { background: var(--ok-soft); border-color: var(--ok); }
+.lines button.bad { background: var(--red-soft); border-color: var(--red); }
+.goal { font-size: .95rem; }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 220px auto; gap: 10px; align-items: center; }
+.quiz li > span:first-child { min-width: 0; overflow-wrap: anywhere; }
+.quiz select { font-size: .95rem; padding: 6px 6px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb:empty { display: none; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+
+.steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; counter-reset: st; }
+.steps li { counter-increment: st; display: grid; grid-template-columns: 34px 1fr; gap: 10px; align-items: start; border: 1.5px solid var(--line); border-radius: 10px; padding: 8px 10px; background: var(--card); }
+.steps li::before { content: counter(st); width: 30px; height: 30px; border-radius: 50%; background: var(--acc); color: var(--card); display: grid; place-items: center; font-family: var(--f-display); font-weight: 800; }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 140px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; min-height: 32px; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+details.journal { padding: 10px 14px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+<!--ticons--><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Tutoriels"><script src="progress.js" defer></script><!--/ticons-->
+<style id="tnav-css">
+.tnav-top { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin: 0 0 4px; }
+.tnav-home { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font-weight: 700; font-size: .95rem; text-decoration: none; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tnav-home:hover, .tnav-home:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.tnav-bottom { margin-top: 8px; display: flex; flex-direction: column; gap: 12px; }
+.tnav-bottom h2 { margin: 0; }
+.tnav-pn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tnav-pn a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--ink, #222); border-radius: 10px;
+  background: var(--card, #fff); color: var(--ink, #222); text-decoration: none; box-shadow: 3px 3px 0 var(--ink, #222); min-width: 0; }
+.tnav-pn a span { font-size: .85rem; color: var(--ink-soft, #666); }
+.tnav-pn a strong { overflow-wrap: anywhere; }
+.tnav-pn a.next { text-align: right; grid-column: 2; }
+.tnav-bottom .tnav-home { align-self: center; }
+@media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
+.diff { font: 700 .72rem/1.2 var(--f-mono, monospace); padding: 2px 8px; border-radius: 99px; border: 1.5px solid; white-space: nowrap; }
+.diff.d1 { color: #15803d; border-color: #15803d; background: #dcf3e3; }
+.diff.d2 { color: #a15c07; border-color: #b45309; background: #fbe7cf; }
+.diff.d3 { color: #b91c1c; border-color: #b91c1c; background: #fde2e2; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root:not([data-theme="light"]) .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root:not([data-theme="light"]) .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; } }
+:root[data-theme="dark"] .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root[data-theme="dark"] .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root[data-theme="dark"] .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; }
+</style>
+</head>
+<body>
+<main class="page">
+<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="numerique.html">← Tous les tutoriels numériques</a><span class="diff d2" title="Difficulté : moyen">Moyen</span></nav><!--/tnav-->
+
+
+  <header class="hero">
+    <span class="eyebrow">Tutoriel numérique · niveau 9H</span>
+    <h1>Programmer pas à pas</h1>
+    <p class="lead">Un robot, une grille, des murs, des gemmes à ramasser. Tu vas lui écrire des programmes avec des blocs, les lancer, les voir planter… et les réparer. Parce que programmer, c'est surtout ça : essayer, regarder ce qui se passe, corriger.</p>
+    <div class="box fig">
+      <svg viewBox="0 0 400 190" role="img" aria-label="Un robot orange sur une grille, une gemme rose et un drapeau vert, à côté de trois blocs de programme">
+        <g stroke="var(--line)" stroke-width="2" fill="var(--card)">
+          <rect x="10" y="20" width="50" height="50"/><rect x="60" y="20" width="50" height="50"/><rect x="110" y="20" width="50" height="50"/><rect x="160" y="20" width="50" height="50"/>
+          <rect x="10" y="70" width="50" height="50"/><rect x="60" y="70" width="50" height="50" fill="var(--wall)"/><rect x="110" y="70" width="50" height="50"/><rect x="160" y="70" width="50" height="50"/>
+          <rect x="10" y="120" width="50" height="50"/><rect x="60" y="120" width="50" height="50"/><rect x="110" y="120" width="50" height="50"/><rect x="160" y="120" width="50" height="50"/>
+        </g>
+        <path d="M35 145 H135 V95 H185 V45" fill="none" stroke="var(--acc)" stroke-width="4" stroke-dasharray="2 9" stroke-linecap="round"/>
+        <g transform="translate(35 145)"><rect x="-16" y="-15" width="29" height="30" rx="7" fill="var(--acc)" stroke="var(--ink)" stroke-width="2"/><circle cx="5" cy="-6" r="4" fill="#fff" stroke="var(--ink)" stroke-width="1.5"/><circle cx="5" cy="6" r="4" fill="#fff" stroke="var(--ink)" stroke-width="1.5"/><polygon points="14,-7 21,0 14,7" fill="var(--ink)"/></g>
+        <polygon points="135,82 146,95 135,108 124,95" fill="var(--gem)" stroke="var(--ink)" stroke-width="2"/>
+        <line x1="178" y1="62" x2="178" y2="30" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/><polygon points="178,30 198,37 178,44" fill="var(--ok)" stroke="var(--ink)" stroke-width="2"/>
+        <rect x="235" y="30" width="150" height="30" rx="7" fill="var(--acc)"/><text x="245" y="50" font-size="14" style="fill:var(--card)" font-weight="600">répéter 2 fois</text>
+        <rect x="255" y="68" width="130" height="30" rx="7" fill="var(--mv)"/><text x="265" y="88" font-size="14" style="fill:var(--card)" font-weight="600">avancer</text>
+        <rect x="255" y="106" width="130" height="30" rx="7" fill="var(--mv)"/><text x="265" y="126" font-size="14" style="fill:var(--card)" font-weight="600">tourner ↺</text>
+        <rect x="235" y="30" width="8" height="114" rx="3" fill="var(--acc)"/>
+        <text x="235" y="172" font-size="13" style="fill:var(--ink-soft)">for i in range(2): …</text>
+      </svg>
+    </div>
+    <p class="soft">Ce qu'est un algorithme, une boucle, une condition ou une variable, le tutoriel sur <a class="tlink" href="l-algorithmique.html">l'algorithmique</a> l'explique. Ici, on met les mains dans le cambouis : on <strong>programme vraiment</strong>, niveau par niveau, et on apprend à <strong>débugger</strong>.</p>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · Exactement ce qu'on lui dit</span>
+    <h2>Le robot cuisinier qui obéit trop bien</h2>
+    <p>Tu dis à un robot : « Fais-moi un sandwich au fromage. » Il répond : « Instruction inconnue. » Un ordinateur ne sait faire que des choses <strong>toutes petites et très précises</strong>. Et surtout :</p>
+    <div class="note">
+      <span class="note-title">La règle d'or du programmeur</span>
+      <span><span class="hl">Un ordinateur fait exactement ce qu'on lui dit, pas ce qu'on veut dire.</span> Il ne devine rien, il ne « comprend » pas ton intention. Si ton instruction peut être prise de travers, il la prendra de travers.</span>
+    </div>
+    <div class="box">
+      <h3>Assez précis pour un robot ?</h3>
+      <p class="soft">Voici les instructions de Léa pour le robot cuisinier. Pour chacune, décide : le robot peut-il la suivre sans se tromper ?</p>
+      <ol class="items" id="sandList"></ol>
+      <div class="btns"><span class="score" id="sandScore">0 / 8</span><button type="button" id="sandReset">Recommencer</button></div>
+    </div>
+    <p>Écrire un programme, c'est découper ce qu'on veut en <strong>instructions minuscules</strong>, sans rien oublier, dans le bon ordre. C'est exactement ce que tu vas faire avec le robot de la grille.</p>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · Les premiers blocs</span>
+    <h2>Une séquence : un bloc après l'autre</h2>
+    <p>Le robot connaît seulement trois gestes : <span class="blk mv">avancer</span> d'une case, <span class="blk mv">tourner à gauche ↺</span> et <span class="blk mv">tourner à droite ↻</span> (sur place, d'un quart de tour). Une <strong>séquence</strong>, c'est une liste de blocs exécutés <strong>dans l'ordre</strong>, de haut en bas.</p>
+    <div class="note warn">
+      <span class="note-title">Sa gauche, pas la tienne</span>
+      <span>Le robot tourne par rapport à <strong>la direction où il regarde</strong> (ses yeux et sa flèche). S'il regarde vers le bas de l'écran, sa gauche est… ta droite ! Penche la tête ou mets-toi à sa place.</span>
+    </div>
+    <div class="box ws" data-levels="0,1" role="group" aria-label="Atelier du robot, niveaux 1 et 2"></div>
+    <div class="note">
+      <span class="note-title">Comment utiliser l'atelier</span>
+      <span>Touche un bloc pour l'ajouter. Il va à l'endroit marqué en orange (« ＋ ajouter… »). Sur chaque bloc : ↑ ↓ pour le déplacer, ✕ pour l'enlever, ⇄ pour changer le sens d'un virage. <strong>Pas à pas</strong> exécute une seule instruction à la fois et la surligne ; <strong>Tout exécuter</strong> lance le programme jusqu'au bout.</span>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Les boucles</span>
+    <h2>Moins de blocs, même travail</h2>
+    <p>Au niveau 2, tu as sûrement écrit plusieurs fois les mêmes blocs. Une <strong>boucle</strong> <span class="blk ctl">répéter 3 fois</span> exécute les blocs qu'elle contient plusieurs fois de suite. Les programmeurs aiment les programmes <strong>courts</strong> : moins de blocs, c'est moins de place pour les erreurs, et plus facile à relire.</p>
+    <p>Dans les niveaux suivants, il y a un <strong>défi</strong> : y arriver en <strong>5 blocs maximum</strong>. Un bloc « répéter » compte pour 1, plus les blocs qu'il contient. Le compteur de blocs est sous la grille.</p>
+    <div class="box ws" data-levels="2,3" role="group" aria-label="Atelier du robot, niveaux 3 et 4"></div>
+    <div class="note">
+      <span class="note-title">L'astuce : chercher le motif</span>
+      <span>Avant d'ajouter des blocs, regarde le chemin et cherche le petit morceau qui revient toujours pareil. C'est lui qui va dans la boucle. Et une boucle peut contenir… une autre boucle !</span>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · Les conditions</span>
+    <h2>Le robot regarde devant lui</h2>
+    <p>Jusqu'ici, ton programme ne marchait que pour <strong>un seul</strong> chemin. Mais le robot a un capteur : il peut tester s'il y a un <strong>mur devant</strong> lui (le bord de la grille compte comme un mur). Le bloc <span class="blk cnd">si mur devant alors … sinon …</span> fait la partie « alors » si c'est vrai, et la partie « sinon » si c'est faux.</p>
+    <p>Avec le bloc <span class="blk ctl">répéter jusqu'au drapeau</span>, le robot recommence tant qu'il n'est pas arrivé. Ensemble, ces deux blocs donnent un programme qui <strong>s'adapte</strong> au chemin, au lieu de compter les cases.</p>
+    <div class="box ws" data-levels="4" role="group" aria-label="Atelier du robot, niveau 5"></div>
+    <div class="note red">
+      <span class="note-title">Attention à la boucle infinie</span>
+      <span>« Répéter jusqu'au drapeau » ne s'arrête que si le robot arrive. Si ton programme le fait tourner en rond, il tournerait <strong>pour toujours</strong>. Ici, l'atelier arrête tout après 300 instructions. Essaie par exemple avec « tourner à gauche » au lieu de « tourner à droite » dans la partie « alors », pour voir.</span>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Du bloc au texte</span>
+    <h2>Le même programme, en code</h2>
+    <p>Sous chaque atelier, tu as vu une case « code texte » qui change quand tu ajoutes un bloc. C'est le <strong>même programme</strong>, écrit comme dans un vrai langage de programmation (ici, presque du Python, un langage très utilisé pour apprendre). Les mots du langage sont en anglais : <span class="mono">for</span> (pour), <span class="mono">while not</span> (tant que pas), <span class="mono">if</span> (si), <span class="mono">else</span> (sinon).</p>
+    <div class="results">
+      <div class="res"><strong>En blocs</strong><ul class="sb"><li><span class="blk ctl">répéter 4 fois</span><ul class="sb"><li><span class="blk mv">avancer</span></li><li><span class="blk mv">tourner à droite ↻</span></li></ul></li></ul></div>
+      <div class="res"><strong>En texte</strong><pre class="code"><span class="kw">for</span> i <span class="kw">in</span> range(4):
+    avancer()
+    tourner_a_droite()</pre></div>
+    </div>
+    <p>En texte, il n'y a plus de « boîte » autour des blocs répétés. C'est le <strong>décalage vers la droite</strong> (l'indentation, 4 espaces) qui dit ce qui est <strong>dans</strong> la boucle. Un décalage oublié, et le programme fait autre chose !</p>
+    <div class="box">
+      <h3>Que fait ce code ?</h3>
+      <p class="soft">Lis chaque code et choisis la bonne description. Regarde bien les décalages.</p>
+      <ol class="items" id="readList"></ol>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · Chasse au bug</span>
+    <h2>Répare le programme de Robin</h2>
+    <p>Un <strong>bug</strong>, c'est une erreur dans un programme. Robin a écrit un programme pour faire passer le robot sur toutes les gemmes, rangée par rangée, comme une tondeuse à gazon. Mais il plante. Il y a <strong>deux bugs</strong>. Lance-le pas à pas et regarde à quel moment le robot fait autre chose que prévu.</p>
+    <div class="box ws" data-levels="5" role="group" aria-label="Atelier du robot, niveau 6"></div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Débugger, c'est normal</span>
+    <h2>Tout le monde fait des bugs</h2>
+    <p>Les programmeurs professionnels passent une grande partie de leur temps à chercher et corriger des bugs. Un bug ne veut pas dire que tu es nul : il veut dire que tu <strong>programmes</strong>. Ce qui compte, c'est d'avoir une méthode.</p>
+    <ol class="steps">
+      <li><span><strong>Dis ce qui devait se passer.</strong> « Le robot devait tourner à droite ici. »</span></li>
+      <li><span><strong>Exécute pas à pas.</strong> Une instruction à la fois, en regardant le robot et le journal.</span></li>
+      <li><span><strong>Trouve le premier moment qui cloche.</strong> Le bug est souvent juste avant.</span></li>
+      <li><span><strong>Change une seule chose</strong>, puis relance. Si tu changes tout à la fois, tu ne sais plus ce qui a marché.</span></li>
+      <li><span><strong>Explique ton programme à voix haute</strong>, ligne par ligne, à un ami ou même à un canard en plastique. Souvent, on trouve le bug en l'expliquant !</span></li>
+    </ol>
+    <div class="box">
+      <h3>Trouve la ligne fautive</h3>
+      <p class="soft">Pour chaque programme, touche la ligne qui contient le bug.</p>
+      <ol class="items" id="bugList"></ol>
+      <div class="btns"><span class="score" id="bugScore">0 / 3</span><button type="button" id="bugReset">Recommencer</button></div>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Une variable</span>
+    <h2>Le compteur de gemmes</h2>
+    <p>As-tu remarqué <span class="mono">gemmes = 0</span> sous la grille ? C'est une <strong>variable</strong> : une case de la mémoire avec un nom, qui garde un nombre. Au départ, <span class="mono">gemmes = 0</span>. Chaque fois que le robot passe sur une gemme, le programme fait <span class="mono">gemmes = gemmes + 1</span> : il prend l'ancienne valeur, ajoute 1, et range le résultat au même endroit. Le <strong>journal du robot</strong>, sous chaque atelier, montre la valeur à chaque instruction.</p>
+    <div class="box">
+      <h3>Prédis la valeur</h3>
+      <p class="soft">Le robot part de la case A1, tourné vers la droite. Combien vaut <span class="mono">gemmes</span> quand le programme s'arrête ? Fais-le dans ta tête, puis vérifie.</p>
+      <div class="results" id="predList"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Les variables sont partout</span>
+      <span>Ton score dans un jeu, le nombre de vies, le temps restant, le nombre de messages non lus : ce sont des variables. Le programme les lit et les change sans arrêt.</span>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Attention</span>
+    <h2>Les erreurs fréquentes</h2>
+    <div class="cards">
+      <div class="box"><span class="tag no">Piège</span><strong>Compter les cases au lieu des pas</strong><span class="soft">Pour aller de A1 à E1, le robot fait 4 pas, pas 5 : il est déjà sur A1. C'est l'erreur « à un près », très courante, même chez les pros.</span></div>
+      <div class="box"><span class="tag no">Piège</span><strong>Confondre sa gauche et la tienne</strong><span class="soft">Le robot tourne selon la direction où il regarde. Quand il descend, sa gauche est ta droite.</span></div>
+      <div class="box"><span class="tag no">Piège</span><strong>Un bloc hors de la boucle</strong><span class="soft">Un bloc juste en dessous de la boucle, au lieu de dedans, n'est exécuté qu'une fois. En code texte, c'est un décalage oublié.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« Le robot sait où est le drapeau. »</strong><span class="soft">Non : il ne connaît que la case juste devant lui. Tout le reste, c'est ton programme qui doit le prévoir.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« Un bug, c'est que je suis nul. »</strong><span class="soft">Tout le monde en fait. Débugger fait partie du travail, et c'est souvent là qu'on apprend le plus.</span></div>
+      <div class="box"><span class="tag no">Piège</span><strong>Tout changer d'un coup</strong><span class="soft">Change une seule chose à la fois, puis relance. Sinon tu ne sais pas ce qui a réparé… ou cassé.</span></div>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Choisis ta réponse, puis vérifie.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Recommencer</button>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · Le savais-tu ?</span>
+    <h2>Des câbles aux blocs</h2>
+    <ol class="timeline">
+      <li><span class="when">années 1840</span><div class="what"><strong>Ada Lovelace</strong><span>Elle écrit une méthode pour faire calculer une machine imaginée par Charles Babbage, une machine qui n'a jamais été terminée. On la présente souvent comme la première programmeuse.</span></div></li>
+      <li><span class="when">années 1940</span><div class="what"><strong>Programmer avec des câbles</strong><span>Sur certains des premiers ordinateurs, programmer voulait dire brancher des câbles et tourner des boutons, parfois pendant des jours. Plus tard, on a utilisé des cartes en carton percées de trous.</span></div></li>
+      <li><span class="when">1947</span><div class="what"><strong>Le papillon de nuit</strong><span>On raconte que l'équipe de l'informaticienne Grace Hopper a trouvé un papillon de nuit coincé dans un ordinateur, et l'a collé dans son carnet comme « premier vrai bug ». Le mot « bug » (insecte, en anglais) existait déjà pour parler de pannes, mais cette histoire l'a rendu célèbre.</span></div></li>
+      <li><span class="when">fin des années 1960</span><div class="what"><strong>La tortue</strong><span>Le langage Logo permet aux enfants de programmer une « tortue » qui avance et tourne en dessinant : l'ancêtre de notre robot.</span></div></li>
+      <li><span class="when">années 2000</span><div class="what"><strong>Les langages par blocs</strong><span>Des langages comme Scratch permettent de programmer en assemblant des blocs, sans fautes de frappe. On les utilise beaucoup à l'école.</span></div></li>
+      <li><span class="when">aujourd'hui</span><div class="what"><strong>Des assistants qui écrivent du code</strong><span>Des intelligences artificielles proposent du code. Mais elles se trompent aussi : il faut toujours lire, tester et débugger. Pour savoir comment elles fonctionnent, va voir le tutoriel sur <a class="tlink" href="comment-une-ia-ecrit.html">l'intelligence artificielle</a>.</span></div></li>
+    </ol>
+  </section>
+
+  <!-- 12 -->
+  <section>
+    <span class="eyebrow">Étape 12 · À toi de jouer</span>
+    <h2>Exercices</h2>
+    <div class="exos">
+      <details>
+        <summary>1. Où est le robot ?<span class="q">Le robot est en A1, tourné vers la droite, sur une grille vide. Programme : avancer, avancer, tourner à droite, répéter 3 fois [ avancer ]. Sur quelle case arrive-t-il ? Vers où regarde-t-il ?</span></summary>
+        <div><span>Deux pas vers la droite : C1. Il tourne à droite : il regarde vers le bas. Trois pas : <strong>C4</strong>, tourné <strong>vers le bas</strong>.</span></div>
+      </details>
+      <details>
+        <summary>2. Raccourcis le programme<span class="q">avancer, avancer, tourner à gauche, avancer, avancer, tourner à gauche, avancer, avancer, tourner à gauche. Écris-le avec le moins de blocs possible.</span></summary>
+        <div><span>Le motif « avancer, avancer, tourner à gauche » revient 3 fois : <strong>répéter 3 fois [ avancer, avancer, tourner à gauche ]</strong> (4 blocs au lieu de 9).</span><span>Encore mieux : <strong>répéter 3 fois [ répéter 2 fois [ avancer ], tourner à gauche ]</strong>, aussi 4 blocs, mais facile à changer si on veut 5 pas au lieu de 2.</span></div>
+      </details>
+      <details>
+        <summary>3. Traduis en code texte<span class="q">répéter 2 fois [ avancer, tourner à droite ], puis avancer.</span></summary>
+        <div><pre class="code"><span class="kw">for</span> i <span class="kw">in</span> range(2):
+    avancer()
+    tourner_a_droite()
+avancer()</pre><span>Le dernier <span class="mono">avancer()</span> n'est <strong>pas décalé</strong> : il est après la boucle, donc exécuté une seule fois.</span></div>
+      </details>
+      <details>
+        <summary>4. Le robot qui se lave les mains<span class="q">Écris des instructions assez précises pour qu'un robot se lave les mains. Puis fais-les lire à quelqu'un qui doit les suivre « exactement », comme un robot.</span></summary>
+        <div><span>Exemple : ouvrir le robinet d'eau tiède ; mettre les deux mains sous l'eau ; fermer le robinet ; appuyer une fois sur le savon ; frotter les mains l'une contre l'autre pendant 20 secondes ; rouvrir le robinet ; rincer jusqu'à ce qu'il n'y ait plus de mousse ; fermer le robinet ; sécher avec la serviette.</span><span>Tu peux utiliser une boucle (« répéter jusqu'à ce qu'il n'y ait plus de mousse : rincer ») et une condition (« si le savon est vide, alors prévenir un adulte »).</span></div>
+      </details>
+      <details>
+        <summary>5. Solution du labyrinthe (niveau 5)<span class="q">Essaie d'abord vraiment ! Puis compare.</span></summary>
+        <div><pre class="code"><span class="kw">while not</span> sur_le_drapeau():
+    <span class="kw">if</span> mur_devant():
+        tourner_a_droite()
+    <span class="kw">else</span>:
+        avancer()</pre><span>4 blocs : répéter jusqu'au drapeau [ si mur devant alors [ tourner à droite ] sinon [ avancer ] ]. Ce programme marche pour ce labyrinthe parce que tous ses virages vont à droite.</span></div>
+      </details>
+      <details>
+        <summary>6. Les bugs de Robin (niveau 6)<span class="q">Où étaient les deux bugs ?</span></summary>
+        <div><span>Bug 1 : le premier « répéter » faisait <strong>4</strong> pas au lieu de <strong>5</strong> : le robot tournait trop tôt (erreur « à un près »).</span><span>Bug 2 : après la deuxième rangée, il fallait <strong>tourner à gauche</strong> (pour descendre), pas à droite.</span><span>Programme juste : répéter 2 fois [ répéter 5 fois [ avancer ], tourner à droite, avancer, tourner à droite, répéter 5 fois [ avancer ], tourner à gauche, avancer, tourner à gauche ].</span></div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• Un ordinateur fait <strong>exactement ce qu'on lui dit</strong>, pas ce qu'on veut dire : il faut des instructions précises, dans le bon ordre.</span>
+      <span>• Une <strong>séquence</strong> exécute les blocs un par un, de haut en bas. Le robot tourne selon <strong>sa</strong> direction.</span>
+      <span>• Une <strong>boucle</strong> répète des blocs : le programme est plus court et plus facile à corriger. Une boucle peut en contenir une autre.</span>
+      <span>• Une <strong>condition</strong> (« si mur devant alors … sinon … ») permet au programme de s'adapter. « Répéter jusqu'à » peut devenir une boucle infinie.</span>
+      <span>• Une <strong>variable</strong> garde une valeur qui change : <span class="mono">gemmes = gemmes + 1</span>.</span>
+      <span>• En code texte, c'est le <strong>décalage</strong> (indentation) qui montre ce qui est dans une boucle ou une condition.</span>
+      <span>• Un <strong>bug</strong> est normal. Pour débugger : exécuter pas à pas, trouver le premier moment qui cloche, changer une seule chose.</span>
+    </div>
+  </section>
+
+  <!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"><a class="prev" href="les-pixels-et-la-compression.html"><span>← Précédent</span><strong>Les pixels et la compression</strong></a><a class="next" href="le-temps-d-ecran-et-l-attention.html"><span>Suivant →</span><strong>Le temps d&#x27;écran et l&#x27;attention</strong></a></div><a class="tnav-home" href="numerique.html">⌂ Tous les tutoriels numériques</a></nav><!--/tnav-->
+<footer>Fiche de révision · Programmer pas à pas</footer>
+</main>
+
+<script>
+(function () {
+  /*
+   * Hooks de test : window.__prg
+   *   levels                  -> tableau de 6 niveaux {key, name, concept, text, grid:[lignes], start:{x,y,d}, limit (null ou nombre), given?, solution}
+   *                              grille : '.' vide, '#' mur, '~' eau (obstacle), '*' gemme, 'F' drapeau ; x vers la droite, y vers le bas
+   *                              d : 0 = droite, 1 = bas, 2 = gauche, 3 = haut ; case nommée lettre de colonne + numéro de ligne (A1 en haut à gauche)
+   *   mini                    -> niveau « la ligne » (7 × 1, sans drapeau) de l'étape 8
+   *   build(spec)             -> programme (nœuds avec id) à partir d'une écriture courte :
+   *                              'F' avancer, 'L' tourner à gauche, 'R' tourner à droite, ['rep', n, [...]], ['until', [...]] (jusqu'au drapeau),
+   *                              ['if', [alors], [sinon]] (condition : mur devant, le bord compte comme un mur)
+   *                              nœuds : {t:'fwd'|'left'|'right'|'rep'|'until'|'if', id, n?, body?, then?, els?}
+   *   run(program, level)     -> {status, steps, gems, total, trace, x, y, d, blocks, limit, ok}
+   *                              program : nœuds ou spec ; level : index, key ou objet niveau
+   *                              status : 'win' (au drapeau avec toutes les gemmes), 'missing' (au drapeau, il manque des gemmes),
+   *                                       'wall' (mur), 'out' (sortie de grille), 'end' (programme fini ailleurs), 'max' (plus de 300 instructions)
+   *                              steps = nombre de gestes (avancer / tourner) ; ok = win et blocs <= limite
+   *                              trace : [{id, kind:'fwd'|'left'|'right'|'loop'|'until'|'if', x, y, d, gems, steps, pick?, crash?, k?, n?, res?}]
+   *   toCode(program)         -> texte façon Python (avancer(), tourner_a_gauche(), for i in range(n):, while not sur_le_drapeau():, if mur_devant(): / else:)
+   *   codeLines(program)      -> [{text, id}]
+   *   countBlocks(program)    -> nombre de blocs (une boucle ou une condition compte 1, plus son contenu)
+   *   checkAll()              -> [{level, status, blocks, limit, ok}] pour la solution de chaque niveau
+   *   sandwich, readCode, bugs, preds, quiz : données des autres activités
+   * Rien n'est envoyé ni enregistré : tout reste dans la page.
+   */
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+
+  /* CORE START */
+  var DIRS = [[1, 0], [0, 1], [-1, 0], [0, -1]];
+  var ARROW = ['→', '↓', '←', '↑'];
+  var DIRNAME = ['vers la droite', 'vers le bas', 'vers la gauche', 'vers le haut'];
+  var COLS = 'ABCDEFGHIJ';
+  var MAX_TICKS = 300, MAX_BLOCKS = 30, MAX_REP = 12;
+  function cellName(x, y) { return COLS.charAt(x) + (y + 1); }
+
+  var uid = 0;
+  function mk(t, a, b) {
+    uid += 1;
+    var n = { t: t, id: 'b' + uid };
+    if (t === 'rep') { n.n = a; n.body = b || []; }
+    else if (t === 'until') { n.body = a || []; }
+    else if (t === 'if') { n.cond = 'wall'; n.then = a || []; n.els = b || []; }
+    return n;
+  }
+  function build(spec) {
+    return (spec || []).map(function (s) {
+      if (s && typeof s === 'object' && !Array.isArray(s)) return s;
+      if (s === 'F') return mk('fwd');
+      if (s === 'L') return mk('left');
+      if (s === 'R') return mk('right');
+      if (Array.isArray(s) && s[0] === 'rep') return mk('rep', s[1], build(s[2]));
+      if (Array.isArray(s) && s[0] === 'until') return mk('until', build(s[1]));
+      if (Array.isArray(s) && s[0] === 'if') return mk('if', build(s[1]), build(s[2]));
+      throw new Error('bloc inconnu : ' + s);
+    });
+  }
+  function clone(list) {
+    return list.map(function (n) {
+      if (n.t === 'rep') return mk('rep', n.n, clone(n.body));
+      if (n.t === 'until') return mk('until', clone(n.body));
+      if (n.t === 'if') return mk('if', clone(n.then), clone(n.els));
+      return mk(n.t);
+    });
+  }
+  function kids(n) { return n.t === 'if' ? [n.then, n.els] : (n.body ? [n.body] : []); }
+  function countBlocks(list) {
+    list = build(list || []);
+    var c = 0;
+    list.forEach(function (n) { c += 1; kids(n).forEach(function (k) { c += countBlocks(k); }); });
+    return c;
+  }
+
+  var LEVELS = [
+    { key: 'premiers-pas', name: 'Premiers pas', concept: 'séquence',
+      text: 'Amène le robot jusqu’au drapeau, sans toucher les murs.',
+      grid: ['..#....', '..#.##.', '..#....', '...F.#.', '.##..#.', '.##....', '....#..'],
+      start: { x: 0, y: 6, d: 0 }, limit: null,
+      solution: ['F', 'F', 'F', 'L', 'F', 'F', 'F'] },
+    { key: 'cueillette', name: 'La cueillette', concept: 'séquence',
+      text: 'Ramasse les 3 gemmes, puis va au drapeau. Le robot ramasse une gemme en passant dessus.',
+      grid: ['..*#...', '##.#.#.', '#.*.*#.', '#.##.#.', '....F..', '.###.#.', '.......'],
+      start: { x: 0, y: 0, d: 0 }, limit: null,
+      solution: ['F', 'F', 'R', 'F', 'F', 'L', 'F', 'F', 'R', 'F', 'F'] },
+    { key: 'escalier', name: 'L’escalier', concept: 'boucle',
+      text: 'Monte l’escalier, ramasse les 5 gemmes et atteins le drapeau. Défi : 5 blocs maximum. Indice : quels blocs reviennent à chaque marche ?',
+      grid: ['.....#F', '....#*.', '...#*..', '..#*...', '.#*....', '#*.....', '.......'],
+      start: { x: 0, y: 6, d: 0 }, limit: 5,
+      solution: [['rep', 6, ['F', 'L', 'F', 'R']]] },
+    { key: 'tour-du-lac', name: 'Le tour du lac', concept: 'boucles imbriquées',
+      text: 'Fais le tour du lac, ramasse les 7 gemmes et finis au drapeau. Défi : 5 blocs maximum. Indice : une boucle peut contenir une autre boucle.',
+      grid: ['#######', '#..*.*#', '#F~~~.#', '#.~~~*#', '#*~~~.#', '#*.*.*#', '#######'],
+      start: { x: 1, y: 1, d: 0 }, limit: 5,
+      solution: [['rep', 4, [['rep', 4, ['F']], 'R']]] },
+    { key: 'labyrinthe', name: 'Le labyrinthe', concept: 'condition',
+      text: 'Le couloir tourne souvent, et jamais après le même nombre de cases. Trouve le drapeau en 5 blocs maximum. Indice : utilise « si mur devant » dans « répéter jusqu’au drapeau ».',
+      grid: ['.......', '######.', '.....#.', '.###*#*', '*#F..#.', '.#####.', '.......'],
+      start: { x: 0, y: 0, d: 0 }, limit: 5,
+      solution: [['until', [['if', ['R'], ['F']]]]] },
+    { key: 'bug-robin', name: 'Chasse au bug', concept: 'débugger',
+      text: 'Le programme de Robin devrait ramasser les 5 gemmes, rangée par rangée, et finir au drapeau. Il contient 2 bugs : trouve-les et corrige-les (11 blocs maximum).',
+      grid: ['.....*#', '..*...#', '...*..#', '.*...*#', 'F######'],
+      start: { x: 0, y: 0, d: 0 }, limit: 11,
+      given: [['rep', 2, [['rep', 4, ['F']], 'R', 'F', 'R', ['rep', 5, ['F']], 'R', 'F', 'L']]],
+      solution: [['rep', 2, [['rep', 5, ['F']], 'R', 'F', 'R', ['rep', 5, ['F']], 'L', 'F', 'L']]] }
+  ];
+  var MINI = { key: 'ligne', name: 'La ligne', concept: 'variable', text: '', grid: ['.**.**.'], start: { x: 0, y: 0, d: 0 }, limit: null };
+  LEVELS.forEach(function (L) { L.solution = build(L.solution); if (L.given) L.given = build(L.given); });
+
+  function parse(L) {
+    var P = { W: L.grid[0].length, H: L.grid.length, walls: {}, water: {}, gems: {}, total: 0, goal: null };
+    L.grid.forEach(function (row, y) {
+      for (var x = 0; x < row.length; x++) {
+        var c = row.charAt(x), k = x + ',' + y;
+        if (c === '#') P.walls[k] = true;
+        else if (c === '~') { P.walls[k] = true; P.water[k] = true; }
+        else if (c === '*') { P.gems[k] = true; P.total += 1; }
+        else if (c === 'F') P.goal = { x: x, y: y };
+      }
+    });
+    return P;
+  }
+  function getLevel(level) {
+    if (typeof level === 'number') return LEVELS[level];
+    if (typeof level === 'string') return LEVELS.filter(function (L) { return L.key === level; })[0] || (level === 'ligne' ? MINI : null);
+    return level;
+  }
+
+  function run(program, level) {
+    var L = getLevel(level);
+    if (!L) throw new Error('niveau inconnu');
+    var P = parse(L), prog = build(program || []);
+    var x = L.start.x, y = L.start.y, d = L.start.d, gems = 0, steps = 0, ticks = 0, status = null, trace = [], got = {};
+    function push(n, kind, extra) {
+      var e = { id: n.id, kind: kind, x: x, y: y, d: d, gems: gems, steps: steps };
+      for (var k in extra) if (Object.prototype.hasOwnProperty.call(extra, k)) e[k] = extra[k];
+      trace.push(e);
+    }
+    function tick() { ticks += 1; if (ticks > MAX_TICKS) { status = 'max'; return false; } return true; }
+    function ahead() {
+      var nx = x + DIRS[d][0], ny = y + DIRS[d][1];
+      return { nx: nx, ny: ny, out: nx < 0 || ny < 0 || nx >= P.W || ny >= P.H, wall: !!P.walls[nx + ',' + ny] };
+    }
+    function exec(list) {
+      for (var i = 0; i < list.length; i++) {
+        if (status) return;
+        var n = list[i];
+        if (!tick()) return;
+        if (n.t === 'fwd') {
+          steps += 1;
+          var a = ahead();
+          if (a.out || a.wall) { status = a.out ? 'out' : 'wall'; push(n, 'fwd', { crash: status }); return; }
+          x = a.nx; y = a.ny;
+          var key = x + ',' + y, pick = null;
+          if (P.gems[key] && !got[key]) { got[key] = true; gems += 1; pick = key; }
+          push(n, 'fwd', { pick: pick });
+          if (P.goal && x === P.goal.x && y === P.goal.y) status = gems === P.total ? 'win' : 'missing';
+        } else if (n.t === 'left' || n.t === 'right') {
+          steps += 1;
+          d = (d + (n.t === 'left' ? 3 : 1)) % 4;
+          push(n, n.t, {});
+        } else if (n.t === 'rep') {
+          var cnt = Math.max(0, Math.min(99, Math.floor(Number(n.n) || 0)));
+          for (var r = 0; r < cnt; r++) {
+            if (status) return;
+            if (r > 0 && !tick()) return;
+            push(n, 'loop', { k: r + 1, n: cnt });
+            exec(n.body);
+          }
+        } else if (n.t === 'until') {
+          var first = true;
+          while (!status) {
+            if (!first && !tick()) return;
+            first = false;
+            push(n, 'until', {});
+            exec(n.body);
+          }
+        } else if (n.t === 'if') {
+          var b = ahead(), res = b.out || b.wall;
+          push(n, 'if', { res: res });
+          exec(res ? n.then : n.els);
+        }
+      }
+    }
+    exec(prog);
+    if (!status) status = 'end';
+    var blocks = countBlocks(prog), limit = L.limit == null ? null : L.limit;
+    return { status: status, steps: steps, gems: gems, total: P.total, trace: trace, x: x, y: y, d: d, blocks: blocks, limit: limit,
+      ok: status === 'win' && (limit === null || blocks <= limit) };
+  }
+
+  function codeLines(program) {
+    var prog = build(program || []), out = [], V = ['i', 'j', 'k', 'm'];
+    function w(list, ind, depth) {
+      var pad = new Array(ind + 1).join('    ');
+      if (!list.length) { out.push({ text: pad + 'pass  # vide', id: null }); return; }
+      list.forEach(function (n) {
+        if (n.t === 'fwd') out.push({ text: pad + 'avancer()', id: n.id });
+        else if (n.t === 'left') out.push({ text: pad + 'tourner_a_gauche()', id: n.id });
+        else if (n.t === 'right') out.push({ text: pad + 'tourner_a_droite()', id: n.id });
+        else if (n.t === 'rep') { out.push({ text: pad + 'for ' + V[Math.min(depth, 3)] + ' in range(' + n.n + '):', id: n.id }); w(n.body, ind + 1, depth + 1); }
+        else if (n.t === 'until') { out.push({ text: pad + 'while not sur_le_drapeau():', id: n.id }); w(n.body, ind + 1, depth); }
+        else if (n.t === 'if') {
+          out.push({ text: pad + 'if mur_devant():', id: n.id });
+          w(n.then, ind + 1, depth);
+          if (n.els.length) { out.push({ text: pad + 'else:', id: n.id + ':else' }); w(n.els, ind + 1, depth); }
+        }
+      });
+    }
+    if (!prog.length) return [{ text: '# programme vide : ajoute des blocs', id: null }];
+    w(prog, 0, 0);
+    return out;
+  }
+  function toCode(program) { return codeLines(program).map(function (l) { return l.text; }).join('\n'); }
+  function checkAll() {
+    return LEVELS.map(function (L, i) { var r = run(L.solution, i); return { level: i, status: r.status, blocks: r.blocks, limit: r.limit, ok: r.ok }; });
+  }
+  /* CORE END */
+
+  /* ---------- Dessin de la grille ---------- */
+  function boardState(L, res, idx) {
+    var st = { x: L.start.x, y: L.start.y, d: L.start.d, picked: {}, trail: [[L.start.x, L.start.y]], crash: null, gems: 0, steps: 0 };
+    if (!res) return st;
+    for (var i = 0; i <= idx && i < res.trace.length; i++) {
+      var e = res.trace[i];
+      st.x = e.x; st.y = e.y; st.d = e.d; st.gems = e.gems; st.steps = e.steps; st.crash = e.crash || null;
+      if (e.pick) st.picked[e.pick] = true;
+      if (e.kind === 'fwd' && !e.crash) st.trail.push([e.x, e.y]);
+    }
+    return st;
+  }
+  function drawBoard(svg, L, st) {
+    var P = parse(L), C = 90, M = 36, W = P.W, H = P.H, h = '';
+    svg.setAttribute('viewBox', '0 0 ' + (M + W * C + 6) + ' ' + (M + H * C + 6));
+    var x, y;
+    for (x = 0; x < W; x++) h += '<text class="lbl" x="' + (M + x * C + C / 2) + '" y="26" text-anchor="middle">' + COLS.charAt(x) + '</text>';
+    for (y = 0; y < H; y++) h += '<text class="lbl" x="17" y="' + (M + y * C + C / 2 + 8) + '" text-anchor="middle">' + (y + 1) + '</text>';
+    for (y = 0; y < H; y++) for (x = 0; x < W; x++) {
+      var k = x + ',' + y, X = M + x * C, Y = M + y * C;
+      if (P.water[k]) h += '<rect class="water" x="' + X + '" y="' + Y + '" width="' + C + '" height="' + C + '"/><path class="wave" d="M' + (X + 15) + ' ' + (Y + 40) + ' q15 -10 30 0 t30 0 M' + (X + 15) + ' ' + (Y + 60) + ' q15 -10 30 0 t30 0"/>';
+      else if (P.walls[k]) h += '<rect class="wall" x="' + X + '" y="' + Y + '" width="' + C + '" height="' + C + '"/><path class="brick" d="M' + X + ' ' + (Y + 30) + ' h' + C + ' M' + X + ' ' + (Y + 60) + ' h' + C + ' M' + (X + 45) + ' ' + Y + ' v30 M' + (X + 22) + ' ' + (Y + 30) + ' v30 M' + (X + 67) + ' ' + (Y + 30) + ' v30 M' + (X + 45) + ' ' + (Y + 60) + ' v30"/>';
+      else h += '<rect class="cell" x="' + X + '" y="' + Y + '" width="' + C + '" height="' + C + '"/>';
+    }
+    if (st.trail.length > 1) h += '<polyline class="trail" points="' + st.trail.map(function (p) { return (M + p[0] * C + C / 2) + ',' + (M + p[1] * C + C / 2); }).join(' ') + '"/>';
+    Object.keys(P.gems).forEach(function (k) {
+      if (st.picked[k]) return;
+      var p = k.split(','), cx = M + Number(p[0]) * C + C / 2, cy = M + Number(p[1]) * C + C / 2;
+      h += '<polygon class="gem" points="' + cx + ',' + (cy - 24) + ' ' + (cx + 20) + ',' + cy + ' ' + cx + ',' + (cy + 24) + ' ' + (cx - 20) + ',' + cy + '"/>';
+    });
+    if (P.goal) {
+      var gx = M + P.goal.x * C + C / 2, gy = M + P.goal.y * C + C / 2;
+      h += '<line class="pole" x1="' + (gx - 16) + '" y1="' + (gy + 30) + '" x2="' + (gx - 16) + '" y2="' + (gy - 30) + '"/><polygon class="flagc" points="' + (gx - 16) + ',' + (gy - 30) + ' ' + (gx + 26) + ',' + (gy - 16) + ' ' + (gx - 16) + ',' + (gy - 2) + '"/>';
+    }
+    var rx = M + st.x * C + C / 2, ry = M + st.y * C + C / 2;
+    h += '<g transform="translate(' + rx + ' ' + ry + ') rotate(' + (st.d * 90) + ')"><rect class="rb' + (st.crash ? ' crash' : '') + '" x="-30" y="-27" width="52" height="54" rx="13"/>' +
+      '<circle class="eye" cx="8" cy="-11" r="8"/><circle class="eye" cx="8" cy="11" r="8"/><circle class="pup" cx="11" cy="-11" r="3.5"/><circle class="pup" cx="11" cy="11" r="3.5"/>' +
+      '<polygon class="nose" points="25,-10 38,0 25,10"/></g>';
+    if (st.crash) {
+      var bx = rx + DIRS[st.d][0] * C / 2, by = ry + DIRS[st.d][1] * C / 2, pts = [];
+      for (var i = 0; i < 16; i++) { var r = i % 2 ? 9 : 22, a = i * Math.PI / 8; pts.push((bx + r * Math.cos(a)).toFixed(1) + ',' + (by + r * Math.sin(a)).toFixed(1)); }
+      h += '<polygon class="boom" points="' + pts.join(' ') + '"/>';
+    }
+    svg.innerHTML = h;
+    svg.setAttribute('aria-label', 'Grille de ' + W + ' colonnes sur ' + H + ' lignes. Robot en ' + cellName(st.x, st.y) + ', ' + DIRNAME[st.d] + (st.crash ? ', bloqué' : '') + '.');
+  }
+
+  function blockLabel(n) {
+    return { fwd: 'avancer', left: 'tourner à gauche ↺', right: 'tourner à droite ↻', until: 'répéter jusqu’au drapeau', 'if': 'si mur devant alors' }[n.t] || ('répéter ' + n.n + ' fois');
+  }
+  function blockClass(n) { return { fwd: 'mv', left: 'mv', right: 'mv', rep: 'ctl', until: 'ctl', 'if': 'cnd' }[n.t]; }
+  function staticBlocks(list) {
+    return '<ul class="sb">' + list.map(function (n) {
+      var h = '<li><span class="blk ' + blockClass(n) + '">' + esc(blockLabel(n)) + '</span>';
+      if (n.t === 'rep' || n.t === 'until') h += staticBlocks(n.body);
+      if (n.t === 'if') h += '<ul class="sb cnd"><li>' + staticBlocks(n.then) + '</li><li><span class="itag">sinon</span>' + staticBlocks(n.els) + '</li></ul>';
+      return h + '</li>';
+    }).join('') + '</ul>';
+  }
+  function codeHTML(lines, curId) {
+    var hit = false;
+    return lines.map(function (l) {
+      var t = esc(l.text).replace(/^(\s*)(for|while not|if|else)\b/, '$1<span class="kw">$2</span>').replace(/ in range/, ' <span class="kw">in</span> range').replace(/(#.*)$/, '<span class="cm">$1</span>');
+      var on = !hit && curId && l.id === curId;
+      if (on) hit = true;
+      return '<span class="cl' + (on ? ' cur' : '') + '">' + (t || ' ') + '</span>';
+    }).join('\n');
+  }
+  function plural(n, s) { return n + ' ' + s + (n > 1 ? 's' : ''); }
+
+  /* ---------- Atelier du robot ---------- */
+  function entryText(e) {
+    if (e.kind === 'fwd') return 'avancer' + (e.crash ? (e.crash === 'out' ? ' : sort de la grille !' : ' : BOUM, un mur !') : (e.pick ? ' : gemme ramassée, gemmes = ' + e.gems : ''));
+    if (e.kind === 'left') return 'tourner à gauche';
+    if (e.kind === 'right') return 'tourner à droite';
+    if (e.kind === 'loop') return 'répéter : tour ' + e.k + ' sur ' + e.n;
+    if (e.kind === 'until') return 'pas encore au drapeau : on continue';
+    if (e.kind === 'if') return 'mur devant ? ' + (e.res ? 'oui → alors' : 'non → sinon');
+    return e.kind;
+  }
+
+  function makeWorkshop(root) {
+    var ids = root.getAttribute('data-levels').split(',').map(Number);
+    var progs = {}, solved = {};
+    ids.forEach(function (i) { progs[i] = LEVELS[i].given ? clone(LEVELS[i].given) : []; });
+    var cur = ids[0], target = 'root', res = null, idx = -1, timer = null;
+
+    root.innerHTML =
+      (ids.length > 1 ? '<div class="btns lvls" role="group" aria-label="Choix du niveau"></div>' : '') +
+      '<h3 class="lvname"></h3><p class="lvtext"></p>' +
+      '<div class="ws-grid">' +
+        '<div><svg class="board" role="img"></svg><div class="hud" aria-live="polite"></div></div>' +
+        '<div class="side">' +
+          '<strong>Ajoute un bloc</strong>' +
+          '<div class="pal" role="group" aria-label="Ajouter un bloc">' +
+            '<button type="button" class="mv" data-add="fwd">avancer</button>' +
+            '<button type="button" class="mv" data-add="left">tourner à gauche ↺</button>' +
+            '<button type="button" class="mv" data-add="right">tourner à droite ↻</button>' +
+            '<button type="button" class="ctl" data-add="rep">répéter … fois</button>' +
+            '<button type="button" class="ctl" data-add="until">répéter jusqu’au drapeau</button>' +
+            '<button type="button" class="cnd" data-add="if">si mur devant… sinon…</button>' +
+          '</div>' +
+          '<strong>Ton programme <span class="soft mono cnt"></span></strong>' +
+          '<div class="prog"></div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="btns">' +
+        '<button type="button" data-run="step">Pas à pas</button>' +
+        '<button type="button" data-run="all">Tout exécuter</button>' +
+        '<button type="button" data-run="reset">Remettre au départ</button>' +
+        '<button type="button" data-run="clear">Tout effacer</button>' +
+        '<button type="button" data-run="given" hidden>Reprendre le programme de Robin</button>' +
+      '</div>' +
+      '<label class="chk"><input type="checkbox" class="instant"> Sans animation (résultat tout de suite)</label>' +
+      '<p class="status" aria-live="polite"></p>' +
+      '<div class="verdict" aria-live="polite"></div>' +
+      '<div><strong>Le même programme en code texte</strong><pre class="code"></pre></div>' +
+      '<details class="journal"><summary>Journal du robot (une ligne par instruction)</summary><div class="scroll"><table><thead><tr><th>n°</th><th>instruction</th><th>case</th><th>regard</th><th>gemmes</th></tr></thead><tbody></tbody></table></div></details>';
+
+    function q(s) { return root.querySelector(s); }
+    var svg = q('.board'), progBox = q('.prog');
+
+    function findNode(list, id) {
+      for (var i = 0; i < list.length; i++) {
+        var n = list[i];
+        if (n.id === id) return { node: n, list: list, i: i };
+        var ks = kids(n);
+        for (var j = 0; j < ks.length; j++) { var r = findNode(ks[j], id); if (r) return r; }
+      }
+      return null;
+    }
+    function container(key) {
+      if (key === 'root') return progs[cur];
+      var p = key.split(':'), f = findNode(progs[cur], p[0]);
+      return f && f.node[p[1]] ? f.node[p[1]] : null;
+    }
+    function slotHTML(key, label) {
+      var on = target === key;
+      return '<button type="button" class="slot" data-slot="' + key + '" aria-pressed="' + on + '">＋ ajouter ' + label + '</button>';
+    }
+    function listHTML(list, key, label) {
+      var h = '<ol class="plist">';
+      list.forEach(function (n, i) { h += itemHTML(n, i, list.length); });
+      return h + '</ol>' + slotHTML(key, label);
+    }
+    function itemHTML(n, i, len) {
+      var lab, inner = '';
+      if (n.t === 'rep') lab = 'répéter <button type="button" class="mini" data-act="minus" aria-label="Une fois de moins">−</button><b class="mono">' + n.n + '</b><button type="button" class="mini" data-act="plus" aria-label="Une fois de plus">+</button> fois';
+      else lab = esc(blockLabel(n));
+      var ctl = (n.t === 'left' || n.t === 'right' ? '<button type="button" class="mini" data-act="flip" aria-label="Changer le sens du virage">⇄</button>' : '') +
+        '<button type="button" class="mini" data-act="up" aria-label="Monter ce bloc"' + (i === 0 ? ' disabled' : '') + '>↑</button>' +
+        '<button type="button" class="mini" data-act="down" aria-label="Descendre ce bloc"' + (i === len - 1 ? ' disabled' : '') + '>↓</button>' +
+        '<button type="button" class="mini" data-act="del" aria-label="Supprimer ce bloc">✕</button>';
+      if (n.t === 'rep' || n.t === 'until') inner = '<div class="inner">' + listHTML(n.body, n.id + ':body', 'dans la boucle') + '</div>';
+      if (n.t === 'if') inner = '<div class="inner">' + listHTML(n.then, n.id + ':then', 'dans « alors »') + '<span class="itag">sinon</span>' + listHTML(n.els, n.id + ':els', 'dans « sinon »') + '</div>';
+      return '<li class="pb ' + blockClass(n) + '" data-id="' + n.id + '"><div class="prow"><span class="plab">' + lab + '</span><span class="pctl">' + ctl + '</span></div>' + inner + '</li>';
+    }
+    function renderEditor() {
+      if (!container(target)) target = 'root';
+      progBox.innerHTML = listHTML(progs[cur], 'root', 'à la fin du programme');
+      var L = LEVELS[cur], b = countBlocks(progs[cur]);
+      var c = q('.cnt');
+      c.textContent = '(' + plural(b, 'bloc') + (L.limit ? ' / ' + L.limit + ' max' : '') + ')';
+      c.style.color = L.limit && b > L.limit ? 'var(--red)' : '';
+    }
+    function curId() { return res && idx >= 0 && res.trace[idx] ? res.trace[idx].id : null; }
+    function show() {
+      var L = LEVELS[cur], st = boardState(L, res, idx), P = parse(L);
+      drawBoard(svg, L, st);
+      var b = countBlocks(progs[cur]);
+      q('.hud').innerHTML = '<span>gemmes = <b>' + st.gems + '</b>' + (P.total ? ' / ' + P.total : '') + '</span><span>gestes : <b>' + st.steps + '</b></span><span' + (L.limit && b > L.limit ? ' class="over"' : '') + '>blocs : <b>' + b + '</b>' + (L.limit ? ' / ' + L.limit + ' max' : '') + '</span>';
+      var id = curId();
+      Array.prototype.forEach.call(progBox.querySelectorAll('.pb.cur'), function (el) { el.classList.remove('cur'); });
+      if (id) { var el = progBox.querySelector('[data-id="' + id + '"]'); if (el) el.classList.add('cur'); }
+      var codeId = id;
+      if (res && idx >= 0 && res.trace[idx].kind === 'if' && !res.trace[idx].res) {
+        var f = findNode(progs[cur], id);
+        if (f && f.node.els.length) codeId = id + ':else';
+      }
+      q('pre.code').innerHTML = codeHTML(codeLines(progs[cur]), codeId);
+      var rows = '';
+      if (res) for (var i = 0; i <= idx && i < res.trace.length; i++) {
+        var e = res.trace[i];
+        rows += '<tr' + (i === idx ? ' class="last"' : '') + '><td class="n">' + (i + 1) + '</td><td>' + esc(entryText(e)) + '</td><td class="n">' + cellName(e.x, e.y) + '</td><td class="n">' + ARROW[e.d] + '</td><td class="n">' + e.gems + '</td></tr>';
+      }
+      q('.journal tbody').innerHTML = rows || '<tr><td colspan="5" class="soft">Lance le programme pour remplir le journal.</td></tr>';
+      var s = q('.status');
+      if (!res || idx < 0) s.textContent = 'Robot en ' + cellName(L.start.x, L.start.y) + ', ' + DIRNAME[L.start.d] + '.';
+      else s.textContent = 'Instruction ' + (idx + 1) + ' sur ' + res.trace.length + ' : ' + entryText(res.trace[idx]);
+    }
+    function verdict() {
+      var v = q('.verdict'), L = LEVELS[cur];
+      if (!res) { v.className = 'verdict'; v.innerHTML = ''; return; }
+      var where = cellName(res.x, res.y), cls, msg;
+      if (!progs[cur].length) { cls = 'mid'; msg = 'Ton programme est vide.<span>Touche des blocs pour l’écrire.</span>'; }
+      else if (res.status === 'win' && res.ok) {
+        cls = 'yes'; solved[cur] = true;
+        msg = 'Bravo, niveau réussi !<span>Le robot est au drapeau' + (res.total ? ' avec ' + plural(res.gems, 'gemme') : '') + ', en ' + plural(res.blocks, 'bloc') + ' et ' + plural(res.steps, 'geste') + '.' + (L.limit === null && cur === 1 ? ' Tu as écrit plusieurs fois les mêmes blocs ? L’étape suivante va t’aider.' : '') + '</span>';
+        renderLevels();
+      }
+      else if (res.status === 'win') { cls = 'mid'; msg = 'Le robot arrive… mais ton programme a ' + res.blocks + ' blocs.<span>Le défi, c’est ' + res.limit + ' blocs maximum. Cherche ce qui se répète et mets-le dans une boucle.</span>'; }
+      else if (res.status === 'missing') { cls = 'mid'; msg = 'Au drapeau, mais il manque ' + plural(res.total - res.gems, 'gemme') + '.<span>Le robot doit passer sur toutes les gemmes avant d’arriver.</span>'; }
+      else if (res.status === 'wall') { cls = 'no'; msg = 'BOUM ! Le robot a foncé dans un mur depuis ' + where + '.<span>L’instruction surlignée est celle qui a coincé. Que devait faire le robot juste avant ?</span>'; }
+      else if (res.status === 'out') { cls = 'no'; msg = 'Oups, le robot est sorti de la grille depuis ' + where + '.<span>L’instruction surlignée est celle qui a coincé. As-tu compté les pas ou les cases ?</span>'; }
+      else if (res.status === 'max') { cls = 'no'; msg = 'Stop : plus de ' + MAX_TICKS + ' instructions !<span>Le robot tourne en rond : c’est une boucle infinie. Regarde le journal pour voir ce qui se répète.</span>'; }
+      else { cls = 'mid'; msg = 'Le programme est fini, mais le robot est en ' + where + ', pas au drapeau.<span>Il manque des blocs, ou une boucle ne tourne pas assez de fois.</span>'; }
+      v.className = 'verdict ' + cls; v.innerHTML = msg;
+    }
+    function stop() { if (timer) { clearInterval(timer); timer = null; } }
+    function changed() { stop(); res = null; idx = -1; renderEditor(); show(); verdict(); }
+    function ensureRun() { if (!res) { res = run(progs[cur], cur); idx = -1; } }
+    function renderLevels() {
+      var g = q('.lvls');
+      if (g) g.innerHTML = ids.map(function (i) { return '<button type="button" data-lv="' + i + '" aria-pressed="' + (i === cur) + '">Niveau ' + (i + 1) + ' · ' + esc(LEVELS[i].name) + (solved[i] ? ' ✓' : '') + '</button>'; }).join('');
+      q('.lvname').textContent = 'Niveau ' + (cur + 1) + ' · ' + LEVELS[cur].name + (solved[cur] ? ' ✓' : '');
+    }
+    function setLevel(i) {
+      cur = i; target = 'root';
+      q('.lvtext').textContent = LEVELS[i].text;
+      q('[data-run="given"]').hidden = !LEVELS[i].given;
+      renderLevels(); changed();
+    }
+
+    root.addEventListener('click', function (e) {
+      var b = e.target.closest('button');
+      if (!b || !root.contains(b)) return;
+      if (b.hasAttribute('data-lv')) { stop(); setLevel(Number(b.getAttribute('data-lv'))); return; }
+      if (b.hasAttribute('data-add')) {
+        var c = container(target) || progs[cur];
+        if (countBlocks(progs[cur]) >= MAX_BLOCKS) { q('.status').textContent = 'Maximum ' + MAX_BLOCKS + ' blocs : enlève-en avant d’en ajouter.'; return; }
+        var t = b.getAttribute('data-add'), n = t === 'rep' ? mk('rep', 3, []) : (t === 'until' ? mk('until', []) : (t === 'if' ? mk('if', [], []) : mk(t)));
+        c.push(n);
+        if (t === 'rep' || t === 'until') target = n.id + ':body';
+        if (t === 'if') target = n.id + ':then';
+        changed(); return;
+      }
+      if (b.hasAttribute('data-slot')) { target = b.getAttribute('data-slot'); renderEditor(); show(); return; }
+      if (b.hasAttribute('data-act')) {
+        var li = b.closest('[data-id]'), f = li && findNode(progs[cur], li.getAttribute('data-id'));
+        if (!f) return;
+        var act = b.getAttribute('data-act'), tmp;
+        if (act === 'del') f.list.splice(f.i, 1);
+        else if (act === 'up' && f.i > 0) { tmp = f.list[f.i - 1]; f.list[f.i - 1] = f.node; f.list[f.i] = tmp; }
+        else if (act === 'down' && f.i < f.list.length - 1) { tmp = f.list[f.i + 1]; f.list[f.i + 1] = f.node; f.list[f.i] = tmp; }
+        else if (act === 'flip') f.node.t = f.node.t === 'left' ? 'right' : 'left';
+        else if (act === 'minus') f.node.n = Math.max(1, f.node.n - 1);
+        else if (act === 'plus') f.node.n = Math.min(MAX_REP, f.node.n + 1);
+        changed(); return;
+      }
+      var r = b.getAttribute('data-run');
+      if (!r) return;
+      if (r === 'reset') { stop(); res = null; idx = -1; show(); verdict(); return; }
+      if (r === 'clear') { progs[cur] = []; target = 'root'; changed(); return; }
+      if (r === 'given') { progs[cur] = clone(LEVELS[cur].given); target = 'root'; changed(); return; }
+      if (r === 'step') {
+        stop(); ensureRun();
+        var last = res.trace.length - 1;
+        if (last < 0) { show(); verdict(); return; }
+        if (idx >= last) { idx = -1; q('.verdict').className = 'verdict'; q('.verdict').innerHTML = ''; }
+        idx += 1; show();
+        if (idx >= last) verdict();
+        return;
+      }
+      if (r === 'all') {
+        stop(); ensureRun();
+        var end = res.trace.length - 1;
+        if (idx >= end) idx = -1;
+        q('.verdict').className = 'verdict'; q('.verdict').innerHTML = '';
+        if (end < 0 || q('.instant').checked) { idx = end; show(); verdict(); return; }
+        show();
+        timer = setInterval(function () {
+          if (!res) { stop(); return; }
+          idx += 1; show();
+          if (idx >= res.trace.length - 1) { stop(); verdict(); }
+        }, Math.round(Math.max(80, Math.min(300, 12000 / (res.trace.length || 1)))));
+      }
+    });
+    setLevel(cur);
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('.ws'), makeWorkshop);
+
+  /* ---------- Étape 1 : le robot cuisinier ---------- */
+  var SAND = [
+    { t: 'Mets le beurre sur le pain.', ok: false, why: 'Le robot pose la plaquette de beurre entière, encore emballée, sur le sachet de pain fermé. Il a obéi !' },
+    { t: 'Ouvre le sachet de pain et sors-en 2 tranches.', ok: true, why: 'On sait quoi faire, avec quoi, et combien.' },
+    { t: 'Étale du beurre.', ok: false, why: 'Étaler où ? Avec quoi ? Le robot étale le beurre… sur la table, avec ses pinces.' },
+    { t: 'Prends le couteau par le manche.', ok: true, why: 'Précis. Sans « par le manche », il pourrait l’attraper par la lame.' },
+    { t: 'Mets du fromage.', ok: false, why: 'Combien ? Où ? Le robot vide les trois paquets de fromage du frigo par terre.' },
+    { t: 'Pose 1 tranche de fromage sur la tranche beurrée, côté beurre.', ok: true, why: 'On sait quoi, combien, où et dans quel sens.' },
+    { t: 'Ferme le sandwich.', ok: false, why: 'Fermer ? Le robot cherche une fermeture éclair sur le pain, puis s’arrête : « Fermeture introuvable. »' },
+    { t: 'Pose la 2e tranche de pain sur le fromage.', ok: true, why: 'Parfait : le robot sait exactement quoi poser, et où.' }
+  ];
+  var sandDone = [];
+  function renderSand() {
+    sandDone = [];
+    $('sandList').innerHTML = SAND.map(function (s, k) {
+      return '<li><span class="ins">« ' + esc(s.t) + ' »</span><div class="btns"><button type="button" data-sk="' + k + '" data-sv="1">Assez précis</button><button type="button" data-sk="' + k + '" data-sv="0">Trop flou</button></div><span class="fb" id="sf' + k + '" aria-live="polite"></span></li>';
+    }).join('');
+    $('sandScore').textContent = '0 / ' + SAND.length;
+  }
+  $('sandList').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-sk]');
+    if (!b) return;
+    var k = Number(b.getAttribute('data-sk')), v = b.getAttribute('data-sv') === '1', s = SAND[k], fb = $('sf' + k);
+    Array.prototype.forEach.call(b.parentNode.querySelectorAll('button'), function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+    sandDone[k] = v === s.ok;
+    fb.className = 'fb ' + (sandDone[k] ? 'ok' : 'no');
+    fb.innerHTML = '<strong>' + (sandDone[k] ? 'Oui ! ' : 'Pas tout à fait. ') + (s.ok ? 'C’est assez précis.' : 'C’est trop flou.') + '</strong> <span>' + esc(s.why) + '</span>';
+    $('sandScore').textContent = sandDone.filter(Boolean).length + ' / ' + SAND.length;
+  });
+  $('sandReset').addEventListener('click', renderSand);
+  renderSand();
+
+  /* ---------- Étape 5 : que fait ce code ? ---------- */
+  var READ = [
+    { code: 'for i in range(3):\n    avancer()\ntourner_a_gauche()', o: ['Il avance 3 fois, puis tourne à gauche une seule fois.', 'Il avance puis tourne à gauche, et ça 3 fois de suite.', 'Il tourne à gauche 3 fois.'], a: 0,
+      how: 'Seul avancer() est décalé : lui seul est dans la boucle. tourner_a_gauche() vient après, une fois.' },
+    { code: 'for i in range(3):\n    avancer()\n    tourner_a_gauche()', o: ['Il avance 3 fois, puis tourne à gauche une seule fois.', 'Il avance puis tourne à gauche, et ça 3 fois de suite.', 'Il avance une fois, puis tourne 3 fois.'], a: 1,
+      how: 'Les deux lignes sont décalées : les deux sont dans la boucle, répétées 3 fois.' },
+    { code: 'while not sur_le_drapeau():\n    if mur_devant():\n        tourner_a_droite()\n    else:\n        avancer()', o: ['Il avance tout droit jusqu’au premier mur, puis s’arrête.', 'Tant qu’il n’est pas au drapeau : s’il y a un mur devant, il tourne à droite, sinon il avance.', 'Il tourne à droite à chaque case.'], a: 1,
+      how: 'C’est la solution du labyrinthe : la condition est testée à chaque tour de la boucle.' }
+  ];
+  $('readList').innerHTML = READ.map(function (r, k) {
+    return '<li><pre class="code">' + codeHTML(r.code.split('\n').map(function (t) { return { text: t, id: null }; }), null) + '</pre><div class="opts">' +
+      r.o.map(function (o, j) { return '<button type="button" data-rk="' + k + '" data-rj="' + j + '">' + esc(o) + '</button>'; }).join('') + '</div><span class="fb" id="rf' + k + '" aria-live="polite"></span></li>';
+  }).join('');
+  $('readList').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-rk]');
+    if (!b) return;
+    var k = Number(b.getAttribute('data-rk')), j = Number(b.getAttribute('data-rj')), r = READ[k], fb = $('rf' + k);
+    Array.prototype.forEach.call(b.parentNode.querySelectorAll('button'), function (x) { x.classList.remove('good', 'bad'); });
+    b.classList.add(j === r.a ? 'good' : 'bad');
+    fb.className = 'fb ' + (j === r.a ? 'ok' : 'no');
+    fb.innerHTML = '<strong>' + (j === r.a ? 'Exact !' : 'Non, relis les décalages.') + '</strong> <span>' + esc(r.how) + '</span>';
+  });
+
+  /* ---------- Étape 7 : trouve la ligne fautive ---------- */
+  var BUGS = [
+    { goal: 'But : avancer de 4 cases, puis tourner à droite.', lines: ['for i in range(3):', '    avancer()', 'tourner_a_droite()'], bug: 0,
+      how: 'range(3) ne fait que 3 tours : il faut range(4). C’est l’erreur « à un près ».' },
+    { goal: 'But : faire le tour d’un carré (4 côtés de 2 cases).', lines: ['for i in range(4):', '    avancer()', '    avancer()', 'tourner_a_droite()'], bug: 3,
+      how: 'tourner_a_droite() n’est pas décalé : il est hors de la boucle, donc le robot ne tourne qu’une fois, à la fin, après 8 pas tout droit.' },
+    { goal: 'But : compter les pas. À la fin, pas doit valoir 5.', lines: ['pas = 0', 'for i in range(5):', '    avancer()', '    pas = 0', 'print(pas)'], bug: 3,
+      how: 'pas = 0 remet le compteur à zéro à chaque tour ! Il faut pas = pas + 1. À la fin, le programme affiche 0 au lieu de 5.' }
+  ];
+  var bugDone = [];
+  function renderBugs() {
+    bugDone = [];
+    $('bugList').innerHTML = BUGS.map(function (B, k) {
+      return '<li><span class="goal"><strong>' + esc(B.goal) + '</strong></span><div class="lines">' +
+        B.lines.map(function (l, j) { return '<button type="button" data-bk="' + k + '" data-bj="' + j + '" aria-label="Ligne ' + (j + 1) + ' : ' + esc(l.trim()) + '">' + esc(l) + '</button>'; }).join('') +
+        '</div><span class="fb" id="bf' + k + '" aria-live="polite"></span></li>';
+    }).join('');
+    $('bugScore').textContent = '0 / ' + BUGS.length;
+  }
+  $('bugList').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-bk]');
+    if (!b) return;
+    var k = Number(b.getAttribute('data-bk')), j = Number(b.getAttribute('data-bj')), B = BUGS[k], fb = $('bf' + k);
+    Array.prototype.forEach.call(b.parentNode.querySelectorAll('button'), function (x) { x.classList.remove('good', 'bad'); });
+    var good = j === B.bug;
+    b.classList.add(good ? 'good' : 'bad');
+    bugDone[k] = bugDone[k] || good;
+    fb.className = 'fb ' + (good ? 'ok' : 'no');
+    fb.innerHTML = good ? '<strong>Trouvé, ligne ' + (j + 1) + ' !</strong> <span>' + esc(B.how) + '</span>' : '<strong>Cette ligne-là est correcte.</strong> <span>Fais tourner le programme dans ta tête, ligne par ligne, et compare avec le but.</span>';
+    $('bugScore').textContent = bugDone.filter(Boolean).length + ' / ' + BUGS.length;
+  });
+  $('bugReset').addEventListener('click', renderBugs);
+  renderBugs();
+
+  /* ---------- Étape 8 : prédis la valeur ---------- */
+  var PREDS = [[['rep', 3, ['F']]], [['rep', 2, ['F', 'F']]], [['rep', 9, ['F']]]].map(function (s) { return build(s); });
+  $('predList').innerHTML = PREDS.map(function (p, k) {
+    return '<div class="res"><strong>Programme ' + String.fromCharCode(65 + k) + '</strong>' + staticBlocks(p) +
+      '<svg class="board" id="pv' + k + '" role="img"></svg>' +
+      '<label for="ps' + k + '" class="soft">gemmes à la fin =</label><select id="ps' + k + '"><option value="">…</option><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option></select>' +
+      '<button type="button" data-pk="' + k + '">Vérifier</button><span class="verdict" id="pf' + k + '" aria-live="polite"></span></div>';
+  }).join('');
+  PREDS.forEach(function (p, k) { drawBoard($('pv' + k), MINI, boardState(MINI, null, -1)); });
+  $('predList').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-pk]');
+    if (!b) return;
+    var k = Number(b.getAttribute('data-pk')), v = $('ps' + k).value, out = $('pf' + k);
+    if (v === '') { out.className = 'verdict mid'; out.textContent = 'Choisis une valeur.'; return; }
+    var r = run(PREDS[k], MINI);
+    drawBoard($('pv' + k), MINI, boardState(MINI, r, r.trace.length - 1));
+    var why = r.status === 'out' ? 'Au pas n° ' + r.steps + ', le robot veut sortir de la grille : le programme s’arrête là, en ' + cellName(r.x, r.y) + '.' : 'Le robot finit en ' + cellName(r.x, r.y) + ', après ' + plural(r.steps, 'pas') + '.';
+    var good = Number(v) === r.gems;
+    out.className = 'verdict ' + (good ? 'yes' : 'no');
+    out.innerHTML = (good ? 'Exact : gemmes = ' : 'Non : gemmes = ') + r.gems + '.<span>' + esc(why) + '</span>';
+  });
+
+  /* ---------- Quiz ---------- */
+  var QZ = [
+    { q: 'Le robot regarde vers la droite (→). Programme : tourner à gauche, tourner à gauche. Où regarde-t-il ?', o: [['a', 'vers la droite →'], ['b', 'vers la gauche ←'], ['c', 'vers le haut ↑']], a: 'b', how: 'Deux quarts de tour = un demi-tour : → devient ←.' },
+    { q: 'Combien de blocs compte « répéter 4 fois [ avancer, tourner à droite ] » ?', o: [['a', '2'], ['b', '3'], ['c', '8']], a: 'b', how: 'Le bloc répéter (1) + les 2 blocs dedans = 3 blocs, même s’il fait 8 gestes.' },
+    { q: 'Qu’est-ce qu’un bug ?', o: [['a', 'une erreur dans un programme'], ['b', 'un virus'], ['c', 'un ordinateur cassé']], a: 'a', how: 'Un bug est une erreur du programme. Le corriger s’appelle débugger.' },
+    { q: 'Avec « for i in range(5): », combien de fois les lignes décalées sont-elles exécutées ?', o: [['a', '4 fois'], ['b', '5 fois'], ['c', '6 fois']], a: 'b', how: 'range(5) donne 5 tours (i vaut 0, 1, 2, 3, 4).' },
+    { q: 'Ton programme ne marche pas. Le meilleur réflexe ?', o: [['a', 'tout effacer et recommencer'], ['b', 'exécuter pas à pas pour trouver le premier moment qui cloche'], ['c', 'ajouter des blocs au hasard']], a: 'b', how: 'Pas à pas, on voit où le robot s’écarte du plan. Puis on change une seule chose.' },
+    { q: '« si mur devant alors tourner à droite sinon avancer ». Il n’y a pas de mur devant. Que fait le robot ?', o: [['a', 'il tourne à droite'], ['b', 'il avance'], ['c', 'les deux']], a: 'b', how: 'La condition est fausse : seule la partie « sinon » est exécutée.' },
+    { q: '« répéter jusqu’au drapeau [ tourner à droite ] » : que se passe-t-il ?', o: [['a', 'le robot arrive au drapeau'], ['b', 'il tourne sur place pour toujours : boucle infinie'], ['c', 'il s’arrête après un tour complet']], a: 'b', how: 'Le robot ne bouge jamais de sa case, donc il n’arrive jamais : la boucle ne s’arrête pas.' },
+    { q: 'Vrai ou faux : un ordinateur comprend ce que tu voulais dire, même si ton programme contient une erreur.', o: [['v', 'Vrai'], ['f', 'Faux']], a: 'f', how: 'Il fait exactement ce qui est écrit, pas ce que tu voulais dire.' }
+  ];
+  var quiz = $('quiz'), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ''; done = [];
+    QZ.forEach(function (Q, k) {
+      var li = document.createElement('li');
+      li.innerHTML = '<span>' + esc(Q.q) + '</span><select id="qa' + k + '" aria-label="Ta réponse à la question ' + (k + 1) + '"><option value="">…</option>' + Q.o.map(function (o) { return '<option value="' + o[0] + '">' + esc(o[1]) + '</option>'; }).join('') + '</select><button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+      quiz.appendChild(li);
+      function check() {
+        var fb = $('qf' + k), v = $('qa' + k).value;
+        if (!v) { fb.className = 'fb'; fb.textContent = 'Choisis une réponse.'; return; }
+        if (v === Q.a) { fb.className = 'fb ok'; fb.innerHTML = 'Bravo, c’est juste !<span>' + esc(Q.how) + '</span>'; done[k] = true; }
+        else {
+          done[k] = false;
+          var good = Q.o.filter(function (o) { return o[0] === Q.a; })[0][1];
+          fb.className = 'fb no'; fb.innerHTML = 'Pas tout à fait : la bonne réponse est « ' + esc(good) + ' ».<span>' + esc(Q.how) + '</span>';
+        }
+        $('score').textContent = done.filter(Boolean).length + ' / 8';
+      }
+      $('qb' + k).addEventListener('click', check);
+      $('qa' + k).addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+    });
+    $('score').textContent = '0 / 8';
+  }
+  $('newQuiz').addEventListener('click', newQuiz);
+  newQuiz();
+
+  window.__prg = { levels: LEVELS, mini: MINI, build: build, run: run, toCode: toCode, codeLines: codeLines, countBlocks: countBlocks, checkAll: checkAll,
+    sandwich: SAND, readCode: READ, bugs: BUGS, preds: PREDS, quiz: QZ };
+})();
+</script>
+</body>
+</html>

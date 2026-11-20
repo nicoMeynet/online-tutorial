@@ -1,0 +1,1078 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Les octets et le stockage</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, marge rouge. Accent vert (#16a34a). Les tailles de fichiers et les débits sont des ordres de grandeur, arrondis exprès. Rien de ce qui est tapé n'est envoyé ni enregistré. */
+:root {
+  --paper: #f6faf7;
+  --grid: #dfece3;
+  --card: #ffffff;
+  --ink: #13291b;
+  --ink-soft: #4f6a58;
+  --acc: #16a34a;
+  --acc-soft: #dcfce7;
+  --warn: #d97706;
+  --warn-soft: #fdf0d6;
+  --warn-ink: #92400e;
+  --org: #ea580c;
+  --org-soft: #fde4d4;
+  --vio: #7c3aed;
+  --vio-soft: #ede4fd;
+  --blue: #2563eb;
+  --blue-soft: #dce8fd;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #fff0a3;
+  --line: #d3e3d8;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0d1710; --grid: #172519; --card: #121f15; --ink: #e8f3eb; --ink-soft: #a3bdab;
+    --acc: #4ade80; --acc-soft: #12331f; --warn: #f5a524; --warn-soft: #3d2a0c; --warn-ink: #fbbf5a;
+    --org: #fb923c; --org-soft: #3d2210; --vio: #c4b5fd; --vio-soft: #2a1f45; --blue: #93b4fd; --blue-soft: #172a4a;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #2a3e2f;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0d1710; --grid: #172519; --card: #121f15; --ink: #e8f3eb; --ink-soft: #a3bdab;
+  --acc: #4ade80; --acc-soft: #12331f; --warn: #f5a524; --warn-soft: #3d2a0c; --warn-ink: #fbbf5a;
+  --org: #fb923c; --org-soft: #3d2210; --vio: #c4b5fd; --vio-soft: #2a1f45; --blue: #93b4fd; --blue-soft: #172a4a;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #2a3e2f;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--acc); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note.warn { border-left-color: var(--warn); background: var(--warn-soft); }
+.note.ok { border-left-color: var(--ok); background: var(--ok-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+.fig svg { width: 100%; height: auto; display: block; }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 8px 12px; min-height: 44px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+button:disabled { opacity: .5; cursor: default; transform: none; }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+input[type="text"] { font: inherit; font-family: var(--f-mono); font-size: 1rem; padding: 8px 10px; min-height: 44px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; }
+select { font: inherit; font-size: 1rem; padding: 8px 8px; min-height: 44px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; }
+.param { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.param label { font-weight: 700; }
+.params { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.privacy { font-size: .9rem; color: var(--ok); font-weight: 700; display: flex; gap: 6px; align-items: flex-start; }
+.privacy::before { content: "🔒"; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
+.tag.ok { color: var(--ok); }
+.tag.no { color: var(--red); }
+.tag.warn { color: var(--warn-ink); }
+.tag.acc { color: var(--acc); }
+.formula { font-family: var(--f-mono); font-size: 1.1rem; text-align: center; background: var(--paper); border: 1.5px dashed var(--line); border-radius: 8px; padding: 10px; overflow-wrap: anywhere; }
+.res { font-family: var(--f-mono); font-size: 1.05rem; background: var(--acc-soft); border-radius: 8px; padding: 10px 12px; overflow-wrap: anywhere; }
+.res:empty { display: none; }
+
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.stat { background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 10px; min-width: 0; }
+.stat b { display: block; font-family: var(--f-mono); font-size: 1.05rem; overflow-wrap: anywhere; }
+.stat small { color: var(--ink-soft); font-size: .85rem; }
+
+.cmp { width: 100%; border-collapse: collapse; font-size: .92rem; font-variant-numeric: tabular-nums; }
+.cmp th, .cmp td { border: 1.5px solid var(--line); padding: 6px 8px; text-align: left; vertical-align: top; }
+.cmp th { font-family: var(--f-display); background: var(--paper); }
+.cmp td.n { font-family: var(--f-mono); white-space: nowrap; }
+.scroll { overflow-x: auto; }
+@media (max-width: 480px) { .cmp { font-size: .8rem; } .cmp th, .cmp td { padding: 5px 4px; } .cmp td.n { white-space: normal; } }
+
+/* Bits physiques */
+.bitbtns { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 6px; }
+.bitbtns button { padding: 4px 0; font-family: var(--f-mono); font-size: 1.1rem; min-width: 0; }
+@media (max-width: 480px) { .bitbtns { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+#physSvg g { cursor: pointer; }
+
+/* Lettres et octets */
+.chars { display: flex; flex-wrap: wrap; gap: 8px; }
+.chr { border: 2px solid var(--acc); border-radius: 8px; padding: 6px 8px; min-width: 72px; display: flex; flex-direction: column; align-items: center; gap: 2px; background: var(--paper); }
+.chr .g { font-size: 1.5rem; line-height: 1.2; font-family: var(--f-body); }
+.chr .g.sp { font-size: .85rem; font-family: var(--f-mono); color: var(--ink-soft); padding-block: 6px; }
+.chr .cp { font-family: var(--f-mono); font-size: .72rem; color: var(--ink-soft); }
+.chr code { font-family: var(--f-mono); font-size: .78rem; }
+.chr .n { font-family: var(--f-mono); font-size: .75rem; font-weight: 600; }
+.chr.n2 { border-color: var(--warn); }
+.chr.n3 { border-color: var(--org); }
+.chr.n4 { border-color: var(--red); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: .9rem; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 14px; height: 14px; border-radius: 3px; display: inline-block; flex: none; }
+
+/* Combien ça pèse */
+.wlist { display: flex; flex-direction: column; gap: 12px; }
+.wcard { border: 1.5px solid var(--line); border-radius: 10px; padding: 10px 12px; background: var(--paper); display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.wcard strong { font-family: var(--f-display); font-size: 1.05rem; }
+.wcard .btns { gap: 8px; }
+.wcard .btns button { font-size: .9rem; padding: 6px 10px; box-shadow: 2px 2px 0 var(--ink); }
+.wcard.good { border-color: var(--ok); background: var(--ok-soft); }
+.wcard.bad { border-color: var(--red); background: var(--red-soft); }
+.wfb { font-size: .95rem; }
+.wfb:empty { display: none; }
+.rows { display: flex; flex-direction: column; gap: 10px; }
+.row { display: grid; grid-template-columns: minmax(0, 170px) minmax(0, 1fr); gap: 4px 12px; align-items: center; }
+.row .lab { font-weight: 700; font-size: .95rem; }
+.row .track { position: relative; height: 18px; border-radius: 4px; background: repeating-linear-gradient(90deg, transparent 0, transparent calc(25% - 1px), var(--line) calc(25% - 1px), var(--line) 25%); }
+.row .bar { height: 18px; border-radius: 4px; background: var(--acc); min-width: 2px; transition: width .25s; }
+.row .val { grid-column: 2; font-family: var(--f-mono); font-size: .85rem; color: var(--ink-soft); overflow-wrap: anywhere; }
+@media (max-width: 520px) { .row { grid-template-columns: minmax(0, 1fr); } .row .val { grid-column: 1; } }
+.scale { display: grid; grid-template-columns: repeat(4, 1fr); font-family: var(--f-mono); font-size: .78rem; color: var(--ink-soft); }
+.scale span:last-child { text-align: right; }
+
+/* Téléphone */
+.disk { display: flex; height: 36px; border: 2px solid var(--ink); border-radius: 8px; overflow: hidden; background: var(--paper); }
+.disk i { display: block; height: 100%; transition: width .25s; flex: none; }
+.disk.over { border-color: var(--red); box-shadow: 0 0 0 3px var(--red-soft); }
+.c-sys { background: var(--ink-soft); }
+.c-photos { background: var(--acc); }
+.c-videos { background: var(--org); }
+.c-jeux { background: var(--red); }
+.c-apps { background: var(--warn); }
+.c-chansons { background: var(--vio); }
+.fill-rows { display: flex; flex-direction: column; gap: 8px; }
+.fill-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto auto; gap: 8px; align-items: center; border: 1.5px solid var(--line); border-radius: 10px; padding: 6px 10px; background: var(--paper); }
+.fill-row .nm { display: flex; align-items: center; gap: 8px; min-width: 0; font-weight: 700; overflow-wrap: anywhere; }
+.fill-row .nm small { display: block; font-weight: 400; color: var(--ink-soft); font-size: .82rem; }
+.fill-row .cnt { font-family: var(--f-mono); font-weight: 600; min-width: 4ch; text-align: center; }
+.fill-row button { min-width: 48px; padding: 6px 8px; font-size: .9rem; }
+@media (max-width: 420px) { .fill-row { grid-template-columns: auto auto auto; } .fill-row .nm { grid-column: 1 / -1; } }
+.msg { font-weight: 700; }
+.msg:empty { display: none; }
+.msg.no { color: var(--red); }
+.msg.ok { color: var(--ok); }
+
+/* Pas à pas */
+.calc { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 6px; }
+.calc li { overflow-wrap: anywhere; }
+.calc li[hidden] { display: none; }
+.calc li::marker { color: var(--acc); font-weight: 700; }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 220px auto; gap: 10px; align-items: center; }
+.quiz li > span:first-child { min-width: 0; overflow-wrap: anywhere; }
+.quiz select { font-size: .95rem; padding: 6px 6px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb:empty { display: none; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc); }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 140px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+details ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+<!--ticons--><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Tutoriels"><script src="progress.js" defer></script><!--/ticons-->
+<style id="tnav-css">
+.tnav-top { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin: 0 0 4px; }
+.tnav-home { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font-weight: 700; font-size: .95rem; text-decoration: none; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tnav-home:hover, .tnav-home:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.tnav-bottom { margin-top: 8px; display: flex; flex-direction: column; gap: 12px; }
+.tnav-bottom h2 { margin: 0; }
+.tnav-pn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tnav-pn a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--ink, #222); border-radius: 10px;
+  background: var(--card, #fff); color: var(--ink, #222); text-decoration: none; box-shadow: 3px 3px 0 var(--ink, #222); min-width: 0; }
+.tnav-pn a span { font-size: .85rem; color: var(--ink-soft, #666); }
+.tnav-pn a strong { overflow-wrap: anywhere; }
+.tnav-pn a.next { text-align: right; grid-column: 2; }
+.tnav-bottom .tnav-home { align-self: center; }
+@media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
+.diff { font: 700 .72rem/1.2 var(--f-mono, monospace); padding: 2px 8px; border-radius: 99px; border: 1.5px solid; white-space: nowrap; }
+.diff.d1 { color: #15803d; border-color: #15803d; background: #dcf3e3; }
+.diff.d2 { color: #a15c07; border-color: #b45309; background: #fbe7cf; }
+.diff.d3 { color: #b91c1c; border-color: #b91c1c; background: #fde2e2; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root:not([data-theme="light"]) .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root:not([data-theme="light"]) .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; } }
+:root[data-theme="dark"] .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root[data-theme="dark"] .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root[data-theme="dark"] .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; }
+</style>
+</head>
+<body>
+<main class="page">
+<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="numerique.html">← Tous les tutoriels numériques</a><span class="diff d1" title="Difficulté : facile">Facile</span></nav><!--/tnav-->
+
+
+  <header class="hero">
+    <span class="eyebrow">Tutoriel numérique · niveau 9H</span>
+    <h1>Les octets et le stockage</h1>
+    <p class="lead">Ton téléphone affiche « Stockage presque plein ». Mais qu'est-ce qui prend toute cette place ? Ici, tu vas découvrir ce qu'est un octet, combien « pèsent » une lettre, une photo ou un jeu, et combien de temps il faut pour les télécharger.</p>
+    <div class="box fig">
+      <svg viewBox="0 0 360 160" role="img" aria-label="Cinq carrés de plus en plus grands, étiquetés o, ko, Mo, Go et To : à chaque marche, on multiplie par 1 000">
+        <text x="14" y="26" font-size="14" font-weight="600">chaque marche : × 1 000</text>
+        <rect x="14" y="104" width="16" height="16" rx="3" fill="var(--acc-soft)" stroke="var(--acc)" stroke-width="2.5"/>
+        <rect x="56" y="96" width="24" height="24" rx="3" fill="var(--acc-soft)" stroke="var(--acc)" stroke-width="2.5"/>
+        <rect x="110" y="86" width="34" height="34" rx="4" fill="var(--acc-soft)" stroke="var(--acc)" stroke-width="2.5"/>
+        <rect x="178" y="72" width="48" height="48" rx="5" fill="var(--acc-soft)" stroke="var(--acc)" stroke-width="2.5"/>
+        <rect x="262" y="50" width="70" height="70" rx="6" fill="var(--acc)" stroke="var(--acc)" stroke-width="2.5"/>
+        <text x="22" y="144" font-size="15" text-anchor="middle">o</text>
+        <text x="68" y="144" font-size="15" text-anchor="middle">ko</text>
+        <text x="127" y="144" font-size="15" text-anchor="middle">Mo</text>
+        <text x="202" y="144" font-size="15" text-anchor="middle">Go</text>
+        <text x="297" y="144" font-size="15" text-anchor="middle">To</text>
+        <text x="297" y="90" font-size="11" text-anchor="middle" style="fill: var(--card)">01000001</text>
+      </svg>
+    </div>
+    <p class="soft">Les tailles de fichiers de cette page sont des <strong>ordres de grandeur</strong> : selon le téléphone, la qualité ou le logiciel, les vraies tailles peuvent être plus petites ou plus grandes. Ce que tu tapes reste dans ta page : <strong>rien n'est envoyé ni enregistré</strong>.</p>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · Le bit</span>
+    <h2>Un 0 ou un 1… rangé dans la matière</h2>
+    <p>Un <strong>bit</strong>, c'est la plus petite information possible : <strong>0 ou 1</strong>, oui ou non, allumé ou éteint. Le tutoriel sur <a class="tlink" href="le-binaire-et-les-bases.html">le binaire</a> t'explique comment on compte avec seulement ces deux chiffres. Ici, on se pose une autre question : <strong>où est rangé un bit, en vrai ?</strong></p>
+    <p>Un bit n'est pas une idée magique : c'est toujours <strong>quelque chose de physique</strong> qui peut être dans deux états différents.</p>
+    <div class="cards">
+      <div class="box"><span class="tag acc">Disque dur</span><strong>De minuscules aimants</strong><span class="soft">Sur un disque qui tourne, de toutes petites zones sont aimantées dans un sens ou dans l'autre.</span></div>
+      <div class="box"><span class="tag acc">Clé USB, téléphone</span><strong>Des charges électriques</strong><span class="soft">La mémoire « flash » est faite de milliards de minuscules cases qui gardent, ou non, des charges électriques, même sans pile.</span></div>
+      <div class="box"><span class="tag acc">CD, DVD</span><strong>Des creux microscopiques</strong><span class="soft">Une longue piste en spirale, avec des creux et des plats. Un laser les lit en mesurant la lumière qui revient.</span></div>
+      <div class="box"><span class="tag acc">En voyage</span><strong>Du courant, de la lumière, des ondes</strong><span class="soft">Pour aller d'un appareil à l'autre, les bits deviennent des impulsions électriques, des éclairs de lumière dans une fibre, ou des ondes radio (Wi-Fi, 4G, 5G).</span></div>
+    </div>
+    <div class="box">
+      <h3>Huit bits, trois façons de les ranger</h3>
+      <p class="soft">Touche les bits pour les changer, puis choisis le support. C'est le même octet, rangé de trois façons.</p>
+      <div class="btns" id="physView" role="group" aria-label="Choisir le support">
+        <button type="button" data-view="disque" aria-pressed="true">Disque dur</button>
+        <button type="button" data-view="flash" aria-pressed="false">Clé USB / téléphone</button>
+        <button type="button" data-view="cd" aria-pressed="false">CD</button>
+      </div>
+      <div class="fig"><svg id="physSvg" viewBox="0 0 400 112" role="img" aria-label="Les huit bits dessinés sur le support choisi"></svg></div>
+      <div class="bitbtns" id="bitBtns" role="group" aria-label="Les huit bits, de gauche à droite"></div>
+      <div class="btns">
+        <button type="button" data-preset="65">La lettre A</button>
+        <button type="button" data-preset="122">La lettre z</button>
+        <button type="button" data-preset="0">Tout à 0</button>
+        <button type="button" data-preset="255">Tout à 1</button>
+      </div>
+      <p class="res" id="physOut" aria-live="polite"></p>
+      <p class="soft" id="physNote"></p>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · L'octet</span>
+    <h2>Un paquet de 8 bits</h2>
+    <p>Un bit tout seul ne dit presque rien. Alors on les range par paquets de <strong>8</strong> : un paquet de 8 bits s'appelle un <strong>octet</strong> (« octo » veut dire huit). Avec 8 bits, on peut former 2 × 2 × 2 × 2 × 2 × 2 × 2 × 2 = <strong>256</strong> combinaisons différentes, donc écrire les nombres de <strong>0 à 255</strong>.</p>
+    <p>Pour écrire du texte, on a donné un numéro à chaque caractère. Dans le vieux code <strong>ASCII</strong>, les lettres sans accent, les chiffres et la ponctuation ont un numéro entre 0 et 127 : <span class="hl">chaque caractère tient dans un octet</span>. Le « A » majuscule porte le numéro 65, le « a » minuscule le 97, l'espace le 32.</p>
+    <p>Mais le monde entier n'écrit pas qu'avec 26 lettres ! Aujourd'hui, on utilise <strong>Unicode</strong>, qui numérote bien plus de 100 000 caractères : lettres accentuées, alphabets du monde, symboles, émojis. Pour les ranger, la méthode la plus courante s'appelle <strong>UTF-8</strong> : un caractère y prend <strong>1, 2, 3 ou 4 octets</strong>.</p>
+    <div class="box">
+      <h3>Combien d'octets pèse ton mot ?</h3>
+      <div class="param"><label for="txt">Tape un mot ou une petite phrase</label><input type="text" id="txt" maxlength="40" autocomplete="off" spellcheck="false" value="Bonjour"></div>
+      <div class="btns" id="txtBtns">
+        <button type="button" data-t="Bonjour">Bonjour</button>
+        <button type="button" data-t="été">été</button>
+        <button type="button" data-t="ça coûte 5 €">ça coûte 5 €</button>
+        <button type="button" data-t="salut 😀">salut 😀</button>
+      </div>
+      <span class="privacy">Rien n'est envoyé ni enregistré : le calcul se fait dans ta page.</span>
+      <div class="stats">
+        <div class="stat"><small>Caractères</small><b id="tChars">0</b></div>
+        <div class="stat"><small>Octets en UTF-8</small><b id="tBytes">0</b></div>
+        <div class="stat"><small>Bits</small><b id="tBits">0</b></div>
+      </div>
+      <div class="legend" aria-hidden="true">
+        <span><i style="background: var(--acc)"></i>1 octet</span>
+        <span><i style="background: var(--warn)"></i>2 octets</span>
+        <span><i style="background: var(--org)"></i>3 octets</span>
+        <span><i style="background: var(--red)"></i>4 octets</span>
+      </div>
+      <div class="chars" id="tOut" aria-live="polite"></div>
+      <p class="soft" id="tNote"></p>
+    </div>
+    <div class="note">
+      <span class="note-title">Le bon réflexe</span>
+      <span>Lettres simples, chiffres, espaces : <strong>1 octet</strong>. Lettres accentuées comme é, à, ç : <strong>2 octets</strong>. Le symbole € : <strong>3 octets</strong>. La plupart des émojis : <strong>4 octets</strong> (et certains émojis sont faits de plusieurs morceaux collés, donc encore plus).</span>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Les grandes unités</span>
+    <h2>Kilo, méga, giga, téra</h2>
+    <p>Un octet, c'est tout petit. Pour les gros fichiers, on utilise les mêmes préfixes qu'avec les mètres : <strong>kilo</strong> veut dire mille, comme dans kilomètre. À chaque marche, on multiplie par <strong>1 000</strong>.</p>
+    <div class="scroll">
+      <table class="cmp">
+        <thead><tr><th>Unité</th><th>Symbole</th><th>Nombre d'octets</th><th>Par exemple</th></tr></thead>
+        <tbody>
+          <tr><td>octet</td><td class="n">o</td><td class="n">1</td><td>une lettre sans accent</td></tr>
+          <tr><td>kilooctet</td><td class="n">ko</td><td class="n">1 000</td><td>un petit message</td></tr>
+          <tr><td>mégaoctet</td><td class="n">Mo</td><td class="n">1 000 000</td><td>une photo pèse quelques Mo</td></tr>
+          <tr><td>gigaoctet</td><td class="n">Go</td><td class="n">1 000 000 000</td><td>un film pèse quelques Go</td></tr>
+          <tr><td>téraoctet</td><td class="n">To</td><td class="n">1 000 000 000 000</td><td>un gros disque dur</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Attention aux lettres : <strong>o</strong> veut dire octet, <strong>bit</strong> (ou parfois <strong>b</strong>) veut dire bit. Et en anglais, un octet se dit <em>byte</em> : 1 MB (<em>megabyte</em>) = 1 Mo. Tu verras aussi souvent « Ko » avec une majuscule : l'écriture officielle est « ko », mais tout le monde comprend.</p>
+    <div class="note warn">
+      <span class="note-title">Pourquoi ton téléphone de 128 Go affiche moins ?</span>
+      <span>Pour un ordinateur, les nombres « ronds » sont les puissances de 2, et 2<sup>10</sup> = <strong>1 024</strong>, presque 1 000. Certains appareils comptent donc par paquets de 1 024 : 1 gibioctet (<strong>Gio</strong>) = 1 024 × 1 024 × 1 024 = 1 073 741 824 octets. Le fabricant, lui, annonce de vrais Go : 128 Go = 128 000 000 000 octets, ce qui fait environ <strong>119,2 Gio</strong>. Si l'appareil écrit quand même « Go », tu crois avoir perdu de la place. Aucun octet n'a disparu : c'est juste une autre unité. Le tutoriel sur <a class="tlink" href="le-binaire-et-les-bases.html">le binaire</a> montre ce calcul en détail.</span>
+      <span>Et surtout, <strong>le système du téléphone</strong> et les applis déjà installées occupent souvent plus de 10 Go avant même ta première photo.</span>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · Le convertisseur</span>
+    <h2>D'une unité à l'autre</h2>
+    <p>Pour convertir, on passe par les octets : on <strong>multiplie</strong> pour descendre vers les octets, puis on <strong>divise</strong> pour remonter vers l'unité voulue. Pour les bits, on se souvient que <strong>1 octet = 8 bits</strong>.</p>
+    <div class="box">
+      <div class="params">
+        <div class="param"><label for="cvVal">Nombre</label><input type="text" id="cvVal" inputmode="decimal" autocomplete="off" value="2,5"></div>
+        <div class="param"><label for="cvFrom">De</label><select id="cvFrom"></select></div>
+        <div class="param"><label for="cvTo">Vers</label><select id="cvTo"></select></div>
+      </div>
+      <div class="btns"><button type="button" id="cvSwap">Inverser ⇄</button></div>
+      <p class="res" id="cvOut" aria-live="polite"></p>
+      <ol class="calc" id="cvCalc"></ol>
+    </div>
+    <p class="soft">Les unités en « i » (kio, Mio, Gio, Tio) comptent par 1 024. Elles sont là pour comparer : tu verras que l'écart grandit avec la taille (environ 2 % pour les ko, 7 % pour les Go, 9 % pour les To).</p>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Combien ça pèse ?</span>
+    <h2>Du SMS au jeu vidéo</h2>
+    <p>Devine le « poids » de chaque chose. Il n'y a pas une taille exacte : une photo de téléphone peut faire 2 Mo ou 6 Mo selon l'appareil. Ce qui compte, c'est l'<strong>ordre de grandeur</strong>.</p>
+    <div class="box">
+      <div class="wlist" id="wList"></div>
+      <div class="btns">
+        <span class="score" id="wScore">0 / 9</span>
+        <button type="button" id="wReset">Recommencer</button>
+      </div>
+      <h3>La règle des tailles</h3>
+      <p class="soft">Chaque chose que tu as classée apparaît ici. Attention, c'est une règle spéciale : chaque quart de la barre veut dire <strong>× 1 000</strong>.</p>
+      <div class="scale" aria-hidden="true"><span>1 o</span><span>1 ko</span><span>1 Mo</span><span>1 Go → 1 To</span></div>
+      <div class="rows" id="wRows"><p class="soft">Rien pour l'instant : classe un premier objet.</p></div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · Simulation</span>
+    <h2>Remplis ton téléphone</h2>
+    <p>Choisis la capacité de ton téléphone, puis ajoute des photos, des vidéos, des jeux… Regarde la barre se remplir. Les tailles sont des moyennes inventées mais réalistes : <strong>photo ≈ 3 Mo</strong>, <strong>minute de vidéo HD ≈ 100 Mo</strong>, <strong>gros jeu pour téléphone ≈ 4 Go</strong>, <strong>appli ≈ 200 Mo</strong>, <strong>chanson ≈ 5 Mo</strong>. Le système occupe déjà environ <strong>15 Go</strong> (ça dépend du téléphone).</p>
+    <div class="box">
+      <div class="btns" id="capBtns" role="group" aria-label="Capacité du téléphone">
+        <button type="button" data-cap="64" aria-pressed="false">64 Go</button>
+        <button type="button" data-cap="128" aria-pressed="true">128 Go</button>
+        <button type="button" data-cap="256" aria-pressed="false">256 Go</button>
+      </div>
+      <div class="disk" id="disk" role="img" aria-label="Barre de stockage du téléphone"></div>
+      <div class="stats">
+        <div class="stat"><small>Utilisé</small><b id="fUsed">—</b></div>
+        <div class="stat"><small>Libre</small><b id="fFree">—</b></div>
+        <div class="stat"><small>Rempli à</small><b id="fPct">—</b></div>
+      </div>
+      <div class="fill-rows" id="fillRows"></div>
+      <p class="msg" id="fMsg" aria-live="polite"></p>
+      <p class="soft" id="fRoom"></p>
+      <div class="btns"><button type="button" id="fReset">Vider le téléphone</button></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Ce qui remplit vraiment un téléphone</span>
+      <span>Les <strong>vidéos</strong> et les <strong>jeux</strong>, de loin. Mille photos font environ 3 Go ; une demi-heure de vidéo HD aussi. Les messageries gardent aussi toutes les photos et vidéos reçues dans les groupes : elles peuvent peser plusieurs Go sans que tu t'en rendes compte. Dans les réglages, la page « Stockage » te montre ce qui prend de la place.</span>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Le débit</span>
+    <h2>Combien de temps pour télécharger ?</h2>
+    <p>Le <strong>débit</strong>, c'est la vitesse de ta connexion : combien de données arrivent chaque seconde. Comme les données voyagent bit par bit (le tutoriel sur <a class="tlink" href="comment-marche-internet.html">Internet</a> explique leur trajet), on l'annonce en <strong>mégabits par seconde</strong> (Mbit/s), et pas en mégaoctets. Pour passer des bits aux octets, on <strong>divise par 8</strong>.</p>
+    <div class="formula">temps = taille ÷ vitesse &nbsp;·&nbsp; vitesse en Mo/s = débit en Mbit/s ÷ 8</div>
+    <div class="box">
+      <h3>Le calculateur de téléchargement</h3>
+      <div class="params">
+        <div class="param"><label for="dlSize">Taille du fichier</label><input type="text" id="dlSize" inputmode="decimal" autocomplete="off" value="3"></div>
+        <div class="param"><label for="dlUnit">Unité</label><select id="dlUnit"><option value="Mo">Mo</option><option value="Go" selected>Go</option></select></div>
+      </div>
+      <div class="btns" id="dlPresets">
+        <button type="button" data-mo="3">une photo</button>
+        <button type="button" data-mo="200">une appli</button>
+        <button type="button" data-mo="3000">un film HD</button>
+        <button type="button" data-mo="50000">un gros jeu de console</button>
+      </div>
+      <div class="params">
+        <div class="param"><label for="dlRate">Connexion (exemples)</label>
+          <select id="dlRate">
+            <option value="10">vieille connexion ADSL (≈ 10 Mbit/s)</option>
+            <option value="30">4G moyenne (≈ 30 Mbit/s)</option>
+            <option value="100" selected>Wi-Fi à la maison (≈ 100 Mbit/s)</option>
+            <option value="300">bonne 5G (≈ 300 Mbit/s)</option>
+            <option value="1000">fibre optique (1 000 Mbit/s)</option>
+            <option value="">autre (tape à droite)</option>
+          </select>
+        </div>
+        <div class="param"><label for="dlMbps">Débit en Mbit/s</label><input type="text" id="dlMbps" inputmode="decimal" autocomplete="off" value="100"></div>
+      </div>
+      <div class="stats">
+        <div class="stat"><small>Vitesse en Mo/s</small><b id="dlMops">—</b></div>
+        <div class="stat"><small>Temps (au mieux)</small><b id="dlTime">—</b></div>
+      </div>
+      <div class="btns">
+        <button type="button" id="dlStep">Pas à pas</button>
+        <button type="button" id="dlAll">Tout montrer</button>
+        <button type="button" id="dlHide">Cacher le calcul</button>
+      </div>
+      <ol class="calc" id="dlCalc" aria-live="polite"></ol>
+    </div>
+    <div class="note warn">
+      <span class="note-title">Débit et forfait, ce n'est pas pareil</span>
+      <span>Le <strong>débit</strong> (en Mbit/s), c'est la <strong>vitesse</strong>. Le <strong>forfait</strong> de ton téléphone (par exemple « 5 Go par mois »), c'est la <strong>quantité</strong> de données que tu peux utiliser. Regarder une heure de vidéo en HD peut consommer environ 1 à 3 Go : avec un petit forfait, mieux vaut attendre le Wi-Fi. Et le débit annoncé est un <strong>maximum</strong> : en vrai, c'est souvent plus lent.</span>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Pourquoi c'est si lourd ?</span>
+    <h2>Photos, vidéos et compression</h2>
+    <p>Une photo, c'est une grille de <strong>pixels</strong>, et chaque pixel mélange du rouge, du vert et du bleu, à raison d'<strong>un octet par couleur</strong> (le tutoriel sur <a class="tlink" href="les-pixels-et-la-compression.html">les pixels</a> explique tout ça). Donc 3 octets par pixel. Mais ton téléphone <strong>compresse</strong> la photo : il trouve des astuces pour la décrire avec beaucoup moins d'octets, en perdant des détails que l'œil remarque à peine.</p>
+    <div class="box">
+      <h3>Une photo</h3>
+      <div class="param"><label for="pxMp">Nombre de pixels de l'appareil photo</label>
+        <select id="pxMp">
+          <option value="1">1 mégapixel (1 million de pixels)</option>
+          <option value="2">2 mégapixels (environ une image HD)</option>
+          <option value="8">8 mégapixels</option>
+          <option value="12" selected>12 mégapixels (beaucoup de téléphones)</option>
+          <option value="24">24 mégapixels</option>
+        </select>
+      </div>
+      <p class="res" id="pxOut" aria-live="polite"></p>
+      <h3>Une minute de vidéo</h3>
+      <div class="params">
+        <div class="param"><label for="vDef">Définition</label><select id="vDef"><option value="hd" selected>HD (1 920 × 1 080 pixels)</option><option value="4k">4K (3 840 × 2 160 pixels)</option></select></div>
+        <div class="param"><label for="vFps">Images par seconde</label><select id="vFps"><option value="30" selected>30 images par seconde</option><option value="60">60 images par seconde</option></select></div>
+      </div>
+      <p class="res" id="vOut" aria-live="polite"></p>
+      <p class="soft">Compressée, une minute de vidéo pèse plutôt quelques dizaines à quelques centaines de Mo : souvent <strong>des dizaines, voire des centaines de fois moins</strong>. Sans compression, ton téléphone serait plein en quelques minutes de film !</p>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Un peu d'histoire</span>
+    <h2>De l'armoire au nuage</h2>
+    <ol class="timeline">
+      <li><span class="when">années 1950</span><div class="what"><strong>Le premier disque dur</strong><span>Il est grand comme une armoire, pèse des centaines de kilos et contient… quelques Mo. Moins qu'une seule photo de ton téléphone.</span></div></li>
+      <li><span class="when">années 1970–1990</span><div class="what"><strong>La disquette</strong><span>Un petit carré de plastique avec un disque aimanté dedans. La plus connue contenait environ <strong>1,4 Mo</strong> (on écrivait « 1,44 Mo » dessus). L'icône « Enregistrer » de beaucoup de logiciels la dessine encore !</span></div></li>
+      <li><span class="when">années 1980–1990</span><div class="what"><strong>Le CD</strong><span>Environ <strong>700 Mo</strong>, lus par un laser. On y mettait de la musique (à peu près 80 minutes) et des logiciels. Puis le DVD est arrivé, avec environ <strong>4,7 Go</strong>.</span></div></li>
+      <li><span class="when">années 2000</span><div class="what"><strong>La clé USB</strong><span>Les premières contenaient quelques Mo ou dizaines de Mo. Aujourd'hui, on trouve des clés de plusieurs centaines de Go, pas plus grandes qu'un pouce.</span></div></li>
+      <li><span class="when">années 2010</span><div class="what"><strong>Le « cloud »</strong><span>Tes photos sont sauvegardées « dans le nuage ». En vrai, elles sont rangées sur des milliers de disques, dans d'immenses bâtiments appelés <strong>centres de données</strong>, qui consomment beaucoup d'électricité. On dit souvent : le cloud, c'est l'ordinateur de quelqu'un d'autre.</span></div></li>
+    </ol>
+    <div class="box">
+      <h3>Combien de disquettes pour ton téléphone ?</h3>
+      <div class="params">
+        <div class="param"><label for="hmC">Ce que tu veux ranger</label>
+          <select id="hmC">
+            <option value="3">une photo (≈ 3 Mo)</option>
+            <option value="5">une chanson (≈ 5 Mo)</option>
+            <option value="3000">un film HD (≈ 3 Go)</option>
+            <option value="128000" selected>un téléphone de 128 Go, plein</option>
+          </select>
+        </div>
+        <div class="param"><label for="hmS">Sur quoi</label>
+          <select id="hmS">
+            <option value="disquette" selected>des disquettes (≈ 1,44 Mo)</option>
+            <option value="cd">des CD (≈ 700 Mo)</option>
+            <option value="dvd">des DVD (≈ 4,7 Go)</option>
+            <option value="cle">des clés USB de 64 Go</option>
+          </select>
+        </div>
+      </div>
+      <p class="res" id="hmOut" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · Attention</span>
+    <h2>Les erreurs fréquentes</h2>
+    <div class="cards">
+      <div class="box"><span class="tag no">Faux</span><strong>« 100 Mbit/s, ça fait 100 Mo par seconde. »</strong><span class="soft">Non : ce sont des <strong>bits</strong>. 100 Mbit/s ÷ 8 = 12,5 Mo/s au mieux.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« Une lettre, c'est toujours un octet. »</strong><span class="soft">En UTF-8, oui pour les lettres sans accent. Mais é prend 2 octets, € en prend 3 et un émoji en prend souvent 4.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« 1 Go = 1 024 Mo. »</strong><span class="soft">Officiellement, 1 Go = 1 000 Mo. Le paquet de 1 024 s'appelle 1 Gio = 1 024 Mio. Beaucoup de logiciels mélangent encore les deux.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« Mo et Mb, c'est pareil. »</strong><span class="soft">Mo = mégaoctet, Mb ou Mbit = mégabit, 8 fois plus petit. En anglais, MB (avec un B majuscule) = mégaoctet.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« Un forfait de 20 Go, c'est une connexion plus rapide. »</strong><span class="soft">Les Go du forfait, c'est la quantité. La vitesse, c'est le débit, en Mbit/s.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« Le cloud, c'est dans les nuages. »</strong><span class="soft">Ce sont de vrais disques, dans de vrais bâtiments, quelque part dans le monde. Ils prennent de la place et consomment de l'énergie.</span></div>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Choisis ta réponse, puis vérifie.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Recommencer</button>
+    </div>
+  </section>
+
+  <!-- 12 -->
+  <section>
+    <span class="eyebrow">Étape 12 · À toi de jouer</span>
+    <h2>Six problèmes</h2>
+    <div class="exos">
+      <details>
+        <summary>1. Le poids d'un prénom<span class="q">Combien d'octets et de bits pèse le prénom « Zoé » en UTF-8 ?</span></summary>
+        <div>
+          <span>Z : 1 octet, o : 1 octet, é : 2 octets. Total : <strong>4 octets</strong>, soit 4 × 8 = <strong>32 bits</strong>.</span>
+          <span>Tu peux vérifier avec le compteur de l'étape 2.</span>
+        </div>
+      </details>
+      <details>
+        <summary>2. Trois conversions<span class="q">a) 2,5 Go en Mo. b) 750 ko en Mo. c) 3 To en Go.</span></summary>
+        <div>
+          <ul>
+            <li>a) 2,5 × 1 000 = <strong>2 500 Mo</strong>.</li>
+            <li>b) 750 ÷ 1 000 = <strong>0,75 Mo</strong>.</li>
+            <li>c) 3 × 1 000 = <strong>3 000 Go</strong>.</li>
+          </ul>
+        </div>
+      </details>
+      <details>
+        <summary>3. La clé USB<span class="q">Une clé USB de 32 Go est vide. Tes photos font environ 4 Mo chacune. Combien de photos peux-tu y mettre, à peu près ?</span></summary>
+        <div>
+          <span>32 Go = 32 000 Mo. 32 000 ÷ 4 = <strong>8 000 photos</strong> environ.</span>
+        </div>
+      </details>
+      <details>
+        <summary>4. Le jeu de 45 Go<span class="q">Tu télécharges un jeu de 45 Go. Combien de temps, au mieux, avec la fibre à 500 Mbit/s ? Et avec une 4G à 25 Mbit/s ?</span></summary>
+        <div>
+          <span>45 Go = 45 000 Mo.</span>
+          <span>Fibre : 500 ÷ 8 = 62,5 Mo/s ; 45 000 ÷ 62,5 = 720 s = <strong>12 minutes</strong>.</span>
+          <span>4G : 25 ÷ 8 = 3,125 Mo/s ; 45 000 ÷ 3,125 = 14 400 s = <strong>4 heures</strong>. Et ça mangerait 45 Go de forfait !</span>
+        </div>
+      </details>
+      <details>
+        <summary>5. Le disque qui rétrécit<span class="q">Un disque dur est vendu « 1 To ». Combien de Gio l'ordinateur peut-il afficher ?</span></summary>
+        <div>
+          <span>1 To = 1 000 000 000 000 octets. 1 Gio = 1 073 741 824 octets.</span>
+          <span>1 000 000 000 000 ÷ 1 073 741 824 ≈ <strong>931 Gio</strong>. Rien n'a disparu : c'est une autre unité.</span>
+        </div>
+      </details>
+      <details>
+        <summary>6. Envoyer une vidéo<span class="q">Tu as filmé 10 minutes de vidéo HD, à environ 100 Mo par minute. Tu l'envoies avec une connexion qui envoie à 20 Mbit/s. Combien de temps ?</span></summary>
+        <div>
+          <span>Taille : 10 × 100 = 1 000 Mo (1 Go).</span>
+          <span>Vitesse : 20 ÷ 8 = 2,5 Mo/s. Temps : 1 000 ÷ 2,5 = 400 s = <strong>6 min 40 s</strong>.</span>
+          <span>Remarque : sur beaucoup de connexions, on <strong>envoie</strong> plus lentement qu'on ne <strong>reçoit</strong>.</span>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• Un <strong>bit</strong> = un 0 ou un 1, rangé dans la matière (aimant, charge électrique, creux sur un CD).</span>
+      <span>• Un <strong>octet</strong> = 8 bits = 256 valeurs (de 0 à 255).</span>
+      <span>• En UTF-8 : lettre sans accent = 1 octet, é ou ç = 2 octets, € = 3 octets, émoji = souvent 4 octets.</span>
+      <span>• 1 ko = 1 000 o, 1 Mo = 1 000 ko, 1 Go = 1 000 Mo, 1 To = 1 000 Go. Les Kio, Mio, Gio comptent par 1 024.</span>
+      <span>• Ordres de grandeur : SMS ≈ 100 octets, photo ≈ quelques Mo, minute de vidéo HD ≈ 100 Mo, film ≈ quelques Go, gros jeu ≈ des dizaines de Go.</span>
+      <span>• Débit en <strong>Mbit/s</strong> ÷ 8 = vitesse en <strong>Mo/s</strong>. Temps = taille ÷ vitesse.</span>
+      <span>• Le forfait, c'est la quantité de données ; le débit, c'est la vitesse.</span>
+    </div>
+  </section>
+
+  <!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"><a class="prev" href="comment-marche-internet.html"><span>← Précédent</span><strong>Comment marche Internet</strong></a><a class="next" href="les-pixels-et-la-compression.html"><span>Suivant →</span><strong>Les pixels et la compression</strong></a></div><a class="tnav-home" href="numerique.html">⌂ Tous les tutoriels numériques</a></nav><!--/tnav-->
+<footer>Fiche de révision · Les octets et le stockage</footer>
+</main>
+
+<script>
+(function () {
+  /*
+   * Hooks de test : window.__oct
+   *   toBytes(text)                  -> {chars:[{ch, cp, bytes:[n…], ascii}], count, bytes, bits, asciiOnly}
+   *                                     encodage UTF-8 calculé à la main (1 à 4 octets par point de code ;
+   *                                     surrogate isolé → U+FFFD, comme TextEncoder)
+   *   convert(value, from, to)       -> number (NaN si unité inconnue ou valeur invalide)
+   *                                     unités : 'bit','kbit','Mbit','Gbit','o','ko','Mo','Go','To','kio','Mio','Gio','Tio'
+   *                                     ko/Mo/Go/To = ×1000 (SI) ; kio/Mio/Gio/Tio = ×1024 ; 1 o = 8 bits
+   *   fit(capacityGo, items, systemGo?) -> {capacityMo, systemMo, usedMo, freeMo, overflowMo, fits, percent,
+   *                                     parts:[{id, count, mo}], room:{id: combien rentrent encore}}
+   *                                     items = {photos, videos (minutes), jeux, apps, chansons} ; 1 Go = 1000 Mo ;
+   *                                     tailles : photo 3 Mo, minute vidéo HD 100 Mo, gros jeu 4000 Mo, appli 200 Mo,
+   *                                     chanson 5 Mo ; système 15 Go par défaut
+   *   downloadTime(sizeMo, mbps)     -> {seconds, moPerSec, text}  (seconds = sizeMo × 8 ÷ mbps ; NaN si débit ≤ 0)
+   *   extras : rawImage(megapixels) -> octets ; rawVideo(w, h, fps, minutes) -> octets ;
+   *            howMany(contentMo, supportMo) -> nombre de supports ; fmtDuration(s) ; units, items, weigh, quiz
+   * Rien n'est envoyé ni enregistré : tout reste dans la page.
+   */
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[c]; }); }
+  function nb(s) { return String(s).replace(/[   ]/g, " "); }
+  function fmt(x, maxDec) {
+    if (!isFinite(x)) return "—";
+    return nb(Number(x).toLocaleString("fr-FR", { maximumFractionDigits: maxDec == null ? 2 : maxDec }));
+  }
+  function pl(n, one, many) { return n > 1 ? many : one; }
+  var SUP = { "0": "⁰", "1": "¹", "2": "²", "3": "³", "4": "⁴", "5": "⁵", "6": "⁶", "7": "⁷", "8": "⁸", "9": "⁹", "-": "⁻" };
+  function sup(n) { return String(n).split("").map(function (c) { return SUP[c] || c; }).join(""); }
+  function fmtSmart(x) {
+    if (!isFinite(x)) return "—";
+    if (x === 0) return "0";
+    var a = Math.abs(x);
+    if (a >= 1e15 || a < 1e-4) {
+      var e = Math.floor(Math.log(a) / Math.LN10), m = x / Math.pow(10, e);
+      m = Math.round(m * 1000) / 1000;
+      if (Math.abs(m) >= 10) { m = m / 10; e += 1; }
+      return fmt(m, 3) + " × 10" + sup(e);
+    }
+    var p = Number(x.toPrecision(12));
+    if (Math.abs(p - Math.round(p)) < 1e-9) return fmt(Math.round(p), 0);
+    if (a >= 1000) return fmt(p, 2);
+    return nb(p.toLocaleString("fr-FR", { maximumSignificantDigits: 6 }));
+  }
+  function parseNum(s) {
+    var t = String(s == null ? "" : s).replace(/[\s  ']/g, "").replace(",", ".");
+    if (t === "" || !/^[0-9]*\.?[0-9]*$/.test(t) || t === ".") return NaN;
+    return Number(t);
+  }
+  function pressGroup(container, btn) {
+    Array.prototype.forEach.call(container.querySelectorAll("button"), function (b) { b.setAttribute("aria-pressed", b === btn ? "true" : "false"); });
+  }
+
+  /* ---------- Étape 1 : bits physiques ---------- */
+  var bits = [0, 1, 0, 0, 0, 0, 0, 1], view = "disque";
+  var bitBtns = $("bitBtns");
+  bitBtns.innerHTML = bits.map(function (b, i) { return "<button type=\"button\" data-i=\"" + i + "\" aria-label=\"Bit " + (i + 1) + "\">" + b + "</button>"; }).join("");
+  function byteValue() { return bits.reduce(function (acc, b) { return acc * 2 + b; }, 0); }
+  function drawPhys() {
+    var g = "";
+    for (var i = 0; i < 8; i++) {
+      var x = 6 + i * 49, b = bits[i], cx = x + 22;
+      g += "<g data-i=\"" + i + "\">";
+      if (view === "disque") {
+        g += "<rect x=\"" + x + "\" y=\"18\" width=\"44\" height=\"64\" rx=\"4\" fill=\"" + (b ? "var(--acc-soft)" : "var(--paper)") + "\" stroke=\"var(--ink)\" stroke-width=\"1.5\"/>";
+        if (b) g += "<path d=\"M" + cx + " 72 V36\" stroke=\"var(--acc)\" stroke-width=\"4\"/><polygon points=\"" + (cx - 8) + ",40 " + (cx + 8) + ",40 " + cx + ",26\" fill=\"var(--acc)\"/>";
+        else g += "<path d=\"M" + cx + " 28 V64\" stroke=\"var(--ink-soft)\" stroke-width=\"4\"/><polygon points=\"" + (cx - 8) + ",60 " + (cx + 8) + ",60 " + cx + ",74\" fill=\"var(--ink-soft)\"/>";
+      } else if (view === "flash") {
+        g += "<rect x=\"" + x + "\" y=\"18\" width=\"44\" height=\"64\" rx=\"4\" fill=\"var(--paper)\" stroke=\"var(--ink)\" stroke-width=\"1.5\"/>";
+        g += "<rect x=\"" + (x + 6) + "\" y=\"30\" width=\"32\" height=\"40\" rx=\"3\" fill=\"none\" stroke=\"var(--line)\" stroke-width=\"1.5\" stroke-dasharray=\"3 2\"/>";
+        if (b) [38, 50, 62].forEach(function (cy) { g += "<circle cx=\"" + (cx - 6) + "\" cy=\"" + cy + "\" r=\"4\" fill=\"var(--acc)\"/><circle cx=\"" + (cx + 6) + "\" cy=\"" + cy + "\" r=\"4\" fill=\"var(--acc)\"/>"; });
+      } else {
+        g += "<rect x=\"" + x + "\" y=\"18\" width=\"49\" height=\"64\" fill=\"var(--acc-soft)\"/>";
+        g += "<rect x=\"" + x + "\" y=\"18\" width=\"49\" height=\"4\" fill=\"var(--ink-soft)\"/>";
+        if (b) g += "<rect x=\"" + (x + 8) + "\" y=\"22\" width=\"30\" height=\"22\" rx=\"3\" fill=\"var(--paper)\" stroke=\"var(--ink)\" stroke-width=\"1.5\"/>";
+        g += "<path d=\"M" + cx + " 80 L" + cx + " " + (b ? 48 : 26) + "\" stroke=\"var(--red)\" stroke-width=\"1.5\" stroke-dasharray=\"3 3\"/>";
+      }
+      g += "<text x=\"" + cx + "\" y=\"104\" font-size=\"16\" font-weight=\"600\" text-anchor=\"middle\">" + b + "</text></g>";
+    }
+    $("physSvg").innerHTML = g;
+    Array.prototype.forEach.call(bitBtns.querySelectorAll("button"), function (bt, i) { bt.textContent = bits[i]; bt.setAttribute("aria-pressed", bits[i] ? "true" : "false"); });
+    var v = byteValue(), ch = v >= 33 && v <= 126 ? String.fromCharCode(v) : "";
+    $("physOut").textContent = bits.join("") + " = " + v + (ch ? " → en ASCII, c’est le caractère « " + ch + " »" : (v === 32 ? " → en ASCII, c’est l’espace" : " → ce n’est pas une lettre en ASCII"));
+    var notes = {
+      disque: "Flèche vers le haut ou vers le bas : la petite zone est aimantée dans un sens ou dans l’autre. Une tête de lecture passe au-dessus et sent le sens de l’aimant.",
+      flash: "Une case qui garde des charges électriques, ou une case vide. Les charges restent même quand le téléphone est éteint.",
+      cd: "Le laser (en pointillé rouge) tombe sur un creux ou sur un plat, et la lumière ne revient pas de la même façon."
+    };
+    $("physNote").textContent = notes[view] + " (C’est simplifié : en vrai, les appareils utilisent des codes plus malins, mais l’idée est la même : deux états différents.)";
+  }
+  function toggleBit(i) { if (i >= 0 && i < 8) { bits[i] = bits[i] ? 0 : 1; drawPhys(); } }
+  bitBtns.addEventListener("click", function (e) { var b = e.target.closest("button"); if (b) toggleBit(Number(b.getAttribute("data-i"))); });
+  $("physSvg").addEventListener("click", function (e) { var g = e.target.closest("[data-i]"); if (g) toggleBit(Number(g.getAttribute("data-i"))); });
+  $("physView").addEventListener("click", function (e) { var b = e.target.closest("button"); if (!b) return; view = b.getAttribute("data-view"); pressGroup($("physView"), b); drawPhys(); });
+  Array.prototype.forEach.call(document.querySelectorAll("[data-preset]"), function (b) {
+    b.addEventListener("click", function () { var v = Number(b.getAttribute("data-preset")); for (var i = 7; i >= 0; i--) { bits[i] = v % 2; v = Math.floor(v / 2); } drawPhys(); });
+  });
+  drawPhys();
+
+  /* ---------- Étape 2 : UTF-8 ---------- */
+  function utf8(cp) {
+    if (cp < 0x80) return [cp];
+    if (cp < 0x800) return [0xC0 | (cp >> 6), 0x80 | (cp & 63)];
+    if (cp < 0x10000) return [0xE0 | (cp >> 12), 0x80 | ((cp >> 6) & 63), 0x80 | (cp & 63)];
+    return [0xF0 | (cp >> 18), 0x80 | ((cp >> 12) & 63), 0x80 | ((cp >> 6) & 63), 0x80 | (cp & 63)];
+  }
+  function toBytes(text) {
+    var s = String(text == null ? "" : text), chars = [], total = 0, i = 0;
+    while (i < s.length) {
+      var cp = s.codePointAt(i), len = cp > 0xFFFF ? 2 : 1;
+      var shown = s.slice(i, i + len);
+      if (cp >= 0xD800 && cp <= 0xDFFF) cp = 0xFFFD;
+      var b = utf8(cp);
+      chars.push({ ch: shown, cp: cp, bytes: b, ascii: cp < 128 });
+      total += b.length; i += len;
+    }
+    return { chars: chars, count: chars.length, bytes: total, bits: total * 8, asciiOnly: chars.every(function (c) { return c.ascii; }) };
+  }
+  function hex(cp) { var h = cp.toString(16).toUpperCase(); while (h.length < 4) h = "0" + h; return "U+" + h; }
+  function bin8(n) { var b = n.toString(2); while (b.length < 8) b = "0" + b; return b; }
+  function renderText() {
+    var r = toBytes($("txt").value);
+    $("tChars").textContent = fmt(r.count, 0);
+    $("tBytes").textContent = fmt(r.bytes, 0);
+    $("tBits").textContent = fmt(r.bits, 0);
+    $("tOut").innerHTML = r.chars.map(function (c) {
+      var n = c.bytes.length, g = c.ch === " " ? "<span class=\"g sp\">espace</span>" : "<span class=\"g\">" + esc(c.ch) + "</span>";
+      return "<div class=\"chr n" + n + "\">" + g + "<span class=\"cp\">" + (c.ascii ? "n° " + c.cp : hex(c.cp)) + "</span>" +
+        c.bytes.map(function (x) { return "<code>" + bin8(x) + "</code>"; }).join("") +
+        "<span class=\"n\">" + n + " " + pl(n, "octet", "octets") + "</span></div>";
+    }).join("");
+    var note;
+    if (!r.count) note = "Tape quelque chose pour voir ses octets.";
+    else if (r.asciiOnly) note = r.count + " " + pl(r.count, "caractère", "caractères") + " sans accent → " + r.bytes + " " + pl(r.bytes, "octet", "octets") + " : un octet par caractère, comme en ASCII.";
+    else note = r.count + " " + pl(r.count, "caractère", "caractères") + ", mais " + r.bytes + " octets : les caractères en couleur prennent plus d’un octet. Les octets qui commencent par 10 sont des « suites » : ils complètent le caractère.";
+    $("tNote").textContent = note;
+  }
+  $("txt").addEventListener("input", renderText);
+  $("txtBtns").addEventListener("click", function (e) { var b = e.target.closest("button"); if (!b) return; $("txt").value = b.getAttribute("data-t"); renderText(); });
+  renderText();
+
+  /* ---------- Étape 4 : convertisseur ---------- */
+  var UNITS = {
+    "bit": 0.125, "kbit": 125, "Mbit": 125000, "Gbit": 125000000,
+    "o": 1, "ko": 1e3, "Mo": 1e6, "Go": 1e9, "To": 1e12,
+    "kio": 1024, "Mio": 1048576, "Gio": 1073741824, "Tio": 1099511627776
+  };
+  var UNIT_LABELS = [
+    ["bit", "bit"], ["kbit", "kilobit (kbit)"], ["Mbit", "mégabit (Mbit)"], ["Gbit", "gigabit (Gbit)"],
+    ["o", "octet (o)"], ["ko", "kilooctet (ko)"], ["Mo", "mégaoctet (Mo)"], ["Go", "gigaoctet (Go)"], ["To", "téraoctet (To)"],
+    ["kio", "kibioctet (kio, × 1 024)"], ["Mio", "mébioctet (Mio)"], ["Gio", "gibioctet (Gio)"], ["Tio", "tébioctet (Tio)"]
+  ];
+  function convert(value, from, to) {
+    if (!Object.prototype.hasOwnProperty.call(UNITS, from) || !Object.prototype.hasOwnProperty.call(UNITS, to)) return NaN;
+    var v = typeof value === "number" ? value : parseNum(value);
+    if (!isFinite(v)) return NaN;
+    return Number((v * UNITS[from] / UNITS[to]).toPrecision(12));
+  }
+  var opts = UNIT_LABELS.map(function (u) { return "<option value=\"" + u[0] + "\">" + esc(u[1]) + "</option>"; }).join("");
+  $("cvFrom").innerHTML = opts; $("cvTo").innerHTML = opts;
+  $("cvFrom").value = "Go"; $("cvTo").value = "Mo";
+  function renderConv() {
+    var v = parseNum($("cvVal").value), f = $("cvFrom").value, t = $("cvTo").value;
+    if (!isFinite(v)) { $("cvOut").textContent = "Tape un nombre positif, par exemple 2,5 ou 1 500."; $("cvCalc").innerHTML = ""; return; }
+    var r = convert(v, f, t), oct = Number((v * UNITS[f]).toPrecision(12));
+    $("cvOut").textContent = fmtSmart(v) + " " + f + " = " + fmtSmart(r) + " " + t;
+    var lines = [];
+    if (f === "o") lines.push("On part déjà d’octets : " + fmtSmart(v) + " o.");
+    else if (f === "bit") lines.push("Vers les octets : " + fmtSmart(v) + " bits ÷ 8 = " + fmtSmart(oct) + " o.");
+    else lines.push("Vers les octets : 1 " + f + " = " + fmtSmart(UNITS[f]) + " o, donc " + fmtSmart(v) + " × " + fmtSmart(UNITS[f]) + " = " + fmtSmart(oct) + " o.");
+    if (t === "o") lines.push("On veut des octets : c’est fini.");
+    else if (t === "bit") lines.push("Vers les bits : " + fmtSmart(oct) + " × 8 = " + fmtSmart(r) + " bits.");
+    else lines.push("Vers les " + t + " : 1 " + t + " = " + fmtSmart(UNITS[t]) + " o, donc " + fmtSmart(oct) + " ÷ " + fmtSmart(UNITS[t]) + " = " + fmtSmart(r) + " " + t + ".");
+    $("cvCalc").innerHTML = lines.map(function (l) { return "<li>" + esc(l) + "</li>"; }).join("");
+  }
+  ["cvVal", "cvFrom", "cvTo"].forEach(function (id) { $(id).addEventListener("input", renderConv); $(id).addEventListener("change", renderConv); });
+  $("cvSwap").addEventListener("click", function () { var a = $("cvFrom").value; $("cvFrom").value = $("cvTo").value; $("cvTo").value = a; renderConv(); });
+  renderConv();
+
+  /* ---------- Étape 5 : combien ça pèse ---------- */
+  var CATS = [["a", "moins d’1 Mo"], ["b", "quelques Mo"], ["c", "dizaines ou centaines de Mo"], ["d", "des Go"]];
+  var WEIGH = [
+    { id: "sms", name: "Un SMS", cat: "a", bytes: 140, typ: "au maximum 140 octets", why: "160 lettres codées sur 7 bits chacune : 160 × 7 = 1 120 bits = 140 octets." },
+    { id: "page", name: "Une page de texte, sans images", cat: "a", bytes: 3000, typ: "environ 2 à 3 ko", why: "Environ 2 000 à 3 000 caractères, à peu près un octet chacun." },
+    { id: "mail", name: "Un e-mail sans pièce jointe", cat: "a", bytes: 20000, typ: "souvent quelques ko à quelques dizaines de ko", why: "Le texte, la mise en forme et les informations d’envoi." },
+    { id: "photo", name: "Une photo de téléphone", cat: "b", bytes: 3e6, typ: "environ 2 à 5 Mo", why: "Des millions de pixels, mais compressés (étape 8)." },
+    { id: "mp3", name: "Une chanson en MP3", cat: "b", bytes: 4e6, typ: "environ 3 à 8 Mo", why: "Entre 1 et 2,5 Mo par minute de musique environ, selon la qualité." },
+    { id: "video", name: "Une minute de vidéo HD", cat: "c", bytes: 1e8, typ: "souvent 50 à 200 Mo", why: "30 images par seconde ou plus : ça s’accumule vite." },
+    { id: "app", name: "Une appli de messagerie", cat: "c", bytes: 2e8, typ: "souvent une à quelques centaines de Mo", why: "Le programme, ses images, ses sons… et elle grossit encore avec tes messages et tes photos reçues." },
+    { id: "film", name: "Un film en HD", cat: "d", bytes: 3e9, typ: "environ 2 à 5 Go", why: "Une heure et demie de vidéo, même bien compressée." },
+    { id: "jeu", name: "Un gros jeu vidéo de console", cat: "d", bytes: 5e10, typ: "souvent des dizaines de Go", why: "Des décors, des sons, des musiques et des vidéos en haute qualité." }
+  ];
+  var wAns = {};
+  function fmtBytes(b) {
+    if (b < 1e3) return fmt(b, 0) + " o";
+    if (b < 1e6) return fmt(b / 1e3, 1) + " ko";
+    if (b < 1e9) return fmt(b / 1e6, 1) + " Mo";
+    if (b < 1e12) return fmt(b / 1e9, 1) + " Go";
+    return fmt(b / 1e12, 1) + " To";
+  }
+  function renderWeigh() {
+    $("wList").innerHTML = WEIGH.map(function (w) {
+      var a = wAns[w.id], cls = a == null ? "" : (a === w.cat ? " good" : " bad"), fb = "";
+      if (a != null) {
+        var good = CATS.filter(function (c) { return c[0] === w.cat; })[0][1];
+        fb = (a === w.cat ? "<strong>Juste !</strong> " : "<strong>Pas tout à fait :</strong> plutôt « " + esc(good) + " ». ") + "Typiquement " + esc(w.typ) + ". " + esc(w.why);
+      }
+      return "<div class=\"wcard" + cls + "\"><strong>" + esc(w.name) + "</strong><div class=\"btns\" role=\"group\" aria-label=\"" + esc(w.name) + "\">" +
+        CATS.map(function (c) { return "<button type=\"button\" data-w=\"" + w.id + "\" data-c=\"" + c[0] + "\" aria-pressed=\"" + (a === c[0] ? "true" : "false") + "\">" + esc(c[1]) + "</button>"; }).join("") +
+        "</div><p class=\"wfb\" aria-live=\"polite\">" + fb + "</p></div>";
+    }).join("");
+    var score = WEIGH.filter(function (w) { return wAns[w.id] === w.cat; }).length;
+    $("wScore").textContent = score + " / " + WEIGH.length;
+    var done = WEIGH.filter(function (w) { return wAns[w.id] != null; }).slice().sort(function (x, y) { return x.bytes - y.bytes; });
+    $("wRows").innerHTML = done.length ? done.map(function (w) {
+      var pct = Math.max(1, Math.min(100, Math.log(w.bytes) / Math.LN10 / 12 * 100));
+      return "<div class=\"row\"><span class=\"lab\">" + esc(w.name) + "</span><div class=\"track\"><div class=\"bar\" style=\"width:" + pct.toFixed(1) + "%\"></div></div><span class=\"val\">≈ " + fmtBytes(w.bytes) + "</span></div>";
+    }).join("") : "<p class=\"soft\">Rien pour l’instant : classe un premier objet.</p>";
+  }
+  $("wList").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-w]"); if (!b) return;
+    wAns[b.getAttribute("data-w")] = b.getAttribute("data-c");
+    var id = b.getAttribute("data-w"), c = b.getAttribute("data-c");
+    renderWeigh();
+    var nb2 = $("wList").querySelector("button[data-w=\"" + id + "\"][data-c=\"" + c + "\"]"); if (nb2) nb2.focus();
+  });
+  $("wReset").addEventListener("click", function () { wAns = {}; renderWeigh(); });
+  renderWeigh();
+
+  /* ---------- Étape 6 : remplis ton téléphone ---------- */
+  var ITEMS = [
+    { id: "photos", name: "Photos", one: "photo", many: "photos", mo: 3, step: 100, hint: "≈ 3 Mo chacune" },
+    { id: "videos", name: "Vidéo HD", one: "minute de vidéo", many: "minutes de vidéo", mo: 100, step: 10, hint: "en minutes, ≈ 100 Mo la minute" },
+    { id: "jeux", name: "Gros jeux", one: "gros jeu", many: "gros jeux", mo: 4000, step: 1, hint: "≈ 4 Go chacun" },
+    { id: "apps", name: "Applis", one: "appli", many: "applis", mo: 200, step: 5, hint: "≈ 200 Mo chacune" },
+    { id: "chansons", name: "Chansons", one: "chanson", many: "chansons", mo: 5, step: 50, hint: "≈ 5 Mo chacune" }
+  ];
+  var SYSTEM_GO = 15;
+  function fit(capacityGo, items, systemGo) {
+    var capMo = Number(capacityGo) * 1000;
+    if (!(capMo > 0)) capMo = 0;
+    var sysGo = systemGo == null ? SYSTEM_GO : Number(systemGo);
+    var sys = isFinite(sysGo) && sysGo > 0 ? sysGo * 1000 : 0;
+    items = items || {};
+    var parts = [], used = sys;
+    ITEMS.forEach(function (it) {
+      var n = Math.max(0, Math.floor(Number(items[it.id]) || 0)), mo = n * it.mo;
+      parts.push({ id: it.id, count: n, mo: mo }); used += mo;
+    });
+    var free = capMo - used, room = {};
+    ITEMS.forEach(function (it) { room[it.id] = free > 0 ? Math.floor(free / it.mo + 1e-9) : 0; });
+    return { capacityMo: capMo, systemMo: sys, usedMo: used, freeMo: Math.max(0, free), overflowMo: Math.max(0, -free), fits: free >= 0,
+      percent: capMo > 0 ? Math.min(100, used / capMo * 100) : 100, parts: parts, room: room };
+  }
+  function fmtMo(mo) { return mo >= 1000 ? fmt(mo / 1000, 1) + " Go" : fmt(mo, 0) + " Mo"; }
+  var cap = 128, counts = {}, fMsg = "", fMsgCls = "";
+  ITEMS.forEach(function (it) { counts[it.id] = 0; });
+  $("fillRows").innerHTML = ITEMS.map(function (it) {
+    return "<div class=\"fill-row\"><span class=\"nm\"><i class=\"c-" + it.id + "\" style=\"width:14px;height:14px;border-radius:3px;flex:none;display:inline-block\"></i><span>" + esc(it.name) + "<small>" + esc(it.hint) + "</small></span></span>" +
+      "<button type=\"button\" data-f=\"" + it.id + "\" data-s=\"-1\" aria-label=\"Enlever " + it.step + " " + esc(pl(it.step, it.one, it.many)) + "\">− " + it.step + "</button>" +
+      "<span class=\"cnt\" id=\"cnt-" + it.id + "\">0</span>" +
+      "<button type=\"button\" data-f=\"" + it.id + "\" data-s=\"1\" aria-label=\"Ajouter " + it.step + " " + esc(pl(it.step, it.one, it.many)) + "\">+ " + it.step + "</button></div>";
+  }).join("");
+  function renderFill() {
+    var r = fit(cap, counts), denom = Math.max(r.capacityMo, r.usedMo) || 1;
+    var segs = "<i class=\"c-sys\" style=\"width:" + (r.systemMo / denom * 100).toFixed(2) + "%\" title=\"Système\"></i>";
+    r.parts.forEach(function (p) { segs += "<i class=\"c-" + p.id + "\" style=\"width:" + (p.mo / denom * 100).toFixed(2) + "%\"></i>"; });
+    $("disk").innerHTML = segs;
+    $("disk").classList.toggle("over", !r.fits);
+    $("disk").setAttribute("aria-label", "Stockage : " + fmtMo(r.usedMo) + " utilisés sur " + cap + " Go");
+    $("fUsed").textContent = fmtMo(r.usedMo) + " / " + cap + " Go";
+    $("fFree").textContent = r.fits ? fmtMo(r.freeMo) : "il manque " + fmtMo(r.overflowMo);
+    $("fPct").textContent = fmt(r.usedMo / r.capacityMo * 100, 0) + " %";
+    ITEMS.forEach(function (it) { $("cnt-" + it.id).textContent = fmt(counts[it.id], 0); });
+    var m = fMsg;
+    if (!r.fits) { m = "Ça ne rentre pas dans " + cap + " Go : il faut libérer " + fmtMo(r.overflowMo) + ", ou prendre un téléphone plus grand."; fMsgCls = "no"; }
+    $("fMsg").textContent = m; $("fMsg").className = "msg" + (m ? " " + fMsgCls : "");
+    $("fRoom").textContent = r.fits && r.freeMo > 0 ? "Il reste de la place pour encore " + ITEMS.map(function (it) { var n = r.room[it.id]; return fmt(n, 0) + " " + pl(n, it.one, it.many); }).join(", ou ") + "." : "";
+  }
+  $("fillRows").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-f]"); if (!b) return;
+    var id = b.getAttribute("data-f"), s = Number(b.getAttribute("data-s")), it = ITEMS.filter(function (x) { return x.id === id; })[0];
+    if (s < 0) { counts[id] = Math.max(0, counts[id] - it.step); fMsg = ""; }
+    else {
+      var room = fit(cap, counts).room[id], n = Math.min(it.step, room);
+      if (n <= 0) { fMsg = "Plus de place pour ajouter des " + it.many + " : le téléphone est plein !"; fMsgCls = "no"; }
+      else { counts[id] += n; fMsg = n < it.step ? "Seulement " + n + " " + pl(n, it.one, it.many) + " " + pl(n, "a pu", "ont pu") + " rentrer : le téléphone est plein !" : ""; fMsgCls = "no"; }
+    }
+    renderFill();
+  });
+  $("capBtns").addEventListener("click", function (e) { var b = e.target.closest("button"); if (!b) return; cap = Number(b.getAttribute("data-cap")); pressGroup($("capBtns"), b); fMsg = ""; renderFill(); });
+  $("fReset").addEventListener("click", function () { ITEMS.forEach(function (it) { counts[it.id] = 0; }); fMsg = "Téléphone vidé."; fMsgCls = "ok"; renderFill(); });
+  renderFill();
+
+  /* ---------- Étape 7 : débit ---------- */
+  function fmtDuration(sec) {
+    if (!isFinite(sec) || sec < 0) return "—";
+    if (sec < 1) return "moins d’une seconde";
+    if (sec < 59.5) return fmt(sec, sec < 10 ? 1 : 0) + " s";
+    var t = Math.round(sec);
+    if (t < 3600) { var m = Math.floor(t / 60), s = t % 60; return m + " min" + (s ? " " + s + " s" : ""); }
+    if (t < 86400) { var h = Math.floor(t / 3600), m2 = Math.round((t % 3600) / 60); if (m2 === 60) { h++; m2 = 0; } return h + " h" + (m2 ? " " + m2 + " min" : ""); }
+    var d = Math.floor(t / 86400), h2 = Math.round((t % 86400) / 3600); if (h2 === 24) { d++; h2 = 0; }
+    return d + " " + pl(d, "jour", "jours") + (h2 ? " " + h2 + " h" : "");
+  }
+  function downloadTime(sizeMo, mbps) {
+    var s = Number(sizeMo), r = Number(mbps);
+    if (!(s >= 0) || !(r > 0) || !isFinite(s) || !isFinite(r)) return { seconds: NaN, moPerSec: NaN, text: "—" };
+    var mops = r / 8, sec = s / mops;
+    return { seconds: sec, moPerSec: mops, text: fmtDuration(sec) };
+  }
+  var dlShown = 0;
+  function renderDl() {
+    var size = parseNum($("dlSize").value), unit = $("dlUnit").value, mbps = parseNum($("dlMbps").value);
+    var sizeMo = unit === "Go" ? size * 1000 : size;
+    var r = downloadTime(sizeMo, mbps), lines = [];
+    $("dlMops").textContent = isFinite(r.moPerSec) ? fmtSmart(r.moPerSec) + " Mo/s" : "—";
+    $("dlTime").textContent = r.text;
+    if (!isFinite(r.seconds)) {
+      lines.push(!isFinite(size) ? "Tape une taille, par exemple 3 ou 1,5." : "Tape un débit plus grand que 0, par exemple 100.");
+      $("dlCalc").innerHTML = "<li>" + esc(lines[0]) + "</li>";
+      $("dlStep").disabled = true; $("dlAll").disabled = true; return;
+    }
+    lines.push(unit === "Go" ? "La taille en Mo : " + fmtSmart(size) + " Go × 1 000 = " + fmtSmart(sizeMo) + " Mo." : "La taille : " + fmtSmart(sizeMo) + " Mo.");
+    lines.push("Le débit est en bits. 8 bits = 1 octet, donc " + fmtSmart(mbps) + " Mbit/s ÷ 8 = " + fmtSmart(r.moPerSec) + " Mo par seconde.");
+    lines.push("Le temps = taille ÷ vitesse : " + fmtSmart(sizeMo) + " ÷ " + fmtSmart(r.moPerSec) + " = " + fmtSmart(Number(r.seconds.toPrecision(6))) + " secondes.");
+    lines.push("Ça fait " + r.text + ", au mieux. En vrai, c’est souvent un peu plus long : le débit annoncé est un maximum, et on partage souvent la connexion.");
+    $("dlCalc").innerHTML = lines.map(function (l, k) { return "<li" + (k < dlShown ? "" : " hidden") + ">" + esc(l) + "</li>"; }).join("");
+    $("dlStep").disabled = dlShown >= lines.length; $("dlAll").disabled = dlShown >= lines.length;
+    $("dlStep").textContent = dlShown === 0 ? "Pas à pas" : "Étape suivante";
+  }
+  $("dlStep").addEventListener("click", function () { dlShown = Math.min(4, dlShown + 1); renderDl(); });
+  $("dlAll").addEventListener("click", function () { dlShown = 4; renderDl(); });
+  $("dlHide").addEventListener("click", function () { dlShown = 0; renderDl(); });
+  $("dlSize").addEventListener("input", renderDl);
+  $("dlUnit").addEventListener("change", renderDl);
+  $("dlMbps").addEventListener("input", function () {
+    var v = parseNum($("dlMbps").value), sel = $("dlRate"), match = "";
+    Array.prototype.forEach.call(sel.options, function (o) { if (o.value !== "" && Number(o.value) === v) match = o.value; });
+    sel.value = match; renderDl();
+  });
+  $("dlRate").addEventListener("change", function () { var v = $("dlRate").value; if (v !== "") $("dlMbps").value = v; else $("dlMbps").focus(); renderDl(); });
+  $("dlPresets").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-mo]"); if (!b) return;
+    var mo = Number(b.getAttribute("data-mo"));
+    if (mo >= 1000) { $("dlUnit").value = "Go"; $("dlSize").value = fmt(mo / 1000, 3).replace(/ /g, ""); }
+    else { $("dlUnit").value = "Mo"; $("dlSize").value = String(mo); }
+    renderDl();
+  });
+  renderDl();
+
+  /* ---------- Étape 8 : pixels et compression ---------- */
+  function rawImage(mp) { var m = Number(mp); return m > 0 ? m * 1e6 * 3 : NaN; }
+  function rawVideo(w, h, fps, minutes) { var v = Number(w) * Number(h) * 3 * Number(fps) * 60 * Number(minutes == null ? 1 : minutes); return v >= 0 ? v : NaN; }
+  function renderPx() {
+    var mp = Number($("pxMp").value), raw = rawImage(mp);
+    $("pxOut").textContent = fmt(mp * 1e6, 0) + " pixels × 3 octets = " + fmt(raw / 1e6, 0) + " Mo sans compression. Compressée, la photo pèse souvent environ 10 fois moins : à peu près " + fmt(raw / 1e7, 1) + " Mo.";
+    var hd = $("vDef").value === "hd", w = hd ? 1920 : 3840, h = hd ? 1080 : 2160, fps = Number($("vFps").value);
+    var img = w * h * 3, min = rawVideo(w, h, fps, 1);
+    $("vOut").textContent = "Une image : " + fmt(w, 0) + " × " + fmt(h, 0) + " × 3 = " + fmt(img, 0) + " octets ≈ " + fmt(img / 1e6, 1) + " Mo. Une minute = " + fmt(fps * 60, 0) + " images, donc ≈ " + fmt(min / 1e9, 1) + " Go sans compression !";
+  }
+  ["pxMp", "vDef", "vFps"].forEach(function (id) { $(id).addEventListener("change", renderPx); });
+  renderPx();
+
+  /* ---------- Étape 9 : combien de disquettes ---------- */
+  var SUPPORTS = {
+    disquette: { mo: 1.44, one: "disquette", many: "disquettes", mm: 3.3 },
+    cd: { mo: 700, one: "CD", many: "CD", mm: 1.2 },
+    dvd: { mo: 4700, one: "DVD", many: "DVD", mm: 1.2 },
+    cle: { mo: 64000, one: "clé USB de 64 Go", many: "clés USB de 64 Go", mm: 0 }
+  };
+  function howMany(contentMo, supportMo) { var c = Number(contentMo), s = Number(supportMo); return c > 0 && s > 0 ? Math.ceil(c / s - 1e-9) : NaN; }
+  function renderHm() {
+    var c = Number($("hmC").value), S = SUPPORTS[$("hmS").value], n = howMany(c, S.mo), txt;
+    if (n <= 1) {
+      var k = Math.floor(S.mo / c + 1e-9);
+      txt = "Ça rentre : 1 " + S.one + " suffit. Il pourrait même en contenir environ " + fmt(k, 0) + ".";
+    } else {
+      txt = "Il faut " + fmt(n, 0) + " " + S.many + " !";
+      if (S.mm) {
+        var m = n * S.mm / 1000;
+        txt += " En pile, ça ferait une tour d’environ " + (m >= 1 ? fmt(m, m >= 10 ? 0 : 1) + " m" : fmt(m * 100, 0) + " cm") + " de haut.";
+      }
+    }
+    $("hmOut").textContent = txt;
+  }
+  ["hmC", "hmS"].forEach(function (id) { $(id).addEventListener("change", renderHm); });
+  renderHm();
+
+  /* ---------- Quiz ---------- */
+  var QZ = [
+    { q: "Combien de bits y a-t-il dans un octet ?", o: [["a", "2"], ["b", "8"], ["c", "10"]], a: "b", how: "Un octet est un paquet de 8 bits." },
+    { q: "Combien de valeurs différentes peut-on écrire avec un octet ?", o: [["a", "8"], ["b", "255"], ["c", "256"]], a: "c", how: "2⁸ = 256 valeurs, de 0 à 255 (255 est la plus grande, mais il faut compter le 0)." },
+    { q: "Combien d’octets pèse le mot « été » en UTF-8 ?", o: [["a", "3"], ["b", "5"], ["c", "6"]], a: "b", how: "é = 2 octets, t = 1 octet, é = 2 octets : 2 + 1 + 2 = 5." },
+    { q: "En unités officielles, 1 Go, c’est…", o: [["a", "1 000 Mo"], ["b", "1 024 ko"], ["c", "100 Mo"]], a: "a", how: "Giga = milliard : 1 Go = 1 000 Mo = 1 000 000 000 octets. Le paquet de 1 024 Mio s’appelle 1 Gio." },
+    { q: "Ta connexion est à 80 Mbit/s. Au mieux, combien de Mo reçois-tu par seconde ?", o: [["a", "80 Mo"], ["b", "10 Mo"], ["c", "640 Mo"]], a: "b", how: "Ce sont des bits : 80 ÷ 8 = 10 Mo par seconde." },
+    { q: "Un fichier de 600 Mo, une connexion à 40 Mbit/s. Combien de temps, au mieux ?", o: [["a", "15 secondes"], ["b", "2 minutes"], ["c", "15 minutes"]], a: "b", how: "40 ÷ 8 = 5 Mo/s ; 600 ÷ 5 = 120 s = 2 minutes." },
+    { q: "Qu’est-ce qui pèse le plus lourd ?", o: [["a", "100 photos de téléphone"], ["b", "1 000 SMS"], ["c", "un film en HD"]], a: "c", how: "100 photos ≈ 300 Mo, 1 000 SMS ≈ 140 ko, un film HD ≈ quelques Go." },
+    { q: "Pourquoi un téléphone vendu « 128 Go » montre moins de place libre ?", o: [["a", "des octets se perdent à l’usine"], ["b", "le système prend de la place, et certains appareils comptent par 1 024"], ["c", "la mémoire s’use quand on l’allume"]], a: "b", how: "Le système et les applis installées occupent souvent plus de 10 Go, et 128 Go ≈ 119,2 Gio." }
+  ];
+  var quiz = $("quiz"), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ""; done = [];
+    QZ.forEach(function (Q, k) {
+      var li = document.createElement("li");
+      li.innerHTML = "<span>" + esc(Q.q) + "</span><select id=\"qa" + k + "\" aria-label=\"Ta réponse à la question " + (k + 1) + "\"><option value=\"\">…</option>" + Q.o.map(function (o) { return "<option value=\"" + o[0] + "\">" + esc(o[1]) + "</option>"; }).join("") + "</select><button type=\"button\" id=\"qb" + k + "\">Vérifier</button><span class=\"fb\" id=\"qf" + k + "\" aria-live=\"polite\"></span>";
+      quiz.appendChild(li);
+      function check() {
+        var fb = $("qf" + k), v = $("qa" + k).value;
+        if (!v) { fb.className = "fb"; fb.textContent = "Choisis une réponse."; return; }
+        if (v === Q.a) { fb.className = "fb ok"; fb.innerHTML = "Bravo, c’est juste !<span>" + esc(Q.how) + "</span>"; done[k] = true; }
+        else {
+          done[k] = false;
+          var good = Q.o.filter(function (o) { return o[0] === Q.a; })[0][1];
+          fb.className = "fb no"; fb.innerHTML = "Pas tout à fait : la bonne réponse est « " + esc(good) + " ».<span>" + esc(Q.how) + "</span>";
+        }
+        $("score").textContent = done.filter(Boolean).length + " / 8";
+      }
+      $("qb" + k).addEventListener("click", check);
+      $("qa" + k).addEventListener("keydown", function (e) { if (e.key === "Enter") check(); });
+    });
+    $("score").textContent = "0 / 8";
+  }
+  $("newQuiz").addEventListener("click", newQuiz);
+  newQuiz();
+
+  window.__oct = { toBytes: toBytes, convert: convert, fit: fit, downloadTime: downloadTime, rawImage: rawImage, rawVideo: rawVideo, howMany: howMany, fmtDuration: fmtDuration, units: UNITS, items: ITEMS, weigh: WEIGH, quiz: QZ };
+})();
+</script>
+</body>
+</html>

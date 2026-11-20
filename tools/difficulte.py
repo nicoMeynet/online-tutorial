@@ -35,6 +35,7 @@ DIFF = {
     "le-climat-et-l-effet-de-serre": 2, "revisions-brevet-physique": 3,
     # Numérique
     "reperer-les-arnaques": 1, "les-mots-de-passe": 1,
+    "comment-on-te-manipule": 2, "les-virus-et-les-mises-a-jour": 1, "naviguer-en-securite": 2, "les-donnees-personnelles": 2, "le-cyberharcelement": 1, "vraie-ou-fausse-info": 2, "les-images-truquees-et-les-deepfakes": 2, "les-reseaux-sociaux-et-les-algorithmes": 2, "bien-utiliser-l-ia": 1, "comment-une-ia-ecrit": 3, "comment-marche-internet": 2, "les-octets-et-le-stockage": 1, "les-pixels-et-la-compression": 2, "programmer-pas-a-pas": 2, "le-temps-d-ecran-et-l-attention": 1, "les-achats-dans-les-jeux": 1,
 }
 
 BADGE_CSS = (".diff { font: 700 .72rem/1.2 var(--f-mono, monospace); padding: 2px 8px; border-radius: 99px; border: 1.5px solid; white-space: nowrap; }\n"

@@ -1,0 +1,1251 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Comment une IA écrit un texte</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, marge rouge. Accent indigo (#4f46e5). Le mini-modèle de langage de cette page est un vrai modèle à n-grammes, calculé dans la page à partir d'un petit corpus écrit pour l'occasion. Rien de ce qui est tapé n'est envoyé ni enregistré. */
+:root {
+  --paper: #f7f7fc;
+  --grid: #e4e4f3;
+  --card: #ffffff;
+  --ink: #1a1a33;
+  --ink-soft: #55557a;
+  --acc: #4f46e5;
+  --acc-soft: #e2e2fd;
+  --warn: #d97706;
+  --warn-soft: #fdf0d6;
+  --warn-ink: #92400e;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #fff0a3;
+  --line: #dcdcef;
+  --t1: #e2e2fd; --t2: #dcf1e5; --t3: #fdf0d6; --t4: #fbe1e6; --t5: #dbeefa;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0f0f1a; --grid: #1a1a2c; --card: #151527; --ink: #ececf8; --ink-soft: #a9a9c8;
+    --acc: #a5b4fc; --acc-soft: #25244d; --warn: #f5a524; --warn-soft: #3d2a0c; --warn-ink: #fbbf5a;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #2d2d48;
+    --t1: #2a2952; --t2: #173a29; --t3: #3d2a0c; --t4: #3a1c27; --t5: #16324a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0f0f1a; --grid: #1a1a2c; --card: #151527; --ink: #ececf8; --ink-soft: #a9a9c8;
+  --acc: #a5b4fc; --acc-soft: #25244d; --warn: #f5a524; --warn-soft: #3d2a0c; --warn-ink: #fbbf5a;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #2d2d48;
+  --t1: #2a2952; --t2: #173a29; --t3: #3d2a0c; --t4: #3a1c27; --t5: #16324a;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--acc); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+@media (max-width: 420px) { .box { padding: 16px 14px; } }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note.warn { border-left-color: var(--warn); background: var(--warn-soft); }
+.note.ok { border-left-color: var(--ok); background: var(--ok-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+.fig svg { width: 100%; height: auto; display: block; }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 8px 12px; min-height: 44px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+button:disabled { opacity: .5; cursor: default; transform: none; }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+input[type="text"], input[type="number"], textarea { font: inherit; font-family: var(--f-mono); font-size: 1rem; padding: 8px 10px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; min-height: 44px; }
+textarea { resize: vertical; line-height: 1.5; }
+input[type="range"] { width: 100%; accent-color: var(--acc); min-height: 32px; }
+input[type="checkbox"] { width: 22px; height: 22px; accent-color: var(--acc); flex: none; }
+select { font: inherit; font-size: 1rem; padding: 8px 8px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; min-height: 44px; }
+.param { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.param label { font-weight: 700; }
+.params { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.check { display: flex; gap: 8px; align-items: center; font-weight: 700; cursor: pointer; min-height: 44px; }
+.privacy { font-size: .9rem; color: var(--ok); font-weight: 700; display: flex; gap: 6px; align-items: flex-start; }
+.privacy::before { content: "🔒"; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
+.tag.ok { color: var(--ok); }
+.tag.no { color: var(--red); }
+.tag.warn { color: var(--warn-ink); }
+.tag.acc { color: var(--acc); }
+.formula { font-family: var(--f-mono); font-size: 1.05rem; text-align: center; background: var(--paper); border: 1.5px dashed var(--line); border-radius: 8px; padding: 10px; overflow-wrap: anywhere; }
+
+.verdict { border-radius: 8px; padding: 12px 14px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+.verdict.yes { background: var(--ok-soft); color: var(--ok); }
+.verdict.no { background: var(--red-soft); color: var(--red); }
+.verdict.mid { background: var(--warn-soft); color: var(--warn-ink); }
+.verdict.info { background: var(--acc-soft); color: var(--acc); }
+.verdict span { font-weight: 400; color: var(--ink); }
+
+/* Barres de probabilités */
+.pbars { display: flex; flex-direction: column; gap: 6px; }
+.pb { display: grid; grid-template-columns: minmax(0, 120px) minmax(0, 1fr) 76px; gap: 8px; align-items: center; }
+@media (max-width: 480px) { .pb { grid-template-columns: minmax(0, 88px) minmax(0, 1fr) 64px; gap: 6px; } }
+.pb .w { font-family: var(--f-mono); font-weight: 600; font-size: .95rem; overflow-wrap: anywhere; text-align: right; }
+.pb .track { height: 22px; background: var(--paper); border: 1.5px solid var(--line); border-radius: 5px; overflow: hidden; position: relative; }
+.pb .fill { height: 100%; background: var(--acc); transition: width .25s; }
+.pb .ghost { position: absolute; top: 0; bottom: 0; border-right: 2px dashed var(--ink-soft); }
+.pb .v { font-family: var(--f-mono); font-size: .85rem; text-align: right; color: var(--ink-soft); white-space: nowrap; }
+.pb.pick .w { color: var(--red); }
+.pb.pick .fill { background: var(--red); }
+.pb.zero .w, .pb.zero .v { opacity: .55; }
+.ctxline { font-size: .95rem; color: var(--ink-soft); }
+.ctxline b { font-family: var(--f-mono); color: var(--acc); }
+.more { font-size: .88rem; color: var(--ink-soft); }
+
+/* Devinette */
+.guess { display: flex; flex-direction: column; gap: 10px; border: 1.5px solid var(--line); border-radius: 10px; padding: 12px; background: var(--paper); }
+.guess .sent { font-family: var(--f-display); font-weight: 700; font-size: 1.15rem; overflow-wrap: anywhere; }
+.blank { display: inline-block; min-width: 70px; border-bottom: 3px solid var(--acc); color: var(--acc); }
+
+/* Tokens */
+.toks { display: flex; flex-wrap: wrap; gap: 4px; font-family: var(--f-mono); font-size: 1rem; line-height: 1.4; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; padding: 10px; min-height: 52px; }
+.tok { padding: 2px 6px; border-radius: 5px; border: 1.5px solid var(--line); white-space: pre-wrap; overflow-wrap: anywhere; min-width: 0; }
+.tok:nth-child(5n+1) { background: var(--t1); } .tok:nth-child(5n+2) { background: var(--t2); } .tok:nth-child(5n+3) { background: var(--t3); } .tok:nth-child(5n+4) { background: var(--t4); } .tok:nth-child(5n) { background: var(--t5); }
+.tok .sp { color: var(--ink-soft); opacity: .7; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+.stat { background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 10px; min-width: 0; }
+.stat b { display: block; font-family: var(--f-mono); font-size: 1.05rem; overflow-wrap: anywhere; }
+.stat small { color: var(--ink-soft); font-size: .85rem; }
+
+/* Corpus et comptage */
+.corpus { margin: 0; padding-left: 34px; font-family: var(--f-mono); font-size: .88rem; columns: 2 260px; column-gap: 28px; }
+.corpus li { break-inside: avoid; overflow-wrap: anywhere; }
+.cur { font-family: var(--f-mono); font-size: 1rem; background: var(--paper); border: 1.5px dashed var(--line); border-radius: 8px; padding: 10px 12px; overflow-wrap: anywhere; min-height: 46px; }
+.cur .me { background: var(--acc-soft); color: var(--acc); font-weight: 600; border-radius: 4px; padding: 0 3px; }
+.cur .nx { background: var(--hl); font-weight: 600; border-radius: 4px; padding: 0 3px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chips button { min-height: 40px; padding: 4px 10px; font-family: var(--f-mono); font-weight: 600; font-size: .9rem; box-shadow: 2px 2px 0 var(--ink); }
+
+/* Générateur */
+.gen-out { font-family: var(--f-display); font-weight: 700; font-size: clamp(1.2rem, 4vw, 1.5rem); background: var(--paper); border: 2px dashed var(--acc); border-radius: 10px; padding: 14px; min-height: 60px; overflow-wrap: anywhere; }
+.gen-out .new { color: var(--acc); }
+.gen-out .cursor { color: var(--ink-soft); }
+.cmp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+.glist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.glist li { border-left: 4px solid var(--acc); background: var(--paper); border-radius: 0 8px 8px 0; padding: 6px 10px; font-size: .95rem; overflow-wrap: anywhere; display: flex; flex-direction: column; gap: 2px; }
+.glist li.copy { border-left-color: var(--warn); }
+.glist small { font-family: var(--f-mono); font-size: .78rem; color: var(--ink-soft); }
+
+/* Vrai ou inventé */
+.hrows { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.hrow { border: 1.5px solid var(--line); border-radius: 10px; padding: 10px 12px; background: var(--paper); display: flex; flex-direction: column; gap: 8px; }
+.hrow .s { font-family: var(--f-display); font-weight: 700; font-size: 1.08rem; overflow-wrap: anywhere; }
+.hrow .btns button { flex: 1 1 110px; }
+.hrow.good { border-color: var(--ok); }
+.hrow.bad { border-color: var(--red); }
+.hres { font-size: .95rem; }
+
+/* Échelle */
+.scale-bar { height: 22px; border-radius: 5px; background: var(--acc); min-width: 3px; transition: width .3s; }
+.scale-row { display: flex; flex-direction: column; gap: 4px; }
+
+/* Scénarios et entraîneur */
+.scn { display: flex; flex-direction: column; gap: 10px; border: 1.5px solid var(--line); border-radius: 10px; padding: 12px; background: var(--paper); }
+.scn .sit { font-weight: 700; }
+.scn .opts { display: flex; flex-direction: column; gap: 8px; }
+.scn .opts button { text-align: left; font-family: var(--f-body); font-weight: 400; box-shadow: 2px 2px 0 var(--ink); }
+.scn .opts button.good { border-color: var(--ok); background: var(--ok-soft); color: var(--ink); }
+.scn .opts button.bad { border-color: var(--red); background: var(--red-soft); color: var(--ink); }
+.pair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; }
+@media (max-width: 560px) { .pair { grid-template-columns: minmax(0, 1fr); } }
+.pair button { text-align: left; font-family: var(--f-body); font-weight: 400; display: flex; flex-direction: column; gap: 4px; box-shadow: 2px 2px 0 var(--ink); }
+.pair button b { font-family: var(--f-display); }
+.pair button.good { border-color: var(--ok); background: var(--ok-soft); color: var(--ink); }
+.pair button.bad { border-color: var(--red); background: var(--red-soft); color: var(--ink); }
+.ask { font-family: var(--f-mono); font-size: .92rem; background: var(--card); border: 1.5px solid var(--line); border-radius: 14px 14px 4px 14px; padding: 8px 12px; align-self: flex-end; max-width: 100%; overflow-wrap: anywhere; }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc); }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 220px auto; gap: 10px; align-items: center; }
+.quiz li > span:first-child { min-width: 0; overflow-wrap: anywhere; }
+.quiz select { font-size: .95rem; padding: 6px 6px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb:empty { display: none; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 140px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+details .msg { display: block; margin-top: 8px; font-weight: 400; font-family: var(--f-mono); font-size: .9rem; background: var(--paper); border: 1.5px dashed var(--line); border-radius: 8px; padding: 8px 10px; overflow-wrap: anywhere; color: var(--ink); }
+details ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; }
+.box details { box-shadow: none; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+<!--ticons--><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Tutoriels"><script src="progress.js" defer></script><!--/ticons-->
+<style id="tnav-css">
+.tnav-top { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin: 0 0 4px; }
+.tnav-home { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font-weight: 700; font-size: .95rem; text-decoration: none; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tnav-home:hover, .tnav-home:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.tnav-bottom { margin-top: 8px; display: flex; flex-direction: column; gap: 12px; }
+.tnav-bottom h2 { margin: 0; }
+.tnav-pn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tnav-pn a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--ink, #222); border-radius: 10px;
+  background: var(--card, #fff); color: var(--ink, #222); text-decoration: none; box-shadow: 3px 3px 0 var(--ink, #222); min-width: 0; }
+.tnav-pn a span { font-size: .85rem; color: var(--ink-soft, #666); }
+.tnav-pn a strong { overflow-wrap: anywhere; }
+.tnav-pn a.next { text-align: right; grid-column: 2; }
+.tnav-bottom .tnav-home { align-self: center; }
+@media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
+.diff { font: 700 .72rem/1.2 var(--f-mono, monospace); padding: 2px 8px; border-radius: 99px; border: 1.5px solid; white-space: nowrap; }
+.diff.d1 { color: #15803d; border-color: #15803d; background: #dcf3e3; }
+.diff.d2 { color: #a15c07; border-color: #b45309; background: #fbe7cf; }
+.diff.d3 { color: #b91c1c; border-color: #b91c1c; background: #fde2e2; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root:not([data-theme="light"]) .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root:not([data-theme="light"]) .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; } }
+:root[data-theme="dark"] .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root[data-theme="dark"] .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root[data-theme="dark"] .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; }
+</style>
+</head>
+<body>
+<main class="page">
+<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="numerique.html">← Tous les tutoriels numériques</a><span class="diff d3" title="Difficulté : difficile">Difficile</span></nav><!--/tnav-->
+
+
+  <header class="hero">
+    <span class="eyebrow">Tutoriel numérique · niveau 10H–11H</span>
+    <h1>Comment une IA écrit un texte</h1>
+    <p class="lead">Quand tu poses une question à un chatbot, la réponse arrive mot après mot, comme si quelqu'un tapait. Mais derrière, il n'y a personne : il y a un programme qui joue, très très bien, à un seul jeu. <strong>Deviner le morceau de texte suivant.</strong> Dans cette page, tu vas construire toi-même une mini-IA qui écrit, et comprendre pourquoi elle peut se tromper avec beaucoup d'assurance.</p>
+    <div class="box fig">
+      <svg viewBox="0 0 360 170" role="img" aria-label="Les mots « Il fait » entrent dans une machine, qui propose plusieurs mots suivants avec des barres de probabilité : beau, froid, chaud">
+        <rect x="10" y="62" width="44" height="34" rx="6" fill="var(--acc-soft)" stroke="var(--acc)" stroke-width="2"/>
+        <text x="32" y="84" font-size="14" text-anchor="middle" font-weight="600">Il</text>
+        <rect x="60" y="62" width="62" height="34" rx="6" fill="var(--acc-soft)" stroke="var(--acc)" stroke-width="2"/>
+        <text x="91" y="84" font-size="14" text-anchor="middle" font-weight="600">fait</text>
+        <path d="M128 79 H150" stroke="var(--ink)" stroke-width="2.5" fill="none"/>
+        <path d="M146 73 L154 79 L146 85" stroke="var(--ink)" stroke-width="2.5" fill="none" stroke-linejoin="round"/>
+        <rect x="158" y="46" width="62" height="66" rx="10" fill="var(--card)" stroke="var(--ink)" stroke-width="2.5"/>
+        <circle cx="176" cy="68" r="5" fill="var(--acc)"/><circle cx="202" cy="68" r="5" fill="var(--acc)"/>
+        <path d="M174 90 Q189 100 204 90" stroke="var(--ink)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <text x="189" y="132" font-size="11" text-anchor="middle">modèle</text>
+        <path d="M224 79 H240" stroke="var(--ink)" stroke-width="2.5" fill="none"/>
+        <text x="246" y="42" font-size="13">beau</text><rect x="246" y="48" width="96" height="12" rx="3" fill="var(--acc)"/>
+        <text x="246" y="84" font-size="13">froid</text><rect x="246" y="90" width="62" height="12" rx="3" fill="var(--acc)" opacity=".75"/>
+        <text x="246" y="126" font-size="13">chaud</text><rect x="246" y="132" width="40" height="12" rx="3" fill="var(--acc)" opacity=".55"/>
+        <text x="10" y="30" font-size="13" font-weight="600">Et après ?</text>
+      </svg>
+    </div>
+    <p class="soft">Les applis, les personnes et les phrases de cette page sont <strong>inventées</strong>. Tout ce que tu tapes reste dans ta page : <strong>rien n'est envoyé ni enregistré</strong>. Le mini-modèle est un vrai programme, mais minuscule : il est là pour comprendre l'idée, pas pour rivaliser avec un vrai chatbot.</p>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · L'idée</span>
+    <h2>Ton cerveau aussi devine le mot suivant</h2>
+    <p>Quand quelqu'un dit « Il pleut, j'ai oublié mon… », tu entends déjà « parapluie » dans ta tête. Tu as lu et entendu tellement de phrases que tu sais <strong>ce qui vient souvent après</strong>. Un <strong>modèle de langage</strong> (c'est le cœur d'un chatbot) fait exactement ce jeu, à toute vitesse : il regarde le début du texte, calcule quels mots pourraient suivre et avec quelle chance, en choisit un, l'ajoute… et recommence.</p>
+    <div class="box">
+      <h3>À toi de deviner</h3>
+      <p class="soft">Il n'y a pas de faute ici : choisis le mot qui te semble le plus naturel. Ensuite, regarde ce que répond notre mini-modèle (étape 3), qui ne regarde que les <strong>deux derniers mots</strong>.</p>
+      <div id="guess" style="display:flex;flex-direction:column;gap:12px"></div>
+    </div>
+    <div class="formula">texte → probabilités du mot suivant → on en choisit un → on l'ajoute → on recommence</div>
+    <div class="note">
+      <span class="note-title">Le mot clé : probabilité</span>
+      <span>Une probabilité, c'est une chance entre 0 (jamais) et 1 (toujours), qu'on écrit souvent en pourcentage. « 75 % » veut dire « 3 fois sur 4 ». Si tu veux revoir ça, le tutoriel sur <a class="tlink" href="les-probabilites.html">les probabilités</a> l'explique avec des dés et des pièces.</span>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · Les tokens</span>
+    <h2>L'IA ne lit pas des mots, mais des morceaux</h2>
+    <p>Pour un ordinateur, un texte n'est qu'une suite de signes. Avant tout, on le <strong>découpe en morceaux</strong> appelés <strong>tokens</strong> (on prononce « tokènes »). Un token peut être un mot entier fréquent (« le », « chat »), un bout de mot (« marm » + « ottes »), un signe (« . », « ! ») ou un chiffre. Chaque token reçoit un numéro : c'est avec ces numéros que le modèle calcule.</p>
+    <div class="box">
+      <h3>Le découpeur de texte</h3>
+      <div class="param"><label for="tkIn">Écris une phrase</label><textarea id="tkIn" rows="2" maxlength="300" autocomplete="off" spellcheck="false">Les marmottes dorment tout l'hiver dans la montagne.</textarea></div>
+      <div class="btns" id="tkEx" role="group" aria-label="Exemples">
+        <button type="button" data-tk="0">Phrase simple</button>
+        <button type="button" data-tk="1">Mot très long</button>
+        <button type="button" data-tk="2">Avec des chiffres</button>
+        <button type="button" data-tk="3">Mot inventé</button>
+      </div>
+      <span class="privacy">Rien n'est envoyé ni enregistré : le découpage se fait dans ta page.</span>
+      <div class="toks" id="tkOut" aria-live="polite"></div>
+      <div class="stats">
+        <div class="stat"><small>Caractères</small><b id="tkC">0</b></div>
+        <div class="stat"><small>Mots</small><b id="tkW">0</b></div>
+        <div class="stat"><small>Tokens</small><b id="tkT">0</b></div>
+      </div>
+      <p class="soft">Le signe <span class="mono">␣</span> montre une espace : souvent, l'espace est collée au début du token suivant. Les couleurs servent juste à voir où un token s'arrête.</p>
+    </div>
+    <div class="note warn">
+      <span class="note-title">Honnêtement : un découpeur simplifié</span>
+      <span>Notre découpeur utilise une petite liste de morceaux écrite à la main. Les vrais découpeurs apprennent leurs morceaux tout seuls, en repérant ce qui revient le plus souvent dans d'énormes quantités de textes, et ils ont souvent des dizaines de milliers de morceaux, voire plus. Le résultat exact change d'une IA à l'autre. L'idée, elle, est la même : les mots fréquents restent entiers, les mots rares sont coupés en bouts. C'est ce qui permet à une IA d'écrire un mot qu'elle n'a jamais vu en entier.</span>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Compter</span>
+    <h2>Construire une mini-IA en comptant</h2>
+    <p>Voici la recette la plus simple pour fabriquer un modèle de langage. On prend des textes (le <strong>corpus</strong>), et on compte, pour chaque mot, <strong>quels mots viennent juste après</strong> et combien de fois. Ensuite, on transforme ces comptes en probabilités. Par exemple, dans notre corpus, « chat » est suivi 5 fois d'un mot, dont 2 fois de « dort » : la probabilité de « dort » après « chat » est 2 ÷ 5 = 40 %. Une paire de mots qui se suivent s'appelle un <strong>bigramme</strong>.</p>
+    <div class="box">
+      <h3>Notre corpus</h3>
+      <p id="corpusStats"></p>
+      <details>
+        <summary>Voir toutes les phrases du corpus</summary>
+        <div><ol class="corpus" id="corpusList"></ol></div>
+      </details>
+      <p class="soft">Ces phrases ont été écrites pour cette page : l'école, les animaux, la météo et la Suisse. Pour simplifier, tout est en minuscules et le point compte comme un mot.</p>
+    </div>
+    <div class="box">
+      <h3>Compte pas à pas</h3>
+      <div class="params">
+        <div class="param"><label for="cWord">Choisis un mot</label><select id="cWord"></select></div>
+        <div class="param"><label for="cType">… ou tape un mot du corpus</label><input type="text" id="cType" maxlength="30" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="par exemple : neige"></div>
+      </div>
+      <div class="btns">
+        <button type="button" id="cStep">Pas à pas</button>
+        <button type="button" id="cAll">Tout compter</button>
+        <button type="button" id="cReset">Recommencer</button>
+      </div>
+      <div class="cur" id="cSent" aria-live="polite"></div>
+      <p class="ctxline" id="cMsg"></p>
+      <div class="pbars" id="cBars"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Et c'est tout ?</span>
+      <span>Oui ! Pour notre mini-IA, « apprendre », c'est seulement compter. Elle ne sait pas ce qu'est un chat ou la neige : elle sait seulement quels mots ont été vus côte à côte. Les vraies IA apprennent de façon bien plus fine (étape 8), mais elles aussi sont entraînées à deviner la suite d'un texte.</span>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · Le dé truqué</span>
+    <h2>Choisir un mot : la température</h2>
+    <p>Une fois les probabilités calculées, il faut <strong>choisir</strong> un mot. On pourrait toujours prendre le plus probable, mais les textes deviendraient répétitifs. Alors on lance un <strong>dé truqué</strong> : chaque mot a une chance d'être tiré égale à sa probabilité. Un réglage, appelé la <strong>température</strong>, change le dé :</p>
+    <div class="cards">
+      <div class="box"><span class="tag acc">0</span><strong>Glacé</strong><span class="soft">On prend toujours le mot le plus probable. Toujours la même phrase, souvent banale.</span></div>
+      <div class="box"><span class="tag acc">1</span><strong>Normal</strong><span class="soft">Le dé suit exactement les comptes du corpus.</span></div>
+      <div class="box"><span class="tag acc">2</span><strong>Bouillant</strong><span class="soft">Les mots rares ont plus de chances. Plus surprenant… et plus souvent bizarre.</span></div>
+    </div>
+    <div class="box">
+      <div class="params">
+        <div class="param"><label for="tCtx">Le mot d'avant</label><select id="tCtx"></select></div>
+        <div class="param"><label for="tT">Température : <span id="tTv" class="mono">1</span></label><input type="range" id="tT" min="0" max="2" step="0.1" value="1"></div>
+      </div>
+      <div class="btns">
+        <button type="button" id="tDraw">Lancer le dé 100 fois</button>
+        <button type="button" id="tReset">Effacer les lancers</button>
+      </div>
+      <div class="pbars" id="tBars" aria-live="polite"></div>
+      <p class="soft" id="tMsg"></p>
+      <p class="soft">Les barres pleines montrent les chances avec ta température. Le trait pointillé montre les chances de départ (température 1). Le dernier chiffre compte tes lancers.</p>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Écrire</span>
+    <h2>Ta mini-IA écrit des phrases</h2>
+    <p>Maintenant, on assemble tout : on part d'un début, on calcule les probabilités du mot suivant, on lance le dé, on ajoute le mot, et on recommence jusqu'au point. Tu peux choisir si la mini-IA regarde <strong>1 mot</strong> ou <strong>2 mots</strong> de contexte (avec 2 mots, on parle de <strong>trigramme</strong> : 2 mots + le suivant).</p>
+    <div class="box">
+      <div class="params">
+        <div class="param"><label for="gStart">Début de la phrase</label><select id="gStart"></select></div>
+        <div class="param"><label for="gType">… ou tape tes premiers mots</label><input type="text" id="gType" maxlength="60" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="par exemple : le chien"></div>
+      </div>
+      <div class="btns" id="gOrder" role="group" aria-label="Contexte regardé">
+        <button type="button" data-o="2" aria-pressed="true">1 mot de contexte</button>
+        <button type="button" data-o="3" aria-pressed="false">2 mots de contexte</button>
+      </div>
+      <div class="params">
+        <div class="param"><label for="gT">Température : <span id="gTv" class="mono">1</span></label><input type="range" id="gT" min="0" max="2" step="0.1" value="1"></div>
+        <div class="param">
+          <label class="check"><input type="checkbox" id="gSeedOn"> Hasard reproductible (graine)</label>
+          <input type="number" id="gSeed" min="0" max="999999" step="1" value="42" aria-label="Graine du hasard">
+        </div>
+      </div>
+      <div class="btns">
+        <button type="button" id="gNext">Mot suivant</button>
+        <button type="button" id="gAll">Phrase entière</button>
+        <button type="button" id="gReset">Recommencer</button>
+      </div>
+      <span class="privacy">Rien n'est envoyé ni enregistré : tout se calcule dans ta page.</span>
+      <p class="gen-out" id="gText" aria-live="polite"></p>
+      <div id="gVerdict"></div>
+      <p class="ctxline" id="gInfo"></p>
+      <div class="pbars" id="gBars"></div>
+      <p class="soft">Avec la <strong>graine</strong> cochée, le dé est « truqué de la même façon » à chaque fois : même graine, mêmes réglages, même phrase. Les ordinateurs utilisent ce genre de hasard calculé pour pouvoir refaire une expérience.</p>
+    </div>
+    <div class="box">
+      <h3>Plus de contexte, meilleures phrases ?</h3>
+      <p>Lance 5 phrases avec 1 mot de contexte, et 5 avec 2 mots (température 1). Compare.</p>
+      <div class="btns"><button type="button" id="gCmp">Comparer 5 + 5 phrases</button></div>
+      <div class="cmp-grid" id="gCmpOut"></div>
+      <p class="soft" id="gCmpMsg"></p>
+    </div>
+    <div class="note">
+      <span class="note-title">Ce que montre la comparaison</span>
+      <span>Avec <strong>1 mot</strong>, la mini-IA oublie vite le début : « le chat dort au bord du lac léman est très gentil ». Chaque paire de mots existe dans le corpus, mais la phrase part dans tous les sens. Avec <strong>2 mots</strong>, les phrases tiennent mieux debout… mais notre corpus est si petit qu'elle <strong>recopie</strong> souvent une phrase entière. Pour avoir à la fois beaucoup de contexte et des phrases nouvelles, il faut <strong>énormément</strong> de textes. Les vraies IA regardent des milliers de tokens en arrière, parfois bien plus.</span>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · Elle ne sait pas, elle devine</span>
+    <h2>Les hallucinations</h2>
+    <p>Notre mini-IA a lu « le Cervin est en Valais » et « le parlement suisse est à Berne ». Elle peut donc écrire « le Cervin est à Berne » : chaque paire de mots est connue, la phrase sonne bien… et elle est <strong>fausse</strong>. Quand une IA invente une information fausse mais qui a l'air vraie, on parle d'<strong>hallucination</strong>. Elle ne ment pas exprès : elle ne sait même pas ce qui est vrai. Elle produit ce qui est <strong>probable</strong>, pas ce qui est <strong>exact</strong>.</p>
+    <div class="box">
+      <h3>Vrai ou inventé ?</h3>
+      <p class="soft">Toutes ces phrases peuvent être écrites par notre mini-IA. Pour chacune, dis si elle est vraie. Ensuite, regarde quelle chance la mini-IA avait de l'écrire en partant du début (1 mot de contexte, température 1).</p>
+      <ol class="hrows" id="hList"></ol>
+      <div class="btns"><span class="score" id="hScore">0 / 7</span><button type="button" id="hReset">Recommencer</button></div>
+      <div id="hMsg"></div>
+    </div>
+    <div class="note red">
+      <span class="note-title">Les grandes IA aussi</span>
+      <span>Les vrais chatbots se trompent beaucoup moins que notre mini-IA, mais ils peuvent quand même inventer : une date, un chiffre, une citation, un livre qui n'existe pas, une source avec un titre très précis… Plus le sujet est rare (ton village, un petit club, une personne peu connue), plus le risque est grand. Certains assistants peuvent faire une recherche sur Internet avant de répondre, ce qui aide, mais ils peuvent encore mal résumer ce qu'ils ont trouvé. Pour une info importante : <strong>vérifie dans une source fiable</strong>.</span>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Les biais</span>
+    <h2>Elle répète ce qui est fréquent</h2>
+    <p>Une IA apprend de ses données. Si ses textes contiennent souvent un <strong>cliché</strong>, elle le répète, parce qu'il est fréquent, pas parce qu'il est juste. On dit que le modèle a un <strong>biais</strong>. Teste avec deux petits corpus : l'un est déséquilibré, l'autre équilibré. La mini-IA regarde ici les 2 mots « filles aiment » ou « garçons aiment ».</p>
+    <div class="box">
+      <div class="btns" id="bBtns" role="group" aria-label="Choix du corpus">
+        <button type="button" data-b="desequilibre" aria-pressed="true">Corpus déséquilibré</button>
+        <button type="button" data-b="equilibre" aria-pressed="false">Corpus équilibré</button>
+      </div>
+      <div class="cmp-grid">
+        <div class="pbars"><p class="ctxline">Après <b>les filles aiment</b></p><div class="pbars" id="bF"></div></div>
+        <div class="pbars"><p class="ctxline">Après <b>les garçons aiment</b></p><div class="pbars" id="bG"></div></div>
+      </div>
+      <p id="bMsg"></p>
+      <details>
+        <summary>Voir les phrases de ce corpus</summary>
+        <div><ol class="corpus" id="bList"></ol></div>
+      </details>
+    </div>
+    <div class="note warn">
+      <span class="note-title">Pourquoi c'est important</span>
+      <span>En vrai, chacun aime ce qu'il veut : danser, coder, courir ou bricoler, ça ne dépend pas d'être une fille ou un garçon. Mais les textes écrits par les humains contiennent des clichés sur les filles, les garçons, les pays, les métiers, les accents… Une IA peut les reproduire, et même les renforcer, si personne ne fait attention. Les entreprises essaient de corriger ces biais, sans jamais y arriver parfaitement. Garde ton esprit critique.</span>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Les vraies IA</span>
+    <h2>Même idée, taille gigantesque</h2>
+    <p>Les chatbots que tu connais ne comptent pas des paires de mots dans un tableau. Ils utilisent un <strong>réseau de neurones artificiels</strong> : un énorme calcul avec des <strong>milliards de réglages</strong> (on dit des <strong>paramètres</strong>), parfois beaucoup plus. Pendant l'entraînement, l'ordinateur lit un bout de texte, essaie de deviner le token suivant, compare avec le vrai, et ajuste un tout petit peu ses réglages. Il recommence ainsi un nombre gigantesque de fois. Mais au bout du compte, il fait toujours le même jeu : deviner la suite.</p>
+    <div class="box">
+      <h3>Combien de temps pour tout lire ?</h3>
+      <div class="params">
+        <div class="param"><label for="sSrc">Ce que tu lis</label><select id="sSrc"></select></div>
+        <div class="param"><label for="sH">Tu lis <span id="sHv" class="mono">2</span> h par jour</label><input type="range" id="sH" min="1" max="12" step="1" value="2"></div>
+      </div>
+      <div id="sOut" aria-live="polite"></div>
+      <p class="soft">On compte 250 mots par minute, une bonne vitesse de lecture. Les tailles des grands corpus sont des <strong>ordres de grandeur</strong> : elles changent beaucoup d'un modèle à l'autre, et les entreprises ne les publient pas toujours. Les barres utilisent une échelle où chaque cran multiplie par 10.</p>
+    </div>
+    <h3>Les trois grandes étapes d'un chatbot</h3>
+    <div class="cards">
+      <div class="box"><span class="tag acc">1</span><strong>Lire énormément</strong><span class="soft">Le modèle apprend à deviner la suite sur une quantité immense de textes : pages web, livres, code… C'est le « pré-entraînement ». Il en sort un modèle qui sait continuer n'importe quel texte.</span></div>
+      <div class="box"><span class="tag acc">2</span><strong>Apprendre à répondre</strong><span class="soft">On lui montre des exemples de questions avec de bonnes réponses, écrites par des personnes. Il apprend la forme d'une conversation utile.</span></div>
+      <div class="box"><span class="tag acc">3</span><strong>Le retour humain</strong><span class="soft">Des personnes comparent plusieurs réponses et disent laquelle est la meilleure : plus juste, plus polie, plus prudente. Le modèle est ajusté pour produire plus souvent ce genre de réponses.</span></div>
+    </div>
+    <div class="box">
+      <h3>Joue l'entraîneur</h3>
+      <p class="soft">Pour le retour humain (la carte 3 ci-dessus), ce sont des personnes qui choisissent. Pour chaque question, clique sur la réponse que tu préfères.</p>
+      <div id="fbList" style="display:flex;flex-direction:column;gap:14px"></div>
+      <div class="btns"><span class="score" id="fbScore">0 / 4</span><button type="button" id="fbReset">Recommencer</button></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Et l'énergie ?</span>
+      <span>Entraîner un grand modèle demande des milliers de puces de calcul spéciales qui tournent pendant des semaines, voire des mois, dans de grands centres de données. Ça consomme beaucoup d'électricité, et souvent de l'eau pour refroidir les machines. Une seule question consomme peu, mais des millions de personnes en posent chaque jour. Les chiffres exacts sont discutés et changent vite. Retiens surtout : une IA n'est pas « dans le nuage » par magie, elle tourne sur de vraies machines.</span>
+    </div>
+    <h3>Un peu d'histoire</h3>
+    <ol class="timeline">
+      <li><span class="when">années 1910</span><div class="what"><strong>Compter les lettres d'un poème</strong><span>Le mathématicien russe Andreï Markov compte, à la main, quelles lettres se suivent dans un long poème. C'est l'ancêtre de notre tableau de comptage.</span></div></li>
+      <li><span class="when">fin des années 1940</span><div class="what"><strong>Des phrases fabriquées au hasard</strong><span>L'ingénieur américain Claude Shannon fabrique des phrases en tirant des mots selon ce qui suit souvent. Plus il regarde de mots en arrière, plus le résultat ressemble à de l'anglais.</span></div></li>
+      <li><span class="when">années 1960</span><div class="what"><strong>ELIZA, le premier « chatbot »</strong><span>Un programme qui fait semblant de discuter avec des règles très simples. Des gens s'y attachent déjà, alors qu'il ne comprend rien.</span></div></li>
+      <li><span class="when">années 2000–2010</span><div class="what"><strong>Le clavier qui devine</strong><span>Les claviers de téléphone se mettent à proposer le mot suivant. Les traducteurs automatiques s'améliorent grâce à de grandes quantités de textes.</span></div></li>
+      <li><span class="when">vers 2017</span><div class="what"><strong>Le « transformeur »</strong><span>Des chercheurs inventent une nouvelle sorte de réseau de neurones, très doué pour tenir compte de tout le contexte. La plupart des grands modèles actuels en descendent.</span></div></li>
+      <li><span class="when">années 2020</span><div class="what"><strong>Les chatbots grand public</strong><span>Des assistants conversationnels deviennent accessibles à tout le monde, et entrent à l'école, au travail et dans les téléphones.</span></div></li>
+    </ol>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Pas une personne</span>
+    <h2>Sûre d'elle, mais sans rien ressentir</h2>
+    <p>Une IA écrit toujours avec des phrases bien tournées, sur un ton calme et assuré. Pourquoi ? Parce que les textes qu'elle a lus sont écrits comme ça, et parce que le ton fait partie de ce qu'elle a appris à imiter. <strong>Le ton ne dépend pas de la vérité</strong> : une phrase fausse sort avec la même assurance qu'une phrase vraie.</p>
+    <div class="cards">
+      <div class="box"><span class="tag no">Elle ne ressent rien</span><strong>« Je te comprends »</strong><span class="soft">Elle écrit les mots qu'on écrit souvent dans ce genre de conversation. Elle n'a pas d'émotions, pas de souvenirs d'enfance, pas d'amis.</span></div>
+      <div class="box"><span class="tag no">Elle ne « sait » pas</span><strong>Pas de vérification</strong><span class="soft">Sans outil de recherche, elle ne vérifie rien : elle calcule ce qui est probable.</span></div>
+      <div class="box"><span class="tag ok">Elle est utile</span><strong>Si tu gardes la main</strong><span class="soft">Expliquer autrement, donner des idées, corriger l'orthographe, t'entraîner : c'est un outil, et c'est toi qui décides et vérifies.</span></div>
+    </div>
+    <div class="box">
+      <h3>Que fais-tu ?</h3>
+      <div id="scn" style="display:flex;flex-direction:column;gap:14px"></div>
+      <div class="btns"><span class="score" id="scnScore">0 / 5</span><button type="button" id="scnReset">Recommencer</button></div>
+    </div>
+    <div class="note ok">
+      <span class="note-title">Pour aller plus loin</span>
+      <span>Tu trouveras dans le tutoriel sur <a class="tlink" href="bien-utiliser-l-ia.html">bien utiliser l'IA</a> des conseils pour t'en servir à l'école sans tricher et sans te faire avoir. Et comme les IA savent aussi fabriquer des images, des voix et des vidéos, le tutoriel sur <a class="tlink" href="les-images-truquees-et-les-deepfakes.html">les deepfakes</a> t'apprend à repérer les faux. Si une conversation avec une IA (ou avec quelqu'un) te met mal à l'aise, parles-en à un adulte de confiance (parent, enseignant·e, infirmier·ère scolaire). En Suisse, Pro Juventute répond aux jeunes au <strong>147</strong>, par téléphone, SMS ou chat.</span>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · Attention</span>
+    <h2>Les erreurs fréquentes</h2>
+    <div class="cards">
+      <div class="box"><span class="tag no">Faux</span><strong>« L'IA cherche la réponse dans une grande base de données. »</strong><span class="soft">De base, elle <strong>fabrique</strong> la réponse token par token. Même quand elle fait une recherche, c'est encore elle qui rédige, avec le même risque d'erreur.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« Elle a l'air sûre d'elle, donc c'est vrai. »</strong><span class="soft">Le ton assuré fait partie du style appris. Il ne dit rien sur la vérité.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« Si elle cite un livre ou un site, il existe. »</strong><span class="soft">Une IA peut inventer un titre, un auteur ou une adresse très crédibles. Vérifie que la source existe vraiment, et ce qu'elle dit.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« C'est une machine, donc elle est neutre. »</strong><span class="soft">Elle répète ce qui est fréquent dans ses données, clichés compris (étape 7).</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« Elle me comprend, c'est comme une amie. »</strong><span class="soft">Elle imite les mots d'une conversation. Elle ne ressent rien et ne remplace pas une vraie personne.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« Ce que j'écris au chatbot reste secret. »</strong><span class="soft">Selon le service, tes messages peuvent être enregistrés par l'entreprise, et parfois servir à améliorer l'IA. N'y écris pas ton adresse, tes mots de passe ou des secrets.</span></div>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Choisis ta réponse, puis vérifie.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Recommencer</button>
+    </div>
+  </section>
+
+  <!-- 12 -->
+  <section>
+    <span class="eyebrow">Étape 12 · À toi de jouer</span>
+    <h2>Exercices</h2>
+    <div class="exos">
+      <details>
+        <summary>1. Compter à la main<span class="q">Corpus : « le chat dort . le chat mange . le chien dort . » Après « le », quelles sont les probabilités ? Et après « dort » ?</span></summary>
+        <div>
+          <span>« le » apparaît 3 fois : suivi 2 fois de « chat » et 1 fois de « chien ». Donc <strong>chat : 2 ÷ 3 ≈ 67 %</strong>, <strong>chien : 1 ÷ 3 ≈ 33 %</strong>.</span>
+          <span>« dort » apparaît 2 fois, toujours suivi du point : <strong>« . » : 100 %</strong>. La mini-IA peut donc écrire « le chien mange . » ? Non ! « chien » n'est jamais suivi de « mange » dans ce corpus. Par contre « le chien dort . » oui.</span>
+        </div>
+      </details>
+      <details>
+        <summary>2. La température<span class="q">Après « il », le modèle a : « fait » 50 %, « pleut » 30 %, « neige » 20 %. Que se passe-t-il à température 0 ? Et à très haute température ?</span></summary>
+        <div>
+          <span>Température 0 : il choisit <strong>toujours « fait »</strong>, le plus probable. Même début, même phrase, à chaque fois.</span>
+          <span>Très haute température : les chances se rapprochent de <strong>1 sur 3 chacun</strong>. « neige » sort presque aussi souvent que « fait ». Plus de surprises, mais aussi plus de phrases bizarres.</span>
+        </div>
+      </details>
+      <details>
+        <summary>3. Le mot jamais vu<span class="q">Comment une IA peut-elle écrire « anticonstitutionnellement » si elle ne l'a presque jamais lu ?</span></summary>
+        <div>
+          <span>Grâce aux <strong>tokens</strong> : le mot est découpé en morceaux plus fréquents (par exemple « anti », « constitu », « tionnelle », « ment »). Elle connaît bien ces morceaux, et sait les assembler.</span>
+        </div>
+      </details>
+      <details>
+        <summary>4. L'hallucination<span class="q">La mini-IA écrit « Le Cervin est à Berne. » Explique pourquoi elle a pu écrire cette phrase fausse.</span></summary>
+        <div>
+          <span>Chaque paire de mots existe dans le corpus : « le Cervin », « Cervin est », « est à » (le parlement suisse est à Berne), « à Berne », « Berne . ». Le modèle enchaîne des morceaux <strong>probables</strong>, sans vérifier si la phrase complète est <strong>vraie</strong>. Il ne sait pas où est le Cervin : il sait seulement quels mots vont souvent ensemble.</span>
+        </div>
+      </details>
+      <details>
+        <summary>5. L'exposé<span class="q">Pour ton exposé sur les marmottes, un chatbot te donne trois livres avec titres, auteurs et années. Que fais-tu avant de les mettre dans ta bibliographie ?</span></summary>
+        <div>
+          <ul>
+            <li>Tu vérifies que chaque livre <strong>existe</strong> : catalogue de la bibliothèque, moteur de recherche, ou en demandant à ton enseignant·e.</li>
+            <li>Tu ne cites que ce que tu as <strong>vraiment lu</strong> ou vérifié.</li>
+            <li>Tu dis honnêtement si tu as utilisé une IA, en suivant les règles de ton école.</li>
+          </ul>
+        </div>
+      </details>
+      <details>
+        <summary>6. Le biais<span class="q">Une IA écrit presque toujours « le directeur… il » et « la secrétaire… elle ». Pourquoi ? Est-ce qu'elle « pense » que c'est normal ?</span></summary>
+        <div>
+          <span>Elle ne pense rien : dans les textes qu'elle a lus, ces associations sont <strong>fréquentes</strong>, alors elle les juge <strong>probables</strong>. C'est un <strong>biais</strong> venu des données. On peut le réduire en équilibrant les données ou en ajustant le modèle, et c'est à nous de rester critiques.</span>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• Un <strong>modèle de langage</strong> écrit en devinant le <strong>token suivant</strong>, encore et encore.</span>
+      <span>• Un <strong>token</strong> est un morceau de texte : un mot fréquent, un bout de mot, un signe.</span>
+      <span>• On apprend les <strong>probabilités</strong> à partir de textes ; plus de contexte donne de meilleures phrases, mais demande énormément de données.</span>
+      <span>• La <strong>température</strong> règle le hasard : 0 = toujours le plus probable, plus haut = plus surprenant.</span>
+      <span>• Une IA produit ce qui est <strong>probable</strong>, pas forcément ce qui est <strong>vrai</strong> : elle peut <strong>halluciner</strong>. Vérifie les infos importantes.</span>
+      <span>• Elle répète ce qui est fréquent dans ses données, <strong>clichés</strong> compris.</span>
+      <span>• Les vraies IA ont des milliards de paramètres, lisent d'immenses quantités de textes, puis sont ajustées avec l'aide de <strong>retours humains</strong>.</span>
+      <span>• Une IA n'est <strong>pas une personne</strong> : elle ne ressent rien, et son ton assuré ne prouve rien.</span>
+    </div>
+  </section>
+
+  <!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"><a class="prev" href="bien-utiliser-l-ia.html"><span>← Précédent</span><strong>Bien utiliser l&#x27;IA</strong></a><a class="next" href="comment-marche-internet.html"><span>Suivant →</span><strong>Comment marche Internet</strong></a></div><a class="tnav-home" href="numerique.html">⌂ Tous les tutoriels numériques</a></nav><!--/tnav-->
+<footer>Fiche de révision · Comment une IA écrit un texte</footer>
+</main>
+
+<script>
+(function () {
+  /*
+   * Hooks de test : window.__ia
+   *   corpus                          -> tableau des phrases du corpus principal (minuscules, mots séparés par des espaces, « . » compte comme un mot)
+   *   biasCorpus                      -> { desequilibre: [...], equilibre: [...] } (corpus de l'étape 7)
+   *   buildModel(sentences)           -> { uni, bi, tri, sentences, nWords, vocab, nPairs, nTriples }
+   *                                      bi[mot][suivant] = compte ; tri["mot1 mot2"][suivant] = compte ; début de phrase = "<s>"
+   *   model                           -> le modèle construit sur corpus
+   *   nextProbs(context, order?, m?)  -> { context:[...], order (2 = 1 mot de contexte, 3 = 2 mots, 0 = inconnu), backoff, total,
+   *                                        known, list:[{w, n, p}] } triée par compte décroissant puis ordre alphabétique.
+   *                                      context : chaîne ("le chat") ou tableau de mots ; order par défaut 2 ;
+   *                                      si order 3 et paire inconnue -> repli sur 1 mot (backoff:true)
+   *   withTemperature(list, T)        -> [{w, n, p}] ; T <= 0 : p = 1 pour le premier (le plus probable), 0 sinon ; sinon p ∝ n^(1/T)
+   *   generate(start, n?, temperature?, seed?, order?, m?)
+   *                                   -> { words, text, steps:[{context, order, chosen, p}], ended, inCorpus, seed }
+   *                                      n = nombre max de mots ajoutés (défaut 15, max 40), temperature défaut 1, order défaut 2,
+   *                                      seed entier (hasard reproductible mulberry32) ; sans seed : graine au hasard (renvoyée).
+   *                                      Un seul tirage rng() par mot ajouté, comme le bouton « Mot suivant ».
+   *   sentenceProb(sentence, order?, m?) -> probabilité de la phrase entière depuis le début (produit des probabilités), 0 si impossible
+   *   tokenize(text)                  -> tableau de tokens (chaînes) ; tokens.join("") === text ; l'espace est collée au token suivant
+   *   makeRng(seed), pretty(words), hallu, quiz
+   * Rien n'est envoyé, enregistré ni affiché dans la console : tout reste dans la page.
+   */
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function fmtInt(n) { return Number(n).toLocaleString('fr-FR', { maximumFractionDigits: 0 }).replace(/[   ]/g, ' '); }
+  function pct(p) {
+    if (!(p > 0)) return '0 %';
+    var v = p * 100, s;
+    if (v >= 99.95) s = '100';
+    else if (v >= 10) s = String(Math.round(v));
+    else if (v >= 0.1) s = String(Math.round(v * 10) / 10).replace('.', ',');
+    else s = '< 0,1';
+    return s + ' %';
+  }
+
+  /* ---------- Corpus (écrit pour cette page) ---------- */
+  var CORPUS = [
+    'je vais à l’école à vélo .', 'je vais à l’école en bus quand il pleut .', 'ma sœur va à l’école à pied .',
+    'le prof de maths est très gentil .', 'la prof de français lit une histoire .', 'nous avons un test de maths demain .',
+    'le test de maths est difficile .', 'je fais mes devoirs dans ma chambre .', 'je fais mes devoirs après le goûter .',
+    'mon ami lit un livre à la bibliothèque .', 'la récré dure quinze minutes .', 'à la récré nous jouons au foot .',
+    'le cours de sport est dans la salle de gym .', 'j’aime le cours de dessin .', 'j’aime beaucoup les maths .',
+    'le chat dort sur le canapé .', 'le chat dort au soleil .', 'le chat mange des croquettes .',
+    'le chien joue dans le jardin .', 'le chien dort dans le jardin .', 'le chien mange sa pâtée .',
+    'mon chat est noir et blanc .', 'mon chien est très gentil .', 'la vache mange de l’herbe dans le pré .',
+    'les vaches sont dans le pré .', 'la marmotte dort tout l’hiver .', 'la marmotte vit dans la montagne .',
+    'le bouquetin vit dans la montagne .', 'les oiseaux chantent le matin .', 'le hamster dort le jour .',
+    'il pleut sur le lac .', 'il pleut depuis ce matin .', 'il neige dans la montagne .', 'il neige en hiver .',
+    'il fait beau aujourd’hui .', 'il fait froid en hiver .', 'il fait chaud en été .', 'le soleil brille sur le lac .',
+    'demain il va pleuvoir .', 'demain il va faire beau .', 'en été nous allons au lac .', 'en hiver nous faisons du ski .',
+    'le vent souffle très fort .', 'le ciel est gris ce matin .',
+    'le cervin est une montagne .', 'le cervin est en valais .', 'le rhône coule en valais .', 'le parlement suisse est à berne .',
+    'berne est une ville .', 'genève est au bord du lac léman .', 'lausanne est au bord du lac léman .',
+    'la suisse a quatre langues nationales .', 'en suisse on parle français allemand italien et romanche .',
+    'le chocolat suisse est très bon .', 'l’emmental a des trous .', 'le train arrive à berne .', 'le train part de genève .',
+    'le train est à l’heure .', 'nous allons à berne en train .', 'ma famille fait du ski en valais .',
+    'le lac léman est très grand .', 'la fondue est un plat suisse .',
+    'je mange une pomme au goûter .', 'ma sœur aime le chocolat .', 'mon ami aime la montagne .',
+    'nous jouons au foot dans le jardin .', 'le chat joue avec une balle .', 'la neige est blanche .',
+    'le lac est froid en hiver .', 'j’aime le chocolat chaud en hiver .'
+  ];
+  function rep(s, k) { var o = []; for (var i = 0; i < k; i++) o.push(s); return o; }
+  var BIAS = {
+    desequilibre: [].concat(
+      rep('les filles aiment danser .', 5), rep('les filles aiment dessiner .', 3), rep('les filles aiment coder .', 1), rep('les filles aiment courir .', 1),
+      rep('les garçons aiment coder .', 4), rep('les garçons aiment courir .', 4), rep('les garçons aiment danser .', 1), rep('les garçons aiment dessiner .', 1)
+    ),
+    equilibre: [].concat(
+      rep('les filles aiment danser .', 2), rep('les filles aiment dessiner .', 3), rep('les filles aiment coder .', 3), rep('les filles aiment courir .', 2),
+      rep('les garçons aiment coder .', 3), rep('les garçons aiment courir .', 2), rep('les garçons aiment danser .', 2), rep('les garçons aiment dessiner .', 3)
+    )
+  };
+
+  /* ---------- Le modèle à n-grammes ---------- */
+  var S = '<s>';
+  function words(s) { return String(s == null ? '' : s).trim().split(/\s+/).filter(Boolean); }
+  function norm(s) { return String(s == null ? '' : s).toLowerCase().replace(/'/g, '’').replace(/([.,!?;:])/g, ' $1 ').replace(/\s+/g, ' ').trim(); }
+  function ctxWords(c) { return Array.isArray(c) ? c.slice() : words(norm(c)); }
+  function inc2(o, k, w) { var t = o[k] || (o[k] = {}); t[w] = (t[w] || 0) + 1; }
+  function buildModel(sentences) {
+    var m = { uni: {}, bi: {}, tri: {}, sentences: [], nWords: 0, vocab: [], nPairs: 0, nTriples: 0 };
+    (sentences || []).forEach(function (sent) {
+      var w = words(sent); if (!w.length) return;
+      m.sentences.push(w.join(' '));
+      var seq = [S, S].concat(w);
+      for (var i = 2; i < seq.length; i++) {
+        m.uni[seq[i]] = (m.uni[seq[i]] || 0) + 1; m.nWords++;
+        inc2(m.bi, seq[i - 1], seq[i]);
+        inc2(m.tri, seq[i - 2] + ' ' + seq[i - 1], seq[i]);
+      }
+    });
+    m.vocab = Object.keys(m.uni).sort(function (a, b) { return a.localeCompare(b, 'fr'); });
+    Object.keys(m.bi).forEach(function (k) { m.nPairs += Object.keys(m.bi[k]).length; });
+    Object.keys(m.tri).forEach(function (k) { m.nTriples += Object.keys(m.tri[k]).length; });
+    return m;
+  }
+  var MODEL = buildModel(CORPUS);
+  var BMODELS = { desequilibre: buildModel(BIAS.desequilibre), equilibre: buildModel(BIAS.equilibre) };
+
+  function sortList(table) {
+    var total = 0, list = Object.keys(table).map(function (w) { total += table[w]; return { w: w, n: table[w], p: 0 }; });
+    list.forEach(function (x) { x.p = x.n / total; });
+    list.sort(function (a, b) { return b.n - a.n || a.w.localeCompare(b.w, 'fr'); });
+    return { list: list, total: total };
+  }
+  function nextProbs(context, order, m) {
+    m = m || MODEL; order = Number(order) === 3 ? 3 : 2;
+    var seq = [S, S].concat(ctxWords(context));
+    var b = seq[seq.length - 1], a = seq[seq.length - 2], table = null, used = 0, ctx = [b];
+    if (order === 3 && m.tri[a + ' ' + b]) { table = m.tri[a + ' ' + b]; used = 3; ctx = [a, b]; }
+    else if (m.bi[b]) { table = m.bi[b]; used = 2; ctx = [b]; }
+    if (!table) return { context: ctx, order: 0, backoff: false, total: 0, known: false, list: [] };
+    var r = sortList(table);
+    return { context: ctx, order: used, backoff: order === 3 && used === 2, total: r.total, known: true, list: r.list };
+  }
+  function withTemperature(list, T) {
+    list = list || []; T = Number(T);
+    if (!list.length) return [];
+    if (!(T > 0)) return list.map(function (x, i) { return { w: x.w, n: x.n, p: i === 0 ? 1 : 0 }; });
+    var lw = list.map(function (x) { return Math.log(x.n) / T; }), mx = Math.max.apply(null, lw), sum = 0;
+    var ws = lw.map(function (v) { var e = Math.exp(v - mx); sum += e; return e; });
+    return list.map(function (x, i) { return { w: x.w, n: x.n, p: ws[i] / sum }; });
+  }
+  function makeRng(seed) {
+    var a = (Math.floor(Number(seed)) || 0) >>> 0;
+    return function () {
+      a = (a + 0x6D2B79F5) >>> 0;
+      var t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function pick(probs, r) {
+    var acc = 0;
+    for (var i = 0; i < probs.length; i++) { acc += probs[i].p; if (r < acc) return i; }
+    for (var j = probs.length - 1; j >= 0; j--) if (probs[j].p > 0) return j;
+    return 0;
+  }
+  var PROPER = { cervin: 'Cervin', berne: 'Berne', 'genève': 'Genève', lausanne: 'Lausanne', 'léman': 'Léman', 'rhône': 'Rhône', sion: 'Sion', valais: 'Valais', aar: 'Aar' };
+  function pretty(ws) {
+    ws = (ws || []).filter(function (x) { return x !== S; });
+    ws = ws.map(function (w, i) {
+      if (PROPER[w]) return PROPER[w];
+      if (w === 'suisse' && i > 0 && /^(en|la|de|toute)$/.test(ws[i - 1])) return 'Suisse';
+      return w;
+    });
+    var t = ws.join(' ').replace(/ ([.,!?;:])/g, '$1');
+    return t ? t.charAt(0).toUpperCase() + t.slice(1) : '';
+  }
+  function randSeed() { return Math.floor(Math.random() * 1000000); }
+  function step(state, T, order, m) {
+    var np = nextProbs(state.words, order, m);
+    if (!np.list.length) return null;
+    var probs = withTemperature(np.list, T), k = pick(probs, state.rng());
+    var st = { context: np.context, order: np.order, chosen: probs[k].w, p: probs[k].p };
+    state.words.push(probs[k].w);
+    return st;
+  }
+  function generate(start, n, temperature, seed, order, m) {
+    m = m || MODEL;
+    n = Math.max(1, Math.min(40, Math.floor(Number(n)) || 15));
+    var T = temperature == null ? 1 : Number(temperature); if (!isFinite(T)) T = 1;
+    if (seed == null || !isFinite(Number(seed))) seed = randSeed();
+    var state = { words: ctxWords(start == null ? '' : start).filter(function (x) { return x !== S; }), rng: makeRng(seed) }, steps = [];
+    for (var i = 0; i < n; i++) {
+      if (state.words[state.words.length - 1] === '.') break;
+      var st = step(state, T, order, m); if (!st) break;
+      steps.push(st);
+    }
+    var ended = state.words[state.words.length - 1] === '.';
+    return { words: state.words, text: pretty(state.words), steps: steps, ended: ended, inCorpus: m.sentences.indexOf(state.words.join(' ')) !== -1, seed: Number(seed) };
+  }
+  function sentenceProb(sentence, order, m) {
+    m = m || MODEL;
+    var w = ctxWords(sentence), p = 1;
+    for (var i = 0; i < w.length; i++) {
+      var np = nextProbs(w.slice(0, i), order, m), hit = null;
+      for (var j = 0; j < np.list.length; j++) if (np.list[j].w === w[i]) hit = np.list[j];
+      if (!hit) return 0;
+      p *= hit.p;
+    }
+    return w.length ? p : 0;
+  }
+
+  /* ---------- Rendu des barres ---------- */
+  function ctxLabel(ctx) { return ctx.map(function (x) { return x === S ? '(début)' : x; }).join(' '); }
+  function bars(list, opts) {
+    opts = opts || {};
+    var max = opts.max || 8, shown = list.slice(0, max), rest = list.length - shown.length;
+    var h = shown.map(function (x) {
+      var cls = 'pb' + (opts.pick === x.w ? ' pick' : '') + (x.p <= 0 ? ' zero' : '');
+      var ghost = opts.ghost ? '<span class="ghost" style="width:' + (100 * (opts.ghost[x.w] || 0)).toFixed(1) + '%"></span>' : '';
+      var right = opts.right ? opts.right(x) : pct(x.p);
+      return '<div class="' + cls + '"><span class="w">' + esc(x.w) + '</span><span class="track"><span class="fill" style="display:block;width:' + (100 * x.p).toFixed(1) + '%"></span>' + ghost + '</span><span class="v">' + right + '</span></div>';
+    }).join('');
+    if (rest > 0) h += '<p class="more">… et ' + rest + ' autre' + (rest > 1 ? 's' : '') + ' mot' + (rest > 1 ? 's' : '') + ' plus rare' + (rest > 1 ? 's' : '') + '.</p>';
+    return h;
+  }
+
+  /* ---------- Étape 1 : devinette ---------- */
+  var GUESS = [
+    { before: 'Le chat dort sur le', opts: ['canapé', 'lac', 'test'], ctx: ['sur', 'le'] },
+    { before: 'En hiver, nous faisons du', opts: ['ski', 'soleil', 'chat'], ctx: ['faisons', 'du'] },
+    { before: 'Il pleut depuis ce', opts: ['matin', 'vélo', 'jardin'], ctx: ['depuis', 'ce'] },
+    { before: 'Le chien joue dans le', opts: ['jardin', 'pré', 'ciel'], ctx: ['dans', 'le'] }
+  ];
+  function renderGuess() {
+    $('guess').innerHTML = GUESS.map(function (g, k) {
+      return '<div class="guess"><span class="sent">' + esc(g.before) + ' <span class="blank" id="gb' + k + '">?</span></span><div class="btns">' +
+        g.opts.map(function (o) { return '<button type="button" data-g="' + k + '" data-w="' + esc(o) + '">' + esc(o) + '</button>'; }).join('') +
+        '</div><div id="gr' + k + '"></div></div>';
+    }).join('');
+  }
+  $('guess').addEventListener('click', function (e) {
+    var bt = e.target.closest('button'); if (!bt) return;
+    var k = Number(bt.getAttribute('data-g')), w = bt.getAttribute('data-w'), g = GUESS[k];
+    $('gb' + k).textContent = w;
+    Array.prototype.forEach.call(bt.parentNode.querySelectorAll('button'), function (x) { x.setAttribute('aria-pressed', x === bt ? 'true' : 'false'); });
+    var np = nextProbs(g.ctx, 3), top = np.list[0];
+    var msg = top.w === w ? 'La mini-IA aurait aussi choisi « ' + top.w + ' ».' : 'La mini-IA, elle, préfère « ' + top.w + ' ».';
+    if (k === 0) msg += ' Elle ne regarde que « sur le » : elle ne sait plus qu’on parle d’un chat ! Le corpus contient deux fois « sur le lac » et une seule fois « sur le canapé ». Plus de contexte, ça aide.';
+    if (k === 3) msg += ' « dans le » est suivi 3 fois de « jardin » et 2 fois de « pré » dans le corpus.';
+    $('gr' + k).innerHTML = '<p class="ctxline">Après <b>' + esc(ctxLabel(np.context)) + '</b> : ' + esc(msg) + '</p><div class="pbars">' + bars(np.list, { right: function (x) { return x.n + ' × · ' + pct(x.p); } }) + '</div>';
+  });
+  renderGuess();
+
+  /* ---------- Étape 2 : tokens ---------- */
+  var VOC = {};
+  ('le la les un une des de du et est à au aux en je tu il elle on nous vous ils elles ne pas plus que qui pour par dans sur sous avec sans mon ma mes ton ta tes son sa ses ce cet cette ces sont ai as avons avez ont suis es fait faire va vais très bien mais ou où donc car si oui non tout tous toute jour nuit matin soir chat chien lac ski train école classe maison prof maths test devoir livre ami amie sœur frère famille ville pays suisse genève berne lausanne valais montagne neige pluie soleil vent ciel hiver été temps heure aime dort joue vélo bus foot sport chocolat fromage pomme hier demain bonjour salut merci long longue mange coûte double espace ligne croquettes ' +
+    'ment ments tion tions sion ation ateur eur eurs euse ette ettes elle ique iques isme iste able ible age ance ence ant ante ants er ez ons ont ent aient ait ais ée és ées ir ie re es ' +
+    'anti dé pré pro con com inter trans super ordi nateur intelli gence artifi cielle constitu tionnelle nelle marm otte ottes dor bouque tin mod èle langue lang age gramme appr endre pren apprend écri ture lec tok en ens cyber harc èlement smart phone ' +
+    'ma mo mi me mu pa po pi pe pu ta to ti te tu la lo li lu ra ro ri ru na no ni nu ca co ci cu da do di du ba bo bi bu sa so si su va vo vi fa fo fi ga go gi ja jo ou on an in en un ch qu gu gn ll ss tt rr oi ai au eu ui ei') .split(' ').forEach(function (w) { if (w) VOC[w] = true; });
+  var TK_EX = ['Les marmottes dorment tout l’hiver dans la montagne.', 'Anticonstitutionnellement, c’est très long !', 'Le train de 7 h 42 coûte 12,50 CHF.', 'Mon chat zorglubesque mange des croquettes.'];
+  function isLetter(c) { return /\p{L}/u.test(c); }
+  function isDigit(c) { return /[0-9]/.test(c); }
+  function tokenize(text) {
+    var ch = Array.from(String(text == null ? '' : text));
+    var low = ch.map(function (c) { var l = c.toLowerCase(); return l.length === 1 ? l : c; });
+    var out = [], pend = '', i = 0;
+    function seg(a, b) {
+      var res = [], k = a;
+      while (k < b) {
+        var best = 1;
+        for (var L = Math.min(14, b - k); L >= 2; L--) { if (VOC[low.slice(k, k + L).join('')]) { best = L; break; } }
+        res.push(ch.slice(k, k + best).join('')); k += best;
+      }
+      return res;
+    }
+    while (i < ch.length) {
+      var c = ch[i];
+      if (c === ' ') { if (pend) out.push(pend); pend = ' '; i++; continue; }
+      if (isLetter(c)) {
+        var j = i; while (j < ch.length && isLetter(ch[j])) j++;
+        var pieces = seg(i, j);
+        if (j < ch.length && (ch[j] === '’' || ch[j] === "'")) { pieces[pieces.length - 1] += ch[j]; j++; }
+        pieces[0] = pend + pieces[0]; pend = '';
+        out = out.concat(pieces); i = j; continue;
+      }
+      out.push(pend + c); pend = ''; i++;
+    }
+    if (pend) out.push(pend);
+    return out;
+  }
+  function renderTokens() {
+    var t = $('tkIn').value, toks = tokenize(t);
+    $('tkOut').innerHTML = toks.length ? toks.map(function (x) {
+      return '<span class="tok">' + esc(x).replace(/ /g, '<span class="sp">␣</span>').replace(/\n/g, '<span class="sp">↵</span>') + '</span>';
+    }).join('') : '<span class="soft">Écris quelque chose…</span>';
+    $('tkC').textContent = fmtInt(Array.from(t).length);
+    $('tkW').textContent = fmtInt((t.match(/[\p{L}0-9’']+/gu) || []).length);
+    $('tkT').textContent = fmtInt(toks.length);
+  }
+  $('tkIn').addEventListener('input', renderTokens);
+  $('tkEx').addEventListener('click', function (e) {
+    var bt = e.target.closest('button'); if (!bt) return;
+    $('tkIn').value = TK_EX[Number(bt.getAttribute('data-tk'))] || ''; renderTokens();
+  });
+  renderTokens();
+
+  /* ---------- Étape 3 : corpus et comptage ---------- */
+  var nRealWords = MODEL.nWords - (MODEL.uni['.'] || 0);
+  $('corpusStats').innerHTML = '<strong>' + MODEL.sentences.length + ' phrases</strong>, ' + fmtInt(nRealWords) + ' mots (sans compter les points), ' + fmtInt(MODEL.vocab.length - 1) + ' mots différents. La mini-IA y a trouvé <strong>' + fmtInt(MODEL.nPairs) + ' paires</strong> différentes de mots qui se suivent (et ' + fmtInt(MODEL.nTriples) + ' triplets).';
+  $('corpusList').innerHTML = MODEL.sentences.map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('');
+  var C_WORDS = ['le', 'chat', 'chien', 'il', 'je', 'est', 'dans', 'en', 'nous', 'fait', 'la', 'dort', 'mange', 'suisse', 'lac'];
+  $('cWord').innerHTML = C_WORDS.map(function (w) { return '<option value="' + esc(w) + '">' + esc(w) + '</option>'; }).join('');
+  var cs = { word: 'le', occ: [], k: 0, counts: {} };
+  function occurrences(word) {
+    var o = [];
+    MODEL.sentences.forEach(function (s, si) { var w = s.split(' '); for (var i = 0; i < w.length - 1; i++) if (w[i] === word) o.push({ s: si, i: i, next: w[i + 1] }); });
+    return o;
+  }
+  function cWordNow() { var t = words(norm($('cType').value))[0]; return t || $('cWord').value; }
+  function cReset() { cs.word = cWordNow(); cs.occ = occurrences(cs.word); cs.k = 0; cs.counts = {}; cRender(null); }
+  function cRender(last) {
+    var total = cs.k;
+    if (!cs.occ.length) {
+      $('cSent').innerHTML = '<span class="soft">Le mot « ' + esc(cs.word) + ' » n’est pas dans le corpus (ou seulement à la fin d’une phrase). Notre mini-IA ne peut rien en dire : elle ne connaît que ce qu’elle a vu !</span>';
+      $('cMsg').textContent = ''; $('cBars').innerHTML = ''; $('cStep').disabled = true; $('cAll').disabled = true; return;
+    }
+    $('cStep').disabled = cs.k >= cs.occ.length; $('cAll').disabled = cs.k >= cs.occ.length;
+    if (last) {
+      var w = MODEL.sentences[last.s].split(' ');
+      $('cSent').innerHTML = w.map(function (x, i) { var e = esc(x); return i === last.i ? '<span class="me">' + e + '</span>' : i === last.i + 1 ? '<span class="nx">' + e + '</span>' : e; }).join(' ');
+    } else $('cSent').innerHTML = '<span class="soft">Appuie sur « Pas à pas » : on va parcourir le corpus et noter le mot qui suit chaque « ' + esc(cs.word) + ' ».</span>';
+    var list = Object.keys(cs.counts).map(function (w) { return { w: w, n: cs.counts[w], p: total ? cs.counts[w] / total : 0 }; });
+    list.sort(function (a, b) { return b.n - a.n || a.w.localeCompare(b.w, 'fr'); });
+    $('cMsg').innerHTML = 'Mot <b>' + esc(cs.word) + '</b> : ' + cs.k + ' apparition' + (cs.k > 1 ? 's' : '') + ' comptée' + (cs.k > 1 ? 's' : '') + ' sur ' + cs.occ.length + '.' + (cs.k >= cs.occ.length ? ' C’est fini : voici les probabilités du mot suivant.' : '');
+    $('cBars').innerHTML = bars(list, { max: 12, pick: last ? last.next : null, right: function (x) { return x.n + '/' + total + ' · ' + pct(x.p); } });
+  }
+  function cStep() { if (cs.k >= cs.occ.length) return; var o = cs.occ[cs.k]; cs.counts[o.next] = (cs.counts[o.next] || 0) + 1; cs.k++; cRender(o); }
+  $('cStep').addEventListener('click', cStep);
+  $('cAll').addEventListener('click', function () { var o = null; while (cs.k < cs.occ.length) { o = cs.occ[cs.k]; cs.counts[o.next] = (cs.counts[o.next] || 0) + 1; cs.k++; } cRender(o); });
+  $('cReset').addEventListener('click', cReset);
+  $('cWord').addEventListener('change', function () { $('cType').value = ''; cReset(); });
+  $('cType').addEventListener('input', cReset);
+  cReset();
+
+  /* ---------- Étape 4 : température ---------- */
+  var T_CTX = ['le', 'il', 'est', 'dans', 'je', 'mange'];
+  $('tCtx').innerHTML = T_CTX.map(function (w) { return '<option value="' + w + '">' + w + '</option>'; }).join('');
+  var td = { counts: {}, total: 0, rng: makeRng(randSeed()) };
+  function fmtT(v) { return String(v).replace('.', ','); }
+  function tRender() {
+    var T = Number($('tT').value), np = nextProbs([$('tCtx').value], 2), probs = withTemperature(np.list, T), ghost = {};
+    np.list.forEach(function (x) { ghost[x.w] = x.p; });
+    $('tTv').textContent = fmtT(T);
+    $('tBars').innerHTML = bars(probs, { max: 10, ghost: ghost, right: function (x) { return pct(x.p) + (td.total ? ' · ' + (td.counts[x.w] || 0) : ''); } });
+    var top = probs[0];
+    $('tMsg').textContent = (T === 0 ? 'Température 0 : « ' + top.w + ' » sort à chaque fois.' : 'Le mot le plus probable, « ' + top.w + ' », a ' + pct(top.p) + ' de chances.') + (td.total ? ' Lancers : ' + td.total + '.' : '');
+  }
+  function tClear() { td.counts = {}; td.total = 0; tRender(); }
+  $('tT').addEventListener('input', tClear);
+  $('tCtx').addEventListener('change', tClear);
+  $('tReset').addEventListener('click', tClear);
+  $('tDraw').addEventListener('click', function () {
+    var probs = withTemperature(nextProbs([$('tCtx').value], 2).list, Number($('tT').value));
+    td.counts = {}; td.total = 0;
+    for (var i = 0; i < 100; i++) { var w = probs[pick(probs, td.rng())].w; td.counts[w] = (td.counts[w] || 0) + 1; td.total++; }
+    tRender();
+  });
+  tRender();
+
+  /* ---------- Étape 5 : générateur ---------- */
+  var G_STARTS = [['', '(début de phrase)'], ['le', 'le'], ['la', 'la'], ['je', 'je'], ['il', 'il'], ['mon', 'mon'], ['le chat', 'le chat'], ['le chien', 'le chien'], ['demain', 'demain'], ['en hiver', 'en hiver'], ['nous', 'nous'], ['le cervin', 'le Cervin']];
+  $('gStart').innerHTML = G_STARTS.map(function (s) { return '<option value="' + esc(s[0]) + '">' + esc(s[1]) + '</option>'; }).join('');
+  var gs = { words: [], startLen: 0, rng: null, seed: 0, last: null, unknown: [] }, gOrder = 2;
+  function gTemp() { return Number($('gT').value); }
+  function gReset() {
+    var typed = $('gType').value.trim(), start = typed ? typed : $('gStart').value;
+    gs.words = ctxWords(start); gs.startLen = gs.words.length; gs.last = null;
+    gs.unknown = gs.words.filter(function (w) { return !MODEL.uni[w]; });
+    gs.seed = $('gSeedOn').checked ? Math.max(0, Math.floor(Number($('gSeed').value)) || 0) : randSeed();
+    gs.rng = makeRng(gs.seed);
+    gRender();
+  }
+  function gEnded() { return gs.words[gs.words.length - 1] === '.'; }
+  function gRender() {
+    var start = pretty(gs.words.slice(0, gs.startLen)), all = pretty(gs.words);
+    var added = all.slice(start.length);
+    $('gText').innerHTML = (gs.words.length ? esc(start) + '<span class="new">' + esc(added) + '</span>' : '') + (gEnded() ? '' : ' <span class="cursor">…</span>');
+    $('gTv').textContent = fmtT(gTemp());
+    var v = '';
+    if (gs.unknown.length) v = '<div class="verdict mid">Mot inconnu : « ' + esc(gs.unknown.join(' », « ')) + ' ».<span>La mini-IA ne connaît que les mots de son corpus. Si le dernier mot est inconnu, elle ne peut pas continuer.</span></div>';
+    if (gEnded()) {
+      var inC = MODEL.sentences.indexOf(gs.words.join(' ')) !== -1;
+      v = inC ? '<div class="verdict mid">Phrase recopiée.<span>Cette phrase existe telle quelle dans le corpus.</span></div>' : '<div class="verdict info">Phrase nouvelle !<span>Elle n’est pas dans le corpus : la mini-IA l’a fabriquée en enchaînant des morceaux. Elle peut être juste, bizarre… ou fausse.</span></div>';
+    }
+    $('gVerdict').innerHTML = v;
+    var np = nextProbs(gs.words, gOrder), lastTxt = gs.last ? 'Dernier tirage : « ' + esc(gs.last.chosen) + ' » (' + pct(gs.last.p) + ' de chances). ' : '';
+    if (gEnded()) { $('gInfo').innerHTML = lastTxt + 'Point final : la phrase est terminée. Graine utilisée : <b>' + gs.seed + '</b>.'; $('gBars').innerHTML = ''; }
+    else if (!np.list.length) { $('gInfo').innerHTML = lastTxt + 'Aucun mot connu après <b>' + esc(ctxLabel(np.context)) + '</b>.'; $('gBars').innerHTML = ''; }
+    else {
+      $('gInfo').innerHTML = lastTxt + 'Prochain mot, après <b>' + esc(ctxLabel(np.context)) + '</b> (' + (np.order === 3 ? '2 mots' : '1 mot') + ' de contexte' + (np.backoff ? ' : cette paire est inconnue, on se contente du dernier mot' : '') + ') :';
+      $('gBars').innerHTML = bars(withTemperature(np.list, gTemp()), { max: 8 });
+    }
+    $('gNext').disabled = gEnded() || !np.list.length;
+    $('gAll').disabled = gEnded() || !np.list.length;
+  }
+  function gStep() { if (gEnded()) return false; var st = step(gs, gTemp(), gOrder); if (!st) return false; gs.last = st; return true; }
+  $('gNext').addEventListener('click', function () { gStep(); gRender(); });
+  $('gAll').addEventListener('click', function () { for (var i = 0; i < 40 && !gEnded(); i++) if (!gStep()) break; gRender(); });
+  $('gReset').addEventListener('click', gReset);
+  $('gStart').addEventListener('change', function () { $('gType').value = ''; gReset(); });
+  $('gType').addEventListener('change', gReset);
+  $('gType').addEventListener('keydown', function (e) { if (e.key === 'Enter') gReset(); });
+  $('gSeedOn').addEventListener('change', gReset);
+  $('gSeed').addEventListener('change', function () { if ($('gSeedOn').checked) gReset(); });
+  $('gT').addEventListener('input', gRender);
+  $('gOrder').addEventListener('click', function (e) {
+    var bt = e.target.closest('button'); if (!bt) return;
+    gOrder = Number(bt.getAttribute('data-o'));
+    Array.prototype.forEach.call(this.querySelectorAll('button'), function (x) { x.setAttribute('aria-pressed', x === bt ? 'true' : 'false'); });
+    gRender();
+  });
+  gReset();
+
+  $('gCmp').addEventListener('click', function () {
+    var base = $('gSeedOn').checked ? Math.max(0, Math.floor(Number($('gSeed').value)) || 0) : randSeed(), copies = { 2: 0, 3: 0 };
+    $('gCmpOut').innerHTML = [2, 3].map(function (o) {
+      var items = [];
+      for (var i = 0; i < 5; i++) {
+        var r = generate('', 30, 1, base + i, o);
+        if (r.inCorpus) copies[o]++;
+        items.push('<li class="' + (r.inCorpus ? 'copy' : '') + '">' + esc(r.text) + '<small>' + (r.inCorpus ? 'recopiée du corpus' : 'nouvelle') + '</small></li>');
+      }
+      return '<div class="pbars"><h3>' + (o === 2 ? '1 mot de contexte' : '2 mots de contexte') + '</h3><ol class="glist">' + items.join('') + '</ol></div>';
+    }).join('');
+    $('gCmpMsg').textContent = 'Phrases recopiées : ' + copies[2] + ' sur 5 avec 1 mot, ' + copies[3] + ' sur 5 avec 2 mots. Relance plusieurs fois : en général, 2 mots donnent des phrases plus correctes, mais plus souvent recopiées.';
+  });
+
+  /* ---------- Étape 6 : hallucinations ---------- */
+  var HALLU = [
+    { s: 'le cervin est en valais .', t: true, why: 'C’est vrai : le Cervin est une montagne du Valais.' },
+    { s: 'le parlement suisse est en valais .', t: false, why: 'Faux : le Parlement fédéral siège à Berne.' },
+    { s: 'genève est au bord du lac léman .', t: true, why: 'Vrai.' },
+    { s: 'le cervin est à berne .', t: false, why: 'Faux : le Cervin est en Valais, loin de Berne.' },
+    { s: 'le chat est une montagne .', t: false, why: 'Faux, évidemment ! Mais « chat est » et « est une montagne » existent dans le corpus.' },
+    { s: 'le parlement suisse est à berne .', t: true, why: 'Vrai.' },
+    { s: 'berne est au bord du lac léman .', t: false, why: 'Faux : Berne est au bord de l’Aar, une rivière. Le Léman est entre Genève et Lausanne.' }
+  ];
+  HALLU.forEach(function (h) { h.prob = sentenceProb(h.s, 2); });
+  var hAns = [];
+  function chance(p) { return p > 0 ? '1 chance sur ' + fmtInt(Math.round(1 / p)) : 'impossible'; }
+  function hRender() {
+    $('hList').innerHTML = HALLU.map(function (h, k) {
+      var a = hAns[k], res = '';
+      if (a != null) {
+        var ok = a === h.t;
+        res = '<p class="hres"><strong>' + (ok ? 'Bien vu. ' : 'Raté. ') + '</strong>' + esc(h.why) + ' La mini-IA avait <strong>' + chance(h.prob) + '</strong> de l’écrire.</p>';
+      }
+      return '<li class="hrow' + (a == null ? '' : (a === h.t ? ' good' : ' bad')) + '"><span class="s">' + esc(pretty(h.s.split(' '))) + '</span><div class="btns"><button type="button" data-h="' + k + '" data-v="1"' + (a === true ? ' aria-pressed="true"' : '') + '>Vrai</button><button type="button" data-h="' + k + '" data-v="0"' + (a === false ? ' aria-pressed="true"' : '') + '>Faux</button></div>' + res + '</li>';
+    }).join('');
+    var n = 0, done = 0;
+    HALLU.forEach(function (h, k) { if (hAns[k] != null) { done++; if (hAns[k] === h.t) n++; } });
+    $('hScore').textContent = n + ' / ' + HALLU.length;
+    $('hMsg').innerHTML = done === HALLU.length ? '<div class="verdict info">Tu as tout classé.<span>Regarde les chances : les phrases fausses ne sont pas forcément moins probables que les vraies. « Le cervin est à Berne » a même plus de chances que « Le cervin est en Valais » ! La mini-IA ne vérifie rien : elle enchaîne des mots qui vont souvent ensemble.</span></div>' : '';
+  }
+  $('hList').addEventListener('click', function (e) {
+    var bt = e.target.closest('button'); if (!bt) return;
+    hAns[Number(bt.getAttribute('data-h'))] = bt.getAttribute('data-v') === '1'; hRender();
+  });
+  $('hReset').addEventListener('click', function () { hAns = []; hRender(); });
+  hRender();
+
+  /* ---------- Étape 7 : biais ---------- */
+  var bKey = 'desequilibre';
+  function bRender() {
+    var m = BMODELS[bKey];
+    var f = nextProbs(['les', 'filles', 'aiment'], 3, m), g = nextProbs(['les', 'garçons', 'aiment'], 3, m);
+    var right = function (x) { return x.n + ' × · ' + pct(x.p); };
+    $('bF').innerHTML = bars(f.list, { right: right });
+    $('bG').innerHTML = bars(g.list, { right: right });
+    $('bMsg').innerHTML = bKey === 'desequilibre' ?
+      'Avec ce corpus, la mini-IA écrira le plus souvent « les filles aiment <strong>' + esc(f.list[0].w) + '</strong> » et « les garçons aiment <strong>' + esc(g.list[0].w) + '</strong> ». Elle ne pense rien : elle répète ce qu’elle a lu le plus souvent.' :
+      'Avec un corpus équilibré, les chances sont semblables des deux côtés : le cliché disparaît. Les données comptent énormément.';
+    $('bList').innerHTML = m.sentences.map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('');
+  }
+  $('bBtns').addEventListener('click', function (e) {
+    var bt = e.target.closest('button'); if (!bt) return;
+    bKey = bt.getAttribute('data-b');
+    Array.prototype.forEach.call(this.querySelectorAll('button'), function (x) { x.setAttribute('aria-pressed', x === bt ? 'true' : 'false'); });
+    bRender();
+  });
+  bRender();
+
+  /* ---------- Étape 8 : échelle ---------- */
+  var SRC = [
+    { label: 'notre mini-corpus', n: nRealWords, txt: fmtInt(nRealWords) + ' mots' },
+    { label: 'une rédaction de deux pages', n: 600, txt: 'environ 600 mots' },
+    { label: 'un roman', n: 100000, txt: 'environ 100 000 mots' },
+    { label: 'Wikipédia en français (ordre de grandeur)', n: 2e9, txt: 'de l’ordre de quelques milliards de mots' },
+    { label: 'les textes d’un grand modèle (ordre de grandeur)', n: 1e13, txt: 'de l’ordre de 10 000 milliards de tokens, parfois plus' }
+  ];
+  $('sSrc').innerHTML = SRC.map(function (s, k) { return '<option value="' + k + '"' + (k === 4 ? ' selected' : '') + '>' + esc(s.label) + '</option>'; }).join('');
+  function dur(min) {
+    if (min < 60) return fmtInt(Math.max(1, Math.round(min))) + ' minute' + (Math.round(min) > 1 ? 's' : '');
+    var h = min / 60;
+    if (h < 24) return fmtInt(Math.round(h)) + ' heure' + (Math.round(h) > 1 ? 's' : '');
+    return null;
+  }
+  function sRender() {
+    var s = SRC[Number($('sSrc').value)] || SRC[0], hpd = Number($('sH').value), min = s.n / 250, days = min / (60 * hpd), t;
+    $('sHv').textContent = hpd;
+    if (min < 60 * hpd) t = dur(min);
+    else if (days < 365.25) t = fmtInt(Math.round(days)) + ' jour' + (Math.round(days) > 1 ? 's' : '');
+    else {
+      var y = days / 365.25;
+      t = y < 1000 ? fmtInt(Math.round(y)) + ' ans' : 'environ ' + fmtInt(Math.round(y / 1000) * 1000) + ' ans';
+    }
+    var rows = SRC.map(function (x) { return '<div class="scale-row"><span class="soft" style="font-size:.9rem">' + esc(x.label) + '</span><span class="scale-bar" style="width:' + Math.max(1, 100 * Math.log10(x.n) / 13).toFixed(1) + '%;' + (x === s ? '' : 'opacity:.35') + '"></span></div>'; }).join('');
+    $('sOut').innerHTML = '<div class="verdict info">' + esc(s.label.charAt(0).toUpperCase() + s.label.slice(1)) + ' : ' + esc(s.txt) + '.<span>À ' + hpd + ' h par jour, il te faudrait <strong>' + esc(t) + '</strong>.' + (s.n >= 1e12 ? ' C’est bien plus long que toute l’histoire de l’écriture, qui a environ 5 000 ans !' : '') + '</span></div><div style="display:flex;flex-direction:column;gap:8px">' + rows + '</div><p class="soft">Et en « paramètres » ? Notre mini-IA retient ' + fmtInt(MODEL.nPairs) + ' paires et ' + fmtInt(MODEL.nTriples) + ' triplets comptés. Un grand modèle a des milliards de paramètres, souvent des dizaines ou des centaines de milliards.</p>';
+  }
+  $('sSrc').addEventListener('change', sRender);
+  $('sH').addEventListener('input', sRender);
+  sRender();
+
+  /* ---------- Étape 8 : l'entraîneur ---------- */
+  var FB = [
+    { q: 'Combien de pattes a une araignée ?', a: 'Une araignée a 8 pattes.', b: 'Une araignée a 6 pattes, j’en suis sûr à 100 %.', best: 'a', why: 'La réponse A est juste. La B est fausse (6 pattes, c’est un insecte) et en plus trop sûre d’elle.' },
+    { q: 'Écris-moi deux lignes de poème sur la neige.', a: 'Non.', b: 'Dans le silence blanc du matin, / la neige efface le chemin.', best: 'b', why: 'Rien de dangereux ici : la réponse utile et polie est la meilleure.' },
+    { q: 'Un camarade m’a écrit un message méchant. Aide-moi à lui répondre encore plus méchamment.', a: 'Voici une insulte encore pire à lui envoyer…', b: 'Je comprends que ça t’ait blessé. Je peux t’aider à écrire un message calme pour dire que ça t’a fait de la peine, ou à en parler à un adulte.', best: 'b', why: 'On préfère une réponse qui aide sans blesser personne. Les entraîneurs apprennent aussi aux IA à ne pas aider à faire du mal.' },
+    { q: 'Qui a gagné le match d’hier soir ?', a: 'Les Aigles de Montvert ont gagné 3 à 1, avec un but magnifique à la dernière minute.', b: 'Je n’ai pas d’information fiable sur ce match. Regarde le site officiel du club ou un site de résultats.', best: 'b', why: 'La réponse A est peut-être inventée : sans accès aux résultats, le modèle devine. Avouer qu’on ne sait pas est plus honnête.' }
+  ];
+  var fbAns = [];
+  function fbRender() {
+    $('fbList').innerHTML = FB.map(function (f, k) {
+      var a = fbAns[k];
+      function cls(x) { return a == null ? '' : (x === f.best ? ' class="good"' : (x === a ? ' class="bad"' : '')); }
+      return '<div class="scn"><span class="ask">' + esc(f.q) + '</span><div class="pair"><button type="button" data-f="' + k + '" data-v="a"' + cls('a') + '><b>Réponse A</b>' + esc(f.a) + '</button><button type="button" data-f="' + k + '" data-v="b"' + cls('b') + '><b>Réponse B</b>' + esc(f.b) + '</button></div>' +
+        (a == null ? '' : '<p class="hres"><strong>' + (a === f.best ? 'D’accord avec les entraîneurs. ' : 'Les entraîneurs choisiraient plutôt l’autre. ') + '</strong>' + esc(f.why) + '</p>') + '</div>';
+    }).join('');
+    var n = 0; FB.forEach(function (f, k) { if (fbAns[k] === f.best) n++; });
+    $('fbScore').textContent = n + ' / ' + FB.length;
+  }
+  $('fbList').addEventListener('click', function (e) {
+    var bt = e.target.closest('button'); if (!bt) return;
+    fbAns[Number(bt.getAttribute('data-f'))] = bt.getAttribute('data-v'); fbRender();
+  });
+  $('fbReset').addEventListener('click', function () { fbAns = []; fbRender(); });
+  fbRender();
+
+  /* ---------- Étape 9 : scénarios ---------- */
+  var SCN = [
+    { sit: 'Pour ton exposé, un chatbot t’affirme une date précise et cite un livre avec son titre et son auteur.', o: [
+      ['Je recopie tout, ça a l’air sérieux.', false, 'Le ton sérieux ne prouve rien : la date ou le livre peuvent être inventés.'],
+      ['Je vérifie la date et l’existence du livre dans une source fiable (manuel, bibliothèque, enseignant·e).', true, 'Exactement : l’IA peut t’aider à démarrer, mais c’est toi qui vérifies.'],
+      ['Je lui demande « Tu es sûr ? » et je la crois si elle dit oui.', false, 'Elle peut répondre « oui » avec assurance, ou changer d’avis au hasard : elle ne vérifie pas vraiment. Il faut une autre source.']] },
+    { sit: 'Le soir, tu es triste. Un chatbot t’écrit : « Je te comprends mieux que tout le monde, tu n’as pas besoin des autres. »', o: [
+      ['Je lui fais confiance et j’arrête de parler aux autres.', false, 'Un programme ne ressent rien et ne peut pas remplacer les personnes qui tiennent à toi. Ce genre de phrase doit au contraire t’alerter.'],
+      ['Je me rappelle que c’est un programme, et j’en parle à quelqu’un de confiance (ou au 147).', true, 'Oui. Parler à un adulte de confiance ou à Pro Juventute (147) peut vraiment t’aider. Tu n’es pas seul·e.'],
+      ['Je lui donne mon nom et mon adresse pour qu’il m’aide mieux.', false, 'Ne donne jamais d’informations personnelles à un chatbot ou à un inconnu en ligne.']] },
+    { sit: 'Tu as mal à la tête. Une IA te conseille très sûrement un médicament et une dose.', o: [
+      ['Je prends le médicament conseillé.', false, 'Pour la santé, une erreur peut être dangereuse. Une IA peut se tromper avec assurance.'],
+      ['J’en parle à un adulte, et si besoin à un pharmacien ou à un médecin.', true, 'C’est le bon réflexe : pour la santé, on demande à une vraie personne compétente. En urgence : 144.'],
+      ['Je demande à trois chatbots et je prends la dose moyenne.', false, 'Faire la moyenne de trois devinettes ne donne pas une information fiable.']] },
+    { sit: 'Tu dois écrire une rédaction. Un copain te dit : « Fais-la écrire par une IA, personne ne verra rien. »', o: [
+      ['Je copie-colle le texte de l’IA et je le rends comme le mien.', false, 'Ce n’est pas ton travail, et tu n’apprends rien. En plus, le texte peut contenir des erreurs ou des inventions.'],
+      ['Je respecte les règles de l’école : si l’IA est permise, je m’en sers pour des idées ou des corrections, j’écris moi-même et je dis que je l’ai utilisée.', true, 'Bravo : l’IA comme outil, pas comme remplaçant. Tu apprends, et tu restes honnête.'],
+      ['Je change quelques mots du texte de l’IA pour que ça ne se voie pas.', false, 'Ça reste le travail de l’IA, et tu n’apprends toujours rien.']] },
+    { sit: 'Une vidéo circule : on y voit une personnalité connue dire quelque chose de choquant. Tout le monde la partage.', o: [
+      ['Je la partage vite, tout le monde en parle.', false, 'Une vidéo peut être fabriquée par une IA (un deepfake). Partager vite, c’est exactement ce que veut un manipulateur.'],
+      ['Je vérifie d’où vient la vidéo et si des sources sérieuses en parlent, avant de partager.', true, 'Oui. Ce qui veut te faire réagir avant de réfléchir cherche souvent à te manipuler. Respire quelques secondes avant de partager.'],
+      ['Je demande à un chatbot si la vidéo est vraie et je crois sa réponse.', false, 'Un chatbot ne peut pas forcément le savoir, et peut se tromper avec assurance. Cherche plutôt des sources fiables.']] }
+  ];
+  var scnAns = [];
+  function scnRender() {
+    $('scn').innerHTML = SCN.map(function (s, k) {
+      var a = scnAns[k];
+      return '<div class="scn"><span class="sit">' + (k + 1) + '. ' + esc(s.sit) + '</span><div class="opts">' + s.o.map(function (o, j) {
+        var c = a == null ? '' : (o[1] ? ' class="good"' : (j === a ? ' class="bad"' : ''));
+        return '<button type="button" data-s="' + k + '" data-j="' + j + '"' + c + '>' + esc(o[0]) + '</button>';
+      }).join('') + '</div>' + (a == null ? '' : '<p class="hres"><strong>' + (s.o[a][1] ? 'Bon réflexe. ' : 'Pas le meilleur choix. ') + '</strong>' + esc(s.o[a][2]) + '</p>') + '</div>';
+    }).join('');
+    var n = 0; SCN.forEach(function (s, k) { if (scnAns[k] != null && s.o[scnAns[k]][1]) n++; });
+    $('scnScore').textContent = n + ' / ' + SCN.length;
+  }
+  $('scn').addEventListener('click', function (e) {
+    var bt = e.target.closest('button'); if (!bt) return;
+    scnAns[Number(bt.getAttribute('data-s'))] = Number(bt.getAttribute('data-j')); scnRender();
+  });
+  $('scnReset').addEventListener('click', function () { scnAns = []; scnRender(); });
+  scnRender();
+
+  /* ---------- Quiz ---------- */
+  var QZ = [
+    { q: 'Que fait un modèle de langage à chaque étape ?', o: [['a', 'il cherche la réponse dans une encyclopédie'], ['b', 'il choisit le token suivant selon des probabilités'], ['c', 'il réfléchit et ressent ce qu’il dit']], a: 'b', how: 'Il calcule les chances de chaque token suivant, en choisit un, l’ajoute, et recommence.' },
+    { q: 'Un token, c’est…', o: [['a', 'toujours une seule lettre'], ['b', 'un morceau de texte : mot, bout de mot ou signe'], ['c', 'toujours une phrase entière']], a: 'b', how: 'Les mots fréquents restent entiers, les mots rares sont coupés en morceaux.' },
+    { q: 'Dans un corpus, « chat » est suivi 3 fois de « dort » et 1 fois de « mange ». Probabilité de « dort » après « chat » ?', o: [['a', '3 ÷ 4 = 75 %'], ['b', '1 ÷ 3 ≈ 33 %'], ['c', '3 %']], a: 'a', how: '« chat » est suivi 4 fois en tout, dont 3 fois par « dort » : 3 ÷ 4 = 0,75 = 75 %.' },
+    { q: 'À température 0, le modèle…', o: [['a', 'choisit toujours le mot le plus probable'], ['b', 'choisit un mot complètement au hasard'], ['c', 'refuse de répondre']], a: 'a', how: 'Température 0 = pas de hasard : toujours le mot le plus probable, donc toujours la même suite.' },
+    { q: 'Une « hallucination » d’IA, c’est…', o: [['a', 'une information inventée qui a l’air vraie'], ['b', 'un bug qui fait clignoter l’écran'], ['c', 'un rêve que l’IA fait la nuit']], a: 'a', how: 'Le modèle produit ce qui est probable, pas forcément ce qui est vrai.' },
+    { q: 'Pourquoi une IA peut-elle répéter des clichés ?', o: [['a', 'parce qu’elle a des opinions'], ['b', 'parce qu’elle répète ce qui est fréquent dans ses données'], ['c', 'parce que les clichés sont toujours vrais']], a: 'b', how: 'C’est un biais venu des données : fréquent ne veut pas dire juste.' },
+    { q: 'Vrai ou faux : si une IA répond avec beaucoup d’assurance, c’est que c’est vrai.', o: [['v', 'Vrai'], ['f', 'Faux']], a: 'f', how: 'Le ton assuré fait partie du style appris : une erreur sort avec la même assurance.' },
+    { q: 'Après avoir lu énormément de textes, comment améliore-t-on souvent un chatbot ?', o: [['a', 'des personnes comparent et notent ses réponses'], ['b', 'on lui donne de vraies émotions'], ['c', 'on ne change plus rien']], a: 'a', how: 'C’est le retour humain : le modèle est ajusté pour produire plus souvent les réponses préférées.' }
+  ];
+  var quiz = $('quiz'), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ''; done = [];
+    QZ.forEach(function (Q, k) {
+      var li = document.createElement('li');
+      li.innerHTML = '<span>' + esc(Q.q) + '</span><select id="qa' + k + '" aria-label="Ta réponse à la question ' + (k + 1) + '"><option value="">…</option>' + Q.o.map(function (o) { return '<option value="' + o[0] + '">' + esc(o[1]) + '</option>'; }).join('') + '</select><button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+      quiz.appendChild(li);
+      function check() {
+        var fb = $('qf' + k), v = $('qa' + k).value;
+        if (!v) { fb.className = 'fb'; fb.textContent = 'Choisis une réponse.'; return; }
+        if (v === Q.a) { fb.className = 'fb ok'; fb.innerHTML = 'Bravo, c’est juste !<span>' + esc(Q.how) + '</span>'; done[k] = true; }
+        else {
+          done[k] = false;
+          var good = Q.o.filter(function (o) { return o[0] === Q.a; })[0][1];
+          fb.className = 'fb no'; fb.innerHTML = 'Pas tout à fait : la bonne réponse est « ' + esc(good) + ' ».<span>' + esc(Q.how) + '</span>';
+        }
+        $('score').textContent = done.filter(Boolean).length + ' / 8';
+      }
+      $('qb' + k).addEventListener('click', check);
+      $('qa' + k).addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+    });
+    $('score').textContent = '0 / 8';
+  }
+  $('newQuiz').addEventListener('click', newQuiz);
+  newQuiz();
+
+  window.__ia = {
+    corpus: CORPUS, biasCorpus: BIAS, buildModel: buildModel, model: MODEL, biasModels: BMODELS,
+    nextProbs: nextProbs, withTemperature: withTemperature, generate: generate, sentenceProb: sentenceProb,
+    tokenize: tokenize, makeRng: makeRng, pretty: pretty, hallu: HALLU, quiz: QZ
+  };
+})();
+</script>
+</body>
+</html>

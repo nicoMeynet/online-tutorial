@@ -1,0 +1,1306 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Les images truquées et les deepfakes</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, marge rouge. Accent pourpre (#9333ea), ambre pour les indices, vert pour les bons réflexes. Toutes les personnes, familles, écoles, comptes et numéros des exemples sont inventés (domaines en .exemple). Les « photos » sont des dessins : aucune vraie personne. Rien de ce qui est fait sur la page n'est envoyé ni enregistré. */
+:root {
+  --paper: #f9f7fb;
+  --grid: #ebe4f2;
+  --card: #ffffff;
+  --ink: #221a2b;
+  --ink-soft: #625670;
+  --acc: #9333ea;
+  --acc-soft: #f3e8ff;
+  --warn: #d97706;
+  --warn-soft: #fdf0d6;
+  --warn-ink: #92400e;
+  --two: #1c64c8;
+  --two-soft: #dbe8fa;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #fff0a3;
+  --line: #e4dbee;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #120e17; --grid: #201a28; --card: #1b1522; --ink: #f3eef8; --ink-soft: #bcaecb;
+    --acc: #c084fc; --acc-soft: #2e1a47; --warn: #f5a524; --warn-soft: #3d2a0c; --warn-ink: #fbbf5a;
+    --two: #7fb0ff; --two-soft: #1a2a45;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #352b40;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #120e17; --grid: #201a28; --card: #1b1522; --ink: #f3eef8; --ink-soft: #bcaecb;
+  --acc: #c084fc; --acc-soft: #2e1a47; --warn: #f5a524; --warn-soft: #3d2a0c; --warn-ink: #fbbf5a;
+  --two: #7fb0ff; --two-soft: #1a2a45;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #352b40;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--acc); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+@media (max-width: 420px) { .box { padding: 14px; } }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note.warn { border-left-color: var(--warn); background: var(--warn-soft); }
+.note.ok { border-left-color: var(--ok); background: var(--ok-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+.fig svg { width: 100%; height: auto; display: block; }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 8px 12px; min-height: 44px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+button:disabled { opacity: .45; cursor: not-allowed; transform: none; box-shadow: 3px 3px 0 var(--ink); }
+:focus-visible { outline: 3px solid var(--acc); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+input[type="range"] { width: 100%; accent-color: var(--acc); min-height: 32px; }
+select { font: inherit; font-size: 1rem; padding: 8px 8px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; }
+.param { display: flex; flex-direction: column; gap: 2px; }
+.param label { font-weight: 700; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
+.tag.ok { color: var(--ok); }
+.tag.no { color: var(--red); }
+.tag.warn { color: var(--warn-ink); }
+.tag.acc { color: var(--acc); }
+
+.verdict { border-radius: 8px; padding: 12px 14px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+.verdict.yes { background: var(--ok-soft); color: var(--ok); }
+.verdict.no { background: var(--red-soft); color: var(--red); }
+.verdict.mid { background: var(--warn-soft); color: var(--warn-ink); }
+.verdict span { font-weight: 400; color: var(--ink); }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc); }
+.top-row { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between; }
+
+/* Jeu des mots */
+.dots { display: flex; flex-wrap: wrap; gap: 6px; }
+.dots button { min-width: 40px; min-height: 40px; padding: 4px; box-shadow: none; border-width: 1.5px; font-family: var(--f-mono); font-size: .9rem; }
+.dots button:hover { transform: none; box-shadow: none; }
+.dots button.good { background: var(--ok-soft); border-color: var(--ok); color: var(--ok); }
+.dots button.bad { background: var(--red-soft); border-color: var(--red); color: var(--red); }
+.dots button[aria-current="true"] { outline: 3px solid var(--acc); outline-offset: 1px; }
+.example { font-size: 1.1rem; background: var(--paper); border: 1.5px dashed var(--line); border-radius: 10px; padding: 12px 14px; }
+.cat-btns button { flex: 1 1 130px; }
+.cat-btns button.good { background: var(--ok-soft); border-color: var(--ok); color: var(--ok); }
+.cat-btns button.bad { background: var(--red-soft); border-color: var(--red); color: var(--red); }
+
+/* Éditeur de photo et scènes dessinées */
+.photo { border: 2px solid var(--ink); border-radius: 8px; overflow: hidden; background: #fff; }
+.photo svg { width: 100%; height: auto; display: block; }
+.photo svg text, .doc svg text { fill: #2a2230; }
+#editSvg { touch-action: none; cursor: default; }
+#editSvg [data-uid] { cursor: grab; }
+.hs { cursor: pointer; }
+.hs:focus { outline: none; }
+.hs:focus-visible .hs-ring { stroke: #9333ea; stroke-width: 3; stroke-dasharray: 5 4; }
+#clueSvg { cursor: crosshair; }
+.clue-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.clue-list li { border-left: 4px solid var(--warn); background: var(--card); border-radius: 0 8px 8px 0; padding: 6px 10px; font-size: .95rem; border-top: 1.5px solid var(--line); border-right: 1.5px solid var(--line); border-bottom: 1.5px solid var(--line); }
+.clue-list strong { font-family: var(--f-display); }
+.meter { height: 14px; border-radius: 999px; background: var(--paper); border: 1.5px solid var(--ink); overflow: hidden; }
+.meter i { display: block; height: 100%; background: var(--warn); transition: width .3s; }
+
+/* Publications à vérifier */
+.post { border: 1.5px solid var(--ink); border-radius: 12px; background: var(--paper); padding: 12px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.post-head { display: flex; gap: 10px; align-items: center; min-width: 0; }
+.avatar { width: 40px; height: 40px; border-radius: 50%; flex: none; display: grid; place-items: center; font-family: var(--f-display); font-weight: 800; color: #fff; }
+.post-who { display: flex; flex-direction: column; min-width: 0; }
+.post-who strong { font-family: var(--f-display); overflow-wrap: anywhere; }
+.post-who span { font-family: var(--f-mono); font-size: .8rem; color: var(--ink-soft); overflow-wrap: anywhere; }
+.post-img { border-radius: 8px; overflow: hidden; border: 1.5px solid var(--line); max-width: 420px; }
+.post-img svg { width: 100%; height: auto; display: block; }
+.facts { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.facts li { background: var(--card); border: 1.5px solid var(--line); border-left: 4px solid var(--two); border-radius: 0 8px 8px 0; padding: 6px 10px; font-size: .95rem; }
+.facts strong { font-family: var(--f-display); }
+.inv-btns button { flex: 1 1 150px; font-size: .95rem; }
+.inv-btns button.seen { background: var(--two-soft); border-color: var(--two); }
+.choice-col { display: flex; flex-direction: column; gap: 8px; }
+.choice-col button { text-align: left; }
+
+/* Histoire à choix */
+.story { background: var(--paper); border: 1.5px solid var(--line); border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.vocal { display: flex; align-items: center; gap: 10px; background: var(--card); border: 1.5px solid var(--ink); border-radius: 18px 18px 18px 4px; padding: 8px 12px; align-self: flex-start; max-width: 100%; }
+.vocal svg { width: 120px; height: 28px; flex: none; }
+.vocal span { font-family: var(--f-mono); font-size: .85rem; color: var(--ink-soft); }
+.crumbs { font-family: var(--f-mono); font-size: .8rem; color: var(--ink-soft); overflow-wrap: anywhere; }
+.words { font-family: var(--f-mono); font-size: 1.3rem; font-weight: 600; color: var(--acc); background: var(--acc-soft); border-radius: 8px; padding: 8px 12px; text-align: center; overflow-wrap: anywhere; }
+.mini-tri { display: flex; flex-direction: column; gap: 10px; }
+.mini-tri > div { border: 1.5px solid var(--line); border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; background: var(--card); }
+.mini-tri .btns button { flex: 1 1 120px; }
+.mini-tri .fbk { font-size: .95rem; }
+.mini-tri .fbk.ok { color: var(--ok); }
+.mini-tri .fbk.no { color: var(--red); }
+.mini-tri .fbk:empty { display: none; }
+
+/* Faux documents */
+.doc-wrap { position: relative; }
+.doc { background: #fffdf7; color: #2a2230; border: 1.5px solid #cfc6b8; border-radius: 6px; padding: 16px 18px; min-height: 260px; font-family: var(--f-body); display: flex; flex-direction: column; gap: 10px; box-shadow: 0 3px 10px rgba(0,0,0,.12); overflow-wrap: anywhere; }
+.doc .d-head { display: flex; gap: 10px; align-items: center; border-bottom: 2px solid #2a2230; padding-bottom: 8px; }
+.doc .d-head svg { width: 44px; height: 44px; flex: none; }
+.doc .d-org { font-family: var(--f-display); font-weight: 800; font-size: 1.05rem; line-height: 1.2; }
+.doc .d-ref { font-family: var(--f-mono); font-size: .78rem; color: #6b6070; }
+.doc .d-title { font-family: var(--f-display); font-weight: 700; font-size: 1.15rem; }
+.doc .d-body { font-size: .98rem; }
+.doc table { border-collapse: collapse; width: 100%; font-size: .92rem; }
+.doc td { border: 1px solid #cfc6b8; padding: 3px 6px; }
+.doc .d-foot { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 10px; margin-top: auto; }
+.doc .d-foot svg { width: 120px; height: 46px; }
+.doc .stamp { width: 86px; height: 86px; }
+.doc .part { opacity: 0; transition: opacity .35s; }
+.doc .part.on { opacity: 1; }
+.doc .empty { color: #8a8090; font-style: italic; }
+.fake-stamp { position: absolute; right: 8px; top: 40%; transform: rotate(-12deg); border: 4px solid #cf3a52; color: #cf3a52; background: rgba(255,253,247,.88); font-family: var(--f-display); font-weight: 800; font-size: 1.1rem; padding: 4px 12px; border-radius: 8px; text-align: center; pointer-events: none; }
+.fake-stamp[hidden] { display: none; }
+.timer { font-family: var(--f-mono); font-weight: 600; color: var(--acc); }
+
+.steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; counter-reset: st; }
+.steps li { counter-increment: st; display: grid; grid-template-columns: 34px 1fr; gap: 10px; align-items: start; border: 1.5px solid var(--line); border-radius: 10px; padding: 8px 10px; background: var(--card); }
+.steps li::before { content: counter(st); width: 30px; height: 30px; border-radius: 50%; background: var(--acc); color: var(--card); display: grid; place-items: center; font-family: var(--f-display); font-weight: 800; }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 220px auto; gap: 10px; align-items: center; }
+.quiz li > span:first-child { min-width: 0; overflow-wrap: anywhere; }
+.quiz select { font-size: .95rem; padding: 6px 6px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb:empty { display: none; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 150px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--acc); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--acc); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); }
+details .msg { display: block; margin-top: 8px; font-weight: 400; font-family: var(--f-mono); font-size: .9rem; background: var(--paper); border: 1.5px dashed var(--line); border-radius: 8px; padding: 8px 10px; overflow-wrap: anywhere; color: var(--ink); }
+details ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+<!--ticons--><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Tutoriels"><script src="progress.js" defer></script><!--/ticons-->
+<style id="tnav-css">
+.tnav-top { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin: 0 0 4px; }
+.tnav-home { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font-weight: 700; font-size: .95rem; text-decoration: none; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tnav-home:hover, .tnav-home:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.tnav-bottom { margin-top: 8px; display: flex; flex-direction: column; gap: 12px; }
+.tnav-bottom h2 { margin: 0; }
+.tnav-pn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tnav-pn a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--ink, #222); border-radius: 10px;
+  background: var(--card, #fff); color: var(--ink, #222); text-decoration: none; box-shadow: 3px 3px 0 var(--ink, #222); min-width: 0; }
+.tnav-pn a span { font-size: .85rem; color: var(--ink-soft, #666); }
+.tnav-pn a strong { overflow-wrap: anywhere; }
+.tnav-pn a.next { text-align: right; grid-column: 2; }
+.tnav-bottom .tnav-home { align-self: center; }
+@media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
+.diff { font: 700 .72rem/1.2 var(--f-mono, monospace); padding: 2px 8px; border-radius: 99px; border: 1.5px solid; white-space: nowrap; }
+.diff.d1 { color: #15803d; border-color: #15803d; background: #dcf3e3; }
+.diff.d2 { color: #a15c07; border-color: #b45309; background: #fbe7cf; }
+.diff.d3 { color: #b91c1c; border-color: #b91c1c; background: #fde2e2; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root:not([data-theme="light"]) .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root:not([data-theme="light"]) .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; } }
+:root[data-theme="dark"] .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root[data-theme="dark"] .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root[data-theme="dark"] .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; }
+</style>
+</head>
+<body>
+<main class="page">
+<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="numerique.html">← Tous les tutoriels numériques</a><span class="diff d2" title="Difficulté : moyen">Moyen</span></nav><!--/tnav-->
+
+
+  <header class="hero">
+    <span class="eyebrow">Tutoriel numérique · niveau 10H</span>
+    <h1>Les images truquées et les deepfakes</h1>
+    <p class="lead">Une photo peut mentir. Une vidéo aussi. Et maintenant, même une voix au téléphone. Avec l'intelligence artificielle, truquer est devenu facile, rapide et gratuit. Ici, tu vas comprendre comment on fabrique ces faux, et surtout comment ne pas te faire piéger.</p>
+    <div class="box fig">
+      <svg viewBox="0 0 360 190" role="img" aria-label="Une photo dessinée coupée en deux : à gauche la vraie, à droite la même avec un chapeau ajouté par une baguette magique, et une onde sonore copiée">
+        <rect x="20" y="20" width="200" height="140" rx="6" fill="#bfe3f7" stroke="var(--ink)" stroke-width="2.5"/>
+        <rect x="20" y="120" width="200" height="40" fill="#8bd17c"/>
+        <line x1="120" y1="20" x2="120" y2="160" stroke="var(--ink)" stroke-width="2" stroke-dasharray="5 4"/>
+        <g>
+          <circle cx="72" cy="78" r="18" fill="#f2c9a0" stroke="#5a3b26" stroke-width="1.5"/>
+          <circle cx="66" cy="76" r="2" fill="#2a2230"/><circle cx="78" cy="76" r="2" fill="#2a2230"/>
+          <path d="M65 85 q7 6 14 0" fill="none" stroke="#2a2230" stroke-width="1.8"/>
+          <rect x="58" y="96" width="28" height="34" rx="8" fill="#7c5cff"/>
+        </g>
+        <g>
+          <circle cx="170" cy="78" r="18" fill="#f2c9a0" stroke="#5a3b26" stroke-width="1.5"/>
+          <circle cx="164" cy="76" r="2" fill="#2a2230"/><circle cx="176" cy="76" r="2" fill="#2a2230"/>
+          <path d="M163 85 q7 6 14 0" fill="none" stroke="#2a2230" stroke-width="1.8"/>
+          <rect x="156" y="96" width="28" height="34" rx="8" fill="#7c5cff"/>
+          <path d="M148 62 h44 l-6 -4 h-32 z M156 58 l4 -22 h20 l4 22 z" fill="#2a2230"/>
+          <rect x="160" y="50" width="20" height="5" fill="#e11d48"/>
+        </g>
+        <path d="M228 40 L262 18" stroke="var(--acc)" stroke-width="5" stroke-linecap="round"/>
+        <path d="M266 6 l3 7 7 1 -5 5 1 7 -6 -3 -6 3 1 -7 -5 -5 7 -1 z" fill="var(--warn)"/>
+        <text x="40" y="180" font-size="12">vrai</text>
+        <text x="150" y="180" font-size="12">truqué</text>
+        <g fill="none" stroke="var(--acc)" stroke-width="3" stroke-linecap="round">
+          <path d="M245 110 v10 M255 100 v30 M265 92 v46 M275 104 v22 M285 96 v38 M295 108 v14 M305 100 v30 M315 112 v6"/>
+        </g>
+        <text x="244" y="160" font-size="12">voix copiée ?</text>
+      </svg>
+    </div>
+    <p class="soft">Toutes les personnes, familles, écoles, comptes et numéros de cette page sont <strong>inventés</strong>, et les « photos » sont des <strong>dessins</strong>. Rien de ce que tu fais ici n'est envoyé ni enregistré : c'est un entraînement.</p>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · Les mots</span>
+    <h2>Retouche, montage, IA, deepfake : c'est quoi la différence ?</h2>
+    <p>On dit souvent « c'est truqué » pour tout. Mais il existe plusieurs façons de fabriquer un faux. Les connaître aide à savoir quoi vérifier.</p>
+    <div class="cards">
+      <div class="box"><span class="tag acc">Photo modifiée</span><strong>La retouche</strong><span class="soft">On <strong>modifie une vraie photo</strong> : effacer un bouton, changer les couleurs, enlever une personne, lisser la peau.</span></div>
+      <div class="box"><span class="tag acc">Morceaux collés</span><strong>Le montage</strong><span class="soft">On <strong>assemble des morceaux</strong> de plusieurs images pour en faire une seule qui n'a jamais existé.</span></div>
+      <div class="box"><span class="tag acc">Fabriquée de zéro</span><strong>L'image générée par IA</strong><span class="soft">Un programme <strong>invente toute l'image</strong> à partir d'une phrase. Aucune photo n'a été prise.</span></div>
+      <div class="box"><span class="tag acc">Vidéo</span><strong>Le deepfake vidéo</strong><span class="soft">L'IA remplace un visage ou fait bouger les lèvres pour <strong>faire dire ou faire à quelqu'un</strong> ce qu'il n'a jamais dit ni fait. De l'anglais <em>deep learning</em> (une technique d'IA) et <em>fake</em> (faux).</span></div>
+      <div class="box"><span class="tag acc">Son</span><strong>La voix clonée</strong><span class="soft">Une IA imite la <strong>voix d'une personne</strong> et lui fait prononcer n'importe quelle phrase. On parle aussi de deepfake audio.</span></div>
+    </div>
+    <div class="box">
+      <div class="top-row">
+        <h3>Le jeu des mots</h3>
+        <span class="score" id="mScore">0 / 10</span>
+      </div>
+      <p class="soft">Lis l'exemple et choisis le bon mot. Tu peux changer d'avis : seule ta dernière réponse compte.</p>
+      <div class="dots" id="mDots" role="group" aria-label="Choisir un exemple"></div>
+      <p class="example" id="mText" aria-live="polite"></p>
+      <div class="btns cat-btns" id="mCats" role="group" aria-label="Ta réponse"></div>
+      <div id="mOut" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="mPrev">← Précédent</button><button type="button" id="mNext">Suivant →</button><button type="button" id="mReset">Recommencer</button></div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · La retouche</span>
+    <h2>À toi de truquer une photo</h2>
+    <p>Voici une « photo » (un dessin) du parc de Bourg-Fictif. Touche un objet pour le choisir, puis <strong>déplace-le</strong> (en le faisant glisser ou avec les flèches), <strong>copie-le</strong> ou <strong>efface-le</strong>. Tu peux aussi changer la couleur du ciel. Compte combien de secondes il te faut pour raconter une autre histoire.</p>
+    <div class="box">
+      <div class="photo"><svg id="editSvg" viewBox="0 0 400 260" role="img" aria-label="Photo dessinée d'un parc avec un arbre, un enfant, un chien, un ballon, une poubelle et un nuage. Touche un objet pour le choisir."></svg></div>
+      <p class="soft" id="edSel" aria-live="polite">Aucun objet choisi. Touche un objet sur la photo.</p>
+      <div class="btns" role="group" aria-label="Outils de retouche">
+        <button type="button" id="edL" aria-label="Déplacer à gauche">←</button>
+        <button type="button" id="edU" aria-label="Déplacer vers le haut">↑</button>
+        <button type="button" id="edD" aria-label="Déplacer vers le bas">↓</button>
+        <button type="button" id="edR" aria-label="Déplacer à droite">→</button>
+        <button type="button" id="edClone">Cloner</button>
+        <button type="button" id="edErase">Effacer</button>
+        <button type="button" id="edSky">Ciel bleu</button>
+      </div>
+      <div class="btns">
+        <button type="button" id="edOrig" aria-pressed="false">Voir l'original</button>
+        <button type="button" id="edReset">Remettre la vraie photo</button>
+        <span class="score" id="edCount">0 retouche</span>
+      </div>
+      <div id="edMsg" aria-live="polite"></div>
+    </div>
+    <p>Dans les vrais logiciels, c'est encore plus fort : quand on efface un objet, l'IA <strong>invente le décor qui était caché derrière</strong> (de l'herbe, un mur…). Le trou ne se voit plus du tout.</p>
+    <div class="note">
+      <span class="note-title">Toutes les retouches ne sont pas des mensonges</span>
+      <span>Recadrer une photo, enlever les yeux rouges, rendre une image plus lumineuse : c'est normal. Ça devient un <strong>mensonge</strong> quand la retouche change <strong>ce que la photo raconte</strong> (une personne effacée, un objet ajouté, une foule plus grande…) et qu'on la fait passer pour vraie.</span>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Une image qui sort de nulle part</span>
+    <h2>Comment une IA fabrique une image</h2>
+    <p>Une IA d'images a été entraînée sur <strong>d'immenses quantités d'images</strong> avec leur description. Elle n'a rien « compris » comme toi : elle a appris quelles formes et quelles couleurs vont souvent ensemble. On lui écrit une phrase (on dit un <em>prompt</em>), et elle fabrique une image nouvelle. Beaucoup d'IA d'images travaillent à peu près comme ceci : elles partent du <strong>bruit</strong> et le nettoient petit à petit. Pour en savoir plus sur le fonctionnement de ces programmes, va voir le tutoriel sur <a class="tlink" href="comment-une-ia-ecrit.html">l'intelligence artificielle</a>.</p>
+    <div class="box">
+      <p class="mono" style="overflow-wrap:anywhere">Prompt : « un chat astronaute sur la Lune, style dessin »</p>
+      <div class="photo"><svg id="genSvg" viewBox="0 0 320 200" role="img" aria-label="Une image qui passe du bruit à un chat astronaute sur la Lune"></svg></div>
+      <div class="btns"><button type="button" id="genNext">Étape suivante</button><button type="button" id="genReset">Recommencer</button><span class="score" id="genStep">0 / 5</span></div>
+      <p id="genText" aria-live="polite"></p>
+    </div>
+    <div class="note warn">
+      <span class="note-title">Ce que ça change</span>
+      <span>Avant, un faux réussi demandait du temps et du talent. Aujourd'hui, <strong>n'importe qui</strong> peut en fabriquer des dizaines en quelques minutes, sans rien savoir faire. L'IA n'a pas inventé le mensonge : elle le rend <strong>rapide, bon marché et convaincant</strong>.</span>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · Trouve les indices</span>
+    <h2>Les petites erreurs des images d'IA</h2>
+    <p>Cette « photo » de Zoé devant une boulangerie a été fabriquée par une IA encore maladroite. <strong>Cinq détails</strong> la trahissent. Touche-les sur l'image !</p>
+    <div class="box">
+      <div class="top-row"><span class="score" id="clScore">0 / 5</span><span class="soft" id="clHint" aria-live="polite">Touche un endroit bizarre.</span></div>
+      <div class="photo"><svg id="clueSvg" viewBox="0 0 400 280" role="img" aria-label="Image dessinée : une fille à lunettes fait coucou devant une boulangerie, à côté d'un lampadaire et d'une flaque. Cinq zones cachent un indice."></svg></div>
+      <ul class="clue-list" id="clList" aria-live="polite"></ul>
+      <div class="btns"><button type="button" id="clShow">Montrer tous les indices</button><button type="button" id="clReset">Recommencer</button></div>
+    </div>
+    <h3>Mais attention : les indices disparaissent</h3>
+    <p>Les IA s'améliorent très vite. Les erreurs qu'on repérait facilement il y a peu sont de plus en plus rares. Fais glisser le curseur pour voir des IA de plus en plus fortes dessiner la même image.</p>
+    <div class="box">
+      <div class="param">
+        <label for="lvl">Génération d'IA : <span class="mono" id="lvlOut">1</span> / 5</label>
+        <input type="range" id="lvl" min="1" max="5" step="1" value="1">
+      </div>
+      <div class="photo"><svg id="lvlSvg" viewBox="0 0 400 280" role="img" aria-label="La même image dessinée par une IA plus ou moins forte"></svg></div>
+      <div class="meter" aria-hidden="true"><i id="lvlBar" style="width:100%"></i></div>
+      <p id="lvlText" aria-live="polite"></p>
+    </div>
+    <div class="note red">
+      <span class="note-title">À retenir</span>
+      <span>Chercher les erreurs, c'est utile… mais ça ne suffit plus. <strong>Une image sans erreur visible n'est pas une preuve qu'elle est vraie.</strong> La vraie méthode, c'est l'étape suivante.</span>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · La vraie méthode</span>
+    <h2>Enquêter sur le contexte</h2>
+    <p>Au lieu de regarder seulement l'image, on regarde <strong>tout ce qu'il y a autour</strong>. Ces questions marchent même avec l'IA la plus parfaite :</p>
+    <div class="cards">
+      <div class="box"><span class="tag ok">1</span><strong>Qui publie ?</strong><span class="soft">Un compte connu et sérieux, ou un compte créé hier qui ne publie que des « chocs » ?</span></div>
+      <div class="box"><span class="tag ok">2</span><strong>D'où vient l'image ?</strong><span class="soft">Qui l'a publiée en premier ? Certains moteurs de recherche permettent de chercher une image pour voir où elle est déjà apparue.</span></div>
+      <div class="box"><span class="tag ok">3</span><strong>D'autres sources ?</strong><span class="soft">Un vrai événement important est raconté par plusieurs médias sérieux ou par l'organisation concernée.</span></div>
+      <div class="box"><span class="tag ok">4</span><strong>Et moi, je ressens quoi ?</strong><span class="soft">Colère, peur, envie de rire ou de partager tout de suite ? Est-ce que j'ai <strong>envie</strong> que ce soit vrai ?</span></div>
+    </div>
+    <div class="box">
+      <div class="top-row"><h3>Trois publications à vérifier</h3><span class="score" id="pScore">0 / 3</span></div>
+      <div class="btns" id="pTabs" role="group" aria-label="Choisir une publication"></div>
+      <div class="post" id="pPost"></div>
+      <span class="soft">Enquête : touche les questions pour découvrir ce que tu trouves.</span>
+      <div class="btns inv-btns" id="pInv" role="group" aria-label="Questions d'enquête"></div>
+      <ul class="facts" id="pFacts" aria-live="polite"></ul>
+      <span class="soft">Ta décision :</span>
+      <div class="choice-col" id="pChoices" role="group" aria-label="Ta décision"></div>
+      <div id="pOut" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">La règle d'or</span>
+      <span><strong>Ce qui veut te faire réagir avant de réfléchir cherche peut-être à te manipuler.</strong> Devant une image choc, respire 5 à 10 secondes avant de partager. Dans des tests, une simple pause de quelques secondes fait beaucoup baisser le nombre de personnes qui se font piéger. Pour aller plus loin sur les rumeurs et les fausses nouvelles, il y a le tutoriel sur <a class="tlink" href="vraie-ou-fausse-info.html">les fausses infos</a>.</span>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · La voix clonée</span>
+    <h2>« C'est Maman, envoie-moi de l'argent ! »</h2>
+    <p>Pour imiter une voix, une IA a parfois besoin de <strong>quelques secondes d'enregistrement seulement</strong> : une vidéo publiée en public, un message vocal, une interview. Ensuite, elle peut faire dire n'importe quoi à cette voix. Les escrocs s'en servent pour une arnaque très ancienne : se faire passer pour un proche en difficulté.</p>
+    <div class="box">
+      <div class="top-row"><h3>L'histoire de Léa</h3><span class="crumbs" id="vCrumbs"></span></div>
+      <div class="story" id="vStory" aria-live="polite"></div>
+      <div class="choice-col" id="vChoices" role="group" aria-label="Ce que fait Léa"></div>
+      <div class="btns"><button type="button" id="vReset">Recommencer l'histoire</button></div>
+    </div>
+    <h3>Le mot de code de la famille</h3>
+    <p>Une idée simple et très efficace : choisir <strong>en famille, en vrai</strong> (à table, pas par message), un <strong>mot de code secret</strong>. Si un jour quelqu'un appelle avec la voix d'un proche et demande de l'argent ou de l'aide urgente, on demande le mot de code. Une IA peut copier une voix, mais <strong>pas un secret qu'elle n'a jamais entendu</strong>.</p>
+    <div class="box">
+      <h3>Besoin d'idées ?</h3>
+      <p class="soft">Deux mots qui n'ont rien à voir, faciles à retenir. Ce n'est qu'une idée : le vôtre, inventez-le ensemble, et ne l'écrivez nulle part en ligne.</p>
+      <div class="words" id="cwOut" aria-live="polite">…</div>
+      <div class="btns"><button type="button" id="cwGo">Proposer une idée</button></div>
+      <h3>Bon ou mauvais mot de code ?</h3>
+      <div class="mini-tri" id="cwTri"></div>
+    </div>
+    <p>Les arnaques par message (faux colis, faux liens, demandes de code) sont expliquées en détail dans le tutoriel sur <a class="tlink" href="reperer-les-arnaques.html">les arnaques</a>.</p>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Les faux documents</span>
+    <h2>Un « papier officiel » en trois secondes</h2>
+    <p>Un logo, un tampon, une signature, un numéro de dossier : avant, ça avait l'air sérieux. Aujourd'hui, une IA peut fabriquer tout ça en quelques secondes. Choisis un document et regarde.</p>
+    <div class="box">
+      <div class="btns" id="dTabs" role="group" aria-label="Choisir un document"></div>
+      <div class="btns"><button type="button" id="dGo">Fabriquer le document</button><span class="timer" id="dTimer">0,0 s</span></div>
+      <div class="doc-wrap">
+        <div class="doc" id="dDoc"></div>
+        <div class="fake-stamp" id="dFake" hidden>FAUX<br>fabriqué en 3 s</div>
+      </div>
+      <div id="dVerify" hidden>
+        <h3>Comment vérifier ?</h3>
+        <div class="choice-col" id="dChoices" role="group" aria-label="Comment vérifier"></div>
+        <div id="dOut" aria-live="polite"></div>
+      </div>
+    </div>
+    <div class="note ok">
+      <span class="note-title">Le bon réflexe</span>
+      <span>Un document ne prouve rien tout seul. On vérifie <strong>par un autre chemin</strong> : on appelle l'école, la police ou la personne avec <strong>un numéro qu'on connaît déjà</strong> (agenda, carte, site officiel qu'on tape soi-même), <strong>jamais</strong> celui écrit sur le document.</span>
+    </div>
+    <div class="note warn">
+      <span class="note-title">Et dans l'autre sens ?</span>
+      <span>Fabriquer un faux mot d'excuse, un faux bulletin ou un faux document officiel pour tromper quelqu'un, c'est un <strong>faux</strong>. À l'école, c'est sanctionné, et utiliser un faux document officiel peut aussi être puni par la loi. « C'était juste pour rire » ne change rien.</span>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Quand un faux vise quelqu'un</span>
+    <h2>Un deepfake contre une personne, c'est grave</h2>
+    <p>Certaines personnes utilisent l'IA pour <strong>humilier</strong> quelqu'un : une fausse vidéo où un camarade dit des bêtises, un visage collé sur une image gênante, une fausse photo intime. Même si « tout le monde sait que c'est faux », la personne visée a honte, a peur, et la vidéo peut circuler longtemps.</p>
+    <div class="note red">
+      <span class="note-title">Ce qu'il faut savoir</span>
+      <span>• C'est du <strong>harcèlement</strong>. Fabriquer ou partager ce genre d'image peut être <strong>puni</strong>.</span>
+      <span>• En Suisse, la loi protège ton image et tes données personnelles.</span>
+      <span>• Une fausse image intime d'un ou d'une mineur·e est <strong>grave et interdite</strong>, même si elle est fabriquée par une IA et même si c'est un autre ado qui l'a faite. On ne la garde pas, on ne la transfère pas : on prévient un adulte.</span>
+    </div>
+    <div class="box">
+      <h3>Dans le groupe de classe…</h3>
+      <p>Quelqu'un poste une fausse vidéo où Malik (inventé pour l'exemple) semble chanter faux en se ridiculisant. Plusieurs élèves envoient des émojis qui rigolent. Que fais-tu ?</p>
+      <div class="choice-col" id="wChoices" role="group" aria-label="Ta réaction"></div>
+      <div id="wOut" aria-live="polite"></div>
+    </div>
+    <ol class="steps">
+      <li><span><strong>Ne partage pas</strong>, ne commente pas, ne « like » pas : chaque partage fait encore plus de mal.</span></li>
+      <li><span><strong>Parles-en à un adulte de confiance</strong> (parent, enseignant·e, infirmier·ère scolaire). Si c'est toi la victime : ce n'est <strong>pas ta faute</strong>.</span></li>
+      <li><span><strong>Signale</strong> la publication sur le réseau social ou la messagerie, et bloque le compte.</span></li>
+      <li><span><strong>Pro Juventute, le 147</strong> : gratuit et confidentiel, par téléphone, SMS ou chat. En cas de menace ou de chantage : <strong>la police, le 117</strong>.</span></li>
+    </ol>
+    <p class="soft">Pour savoir comment réagir face aux moqueries et aux attaques en ligne, lis aussi le tutoriel sur <a class="tlink" href="le-cyberharcelement.html">le cyberharcèlement</a>.</p>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Utiliser l'IA honnêtement</span>
+    <h2>Créer, oui. Tromper, non.</h2>
+    <p>Fabriquer des images avec une IA peut être génial : illustrer un exposé, inventer un monstre, créer une affiche. Deux règles simples : <strong>dire que c'est généré</strong> (« image générée par IA ») et <strong>ne jamais utiliser le visage ou la voix de quelqu'un sans son accord</strong>.</p>
+    <div class="box">
+      <div class="top-row"><h3>OK ou pas OK ?</h3><span class="score" id="hScore">0 / 7</span></div>
+      <div class="mini-tri" id="hTri"></div>
+      <div class="btns"><button type="button" id="hReset">Recommencer</button></div>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · Attention</span>
+    <h2>Les erreurs fréquentes</h2>
+    <div class="cards">
+      <div class="box"><span class="tag no">Faux</span><strong>« Les mains sont normales, donc c'est une vraie photo. »</strong><span class="soft">Les IA récentes font de moins en moins d'erreurs. Vérifie le contexte : qui publie, d'où ça vient.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« C'est une vidéo, donc c'est vrai. »</strong><span class="soft">Une vidéo peut être un deepfake, ou une vraie vidéo coupée et sortie de son contexte.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« C'est sa voix, donc c'est lui. »</strong><span class="soft">Une voix peut être clonée. Rappelle la personne sur son numéro habituel, ou demande le mot de code.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« Il y a un tampon et un logo, c'est officiel. »</strong><span class="soft">Un logo et un tampon se copient en un instant. Vérifie auprès de l'organisation, avec un numéro que tu connais.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« Tout le monde la partage, donc c'est vrai. »</strong><span class="soft">Le nombre de partages ne prouve rien : un faux circule souvent plus vite que le vrai, parce qu'il surprend.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« Moi, je ne me ferai jamais avoir. »</strong><span class="soft">C'est le piège le plus dangereux ! Les faux sont faits pour tromper tout le monde, adultes compris.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« Puisque tout peut être faux, plus rien n'est vrai. »</strong><span class="soft">Non : beaucoup d'images sont vraies. Le but n'est pas de douter de tout, mais de <strong>vérifier avant de croire et de partager</strong>.</span></div>
+    </div>
+    <h3>Le savais-tu ? Truquer les images, c'est très ancien</h3>
+    <ol class="timeline">
+      <li><span class="when">XIXᵉ siècle</span><div class="what"><strong>Les premiers montages</strong><span>Peu après l'invention de la photographie, des photographes assemblent déjà plusieurs clichés ou retouchent les négatifs à la main, au pinceau.</span></div></li>
+      <li><span class="when">XXᵉ siècle</span><div class="what"><strong>Effacés de l'histoire</strong><span>Dans certains pays, des dirigeants font effacer des photos officielles des personnes tombées en disgrâce, comme si elles n'avaient jamais existé.</span></div></li>
+      <li><span class="when">années 1990</span><div class="what"><strong>La retouche sur ordinateur</strong><span>Des logiciels permettent de retoucher des photos sur un ordinateur. Les magazines retouchent beaucoup les photos de mannequins.</span></div></li>
+      <li><span class="when">fin des années 2010</span><div class="what"><strong>Le mot « deepfake »</strong><span>Il apparaît sur Internet pour désigner des vidéos où un visage est remplacé par un autre grâce à l'IA.</span></div></li>
+      <li><span class="when">années 2020</span><div class="what"><strong>Tout le monde peut le faire</strong><span>Des IA fabriquent en quelques secondes des images réalistes, des vidéos et des voix. Ce qui demandait un expert est à la portée de n'importe qui.</span></div></li>
+    </ol>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Choisis ta réponse, puis vérifie.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Recommencer</button>
+    </div>
+  </section>
+
+  <!-- 12 -->
+  <section>
+    <span class="eyebrow">Étape 12 · À toi de jouer</span>
+    <h2>Cinq situations à analyser</h2>
+    <p>Réfléchis d'abord seul·e (ou à deux), puis ouvre la correction.</p>
+    <div class="exos">
+      <details>
+        <summary>Le loup dans la cour<span class="msg">Image transférée dans le groupe de classe, sans source : « Un loup a été vu ce matin dans la cour du collège des Tilleuls !!! Partagez ! » L'image est très nette, rien de bizarre.</span></summary>
+        <div>
+          <span>Rien de bizarre ne prouve rien. On enquête :</span>
+          <ul>
+            <li><strong>Qui</strong> l'a publiée en premier ? « Transféré plusieurs fois », sans auteur : mauvais signe.</li>
+            <li><strong>D'autres sources ?</strong> Le collège, la commune ou un média local en parlent-ils ?</li>
+            <li><strong>Émotion</strong> : la peur et le « Partagez ! » poussent à réagir vite.</li>
+          </ul>
+          <span><strong>Réaction :</strong> ne pas partager, demander à un adulte ou à l'école. Si c'était vrai, l'école préviendrait officiellement.</span>
+        </div>
+      </details>
+      <details>
+        <summary>Le rapport de police<span class="msg">Ta tante reçoit un PDF « Police de Bourg-Fictif, rapport n° 2026-04817 » : son fils aurait eu un accident. Il faut appeler d'urgence le 079 000 00 00 et payer 450 CHF de « frais ».</span></summary>
+        <div>
+          <span><strong>Très probablement une arnaque</strong>, même si le document a l'air parfait (logo, tampon, signature : tout se fabrique en quelques secondes).</span>
+          <ul>
+            <li>La peur et l'urgence empêchent de réfléchir.</li>
+            <li>La police ne demande pas de payer des « frais » à un numéro de portable reçu par message.</li>
+          </ul>
+          <span><strong>Réaction :</strong> appeler d'abord son fils directement, puis la police au 117 (ou le poste habituel), sans utiliser le numéro du document. Ne rien payer. Garder le message et le signaler (par exemple à l'OFCS, l'Office fédéral de la cybersécurité, sur ncsc.admin.ch).</span>
+        </div>
+      </details>
+      <details>
+        <summary>L'idée de Jade<span class="msg">Ta copine Jade : « Trop drôle, on fait une image IA de M. Rochat en tutu et on la met dans le groupe ! »</span></summary>
+        <div>
+          <span><strong>Pas OK.</strong> Même « pour rire », c'est utiliser l'image d'une vraie personne sans son accord, pour se moquer d'elle. Ça peut blesser, circuler partout, et être puni.</span>
+          <span><strong>Ce que tu peux dire :</strong> « Non, ça peut vraiment lui faire du mal et on aurait de gros problèmes. Si tu veux faire une image drôle, inventons un personnage qui n'existe pas. »</span>
+        </div>
+      </details>
+      <details>
+        <summary>Quel type de faux ?<span class="msg">a) Une photo de vacances où le cousin a été découpé et collé sur une plage où il n'est jamais allé.<br>b) Une vidéo où une chanteuse (inventée) semble insulter ses fans, mais ses lèvres bougent un peu bizarrement.<br>c) Une photo de classe où un bouton a disparu du menton de Noé.</span></summary>
+        <div>
+          <ul>
+            <li>a) un <strong>montage</strong> (des morceaux de plusieurs images assemblés) ;</li>
+            <li>b) sûrement un <strong>deepfake vidéo</strong> : on vérifie sur ses comptes officiels et dans des médias sérieux ;</li>
+            <li>c) une <strong>retouche</strong> (légère, et qui ne change pas l'histoire de la photo).</li>
+          </ul>
+        </div>
+      </details>
+      <details>
+        <summary>Le mot de code de ta famille<span class="msg">Propose à ta famille trois règles pour votre mot de code.</span></summary>
+        <div>
+          <span>Par exemple :</span>
+          <ul>
+            <li>on le choisit <strong>ensemble, en vrai</strong>, jamais par message ;</li>
+            <li>il n'est <strong>visible nulle part</strong> (pas le nom du chien qu'on voit sur les photos, pas une date d'anniversaire) ;</li>
+            <li>on ne l'écrit <strong>jamais</strong> dans un message ni sur un réseau social ;</li>
+            <li>on le demande dès qu'un appel ou un message « d'un proche » réclame de l'argent ou de l'aide urgente ;</li>
+            <li>si on pense qu'il a été découvert, on en choisit un nouveau.</li>
+          </ul>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• <strong>Retouche</strong> : une vraie photo modifiée. <strong>Montage</strong> : des morceaux assemblés. <strong>Image générée par IA</strong> : fabriquée de zéro. <strong>Deepfake</strong> : vidéo ou voix truquée par l'IA.</span>
+      <span>• Avec l'IA, truquer est devenu <strong>facile, rapide et gratuit</strong> : n'importe qui peut le faire.</span>
+      <span>• Les erreurs visibles (mains, texte, ombres, reflets) <strong>disparaissent</strong> : une image sans erreur n'est pas une preuve.</span>
+      <span>• La vraie méthode : <strong>qui publie ? d'où ça vient ? d'autres sources ?</strong> Et respirer quelques secondes avant de partager.</span>
+      <span>• Une voix peut être clonée : on <strong>rappelle sur le numéro habituel</strong> et on utilise un <strong>mot de code familial</strong>.</span>
+      <span>• Un document ne prouve rien tout seul : on vérifie avec un numéro qu'on connaît déjà, <strong>jamais</strong> celui du document.</span>
+      <span>• Un deepfake pour humilier quelqu'un, c'est du <strong>harcèlement</strong> : ne pas partager, en parler à un adulte, appeler le <strong>147</strong>.</span>
+      <span>• Créer avec l'IA, oui : on <strong>dit que c'est généré</strong> et on n'utilise jamais quelqu'un sans son accord.</span>
+    </div>
+  </section>
+
+  <!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"><a class="prev" href="vraie-ou-fausse-info.html"><span>← Précédent</span><strong>Vraie ou fausse info ?</strong></a><a class="next" href="les-reseaux-sociaux-et-les-algorithmes.html"><span>Suivant →</span><strong>Les réseaux sociaux et les algorithmes</strong></a></div><a class="tnav-home" href="numerique.html">⌂ Tous les tutoriels numériques</a></nav><!--/tnav-->
+<footer>Fiche de révision · Les images truquées et les deepfakes</footer>
+</main>
+
+<script>
+(function () {
+  /*
+   * Hooks de test : window.__dpf
+   *   terms                      -> [{id, name}] les 5 catégories : retouche, montage, ia, deepfake, voix
+   *   matchItems                 -> [{id, text, a, how}] les 10 exemples du jeu des mots
+   *   checkMatch(id, cat)        -> {ok, answer, how} (null si id ou catégorie inconnus) ; enregistre la réponse
+   *   matchScore()               -> {correct, answered, total}
+   *   editor                     -> {objects(), select(uid), move(dx, dy), clone(), erase(), sky(), reset(), edits()}
+   *                                 objects() : copie [{uid, type, x, y}] ; clone() et erase() agissent sur l'objet choisi ;
+   *                                 renvoient false si rien n'est choisi (ou si la limite de 16 objets est atteinte)
+   *   noiseOpacity(step)         -> opacité du bruit à l'étape 0..5 (1 → 0) de la fabrication d'image
+   *   clues                      -> [{id, name, how, fixedAt, cx, cy, r}] les 5 indices de l'image
+   *   cluesAt(level)             -> ids des indices encore visibles pour une IA de génération 1..5
+   *   findClue(id)               -> true si l'indice vient d'être trouvé, false s'il l'était déjà, null si inconnu
+   *   cluesFound()               -> ids trouvés
+   *   posts, judgePost(id, choice) -> {ok, text} ; choice : 'share' | 'wait' | 'source' ; postScore() -> {correct, answered, total}
+   *   voice, voiceNext(node, i)  -> id du nœud suivant (null si impossible) ; voiceGo(node) affiche un nœud
+   *   codeItems, judgeCode(id, v) -> {ok, how} ; v : 'bon' | 'mauvais'
+   *   docs, docVerify(docId, i)  -> {ok, how}
+   *   witness, judgeWitness(i)   -> {kind: 'yes'|'mid'|'no', how}
+   *   honest, judgeHonest(id, v) -> {ok, how} ; v : 'ok' | 'pasok' ; honestScore() -> {correct, answered, total}
+   *   quiz
+   * Tout est inventé : personnes, familles, écoles, comptes, numéros (000 00 00). Les images sont des dessins.
+   */
+  var NS = 'http://www.w3.org/2000/svg';
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function btn(label, cls) { var b = document.createElement('button'); b.type = 'button'; b.textContent = label; if (cls) b.className = cls; return b; }
+  function shuffle(a, rnd) { var r = a.slice(), i, j, t; for (i = r.length - 1; i > 0; i--) { j = Math.floor(rnd() * (i + 1)); t = r[i]; r[i] = r[j]; r[j] = t; } return r; }
+  function prng(seed) { var s = seed >>> 0; return function () { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
+
+  /* ---------- Étape 1 : le jeu des mots ---------- */
+  var TERMS = [
+    { id: 'retouche', name: 'Retouche' },
+    { id: 'montage', name: 'Montage' },
+    { id: 'ia', name: 'Image générée par IA' },
+    { id: 'deepfake', name: 'Deepfake vidéo' },
+    { id: 'voix', name: 'Voix clonée' }
+  ];
+  var MATCH = [
+    { id: 1, text: 'Sur la photo de classe, le photographe a fait disparaître un bouton sur le nez de Jules.', a: 'retouche', how: 'C’est une vraie photo, juste modifiée : une retouche.' },
+    { id: 2, text: 'Une image montre une tour célèbre plantée au milieu du lac de Bourg-Fictif : quelqu’un a collé deux photos ensemble.', a: 'montage', how: 'Des morceaux de deux images assemblés : un montage.' },
+    { id: 3, text: 'Une image très réaliste d’un chat astronaute, fabriquée en quelques secondes à partir de la phrase « un chat sur la Lune ».', a: 'ia', how: 'Aucune photo n’a été prise : tout a été inventé par un programme.' },
+    { id: 4, text: 'Une vidéo où un président (inventé) semble dire une phrase qu’il n’a jamais dite. Ses lèvres bougent parfaitement.', a: 'deepfake', how: 'L’IA fait bouger les lèvres et dire des mots inventés : un deepfake vidéo.' },
+    { id: 5, text: 'Un message vocal avec la voix de ton grand-père… alors qu’il n’a jamais enregistré ce message.', a: 'voix', how: 'Une voix imitée par une IA : une voix clonée.' },
+    { id: 6, text: 'Sur un selfie, le ciel gris est devenu bleu et les couleurs sont plus vives.', a: 'retouche', how: 'On a modifié les couleurs d’une vraie photo : une retouche.' },
+    { id: 7, text: 'Une « photo » de concert où on a ajouté une star découpée dans une autre photo.', a: 'montage', how: 'Un morceau d’une autre image collé dedans : un montage.' },
+    { id: 8, text: 'Dans une scène de film, le visage de l’acteur a été remplacé par celui d’un ami. Et ça bouge naturellement.', a: 'deepfake', how: 'Un visage remplacé dans une vidéo : un deepfake vidéo.' },
+    { id: 9, text: 'Un paysage de montagne avec un lac violet, qui n’existe nulle part, créé par un programme à partir d’une description.', a: 'ia', how: 'Fabriqué de zéro à partir d’une phrase : une image générée par IA.' },
+    { id: 10, text: 'Un appel où la « directrice du collège » demande aux parents de payer une sortie sur un nouveau compte. Mais ce n’est pas elle qui parle.', a: 'voix', how: 'La voix d’une vraie personne imitée par une IA : une voix clonée.' }
+  ];
+  var mAns = {}, mCur = 0;
+  function termName(id) { for (var i = 0; i < TERMS.length; i++) if (TERMS[i].id === id) return TERMS[i].name; return null; }
+  function checkMatch(id, cat) {
+    var it = null; MATCH.forEach(function (m) { if (m.id === id) it = m; });
+    if (!it || !termName(cat)) return null;
+    mAns[id] = cat;
+    return { ok: cat === it.a, answer: it.a, how: it.how };
+  }
+  function matchScore() {
+    var c = 0, n = 0;
+    MATCH.forEach(function (m) { if (mAns[m.id]) { n++; if (mAns[m.id] === m.a) c++; } });
+    return { correct: c, answered: n, total: MATCH.length };
+  }
+  MATCH.forEach(function (m, i) {
+    var b = btn(String(i + 1)); b.id = 'mD' + i; b.setAttribute('aria-label', 'Exemple ' + (i + 1));
+    b.addEventListener('click', function () { mShow(i); }); $('mDots').appendChild(b);
+  });
+  TERMS.forEach(function (t) {
+    var b = btn(t.name); b.setAttribute('data-cat', t.id);
+    b.addEventListener('click', function () {
+      var r = checkMatch(MATCH[mCur].id, t.id);
+      mShow(mCur);
+      if (r) $('mOut').innerHTML = '<div class="verdict ' + (r.ok ? 'yes' : 'no') + '">' + (r.ok ? 'Bravo !' : 'Pas tout à fait : c’est « ' + esc(termName(r.answer)) + ' ».') + '<span>' + esc(r.how) + '</span></div>';
+    });
+    $('mCats').appendChild(b);
+  });
+  function mShow(i) {
+    mCur = i; var it = MATCH[i];
+    $('mText').textContent = (i + 1) + ' / ' + MATCH.length + ' — ' + it.text;
+    $('mOut').innerHTML = '';
+    MATCH.forEach(function (m, j) {
+      var d = $('mD' + j); d.className = mAns[m.id] ? (mAns[m.id] === m.a ? 'good' : 'bad') : '';
+      d.setAttribute('aria-current', j === i ? 'true' : 'false');
+    });
+    Array.prototype.forEach.call($('mCats').children, function (b) {
+      var c = b.getAttribute('data-cat'), mine = mAns[it.id] === c;
+      b.className = mine ? (c === it.a ? 'good' : 'bad') : '';
+      b.setAttribute('aria-pressed', mine ? 'true' : 'false');
+    });
+    var s = matchScore();
+    $('mScore').textContent = s.correct + ' / ' + s.total;
+    $('mPrev').disabled = i === 0; $('mNext').disabled = i === MATCH.length - 1;
+  }
+  $('mPrev').addEventListener('click', function () { if (mCur > 0) mShow(mCur - 1); });
+  $('mNext').addEventListener('click', function () { if (mCur < MATCH.length - 1) mShow(mCur + 1); });
+  $('mReset').addEventListener('click', function () { mAns = {}; mShow(0); });
+  mShow(0);
+
+  /* ---------- Étape 2 : l'éditeur de photo ---------- */
+  var SHAPES = {
+    arbre: { name: 'l’arbre', bb: [-38, -40, 76, 82], svg: '<rect x="-6" y="0" width="12" height="40" fill="#8a5a33"/><circle cx="0" cy="-12" r="26" fill="#3f9b4a"/><circle cx="-19" cy="4" r="18" fill="#3f9b4a"/><circle cx="19" cy="4" r="18" fill="#47a852"/>' },
+    chien: { name: 'le chien', bb: [-26, -24, 60, 40], svg: '<path d="M-20 -2 q-8 -8 -4 -14" fill="none" stroke="#a8692f" stroke-width="4" stroke-linecap="round"/><ellipse cx="0" cy="0" rx="20" ry="11" fill="#c98a4b"/><line x1="-12" y1="8" x2="-12" y2="16" stroke="#a8692f" stroke-width="4"/><line x1="12" y1="8" x2="12" y2="16" stroke="#a8692f" stroke-width="4"/><circle cx="20" cy="-10" r="10" fill="#c98a4b"/><ellipse cx="16" cy="-17" rx="4" ry="7" fill="#8a5a33"/><circle cx="23" cy="-12" r="1.8" fill="#2a2230"/><circle cx="29" cy="-8" r="2.2" fill="#2a2230"/>' },
+    poubelle: { name: 'la poubelle', bb: [-16, -36, 32, 40], svg: '<rect x="-13" y="-30" width="26" height="32" rx="3" fill="#6b7280"/><rect x="-15" y="-35" width="30" height="6" rx="2" fill="#4b5563"/><line x1="-5" y1="-24" x2="-5" y2="-3" stroke="#9ca3af" stroke-width="2"/><line x1="5" y1="-24" x2="5" y2="-3" stroke="#9ca3af" stroke-width="2"/><path d="M8 -36 l4 -6 5 3" fill="none" stroke="#b45309" stroke-width="2"/>' },
+    ballon: { name: 'le ballon', bb: [-12, -12, 24, 24], svg: '<circle cx="0" cy="0" r="10" fill="#ef4444"/><path d="M-10 0 h20 M0 -10 q6 10 0 20" fill="none" stroke="#fff" stroke-width="2"/>' },
+    enfant: { name: 'l’enfant', bb: [-22, -64, 44, 66], svg: '<line x1="-5" y1="-8" x2="-7" y2="0" stroke="#2a2230" stroke-width="4" stroke-linecap="round"/><line x1="5" y1="-8" x2="7" y2="0" stroke="#2a2230" stroke-width="4" stroke-linecap="round"/><rect x="-10" y="-36" width="20" height="30" rx="6" fill="#2563eb"/><line x1="-10" y1="-30" x2="-19" y2="-16" stroke="#f2c9a0" stroke-width="4" stroke-linecap="round"/><line x1="10" y1="-30" x2="19" y2="-44" stroke="#f2c9a0" stroke-width="4" stroke-linecap="round"/><circle cx="0" cy="-48" r="12" fill="#f2c9a0"/><path d="M-12 -50 q12 -16 24 0 q-6 -6 -24 0" fill="#3b2416"/><circle cx="-4" cy="-48" r="1.6" fill="#2a2230"/><circle cx="4" cy="-48" r="1.6" fill="#2a2230"/><path d="M-4 -43 q4 3 8 0" fill="none" stroke="#2a2230" stroke-width="1.4"/>' },
+    nuage: { name: 'le nuage', bb: [-36, -22, 72, 36], svg: '<circle cx="-16" cy="0" r="14" fill="#ffffff"/><circle cx="4" cy="-8" r="18" fill="#ffffff"/><circle cx="22" cy="2" r="12" fill="#ffffff"/><rect x="-16" y="0" width="38" height="14" fill="#ffffff"/>' }
+  };
+  var ED_ORIG = [
+    { type: 'nuage', x: 290, y: 50 }, { type: 'arbre', x: 70, y: 150 }, { type: 'poubelle', x: 335, y: 200 },
+    { type: 'enfant', x: 160, y: 210 }, { type: 'chien', x: 236, y: 206 }, { type: 'ballon', x: 196, y: 222 }
+  ];
+  var MAXOBJ = 16;
+  var ed = { objs: [], sel: null, sky: 'gris', edits: 0, nextUid: 1, showOrig: false };
+  function edInit() {
+    ed.objs = ED_ORIG.map(function (o) { return { uid: ed.nextUid++, type: o.type, x: o.x, y: o.y }; });
+    ed.sel = null; ed.sky = 'gris'; ed.edits = 0; ed.showOrig = false;
+  }
+  function edFind(uid) { for (var i = 0; i < ed.objs.length; i++) if (ed.objs[i].uid === uid) return ed.objs[i]; return null; }
+  function clampX(v) { return Math.max(10, Math.min(390, v)); }
+  function clampY(v) { return Math.max(30, Math.min(250, v)); }
+  function edBg(sky) {
+    var blue = sky === 'bleu';
+    return '<rect x="0" y="0" width="400" height="165" fill="' + (blue ? '#8fd0f5' : '#b8bec7') + '"/>' +
+      (blue ? '<circle cx="50" cy="40" r="20" fill="#ffd34d"/>' : '') +
+      '<rect x="0" y="160" width="400" height="100" fill="' + (blue ? '#7ccf6b' : '#86b27a') + '"/>' +
+      '<path d="M0 238 Q200 200 400 236 L400 260 L0 260 Z" fill="' + (blue ? '#e7d8b5' : '#cfc4aa') + '"/>' +
+      '<text x="8" y="254" font-size="10" style="fill:#2a2230">Parc de Bourg-Fictif</text>';
+  }
+  function edObjSvg(o, selected) {
+    var s = SHAPES[o.type], bb = s.bb;
+    return '<g data-uid="' + o.uid + '" transform="translate(' + o.x + ' ' + o.y + ')">' + s.svg +
+      '<rect x="' + bb[0] + '" y="' + bb[1] + '" width="' + bb[2] + '" height="' + bb[3] + '" fill="transparent" stroke="' + (selected ? '#9333ea' : 'none') + '" stroke-width="2.5" stroke-dasharray="6 4" rx="4"/></g>';
+  }
+  function edRender() {
+    var svg = $('editSvg'), list, sky;
+    if (ed.showOrig) {
+      list = ED_ORIG.map(function (o, i) { return { uid: -1 - i, type: o.type, x: o.x, y: o.y }; }); sky = 'gris';
+    } else { list = ed.objs; sky = ed.sky; }
+    svg.innerHTML = edBg(sky) + list.map(function (o) { return edObjSvg(o, !ed.showOrig && o.uid === ed.sel); }).join('') +
+      (ed.showOrig ? '<text x="392" y="20" text-anchor="end" font-size="13" font-weight="600" style="fill:#2a2230">ORIGINAL</text>' : '');
+    var o = edFind(ed.sel);
+    $('edSel').textContent = ed.showOrig ? 'Tu vois la vraie photo, avant tes retouches.' : (o ? 'Objet choisi : ' + SHAPES[o.type].name + '.' : 'Aucun objet choisi. Touche un objet sur la photo.');
+    var dis = ed.showOrig || !o;
+    ['edL', 'edU', 'edD', 'edR', 'edClone', 'edErase'].forEach(function (id) { $(id).disabled = dis; });
+    $('edSky').disabled = ed.showOrig;
+    $('edSky').textContent = ed.sky === 'gris' ? 'Ciel bleu' : 'Ciel gris';
+    $('edCount').textContent = ed.edits + (ed.edits > 1 ? ' retouches' : ' retouche');
+    var m = '';
+    if (ed.edits >= 3 && !ed.showOrig) m = '<div class="verdict mid">' + ed.edits + ' retouches en quelques secondes !<span>Regarde : la « photo » a l’air aussi vraie qu’avant. Imagine-la publiée avec la légende « Dimanche au parc ». Qui pourrait deviner qu’elle a été modifiée ? Appuie sur « Voir l’original » pour comparer.</span></div>';
+    $('edMsg').innerHTML = m;
+  }
+  var editor = {
+    objects: function () { return ed.objs.map(function (o) { return { uid: o.uid, type: o.type, x: o.x, y: o.y }; }); },
+    select: function (uid) { ed.sel = edFind(uid) ? uid : null; edRender(); return ed.sel !== null; },
+    move: function (dx, dy) {
+      var o = edFind(ed.sel); if (!o || ed.showOrig) return false;
+      var nx = clampX(o.x + (+dx || 0)), ny = clampY(o.y + (+dy || 0));
+      if (nx === o.x && ny === o.y) return false;
+      o.x = nx; o.y = ny; ed.edits++; edRender(); return true;
+    },
+    clone: function () {
+      var o = edFind(ed.sel); if (!o || ed.showOrig || ed.objs.length >= MAXOBJ) return false;
+      var c = { uid: ed.nextUid++, type: o.type, x: clampX(o.x + 30), y: clampY(o.y + 6) };
+      ed.objs.push(c); ed.sel = c.uid; ed.edits++; edRender(); return true;
+    },
+    erase: function () {
+      var o = edFind(ed.sel); if (!o || ed.showOrig) return false;
+      ed.objs = ed.objs.filter(function (q) { return q.uid !== o.uid; }); ed.sel = null; ed.edits++; edRender(); return true;
+    },
+    sky: function () { if (ed.showOrig) return false; ed.sky = ed.sky === 'gris' ? 'bleu' : 'gris'; ed.edits++; edRender(); return ed.sky; },
+    reset: function () { edInit(); $('edOrig').setAttribute('aria-pressed', 'false'); $('edOrig').textContent = 'Voir l’original'; edRender(); },
+    edits: function () { return ed.edits; }
+  };
+  $('edL').addEventListener('click', function () { editor.move(-14, 0); });
+  $('edR').addEventListener('click', function () { editor.move(14, 0); });
+  $('edU').addEventListener('click', function () { editor.move(0, -14); });
+  $('edD').addEventListener('click', function () { editor.move(0, 14); });
+  $('edClone').addEventListener('click', function () { if (!editor.clone() && ed.objs.length >= MAXOBJ) $('edSel').textContent = 'Ça suffit : 16 objets au maximum sur la photo.'; });
+  $('edErase').addEventListener('click', function () { editor.erase(); });
+  $('edSky').addEventListener('click', function () { editor.sky(); });
+  $('edReset').addEventListener('click', function () { editor.reset(); });
+  $('edOrig').addEventListener('click', function () {
+    ed.showOrig = !ed.showOrig;
+    this.setAttribute('aria-pressed', ed.showOrig ? 'true' : 'false');
+    this.textContent = ed.showOrig ? 'Revenir à ma retouche' : 'Voir l’original';
+    edRender();
+  });
+  (function () {
+    var svg = $('editSvg'), drag = null;
+    function toSvg(e) {
+      var ctm = svg.getScreenCTM(); if (!ctm) return { x: 0, y: 0 };
+      var p = svg.createSVGPoint(); p.x = e.clientX; p.y = e.clientY; p = p.matrixTransform(ctm.inverse());
+      return { x: p.x, y: p.y };
+    }
+    svg.addEventListener('pointerdown', function (e) {
+      if (ed.showOrig) return;
+      var g = e.target.closest ? e.target.closest('[data-uid]') : null;
+      if (!g) { ed.sel = null; edRender(); return; }
+      var uid = +g.getAttribute('data-uid'), o = edFind(uid); if (!o) return;
+      ed.sel = uid; edRender();
+      var p = toSvg(e);
+      drag = { uid: uid, dx: p.x - o.x, dy: p.y - o.y, x0: o.x, y0: o.y, id: e.pointerId };
+      try { svg.setPointerCapture(e.pointerId); } catch (err) {}
+      e.preventDefault();
+    });
+    svg.addEventListener('pointermove', function (e) {
+      if (!drag || e.pointerId !== drag.id) return;
+      var o = edFind(drag.uid); if (!o) return;
+      var p = toSvg(e);
+      o.x = Math.round(clampX(p.x - drag.dx)); o.y = Math.round(clampY(p.y - drag.dy));
+      var g = svg.querySelector('[data-uid="' + o.uid + '"]');
+      if (g) g.setAttribute('transform', 'translate(' + o.x + ' ' + o.y + ')');
+    });
+    function end(e) {
+      if (!drag || e.pointerId !== drag.id) return;
+      var o = edFind(drag.uid);
+      if (o && (Math.abs(o.x - drag.x0) > 2 || Math.abs(o.y - drag.y0) > 2)) ed.edits++;
+      drag = null; edRender();
+    }
+    svg.addEventListener('pointerup', end);
+    svg.addEventListener('pointercancel', end);
+  })();
+  edInit(); edRender();
+
+  /* ---------- Étape 3 : du bruit à l'image ---------- */
+  var GEN_OP = [1, 0.85, 0.65, 0.42, 0.18, 0];
+  var GEN_TXT = [
+    'Départ : l’IA part d’un <strong>bruit au hasard</strong>, comme la neige d’une vieille télé. Elle a reçu la phrase « un chat astronaute sur la Lune ».',
+    'Elle enlève un peu de bruit, en devinant à chaque fois ce qui ressemblerait le plus à la phrase. De grandes taches de couleur apparaissent.',
+    'Des formes se dessinent : un sol gris, un grand rond clair (un casque ?), le noir de l’espace.',
+    'Les détails arrivent : les oreilles, les yeux, les étoiles, la Terre au loin.',
+    'Presque fini : l’IA affine les petits détails. C’est souvent là que se glissent les erreurs (doigts, texte, reflets).',
+    'Terminé, en quelques secondes. <strong>Aucune photo n’a été prise : ce chat n’a jamais existé.</strong>'
+  ];
+  var genStep = 0;
+  function noiseOpacity(step) { var k = Math.max(0, Math.min(5, Math.round(+step || 0))); return GEN_OP[k]; }
+  var GEN_PIC = '<rect x="0" y="0" width="320" height="200" fill="#1d2340"/>' +
+    '<g fill="#fff"><circle cx="30" cy="25" r="1.6"/><circle cx="90" cy="50" r="1.2"/><circle cx="150" cy="18" r="1.5"/><circle cx="210" cy="40" r="1.2"/><circle cx="290" cy="22" r="1.6"/><circle cx="60" cy="90" r="1.1"/><circle cx="250" cy="80" r="1.3"/></g>' +
+    '<circle cx="270" cy="55" r="20" fill="#3b82f6"/><path d="M258 48 q8 -6 14 2 q-2 8 -10 6 z M274 62 q6 -2 8 6 q-6 4 -10 -2 z" fill="#4ade80"/>' +
+    '<path d="M0 160 Q80 140 160 152 T320 148 L320 200 L0 200 Z" fill="#9ca3af"/><ellipse cx="60" cy="178" rx="18" ry="5" fill="#6b7280"/><ellipse cx="250" cy="172" rx="12" ry="4" fill="#6b7280"/>' +
+    '<rect x="128" y="118" width="64" height="48" rx="14" fill="#e5e7eb" stroke="#6b7280" stroke-width="2"/>' +
+    '<circle cx="160" cy="96" r="34" fill="#dbeafe" fill-opacity=".55" stroke="#e5e7eb" stroke-width="4"/>' +
+    '<path d="M140 86 l6 -16 10 12 z M180 86 l-6 -16 -10 12 z" fill="#f59e0b"/>' +
+    '<circle cx="160" cy="98" r="20" fill="#f59e0b"/><circle cx="153" cy="95" r="3" fill="#1f2937"/><circle cx="167" cy="95" r="3" fill="#1f2937"/>' +
+    '<path d="M157 103 l3 3 3 -3" fill="none" stroke="#1f2937" stroke-width="1.6"/><path d="M146 102 h-10 M146 106 h-9 M174 102 h10 M174 106 h9" stroke="#1f2937" stroke-width="1"/>' +
+    '<rect x="150" y="132" width="20" height="12" rx="3" fill="#9333ea"/>';
+  var NOISE_COL = ['#ef4444', '#f59e0b', '#22c55e', '#3b82f6', '#a855f7', '#f9fafb', '#111827', '#6b7280', '#ec4899', '#14b8a6'];
+  function genRender() {
+    var rnd = prng(42 + genStep * 7), cells = '', x, y;
+    for (y = 0; y < 200; y += 20) for (x = 0; x < 320; x += 20) cells += '<rect x="' + x + '" y="' + y + '" width="20" height="20" fill="' + NOISE_COL[Math.floor(rnd() * NOISE_COL.length)] + '"/>';
+    $('genSvg').innerHTML = GEN_PIC + '<g opacity="' + noiseOpacity(genStep) + '">' + cells + '</g>';
+    $('genText').innerHTML = GEN_TXT[genStep];
+    $('genStep').textContent = genStep + ' / 5';
+    $('genNext').disabled = genStep >= 5;
+  }
+  $('genNext').addEventListener('click', function () { if (genStep < 5) { genStep++; genRender(); } });
+  $('genReset').addEventListener('click', function () { genStep = 0; genRender(); });
+  genRender();
+
+  /* ---------- Étape 4 : les indices ---------- */
+  var CLUES = [
+    { id: 'main', name: 'La main à six doigts', how: 'Compte les doigts de la main qui fait coucou : il y en a six. Les mains sont difficiles à dessiner pour une IA.', fixedAt: 2, cx: 356, cy: 92, r: 28 },
+    { id: 'texte', name: 'Le texte illisible', how: 'L’enseigne mélange des lettres bizarres. Les IA ont longtemps eu du mal à écrire des mots corrects sur les panneaux.', fixedAt: 3, cx: 295, cy: 66, r: 30 },
+    { id: 'visage', name: 'Les lunettes et les oreilles', how: 'Un verre est rond, l’autre carré, et les oreilles n’ont pas la même taille. L’IA rate souvent la symétrie des visages.', fixedAt: 4, cx: 300, cy: 128, r: 28 },
+    { id: 'ombre', name: 'L’ombre dans le mauvais sens', how: 'Le soleil est à gauche : les ombres doivent partir vers la droite. Celle du lampadaire part vers la gauche, vers le soleil !', fixedAt: 5, cx: 118, cy: 248, r: 28 },
+    { id: 'reflet', name: 'Le reflet impossible', how: 'La flaque reflète un arbre… mais il n’y a aucun arbre dans la scène. Les reflets incohérents sont un indice classique.', fixedAt: 5, cx: 42, cy: 250, r: 30 }
+  ];
+  function cluesAt(level) {
+    var L = Math.max(1, Math.min(5, Math.round(+level || 1)));
+    return CLUES.filter(function (c) { return L < c.fixedAt; }).map(function (c) { return c.id; });
+  }
+  function sceneSvg(level) {
+    var bad = {}; cluesAt(level).forEach(function (id) { bad[id] = true; });
+    var s = '';
+    s += '<rect x="0" y="0" width="400" height="175" fill="#bfe3f7"/><circle cx="50" cy="38" r="22" fill="#ffd34d"/>';
+    s += '<rect x="0" y="170" width="400" height="110" fill="#d9d2c5"/><line x1="0" y1="200" x2="400" y2="200" stroke="#c2b9aa" stroke-width="2"/>';
+    s += '<rect x="200" y="40" width="190" height="160" fill="#e9b98a" stroke="#5a3b26" stroke-width="2"/>';
+    s += '<rect x="215" y="52" width="160" height="28" rx="3" fill="#fff8e6" stroke="#5a3b26" stroke-width="1.5"/>';
+    s += '<text x="295" y="71" text-anchor="middle" font-size="15" font-weight="600" style="fill:#5a3b26">' + (bad.texte ? 'BØUŁAGИЯIƎ' : 'BOULANGERIE') + '</text>';
+    s += '<rect x="215" y="92" width="160" height="100" fill="#d8eef5" stroke="#5a3b26" stroke-width="2"/><path d="M228 180 l40 -76 M248 184 l30 -58" stroke="#ffffff" stroke-width="5" opacity=".7"/>';
+    s += '<g fill="#d9a066" stroke="#8a5a33" stroke-width="1.2"><ellipse cx="240" cy="175" rx="14" ry="6"/><ellipse cx="350" cy="176" rx="14" ry="6"/></g>';
+    // ombres
+    s += '<polygon points="146,236 154,236 ' + (bad.ombre ? '92,258 84,258' : '228,262 220,262') + '" fill="rgba(0,0,0,.25)"/>';
+    s += '<polygon points="288,250 312,250 372,272 344,272" fill="rgba(0,0,0,.25)"/>';
+    // flaque et reflet
+    s += '<ellipse cx="42" cy="252" rx="36" ry="11" fill="#9cc7dc"/>';
+    s += bad.reflet ? '<rect x="40" y="252" width="4" height="8" fill="#6b4a2a" opacity=".6"/><ellipse cx="42" cy="257" rx="10" ry="4" fill="#3f9b4a" opacity=".7"/>' : '<ellipse cx="50" cy="250" rx="6" ry="2.5" fill="#ffe58a" opacity=".9"/>';
+    // lampadaire
+    s += '<line x1="150" y1="92" x2="150" y2="236" stroke="#374151" stroke-width="5"/><rect x="138" y="82" width="24" height="12" rx="3" fill="#374151"/><rect x="142" y="94" width="16" height="5" fill="#fde68a"/>';
+    // Zoé
+    s += '<line x1="292" y1="214" x2="290" y2="250" stroke="#2a2230" stroke-width="6" stroke-linecap="round"/><line x1="308" y1="214" x2="310" y2="250" stroke="#2a2230" stroke-width="6" stroke-linecap="round"/>';
+    s += '<rect x="280" y="150" width="40" height="68" rx="10" fill="#7c5cff"/>';
+    s += '<line x1="282" y1="160" x2="274" y2="200" stroke="#f2c9a0" stroke-width="6" stroke-linecap="round"/><circle cx="274" cy="204" r="5" fill="#f2c9a0"/>';
+    s += '<line x1="318" y1="160" x2="350" y2="106" stroke="#f2c9a0" stroke-width="6" stroke-linecap="round"/>';
+    s += '<circle cx="355" cy="98" r="7" fill="#f2c9a0"/>';
+    var fingers = bad.main ? [-75, -45, -15, 15, 45] : [-66, -33, 0, 33];
+    fingers.forEach(function (a) {
+      var rad = a * Math.PI / 180, x2 = 355 + Math.cos(rad - Math.PI / 2) * 15, y2 = 98 + Math.sin(rad - Math.PI / 2) * 15;
+      s += '<line x1="355" y1="98" x2="' + x2.toFixed(1) + '" y2="' + y2.toFixed(1) + '" stroke="#f2c9a0" stroke-width="3.2" stroke-linecap="round"/>';
+    });
+    s += '<line x1="355" y1="98" x2="342" y2="104" stroke="#f2c9a0" stroke-width="3.2" stroke-linecap="round"/>'; // le pouce
+    // tête
+    s += bad.visage ? '<ellipse cx="278" cy="130" rx="5" ry="6" fill="#e8b88a"/><ellipse cx="322" cy="130" rx="8" ry="10" fill="#e8b88a"/>' : '<ellipse cx="278" cy="130" rx="6" ry="8" fill="#e8b88a"/><ellipse cx="322" cy="130" rx="6" ry="8" fill="#e8b88a"/>';
+    s += '<circle cx="300" cy="128" r="22" fill="#f2c9a0"/>';
+    s += '<path d="M278 124 q2 -26 22 -26 q20 0 22 26 q-6 -14 -22 -14 q-16 0 -22 14 z" fill="#3b2416"/>';
+    s += bad.visage ? '<circle cx="291" cy="128" r="7" fill="none" stroke="#2a2230" stroke-width="2"/><rect x="303" y="121" width="13" height="13" fill="none" stroke="#2a2230" stroke-width="2"/><line x1="298" y1="128" x2="303" y2="127" stroke="#2a2230" stroke-width="2"/>'
+                    : '<circle cx="291" cy="128" r="7" fill="none" stroke="#2a2230" stroke-width="2"/><circle cx="309" cy="128" r="7" fill="none" stroke="#2a2230" stroke-width="2"/><line x1="298" y1="128" x2="302" y2="128" stroke="#2a2230" stroke-width="2"/>';
+    s += '<circle cx="291" cy="128" r="1.8" fill="#2a2230"/><circle cx="309" cy="128" r="1.8" fill="#2a2230"/>';
+    s += '<path d="M293 139 q7 6 14 0" fill="none" stroke="#2a2230" stroke-width="2"/>';
+    return s;
+  }
+  var clFound = {};
+  function findClue(id) {
+    var ok = false; CLUES.forEach(function (c) { if (c.id === id) ok = true; });
+    if (!ok) return null;
+    if (clFound[id]) return false;
+    clFound[id] = true; return true;
+  }
+  function cluesFound() { return CLUES.filter(function (c) { return clFound[c.id]; }).map(function (c) { return c.id; }); }
+  function clRender(hint) {
+    var svg = $('clueSvg'), s = sceneSvg(1);
+    CLUES.forEach(function (c, i) {
+      var f = !!clFound[c.id];
+      s += '<g class="hs" data-clue="' + c.id + '" tabindex="0" role="button" aria-label="Zone ' + (i + 1) + ' de l’image' + (f ? ', indice trouvé' : '') + '">' +
+        '<circle class="hs-ring" cx="' + c.cx + '" cy="' + c.cy + '" r="' + c.r + '" fill="transparent" stroke="' + (f ? '#9333ea' : 'none') + '" stroke-width="3.5"/>' +
+        (f ? '<circle cx="' + (c.cx + c.r - 6) + '" cy="' + (c.cy - c.r + 6) + '" r="10" fill="#9333ea"/><text x="' + (c.cx + c.r - 6) + '" y="' + (c.cy - c.r + 10) + '" text-anchor="middle" font-size="12" font-weight="600" style="fill:#fff">' + (cluesFound().indexOf(c.id) + 1) + '</text>' : '') +
+        '</g>';
+    });
+    svg.innerHTML = s;
+    var fl = cluesFound();
+    $('clScore').textContent = fl.length + ' / 5';
+    $('clList').innerHTML = fl.map(function (id, k) {
+      var c = CLUES.filter(function (q) { return q.id === id; })[0];
+      return '<li><strong>' + (k + 1) + '. ' + esc(c.name) + '</strong> — ' + esc(c.how) + '</li>';
+    }).join('');
+    $('clHint').textContent = hint || (fl.length === 5 ? 'Bravo, tu as tout trouvé ! Mais lis bien la suite…' : 'Touche un endroit bizarre.');
+  }
+  function clHit(id) {
+    var r = findClue(id);
+    clRender(r === true ? 'Bien vu !' : r === false ? 'Celui-là, tu l’as déjà trouvé.' : null);
+  }
+  $('clueSvg').addEventListener('click', function (e) {
+    var g = e.target.closest ? e.target.closest('[data-clue]') : null;
+    if (g) clHit(g.getAttribute('data-clue'));
+    else clRender('Ici, rien de bizarre. Cherche encore !');
+  });
+  $('clueSvg').addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    var g = e.target.closest ? e.target.closest('[data-clue]') : null;
+    if (g) { e.preventDefault(); var id = g.getAttribute('data-clue'); clHit(id); var n = $('clueSvg').querySelector('[data-clue="' + id + '"]'); if (n) n.focus(); }
+  });
+  $('clShow').addEventListener('click', function () { CLUES.forEach(function (c) { findClue(c.id); }); clRender('Voici les cinq indices.'); });
+  $('clReset').addEventListener('click', function () { clFound = {}; clRender(); });
+  clRender();
+
+  var LVL_TXT = [
+    '',
+    'Une IA maladroite : cinq erreurs visibles. Facile à repérer… si on regarde bien.',
+    'La main est corrigée. Il reste quatre indices.',
+    'Le texte de l’enseigne est maintenant parfait. Plus que trois indices.',
+    'Le visage est symétrique. Il ne reste que l’ombre et le reflet.',
+    '<strong>Plus aucun indice visible.</strong> L’image a l’air parfaitement vraie, et pourtant elle est entièrement fabriquée. Seul le contexte peut t’aider.'
+  ];
+  function lvlRender() {
+    var L = +$('lvl').value, n = cluesAt(L).length;
+    $('lvlOut').textContent = L;
+    $('lvlSvg').innerHTML = sceneSvg(L);
+    $('lvlBar').style.width = (n / 5 * 100) + '%';
+    $('lvlText').innerHTML = 'Indices visibles : <strong>' + n + ' / 5</strong>. ' + LVL_TXT[L];
+  }
+  $('lvl').addEventListener('input', lvlRender);
+  lvlRender();
+
+  /* ---------- Étape 5 : enquêter sur le contexte ---------- */
+  var POSTS = [
+    { id: 'requin', tab: 'Le requin à la gare', who: 'Info Choc 24/24', handle: '@info_choc_2424_x', col: '#dc2626',
+      text: '😱 INCROYABLE : un requin nage dans la gare de Bourg-Fictif après l’orage de cette nuit ! Partagez avant que ce soit supprimé !!!',
+      img: '<rect width="320" height="180" fill="#94a3b8"/><rect x="0" y="0" width="320" height="70" fill="#64748b"/><path d="M20 70 v-40 q30 -30 60 0 v40 M120 70 v-40 q30 -30 60 0 v40 M220 70 v-40 q30 -30 60 0 v40" fill="#cbd5e1"/><rect x="0" y="100" width="320" height="80" fill="#3b82a0"/><path d="M150 120 l18 -26 l8 26 z" fill="#475569"/><path d="M0 104 q40 -8 80 0 t80 0 t80 0 t80 0" fill="none" stroke="#e0f2fe" stroke-width="3"/><text x="10" y="92" font-size="11" style="fill:#0f172a">QUAI 2</text>',
+      inv: { qui: 'Un compte créé il y a trois jours, qui ne publie que des images « incroyables », sans jamais dire d’où elles viennent.', ou: 'En cherchant l’image, on la retrouve publiée plusieurs fois depuis des années… avec d’autres noms de villes à chaque fois.', autres: 'Ni la gare, ni la commune, ni aucun média local ne parle de requin. Ils parlent seulement de quelques caves inondées.', emo: 'Surprise, peur, et ce « Partagez avant que ce soit supprimé ! » qui pousse à agir tout de suite.' },
+      best: 'wait',
+      fb: { share: 'Tu viens de diffuser un faux : la même image circule depuis des années avec d’autres villes. Le « partagez vite » est un piège classique.', wait: 'Exactement : compte inconnu, image déjà vue ailleurs, aucune autre source. Tu ne partages pas, et tu peux même signaler la publication.', source: 'Il n’y a justement aucune source sérieuse à citer : personne d’autre n’en parle. Mieux vaut ne pas partager.' } },
+    { id: 'lac', tab: 'Le lac gelé', who: 'Commune de Bourg-Fictif', handle: '@bourg-fictif.exemple (compte officiel)', col: '#2563eb',
+      text: 'Avec −15 °C depuis une semaine, une partie du lac est gelée. Attention : il est interdit de marcher sur la glace, elle n’est pas assez solide.',
+      img: '<rect width="320" height="180" fill="#dbeafe"/><path d="M0 90 l50 -50 l40 30 l50 -60 l60 70 l40 -30 l80 40 v10 h-320 z" fill="#94a3b8"/><path d="M60 46 l-10 -6 m40 30 m40 -40 l10 -10 10 10" fill="none" stroke="#fff" stroke-width="4"/><rect x="0" y="100" width="320" height="80" fill="#e0f2fe"/><path d="M30 130 l60 10 M120 120 l50 20 M200 150 l70 -10" stroke="#bae6fd" stroke-width="3"/><text x="10" y="172" font-size="11" style="fill:#0f172a">Port de Bourg-Fictif</text>',
+      inv: { qui: 'Le compte officiel de la commune, qui existe depuis des années et publie les informations de la ville.', ou: 'La photo a été publiée pour la première fois aujourd’hui par la commune elle-même.', autres: 'Deux médias locaux en parlent, avec d’autres photos prises sous d’autres angles. La météo annonce bien un grand froid.', emo: 'Le message est calme et donne une consigne de sécurité. Il ne cherche pas à choquer.' },
+      best: 'source',
+      fb: { share: 'L’info est sûrement vraie, mais partager « en vrac », sans dire d’où elle vient, aide les rumeurs. Indique la source : c’est une bonne habitude.', wait: 'Prudent, et ce n’est jamais une faute de ne pas partager ! Mais ici, tout concorde : compte officiel, autres médias, météo. Tu pouvais la partager en citant la source.', source: 'Bravo : compte officiel, autres sources, contexte cohérent. Tu partages en disant d’où ça vient. Toutes les images ne sont pas fausses !' } },
+    { id: 'video', tab: 'La vidéo de la directrice', who: 'Groupe « 10H-B les boss »', handle: 'Transféré plusieurs fois', col: '#9333ea',
+      text: 'Vidéo : la directrice du collège annonce « plus de devoirs jusqu’à Noël, cadeau pour tous les élèves ! » 🎉🎉',
+      img: '<rect width="320" height="180" fill="#1f2937"/><rect x="110" y="30" width="100" height="110" rx="10" fill="#374151"/><circle cx="160" cy="70" r="24" fill="#f2c9a0"/><path d="M136 66 q4 -30 24 -30 q20 0 24 30 q-8 -16 -24 -16 q-16 0 -24 16" fill="#6b4a2a"/><rect x="134" y="96" width="52" height="44" rx="10" fill="#0f766e"/><circle cx="160" cy="90" r="22" fill="none"/><circle cx="160" cy="90" r="26" fill="rgba(255,255,255,.85)"/><path d="M152 78 l22 12 l-22 12 z" fill="#1f2937"/><rect x="10" y="150" width="300" height="20" rx="4" fill="#111827"/><text x="18" y="164" font-size="11" style="fill:#f9fafb">« plus de devoirs jusqu’à Noël »</text>',
+      inv: { qui: 'Personne ne sait qui l’a faite : elle a été transférée de groupe en groupe.', ou: 'Elle n’est pas sur le site du collège. En regardant bien, la voix est un peu « plate » et les lèvres ne suivent pas toujours les mots.', autres: 'Aucun message officiel de l’école, rien dans l’agenda ni chez les enseignant·es.', emo: 'Joie et envie que ce soit vrai : c’est exactement ce qui nous rend moins méfiants.' },
+      best: 'wait',
+      fb: { share: 'Tu as envie que ce soit vrai, et c’est justement là le piège. Source inconnue, rien d’officiel : c’est sûrement un deepfake. Ne partage pas.', wait: 'Bien joué : source inconnue, aucune confirmation de l’école, une voix et des lèvres un peu bizarres. Si l’annonce était vraie, l’école l’enverrait officiellement.', source: 'Quelle source ? Le groupe de classe n’en est pas une : la vidéo n’a pas d’auteur connu. Ne la partage pas.' } }
+  ];
+  var INV = [['qui', 'Qui publie ?'], ['ou', 'D’où vient l’image ?'], ['autres', 'D’autres sources ?'], ['emo', 'Je ressens quoi ?']];
+  var CHO = [['share', 'Je partage tout de suite'], ['wait', 'Je ne partage pas : c’est douteux, j’attends une vraie confirmation'], ['source', 'Je partage en citant la source sérieuse']];
+  var pCur = 0, pSeen = {}, pAns = {};
+  function judgePost(id, choice) {
+    var p = null; POSTS.forEach(function (q) { if (q.id === id) p = q; });
+    if (!p || !p.fb[choice]) return null;
+    pAns[id] = choice;
+    return { ok: choice === p.best, text: p.fb[choice] };
+  }
+  function postScore() {
+    var c = 0, n = 0; POSTS.forEach(function (p) { if (pAns[p.id]) { n++; if (pAns[p.id] === p.best) c++; } });
+    return { correct: c, answered: n, total: POSTS.length };
+  }
+  POSTS.forEach(function (p, i) {
+    var b = btn(p.tab); b.id = 'pT' + i; b.addEventListener('click', function () { pShow(i); }); $('pTabs').appendChild(b);
+  });
+  function pShow(i, outHtml) {
+    pCur = i; var p = POSTS[i];
+    POSTS.forEach(function (q, j) { $('pT' + j).setAttribute('aria-pressed', j === i ? 'true' : 'false'); });
+    $('pPost').innerHTML = '<div class="post-head"><span class="avatar" style="background:' + p.col + '">' + esc(p.who.charAt(0)) + '</span><div class="post-who"><strong>' + esc(p.who) + '</strong><span>' + esc(p.handle) + '</span></div></div>' +
+      '<span>' + esc(p.text) + '</span><div class="post-img photo"><svg viewBox="0 0 320 180" role="img" aria-label="Image de la publication">' + p.img + '</svg></div>';
+    var seen = pSeen[p.id] || {};
+    $('pInv').innerHTML = '';
+    INV.forEach(function (q) {
+      var b = btn(q[1], seen[q[0]] ? 'seen' : '');
+      b.addEventListener('click', function () { pSeen[p.id] = pSeen[p.id] || {}; pSeen[p.id][q[0]] = true; pShow(pCur, $('pOut').innerHTML); });
+      $('pInv').appendChild(b);
+    });
+    $('pFacts').innerHTML = INV.filter(function (q) { return seen[q[0]]; }).map(function (q) { return '<li><strong>' + esc(q[1]) + '</strong> ' + esc(p.inv[q[0]]) + '</li>'; }).join('');
+    $('pChoices').innerHTML = '';
+    CHO.forEach(function (c) {
+      var b = btn(c[1]); b.setAttribute('aria-pressed', pAns[p.id] === c[0] ? 'true' : 'false');
+      b.addEventListener('click', function () {
+        var r = judgePost(p.id, c[0]);
+        var nSeen = Object.keys(pSeen[p.id] || {}).length;
+        var extra = nSeen < 2 ? ' <em>Astuce : enquête d’abord avec les questions, c’est le but du jeu !</em>' : '';
+        pShow(pCur, '<div class="verdict ' + (r.ok ? 'yes' : (c[0] === 'wait' ? 'mid' : 'no')) + '">' + (r.ok ? 'Bonne décision !' : 'Hmm…') + '<span>' + esc(r.text) + extra + '</span></div>');
+      });
+      $('pChoices').appendChild(b);
+    });
+    $('pOut').innerHTML = outHtml || '';
+    var s = postScore(); $('pScore').textContent = s.correct + ' / ' + s.total;
+  }
+  pShow(0);
+
+  /* ---------- Étape 6 : la voix clonée ---------- */
+  var VOICE = {
+    start: { t: 'Mercredi après-midi. Léa, 13 ans, reçoit un message vocal d’un numéro inconnu, le 079 000 00 00. C’est la voix de sa mère, Sandrine, pressée et inquiète :', vocal: '« Léa, c’est Maman ! J’ai perdu mon téléphone, j’emprunte celui d’une dame. J’ai un gros problème : envoie-moi vite 300 CHF avec ton appli de paiement sur ce numéro. Ne dis rien à Papa, je t’expliquerai ! »',
+      c: [['Léa envoie l’argent tout de suite : c’est la voix de Maman !', 'send'], ['Léa répond au numéro : « C’est vraiment toi ? »', 'reply'], ['Léa appelle Maman sur son numéro habituel', 'call'], ['Léa demande le mot de code de la famille', 'code']] },
+    reply: { t: 'Réponse immédiate : « Oui ma chérie, c’est moi ! Fais vite, je suis bloquée ! » Bien sûr : un imposteur répondra toujours que c’est vrai. Demander à la personne elle-même ne prouve rien.',
+      c: [['Léa envoie l’argent', 'send'], ['Léa appelle Maman sur son numéro habituel', 'call'], ['Léa demande le mot de code de la famille', 'code']] },
+    call: { t: 'Ça sonne… Maman ne répond pas. Elle est peut-être en réunion. Le numéro inconnu insiste : « Alors ?? Vite !! »',
+      c: [['Elle ne répond pas, c’est donc vrai qu’elle a perdu son téléphone : Léa envoie l’argent', 'send'], ['Léa appelle Papa (ou un autre adulte de confiance)', 'dad'], ['Léa demande le mot de code au numéro inconnu', 'code']] },
+    code: { t: 'Léa écrit : « Quel est notre mot de code ? » Réponse : « Quoi ? On n’a pas le temps pour tes jeux, envoie l’argent ! » La vraie Maman connaît le mot de code. Cette voix, non.',
+      c: [['Léa n’envoie rien et prévient Papa', 'dad'], ['Elle est stressée, elle a dû oublier : Léa envoie l’argent', 'send']] },
+    send: { end: 'no', t: 'L’argent part chez un escroc : la voix avait été <strong>clonée par une IA</strong>. Ce n’est pas la faute de Léa : la voix était parfaite et le message jouait sur la peur et l’urgence. Ce qu’il faut faire tout de suite : <strong>en parler à un adulte</strong>, contacter vite la banque ou l’appli de paiement (parfois, un paiement peut encore être bloqué), garder les messages, porter plainte à la <strong>police (117)</strong>. Et réessaie l’histoire pour trouver le bon chemin.' },
+    dad: { end: 'yes', t: 'Papa appelle Maman à son travail : elle va très bien, et son téléphone est dans son sac ! La voix avait été <strong>clonée par une IA</strong>, sans doute à partir de vidéos où Maman parle, publiées en public. Bravo Léa : tu as <strong>vérifié par un autre chemin</strong> et tu n’as rien envoyé. Ensuite : garder le message pour le montrer, bloquer le numéro, et le signaler (par exemple à l’OFCS, l’Office fédéral de la cybersécurité, sur ncsc.admin.ch). La famille met aussi ses profils en privé.' }
+  };
+  var vPath = [];
+  function voiceNext(node, i) { var n = VOICE[node]; if (!n || !n.c || !n.c[i]) return null; return n.c[i][1]; }
+  function voiceGo(node) {
+    var n = VOICE[node]; if (!n) return false;
+    if (node === 'start') vPath = ['start']; else vPath.push(node);
+    var h = '<span>' + n.t + '</span>';
+    if (n.vocal) h += '<div class="vocal"><svg viewBox="0 0 120 28" aria-hidden="true"><g stroke="#9333ea" stroke-width="3" stroke-linecap="round"><path d="M6 10v8M14 6v16M22 2v24M30 8v12M38 4v20M46 10v8M54 6v16M62 2v24M70 9v10M78 5v18M86 10v8M94 7v14M102 11v6M110 9v10"/></g></svg><span>0:12</span></div><span><em>' + esc(n.vocal) + '</em></span>';
+    if (n.end) h += '<div class="verdict ' + n.end + '">' + (n.end === 'yes' ? 'Arnaque déjouée !' : 'Aïe, Léa s’est fait piéger…') + '</div>';
+    $('vStory').innerHTML = h;
+    $('vChoices').innerHTML = '';
+    (n.c || []).forEach(function (c, i) {
+      var b = btn(c[0]); b.addEventListener('click', function () { voiceGo(voiceNext(node, i)); }); $('vChoices').appendChild(b);
+    });
+    $('vCrumbs').textContent = 'Étape ' + vPath.length;
+    return true;
+  }
+  $('vReset').addEventListener('click', function () { voiceGo('start'); });
+  voiceGo('start');
+
+  var CW_A = ['pingouin', 'cornichon', 'girafe', 'trottinette', 'hérisson', 'parapluie', 'cactus', 'toboggan', 'flamant', 'tuba', 'marmotte', 'boussole'];
+  var CW_B = ['volcan', 'raclette', 'myrtille', 'fusée', 'tartine', 'banjo', 'igloo', 'citrouille', 'moustache', 'confiture', 'saxophone', 'gruyère'];
+  var cwRnd = prng(Date.now() % 100000);
+  function codeIdea() { return CW_A[Math.floor(cwRnd() * CW_A.length)] + '-' + CW_B[Math.floor(cwRnd() * CW_B.length)]; }
+  $('cwGo').addEventListener('click', function () { $('cwOut').textContent = codeIdea(); });
+  $('cwOut').textContent = codeIdea();
+  var CODES = [
+    { id: 'chien', t: '« Rex », le nom de notre chien… qu’on voit sur toutes nos photos publiées', a: 'mauvais', how: 'Visible sur les réseaux : un escroc peut le trouver en quelques minutes.' },
+    { id: 'mots', t: '« cornichon-volcan », choisi ensemble à table, jamais écrit nulle part', a: 'bon', how: 'Parfait : drôle, facile à retenir, et impossible à deviner.' },
+    { id: 'anniv', t: 'La date d’anniversaire de Maman', a: 'mauvais', how: 'Une date se trouve souvent en ligne (vœux publiés, profils). Trop facile.' },
+    { id: 'question', t: 'Une question secrète : « Qu’est-ce qu’on a mangé au chalet l’hiver passé ? » (jamais publié)', a: 'bon', how: 'Bonne idée aussi : seuls les vrais proches connaissent la réponse, si elle n’a jamais été publiée.' }
+  ];
+  var cwAns = {};
+  function judgeCode(id, v) {
+    var c = null; CODES.forEach(function (q) { if (q.id === id) c = q; });
+    if (!c || (v !== 'bon' && v !== 'mauvais')) return null;
+    cwAns[id] = v; return { ok: v === c.a, how: c.how };
+  }
+  function triBuild(container, items, opts, judge, store, after) {
+    container.innerHTML = '';
+    items.forEach(function (it) {
+      var d = document.createElement('div');
+      d.innerHTML = '<span>' + esc(it.t) + '</span>';
+      var row = document.createElement('div'); row.className = 'btns';
+      var fb = document.createElement('span'); fb.className = 'fbk'; fb.setAttribute('aria-live', 'polite');
+      opts.forEach(function (o) {
+        var b = btn(o[1]); b.setAttribute('aria-pressed', store()[it.id] === o[0] ? 'true' : 'false');
+        b.addEventListener('click', function () {
+          var r = judge(it.id, o[0]);
+          Array.prototype.forEach.call(row.children, function (x) { x.setAttribute('aria-pressed', 'false'); });
+          b.setAttribute('aria-pressed', 'true');
+          fb.className = 'fbk ' + (r.ok ? 'ok' : 'no');
+          fb.innerHTML = '<strong>' + (r.ok ? 'Oui. ' : 'Non. ') + '</strong>' + esc(r.how);
+          if (after) after();
+        });
+        row.appendChild(b);
+      });
+      d.appendChild(row); d.appendChild(fb); container.appendChild(d);
+    });
+  }
+  triBuild($('cwTri'), CODES, [['bon', 'Bon'], ['mauvais', 'Mauvais']], judgeCode, function () { return cwAns; });
+
+  /* ---------- Étape 7 : les faux documents ---------- */
+  var LOGO_SCHOOL = '<svg viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="20" fill="#1d4ed8"/><path d="M22 9 l12 8 h-24 z M13 19 h18 v14 h-18 z" fill="#fff"/><rect x="19" y="25" width="6" height="8" fill="#1d4ed8"/></svg>';
+  var LOGO_POLICE = '<svg viewBox="0 0 44 44" aria-hidden="true"><path d="M22 3 l17 6 v12 c0 11 -8 18 -17 21 c-9 -3 -17 -10 -17 -21 v-12 z" fill="#1e3a8a"/><path d="M22 12 l3 7 7 1 -5 5 1 7 -6 -3 -6 3 1 -7 -5 -5 7 -1 z" fill="#facc15"/></svg>';
+  var SIGN = '<svg viewBox="0 0 120 46" aria-hidden="true"><path d="M6 32 c10 -24 18 -24 14 0 c-2 10 10 -16 18 -10 c6 4 -2 14 6 10 c10 -6 14 -18 22 -8 c4 6 10 2 16 -2 c6 -4 12 0 30 -2" fill="none" stroke="#1e3a8a" stroke-width="2"/></svg>';
+  function stamp(txt) { return '<svg class="stamp" viewBox="0 0 86 86" aria-hidden="true"><circle cx="43" cy="43" r="38" fill="none" stroke="#b91c1c" stroke-width="3"/><circle cx="43" cy="43" r="30" fill="none" stroke="#b91c1c" stroke-width="1.5"/><text x="43" y="40" text-anchor="middle" font-size="10" font-weight="600" style="fill:#b91c1c">' + txt + '</text><text x="43" y="54" text-anchor="middle" font-size="9" style="fill:#b91c1c">OFFICIEL</text></svg>'; }
+  var DOCS = [
+    { id: 'mot', tab: 'Mot du prof', logo: LOGO_SCHOOL, org: 'Collège des Tilleuls<br>Bourg-Fictif', ref: 'Classe 10H-B', title: 'Information aux élèves et aux parents',
+      body: 'Madame, Monsieur, l’examen de mathématiques de jeudi est <strong>annulé</strong>. Les élèves de 10H-B en sont dispensés et peuvent rester à la maison le matin.', who: 'Mme Dubois, maîtresse de classe', st: 'TILLEULS',
+      opts: [['Le croire : il y a la signature de Mme Dubois', false, 'Une signature se copie ou s’invente en une seconde.'], ['Demander directement à Mme Dubois en classe, ou regarder l’agenda et les messages officiels de l’école', true, 'Oui : tu vérifies à la source, par un chemin que tu connais.'], ['Le transférer à toute la classe pour prévenir', false, 'Tu diffuserais peut-être un faux… et des élèves pourraient manquer un examen !']] },
+    { id: 'bulletin', tab: 'Bulletin de notes', logo: LOGO_SCHOOL, org: 'Collège des Tilleuls<br>Bourg-Fictif', ref: 'Bulletin semestriel · Élève : Lou Exemple', title: 'Bulletin scolaire',
+      body: '<table><tr><td>Français</td><td>6</td></tr><tr><td>Mathématiques</td><td>6</td></tr><tr><td>Allemand</td><td>5,5</td></tr><tr><td>Sciences</td><td>6</td></tr><tr><td>Moyenne générale</td><td><strong>5,9</strong></td></tr></table>', who: 'La direction', st: 'DIRECTION',
+      opts: [['Le comparer avec la version donnée par l’école (sur papier ou sur sa plateforme officielle)', true, 'Oui : la seule version qui compte est celle qui vient de l’école elle-même.'], ['Il a un logo, donc c’est officiel', false, 'Un logo se copie en un clic.'],['Demander à celui qui l’a envoyé si c’est vrai', false, 'S’il a fabriqué un faux, il dira bien sûr que c’est vrai.']] },
+    { id: 'convoc', tab: 'Convocation', logo: LOGO_SCHOOL, org: 'Collège des Tilleuls<br>Direction', ref: 'Réf. DIR-2026-311', title: 'Convocation',
+      body: 'Votre enfant est convoqué chez la direction lundi à 8 h pour un problème de discipline grave. Merci de confirmer <strong>aujourd’hui</strong> en appelant le 021 000 00 00 et en donnant vos coordonnées complètes.', who: 'M. Rochat, directeur', st: 'DIRECTION',
+      opts: [['Appeler le 021 000 00 00 écrit sur la convocation', false, 'Ce numéro peut être celui de l’escroc : il est écrit sur le document qu’on veut justement vérifier.'], ['Appeler l’école au numéro qu’on connaît déjà (agenda, site officiel tapé soi-même)', true, 'Oui : un numéro que tu connais déjà, jamais celui du document.'], ['Répondre au message avec toutes les informations demandées', false, 'Tu donnerais tes données personnelles à un inconnu.']] },
+    { id: 'police', tab: 'Rapport de police', logo: LOGO_POLICE, org: 'Police de Bourg-Fictif<br>Service des accidents', ref: 'Rapport d’incident n° 2026-04817', title: 'Rapport d’incident',
+      body: 'Votre enfant a été impliqué dans un accident de la circulation. Pour débloquer la situation, contactez <strong>d’urgence</strong> l’agent responsable au 079 000 00 00 et réglez les frais administratifs de 450 CHF.', who: 'Agent R. Favre', st: 'POLICE',
+      opts: [['Appeler vite le numéro du rapport et payer les frais', false, 'C’est exactement ce que veut l’escroc : la peur fait agir sans réfléchir.'], ['Envoyer une photo de sa carte d’identité pour prouver qui on est', false, 'Jamais : avec ta pièce d’identité, un escroc peut se faire passer pour toi.'], ['Appeler directement l’enfant, puis la police au 117 ou le poste habituel, sans utiliser le numéro du document', true, 'Oui. La police ne demande pas de payer des « frais » à un numéro de portable reçu par message.']] }
+  ];
+  var dCur = 0, dToken = 0, dTimers = [];
+  function docVerify(docId, i) {
+    var d = null; DOCS.forEach(function (q) { if (q.id === docId) d = q; });
+    if (!d || !d.opts[i]) return null;
+    return { ok: d.opts[i][1], how: d.opts[i][2] };
+  }
+  function docHtml(d) {
+    return '<div class="part d-head">' + d.logo + '<div><div class="d-org">' + d.org + '</div><div class="d-ref">' + esc(d.ref) + '</div></div></div>' +
+      '<div class="part d-title">' + esc(d.title) + '</div><div class="part d-body">' + d.body + '</div>' +
+      '<div class="part d-foot"><div>' + SIGN + '<div class="d-ref">' + esc(d.who) + '</div></div>' + stamp(d.st) + '</div>';
+  }
+  function dClear() { dTimers.forEach(function (t) { clearTimeout(t); }); dTimers = []; }
+  function dShow(i) {
+    dClear(); dToken++; dCur = i;
+    DOCS.forEach(function (q, j) { $('dT' + j).setAttribute('aria-pressed', j === i ? 'true' : 'false'); });
+    $('dDoc').innerHTML = '<span class="empty">Appuie sur « Fabriquer le document »…</span>';
+    $('dFake').hidden = true; $('dVerify').hidden = true; $('dOut').innerHTML = ''; $('dTimer').textContent = '0,0 s';
+    $('dGo').disabled = false;
+  }
+  function dMake() {
+    dClear(); var tok = ++dToken, d = DOCS[dCur];
+    $('dGo').disabled = true; $('dFake').hidden = true; $('dVerify').hidden = true; $('dOut').innerHTML = '';
+    $('dDoc').innerHTML = docHtml(d);
+    var parts = $('dDoc').querySelectorAll('.part');
+    var times = [700, 1400, 2100, 2800];
+    Array.prototype.forEach.call(parts, function (p, k) {
+      dTimers.push(setTimeout(function () { if (tok !== dToken) return; p.classList.add('on'); $('dTimer').textContent = (times[k] / 1000 + 0.2).toFixed(1).replace('.', ',') + ' s'; }, times[k]));
+    });
+    dTimers.push(setTimeout(function () {
+      if (tok !== dToken) return;
+      $('dTimer').textContent = '3,0 s'; $('dFake').hidden = false; $('dVerify').hidden = false; $('dGo').disabled = false;
+      $('dChoices').innerHTML = '';
+      d.opts.forEach(function (o, i) {
+        var b = btn(o[0]);
+        b.addEventListener('click', function () {
+          var r = docVerify(d.id, i);
+          Array.prototype.forEach.call($('dChoices').children, function (x) { x.setAttribute('aria-pressed', 'false'); });
+          b.setAttribute('aria-pressed', 'true');
+          $('dOut').innerHTML = '<div class="verdict ' + (r.ok ? 'yes' : 'no') + '">' + (r.ok ? 'Bon réflexe !' : 'Attention !') + '<span>' + esc(r.how) + '</span></div>';
+        });
+        $('dChoices').appendChild(b);
+      });
+    }, 3200));
+  }
+  DOCS.forEach(function (d, i) { var b = btn(d.tab); b.id = 'dT' + i; b.addEventListener('click', function () { dShow(i); }); $('dTabs').appendChild(b); });
+  $('dGo').addEventListener('click', dMake);
+  dShow(0);
+
+  /* ---------- Étape 8 : témoin d'un deepfake ---------- */
+  var WITNESS = [
+    ['Je la transfère à mes amis, elle est trop drôle', 'no', 'En la partageant, tu participes au harcèlement, même sans l’avoir fabriquée. Et la vidéo peut te retomber dessus.'],
+    ['J’envoie juste un émoji qui rigole, comme les autres', 'no', 'Un « simple » émoji montre à Malik que tout le monde se moque de lui, et encourage l’auteur à continuer.'],
+    ['Je ne partage rien, je soutiens Malik en privé et je préviens un adulte de confiance', 'yes', 'C’est le meilleur réflexe : tu ne fais pas circuler la vidéo, Malik se sent moins seul, et un adulte peut faire retirer la vidéo et agir.'],
+    ['J’écris dans le groupe : « C’est un deepfake, arrêtez, c’est pas drôle »', 'mid', 'C’est courageux et ça peut aider ! Mais si tu ne te sens pas en sécurité, tu n’es pas obligé·e. Dans tous les cas, préviens aussi un adulte.']
+  ];
+  function judgeWitness(i) { var w = WITNESS[i]; if (!w) return null; return { kind: w[1], how: w[2] }; }
+  WITNESS.forEach(function (w, i) {
+    var b = btn(w[0]);
+    b.addEventListener('click', function () {
+      var r = judgeWitness(i);
+      Array.prototype.forEach.call($('wChoices').children, function (x) { x.setAttribute('aria-pressed', 'false'); });
+      b.setAttribute('aria-pressed', 'true');
+      $('wOut').innerHTML = '<div class="verdict ' + r.kind + '">' + (r.kind === 'yes' ? 'Bravo !' : r.kind === 'mid' ? 'Courageux, mais pas suffisant seul' : 'Non…') + '<span>' + esc(r.how) + '</span></div>';
+    });
+    $('wChoices').appendChild(b);
+  });
+
+  /* ---------- Étape 9 : OK ou pas OK ? ---------- */
+  var HONEST = [
+    { id: 'dragon', t: 'Je crée un dragon avec une IA pour illustrer mon exposé, et j’écris dessous « image générée par IA ».', a: 'ok', how: 'Créatif et honnête : tout le monde sait que c’est généré.' },
+    { id: 'prof', t: 'Je fabrique une fausse photo de mon prof en tenue ridicule et je la poste.', a: 'pasok', how: 'Utiliser l’image d’une vraie personne pour se moquer d’elle, c’est du harcèlement.' },
+    { id: 'affiche', t: 'Pour l’affiche de la fête de l’école, j’utilise une image IA d’un gâteau géant, avec la mention « image IA ».', a: 'ok', how: 'Aucune personne réelle, et c’est indiqué : parfait.' },
+    { id: 'voixcopain', t: 'Je fais chanter la voix de mon copain avec une IA, sans lui demander, et je l’envoie au groupe.', a: 'pasok', how: 'Sa voix lui appartient. Sans son accord, c’est non, même pour rire.' },
+    { id: 'concours', t: 'J’envoie une image générée par IA au concours photo de la commune en disant que c’est ma photo.', a: 'pasok', how: 'C’est tricher et tromper le jury : il faut dire que c’est généré (et respecter le règlement).' },
+    { id: 'yeux', t: 'Je retouche ma propre photo pour enlever les yeux rouges.', a: 'ok', how: 'Une petite retouche de ta propre photo, qui ne change pas ce qu’elle raconte : aucun problème.' },
+    { id: 'capture', t: 'Je fabrique une fausse capture d’écran pour faire croire qu’une copine a dit quelque chose de méchant.', a: 'pasok', how: 'C’est un faux pour nuire à quelqu’un : c’est du harcèlement, et ça peut être grave.' }
+  ];
+  var hAns = {};
+  function judgeHonest(id, v) {
+    var h = null; HONEST.forEach(function (q) { if (q.id === id) h = q; });
+    if (!h || (v !== 'ok' && v !== 'pasok')) return null;
+    hAns[id] = v; return { ok: v === h.a, how: h.how };
+  }
+  function honestScore() { var c = 0, n = 0; HONEST.forEach(function (h) { if (hAns[h.id]) { n++; if (hAns[h.id] === h.a) c++; } }); return { correct: c, answered: n, total: HONEST.length }; }
+  function hUpdate() { var s = honestScore(); $('hScore').textContent = s.correct + ' / ' + s.total; }
+  function hBuild() { triBuild($('hTri'), HONEST, [['ok', 'OK'], ['pasok', 'Pas OK']], judgeHonest, function () { return hAns; }, hUpdate); hUpdate(); }
+  $('hReset').addEventListener('click', function () { hAns = {}; hBuild(); });
+  hBuild();
+
+  /* ---------- Quiz ---------- */
+  var QZ = [
+    { q: 'Vrai ou faux : une IA peut fabriquer en quelques secondes la photo d’un endroit qui n’existe pas.', o: [['v', 'Vrai'], ['f', 'Faux']], a: 'v', how: 'Une image générée par IA est inventée de zéro, à partir d’une simple phrase.' },
+    { q: 'Sur une image, les mains ont cinq doigts et le texte est parfait. Donc…', o: [['a', 'c’est forcément une vraie photo'], ['b', 'on ne peut pas savoir sans vérifier le contexte']], a: 'b', how: 'Les IA récentes font de moins en moins d’erreurs visibles. Le contexte reste la vraie méthode.' },
+    { q: 'La meilleure façon de vérifier une image choc ?', o: [['a', 'lire les commentaires'], ['b', 'compter les « j’aime »'], ['c', 'chercher qui l’a publiée en premier et si des sources sérieuses en parlent']], a: 'c', how: 'Qui publie ? D’où ça vient ? D’autres sources ? Les likes et les commentaires ne prouvent rien.' },
+    { q: 'Un deepfake vidéo, c’est…', o: [['a', 'une vidéo de mauvaise qualité'], ['b', 'une vidéo truquée par l’IA pour faire dire ou faire à quelqu’un ce qu’il n’a jamais fait'], ['c', 'une vidéo très longue']], a: 'b', how: 'Deep learning (une technique d’IA) + fake (faux).' },
+    { q: 'Message vocal de « ton frère », depuis un numéro inconnu, qui demande de l’argent vite. Ton premier réflexe ?', o: [['a', 'le rappeler sur son numéro habituel ou demander le mot de code'], ['b', 'envoyer l’argent, c’est sa voix'], ['c', 'envoyer la moitié']], a: 'a', how: 'Une voix peut être clonée. On vérifie par un autre chemin.' },
+    { q: 'Un bon mot de code familial, c’est…', o: [['a', 'le nom du chien qu’on voit sur toutes nos photos'], ['b', 'un mot choisi ensemble en vrai, jamais publié'], ['c', '1234']], a: 'b', how: 'Il doit rester secret et impossible à trouver en ligne.' },
+    { q: 'Quelqu’un fabrique un deepfake humiliant d’un camarade et le partage. C’est…', o: [['a', 'juste une blague'], ['b', 'du harcèlement, qui peut être puni']], a: 'b', how: 'On ne partage pas, on en parle à un adulte, et on peut appeler le 147.' },
+    { q: 'Tu crées une image avec une IA pour ton exposé. Que fais-tu ?', o: [['a', 'je la présente comme une vraie photo'], ['b', 'j’indique « image générée par IA »']], a: 'b', how: 'Créer avec l’IA, oui, mais honnêtement : on dit que c’est généré.' }
+  ];
+  var quiz = $('quiz'), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ''; done = [];
+    QZ.forEach(function (Q, k) {
+      var li = document.createElement('li');
+      li.innerHTML = '<span>' + esc(Q.q) + '</span><select id="qa' + k + '" aria-label="Ta réponse à la question ' + (k + 1) + '"><option value="">…</option>' + Q.o.map(function (o) { return '<option value="' + o[0] + '">' + esc(o[1]) + '</option>'; }).join('') + '</select><button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+      quiz.appendChild(li);
+      function check() {
+        var fb = $('qf' + k), v = $('qa' + k).value;
+        if (!v) { fb.className = 'fb'; fb.textContent = 'Choisis une réponse.'; return; }
+        if (v === Q.a) { fb.className = 'fb ok'; fb.innerHTML = 'Bravo, c’est juste !<span>' + esc(Q.how) + '</span>'; done[k] = true; }
+        else {
+          done[k] = false;
+          var good = Q.o.filter(function (o) { return o[0] === Q.a; })[0][1];
+          fb.className = 'fb no'; fb.innerHTML = 'Pas tout à fait : la bonne réponse est « ' + esc(good) + ' ».<span>' + esc(Q.how) + '</span>';
+        }
+        $('score').textContent = done.filter(Boolean).length + ' / 8';
+      }
+      $('qb' + k).addEventListener('click', check);
+      $('qa' + k).addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+    });
+    $('score').textContent = '0 / 8';
+  }
+  $('newQuiz').addEventListener('click', newQuiz);
+  newQuiz();
+
+  window.__dpf = {
+    terms: TERMS, matchItems: MATCH, checkMatch: checkMatch, matchScore: matchScore,
+    editor: editor, noiseOpacity: noiseOpacity,
+    clues: CLUES, cluesAt: cluesAt, findClue: function (id) { var r = findClue(id); clRender(); return r; }, cluesFound: cluesFound,
+    posts: POSTS, judgePost: judgePost, postScore: postScore,
+    voice: VOICE, voiceNext: voiceNext, voiceGo: voiceGo,
+    codeItems: CODES, judgeCode: judgeCode, codeIdea: codeIdea,
+    docs: DOCS, docVerify: docVerify,
+    witness: WITNESS, judgeWitness: judgeWitness,
+    honest: HONEST, judgeHonest: judgeHonest, honestScore: honestScore,
+    quiz: QZ
+  };
+})();
+</script>
+</body>
+</html>

@@ -94,6 +94,22 @@ Accueil du numérique : [numerique.html](numerique.html).
 |---|---|
 | [Repérer les arnaques et l'hameçonnage](reperer-les-arnaques.html) | Faux e-mails, SMS, appels et messages : les signaux d'alerte, lire un lien, l'IA et les arnaques, une boîte de réception à trier, les conséquences et quoi faire si on s'est fait avoir, un quiz. |
 | [Les mots de passe](les-mots-de-passe.html) | Pourquoi un mot de passe compte, comment on se le fait voler, un testeur de solidité, la phrase de passe, un mot de passe par compte, le gestionnaire, la double authentification, que faire si un compte est piraté, un quiz. |
+| [Comment on te manipule](comment-on-te-manipule.html) | Urgence, peur, flatterie, faux consensus : les pièges du cerveau, la check-list des 10 secondes et la règle d'or. |
+| [Les virus et les mises à jour](les-virus-et-les-mises-a-jour.html) | Virus, logiciels espions et rançongiciels : comment ils entrent, pourquoi mettre à jour, les sauvegardes et quoi faire. |
+| [Naviguer en sécurité : https, Wi-Fi et chiffrement](naviguer-en-securite.html) | Le cadenas https, le Wi-Fi public, le chiffrement de tes données et le « cadenas en verre » quantique. |
+| [Les données personnelles et la vie privée](les-donnees-personnelles.html) | Ce que révèle une photo, les quiz qui collectent tes réponses, les réglages de confidentialité et tes droits. |
+| [Le cyberharcèlement](le-cyberharcelement.html) | Reconnaître le harcèlement en ligne, réagir comme témoin, garder des preuves, se faire aider (147). |
+| [Vraie ou fausse info ?](vraie-ou-fausse-info.html) | Info, opinion ou rumeur : enquêter sur une publication, le contexte, les chiffres trompeurs et quoi faire si on a partagé. |
+| [Les images truquées et les deepfakes](les-images-truquees-et-les-deepfakes.html) | Retouches, images d'IA, vidéos et voix clonées : les indices, la vérification du contexte et le mot de passe familial. |
+| [Les réseaux sociaux et les algorithmes](les-reseaux-sociaux-et-les-algorithmes.html) | Un fil qui s'adapte à tes clics, la bulle de filtre, les bots, les likes et la pub déguisée. |
+| [Bien utiliser l'IA](bien-utiliser-l-ia.html) | Ce qu'un chatbot fait bien ou mal, triche ou aide, vérifier une réponse et bien poser sa question. |
+| [Comment une IA écrit un texte](comment-une-ia-ecrit.html) | Un vrai mini-modèle qui prédit le mot suivant : probabilités, température, hallucinations et biais. |
+| [Comment marche Internet](comment-marche-internet.html) | Réseau de réseaux, adresses IP, DNS, paquets qui voyagent, débit et latence, le cloud. |
+| [Les octets et le stockage](les-octets-et-le-stockage.html) | Bits, octets, ko, Mo, Go : combien pèsent une photo ou un jeu, remplir son téléphone, temps de téléchargement. |
+| [Les pixels et la compression](les-pixels-et-la-compression.html) | Un éditeur de pixel art, les couleurs RVB, le poids d'une image et la compression avec ou sans perte. |
+| [Programmer pas à pas](programmer-pas-a-pas.html) | Un robot à programmer avec des blocs : séquences, boucles, conditions, et chasse aux bugs. |
+| [Le temps d'écran et l'attention](le-temps-d-ecran-et-l-attention.html) | Calculer son temps d'écran, repérer les astuces qui retiennent l'attention, le sommeil et son plan perso. |
+| [Les achats dans les jeux](les-achats-dans-les-jeux.html) | Gemmes, coffres, pass et abonnements : calculer le vrai prix en CHF, les probabilités et son budget. |
 
 ## Pour réviser
 

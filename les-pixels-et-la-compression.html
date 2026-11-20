@@ -1,0 +1,1230 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Les pixels et la compression</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, marge rouge. Accent fuchsia (#d946ef pour les décors, #a21caf pour le texte, plus contrasté). Les couleurs des pixels dessinés sont de vraies couleurs, identiques en mode clair et sombre. Rien de ce qui est dessiné ou tapé n'est envoyé ni enregistré. */
+:root {
+  --paper: #fbf7fc;
+  --grid: #efe3f1;
+  --card: #ffffff;
+  --ink: #2a1530;
+  --ink-soft: #6b5470;
+  --acc: #a21caf;
+  --acc-bright: #d946ef;
+  --acc-soft: #fae8ff;
+  --warn: #d97706;
+  --warn-soft: #fdf0d6;
+  --warn-ink: #92400e;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #fff0a3;
+  --line: #e6d6e9;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #160f18; --grid: #231a26; --card: #1d1420; --ink: #f6eaf8; --ink-soft: #bba8c0;
+    --acc: #f0abfc; --acc-bright: #e879f9; --acc-soft: #3b1240; --warn: #f5a524; --warn-soft: #3d2a0c; --warn-ink: #fbbf5a;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #3a2c3e;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #160f18; --grid: #231a26; --card: #1d1420; --ink: #f6eaf8; --ink-soft: #bba8c0;
+  --acc: #f0abfc; --acc-bright: #e879f9; --acc-soft: #3b1240; --warn: #f5a524; --warn-soft: #3d2a0c; --warn-ink: #fbbf5a;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #3a2c3e;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--acc); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note.warn { border-left-color: var(--warn); background: var(--warn-soft); }
+.note.ok { border-left-color: var(--ok); background: var(--ok-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+.fig svg { width: 100%; height: auto; display: block; }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 8px 12px; min-height: 44px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+button:disabled { opacity: .5; cursor: default; transform: none; }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+input[type="text"], input[type="number"] { font: inherit; font-family: var(--f-mono); font-size: 1rem; padding: 8px 10px; min-height: 44px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; }
+input[type="range"] { width: 100%; accent-color: var(--acc-bright); min-height: 32px; }
+select { font: inherit; font-size: 1rem; padding: 8px 8px; min-height: 44px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; }
+.param { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.param label { font-weight: 700; }
+.params { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.privacy { font-size: .9rem; color: var(--ok); font-weight: 700; display: flex; gap: 6px; align-items: flex-start; }
+.privacy::before { content: "🔒"; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
+.tag.ok { color: var(--ok); }
+.tag.no { color: var(--red); }
+.tag.warn { color: var(--warn-ink); }
+.tag.acc { color: var(--acc); }
+.formula { font-family: var(--f-mono); font-size: 1.1rem; text-align: center; background: var(--paper); border: 1.5px dashed var(--line); border-radius: 8px; padding: 10px; overflow-wrap: anywhere; }
+
+.verdict { border-radius: 8px; padding: 12px 14px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+.verdict:empty { display: none; }
+.verdict.yes { background: var(--ok-soft); color: var(--ok); }
+.verdict.no { background: var(--red-soft); color: var(--red); }
+.verdict.mid { background: var(--warn-soft); color: var(--warn-ink); }
+.verdict span { font-weight: 400; color: var(--ink); }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.stat { background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 10px; min-width: 0; }
+.stat b { display: block; font-family: var(--f-mono); font-size: 1.05rem; overflow-wrap: anywhere; }
+.stat small { color: var(--ink-soft); font-size: .85rem; }
+.calc { font-family: var(--f-mono); font-size: .95rem; background: var(--paper); border: 1.5px dashed var(--line); border-radius: 8px; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; overflow-wrap: anywhere; }
+.calc b { color: var(--acc); }
+
+/* Éditeur de pixel art */
+.editor { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 220px); gap: 16px; align-items: start; }
+@media (max-width: 640px) { .editor { grid-template-columns: minmax(0, 1fr); } }
+.pixgrid { display: grid; grid-template-columns: repeat(16, 1fr); grid-template-rows: repeat(16, 1fr); width: 100%; max-width: 460px; aspect-ratio: 1 / 1; border: 2px solid var(--ink); background: #ffffff; touch-action: none; user-select: none; -webkit-user-select: none; cursor: crosshair; }
+.pixgrid i { display: block; box-shadow: inset 0 0 0 .5px rgba(0, 0, 0, .14); }
+.pixgrid.nolines i { box-shadow: none; }
+.pal { display: flex; flex-wrap: wrap; gap: 8px; }
+.pal button { width: 44px; height: 44px; padding: 0; border-radius: 50%; box-shadow: 2px 2px 0 var(--ink); }
+.pal button[aria-pressed="true"] { outline: 4px solid var(--acc-bright); outline-offset: 2px; }
+.cur { display: flex; gap: 10px; align-items: center; font-size: .95rem; }
+.dot { display: inline-block; width: 14px; height: 14px; border-radius: 3px; border: 1px solid var(--ink-soft); vertical-align: -2px; margin-right: 3px; }
+.big-dot { width: 34px; height: 34px; border-radius: 6px; border: 2px solid var(--ink); flex: none; }
+
+/* RVB */
+.rgb-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 180px); gap: 16px; align-items: center; }
+@media (max-width: 560px) { .rgb-grid { grid-template-columns: minmax(0, 1fr); } }
+.sliders { display: flex; flex-direction: column; gap: 8px; }
+.cr { color: #c81e3c; } .cg { color: #1f8a3e; } .cb { color: #2563eb; }
+:root[data-theme="dark"] .cr { color: #ff8095; } :root[data-theme="dark"] .cg { color: #6ee49a; } :root[data-theme="dark"] .cb { color: #8fb4ff; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .cr { color: #ff8095; } :root:not([data-theme="light"]) .cg { color: #6ee49a; } :root:not([data-theme="light"]) .cb { color: #8fb4ff; } }
+#sR { accent-color: #e11d48; } #sG { accent-color: #16a34a; } #sB { accent-color: #2563eb; }
+.swatch { width: 100%; aspect-ratio: 1 / 1; max-width: 180px; border: 2px solid var(--ink); border-radius: 12px; justify-self: center; }
+.hexout { font-family: var(--f-mono); font-size: 1.5rem; font-weight: 600; text-align: center; overflow-wrap: anywhere; }
+.duo { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 14px; }
+.duo figure { margin: 0; display: flex; flex-direction: column; gap: 6px; align-items: center; min-width: 0; }
+.duo figcaption { font-size: .9rem; color: var(--ink-soft); text-align: center; }
+.tswatch { width: 100%; max-width: 160px; height: 90px; border: 2px solid var(--ink); border-radius: 10px; }
+
+/* Canvas pixelisés */
+canvas.pix { width: 100%; height: auto; image-rendering: pixelated; image-rendering: crisp-edges; border: 2px solid var(--ink); border-radius: 6px; display: block; background: #ffffff; }
+.cv-wrap { width: 100%; max-width: 400px; margin: 0 auto; }
+.cv-small { width: 100%; max-width: 220px; }
+
+/* RLE */
+.runs { list-style: none; margin: 0; padding: 8px 10px; display: flex; flex-direction: column; gap: 2px; font-family: var(--f-mono); font-size: .85rem; background: var(--paper); border: 1.5px dashed var(--line); border-radius: 8px; max-height: 300px; overflow: auto; }
+.runs li { overflow-wrap: anywhere; }
+.runs li b { color: var(--acc); display: inline-block; min-width: 3.2em; }
+.runs li.now { background: var(--hl); border-radius: 4px; }
+.bars { display: flex; flex-direction: column; gap: 8px; }
+.bar-row { display: grid; grid-template-columns: minmax(0, 120px) minmax(0, 1fr); gap: 4px 10px; align-items: center; font-size: .92rem; }
+.bar-row .bar { height: 18px; border-radius: 4px; background: var(--acc-bright); min-width: 2px; transition: width .25s; max-width: 100%; }
+.bar-row .bar.raw { background: var(--ink-soft); }
+.bar-row .val { grid-column: 2; font-family: var(--f-mono); font-size: .85rem; color: var(--ink-soft); overflow-wrap: anywhere; }
+@media (max-width: 520px) { .bar-row { grid-template-columns: minmax(0, 1fr); } .bar-row .val { grid-column: 1; } }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 220px auto; gap: 10px; align-items: center; }
+.quiz li > span:first-child { min-width: 0; overflow-wrap: anywhere; }
+.quiz select { font-size: .95rem; padding: 6px 6px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb:empty { display: none; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc); }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+details ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+<!--ticons--><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Tutoriels"><script src="progress.js" defer></script><!--/ticons-->
+<style id="tnav-css">
+.tnav-top { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin: 0 0 4px; }
+.tnav-home { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font-weight: 700; font-size: .95rem; text-decoration: none; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tnav-home:hover, .tnav-home:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.tnav-bottom { margin-top: 8px; display: flex; flex-direction: column; gap: 12px; }
+.tnav-bottom h2 { margin: 0; }
+.tnav-pn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tnav-pn a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--ink, #222); border-radius: 10px;
+  background: var(--card, #fff); color: var(--ink, #222); text-decoration: none; box-shadow: 3px 3px 0 var(--ink, #222); min-width: 0; }
+.tnav-pn a span { font-size: .85rem; color: var(--ink-soft, #666); }
+.tnav-pn a strong { overflow-wrap: anywhere; }
+.tnav-pn a.next { text-align: right; grid-column: 2; }
+.tnav-bottom .tnav-home { align-self: center; }
+@media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
+.diff { font: 700 .72rem/1.2 var(--f-mono, monospace); padding: 2px 8px; border-radius: 99px; border: 1.5px solid; white-space: nowrap; }
+.diff.d1 { color: #15803d; border-color: #15803d; background: #dcf3e3; }
+.diff.d2 { color: #a15c07; border-color: #b45309; background: #fbe7cf; }
+.diff.d3 { color: #b91c1c; border-color: #b91c1c; background: #fde2e2; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root:not([data-theme="light"]) .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root:not([data-theme="light"]) .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; } }
+:root[data-theme="dark"] .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root[data-theme="dark"] .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root[data-theme="dark"] .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; }
+</style>
+</head>
+<body>
+<main class="page">
+<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="numerique.html">← Tous les tutoriels numériques</a><span class="diff d2" title="Difficulté : moyen">Moyen</span></nav><!--/tnav-->
+
+
+  <header class="hero">
+    <span class="eyebrow">Tutoriel numérique · niveau 10H</span>
+    <h1>Les pixels et la compression</h1>
+    <p class="lead">Une photo sur ton téléphone, un mème dans un groupe, une vidéo de ton jeu préféré : pour l'ordinateur, ce ne sont que des <strong>petits carrés de couleur</strong> et des <strong>nombres</strong>. Ici, tu vas dessiner pixel par pixel, fabriquer des couleurs, calculer le poids d'une image… et découvrir les astuces qui la rendent des dizaines de fois plus légère.</p>
+    <div class="box fig">
+      <svg viewBox="0 0 400 170" role="img" aria-label="Un cœur dessiné en pixels, une flèche, puis son code compressé et trois curseurs rouge, vert et bleu">
+        <g transform="translate(20,20)">
+          <rect x="0" y="0" width="128" height="128" fill="#ffffff" stroke="var(--ink)" stroke-width="2"/>
+          <g fill="#e63946">
+            <rect x="16" y="24" width="32" height="40"/><rect x="80" y="24" width="32" height="40"/>
+            <rect x="8" y="32" width="112" height="32"/><rect x="16" y="64" width="96" height="16"/>
+            <rect x="32" y="80" width="64" height="16"/><rect x="48" y="96" width="32" height="16"/>
+            <rect x="56" y="112" width="16" height="8"/>
+          </g>
+          <rect x="24" y="32" width="8" height="8" fill="#ffffff"/>
+          <g stroke="rgba(0,0,0,.15)" stroke-width="1">
+            <path d="M16 0V128M32 0V128M48 0V128M64 0V128M80 0V128M96 0V128M112 0V128M0 16H128M0 32H128M0 48H128M0 64H128M0 80H128M0 96H128M0 112H128"/>
+          </g>
+        </g>
+        <path d="M162 84 H200" stroke="var(--acc-bright)" stroke-width="5" stroke-linecap="round"/>
+        <path d="M194 74 L206 84 L194 94" fill="none" stroke="var(--acc-bright)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="216" y="40" font-size="13">2 blanc, 4 rouge,</text>
+        <text x="216" y="58" font-size="13">4 blanc, 4 rouge…</text>
+        <text x="216" y="84" font-size="13" fill="var(--acc)" style="fill:var(--acc)" font-weight="600">768 → 288 octets</text>
+        <rect x="216" y="104" width="160" height="8" rx="4" fill="#e11d48"/><circle cx="356" cy="108" r="8" fill="#ffffff" stroke="var(--ink)" stroke-width="2"/>
+        <rect x="216" y="124" width="160" height="8" rx="4" fill="#16a34a"/><circle cx="250" cy="128" r="8" fill="#ffffff" stroke="var(--ink)" stroke-width="2"/>
+        <rect x="216" y="144" width="160" height="8" rx="4" fill="#2563eb"/><circle cx="300" cy="148" r="8" fill="#ffffff" stroke="var(--ink)" stroke-width="2"/>
+      </svg>
+    </div>
+    <p class="soft">Tout se passe dans ta page : tes dessins et tes réglages ne sont <strong>ni envoyés, ni enregistrés</strong>. Ils disparaissent quand tu fermes la page.</p>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · Une grille de carrés</span>
+    <h2>Une image, c'est une grille de pixels</h2>
+    <p>Approche ton œil très près d'un écran, ou zoome fort sur une photo : tu finis par voir des <strong>petits carrés</strong>, chacun d'une seule couleur. Ce sont les <strong>pixels</strong> (de l'anglais <em>picture element</em>, « élément d'image »). Une image numérique, c'est simplement un tableau de pixels, rangés en <strong>lignes</strong> et en <strong>colonnes</strong>.</p>
+    <p>Une image de 16 pixels de large et 16 de haut contient 16 × 16 = <strong>256 pixels</strong>. À toi de les colorier !</p>
+    <div class="box">
+      <h3>Ton éditeur de pixel art (16 × 16)</h3>
+      <div class="editor">
+        <div style="display:flex;flex-direction:column;gap:10px;min-width:0">
+          <div class="pixgrid" id="pg" role="img" aria-label="Grille de dessin de 16 pixels sur 16. Clique ou glisse pour colorier."></div>
+          <p class="soft" style="font-size:.9rem">Clique ou glisse le doigt sur la grille pour peindre. Pour gommer, peins en blanc.</p>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px;min-width:0">
+          <strong>Ta couleur</strong>
+          <div class="pal" id="pal" role="group" aria-label="Palette de couleurs"></div>
+          <div class="cur"><span class="big-dot" id="curDot"></span><span id="curName" class="mono">rouge</span></div>
+          <strong>Modèles</strong>
+          <div class="btns">
+            <button type="button" data-tpl="coeur">Cœur</button>
+            <button type="button" data-tpl="maison">Maison</button>
+            <button type="button" data-tpl="damier">Damier</button>
+            <button type="button" data-tpl="vide">Tout effacer</button>
+          </div>
+          <div class="btns"><button type="button" id="lines" aria-pressed="true">Quadrillage</button></div>
+        </div>
+      </div>
+      <p id="pgInfo" class="mono" style="font-size:.9rem;overflow-wrap:anywhere" aria-live="polite"></p>
+      <span class="privacy">Ton dessin reste dans ta page : rien n'est envoyé ni enregistré.</span>
+    </div>
+    <p>Garde ton dessin : à l'étape 5, on va le <strong>compresser</strong>.</p>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · Les couleurs en nombres</span>
+    <h2>Rouge, vert, bleu : trois nombres par pixel</h2>
+    <p>Chaque pixel d'un écran est fait de trois minuscules lumières : une <span class="cr"><strong>rouge</strong></span>, une <span class="cg"><strong>verte</strong></span> et une <span class="cb"><strong>bleue</strong></span>. C'est le système <strong>RVB</strong> (en anglais <em>RGB</em>). Pour chaque lumière, l'ordinateur range un nombre de <strong>0</strong> (éteinte) à <strong>255</strong> (à fond). Pourquoi 255 ? Parce que 0 à 255, ça fait 256 valeurs, exactement ce que contient <strong>un octet</strong> (8 bits). Pourquoi rouge + vert donne du jaune ? C'est expliqué dans le tutoriel sur <a class="tlink" href="la-lumiere.html">la lumière</a>.</p>
+    <div class="box">
+      <h3>Fabrique ta couleur</h3>
+      <div class="rgb-grid">
+        <div class="sliders">
+          <div class="param"><label for="sR" class="cr">Rouge : <span class="mono" id="vR">217</span></label><input id="sR" type="range" min="0" max="255" step="1" value="217"></div>
+          <div class="param"><label for="sG" class="cg">Vert : <span class="mono" id="vG">70</span></label><input id="sG" type="range" min="0" max="255" step="1" value="70"></div>
+          <div class="param"><label for="sB" class="cb">Bleu : <span class="mono" id="vB">239</span></label><input id="sB" type="range" min="0" max="255" step="1" value="239"></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;align-items:center;min-width:0">
+          <div class="swatch" id="sw" role="img" aria-label="Aperçu de la couleur"></div>
+          <div class="hexout" id="hex" aria-live="polite">#d946ef</div>
+        </div>
+      </div>
+      <div class="btns" id="rgbPresets" role="group" aria-label="Couleurs toutes prêtes">
+        <button type="button" data-rgb="0,0,0">Noir</button>
+        <button type="button" data-rgb="255,255,255">Blanc</button>
+        <button type="button" data-rgb="255,0,0">Rouge</button>
+        <button type="button" data-rgb="255,255,0">Jaune</button>
+        <button type="button" data-rgb="128,128,128">Gris</button>
+        <button type="button" data-rgb="217,70,239">Fuchsia</button>
+      </div>
+      <p id="rgbTxt" class="soft" aria-live="polite"></p>
+    </div>
+    <p>Le code qui commence par <span class="mono">#</span> s'appelle le <strong>code hexadécimal</strong> de la couleur : 2 caractères pour le rouge, 2 pour le vert, 2 pour le bleu. En hexadécimal, on compte avec 16 chiffres (0 à 9 puis a à f), et <span class="mono">ff</span> veut dire 255. Pour passer d'une base à l'autre, regarde le tutoriel sur <a class="tlink" href="le-binaire-et-les-bases.html">le binaire</a>.</p>
+    <div class="formula">256 × 256 × 256 = 256³ = 16 777 216 couleurs</div>
+    <p>Environ <strong>16,7 millions de couleurs</strong> : plus que ce que ton œil arrive à distinguer côte à côte. Chaque pixel prend 3 octets, soit 24 bits.</p>
+
+    <div class="box">
+      <h3>Défi : retrouve la couleur</h3>
+      <p>Règle les trois curseurs ci-dessus pour copier la couleur du défi. Tu as gagné si chaque nombre est à moins de 25 du bon.</p>
+      <div class="duo">
+        <figure><div class="tswatch" id="tgtSw"></div><figcaption>La couleur du défi : <strong id="tgtName">…</strong></figcaption></figure>
+        <figure><div class="tswatch" id="youSw"></div><figcaption>Ta couleur</figcaption></figure>
+      </div>
+      <div class="btns">
+        <button type="button" id="tgtCheck">Vérifier</button>
+        <button type="button" id="tgtNew">Nouveau défi</button>
+        <button type="button" id="tgtSol">Voir la solution</button>
+      </div>
+      <div class="verdict" id="tgtOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Le poids d'une image</span>
+    <h2>Combien d'octets pour une photo ?</h2>
+    <p>Si chaque pixel prend 3 octets (un pour le rouge, un pour le vert, un pour le bleu), le calcul est simple :</p>
+    <div class="formula">poids = largeur × hauteur × 3 octets</div>
+    <p>On compte ensuite en grandes unités : 1 Ko (kilooctet) = 1 000 octets, 1 Mo (mégaoctet) = 1 000 000 octets, 1 Go = 1 000 000 000 octets. Tu trouves le détail de ces unités dans le tutoriel sur <a class="tlink" href="les-octets-et-le-stockage.html">les octets</a> (et pourquoi certains logiciels comptent 1 024 au lieu de 1 000).</p>
+    <div class="box">
+      <h3>La calculatrice d'image</h3>
+      <div class="btns" id="szPresets" role="group" aria-label="Exemples d'images">
+        <button type="button" data-w="16" data-h="16">Ton dessin 16 × 16</button>
+        <button type="button" data-w="1920" data-h="1080">Écran Full HD</button>
+        <button type="button" data-w="4000" data-h="3000">Photo de téléphone</button>
+      </div>
+      <div class="params">
+        <div class="param"><label for="szW">Largeur (pixels)</label><input type="number" id="szW" min="1" max="20000" step="1" value="4000" inputmode="numeric"></div>
+        <div class="param"><label for="szH">Hauteur (pixels)</label><input type="number" id="szH" min="1" max="20000" step="1" value="3000" inputmode="numeric"></div>
+        <div class="param"><label for="szB">Octets par pixel</label>
+          <select id="szB">
+            <option value="3" selected>3 : couleurs RVB</option>
+            <option value="4">4 : RVB + transparence</option>
+            <option value="1">1 : 256 niveaux de gris</option>
+          </select>
+        </div>
+      </div>
+      <div class="calc" id="szOut" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">36 Mo… mais ta photo fait quelques Mo seulement !</span>
+      <span>Une photo de téléphone de 4 000 × 3 000 pixels pèserait <strong>36 Mo</strong> sans astuce. Pourtant, le fichier dans ta galerie fait souvent entre <strong>2 et 5 Mo</strong>, environ dix fois moins. Le téléphone ne garde pas les pixels un par un : il les <span class="hl">compresse</span>. C'est le sujet des étapes 5 et 6.</span>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · Définition, résolution et zoom</span>
+    <h2>Combien de pixels, et à quel point serrés ?</h2>
+    <div class="cards">
+      <div class="box"><span class="tag acc">Définition</span><strong>Le nombre de pixels</strong><span class="soft">Largeur × hauteur : 1 920 × 1 080 pour un écran Full HD, 4 000 × 3 000 pour une photo. 4 000 × 3 000 = 12 000 000 de pixels, on dit <strong>12 mégapixels</strong>.</span></div>
+      <div class="box"><span class="tag acc">Résolution</span><strong>Les pixels par pouce</strong><span class="soft">Combien de pixels sont serrés sur une longueur, souvent en <strong>pixels par pouce</strong> (1 pouce = 2,54 cm). Le même 1 920 × 1 080 donne souvent plus de 300 pixels par pouce sur un téléphone, mais environ 40 sur une grande télé.</span></div>
+    </div>
+    <p>Sur un téléphone, les pixels sont si petits que ton œil ne les voit pas. Mais si on <strong>zoome</strong> sur une image, chaque pixel devient un gros carré : c'est la <strong>pixellisation</strong>. Bouge le curseur.</p>
+    <div class="box">
+      <h3>La loupe</h3>
+      <div class="param"><label for="zm">Zoom : <span class="mono" id="zmV">× 1</span></label><input type="range" id="zm" min="0" max="4" step="1" value="0"></div>
+      <div class="cv-wrap"><canvas class="pix" id="zmCv" width="384" height="384" role="img" aria-label="Un paysage avec soleil, cerf-volant et collines, plus ou moins zoomé"></canvas></div>
+      <p id="zmOut" class="soft" aria-live="polite"></p>
+    </div>
+    <div class="note warn">
+      <span class="note-title">Zoomer n'ajoute pas de détails</span>
+      <span>Dans les films, on zoome sur une caméra floue et on lit une plaque de voiture. En vrai, si l'information n'est pas dans les pixels, elle n'existe pas. Certains logiciels avec de l'intelligence artificielle « inventent » des détails qui ont l'air vrais… mais ils sont inventés, pas retrouvés.</span>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · La compression sans perte</span>
+    <h2>Dire « 5 blanc » au lieu de « blanc, blanc, blanc, blanc, blanc »</h2>
+    <p>Pour dicter ton dessin à un ami au téléphone, tu ne dirais pas « blanc, blanc, blanc, blanc, blanc, rouge, rouge, rouge ». Tu dirais <strong>« 5 blanc, 3 rouge »</strong>. C'est exactement l'idée du <strong>codage par plages</strong> (en anglais <em>RLE</em>, <em>run-length encoding</em>) : on remplace chaque suite de pixels identiques par un <strong>nombre</strong> et une <strong>couleur</strong>.</p>
+    <p>Ci-dessous, ton dessin de l'étape 1 est codé ligne par ligne, en direct. Retourne le modifier, ou choisis un modèle : le code change tout seul.</p>
+    <div class="box">
+      <h3>Ton dessin, compressé</h3>
+      <div class="btns" role="group" aria-label="Modèles">
+        <button type="button" data-tpl="coeur">Cœur</button>
+        <button type="button" data-tpl="maison">Maison</button>
+        <button type="button" data-tpl="damier">Damier</button>
+        <button type="button" data-tpl="vide">Tout blanc</button>
+      </div>
+      <ol class="runs" id="rleList" aria-label="Le code de chaque ligne"></ol>
+      <p class="soft" style="font-size:.92rem">Dans notre format, chaque paquet « nombre + couleur » prend <strong>4 octets</strong> : 1 octet pour le nombre (jusqu'à 255) et 3 octets pour la couleur. Sans compression, chaque pixel prend 3 octets.</p>
+      <div class="bars" id="rleBars"></div>
+      <div class="verdict" id="rleOut" aria-live="polite"></div>
+    </div>
+    <div class="box">
+      <h3>Preuve : on décode, pas à pas</h3>
+      <p>Si la compression est vraiment <strong>sans perte</strong>, on doit pouvoir refaire le dessin exact à partir du code seul. Le décodeur ne voit pas ton dessin : il lit seulement les paquets.</p>
+      <div class="duo">
+        <figure><canvas class="pix cv-small" id="decCv" width="16" height="16" role="img" aria-label="Image reconstruite à partir du code"></canvas><figcaption>Image reconstruite</figcaption></figure>
+        <figure><canvas class="pix cv-small" id="origCv" width="16" height="16" role="img" aria-label="Ton dessin de départ"></canvas><figcaption>Ton dessin</figcaption></figure>
+      </div>
+      <div class="btns">
+        <button type="button" id="decStep">Pas à pas</button>
+        <button type="button" id="decAll">Tout décoder</button>
+        <button type="button" id="decReset">Recommencer</button>
+      </div>
+      <p id="decTxt" class="mono" style="font-size:.9rem;overflow-wrap:anywhere" aria-live="polite"></p>
+      <div class="verdict" id="decOut" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Quand ça marche, quand ça rate</span>
+      <span>Le RLE est génial pour les images avec de grandes zones d'une seule couleur (un logo, un drapeau, une capture d'écran de texte). Mais essaie le <strong>damier</strong> : chaque pixel est différent de son voisin, il y a 256 paquets de 1 pixel… et le code devient <strong>plus gros</strong> que l'image ! Les vrais formats sans perte, comme le <strong>PNG</strong>, utilisent des astuces plus malignes, mais l'idée est la même : repérer ce qui se répète.</span>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · La compression avec perte</span>
+    <h2>Jeter ce que l'œil ne remarque pas</h2>
+    <p>Sur une <strong>photo</strong>, deux pixels voisins n'ont presque jamais exactement la même couleur : le RLE ne sert à rien. On utilise alors une autre idée : <strong>simplifier</strong> l'image, en enlevant des détails que l'œil remarque peu. On ne pourra plus retrouver l'image exacte : c'est une compression <strong>avec perte</strong>.</p>
+    <p>Notre démo utilise deux astuces simples : remplacer chaque <strong>bloc</strong> de pixels par sa couleur moyenne, et garder <strong>moins de nuances</strong> par couleur. Baisse la qualité et regarde ce qui se passe.</p>
+    <div class="box">
+      <h3>Le curseur de qualité</h3>
+      <div class="param"><label for="lq">Qualité : <span class="mono" id="lqV">5</span> / 5</label><input type="range" id="lq" min="1" max="5" step="1" value="5"></div>
+      <div class="duo">
+        <figure><canvas class="pix cv-small" id="lqOrig" width="64" height="64" role="img" aria-label="Image originale, 64 pixels sur 64"></canvas><figcaption>Original (64 × 64)</figcaption></figure>
+        <figure><canvas class="pix cv-small" id="lqCv" width="64" height="64" role="img" aria-label="Image compressée avec perte"></canvas><figcaption>Compressée</figcaption></figure>
+      </div>
+      <div class="stats">
+        <div class="stat"><small>Taille des blocs</small><b id="lqBlock">1 × 1</b></div>
+        <div class="stat"><small>Nuances par couleur</small><b id="lqLev">256</b></div>
+        <div class="stat"><small>Poids estimé</small><b id="lqBytes">—</b></div>
+        <div class="stat"><small>Écart moyen</small><b id="lqErr">—</b></div>
+      </div>
+      <p id="lqOut" aria-live="polite"></p>
+      <p class="soft" style="font-size:.9rem">Le poids est calculé pour notre format simplifié : une couleur par bloc, avec moins de bits par nuance (256 nuances = 8 bits, 16 nuances = 4 bits…). L'écart moyen dit de combien, en moyenne, chaque nombre rouge, vert ou bleu s'est éloigné de l'original (sur 255).</p>
+    </div>
+    <div class="note">
+      <span class="note-title">Et le JPEG, alors ?</span>
+      <span>Le format <strong>JPEG</strong> de tes photos est bien plus malin que notre démo. Il découpe l'image en petits blocs de 8 × 8 pixels, garde soigneusement les grandes formes et les changements de lumière, et simplifie beaucoup les détails très fins et les couleurs, parce que <strong>notre œil est plus sensible à la luminosité qu'aux couleurs</strong>. Résultat : une photo souvent dix fois plus légère, presque sans différence visible. Mais si on pousse trop, on voit apparaître des petits carrés et des bavures.</span>
+    </div>
+    <div class="note warn">
+      <span class="note-title">Ce qui est perdu est perdu</span>
+      <span>Remonte le curseur : ici, on repart de l'original. Mais dans la vraie vie, le fichier compressé ne garde pas l'original. C'est pour ça qu'un mème partagé, recompressé, capturé et repartagé des dizaines de fois devient de plus en plus « baveux ».</span>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · La vidéo</span>
+    <h2>Une vidéo, c'est 25 ou 30 images par seconde</h2>
+    <p>Une vidéo, c'est une suite d'images qui défilent très vite, souvent <strong>25 ou 30 images par seconde</strong> (parfois 60 dans les jeux). Ton cerveau les relie et voit un mouvement. Mais alors, combien pèserait une vidéo sans compression ?</p>
+    <div class="box">
+      <h3>La calculatrice de vidéo</h3>
+      <div class="params">
+        <div class="param"><label for="vdDef">Définition</label>
+          <select id="vdDef">
+            <option value="640x360">Petite : 640 × 360</option>
+            <option value="1280x720">HD : 1 280 × 720</option>
+            <option value="1920x1080" selected>Full HD : 1 920 × 1 080</option>
+            <option value="3840x2160">4K : 3 840 × 2 160</option>
+          </select>
+        </div>
+        <div class="param"><label for="vdMin">Durée : <span class="mono" id="vdMinV">1 minute</span></label><input type="range" id="vdMin" min="1" max="120" step="1" value="1"></div>
+      </div>
+      <div class="btns" id="vdFps" role="group" aria-label="Images par seconde">
+        <button type="button" data-fps="25" aria-pressed="false">25 images/s</button>
+        <button type="button" data-fps="30" aria-pressed="true">30 images/s</button>
+        <button type="button" data-fps="60" aria-pressed="false">60 images/s</button>
+      </div>
+      <div class="calc" id="vdOut" aria-live="polite"></div>
+    </div>
+    <p>Plus de 11 Go pour une seule minute en Full HD ! Une vidéo en ligne de la même qualité pèse plutôt quelques dizaines de Mo par minute : elle est <strong>plusieurs centaines de fois</strong> plus légère. Une des astuces : d'une image à la suivante, presque rien ne change. On n'envoie donc que <strong>ce qui bouge</strong>.</p>
+    <div class="box">
+      <h3>Que change-t-on d'une image à l'autre ?</h3>
+      <div class="cv-wrap"><canvas class="pix" id="frCv" width="24" height="12" role="img" aria-label="Une balle qui avance au-dessus d'une pelouse, image par image"></canvas></div>
+      <div class="btns">
+        <button type="button" id="frNext">Image suivante</button>
+        <button type="button" id="frDiff" aria-pressed="false">Montrer seulement les changements</button>
+        <button type="button" id="frReset">Recommencer</button>
+      </div>
+      <p id="frOut" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Le savais-tu ?</span>
+    <h2>Émojis, écrans et vieux jeux vidéo</h2>
+    <div class="cards">
+      <div class="box"><span class="tag acc">Émojis</span><strong>Un émoji n'est pas une image envoyée</strong><span class="soft">Quand tu envoies 😂, ton téléphone n'envoie pas de pixels : il envoie un <strong>numéro</strong> (un code Unicode, quelques octets). Le téléphone de ton ami le dessine avec ses propres dessins. C'est pour ça que le même émoji n'a pas tout à fait la même tête sur deux téléphones différents.</span></div>
+      <div class="box"><span class="tag acc">Émojis</span><strong>Des émojis en plusieurs morceaux</strong><span class="soft">Certains émojis sont fabriqués en collant plusieurs codes : une couleur de peau, ou plusieurs personnes pour faire une famille. Si un vieux téléphone ne connaît pas la combinaison, il affiche les morceaux séparés.</span></div>
+      <div class="box"><span class="tag acc">Écrans</span><strong>Trois lumières par pixel</strong><span class="soft">Avec une loupe, on voit sur beaucoup d'écrans que chaque pixel est fait de trois petits « sous-pixels » rouge, vert et bleu. De loin, ton œil les mélange en une seule couleur.</span></div>
+      <div class="box"><span class="tag acc">Jeux vidéo</span><strong>Le pixel art vient des vieilles consoles</strong><span class="soft">Dans les années 1980, les consoles avaient très peu de mémoire. Les personnages tenaient souvent dans des carrés de 16 × 16 pixels, avec peu de couleurs. Les artistes ont appris à tout dire avec très peu de pixels : c'est devenu un style.</span></div>
+      <div class="box"><span class="tag acc">Histoire</span><strong>Une des premières images numérisées</strong><span class="soft">Dans les années 1950, un chercheur américain a numérisé une photo de son bébé : on la cite souvent comme l'une des toutes premières images numériques. Elle faisait environ 176 × 176 pixels, en noir et blanc. Aujourd'hui, ton téléphone en prend des centaines de fois plus.</span></div>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Attention</span>
+    <h2>Les erreurs fréquentes</h2>
+    <div class="cards">
+      <div class="box"><span class="tag no">Faux</span><strong>« Définition et résolution, c'est pareil. »</strong><span class="soft">La définition, c'est le nombre de pixels (4 000 × 3 000). La résolution, c'est à quel point ils sont serrés (pixels par pouce).</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« Plus de mégapixels, c'est toujours une meilleure photo. »</strong><span class="soft">La qualité dépend aussi de l'objectif, de la lumière et du capteur. Beaucoup de pixels flous restent flous.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« Compresser une image la rend plus petite à l'écran. »</strong><span class="soft">Non : elle garde la même taille en pixels. C'est le nombre d'octets du fichier qui baisse.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« La compression réduit toujours la taille. »</strong><span class="soft">Le damier en RLE donne un code plus gros que l'image ! Une méthode marche bien sur certaines images et mal sur d'autres.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« Recompresser en JPEG ne change rien. »</strong><span class="soft">À chaque compression avec perte, on perd encore un peu. Garde l'original si tu veux retoucher une photo.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« Rouge + vert, ça fait marron. »</strong><span class="soft">Avec de la peinture, on obtient une couleur sombre. Mais un écran mélange des <strong>lumières</strong> : rouge + vert = jaune.</span></div>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Choisis ta réponse, puis vérifie.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Recommencer</button>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · À toi de jouer</span>
+    <h2>Six exercices</h2>
+    <div class="exos">
+      <details>
+        <summary>1. Le poids d'une image<span class="q">Combien pèse, sans compression, une image en couleurs de 800 × 600 pixels ?</span></summary>
+        <div>
+          <span>800 × 600 = 480 000 pixels.</span>
+          <span>480 000 × 3 octets = <strong>1 440 000 octets</strong>, soit 1,44 Mo.</span>
+        </div>
+      </details>
+      <details>
+        <summary>2. Les codes couleur<span class="q">Quelle couleur donne <span class="mono">#00ff00</span> ? Et <span class="mono">#808080</span> ? Quel est le code du blanc ?</span></summary>
+        <div>
+          <span><span class="mono">#00ff00</span> : rouge 0, vert 255, bleu 0 → un <strong>vert</strong> vif.</span>
+          <span><span class="mono">#808080</span> : 80 en hexadécimal = 8 × 16 = 128, pour les trois → un <strong>gris</strong> moyen.</span>
+          <span>Blanc : les trois lumières à fond → <span class="mono">#ffffff</span>.</span>
+        </div>
+      </details>
+      <details>
+        <summary>3. Encoder une ligne<span class="q">Une ligne de 16 pixels : 3 blancs, 2 noirs, puis 11 blancs. Écris son code RLE. Combien d'octets avant et après, avec notre format ?</span></summary>
+        <div>
+          <span>Code : <strong>3 blanc, 2 noir, 11 blanc</strong> (3 + 2 + 11 = 16, le compte est bon).</span>
+          <span>Avant : 16 × 3 = 48 octets. Après : 3 paquets × 4 = <strong>12 octets</strong>, quatre fois moins.</span>
+        </div>
+      </details>
+      <details>
+        <summary>4. Décoder<span class="q">Décode « 2 bleu, 5 jaune, 1 rouge ». Combien de pixels obtiens-tu ?</span></summary>
+        <div>
+          <span>bleu, bleu, jaune, jaune, jaune, jaune, jaune, rouge : <strong>8 pixels</strong>.</span>
+          <span>On retrouve exactement la ligne de départ : c'est sans perte.</span>
+        </div>
+      </details>
+      <details>
+        <summary>5. Le damier<span class="q">Pourquoi le RLE rend-il une ligne de damier (noir, blanc, noir, blanc…) plus lourde ?</span></summary>
+        <div>
+          <span>Aucun pixel n'a le même voisin : 16 paquets de « 1 » pixel. 16 × 4 = 64 octets, alors que la ligne brute prend 16 × 3 = 48 octets.</span>
+          <span>Le RLE n'aide que s'il y a de longues suites identiques.</span>
+        </div>
+      </details>
+      <details>
+        <summary>6. Une minute de vidéo<span class="q">Combien pèse une minute de vidéo HD (1 280 × 720) à 25 images par seconde, sans compression ?</span></summary>
+        <div>
+          <span>Une image : 1 280 × 720 × 3 = 2 764 800 octets.</span>
+          <span>Une seconde : × 25 = 69 120 000 octets. Une minute : × 60 = <strong>4 147 200 000 octets</strong>, environ 4,1 Go.</span>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• Une image numérique est une <strong>grille de pixels</strong> ; chaque pixel a une seule couleur.</span>
+      <span>• Une couleur d'écran = 3 nombres de 0 à 255 (<strong>rouge, vert, bleu</strong>), soit 3 octets ; on l'écrit souvent en hexadécimal, comme <span class="mono">#ff0000</span>.</span>
+      <span>• 256 × 256 × 256 = <strong>16 777 216</strong> couleurs possibles.</span>
+      <span>• Poids sans compression = <strong>largeur × hauteur × 3 octets</strong> : 4 000 × 3 000 → 36 Mo.</span>
+      <span>• Définition = nombre de pixels ; résolution = pixels par pouce. Zoomer n'ajoute pas de détails.</span>
+      <span>• Compression <strong>sans perte</strong> (RLE, PNG) : on retrouve l'image exacte. Elle marche bien s'il y a des répétitions.</span>
+      <span>• Compression <strong>avec perte</strong> (JPEG) : on enlève ce que l'œil remarque peu ; ce qui est perdu ne revient pas.</span>
+      <span>• Une vidéo = 25 ou 30 images par seconde : sans compression, plus de 11 Go par minute en Full HD.</span>
+    </div>
+  </section>
+
+  <!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"><a class="prev" href="les-octets-et-le-stockage.html"><span>← Précédent</span><strong>Les octets et le stockage</strong></a><a class="next" href="programmer-pas-a-pas.html"><span>Suivant →</span><strong>Programmer pas à pas</strong></a></div><a class="tnav-home" href="numerique.html">⌂ Tous les tutoriels numériques</a></nav><!--/tnav-->
+<footer>Fiche de révision · Les pixels et la compression</footer>
+</main>
+
+<script>
+(function () {
+  /*
+   * Hooks de test : window.__pix
+   *   rgbToHex(r, g, b)                -> "#rrggbb" (minuscules ; valeurs arrondies et bornées à 0–255)
+   *   hexToRgb(hex)                    -> [r, g, b] ou null
+   *   imageBytes(w, h, bytesPerPixel?) -> w × h × bytesPerPixel (défaut 3) ; null si entrée invalide
+   *   humanBytes(n)                    -> texte « 36 Mo », « 768 octets » (1 Ko = 1 000 octets)
+   *   rleEncode(row)                   -> [{n, c}] paquets de valeurs identiques consécutives (comparaison ===)
+   *   rleDecode(code)                  -> tableau de valeurs ; code = [{n, c}], [[n, c]] ou texte « 5 blanc, 3 rouge »
+   *                                       (dans le texte, les noms de la palette deviennent leurs indices)
+   *   rleText(runs)                    -> « 5 blanc, 3 rouge » (c = indice de palette)
+   *   rleImage(grid?)                  -> {rows: [[{n,c}]], runs, raw: 768, rle: runs × 4} (16 lignes de 16)
+   *   grid                             -> état de l'éditeur : tableau de 256 indices de palette (ligne par ligne)
+   *   palette                          -> [{id, name, hex}] ; setPixel(i, c), loadTemplate(nom), templates
+   *   lossy(quality 1–5)               -> {block, levels, bits, bytes, original: 12288, meanError}
+   *   videoBytes(w, h, fps, seconds, bytesPerPixel?) -> octets non compressés
+   *   frame(k), frameDiff(a, b)        -> image k de la balle (24 × 12) ; nombre de pixels différents
+   *   checkTarget(rgb, target, tol?)   -> true si chaque canal est à moins de tol (défaut 25)
+   *   quiz
+   * Rien n'est envoyé ni enregistré : tout reste dans la page.
+   */
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function fmtInt(n) { return String(Math.round(Math.abs(n))).replace(/\B(?=(\d{3})+(?!\d))/g, ' '); }
+  function fmtDec(x, d) {
+    var s = Math.abs(x).toFixed(d);
+    if (d > 0) s = s.replace(/\.?0+$/, '');
+    var p = s.split('.');
+    return fmtInt(Number(p[0])) + (p[1] ? ',' + p[1] : '');
+  }
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+  function humanBytes(n) {
+    if (typeof n !== 'number' || !isFinite(n) || n < 0) return '—';
+    if (n < 1000) return fmtInt(n) + (Math.round(n) <= 1 ? ' octet' : ' octets');
+    var units = ['Ko', 'Mo', 'Go', 'To'], k = -1, v = n;
+    while (v >= 1000 && k < units.length - 1) { v /= 1000; k++; }
+    var d = v < 10 ? 2 : (v < 100 ? 1 : 0);
+    if (Number(v.toFixed(d)) >= 1000 && k < units.length - 1) { v /= 1000; k++; d = 2; }
+    return fmtDec(v, d) + ' ' + units[k];
+  }
+
+  /* ---------- Couleurs ---------- */
+  function h2(v) { var s = clamp(Math.round(Number(v) || 0), 0, 255).toString(16); return s.length < 2 ? '0' + s : s; }
+  function rgbToHex(r, g, b) { return '#' + h2(r) + h2(g) + h2(b); }
+  function hexToRgb(hex) {
+    var m = /^#?([0-9a-f]{6})$/i.exec(String(hex).trim());
+    if (!m) return null;
+    var x = parseInt(m[1], 16);
+    return [(x >> 16) & 255, (x >> 8) & 255, x & 255];
+  }
+
+  var PAL = [
+    { id: 'w', name: 'blanc', hex: '#ffffff' },
+    { id: 'k', name: 'noir', hex: '#111111' },
+    { id: 'r', name: 'rouge', hex: '#e63946' },
+    { id: 'o', name: 'orange', hex: '#f4a020' },
+    { id: 'y', name: 'jaune', hex: '#ffd60a' },
+    { id: 'g', name: 'vert', hex: '#2fa84f' },
+    { id: 'c', name: 'bleu clair', hex: '#8ecae6' },
+    { id: 'b', name: 'bleu', hex: '#3a6fd8' },
+    { id: 'p', name: 'rose', hex: '#d946ef' },
+    { id: 'm', name: 'marron', hex: '#8d5524' }
+  ];
+  var PID = {}; PAL.forEach(function (p, k) { PID[p.id] = k; });
+  function nameIndex(name) {
+    var n = String(name).trim().toLowerCase();
+    for (var k = 0; k < PAL.length; k++) if (PAL[k].name === n) return k;
+    return n;
+  }
+
+  /* ---------- Modèles 16 × 16 ---------- */
+  var TPL = {
+    coeur: [
+      'wwwwwwwwwwwwwwww',
+      'wwwwwwwwwwwwwwww',
+      'wwwkkkwwwwkkkwww',
+      'wwkrrrkwwkrrrkww',
+      'wkrwwrrkkrrrrrkw',
+      'wkrwrrrrrrrrrrkw',
+      'wkrrrrrrrrrrrrkw',
+      'wkrrrrrrrrrrrrkw',
+      'wwkrrrrrrrrrrkww',
+      'wwwkrrrrrrrrkwww',
+      'wwwwkrrrrrrkwwww',
+      'wwwwwkrrrrkwwwww',
+      'wwwwwwkrrkwwwwww',
+      'wwwwwwwkkwwwwwww',
+      'wwwwwwwwwwwwwwww',
+      'wwwwwwwwwwwwwwww'
+    ],
+    maison: [
+      'cccccccccccccccc',
+      'cccccccccccyyccc',
+      'ccccccccccyyyycc',
+      'cccccccrcccyyccc',
+      'ccccccrrrccccccc',
+      'cccccrrrrrcccccc',
+      'ccccrrrrrrrccccc',
+      'cccrrrrrrrrrcccc',
+      'ccrrrrrrrrrrrccc',
+      'cccwwwwwwwwwcccc',
+      'cccwbbwwwbbwcccc',
+      'cccwbbwwwbbwcccc',
+      'cccwwwwmmwwwcccc',
+      'cccwwwwmmwwwcccc',
+      'gggggggggggggggg',
+      'gggggggggggggggg'
+    ]
+  };
+  function tplGrid(name) {
+    var out = [];
+    for (var i = 0; i < 256; i++) {
+      var r = Math.floor(i / 16), c = i % 16;
+      if (name === 'damier') out.push((r + c) % 2 ? PID.w : PID.k);
+      else if (TPL[name]) out.push(PID[TPL[name][r].charAt(c)]);
+      else out.push(PID.w);
+    }
+    return out;
+  }
+
+  /* ---------- Éditeur ---------- */
+  var grid = tplGrid('coeur');
+  var cur = PID.r;
+  var pg = $('pg'), cells = [];
+  for (var i = 0; i < 256; i++) { var cell = document.createElement('i'); pg.appendChild(cell); cells.push(cell); }
+  function renderCell(i) { cells[i].style.background = PAL[grid[i]].hex; }
+  function renderAll() { for (var i = 0; i < 256; i++) renderCell(i); }
+
+  var palEl = $('pal');
+  palEl.innerHTML = PAL.map(function (p, k) { return '<button type="button" data-c="' + k + '" aria-pressed="' + (k === cur) + '" aria-label="' + esc(p.name) + '" title="' + esc(p.name) + '" style="background:' + p.hex + '"></button>'; }).join('');
+  function setCur(k) {
+    cur = k;
+    Array.prototype.forEach.call(palEl.querySelectorAll('button'), function (b) { b.setAttribute('aria-pressed', String(Number(b.getAttribute('data-c')) === k)); });
+    $('curDot').style.background = PAL[k].hex;
+    $('curName').textContent = PAL[k].name + ' ' + PAL[k].hex;
+  }
+  palEl.addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) setCur(Number(b.getAttribute('data-c'))); });
+
+  function pixInfo(i) {
+    var p = PAL[grid[i]], rgb = hexToRgb(p.hex);
+    $('pgInfo').textContent = 'Ligne ' + (Math.floor(i / 16) + 1) + ', colonne ' + (i % 16 + 1) + ' : ' + p.name + ' = (' + rgb.join(', ') + ') = ' + p.hex;
+  }
+  function setPixel(i, c) {
+    i = Math.floor(Number(i)); c = Math.floor(Number(c));
+    if (!(i >= 0 && i < 256) || !(c >= 0 && c < PAL.length)) return false;
+    if (grid[i] === c) return false;
+    grid[i] = c; renderCell(i); return true;
+  }
+  function loadTemplate(name) {
+    var g = tplGrid(name);
+    for (var i = 0; i < 256; i++) grid[i] = g[i];
+    renderAll(); changed();
+    $('pgInfo').textContent = name === 'vide' ? 'Grille effacée : 256 pixels blancs.' : 'Modèle chargé : ' + ({ coeur: 'cœur', maison: 'maison', damier: 'damier' }[name] || name) + '.';
+  }
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-tpl]');
+    if (b) loadTemplate(b.getAttribute('data-tpl'));
+  });
+  $('lines').addEventListener('click', function () {
+    var on = this.getAttribute('aria-pressed') !== 'true';
+    this.setAttribute('aria-pressed', String(on));
+    pg.classList.toggle('nolines', !on);
+  });
+
+  var painting = false, last = -1;
+  function cellAt(e) {
+    var r = pg.getBoundingClientRect();
+    var w = pg.clientWidth || r.width, h = pg.clientHeight || r.height;
+    if (!w || !h) return -1;
+    var x = e.clientX - r.left - pg.clientLeft, y = e.clientY - r.top - pg.clientTop;
+    var c = clamp(Math.floor(x / w * 16), 0, 15), rr = clamp(Math.floor(y / h * 16), 0, 15);
+    return rr * 16 + c;
+  }
+  function paintTo(i) {
+    if (i < 0) return;
+    var any = false;
+    if (last >= 0 && last !== i) {
+      var r0 = Math.floor(last / 16), c0 = last % 16, r1 = Math.floor(i / 16), c1 = i % 16;
+      var n = Math.max(Math.abs(r1 - r0), Math.abs(c1 - c0));
+      for (var t = 1; t <= n; t++) {
+        var rr = Math.round(r0 + (r1 - r0) * t / n), cc = Math.round(c0 + (c1 - c0) * t / n);
+        if (setPixel(rr * 16 + cc, cur)) any = true;
+      }
+    } else if (setPixel(i, cur)) any = true;
+    last = i;
+    pixInfo(i);
+    if (any) changed();
+  }
+  pg.addEventListener('pointerdown', function (e) {
+    e.preventDefault();
+    painting = true; last = -1;
+    try { pg.setPointerCapture(e.pointerId); } catch (err) { /* rien */ }
+    paintTo(cellAt(e));
+  });
+  pg.addEventListener('pointermove', function (e) { if (painting) paintTo(cellAt(e)); });
+  function stop() { painting = false; last = -1; }
+  pg.addEventListener('pointerup', stop);
+  pg.addEventListener('pointercancel', stop);
+  pg.addEventListener('lostpointercapture', stop);
+
+  /* ---------- RLE ---------- */
+  function rleEncode(row) {
+    var out = [];
+    for (var i = 0; i < (row ? row.length : 0); i++) {
+      var lastRun = out[out.length - 1];
+      if (lastRun && lastRun.c === row[i]) lastRun.n++;
+      else out.push({ n: 1, c: row[i] });
+    }
+    return out;
+  }
+  function rleDecode(code) {
+    var runs = code;
+    if (typeof code === 'string') {
+      runs = code.split(',').map(function (part) {
+        var m = /^\s*(\d+)\s*(.+?)\s*$/.exec(part);
+        return m ? { n: Number(m[1]), c: nameIndex(m[2]) } : null;
+      }).filter(Boolean);
+    }
+    var out = [];
+    (Array.isArray(runs) ? runs : []).forEach(function (r) {
+      if (!r) return;
+      var n = Array.isArray(r) ? r[0] : r.n, c = Array.isArray(r) ? r[1] : r.c;
+      n = clamp(Math.floor(Number(n) || 0), 0, 100000);
+      for (var j = 0; j < n; j++) out.push(c);
+    });
+    return out;
+  }
+  function cname(c) { return PAL[c] ? PAL[c].name : String(c); }
+  function rleText(runs) { return runs.map(function (r) { return r.n + ' ' + cname(r.c); }).join(', '); }
+  function rleImage(g) {
+    g = g || grid;
+    var rows = [], total = 0;
+    for (var r = 0; r < 16; r++) { var e = rleEncode(g.slice(r * 16, r * 16 + 16)); rows.push(e); total += e.length; }
+    return { rows: rows, runs: total, raw: 256 * 3, rle: total * 4 };
+  }
+  function dotHtml(c) { return '<span class="dot" style="background:' + PAL[c].hex + '"></span>'; }
+
+  function updateRLE() {
+    var im = rleImage();
+    $('rleList').innerHTML = im.rows.map(function (row, r) {
+      return '<li id="rl' + r + '"><b>L' + (r + 1) + '</b> ' + row.map(function (x) { return dotHtml(x.c) + x.n + ' ' + esc(cname(x.c)); }).join(', ') + '</li>';
+    }).join('');
+    var mx = Math.max(im.raw, im.rle);
+    $('rleBars').innerHTML =
+      '<div class="bar-row"><span>Image brute</span><div class="bar raw" style="width:' + (im.raw / mx * 100) + '%"></div><span class="val">256 pixels × 3 octets = ' + fmtInt(im.raw) + ' octets</span></div>' +
+      '<div class="bar-row"><span>Code RLE</span><div class="bar" style="width:' + (im.rle / mx * 100) + '%"></div><span class="val">' + im.runs + ' paquets × 4 octets = ' + fmtInt(im.rle) + ' octets</span></div>';
+    var out = $('rleOut'), pct = Math.round(im.rle / im.raw * 100);
+    if (im.rle < im.raw) {
+      out.className = 'verdict yes';
+      out.innerHTML = 'Gagné : le code fait ' + pct + ' % de la taille de départ.<span>C’est ' + fmtDec(im.raw / im.rle, 1) + ' fois plus petit. Plus il y a de longues suites de la même couleur, mieux ça marche.</span>';
+    } else if (im.rle === im.raw) {
+      out.className = 'verdict mid';
+      out.innerHTML = 'Match nul : le code fait exactement la même taille.<span>Pas assez de répétitions pour gagner de la place.</span>';
+    } else {
+      out.className = 'verdict no';
+      out.innerHTML = 'Raté : le code est plus gros que l’image (' + pct + ' %) !<span>Trop de pixels différents de leur voisin : chaque paquet ne contient presque qu’un pixel, et coûte 4 octets au lieu de 3.</span>';
+    }
+  }
+
+  /* ---------- Décodeur pas à pas ---------- */
+  var dec = { flat: null, snap: null, pos: 0, px: 0, out: [] };
+  function drawGrid16(cv, arr) {
+    var ctx = cv && cv.getContext ? cv.getContext('2d') : null;
+    if (!ctx) return;
+    for (var i = 0; i < 256; i++) {
+      var r = Math.floor(i / 16), c = i % 16;
+      ctx.fillStyle = arr[i] >= 0 && PAL[arr[i]] ? PAL[arr[i]].hex : ((r + c) % 2 ? '#e5e7eb' : '#cbd0d8');
+      ctx.fillRect(c, r, 1, 1);
+    }
+  }
+  function decReset() {
+    dec.flat = null; dec.snap = null; dec.pos = 0; dec.px = 0; dec.out = [];
+    for (var i = 0; i < 256; i++) dec.out.push(-1);
+    drawGrid16($('decCv'), dec.out);
+    drawGrid16($('origCv'), grid);
+    $('decTxt').textContent = 'Le décodeur attend. Clique sur « Pas à pas » pour lire le premier paquet.';
+    $('decOut').className = 'verdict'; $('decOut').innerHTML = '';
+    $('decStep').disabled = false; $('decAll').disabled = false;
+    var now = document.querySelector('#rleList li.now'); if (now) now.classList.remove('now');
+  }
+  function decStart() {
+    if (dec.flat) return;
+    var im = rleImage();
+    dec.flat = [];
+    im.rows.forEach(function (row, r) { row.forEach(function (x) { dec.flat.push({ row: r, n: x.n, c: x.c }); }); });
+    dec.snap = grid.slice();
+  }
+  function decOne() {
+    decStart();
+    if (dec.pos >= dec.flat.length) return false;
+    var run = dec.flat[dec.pos];
+    for (var j = 0; j < run.n && dec.px < 256; j++) dec.out[dec.px++] = run.c;
+    dec.pos++;
+    $('decTxt').textContent = 'Paquet ' + dec.pos + ' sur ' + dec.flat.length + ' (ligne ' + (run.row + 1) + ') : « ' + run.n + ' ' + cname(run.c) + ' » → je peins ' + run.n + ' pixel' + (run.n > 1 ? 's' : '') + ' ' + cname(run.c) + '. Pixels remplis : ' + dec.px + ' / 256.';
+    var now = document.querySelector('#rleList li.now'); if (now) now.classList.remove('now');
+    var li = $('rl' + run.row); if (li) li.classList.add('now');
+    return true;
+  }
+  function decFinish() {
+    drawGrid16($('decCv'), dec.out);
+    if (dec.pos < dec.flat.length) return;
+    $('decStep').disabled = true; $('decAll').disabled = true;
+    var same = 0;
+    for (var i = 0; i < 256; i++) if (dec.out[i] === dec.snap[i]) same++;
+    var o = $('decOut');
+    if (same === 256) { o.className = 'verdict yes'; o.innerHTML = 'Identique, pixel pour pixel : 256 sur 256.<span>Le code seul suffit pour refaire exactement ton dessin. C’est ça, une compression sans perte.</span>'; }
+    else { o.className = 'verdict no'; o.innerHTML = same + ' pixels sur 256 identiques.<span>Le dessin a changé pendant le décodage : clique sur « Recommencer ».</span>'; }
+  }
+  $('decStep').addEventListener('click', function () { decOne(); decFinish(); });
+  $('decAll').addEventListener('click', function () { while (decOne()) { /* suite */ } decFinish(); });
+  $('decReset').addEventListener('click', decReset);
+
+  function changed() { updateRLE(); decReset(); }
+
+  /* ---------- RVB ---------- */
+  var sR = $('sR'), sG = $('sG'), sB = $('sB');
+  function colorName(r, g, b) {
+    var mx = Math.max(r, g, b), mn = Math.min(r, g, b);
+    if (mx < 40) return 'presque noir';
+    if (mn > 220) return 'presque blanc';
+    if (mx - mn < 25) return 'un gris';
+    return '';
+  }
+  function updRGB() {
+    var r = Number(sR.value), g = Number(sG.value), b = Number(sB.value), hx = rgbToHex(r, g, b);
+    $('vR').textContent = r; $('vG').textContent = g; $('vB').textContent = b;
+    $('sw').style.background = hx; $('youSw').style.background = hx;
+    $('hex').textContent = hx;
+    var nm = colorName(r, g, b);
+    $('rgbTxt').innerHTML = 'Rouge ' + r + ' → <span class="mono">' + hx.slice(1, 3) + '</span>, vert ' + g + ' → <span class="mono">' + hx.slice(3, 5) + '</span>, bleu ' + b + ' → <span class="mono">' + hx.slice(5, 7) + '</span>. ' + (nm ? 'Résultat : ' + nm + '. ' : '') + 'En binaire, ce pixel s’écrit avec 24 chiffres 0 ou 1.';
+  }
+  [sR, sG, sB].forEach(function (s) { s.addEventListener('input', updRGB); });
+  $('rgbPresets').addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    var v = b.getAttribute('data-rgb').split(',');
+    sR.value = v[0]; sG.value = v[1]; sB.value = v[2]; updRGB();
+  });
+
+  var TARGETS = [
+    { name: 'jaune', rgb: [255, 255, 0] },
+    { name: 'orange', rgb: [255, 140, 0] },
+    { name: 'cyan', rgb: [0, 255, 255] },
+    { name: 'violet', rgb: [128, 0, 255] },
+    { name: 'gris clair', rgb: [200, 200, 200] },
+    { name: 'vert forêt', rgb: [30, 110, 40] },
+    { name: 'marron', rgb: [140, 70, 20] },
+    { name: 'rose bonbon', rgb: [255, 120, 200] }
+  ];
+  var tIdx = 0;
+  function checkTarget(rgb, target, tol) {
+    tol = tol == null ? 25 : tol;
+    for (var k = 0; k < 3; k++) if (Math.abs(Number(rgb[k]) - target[k]) >= tol) return false;
+    return true;
+  }
+  function setTarget(k) {
+    tIdx = ((k % TARGETS.length) + TARGETS.length) % TARGETS.length;
+    var t = TARGETS[tIdx];
+    $('tgtSw').style.background = rgbToHex(t.rgb[0], t.rgb[1], t.rgb[2]);
+    $('tgtName').textContent = t.name;
+    $('tgtOut').className = 'verdict'; $('tgtOut').innerHTML = '';
+  }
+  $('tgtNew').addEventListener('click', function () { setTarget(tIdx + 1 + Math.floor(Math.random() * (TARGETS.length - 1))); });
+  $('tgtCheck').addEventListener('click', function () {
+    var t = TARGETS[tIdx].rgb, me = [Number(sR.value), Number(sG.value), Number(sB.value)];
+    var o = $('tgtOut');
+    if (checkTarget(me, t)) { o.className = 'verdict yes'; o.innerHTML = 'Bravo, c’est presque la même couleur !<span>La couleur exacte : (' + t.join(', ') + ') = ' + rgbToHex(t[0], t[1], t[2]) + '.</span>'; return; }
+    var names = ['rouge', 'vert', 'bleu'], tips = [];
+    for (var k = 0; k < 3; k++) {
+      var d = t[k] - me[k];
+      if (Math.abs(d) >= 25) tips.push((d > 0 ? 'plus de ' : 'moins de ') + names[k] + (Math.abs(d) > 100 ? ' (beaucoup)' : ''));
+    }
+    o.className = 'verdict mid'; o.innerHTML = 'Pas encore.<span>Indice : ' + tips.join(', ') + '.</span>';
+  });
+  $('tgtSol').addEventListener('click', function () {
+    var t = TARGETS[tIdx].rgb;
+    sR.value = t[0]; sG.value = t[1]; sB.value = t[2]; updRGB();
+    $('tgtOut').className = 'verdict mid';
+    $('tgtOut').innerHTML = 'Solution : rouge ' + t[0] + ', vert ' + t[1] + ', bleu ' + t[2] + '.<span>Code : ' + rgbToHex(t[0], t[1], t[2]) + '. Essaie le défi suivant sans regarder !</span>';
+  });
+
+  /* ---------- Poids d'une image ---------- */
+  function imageBytes(w, h, bpp) {
+    w = Number(w); h = Number(h); bpp = bpp == null ? 3 : Number(bpp);
+    if (!isFinite(w) || !isFinite(h) || !isFinite(bpp) || w <= 0 || h <= 0 || bpp <= 0) return null;
+    return Math.round(w) * Math.round(h) * bpp;
+  }
+  function updSize() {
+    var wv = $('szW').value, hv = $('szH').value, bpp = Number($('szB').value);
+    var w = Math.floor(Number(wv)), h = Math.floor(Number(hv)), out = $('szOut');
+    if (wv === '' || hv === '' || !isFinite(w) || !isFinite(h) || w < 1 || h < 1 || w > 20000 || h > 20000) {
+      out.innerHTML = '<span>Entre une largeur et une hauteur entières entre 1 et 20 000 pixels.</span>'; return;
+    }
+    var px = w * h, bytes = imageBytes(w, h, bpp);
+    var mp = px >= 100000 ? ' (' + fmtDec(px / 1e6, 1) + ' mégapixel' + (px >= 2e6 ? 's' : '') + ')' : '';
+    out.innerHTML = '<span>' + fmtInt(w) + ' × ' + fmtInt(h) + ' = ' + fmtInt(px) + ' pixels' + mp + '</span>' +
+      '<span>' + fmtInt(px) + ' × ' + bpp + ' octet' + (bpp > 1 ? 's' : '') + ' = <b>' + fmtInt(bytes) + ' octets</b></span>' +
+      (bytes >= 1000 ? '<span>soit environ <b>' + humanBytes(bytes) + '</b>, sans compression</span>' : '<span>tout petit : moins de 1 Ko</span>');
+  }
+  ['szW', 'szH'].forEach(function (id) { $(id).addEventListener('input', updSize); });
+  $('szB').addEventListener('change', updSize);
+  $('szPresets').addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    $('szW').value = b.getAttribute('data-w'); $('szH').value = b.getAttribute('data-h'); updSize();
+  });
+
+  /* ---------- Paysage (images de démonstration) ---------- */
+  function sstep(e0, e1, x) { var t = clamp((x - e0) / (e1 - e0), 0, 1); return t * t * (3 - 2 * t); }
+  function mix(a, b, t) { return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t]; }
+  function noise(x, y) { var s = Math.sin(x * 12.9898 + y * 78.233) * 43758.5453; return s - Math.floor(s); }
+  function segDist(px, py, ax, ay, bx, by) {
+    var dx = bx - ax, dy = by - ay, t = clamp(((px - ax) * dx + (py - ay) * dy) / (dx * dx + dy * dy), 0, 1);
+    var qx = ax + t * dx - px, qy = ay + t * dy - py; return Math.sqrt(qx * qx + qy * qy);
+  }
+  function scenePixel(x, y, N) {
+    var u = (x + 0.5) / N, v = (y + 0.5) / N, px = 1 / N;
+    var col = mix([96, 165, 250], [253, 230, 138], clamp(v / 0.65, 0, 1));
+    var d = Math.sqrt((u - 0.72) * (u - 0.72) + (v - 0.3) * (v - 0.3));
+    col = mix(col, mix([255, 236, 150], [251, 176, 36], clamp(d / 0.12, 0, 1)), sstep(0.12 + px * 0.7, 0.12 - px * 0.7, d));
+    var h2y = 0.58 + 0.05 * Math.sin(u * 4 + 3);
+    col = mix(col, [110, 200, 120], sstep(h2y - px * 0.7, h2y + px * 0.7, v));
+    var hy = 0.68 + 0.06 * Math.sin(u * 7 + 1);
+    var g = mix([60, 170, 80], [22, 100, 45], clamp((v - hy) / 0.3, 0, 1));
+    var nz = (noise(x, y) - 0.5) * 22;
+    g = [g[0] + nz, g[1] + nz, g[2] + nz];
+    col = mix(col, g, sstep(hy - px * 0.7, hy + px * 0.7, v));
+    var sd = segDist(u, v, 0.28, 0.38, 0.44, 0.8);
+    col = mix(col, [55, 65, 81], sstep(0.006 + px * 0.6, 0.006 - px * 0.6, sd) * (v < hy ? 1 : 0));
+    var k = Math.abs(u - 0.28) / 0.07 + Math.abs(v - 0.28) / 0.1;
+    var kc = (u < 0.28) === (v < 0.28) ? [217, 70, 239] : [162, 28, 175];
+    col = mix(col, kc, sstep(1 + px * 12, 1 - px * 12, k));
+    return [clamp(Math.round(col[0]), 0, 255), clamp(Math.round(col[1]), 0, 255), clamp(Math.round(col[2]), 0, 255)];
+  }
+  function makeScene(N) {
+    var a = new Uint8ClampedArray(N * N * 4);
+    for (var y = 0; y < N; y++) for (var x = 0; x < N; x++) {
+      var p = scenePixel(x, y, N), o = (y * N + x) * 4;
+      a[o] = p[0]; a[o + 1] = p[1]; a[o + 2] = p[2]; a[o + 3] = 255;
+    }
+    return a;
+  }
+  function putData(cv, data, N) {
+    var ctx = cv && cv.getContext ? cv.getContext('2d') : null;
+    if (!ctx || typeof ImageData === 'undefined') return;
+    ctx.putImageData(new ImageData(new Uint8ClampedArray(data), N, N), 0, 0);
+  }
+
+  /* ---------- Zoom ---------- */
+  var ZN = 128, ZOOMS = [1, 2, 4, 8, 16], zData = makeScene(ZN), zSrc = document.createElement('canvas');
+  zSrc.width = ZN; zSrc.height = ZN; putData(zSrc, zData, ZN);
+  var ZC = [28, 36];
+  function updZoom() {
+    var z = ZOOMS[clamp(Number($('zm').value) || 0, 0, 4)], sw = ZN / z;
+    var sx = clamp(Math.round(ZC[0] - sw / 2), 0, ZN - sw), sy = clamp(Math.round(ZC[1] - sw / 2), 0, ZN - sw);
+    $('zmV').textContent = '× ' + z;
+    var cv = $('zmCv'), ctx = cv.getContext ? cv.getContext('2d') : null;
+    if (ctx) {
+      ctx.imageSmoothingEnabled = false;
+      ctx.clearRect(0, 0, 384, 384);
+      ctx.drawImage(zSrc, sx, sy, sw, sw, 0, 0, 384, 384);
+      var cs = 384 / sw;
+      if (cs >= 16) {
+        ctx.strokeStyle = 'rgba(0,0,0,.25)'; ctx.lineWidth = 1; ctx.beginPath();
+        for (var k = 1; k < sw; k++) { var q = Math.round(k * cs) + 0.5; ctx.moveTo(q, 0); ctx.lineTo(q, 384); ctx.moveTo(0, q); ctx.lineTo(384, q); }
+        ctx.stroke();
+      }
+    }
+    var cx = sx + Math.floor(sw / 2), cy = sy + Math.floor(sw / 2), o = (cy * ZN + cx) * 4;
+    var hx = rgbToHex(zData[o], zData[o + 1], zData[o + 2]);
+    $('zmOut').innerHTML = z === 1
+      ? 'Image entière : ' + ZN + ' × ' + ZN + ' = ' + fmtInt(ZN * ZN) + ' pixels. Les bords ont l’air lisses.'
+      : 'Tu vois ' + sw + ' × ' + sw + ' = ' + fmtInt(sw * sw) + ' pixels, chacun agrandi ' + z + ' fois. Le bord du cerf-volant devient un escalier de carrés. Un pixel du milieu : (' + zData[o] + ', ' + zData[o + 1] + ', ' + zData[o + 2] + ') = <span class="mono">' + hx + '</span>.';
+  }
+  $('zm').addEventListener('input', updZoom);
+
+  /* ---------- Compression avec perte ---------- */
+  var LN = 64, lData = makeScene(LN);
+  var LQ = { 1: { b: 8, L: 4 }, 2: { b: 4, L: 8 }, 3: { b: 2, L: 16 }, 4: { b: 1, L: 32 }, 5: { b: 1, L: 256 } };
+  function quantize(v, L) { if (L >= 256) return v; var s = 255 / (L - 1); return Math.round(Math.round(v / s) * s); }
+  function lossyData(q) {
+    var P = LQ[clamp(Math.round(Number(q) || 5), 1, 5)], b = P.b, out = new Uint8ClampedArray(lData.length), err = 0;
+    for (var by = 0; by < LN; by += b) for (var bx = 0; bx < LN; bx += b) {
+      var s = [0, 0, 0];
+      for (var y = by; y < by + b; y++) for (var x = bx; x < bx + b; x++) { var o = (y * LN + x) * 4; s[0] += lData[o]; s[1] += lData[o + 1]; s[2] += lData[o + 2]; }
+      var m = [quantize(Math.round(s[0] / (b * b)), P.L), quantize(Math.round(s[1] / (b * b)), P.L), quantize(Math.round(s[2] / (b * b)), P.L)];
+      for (y = by; y < by + b; y++) for (x = bx; x < bx + b; x++) {
+        o = (y * LN + x) * 4;
+        for (var c = 0; c < 3; c++) { out[o + c] = m[c]; err += Math.abs(m[c] - lData[o + c]); }
+        out[o + 3] = 255;
+      }
+    }
+    var bits = Math.round(Math.log(P.L) / Math.LN2), blocks = (LN / b) * (LN / b);
+    return { data: out, block: b, levels: P.L, bits: bits, bytes: Math.ceil(blocks * 3 * bits / 8), original: LN * LN * 3, meanError: err / (LN * LN * 3) };
+  }
+  function lossy(q) { var r = lossyData(q); return { block: r.block, levels: r.levels, bits: r.bits, bytes: r.bytes, original: r.original, meanError: r.meanError }; }
+  putData($('lqOrig'), lData, LN);
+  function updLossy() {
+    var q = clamp(Number($('lq').value) || 5, 1, 5), r = lossyData(q);
+    putData($('lqCv'), r.data, LN);
+    $('lqV').textContent = q;
+    $('lqBlock').textContent = r.block + ' × ' + r.block;
+    $('lqLev').textContent = r.levels + ' (' + r.bits + ' bits)';
+    $('lqBytes').textContent = fmtInt(r.bytes) + ' octets';
+    $('lqErr').textContent = fmtDec(r.meanError, 1) + ' / 255';
+    var pct = r.bytes / r.original * 100;
+    var msgs = {
+      5: 'Qualité maximale : aucune perte, ' + fmtInt(r.original) + ' octets (64 × 64 × 3).',
+      4: 'Moins de nuances : presque aucune différence à l’œil, et déjà ' + fmtDec(pct, 0) + ' % du poids.',
+      3: 'Blocs de 2 × 2 : regarde le fil du cerf-volant, il devient un peu flou. Seulement ' + fmtDec(pct, 1) + ' % du poids.',
+      2: 'Blocs de 4 × 4 : les détails fins disparaissent, le ciel fait des marches. ' + fmtDec(pct, 1) + ' % du poids.',
+      1: 'Blocs de 8 × 8 et 4 nuances : on devine encore le paysage, mais c’est très abîmé. ' + fmtDec(pct, 1) + ' % du poids.'
+    };
+    $('lqOut').textContent = msgs[q];
+  }
+  $('lq').addEventListener('input', updLossy);
+
+  /* ---------- Vidéo ---------- */
+  function videoBytes(w, h, fps, seconds, bpp) {
+    var one = imageBytes(w, h, bpp == null ? 3 : bpp);
+    fps = Number(fps); seconds = Number(seconds);
+    if (one == null || !isFinite(fps) || !isFinite(seconds) || fps <= 0 || seconds < 0) return null;
+    return one * fps * seconds;
+  }
+  var fps = 30;
+  function updVideo() {
+    var d = $('vdDef').value.split('x'), w = Number(d[0]), h = Number(d[1]);
+    var min = clamp(Math.round(Number($('vdMin').value) || 1), 1, 120);
+    $('vdMinV').textContent = min + (min > 1 ? ' minutes' : ' minute');
+    var one = imageBytes(w, h, 3), sec = one * fps, tot = videoBytes(w, h, fps, min * 60, 3);
+    $('vdOut').innerHTML = '<span>Une image : ' + fmtInt(w) + ' × ' + fmtInt(h) + ' × 3 = ' + fmtInt(one) + ' octets (' + humanBytes(one) + ')</span>' +
+      '<span>Une seconde : × ' + fps + ' images = ' + fmtInt(sec) + ' octets (' + humanBytes(sec) + ')</span>' +
+      '<span>' + min + (min > 1 ? ' minutes' : ' minute') + ' : × ' + fmtInt(min * 60) + ' secondes = <b>' + humanBytes(tot) + '</b> sans compression</span>';
+  }
+  $('vdDef').addEventListener('change', updVideo);
+  $('vdMin').addEventListener('input', updVideo);
+  $('vdFps').addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    fps = Number(b.getAttribute('data-fps'));
+    Array.prototype.forEach.call(this.querySelectorAll('button'), function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+    updVideo();
+  });
+
+  /* ---------- Images successives ---------- */
+  var FW = 24, FH = 12, FMAX = 19, FCOL = ['#9bd3ff', '#e63946', '#2fa84f'];
+  function frame(k) {
+    var out = [];
+    for (var y = 0; y < FH; y++) for (var x = 0; x < FW; x++) {
+      var v = y >= 10 ? 2 : 0;
+      if (x >= 1 + k && x <= 3 + k && y >= 6 && y <= 8) v = 1;
+      out.push(v);
+    }
+    return out;
+  }
+  function frameDiff(a, b) { var n = 0; for (var i = 0; i < a.length; i++) if (a[i] !== b[i]) n++; return n; }
+  var fk = 0, fShowDiff = false;
+  function drawFrame() {
+    var cv = $('frCv'), ctx = cv.getContext ? cv.getContext('2d') : null, f = frame(fk), p = fk > 0 ? frame(fk - 1) : null;
+    if (ctx) for (var i = 0; i < f.length; i++) {
+      var changedPx = !p || p[i] !== f[i];
+      ctx.fillStyle = fShowDiff && !changedPx ? '#d1d5db' : FCOL[f[i]];
+      ctx.fillRect(i % FW, Math.floor(i / FW), 1, 1);
+    }
+    var tot = FW * FH;
+    if (!p) $('frOut').innerHTML = 'Image 1 : c’est la première, il faut tout envoyer, <strong>' + tot + ' pixels</strong>.';
+    else {
+      var n = frameDiff(p, f);
+      $('frOut').innerHTML = 'Image ' + (fk + 1) + ' : seulement <strong>' + n + ' pixels sur ' + tot + '</strong> ont changé (environ ' + fmtDec(n / tot * 100, 0) + ' %). On envoie juste ces ' + n + ' pixels, au lieu de toute l’image.' + (fShowDiff ? ' En gris : ce qui ne bouge pas.' : '');
+    }
+    $('frNext').disabled = fk >= FMAX;
+  }
+  $('frNext').addEventListener('click', function () { if (fk < FMAX) { fk++; drawFrame(); } });
+  $('frReset').addEventListener('click', function () { fk = 0; drawFrame(); });
+  $('frDiff').addEventListener('click', function () { fShowDiff = !fShowDiff; this.setAttribute('aria-pressed', String(fShowDiff)); drawFrame(); });
+
+  /* ---------- Quiz ---------- */
+  var QZ = [
+    { q: 'Avec 3 nombres de 0 à 255 (rouge, vert, bleu), combien de couleurs possibles ?', o: [['a', '3 × 256 = 768'], ['b', '256³ = 16 777 216'], ['c', '255 + 255 + 255 = 765']], a: 'b', how: '256 choix pour le rouge, 256 pour le vert, 256 pour le bleu : on multiplie, 256 × 256 × 256.' },
+    { q: 'Quelle couleur donne le code #ff0000 ?', o: [['a', 'rouge'], ['b', 'vert'], ['c', 'noir']], a: 'a', how: 'ff = 255 pour le rouge, 00 pour le vert et le bleu : rouge à fond, le reste éteint.' },
+    { q: 'Combien pèse, sans compression, une image en couleurs de 100 × 100 pixels ?', o: [['a', '300 octets'], ['b', '10 000 octets'], ['c', '30 000 octets']], a: 'c', how: '100 × 100 = 10 000 pixels, × 3 octets = 30 000 octets.' },
+    { q: 'Le code « 4 blanc, 2 noir, 4 blanc » donne combien de pixels ?', o: [['a', '3'], ['b', '10'], ['c', '6']], a: 'b', how: '4 + 2 + 4 = 10 pixels.' },
+    { q: 'Une compression « sans perte », c’est…', o: [['a', 'on retrouve exactement l’image de départ'], ['b', 'une image un peu floue mais légère'], ['c', 'on enlève les pixels blancs']], a: 'a', how: 'Comme le RLE ou le PNG : en décodant, on retrouve chaque pixel à l’identique.' },
+    { q: 'Pour quelle image le RLE marche-t-il le mieux ?', o: [['a', 'un damier noir et blanc'], ['b', 'une photo de forêt'], ['c', 'un drapeau à grandes bandes de couleur']], a: 'c', how: 'De longues suites de pixels identiques : peu de paquets. Le damier et la photo changent presque à chaque pixel.' },
+    { q: 'Que fait surtout la compression JPEG ?', o: [['a', 'elle enlève les détails fins que l’œil remarque peu'], ['b', 'elle supprime une ligne sur deux'], ['c', 'elle transforme la photo en noir et blanc']], a: 'a', how: 'Elle garde les grandes formes et la luminosité, et simplifie les détails fins et les couleurs.' },
+    { q: 'Une vidéo à 25 images par seconde dure 10 secondes. Combien d’images ?', o: [['a', '35'], ['b', '250'], ['c', '2,5']], a: 'b', how: '25 images × 10 secondes = 250 images.' }
+  ];
+  var quiz = $('quiz'), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ''; done = [];
+    QZ.forEach(function (Q, k) {
+      var li = document.createElement('li');
+      li.innerHTML = '<span>' + esc(Q.q) + '</span><select id="qa' + k + '" aria-label="Ta réponse à la question ' + (k + 1) + '"><option value="">…</option>' + Q.o.map(function (o) { return '<option value="' + o[0] + '">' + esc(o[1]) + '</option>'; }).join('') + '</select><button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+      quiz.appendChild(li);
+      function check() {
+        var fb = $('qf' + k), v = $('qa' + k).value;
+        if (!v) { fb.className = 'fb'; fb.textContent = 'Choisis une réponse.'; return; }
+        if (v === Q.a) { fb.className = 'fb ok'; fb.innerHTML = 'Bravo, c’est juste !<span>' + esc(Q.how) + '</span>'; done[k] = true; }
+        else {
+          done[k] = false;
+          var good = Q.o.filter(function (o) { return o[0] === Q.a; })[0][1];
+          fb.className = 'fb no'; fb.innerHTML = 'Pas tout à fait : la bonne réponse est « ' + esc(good) + ' ».<span>' + esc(Q.how) + '</span>';
+        }
+        $('score').textContent = done.filter(Boolean).length + ' / 8';
+      }
+      $('qb' + k).addEventListener('click', check);
+      $('qa' + k).addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+    });
+    $('score').textContent = '0 / 8';
+  }
+  $('newQuiz').addEventListener('click', newQuiz);
+
+  /* ---------- Démarrage ---------- */
+  renderAll(); setCur(cur); changed();
+  $('pgInfo').textContent = 'Modèle chargé : cœur. Choisis une couleur et peins !';
+  updRGB(); setTarget(0); updSize(); updZoom(); updLossy(); updVideo(); drawFrame(); newQuiz();
+
+  window.__pix = {
+    rgbToHex: rgbToHex, hexToRgb: hexToRgb, imageBytes: imageBytes, humanBytes: humanBytes,
+    rleEncode: rleEncode, rleDecode: rleDecode, rleText: rleText, rleImage: rleImage,
+    grid: grid, palette: PAL, setPixel: function (i, c) { var ok = setPixel(i, c); if (ok) changed(); return ok; },
+    loadTemplate: loadTemplate, templates: TPL,
+    lossy: lossy, videoBytes: videoBytes, frame: frame, frameDiff: frameDiff, checkTarget: checkTarget, quiz: QZ
+  };
+})();
+</script>
+</body>
+</html>

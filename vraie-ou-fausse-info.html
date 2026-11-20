@@ -1,0 +1,1136 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vraie ou fausse info ?</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, marge rouge. Accent jaune moutarde (#ca8a04) pour les surfaces et les bordures ; le texte « accent » utilise une encre plus foncée (--acc-ink) pour rester bien lisible. Rouge pour la rumeur, vert pour ce qui est vérifié, bleu pour ceux qui vérifient. Tous les noms, comptes, sites et produits des exemples sont inventés (domaines en .exemple). */
+:root {
+  --paper: #faf8f2;
+  --grid: #ece6d3;
+  --card: #ffffff;
+  --ink: #26210f;
+  --ink-soft: #625a40;
+  --acc: #ca8a04;
+  --acc-ink: #854d0e;
+  --acc-soft: #fbf0c9;
+  --warn: #d97706;
+  --warn-soft: #fdf0d6;
+  --warn-ink: #92400e;
+  --two: #1c64c8;
+  --two-soft: #dbe8fa;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #fff0a3;
+  --line: #e4dcc4;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #15130c; --grid: #24200f; --card: #1d1a10; --ink: #f5f0dc; --ink-soft: #c7bd9a;
+    --acc: #eab308; --acc-ink: #fcd34d; --acc-soft: #3a300c; --warn: #f5a524; --warn-soft: #3d2a0c; --warn-ink: #fbbf5a;
+    --two: #7fb0ff; --two-soft: #1a2a45;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #3a3420;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #15130c; --grid: #24200f; --card: #1d1a10; --ink: #f5f0dc; --ink-soft: #c7bd9a;
+  --acc: #eab308; --acc-ink: #fcd34d; --acc-soft: #3a300c; --warn: #f5a524; --warn-soft: #3d2a0c; --warn-ink: #fbbf5a;
+  --two: #7fb0ff; --two-soft: #1a2a45;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #3a3420;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--acc-ink); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note.warn { border-left-color: var(--warn); background: var(--warn-soft); }
+.note.ok { border-left-color: var(--ok); background: var(--ok-soft); }
+.note.two { border-left-color: var(--two); background: var(--two-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+.fig svg { width: 100%; height: auto; display: block; }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 8px 12px; min-height: 44px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button[aria-pressed="true"] { background: var(--acc-ink); color: var(--paper); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+button:disabled { opacity: .45; cursor: not-allowed; transform: none; box-shadow: 3px 3px 0 var(--ink); }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+input[type="range"] { width: 100%; accent-color: var(--acc); min-height: 32px; }
+select { font: inherit; font-size: 1rem; padding: 8px 8px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; }
+.param { display: flex; flex-direction: column; gap: 2px; }
+.param label { font-weight: 700; }
+.params { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px 18px; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
+.tag.ok { color: var(--ok); }
+.tag.no { color: var(--red); }
+.tag.acc { color: var(--acc-ink); }
+.tag.warn { color: var(--warn-ink); }
+.tag.two { color: var(--two); }
+
+.verdict { border-radius: 8px; padding: 12px 14px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+.verdict:empty { display: none; }
+.verdict.yes { background: var(--ok-soft); color: var(--ok); }
+.verdict.no { background: var(--red-soft); color: var(--red); }
+.verdict.mid { background: var(--warn-soft); color: var(--warn-ink); }
+.verdict span { font-weight: 400; color: var(--ink); }
+
+/* Tri */
+.sort-list { display: flex; flex-direction: column; gap: 12px; }
+.sort-item { border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; background: var(--paper); display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.sort-item.good { border-color: var(--ok); border-width: 2.5px; }
+.sort-item.bad { border-color: var(--red); border-width: 2.5px; }
+.sort-src { font-family: var(--f-mono); font-size: .8rem; color: var(--ink-soft); overflow-wrap: anywhere; }
+.sort-txt { font-weight: 700; overflow-wrap: anywhere; }
+.sort-btns { display: flex; flex-wrap: wrap; gap: 6px; }
+.sort-btns button { flex: 1 1 96px; box-shadow: none; border-width: 1.5px; padding: 6px 8px; font-size: .95rem; }
+.sort-btns button:hover { transform: none; box-shadow: none; background: var(--acc-soft); }
+.sort-btns button[aria-pressed="true"]:hover { background: var(--acc-ink); }
+.sort-fb { font-size: .95rem; }
+.sort-fb:empty { display: none; }
+.sort-fb.ok { color: var(--ok); }
+.sort-fb.no { color: var(--red); }
+.sort-fb span { color: var(--ink); }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc-ink); }
+.bar-top { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between; }
+
+/* Simulation */
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: .92rem; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.dot { width: 14px; height: 14px; border-radius: 50%; display: inline-block; border: 2px solid var(--ink-soft); flex: none; }
+.stack { display: flex; height: 26px; border: 1.5px solid var(--ink); border-radius: 6px; overflow: hidden; }
+.stack i { display: block; height: 100%; }
+.tbl { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: .92rem; }
+.tbl th, .tbl td { border: 1.5px solid var(--line); padding: 5px 7px; text-align: center; }
+.tbl th { font-family: var(--f-display); background: var(--paper); }
+.scroll { overflow-x: auto; }
+
+/* Enquête */
+.inv-tabs button { flex: 1 1 120px; font-size: .95rem; }
+.post { border: 1.5px solid var(--ink); border-radius: 12px; padding: 14px; background: var(--paper); display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.post-head { display: flex; gap: 10px; align-items: center; min-width: 0; }
+.avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--acc-soft); border: 2px solid var(--acc); display: grid; place-items: center; font-family: var(--f-display); font-weight: 800; color: var(--acc-ink); flex: none; }
+.post-who { display: flex; flex-direction: column; min-width: 0; }
+.post-who strong { font-family: var(--f-display); overflow-wrap: anywhere; }
+.post-who span { font-family: var(--f-mono); font-size: .8rem; color: var(--ink-soft); overflow-wrap: anywhere; }
+.post-title { font-family: var(--f-display); font-weight: 800; font-size: 1.15rem; overflow-wrap: anywhere; }
+.post-img { border: 1.5px dashed var(--ink-soft); border-radius: 8px; padding: 8px 10px; font-size: .9rem; color: var(--ink-soft); font-style: italic; }
+.tools { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
+.tools button { font-size: .95rem; box-shadow: none; border-width: 1.5px; text-align: left; }
+.tools button:hover { transform: none; box-shadow: none; background: var(--acc-soft); }
+.tools button.used { border-color: var(--acc); background: var(--acc-soft); color: var(--ink); }
+.clue-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.clue-list li { border-left: 4px solid var(--warn); background: var(--card); border-radius: 0 8px 8px 0; padding: 6px 10px; font-size: .95rem; overflow-wrap: anywhere; }
+.clue-list li.bad { border-left-color: var(--red); }
+.clue-list li.ok { border-left-color: var(--ok); }
+.clue-list strong { font-family: var(--f-display); }
+.big-choice button { flex: 1 1 150px; }
+
+/* Contexte */
+.post-cap { font-family: var(--f-display); font-weight: 700; border-radius: 8px; padding: 8px 12px; background: var(--red-soft); color: var(--ink); }
+.post-cap.ok { background: var(--ok-soft); }
+.post-cap.mid { background: var(--warn-soft); }
+.frame { border: 2px solid var(--ink); border-radius: 10px; overflow: hidden; background: var(--paper); }
+.frame svg { width: 100%; height: auto; display: block; }
+
+/* Scénarios */
+.steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; counter-reset: st; }
+.steps li { counter-increment: st; display: grid; grid-template-columns: 34px 1fr; gap: 10px; align-items: start; border: 1.5px solid var(--line); border-radius: 10px; padding: 8px 10px; background: var(--card); }
+.steps li::before { content: counter(st); width: 30px; height: 30px; border-radius: 50%; background: var(--acc-ink); color: var(--paper); display: grid; place-items: center; font-family: var(--f-display); font-weight: 800; }
+.bubble { background: var(--paper); border: 1.5px solid var(--line); border-radius: 14px 14px 14px 4px; padding: 12px 14px; overflow-wrap: anywhere; }
+.choices { display: flex; flex-direction: column; gap: 8px; }
+.choices button { text-align: left; font-family: var(--f-body); font-weight: 700; }
+
+/* Check-list */
+.check { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; counter-reset: ck; }
+.check li { counter-increment: ck; display: grid; grid-template-columns: 30px 1fr; gap: 8px; align-items: start; }
+.check li::before { content: counter(ck); width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--acc); color: var(--acc-ink); display: grid; place-items: center; font-family: var(--f-display); font-weight: 800; font-size: .9rem; }
+.timer { font-family: var(--f-display); font-weight: 800; font-size: 2rem; color: var(--acc-ink); min-width: 3ch; text-align: center; }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 220px auto; gap: 10px; align-items: center; }
+.quiz li > span:first-child { min-width: 0; overflow-wrap: anywhere; }
+.quiz select { font-size: .95rem; padding: 6px 6px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb:empty { display: none; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 150px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--acc-ink); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--acc-ink); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); }
+details .msg { display: block; margin-top: 8px; font-weight: 400; font-family: var(--f-mono); font-size: .9rem; background: var(--paper); border: 1.5px dashed var(--line); border-radius: 8px; padding: 8px 10px; overflow-wrap: anywhere; color: var(--ink); }
+details ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+<!--ticons--><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Tutoriels"><script src="progress.js" defer></script><!--/ticons-->
+<style id="tnav-css">
+.tnav-top { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin: 0 0 4px; }
+.tnav-home { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font-weight: 700; font-size: .95rem; text-decoration: none; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tnav-home:hover, .tnav-home:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.tnav-bottom { margin-top: 8px; display: flex; flex-direction: column; gap: 12px; }
+.tnav-bottom h2 { margin: 0; }
+.tnav-pn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tnav-pn a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--ink, #222); border-radius: 10px;
+  background: var(--card, #fff); color: var(--ink, #222); text-decoration: none; box-shadow: 3px 3px 0 var(--ink, #222); min-width: 0; }
+.tnav-pn a span { font-size: .85rem; color: var(--ink-soft, #666); }
+.tnav-pn a strong { overflow-wrap: anywhere; }
+.tnav-pn a.next { text-align: right; grid-column: 2; }
+.tnav-bottom .tnav-home { align-self: center; }
+@media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
+.diff { font: 700 .72rem/1.2 var(--f-mono, monospace); padding: 2px 8px; border-radius: 99px; border: 1.5px solid; white-space: nowrap; }
+.diff.d1 { color: #15803d; border-color: #15803d; background: #dcf3e3; }
+.diff.d2 { color: #a15c07; border-color: #b45309; background: #fbe7cf; }
+.diff.d3 { color: #b91c1c; border-color: #b91c1c; background: #fde2e2; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root:not([data-theme="light"]) .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root:not([data-theme="light"]) .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; } }
+:root[data-theme="dark"] .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root[data-theme="dark"] .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root[data-theme="dark"] .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; }
+</style>
+</head>
+<body>
+<main class="page">
+<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="numerique.html">← Tous les tutoriels numériques</a><span class="diff d2" title="Difficulté : moyen">Moyen</span></nav><!--/tnav-->
+
+
+  <header class="hero">
+    <span class="eyebrow">Tutoriel numérique · niveau 9H–10H</span>
+    <h1>Vraie ou fausse info ?</h1>
+    <p class="lead">« L'école ferme demain ! », « Ce jeu va être interdit ! », « Ces chips rendent malade ! »… Chaque jour, des messages comme ça arrivent dans les groupes de classe. Certains sont vrais, beaucoup sont faux ou déformés. Ici, tu deviens enquêteur ou enquêtrice : tu vas apprendre à vérifier avant de croire, et surtout avant de partager.</p>
+    <div class="box fig">
+      <svg viewBox="0 0 360 190" role="img" aria-label="Un téléphone affiche un message « L'école ferme demain, partage vite ! » et une loupe l'examine">
+        <rect x="40" y="8" width="150" height="176" rx="20" fill="var(--paper)" stroke="var(--ink)" stroke-width="2.5"/>
+        <rect x="92" y="16" width="46" height="6" rx="3" fill="var(--line)"/>
+        <rect x="52" y="36" width="126" height="104" rx="12" fill="var(--red-soft)" stroke="var(--red)" stroke-width="2"/>
+        <text x="62" y="58" font-size="12" font-weight="600">@alerte_ecoles</text>
+        <text x="62" y="80" font-size="13" font-weight="600">L'ÉCOLE FERME</text>
+        <text x="62" y="98" font-size="13" font-weight="600">DEMAIN !!!</text>
+        <text x="62" y="124" font-size="12" style="fill:var(--red)">Partage vite !</text>
+        <rect x="52" y="148" width="58" height="24" rx="12" fill="var(--acc)"/>
+        <text x="81" y="164" font-size="11" text-anchor="middle" font-weight="600" style="fill:#26210f">Partager</text>
+        <circle cx="258" cy="92" r="46" fill="var(--acc-soft)" fill-opacity=".55" stroke="var(--acc)" stroke-width="7"/>
+        <path d="M290 126 L330 168" stroke="var(--ink)" stroke-width="11" stroke-linecap="round"/>
+        <text x="258" y="80" font-size="13" text-anchor="middle" font-weight="600">Qui ?</text>
+        <text x="258" y="98" font-size="13" text-anchor="middle" font-weight="600">Quand ?</text>
+        <text x="258" y="116" font-size="13" text-anchor="middle" font-weight="600">Preuve ?</text>
+        <path d="M178 88 H210" stroke="var(--acc)" stroke-width="2" stroke-dasharray="4 4"/>
+      </svg>
+    </div>
+    <p class="soft">Tous les comptes, sites, journaux, produits et jeux de cette page sont <strong>inventés</strong>. Les adresses finissent par <span class="mono">.exemple</span>, une terminaison qui n'existe pas. Rien n'est cliquable « pour de vrai », rien n'est envoyé nulle part.</p>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · Trier</span>
+    <h2>Info, opinion, pub, humour ou rumeur ?</h2>
+    <p>Tout ce que tu lis n'est pas de la même famille. Avant de te demander si c'est vrai, demande-toi <strong>ce que c'est</strong> :</p>
+    <div class="cards">
+      <div class="box"><span class="tag ok">Info</span><span class="soft">Un <strong>fait</strong> qu'on peut vérifier, avec une source connue : « la piscine ouvre samedi à 9 h ».</span></div>
+      <div class="box"><span class="tag two">Opinion</span><span class="soft">Ce que quelqu'un <strong>pense</strong>. Ni vrai ni faux : « les lasagnes, c'est le meilleur plat ».</span></div>
+      <div class="box"><span class="tag acc">Publicité</span><span class="soft">Un message qui veut te <strong>faire acheter</strong>. Parfois déguisé en conseil d'un influenceur.</span></div>
+      <div class="box"><span class="tag warn">Humour, satire</span><span class="soft">Une fausse info <strong>pour rire</strong>, publiée par un site parodique qui le dit clairement.</span></div>
+      <div class="box"><span class="tag no">Rumeur</span><span class="soft">Une histoire qui circule <strong>sans source</strong> : « paraît que… », « mon cousin m'a dit… ».</span></div>
+    </div>
+    <div class="box">
+      <div class="bar-top">
+        <h3>Le grand tri</h3>
+        <span class="score" id="sortScore">0 / 10</span>
+      </div>
+      <p class="soft">Pour chaque message, choisis sa famille. Tu peux changer d'avis : le score se recalcule.</p>
+      <div class="sort-list" id="sortList"></div>
+      <div class="btns"><button type="button" id="sortReset">Recommencer le tri</button></div>
+      <div class="verdict" id="sortEnd" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Une satire partagée sans son contexte devient une fausse info</span>
+      <span>Un article pour rire est honnête sur son site parodique. Mais si quelqu'un fait une capture d'écran et la partage sans dire d'où elle vient, des gens vont y croire.</span>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · Pourquoi ça marche</span>
+    <h2>Pourquoi les fausses infos vont si vite</h2>
+    <p>Une fausse info n'est pas faite pour être vraie : elle est faite pour être <strong>partagée</strong>. Elle vise d'abord ton cerveau, pas ton téléphone.</p>
+    <div class="cards">
+      <div class="box"><span class="tag no">Émotion</span><strong>Peur, colère, rire</strong><span class="soft">Quand on a peur ou qu'on est fâché, on réfléchit moins et on partage plus vite.</span></div>
+      <div class="box"><span class="tag no">Nouveauté</span><strong>« Incroyable ! »</strong><span class="soft">Une fausse info est souvent plus surprenante qu'une vraie. On a envie d'être le premier à l'annoncer.</span></div>
+      <div class="box"><span class="tag no">Urgence</span><strong>« Partage vite ! »</strong><span class="soft">« Partagez au maximum », « avant que ce soit supprimé » : on te presse pour que tu ne vérifies pas.</span></div>
+      <div class="box"><span class="tag no">Algorithme</span><strong>Il aime les réactions</strong><span class="soft">Le réseau social montre à plus de monde ce qui fait cliquer, commenter, réagir. Il récompense ce qui fait réagir, pas ce qui est vrai.</span></div>
+      <div class="box"><span class="tag warn">Biais</span><strong>« J'avais raison ! »</strong><span class="soft">On croit plus facilement ce qui confirme ce qu'on pense déjà. C'est le <strong>biais de confirmation</strong>.</span></div>
+      <div class="box"><span class="tag warn">Répétition</span><strong>Vu dix fois = vrai ?</strong><span class="soft">Une phrase vue souvent finit par sembler vraie. C'est l'<strong>effet de vérité illusoire</strong>. Mais dix copies du même mensonge restent un mensonge.</span></div>
+      <div class="box"><span class="tag warn">Groupe</span><strong>« Tout le monde le dit »</strong><span class="soft">On a envie de faire comme son groupe. Mais « tout le monde » c'est parfois juste trois comptes qui se répètent.</span></div>
+      <div class="box"><span class="tag warn">Mélange</span><strong>Un peu de vrai, beaucoup de faux</strong><span class="soft">Un détail vrai (le nom de ton école, une vraie photo) rend crédible tout le reste, qui est inventé.</span></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Arnaque et fausse info : le même piège</span>
+      <span>Un message d'arnaque veut que tu <strong>cliques</strong> ; une fausse info veut que tu <strong>croies et partages</strong>. Mais le truc est le même : te faire réagir avant de réfléchir, avec l'urgence et l'émotion. L'une vole ton mot de passe, l'autre vole ta façon de voir le monde. Pour les faux messages et les faux sites, va voir le tutoriel sur <a class="tlink" href="reperer-les-arnaques.html">les arnaques</a>. Pour tous les leviers des manipulateurs, le tutoriel sur <a class="tlink" href="comment-on-te-manipule.html">comment on te manipule</a>.</span>
+    </div>
+    <div class="note warn">
+      <span class="note-title">L'intelligence artificielle fabrique à la chaîne</span>
+      <span>Aujourd'hui, une IA peut écrire cent faux messages, inventer une photo « réaliste » ou imiter une voix en quelques secondes. Une image ou une vidéo n'est donc plus une preuve à elle seule. Pour en savoir plus, le tutoriel sur <a class="tlink" href="les-images-truquees-et-les-deepfakes.html">les deepfakes</a>.</span>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Simulation</span>
+    <h2>La rumeur court, la correction marche</h2>
+    <p>Voici 30 élèves de 5 classes. Chaque point est un élève, chaque trait un ami avec qui il discute. Un élève partage : « L'école ferme demain ! ». Plus tard, quelqu'un vérifie auprès de la direction et partage la <strong>correction</strong>. Mais une correction, c'est moins excitant : elle se transmet moins vite.</p>
+    <div class="box">
+      <div class="params">
+        <div class="param">
+          <label for="simLevel">Le message est choquant : <span class="mono" id="simLevelOut">3 / 5</span></label>
+          <input type="range" id="simLevel" min="1" max="5" step="1" value="3">
+        </div>
+        <div class="param">
+          <label for="simCheck">Élèves qui vérifient avant de partager : <span class="mono" id="simCheckOut">0 %</span></label>
+          <input type="range" id="simCheck" min="0" max="50" step="10" value="0">
+        </div>
+        <div class="param">
+          <label for="simCorr">La correction arrive au tour : <span class="mono" id="simCorrOut">3</span></label>
+          <input type="range" id="simCorr" min="1" max="8" step="1" value="3">
+        </div>
+      </div>
+      <div class="fig"><svg id="simSvg" viewBox="0 0 360 260" role="img" aria-label="Réseau de 30 élèves répartis en 5 classes, colorés selon ce qu'ils croient"></svg></div>
+      <div class="legend">
+        <span><i class="dot" style="background:var(--paper)"></i>pas au courant</span>
+        <span><i class="dot" style="background:var(--red);border-color:var(--red)"></i>y croit et partage</span>
+        <span><i class="dot" style="background:var(--two);border-color:var(--two)"></i>a vérifié, ne partage pas</span>
+        <span><i class="dot" style="background:var(--ok);border-color:var(--ok)"></i>connaît la correction</span>
+      </div>
+      <div class="stack" id="simStack" aria-hidden="true"></div>
+      <p id="simStatus" aria-live="polite"></p>
+      <div class="btns">
+        <button type="button" id="simStep">Tour suivant (pas à pas)</button>
+        <button type="button" id="simAll">Jouer les 12 tours</button>
+        <button type="button" id="simReset">Recommencer</button>
+        <button type="button" id="simSeed">Autre tirage</button>
+      </div>
+      <div class="scroll"><table class="tbl" id="simTbl"></table></div>
+      <p class="soft">C'est un <strong>modèle simplifié</strong> avec des probabilités inventées, pour comprendre l'idée, pas une mesure réelle. Essaie : monte les élèves qui vérifient à 30 %, ou fais arriver la correction plus tôt.</p>
+    </div>
+    <div class="note ok">
+      <span class="note-title">Ce que montre la simulation</span>
+      <span>Plus une correction arrive tard, plus il y a de monde à « dé-convaincre ». Et chaque élève qui <strong>ne partage pas sans vérifier</strong> coupe un chemin à la rumeur. Tu n'es pas juste un spectateur : <span class="hl">tu es un des points du réseau.</span></span>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · L'enquête</span>
+    <h2>Cinq messages, cinq enquêtes</h2>
+    <p>Un bon enquêteur ne devine pas : il <strong>utilise des outils</strong>. Choisis un message, utilise au moins deux outils, puis donne ton verdict.</p>
+    <div class="cards">
+      <div class="box"><span class="tag acc">Outil 1</span><strong>Qui parle ?</strong><span class="soft">Un journal connu, l'école, la commune ? Ou un compte anonyme créé hier ?</span></div>
+      <div class="box"><span class="tag acc">Outil 2</span><strong>Quelle date ?</strong><span class="soft">Une vieille info qui ressort peut tromper : elle était peut-être vraie… il y a trois ans.</span></div>
+      <div class="box"><span class="tag acc">Outil 3</span><strong>D'autres sources le disent ?</strong><span class="soft">Une vraie nouvelle importante est reprise par plusieurs sources sérieuses. Une seule source, c'est fragile.</span></div>
+      <div class="box"><span class="tag acc">Outil 4</span><strong>L'image vient d'où ?</strong><span class="soft">La <strong>recherche d'image inversée</strong> : tu donnes une image à un moteur de recherche, il te montre où elle a déjà été publiée, et depuis quand.</span></div>
+      <div class="box"><span class="tag acc">Outil 5</span><strong>Le titre dit la même chose que l'article ?</strong><span class="soft">Certains titres exagèrent pour qu'on clique. Lis plus loin que le titre !</span></div>
+    </div>
+    <div class="box">
+      <div class="bar-top">
+        <h3>Le bureau d'enquête</h3>
+        <span class="score" id="invScore">0 / 5</span>
+      </div>
+      <div class="btns inv-tabs" id="invTabs" role="group" aria-label="Choisir un message à examiner"></div>
+      <div class="post" id="invPost" aria-live="polite"></div>
+      <span class="soft" id="invUsed"></span>
+      <div class="tools" id="invTools" role="group" aria-label="Outils d'enquête"></div>
+      <ul class="clue-list" id="invClues"></ul>
+      <div class="btns big-choice" id="invVerdict" role="group" aria-label="Ton verdict"></div>
+      <div class="verdict" id="invOut" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="invReset">Recommencer les enquêtes</button></div>
+    </div>
+    <div class="box">
+      <h3>La check-list des 10 secondes</h3>
+      <p>Avant de croire ou de partager, pose-toi ces cinq questions :</p>
+      <ol class="check">
+        <li><span><strong>Qui parle ?</strong> Est-ce que je connais la source ?</span></li>
+        <li><span><strong>Pourquoi maintenant ?</strong> Est-ce qu'on me presse ?</span></li>
+        <li><span><strong>Est-ce que ça joue sur mes émotions ?</strong> Peur, colère, envie de rire ?</span></li>
+        <li><span><strong>Est-ce que je reconnais un piège classique ?</strong> « Partage vite », « on nous cache tout », « prouve que c'est faux »…</span></li>
+        <li><span><strong>Est-ce que j'ai envie que ce soit vrai ?</strong> Si oui, je vérifie encore plus.</span></li>
+      </ol>
+      <div class="btns">
+        <button type="button" id="pauseBtn">Je fais une pause de 10 secondes</button>
+        <span class="timer" id="pauseOut" aria-live="polite">10</span>
+      </div>
+      <p class="soft" id="pauseMsg">Respire. Dans des tests, une simple pause de quelques secondes avant de cliquer fait beaucoup baisser le nombre de personnes qui tombent dans le piège.</p>
+    </div>
+    <div class="note red">
+      <span class="note-title">La règle d'or</span>
+      <span><strong>Ce qui veut te faire réagir avant de réfléchir cherche à te manipuler.</strong> Respire 5 à 10 secondes. Si tu as un doute : tu ne partages pas.</span>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Le contexte</span>
+    <h2>Une image coupée peut mentir</h2>
+    <p>Pas besoin de truquer une photo pour tromper : il suffit de la <strong>couper</strong> au bon endroit, ou de la ressortir des années plus tard avec une autre légende. Pareil pour une vidéo : on garde dix secondes, on enlève ce qui s'est passé avant et après, et le sens change complètement.</p>
+    <div class="box">
+      <h3>Agrandis l'image</h3>
+      <div class="post-cap" id="ctxCap" aria-live="polite"></div>
+      <div class="frame"><svg id="ctxSvg" viewBox="230 140 160 80" role="img" aria-label="Une image de la cour qui s'agrandit avec le curseur">
+        <rect x="0" y="0" width="600" height="300" fill="var(--paper)"/>
+        <rect x="0" y="200" width="600" height="100" fill="var(--line)"/>
+        <rect x="30" y="30" width="170" height="92" rx="4" fill="var(--card)" stroke="var(--ink)" stroke-width="2.5"/>
+        <text x="115" y="62" font-size="15" text-anchor="middle" font-weight="600">Cours de</text>
+        <text x="115" y="84" font-size="15" text-anchor="middle" font-weight="600">premiers secours</text>
+        <text x="115" y="106" font-size="12" text-anchor="middle">exercice : la PLS</text>
+        <circle cx="130" cy="140" r="14" fill="var(--card)" stroke="var(--ink)" stroke-width="2.5"/>
+        <rect x="116" y="155" width="28" height="52" rx="8" fill="var(--two-soft)" stroke="var(--ink)" stroke-width="2.5"/>
+        <path d="M118 165 L92 120" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+        <path d="M124 207 L122 240 M136 207 L138 240" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+        <rect x="150" y="108" width="90" height="24" rx="12" fill="var(--card)" stroke="var(--ink)" stroke-width="1.5"/>
+        <text x="195" y="124" font-size="10" text-anchor="middle">Bravo, bien !</text>
+        <rect x="215" y="203" width="200" height="22" rx="4" fill="var(--two-soft)" stroke="var(--two)" stroke-width="2"/>
+        <circle cx="256" cy="192" r="11" fill="var(--card)" stroke="var(--ink)" stroke-width="2.5"/>
+        <rect x="268" y="185" width="58" height="17" rx="7" fill="var(--acc-soft)" stroke="var(--ink)" stroke-width="2.5"/>
+        <rect x="326" y="189" width="36" height="11" rx="5" fill="var(--acc-soft)" stroke="var(--ink)" stroke-width="2"/>
+        <circle cx="372" cy="152" r="12" fill="var(--card)" stroke="var(--ink)" stroke-width="2.5"/>
+        <rect x="360" y="165" width="24" height="38" rx="7" fill="var(--red-soft)" stroke="var(--ink)" stroke-width="2.5"/>
+        <path d="M362 176 L320 186" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+        <path d="M366 203 L364 232 M378 203 L380 232" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+        <rect x="425" y="208" width="34" height="24" rx="4" fill="var(--card)" stroke="var(--red)" stroke-width="2"/>
+        <path d="M442 213 V227 M435 220 H449" stroke="var(--red)" stroke-width="3"/>
+        <g stroke="var(--ink)" stroke-width="2.5">
+          <circle cx="490" cy="168" r="11" fill="var(--card)"/><rect x="479" y="180" width="22" height="34" rx="7" fill="var(--ok-soft)"/>
+          <circle cx="535" cy="168" r="11" fill="var(--card)"/><rect x="524" y="180" width="22" height="34" rx="7" fill="var(--warn-soft)"/>
+          <path d="M544 186 L556 150" stroke-linecap="round"/>
+          <circle cx="578" cy="168" r="11" fill="var(--card)"/><rect x="567" y="180" width="22" height="34" rx="7" fill="var(--two-soft)"/>
+        </g>
+        <text x="535" y="250" font-size="12" text-anchor="middle">la classe regarde</text>
+      </svg></div>
+      <div class="param">
+        <label for="ctxRange">Montre-moi plus de l'image : <span class="mono" id="ctxOut">0 %</span></label>
+        <input type="range" id="ctxRange" min="0" max="100" step="5" value="0">
+      </div>
+      <div class="verdict" id="ctxVerdict" aria-live="polite"></div>
+    </div>
+    <div class="cards">
+      <div class="box"><span class="tag no">Couper</span><strong>L'extrait choisi</strong><span class="soft">Une vidéo de 10 minutes, on n'en garde que 8 secondes : celles qui choquent.</span></div>
+      <div class="box"><span class="tag no">Recycler</span><strong>La vieille photo</strong><span class="soft">Une photo de neige d'il y a 5 ans, avec la légende « Aujourd'hui : école fermée ! ».</span></div>
+      <div class="box"><span class="tag no">Déplacer</span><strong>L'autre endroit</strong><span class="soft">Une photo prise dans un autre pays, présentée comme « dans notre ville ».</span></div>
+      <div class="box"><span class="tag no">Légender</span><strong>La phrase ajoutée</strong><span class="soft">L'image est vraie, mais la phrase écrite dessus est inventée. Souvent par un compte créé la veille.</span></div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · Les chiffres</span>
+    <h2>Faux sondages et graphiques qui trichent</h2>
+    <p>Les chiffres ont l'air sérieux. C'est justement pour ça qu'on s'en sert pour tromper. Un « sondage » peut être inventé, ou n'avoir interrogé que dix copains. Et un vrai chiffre peut être dessiné de façon trompeuse.</p>
+    <div class="box">
+      <h3>Le graphique de la cantine</h3>
+      <p class="soft">Vote pour le plat de la fête de l'école : 52 voix pour la pizza, 48 pour les lasagnes. Le club Pizza publie ce graphique.</p>
+      <div class="fig"><svg id="chartSvg" viewBox="0 0 360 230" role="img" aria-label="Diagramme en barres des votes pizza et lasagnes"></svg></div>
+      <div class="btns">
+        <button type="button" id="chartCut" aria-pressed="true">Axe coupé (version du club)</button>
+        <button type="button" id="chartZero" aria-pressed="false">Axe qui commence à 0</button>
+      </div>
+      <div class="verdict" id="chartOut" aria-live="polite"></div>
+    </div>
+    <div class="cards">
+      <div class="box"><span class="tag warn">Question 1</span><strong>Qui a fait le sondage ?</strong><span class="soft">Une organisation connue, ou un compte anonyme avec un joli logo inventé ?</span></div>
+      <div class="box"><span class="tag warn">Question 2</span><strong>Qui a répondu ?</strong><span class="soft">Les 10 membres du club de foot ne représentent pas toute l'école.</span></div>
+      <div class="box"><span class="tag warn">Question 3</span><strong>Combien de personnes ?</strong><span class="soft">« 80 % » de 5 personnes, c'est 4 personnes.</span></div>
+      <div class="box"><span class="tag warn">Question 4</span><strong>Quelle question ?</strong><span class="soft">« Veux-tu encore manger cette horrible soupe ? » pousse déjà vers une réponse.</span></div>
+    </div>
+    <div class="note warn">
+      <span class="note-title">Le faux sondage qui décourage</span>
+      <span>Imagine un message : « Sondage : 80 % des élèves ne viendront pas à la fête de fin d'année. C'est fichu, inutile de t'inscrire. » Personne ne sait qui l'a fait. Pourtant, des élèves se disent « c'est perdu d'avance » et ne s'inscrivent pas… et la fête rate vraiment. Un chiffre inventé a suffi à changer ce que les gens font. Pour aller plus loin avec les graphiques et les moyennes, le tutoriel sur <a class="tlink" href="les-statistiques.html">les statistiques</a>.</span>
+    </div>
+    <div class="note">
+      <span class="note-title">La fausse pétition et le faux « tout le monde »</span>
+      <span>« Pétition : la direction veut supprimer la récré de l'après-midi ! Signez et partagez ! » La pétition semble venir d'un groupe « Élèves en colère »… qui n'existe pas. Les comptes qui la partagent ont été créés hier, n'ont pas de vraie photo et répètent les mêmes phrases. Le but n'est pas la récré : c'est de créer de la colère et de la dispute. Vérifie auprès de la direction ou du conseil des élèves, et ne donne pas ton nom ni ton adresse à un formulaire inconnu.</span>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · La preuve</span>
+    <h2>« Prouve que c'est faux ! »</h2>
+    <p>C'est un piège très utilisé. Quelqu'un affirme quelque chose de bizarre, puis te dit : « Tu ne peux pas prouver que c'est faux, donc c'est vrai ! ». Mais ça ne marche pas comme ça : <span class="hl">c'est à celui qui affirme d'apporter la preuve.</span></p>
+    <p>Un philosophe anglais a imaginé une petite <strong>théière en orbite autour du Soleil</strong>, trop petite pour être vue avec un télescope. Personne ne peut prouver qu'elle n'existe pas… et pourtant, ça ne la rend pas vraie du tout.</p>
+    <div class="box">
+      <h3>Que réponds-tu ?</h3>
+      <div class="btns" id="proofTabs" role="group" aria-label="Choisir une situation"></div>
+      <p class="bubble" id="proofText"></p>
+      <div class="choices" id="proofChoices" role="group" aria-label="Ta réponse"></div>
+      <div class="verdict" id="proofOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Réagir</span>
+    <h2>J'ai partagé une fausse info… et mon ami y croit</h2>
+    <p>Ça arrive à tout le monde, même aux adultes, même aux journalistes. Le piège le plus dangereux, c'est de croire qu'on ne se fera jamais avoir. Ce qui compte, c'est ce qu'on fait ensuite.</p>
+    <div class="box">
+      <h3>Si tu as partagé une fausse info</h3>
+      <ol class="steps">
+        <li><span><strong>Supprime</strong> ton message ou ton post, pour qu'il ne continue pas à circuler.</span></li>
+        <li><span><strong>Écris une correction</strong> au même endroit : « Attention, j'ai partagé une info fausse, l'école est bien ouverte demain. Désolé·e ! »</span></li>
+        <li><span><strong>Préviens</strong> les personnes à qui tu l'avais envoyée directement.</span></li>
+        <li><span><strong>Ne te sens pas nul·le.</strong> Admettre une erreur, c'est courageux, et ça rend les autres plus confiants en toi la prochaine fois.</span></li>
+      </ol>
+    </div>
+    <div class="box">
+      <h3>Que fais-tu ?</h3>
+      <div class="btns" id="reactTabs" role="group" aria-label="Choisir une situation"></div>
+      <p class="bubble" id="reactText"></p>
+      <div class="choices" id="reactChoices" role="group" aria-label="Ta réaction"></div>
+      <div class="verdict" id="reactOut" aria-live="polite"></div>
+    </div>
+    <div class="note ok">
+      <span class="note-title">Parler à un ami qui y croit</span>
+      <span>Ne te moque pas, ne l'humilie pas devant les autres : personne ne change d'avis quand il se sent ridicule. Pose plutôt des questions calmes (« Tu l'as vu où ? Qui l'a écrit ? ») et <strong>vérifiez ensemble</strong>. Tu peux aussi dire : « Moi aussi, j'y ai cru au début. »</span>
+    </div>
+    <div class="note two">
+      <span class="note-title">Si une fausse info te fait peur ou te vise</span>
+      <span>Parles-en à un adulte de confiance (parent, enseignant·e, infirmier·ère scolaire). Si une rumeur t'attaque toi ou un camarade, c'est peut-être du harcèlement : Pro Juventute répond aux jeunes au <strong>147</strong> (téléphone, SMS, chat), gratuit et confidentiel. En cas d'urgence : 117 (police), 144 (ambulance), 112.</span>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Le savais-tu ?</span>
+    <h2>Les fausses nouvelles ne datent pas d'hier</h2>
+    <ol class="timeline">
+      <li><span class="when">depuis toujours</span><div class="what"><strong>Le bouche-à-oreille</strong><span>Les rumeurs existent depuis qu'on parle. Dans l'Antiquité déjà, on répandait de fausses histoires sur ses adversaires.</span></div></li>
+      <li><span class="when">après l'imprimerie</span><div class="what"><strong>Les « canards »</strong><span>Pendant des siècles, on a vendu dans la rue des feuilles imprimées avec des histoires incroyables et souvent fausses : monstres, crimes, prodiges. C'est l'une des explications de pourquoi on appelle encore parfois un journal « un canard ».</span></div></li>
+      <li><span class="when">années 1930</span><div class="what"><strong>La panique… exagérée</strong><span>Aux États-Unis, une pièce de radio racontait une invasion martienne. On a longtemps dit que tout le pays avait paniqué. Des historiens pensent aujourd'hui que la panique était bien plus petite : l'histoire de la panique était elle-même en partie une info gonflée !</span></div></li>
+      <li><span class="when">années 2010</span><div class="what"><strong>Les réseaux sociaux</strong><span>Tout le monde peut publier pour des milliers de gens, en un clic. L'expression anglaise <em>fake news</em> devient très utilisée. Des chercheurs observent que, sur un réseau social, les fausses infos se propagent souvent plus vite et plus loin que les vraies.</span></div></li>
+      <li><span class="when">années 2020</span><div class="what"><strong>L'IA s'en mêle</strong><span>Textes, images, voix et vidéos peuvent être fabriqués en quelques secondes. Mais les bons réflexes (qui parle, quelle date, d'autres sources) marchent toujours.</span></div></li>
+    </ol>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · Attention</span>
+    <h2>Les erreurs fréquentes</h2>
+    <div class="cards">
+      <div class="box"><span class="tag no">Faux</span><strong>« Il y a une photo, donc c'est vrai. »</strong><span class="soft">La photo peut être vieille, coupée, prise ailleurs ou fabriquée par une IA.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« Tout le monde le partage, donc c'est vrai. »</strong><span class="soft">Le nombre de partages mesure l'émotion, pas la vérité.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« C'est mon ami qui me l'a envoyé. »</strong><span class="soft">Ton ami est sincère, mais il a peut-être été trompé lui aussi.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« J'ai lu le titre, j'ai compris. »</strong><span class="soft">Le titre peut exagérer. L'article dit parfois tout autre chose.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« Personne n'a prouvé que c'est faux. »</strong><span class="soft">C'est à celui qui affirme de prouver. Pas à toi.</span></div>
+      <div class="box"><span class="tag no">Faux</span><strong>« Tout est faux, on ne peut croire personne. »</strong><span class="soft">C'est aussi un piège : il existe des sources sérieuses, qui vérifient et corrigent leurs erreurs.</span></div>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Choisis ta réponse, puis vérifie.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Recommencer</button>
+    </div>
+  </section>
+
+  <!-- 12 -->
+  <section>
+    <span class="eyebrow">Étape 12 · À toi de jouer</span>
+    <h2>Cinq messages à analyser</h2>
+    <p>Pour chaque message, cherche les indices, décide ce que tu en penses et ce que tu ferais. Ouvre ensuite la correction.</p>
+    <div class="exos">
+      <details>
+        <summary>La chaîne qui menace<span class="msg">Message transféré plusieurs fois :<br>« Le réseau va supprimer les comptes inactifs ce soir ! Envoie ce message à 10 personnes pour garder le tien. Partagez au maximum !!! »</span></summary>
+        <div>
+          <span><strong>Fausse info.</strong> Les indices :</span>
+          <ul>
+            <li>aucune source : qui dit ça ? Le réseau lui-même ne l'annonce nulle part ;</li>
+            <li>l'urgence (« ce soir ») et la peur (« supprimer ») ;</li>
+            <li>« partagez au maximum » : le but du message, c'est de se multiplier ;</li>
+            <li>ça n'a pas de sens : transférer un message ne protège pas un compte.</li>
+          </ul>
+          <span><strong>Réaction :</strong> ne pas transférer. Tu peux répondre gentiment à la personne que c'est une chaîne.</span>
+        </div>
+      </details>
+      <details>
+        <summary>Le sondage du club<span class="msg">« SONDAGE : 95 % des élèves veulent que la récré dure une heure ! » (publié par le club de foot, qui a interrogé ses 20 membres)</span></summary>
+        <div>
+          <span><strong>Trompeur.</strong> Les questions à poser :</span>
+          <ul>
+            <li>qui a répondu ? 20 membres du club de foot, pas tous les élèves ;</li>
+            <li>95 % de 20 personnes, c'est 19 personnes ;</li>
+            <li>le club a intérêt à ce résultat : plus de temps pour jouer.</li>
+          </ul>
+          <span><strong>Conclusion :</strong> le chiffre est peut-être juste pour le club, mais faux pour « les élèves ».</span>
+        </div>
+      </details>
+      <details>
+        <summary>La photo de neige<span class="msg">Un matin de mai, photo d'une école sous un mètre de neige, avec la légende : « Ce matin chez nous ! Pas d'école aujourd'hui !! »</span></summary>
+        <div>
+          <span><strong>Sortie de son contexte, très probablement.</strong> Les indices :</span>
+          <ul>
+            <li>la date : un mètre de neige en mai, c'est très étonnant ;</li>
+            <li>regarde dehors : il neige chez toi ?</li>
+            <li>la recherche d'image inversée montrerait sûrement la même photo publiée il y a des années, ailleurs ;</li>
+            <li>l'école n'a rien annoncé.</li>
+          </ul>
+          <span><strong>Réaction :</strong> ne pas partager, et aller à l'école !</span>
+        </div>
+      </details>
+      <details>
+        <summary>Le titre qui exagère<span class="msg">Titre : « Les jeux vidéo rendent intelligent, c'est prouvé ! »<br>Dans l'article : « Une petite étude sur 30 adultes montre qu'un jeu de réflexes les a rendus un peu plus rapides à un exercice de réflexes. »</span></summary>
+        <div>
+          <span><strong>Titre trompeur.</strong> L'article ne dit pas la même chose :</span>
+          <ul>
+            <li>30 personnes, des adultes, un seul jeu : c'est très peu pour dire « c'est prouvé » ;</li>
+            <li>« un peu plus rapide à un exercice » n'est pas « plus intelligent ».</li>
+          </ul>
+          <span><strong>Réflexe :</strong> lire l'article, pas seulement le titre.</span>
+        </div>
+      </details>
+      <details>
+        <summary>L'expert inconnu<span class="msg">Vidéo : un homme en blouse blanche, devant des étagères de livres : « Je suis docteur. Le nouveau goûter de la cantine est dangereux pour le cerveau. Partagez avant qu'on supprime ma vidéo ! »</span></summary>
+        <div>
+          <span><strong>Très douteux.</strong> Les indices :</span>
+          <ul>
+            <li>la blouse et les livres donnent un air sérieux, mais n'importe qui peut en mettre : c'est une <strong>fausse autorité</strong> ;</li>
+            <li>il ne dit ni son nom, ni où il travaille, ni sa preuve ;</li>
+            <li>« avant qu'on supprime ma vidéo » : urgence et « on nous cache tout » ;</li>
+            <li>la peur pour sa santé : une émotion très forte.</li>
+          </ul>
+          <span><strong>Réaction :</strong> ne pas partager. Si tu es inquiet, demande à l'infirmier·ère scolaire ou à un adulte de confiance.</span>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• Avant de croire, trie : <strong>info, opinion, publicité, humour ou rumeur</strong> ?</span>
+      <span>• Les fausses infos vont vite parce qu'elles jouent sur l'<strong>émotion</strong>, la <strong>nouveauté</strong> et l'<strong>urgence</strong>. L'algorithme met en avant ce qui fait réagir, pas ce qui est vrai.</span>
+      <span>• Les outils de l'enquêteur : <strong>qui parle ? quelle date ? d'autres sources ? l'image vient d'où ? le titre dit la même chose que l'article ?</strong></span>
+      <span>• Une image ou une vidéo peut être vraie mais <strong>coupée, vieille ou déplacée</strong>. Une photo n'est pas une preuve à elle seule.</span>
+      <span>• Pour un sondage ou un graphique : <strong>qui a demandé, à qui, combien</strong>, et est-ce que l'axe commence à 0 ?</span>
+      <span>• « Prouve que c'est faux ! » est un piège : <strong>c'est à celui qui affirme d'apporter la preuve</strong>.</span>
+      <span>• Règle d'or : ce qui veut te faire réagir avant de réfléchir cherche à te manipuler. <strong>Respire 10 secondes. Dans le doute, ne partage pas.</strong></span>
+      <span>• Si tu as partagé une fausse info : <strong>supprime, corrige, préviens</strong>. Admettre une erreur, c'est courageux. Et parle à un ami qui y croit sans te moquer de lui.</span>
+    </div>
+  </section>
+
+  <!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"><a class="prev" href="le-cyberharcelement.html"><span>← Précédent</span><strong>Le cyberharcèlement</strong></a><a class="next" href="les-images-truquees-et-les-deepfakes.html"><span>Suivant →</span><strong>Les images truquées et les deepfakes</strong></a></div><a class="tnav-home" href="numerique.html">⌂ Tous les tutoriels numériques</a></nav><!--/tnav-->
+<footer>Fiche de révision · Vraie ou fausse info ?</footer>
+</main>
+
+<script>
+(function () {
+  /*
+   * Hooks de test : window.__inf
+   *   items                    -> 10 messages du grand tri {id, src, text, cat, why}
+   *   cats                     -> familles [{key, label}] : 'info' | 'opinion' | 'pub' | 'humour' | 'rumeur'
+   *   classifyItem(id)         -> famille correcte de l'item (null si id inconnu)
+   *   checkSort(id, cat)       -> {ok, cat, why} (null si id ou famille inconnus)
+   *   sortScore(answers)       -> {correct, answered, total} pour answers = {id: famille}
+   *   graph                    -> {nodes:[{id, cls, x, y}], adj:[[voisins]], classes}
+   *   spread(opts)             -> {snapshots:[[état par élève]], counts:[{round, unaware, believe, checked, corrected}], checkers:[ids]}
+   *                               opts = {level 1..5, checkPct 0..50, corrAt 1..8, seed, rounds} (défauts : 3, 0, 3, 1, 12)
+   *                               états : 0 pas au courant, 1 y croit et partage, 2 connaît la correction, 3 a vérifié (passe à 2 dès que la correction existe)
+   *                               probabilités par lien et par tour : rumeur 0,08 + 0,1 × level ; correction 0,2 (0,1 vers qui y croit déjà)
+   *   posts                    -> 5 messages de l'enquête {id, ..., tools:{qui, date, sources, image, titre}, answer, summary}
+   *   verdictOf(id)            -> 'fiable' | 'fausse' | 'attendre' (null si id inconnu)
+   *   checkVerdict(id, v)      -> {ok, answer, summary} (null si inconnu)
+   *   invScore(answers)        -> {correct, answered, total}
+   *   chartModel(axisMin)      -> {bars:[{label, v, h}], apparent, real} (h en pixels sur 150, apparent = rapport des hauteurs dessinées)
+   *   contextStage(pct)        -> 'coupe' | 'doute' | 'complet' (0–100, selon la part de l'image montrée)
+   *   proof, react             -> scénarios « que fais-tu ? » {name, text, c:[[choix, 'yes'|'mid'|'no', explication]]}
+   *   quiz                     -> 8 questions
+   * Tout est inventé : comptes, sites (.exemple), produits, jeux. Aucun lien réel, rien n'est envoyé.
+   */
+  var NS = 'http://www.w3.org/2000/svg';
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function mk(svg, name, attrs, text) { var e = document.createElementNS(NS, name); for (var a in attrs) e.setAttribute(a, attrs[a]); if (text != null) e.textContent = text; svg.appendChild(e); return e; }
+  function fmt(n, d) { return Number(n).toLocaleString('fr-CH', { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 }); }
+  function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+
+  /* ---------- 1. Le grand tri ---------- */
+  var CATS = [
+    { key: 'info', label: 'Info' }, { key: 'opinion', label: 'Opinion' }, { key: 'pub', label: 'Publicité' },
+    { key: 'humour', label: 'Humour' }, { key: 'rumeur', label: 'Rumeur' }
+  ];
+  var CAT_LABEL = {}; CATS.forEach(function (c) { CAT_LABEL[c.key] = c.label; });
+  var ITEMS = [
+    { id: 's1', src: 'Site de la commune · commune-du-lac.exemple', text: 'La piscine communale rouvre samedi à 9 h après les travaux.', cat: 'info', why: 'Un fait précis, vérifiable, annoncé par une source officielle.' },
+    { id: 's2', src: 'Message de Léo dans le groupe de classe', text: 'Les lasagnes de la cantine sont les meilleures du monde !', cat: 'opinion', why: 'C’est un goût personnel : ni vrai ni faux. On a le droit de ne pas être d’accord.' },
+    { id: 's3', src: 'Publication sponsorisée · ZoomZoom', text: 'Avec les baskets ZoomZoom, saute plus haut que tes amis ! –20 % ce week-end seulement.', cat: 'pub', why: 'Le but est de vendre. « Ce week-end seulement » crée l’urgence d’acheter.' },
+    { id: 's4', src: 'Le Canard du Collège · journal pour rire, écrit par les élèves', text: 'Le directeur annonce une récré de 3 heures « pour mieux digérer les épinards ».', cat: 'humour', why: 'Un journal parodique qui le dit clairement. C’est pour rire… tant qu’on sait d’où ça vient.' },
+    { id: 's5', src: 'Message vocal transféré', text: 'Paraît que le prof de maths part vivre en Australie demain, c’est mon cousin qui l’a dit.', cat: 'rumeur', why: '« Paraît que », « mon cousin » : aucune source vérifiable.' },
+    { id: 's6', src: 'Service météo national', text: 'Jeudi, il neigera au-dessus de 800 mètres.', cat: 'info', why: 'Une prévision d’un service officiel. Elle peut se tromper un peu, mais c’est une information sérieuse.' },
+    { id: 's7', src: 'Commentaire de Maya', text: 'À mon avis, les devoirs du week-end devraient être interdits.', cat: 'opinion', why: '« À mon avis » : c’est une opinion. On peut en discuter avec des arguments.' },
+    { id: 's8', src: 'Vidéo de l’influenceuse @JuliaDanse · #partenariat', text: 'Je bois Pétillo tous les matins, c’est trop bon, testez avec mon code JULIA !', cat: 'pub', why: '#partenariat et un code promo : elle est payée. C’est une publicité déguisée en conseil.' },
+    { id: 's9', src: 'Capture d’écran sans nom', text: 'Un élève aurait vu un serpent géant dans les toilettes du 2e étage, faites tourner !!!', cat: 'rumeur', why: '« Aurait vu », pas de source, « faites tourner » : une rumeur typique.' },
+    { id: 's10', src: 'Le Gorafeux du Lac · site parodique', text: 'Scoop : les profs remplacés par des robots qui corrigent en dansant.', cat: 'humour', why: 'Un site parodique, une histoire absurde : de l’humour. Partagée sans son nom, elle pourrait tromper.' }
+  ];
+  var ITEM_BY = {}; ITEMS.forEach(function (it) { ITEM_BY[it.id] = it; });
+  function classifyItem(id) { return ITEM_BY[id] ? ITEM_BY[id].cat : null; }
+  function checkSort(id, cat) { var it = ITEM_BY[id]; if (!it || !CAT_LABEL[cat]) return null; return { ok: it.cat === cat, cat: it.cat, why: it.why }; }
+  function sortScore(ans) {
+    var c = 0, n = 0;
+    ITEMS.forEach(function (it) { if (ans[it.id]) { n++; if (ans[it.id] === it.cat) c++; } });
+    return { correct: c, answered: n, total: ITEMS.length };
+  }
+  var sortAns = {};
+  function sortRender() {
+    $('sortList').innerHTML = ITEMS.map(function (it) {
+      var a = sortAns[it.id], cls = a ? (a === it.cat ? ' good' : ' bad') : '';
+      var fb = '';
+      if (a) fb = a === it.cat ? '<div class="sort-fb ok"><strong>Juste : ' + esc(CAT_LABEL[it.cat]) + '.</strong> <span>' + esc(it.why) + '</span></div>'
+        : '<div class="sort-fb no"><strong>Pas tout à fait : c’est plutôt « ' + esc(CAT_LABEL[it.cat]) + ' ».</strong> <span>' + esc(it.why) + '</span></div>';
+      return '<div class="sort-item' + cls + '"><span class="sort-src">' + esc(it.src) + '</span><span class="sort-txt">« ' + esc(it.text) + ' »</span>' +
+        '<div class="sort-btns" role="group" aria-label="Famille du message">' + CATS.map(function (c) {
+          return '<button type="button" data-id="' + it.id + '" data-cat="' + c.key + '" aria-pressed="' + (a === c.key ? 'true' : 'false') + '">' + esc(c.label) + '</button>';
+        }).join('') + '</div><div aria-live="polite">' + fb + '</div></div>';
+    }).join('');
+    var s = sortScore(sortAns);
+    $('sortScore').textContent = s.correct + ' / ' + s.total;
+    var end = $('sortEnd');
+    if (s.answered === s.total) {
+      end.className = 'verdict ' + (s.correct >= 8 ? 'yes' : 'mid');
+      end.innerHTML = (s.correct === s.total ? 'Parfait, 10 sur 10 !' : s.correct + ' bonnes réponses sur 10.') + '<span>Retiens surtout : une opinion n’est ni vraie ni fausse, une pub veut vendre, et une rumeur n’a pas de source.</span>';
+    } else { end.className = 'verdict'; end.innerHTML = ''; }
+  }
+  $('sortList').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-cat]'); if (!b) return;
+    sortAns[b.getAttribute('data-id')] = b.getAttribute('data-cat');
+    var y = window.scrollY; sortRender(); window.scrollTo(0, y);
+    var nb = document.querySelector('#sortList button[data-id="' + b.getAttribute('data-id') + '"][data-cat="' + b.getAttribute('data-cat') + '"]'); if (nb) nb.focus({ preventScroll: true });
+  });
+  $('sortReset').addEventListener('click', function () { sortAns = {}; sortRender(); });
+  sortRender();
+
+  /* ---------- 3. Simulation de rumeur ---------- */
+  var CLASSES = ['9A', '9B', '10A', '10B', '11A'];
+  var GRAPH = (function () {
+    var nodes = [], adj = [], i, c, j;
+    for (c = 0; c < 5; c++) {
+      var ang = -Math.PI / 2 + c * 2 * Math.PI / 5;
+      var cx = 180 + 92 * Math.cos(ang), cy = 132 + 92 * Math.sin(ang);
+      for (j = 0; j < 6; j++) {
+        var a2 = j * Math.PI / 3;
+        nodes.push({ id: c * 6 + j, cls: c, x: cx + 26 * Math.cos(a2), y: cy + 26 * Math.sin(a2), cx: cx, cy: cy });
+        adj.push([]);
+      }
+    }
+    function link(p, q) { if (p === q || adj[p].indexOf(q) >= 0) return; adj[p].push(q); adj[q].push(p); }
+    for (c = 0; c < 5; c++) for (j = 0; j < 6; j++) { link(c * 6 + j, c * 6 + (j + 1) % 6); link(c * 6 + j, c * 6 + (j + 2) % 6); }
+    for (c = 0; c < 5; c++) { link(c * 6 + 0, ((c + 1) % 5) * 6 + 3); link(c * 6 + 2, ((c + 1) % 5) * 6 + 5); link(c * 6 + 1, ((c + 2) % 5) * 6 + 4); }
+    for (i = 0; i < adj.length; i++) adj[i].sort(function (x, y) { return x - y; });
+    return { nodes: nodes, adj: adj, classes: CLASSES };
+  })();
+  var SRC_RUMOR = 0, SRC_CORR = 14;
+  var CHECK_ORDER = (function () {
+    var ids = [], r = mulberry32(99), i;
+    for (i = 0; i < 30; i++) if (i !== SRC_RUMOR && i !== SRC_CORR) ids.push(i);
+    for (i = ids.length - 1; i > 0; i--) { var k = Math.floor(r() * (i + 1)); var t = ids[i]; ids[i] = ids[k]; ids[k] = t; }
+    return ids;
+  })();
+  function clampInt(v, lo, hi, d) { v = Math.round(Number(v)); if (!isFinite(v)) v = d; return Math.max(lo, Math.min(hi, v)); }
+  function spread(opts) {
+    opts = opts || {};
+    var level = clampInt(opts.level, 1, 5, 3), pct = clampInt(opts.checkPct, 0, 50, 0), corrAt = clampInt(opts.corrAt, 1, 8, 3);
+    var rounds = clampInt(opts.rounds == null ? 12 : opts.rounds, 1, 30, 12), seed = clampInt(opts.seed == null ? 1 : opts.seed, 0, 1e9, 1);
+    var pR = 0.08 + 0.1 * level, pC0 = 0.2, pC1 = 0.1;
+    /* tirage fixe par (tour, lien, type) : changer un réglage ne rebat pas toutes les cartes */
+    function rnd(tt, a, b, kind) { return mulberry32(seed * 1000003 + tt * 7919 + a * 131 + b * 17 + kind * 5)(); }
+    var nCheck = Math.round(pct / 100 * 30), isCheck = [], i, t, k, checkers = CHECK_ORDER.slice(0, nCheck);
+    for (i = 0; i < 30; i++) isCheck[i] = false;
+    checkers.forEach(function (id) { isCheck[id] = true; });
+    var st = []; for (i = 0; i < 30; i++) st[i] = 0; st[SRC_RUMOR] = 1;
+    var snaps = [st.slice()], counts = [countOf(st, 0)];
+    for (t = 1; t <= rounds; t++) {
+      var nx = st.slice();
+      if (t === corrAt) nx[SRC_CORR] = 2;
+      /* ceux qui ont vérifié trouvent la correction dès qu’elle existe */
+      if (t >= corrAt) for (i = 0; i < 30; i++) if (st[i] === 3) nx[i] = 2;
+      for (i = 0; i < 30; i++) if (st[i] === 1) for (k = 0; k < GRAPH.adj[i].length; k++) {
+        var n = GRAPH.adj[i][k];
+        if (st[n] === 0 && nx[n] === 0 && rnd(t, i, n, 1) < pR) nx[n] = isCheck[n] ? 3 : 1;
+      }
+      for (i = 0; i < 30; i++) if (st[i] === 2) for (k = 0; k < GRAPH.adj[i].length; k++) {
+        var m = GRAPH.adj[i][k];
+        if (st[m] !== 2 && nx[m] !== 2 && rnd(t, i, m, 2) < (st[m] === 1 ? pC1 : pC0)) nx[m] = 2;
+      }
+      st = nx; snaps.push(st.slice()); counts.push(countOf(st, t));
+    }
+    return { snapshots: snaps, counts: counts, checkers: checkers };
+  }
+  function countOf(st, round) {
+    var c = { round: round, unaware: 0, believe: 0, corrected: 0, checked: 0 };
+    st.forEach(function (s) { if (s === 0) c.unaware++; else if (s === 1) c.believe++; else if (s === 2) c.corrected++; else c.checked++; });
+    return c;
+  }
+  var sim = { seed: 1, step: 0, res: null };
+  var STATE_FILL = ['var(--paper)', 'var(--red)', 'var(--ok)', 'var(--two)'];
+  var STATE_STROKE = ['var(--ink-soft)', 'var(--red)', 'var(--ok)', 'var(--two)'];
+  function simParams() { return { level: +$('simLevel').value, checkPct: +$('simCheck').value, corrAt: +$('simCorr').value, seed: sim.seed, rounds: 12 }; }
+  function simCompute() {
+    var p = simParams();
+    $('simLevelOut').textContent = p.level + ' / 5';
+    $('simCheckOut').textContent = p.checkPct + ' %';
+    $('simCorrOut').textContent = p.corrAt;
+    sim.res = spread(p); sim.step = 0; simDraw();
+  }
+  function simDraw() {
+    var svg = $('simSvg'); svg.innerHTML = '';
+    var st = sim.res.snapshots[sim.step], i, k;
+    for (i = 0; i < 30; i++) for (k = 0; k < GRAPH.adj[i].length; k++) {
+      var n = GRAPH.adj[i][k]; if (n < i) continue;
+      var a = GRAPH.nodes[i], b = GRAPH.nodes[n];
+      mk(svg, 'line', { x1: a.x, y1: a.y, x2: b.x, y2: b.y, stroke: 'var(--line)', 'stroke-width': a.cls === b.cls ? 1.5 : 1.2 });
+    }
+    for (var c = 0; c < 5; c++) { var nd = GRAPH.nodes[c * 6]; mk(svg, 'text', { x: nd.cx, y: nd.cy + 4, 'font-size': 11, 'text-anchor': 'middle', 'font-weight': 600 }, CLASSES[c]); }
+    GRAPH.nodes.forEach(function (nd) {
+      var s = st[nd.id];
+      mk(svg, 'circle', { cx: nd.x, cy: nd.y, r: nd.id === SRC_RUMOR || nd.id === SRC_CORR ? 8.5 : 7, fill: STATE_FILL[s], stroke: STATE_STROKE[s], 'stroke-width': 2 });
+    });
+    var r0 = GRAPH.nodes[SRC_RUMOR], r1 = GRAPH.nodes[SRC_CORR];
+    mk(svg, 'text', { x: r0.x + 12, y: r0.y - 10, 'font-size': 10 }, 'départ');
+    mk(svg, 'text', { x: r1.x - 8, y: r1.y + 22, 'font-size': 10, 'text-anchor': 'middle' }, 'vérifie');
+    var c0 = sim.res.counts[sim.step];
+    $('simStack').innerHTML = [[c0.believe, 'var(--red)'], [c0.checked, 'var(--two)'], [c0.corrected, 'var(--ok)'], [c0.unaware, 'var(--paper)']].map(function (x) {
+      return '<i style="width:' + (x[0] / 30 * 100) + '%;background:' + x[1] + '"></i>';
+    }).join('');
+    var p = simParams(), msg;
+    if (sim.step === 0) msg = 'Tour 0 : un seul élève a le message. Appuie sur « Tour suivant ».';
+    else msg = 'Tour ' + sim.step + ' : ' + c0.believe + ' élève' + (c0.believe > 1 ? 's' : '') + ' y croi' + (c0.believe > 1 ? 'ent' : 't') + ', ' + c0.corrected + ' ' + (c0.corrected > 1 ? 'connaissent' : 'connaît') + ' la correction, ' + c0.checked + ' ' + (c0.checked > 1 ? 'ont' : 'a') + ' vérifié, ' + c0.unaware + ' pas au courant.';
+    if (sim.step > 0 && sim.step < p.corrAt) msg += ' La correction n’est pas encore partie.';
+    if (sim.step === 12) msg += ' Au plus fort, ' + Math.max.apply(null, sim.res.counts.map(function (x) { return x.believe; })) + ' élèves y croyaient en même temps.';
+    if (sim.step === 12) msg += c0.believe > c0.corrected ? ' Fin : la rumeur a gagné. Fais arriver la correction plus tôt ou ajoute des élèves qui vérifient.' : ' Fin : la correction a rattrapé la rumeur.';
+    $('simStatus').textContent = msg;
+    var rows = sim.res.counts.slice(0, sim.step + 1);
+    $('simTbl').innerHTML = '<tr><th>Tour</th>' + rows.map(function (r) { return '<th>' + r.round + '</th>'; }).join('') + '</tr>' +
+      '<tr><th>Y croient</th>' + rows.map(function (r) { return '<td>' + r.believe + '</td>'; }).join('') + '</tr>' +
+      '<tr><th>Corrigés</th>' + rows.map(function (r) { return '<td>' + r.corrected + '</td>'; }).join('') + '</tr>';
+    $('simStep').disabled = sim.step >= 12;
+    $('simAll').disabled = sim.step >= 12;
+  }
+  ['simLevel', 'simCheck', 'simCorr'].forEach(function (id) { $(id).addEventListener('input', simCompute); });
+  $('simStep').addEventListener('click', function () { if (sim.step < 12) { sim.step++; simDraw(); } });
+  $('simAll').addEventListener('click', function () { sim.step = 12; simDraw(); });
+  $('simReset').addEventListener('click', function () { sim.step = 0; simDraw(); });
+  $('simSeed').addEventListener('click', function () { sim.seed++; simCompute(); });
+  simCompute();
+
+  /* ---------- 4. L'enquête ---------- */
+  var TOOLS = [['qui', 'Qui parle ?'], ['date', 'Quelle date ?'], ['sources', 'D’autres sources ?'], ['image', 'L’image vient d’où ?'], ['titre', 'Titre = article ?']];
+  var VERDICTS = [['fiable', 'Fiable'], ['fausse', 'Fausse ou trompeuse'], ['attendre', 'Pas assez d’infos : j’attends']];
+  var POSTS = [
+    { id: 'p1', tab: 'L’école ferme', av: 'A', who: 'Alerte Écoles', handle: '@alerte_ecoles · réseau social', title: 'URGENT : l’école du Lac FERME demain à cause d’un virus !!!', text: 'Message de la direction (capture ci-dessous). Partagez au maximum, prévenez tous les parents !', img: 'Capture d’un « courrier » avec le logo de l’école, un peu flou en bas.',
+      tools: { qui: ['bad', 'Un compte anonyme, créé il y a 2 jours, sans vraie photo. Ce n’est pas le compte de l’école.'],
+               date: ['bad', 'Le courrier n’a pas de date. En cherchant, on retrouve le même texte qui circulait déjà il y a 3 ans, dans une autre région, avec un autre nom d’école.'],
+               sources: ['bad', 'Le site de l’école (ecole-du-lac.exemple) et la messagerie officielle aux parents ne disent rien. Aucun journal n’en parle.'],
+               image: ['bad', 'Le logo a été copié du site de l’école et collé sur un texte. Le bas flou cache qu’il n’y a pas de signature.'],
+               titre: ['warn', 'Il n’y a pas d’article, juste un titre en MAJUSCULES et « partagez au maximum » : de l’urgence et de la peur.'] },
+      answer: 'fausse', summary: 'Fausse info : compte anonyme, vieux texte recyclé, aucune source officielle. Réflexe : vérifier sur le site ou la messagerie officielle de l’école.' },
+    { id: 'p2', tab: 'Le jeu interdit', av: 'B', who: 'Actu Buzz', handle: 'actu-buzz.exemple · publié hier', title: 'Le jeu Bloc-Bataille INTERDIT dans toute la Suisse dès lundi !', text: 'Une décision choc qui va faire pleurer des milliers d’élèves… Lire la suite.', img: 'L’image du jeu Bloc-Bataille, un personnage triste ajouté à côté.',
+      tools: { qui: ['warn', 'Un site connu pour ses titres choc, qui vit des clics et de la publicité. Pas d’auteur indiqué.'],
+               date: ['ok', 'Publié hier : la date est récente, ce n’est pas le problème ici.'],
+               sources: ['bad', 'Aucune autre source ne parle d’une interdiction nationale. Le journal local parle seulement d’un collège.'],
+               image: ['ok', 'C’est la vraie image du jeu, avec un dessin ajouté. Elle ne prouve rien, ni dans un sens ni dans l’autre.'],
+               titre: ['bad', 'L’article dit en fait : « Un collège d’une ville voisine interdit de jouer à Bloc-Bataille sur son téléphone pendant la récréation. » Rien à voir avec « toute la Suisse » !'] },
+      answer: 'fausse', summary: 'Trompeuse : le titre exagère énormément l’article. Un collège ≠ toute la Suisse. Réflexe : lire plus loin que le titre.' },
+    { id: 'p3', tab: 'Les chips', av: 'M', who: 'MamanInquiète_99', handle: '@maman_inquiete_99 · aujourd’hui', title: 'Les chips Croquilou envoient 12 élèves à l’hôpital ! On nous cache tout !', text: 'Ne laissez plus vos enfants en manger. Les médias n’en parlent pas, partagez avant que ce soit supprimé !', img: 'Photo d’une ambulance devant un bâtiment.',
+      tools: { qui: ['bad', 'Un compte sans nom réel ni photo. Il ne dit pas où ni quand c’est arrivé.'],
+               date: ['warn', 'Le post est d’aujourd’hui, mais il ne donne aucune date pour l’événement lui-même.'],
+               sources: ['bad', 'Aucun journal, aucun hôpital, aucune autorité de santé n’en parle. « Les médias n’en parlent pas » sert à rendre ça « normal ».'],
+               image: ['bad', 'Recherche d’image inversée : la photo de l’ambulance a été publiée il y a 6 ans, dans un autre pays, pour un exercice des pompiers.'],
+               titre: ['warn', '« On nous cache tout », « avant que ce soit supprimé » : des formules classiques pour faire peur et presser.'] },
+      answer: 'fausse', summary: 'Fausse info : photo recyclée d’un autre événement, aucune source, peur et urgence. Réflexe : la recherche d’image inversée.' },
+    { id: 'p4', tab: 'La piscine', av: 'J', who: 'Le Journal du Lac', handle: 'journal-du-lac.exemple · article de Léa Rochat · ce matin', title: 'La piscine communale fermée deux semaines pour des travaux', text: 'La commune répare le toit de la piscine. Elle sera fermée du 3 au 17. Les cours de natation des écoles sont déplacés à la piscine voisine.', img: 'Photo de la piscine avec un échafaudage. Crédit : photo du Journal du Lac.',
+      tools: { qui: ['ok', 'Un journal local connu, avec le nom de la journaliste. On sait qui écrit et on peut le contacter.'],
+               date: ['ok', 'Article de ce matin, avec des dates précises pour la fermeture.'],
+               sources: ['ok', 'Le site de la commune (commune-du-lac.exemple) annonce la même fermeture, et l’école l’a écrit aux parents.'],
+               image: ['ok', 'Photo prise par le journal lui-même, elle n’apparaît nulle part ailleurs avant.'],
+               titre: ['ok', 'Le titre dit exactement ce que dit l’article. Pas de majuscules, pas de « partagez vite ».'] },
+      answer: 'fiable', summary: 'Fiable : source connue et signée, date claire, confirmée par la commune. Pas besoin de se méfier de tout : une vraie info reste une vraie info.' },
+    { id: 'p5', tab: 'La cantine', av: '?', who: 'Message vocal transféré', handle: 'groupe « 10B les meilleurs » · transféré plusieurs fois', title: 'La cantine va servir des insectes dès la semaine prochaine ?', text: '« C’est la cousine d’une amie qui travaille pas loin de la cantine qui l’a dit… »', img: null,
+      tools: { qui: ['warn', 'La cousine d’une amie… On ne sait pas qui parle vraiment. Mais ce n’est pas forcément un mensonge non plus.'],
+               date: ['warn', 'On ne sait pas quand ça a été dit au départ.'],
+               sources: ['warn', 'Le menu de la semaine prochaine n’est pas encore publié. Personne d’autre ne le dit, mais personne ne le dément encore.'],
+               image: ['warn', 'Il n’y a pas d’image. Rien à vérifier de ce côté.'],
+               titre: ['ok', 'Le message pose une question avec « ? » : il ne prétend pas être sûr.'] },
+      answer: 'attendre', summary: 'On ne peut pas savoir pour l’instant. Le bon réflexe : ne pas partager, et demander à la cantine ou à un prof, ou attendre le menu officiel. « Je ne sais pas encore » est une vraie réponse !' }
+  ];
+  var POST_BY = {}; POSTS.forEach(function (p) { POST_BY[p.id] = p; });
+  var V_LABEL = {}; VERDICTS.forEach(function (v) { V_LABEL[v[0]] = v[1]; });
+  function verdictOf(id) { return POST_BY[id] ? POST_BY[id].answer : null; }
+  function checkVerdict(id, v) { var p = POST_BY[id]; if (!p || !V_LABEL[v]) return null; return { ok: p.answer === v, answer: p.answer, summary: p.summary }; }
+  function invScore(ans) { var c = 0, n = 0; POSTS.forEach(function (p) { if (ans[p.id]) { n++; if (ans[p.id] === p.answer) c++; } }); return { correct: c, answered: n, total: POSTS.length }; }
+  var inv = { cur: 'p1', used: {}, ans: {} };
+  function invTabs() {
+    $('invTabs').innerHTML = POSTS.map(function (p) {
+      var a = inv.ans[p.id], mark = a ? (a === p.answer ? ' ✓' : ' ✗') : '';
+      return '<button type="button" data-post="' + p.id + '" aria-pressed="' + (p.id === inv.cur ? 'true' : 'false') + '">' + esc(p.tab) + mark + '</button>';
+    }).join('');
+  }
+  function invRender() {
+    var p = POST_BY[inv.cur], used = inv.used[p.id] || {}, nUsed = Object.keys(used).length, a = inv.ans[p.id];
+    invTabs();
+    $('invPost').innerHTML = '<div class="post-head"><span class="avatar" aria-hidden="true">' + esc(p.av) + '</span><div class="post-who"><strong>' + esc(p.who) + '</strong><span>' + esc(p.handle) + '</span></div></div>' +
+      '<span class="post-title">' + esc(p.title) + '</span><span>' + esc(p.text) + '</span>' + (p.img ? '<span class="post-img">Image : ' + esc(p.img) + '</span>' : '');
+    $('invUsed').textContent = 'Outils utilisés : ' + nUsed + ' sur 5' + (nUsed < 2 ? ' (il en faut au moins 2 pour donner ton verdict)' : '');
+    $('invTools').innerHTML = TOOLS.map(function (t) {
+      return '<button type="button" data-tool="' + t[0] + '" class="' + (used[t[0]] ? 'used' : '') + '">' + esc(t[1]) + '</button>';
+    }).join('');
+    $('invClues').innerHTML = TOOLS.filter(function (t) { return used[t[0]]; }).map(function (t) {
+      var r = p.tools[t[0]];
+      return '<li class="' + (r[0] === 'bad' ? 'bad' : r[0] === 'ok' ? 'ok' : '') + '"><strong>' + esc(t[1]) + '</strong> ' + esc(r[1]) + '</li>';
+    }).join('');
+    $('invVerdict').innerHTML = VERDICTS.map(function (v) {
+      return '<button type="button" data-v="' + v[0] + '" aria-pressed="' + (a === v[0] ? 'true' : 'false') + '"' + (nUsed < 2 ? ' disabled' : '') + '>' + esc(v[1]) + '</button>';
+    }).join('');
+    var out = $('invOut');
+    if (a) {
+      var ok = a === p.answer;
+      out.className = 'verdict ' + (ok ? 'yes' : 'no');
+      out.innerHTML = (ok ? 'Bien vu !' : 'Pas tout à fait : la bonne réponse est « ' + esc(V_LABEL[p.answer]) + ' ».') + '<span>' + esc(p.summary) + '</span>';
+    } else { out.className = 'verdict'; out.innerHTML = ''; }
+    var s = invScore(inv.ans);
+    $('invScore').textContent = s.correct + ' / ' + s.total;
+  }
+  $('invTabs').addEventListener('click', function (e) { var b = e.target.closest('button[data-post]'); if (!b) return; inv.cur = b.getAttribute('data-post'); invRender(); });
+  $('invTools').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-tool]'); if (!b) return;
+    var u = inv.used[inv.cur] || (inv.used[inv.cur] = {}); u[b.getAttribute('data-tool')] = true; invRender();
+    var nb = document.querySelector('#invTools button[data-tool="' + b.getAttribute('data-tool') + '"]'); if (nb) nb.focus({ preventScroll: true });
+  });
+  $('invVerdict').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-v]'); if (!b || b.disabled) return;
+    inv.ans[inv.cur] = b.getAttribute('data-v'); invRender();
+  });
+  $('invReset').addEventListener('click', function () { inv = { cur: 'p1', used: {}, ans: {} }; invRender(); });
+  invRender();
+
+  /* Pause de 10 secondes (setInterval, pas d’animation) */
+  var pauseTimer = null;
+  $('pauseBtn').addEventListener('click', function () {
+    if (pauseTimer) clearInterval(pauseTimer);
+    var left = 10; $('pauseOut').textContent = left;
+    $('pauseMsg').textContent = 'Respire… Qui parle ? Pourquoi maintenant ? Est-ce que ça joue sur mes émotions ?';
+    pauseTimer = setInterval(function () {
+      left--; $('pauseOut').textContent = Math.max(0, left);
+      if (left <= 0) { clearInterval(pauseTimer); pauseTimer = null; $('pauseMsg').textContent = 'Voilà : 10 secondes, et ton cerveau a repris les commandes. Maintenant tu peux décider calmement.'; }
+    }, 1000);
+  });
+
+  /* ---------- 5. Sortir de son contexte ---------- */
+  var CROP = [230, 140, 160, 80], FULL = [0, 0, 600, 300];
+  function contextStage(pct) { pct = Math.max(0, Math.min(100, Number(pct) || 0)); return pct < 35 ? 'coupe' : pct < 90 ? 'doute' : 'complet'; }
+  function ctxUpdate() {
+    var v = Math.max(0, Math.min(100, Number($('ctxRange').value) || 0)), t = v / 100;
+    var vb = CROP.map(function (c, i) { return (c + (FULL[i] - c) * t).toFixed(1); });
+    $('ctxSvg').setAttribute('viewBox', vb.join(' '));
+    $('ctxOut').textContent = v + ' %';
+    var st = contextStage(v), cap = $('ctxCap'), out = $('ctxVerdict');
+    if (st === 'coupe') {
+      cap.className = 'post-cap'; cap.textContent = '@buzz_college : « BAGARRE à la récré ! Il l’a mis par terre ! Partagez ! »';
+      out.className = 'verdict no'; out.innerHTML = 'Ça a l’air grave…<span>Un élève est au sol, un autre tend le bras vers lui. Mais tu ne vois qu’un tout petit morceau de la scène. Agrandis l’image.</span>';
+    } else if (st === 'doute') {
+      cap.className = 'post-cap mid'; cap.textContent = '@buzz_college : « BAGARRE à la récré ! » … vraiment ?';
+      out.className = 'verdict mid'; out.innerHTML = 'Tiens, il y a d’autres choses…<span>Un tapis de sport, une trousse de secours, d’autres élèves calmes, un tableau… Continue.</span>';
+    } else {
+      cap.className = 'post-cap ok'; cap.textContent = 'En vrai : un exercice de premiers secours en classe. On apprend à mettre quelqu’un en position latérale de sécurité.';
+      out.className = 'verdict yes'; out.innerHTML = 'Le sens a complètement changé !<span>L’image n’était pas truquée : elle était juste coupée, avec une légende inventée. Avant de croire une image choc, demande-toi : qu’est-ce qu’il y a autour ? Avant ? Après ?</span>';
+    }
+  }
+  $('ctxRange').addEventListener('input', ctxUpdate);
+  ctxUpdate();
+
+  /* ---------- 6. Le graphique ---------- */
+  var VOTES = [['Pizza', 52], ['Lasagnes', 48]];
+  var CH = { x0: 60, y0: 190, H: 150 };
+  function chartModel(axisMin) {
+    axisMin = axisMin === 46 ? 46 : 0;
+    var axisMax = axisMin === 0 ? 60 : 54;
+    var bars = VOTES.map(function (v) { return { label: v[0], v: v[1], h: (v[1] - axisMin) / (axisMax - axisMin) * CH.H }; });
+    return { axisMin: axisMin, axisMax: axisMax, bars: bars, apparent: bars[0].h / bars[1].h, real: VOTES[0][1] / VOTES[1][1] };
+  }
+  var chartMin = 46;
+  function chartDraw() {
+    var m = chartModel(chartMin), svg = $('chartSvg'); svg.innerHTML = '';
+    var step = m.axisMin === 0 ? 10 : 2, v;
+    for (v = m.axisMin; v <= m.axisMax; v += step) {
+      var y = CH.y0 - (v - m.axisMin) / (m.axisMax - m.axisMin) * CH.H;
+      mk(svg, 'line', { x1: CH.x0, y1: y, x2: 330, y2: y, stroke: 'var(--line)', 'stroke-width': 1 });
+      mk(svg, 'text', { x: CH.x0 - 8, y: y + 4, 'font-size': 11, 'text-anchor': 'end' }, String(v));
+    }
+    mk(svg, 'line', { x1: CH.x0, y1: CH.y0, x2: CH.x0, y2: CH.y0 - CH.H, stroke: 'var(--ink)', 'stroke-width': 2 });
+    mk(svg, 'line', { x1: CH.x0, y1: CH.y0, x2: 330, y2: CH.y0, stroke: 'var(--ink)', 'stroke-width': 2 });
+    if (m.axisMin !== 0) mk(svg, 'path', { d: 'M' + (CH.x0 - 7) + ' ' + (CH.y0 - 6) + ' l14 -6 M' + (CH.x0 - 7) + ' ' + (CH.y0 - 12) + ' l14 -6', stroke: 'var(--red)', 'stroke-width': 2.5, fill: 'none' });
+    var colors = ['var(--acc)', 'var(--two)'];
+    m.bars.forEach(function (b, i) {
+      var x = 100 + i * 120;
+      mk(svg, 'rect', { x: x, y: CH.y0 - b.h, width: 80, height: b.h, fill: colors[i], stroke: 'var(--ink)', 'stroke-width': 1.5 });
+      mk(svg, 'text', { x: x + 40, y: CH.y0 - b.h - 6, 'font-size': 13, 'text-anchor': 'middle', 'font-weight': 600 }, b.v + ' voix');
+      mk(svg, 'text', { x: x + 40, y: CH.y0 + 18, 'font-size': 13, 'text-anchor': 'middle' }, b.label);
+    });
+    mk(svg, 'text', { x: 12, y: 24, 'font-size': 11 }, m.axisMin === 0 ? 'axe de 0 à 60' : 'axe de 46 à 54 (coupé !)');
+    $('chartCut').setAttribute('aria-pressed', chartMin === 46 ? 'true' : 'false');
+    $('chartZero').setAttribute('aria-pressed', chartMin === 0 ? 'true' : 'false');
+    var out = $('chartOut');
+    if (m.axisMin !== 0) { out.className = 'verdict no'; out.innerHTML = 'La barre « pizza » paraît ' + fmt(m.apparent, 0) + ' fois plus haute !<span>L’axe commence à 46 au lieu de 0 : on a coupé le bas des barres. La petite différence de 4 voix a l’air énorme. En vrai, 52 contre 48, c’est presque égal (environ ' + fmt(m.real, 2) + ' fois).</span>'; }
+    else { out.className = 'verdict yes'; out.innerHTML = 'Avec un axe à 0, la vérité se voit.<span>Les deux barres sont presque pareilles : environ ' + fmt(m.real, 2) + ' fois. Les mêmes chiffres, mais une impression complètement différente.</span>'; }
+  }
+  $('chartCut').addEventListener('click', function () { chartMin = 46; chartDraw(); });
+  $('chartZero').addEventListener('click', function () { chartMin = 0; chartDraw(); });
+  chartDraw();
+
+  /* ---------- Scénarios « que fais-tu ? » ---------- */
+  var PROOF = [
+    { name: 'Le fantôme du gymnase', text: 'Malik : « Il y a un fantôme dans le gymnase la nuit, c’est sûr. Tu ne peux pas prouver que c’est faux, hein ? Donc c’est vrai ! »',
+      c: [['« C’est vrai, je ne peux pas prouver le contraire… donc tu as sûrement raison. »', 'no', 'C’est le piège ! Ne pas pouvoir prouver que c’est faux ne rend pas une chose vraie. Sinon, la théière dans l’espace existerait aussi.'],
+          ['« C’est toi qui l’affirmes, c’est à toi de le prouver. Tu as quoi comme preuve ? »', 'yes', 'Exactement : la charge de la preuve est à celui qui affirme. Calmement, sans te moquer.'],
+          ['« T’es complètement bête, Malik. » devant toute la classe', 'no', 'Tu as raison sur le fond, mais l’humilier le pousse à s’accrocher à son idée. Demande-lui plutôt sa preuve.']] },
+    { name: 'Le jeu qui abîme le cerveau', text: 'Un post : « Personne n’a prouvé que le jeu Bloc-Bataille n’abîme pas le cerveau. Donc il l’abîme ! Partagez pour protéger vos amis ! »',
+      c: [['Je partage, on ne sait jamais.', 'no', '« On ne sait jamais » est exactement ce que veut le post. Il n’apporte aucune preuve, juste de la peur.'],
+          ['Je me demande : qui l’affirme, et avec quelle preuve ? Ici : aucune. Je ne partage pas.', 'yes', 'Bravo. Une affirmation sans preuve ne mérite pas d’être partagée, même si elle fait peur.'],
+          ['Je cherche pendant 3 heures toutes les études du monde pour prouver que c’est faux.', 'mid', 'C’est bien de chercher, mais ce n’est pas à toi de tout prouver. C’est au post de montrer ses preuves. S’il n’en a pas, c’est déjà une réponse.']] }
+  ];
+  var REACT = [
+    { name: 'J’ai partagé', text: 'Hier soir, tu as partagé « L’école ferme demain ! » dans le groupe de classe. Ce matin, tu découvres que c’est faux : l’école est ouverte.',
+      c: [['Je supprime mon message sans rien dire.', 'mid', 'C’est un début, mais ceux qui l’ont lu croient toujours la fausse info. Il faut aussi corriger.'],
+          ['J’écris : « Attention, j’ai partagé une fausse info, l’école est ouverte. Désolé·e ! »', 'yes', 'Parfait. C’est courageux et utile : tu arrêtes la rumeur là où tu l’as lancée.'],
+          ['Je ne fais rien, ça va passer.', 'no', 'La rumeur continue à circuler et des camarades pourraient rater l’école à cause d’elle.'],
+          ['Je dis que c’était une blague.', 'no', 'Ce n’est pas honnête, et ça fait douter les gens de toi. Admettre l’erreur, c’est plus fort.']] },
+    { name: 'Mon ami y croit', text: 'Ton ami Noé est sûr que les chips Croquilou envoient des élèves à l’hôpital. Il en parle à tout le monde et il a l’air vraiment inquiet.',
+      c: [['« T’es trop naïf, n’importe quoi ! »', 'no', 'Il va se sentir ridicule et se braquer. Personne ne change d’avis en se faisant moquer.'],
+          ['« Ah bon ? Tu l’as vu où ? On regarde ensemble qui l’a écrit et d’où vient la photo ? »', 'yes', 'Super : des questions calmes et une vérification à deux. Il peut changer d’avis sans perdre la face.'],
+          ['Je ne dis rien, ce n’est pas mon problème.', 'mid', 'Tu n’es pas obligé·e de convaincre tout le monde. Mais un ami inquiet mérite un coup de main.'],
+          ['Je lui envoie 40 liens d’un coup.', 'mid', 'Trop d’infos d’un coup, ça noie et ça énerve. Mieux vaut une vérification simple, ensemble.']] },
+    { name: 'La chaîne', text: 'Dans le groupe du club : « Si tu ne partages pas ce message à 10 personnes, ton compte sera supprimé ce soir. Partagez au maximum !!! »',
+      c: [['Je le partage à 10 personnes, au cas où.', 'no', 'Aucun réseau ne supprime des comptes comme ça. Ce message vit seulement parce que les gens ont peur et le transfèrent.'],
+          ['Je ne le partage pas, et j’écris gentiment au groupe que c’est une chaîne.', 'yes', 'Bon réflexe : tu coupes la chaîne et tu aides les autres, sans moquerie.'],
+          ['Je le transfère à un adulte pour lui demander son avis.', 'yes', 'Très bien aussi : demander à un adulte de confiance, c’est toujours une bonne idée quand on a un doute.']] }
+  ];
+  function scenario(list, tabsId, textId, choicesId, outId) {
+    var cur = 0;
+    $(tabsId).innerHTML = list.map(function (s, i) { return '<button type="button" data-i="' + i + '">' + esc(s.name) + '</button>'; }).join('');
+    function show(i) {
+      cur = i;
+      Array.prototype.forEach.call($(tabsId).querySelectorAll('button'), function (b, j) { b.setAttribute('aria-pressed', j === i ? 'true' : 'false'); });
+      $(textId).textContent = list[i].text;
+      $(choicesId).innerHTML = list[i].c.map(function (c, j) { return '<button type="button" data-j="' + j + '" aria-pressed="false">' + esc(c[0]) + '</button>'; }).join('');
+      $(outId).className = 'verdict'; $(outId).innerHTML = '';
+    }
+    $(tabsId).addEventListener('click', function (e) { var b = e.target.closest('button[data-i]'); if (b) show(+b.getAttribute('data-i')); });
+    $(choicesId).addEventListener('click', function (e) {
+      var b = e.target.closest('button[data-j]'); if (!b) return;
+      var j = +b.getAttribute('data-j'), c = list[cur].c[j];
+      Array.prototype.forEach.call($(choicesId).querySelectorAll('button'), function (x, k) { x.setAttribute('aria-pressed', k === j ? 'true' : 'false'); });
+      $(outId).className = 'verdict ' + c[1];
+      $(outId).innerHTML = (c[1] === 'yes' ? 'Bon réflexe !' : c[1] === 'mid' ? 'Pas mal, mais…' : 'Attention !') + '<span>' + esc(c[2]) + '</span>';
+    });
+    show(0);
+  }
+  scenario(PROOF, 'proofTabs', 'proofText', 'proofChoices', 'proofOut');
+  scenario(REACT, 'reactTabs', 'reactText', 'reactChoices', 'reactOut');
+
+  /* ---------- Quiz ---------- */
+  var QZ = [
+    { q: '« Les frites de la cantine sont trop bonnes ! » C’est…', o: [['a', 'une info'], ['b', 'une opinion'], ['c', 'une publicité']], a: 'b', how: 'C’est un goût personnel : ni vrai ni faux.' },
+    { q: 'Vrai ou faux : une info partagée par des milliers de personnes est forcément vraie.', o: [['v', 'Vrai'], ['f', 'Faux']], a: 'f', how: 'Les partages mesurent l’émotion, pas la vérité. Les fausses infos sont souvent plus partagées.' },
+    { q: 'Une photo choc circule. Quel outil montre si elle a déjà été publiée avant, ailleurs ?', o: [['a', 'la recherche d’image inversée'], ['b', 'compter les « j’aime »'], ['c', 'zoomer sur la photo']], a: 'a', how: 'On donne l’image à un moteur de recherche, il montre où et depuis quand elle circule.' },
+    { q: 'Un graphique commence son axe à 46 au lieu de 0. Ça peut…', o: [['a', 'rendre les chiffres plus précis'], ['b', 'faire paraître une petite différence énorme'], ['c', 'ne rien changer']], a: 'b', how: '52 contre 48 peut avoir l’air de 3 contre 1 si on coupe le bas des barres.' },
+    { q: 'Quelqu’un dit : « Prouve que c’est faux ! ». Qui doit apporter la preuve ?', o: [['a', 'moi'], ['b', 'celui qui affirme'], ['c', 'personne']], a: 'b', how: 'La charge de la preuve est à celui qui affirme quelque chose.' },
+    { q: 'Tu as partagé une fausse info dans le groupe de classe. Le mieux, c’est…', o: [['a', 'ne rien dire'], ['b', 'supprimer et écrire une correction'], ['c', 'dire que c’était une blague']], a: 'b', how: 'Supprimer, corriger, prévenir. Admettre une erreur, c’est courageux.' },
+    { q: 'Vrai ou faux : le titre d’un article peut dire autre chose que l’article lui-même.', o: [['v', 'Vrai'], ['f', 'Faux']], a: 'v', how: 'Certains titres exagèrent pour attirer les clics. Il faut lire plus loin.' },
+    { q: 'Ton ami croit une rumeur. Que fais-tu ?', o: [['a', 'je me moque de lui devant les autres'], ['b', 'je pose des questions calmes et on vérifie ensemble'], ['c', 'je partage la rumeur moi aussi']], a: 'b', how: 'Sans humilier : on change plus facilement d’avis quand on ne se sent pas ridicule.' }
+  ];
+  var quiz = $('quiz'), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ''; done = [];
+    QZ.forEach(function (Q, k) {
+      var li = document.createElement('li');
+      li.innerHTML = '<span>' + esc(Q.q) + '</span><select id="qa' + k + '" aria-label="Ta réponse à la question ' + (k + 1) + '"><option value="">…</option>' + Q.o.map(function (o) { return '<option value="' + o[0] + '">' + esc(o[1]) + '</option>'; }).join('') + '</select><button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+      quiz.appendChild(li);
+      function check() {
+        var fb = $('qf' + k), v = $('qa' + k).value;
+        if (!v) { fb.className = 'fb'; fb.textContent = 'Choisis une réponse.'; return; }
+        if (v === Q.a) { fb.className = 'fb ok'; fb.innerHTML = 'Bravo, c’est juste !<span>' + esc(Q.how) + '</span>'; done[k] = true; }
+        else {
+          done[k] = false;
+          var good = Q.o.filter(function (o) { return o[0] === Q.a; })[0][1];
+          fb.className = 'fb no'; fb.innerHTML = 'Pas tout à fait : la bonne réponse est « ' + esc(good) + ' ».<span>' + esc(Q.how) + '</span>';
+        }
+        $('score').textContent = done.filter(Boolean).length + ' / 8';
+      }
+      $('qb' + k).addEventListener('click', check);
+      $('qa' + k).addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+    });
+    $('score').textContent = '0 / 8';
+  }
+  $('newQuiz').addEventListener('click', newQuiz);
+  newQuiz();
+
+  window.__inf = {
+    items: ITEMS, cats: CATS, classifyItem: classifyItem, checkSort: checkSort, sortScore: sortScore,
+    graph: GRAPH, spread: spread, posts: POSTS, verdictOf: verdictOf, checkVerdict: checkVerdict, invScore: invScore,
+    chartModel: chartModel, contextStage: contextStage, proof: PROOF, react: REACT, quiz: QZ
+  };
+})();
+</script>
+</body>
+</html>

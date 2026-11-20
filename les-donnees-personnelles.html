@@ -1,0 +1,1142 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Les données personnelles et la vie privée</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, marge rouge. Accent bleu (#2563eb), violet en couleur secondaire, ambre pour les avertissements, vert pour les bons réflexes. Tous les noms, lieux, applis et numéros des exemples sont inventés (domaines en .exemple). */
+:root {
+  --paper: #f6f8fc;
+  --grid: #e0e7f3;
+  --card: #ffffff;
+  --ink: #172033;
+  --ink-soft: #56607a;
+  --acc: #2563eb;
+  --acc-soft: #dbe7fd;
+  --warn: #d97706;
+  --warn-soft: #fdf0d6;
+  --warn-ink: #92400e;
+  --two: #7c3aed;
+  --two-soft: #ede4fd;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #fff0a3;
+  --line: #dbe2ee;
+  --sky: #e3eefc;
+  --wall: #fbf3e4;
+  --roof: #c2553f;
+  --grass: #cfe8c4;
+  --glass: #c9e0f5;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0e121a; --grid: #1a2130; --card: #151b26; --ink: #eef2fa; --ink-soft: #a9b3c8;
+    --acc: #7aa7ff; --acc-soft: #172747; --warn: #f5a524; --warn-soft: #3d2a0c; --warn-ink: #fbbf5a;
+    --two: #b79cff; --two-soft: #2a1d47;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #2a3346;
+    --sky: #1b2740; --wall: #2c2a26; --roof: #8a3a2c; --grass: #1f3322; --glass: #23405e;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0e121a; --grid: #1a2130; --card: #151b26; --ink: #eef2fa; --ink-soft: #a9b3c8;
+  --acc: #7aa7ff; --acc-soft: #172747; --warn: #f5a524; --warn-soft: #3d2a0c; --warn-ink: #fbbf5a;
+  --two: #b79cff; --two-soft: #2a1d47;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #2a3346;
+  --sky: #1b2740; --wall: #2c2a26; --roof: #8a3a2c; --grass: #1f3322; --glass: #23405e;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--acc); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+@media (max-width: 420px) { .box { padding: 16px 14px; } }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note.warn { border-left-color: var(--warn); background: var(--warn-soft); }
+.note.ok { border-left-color: var(--ok); background: var(--ok-soft); }
+.note.two { border-left-color: var(--two); background: var(--two-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+.fig svg { width: 100%; height: auto; display: block; }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 8px 12px; min-height: 44px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+button:disabled { opacity: .5; cursor: default; transform: none; }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+input[type="text"] { font: inherit; font-family: var(--f-mono); font-size: 1rem; padding: 8px 10px; min-height: 44px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; }
+input[type="range"] { width: 100%; accent-color: var(--acc); min-height: 40px; }
+select { font: inherit; font-size: 1rem; padding: 8px 8px; min-height: 44px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; }
+.param { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.param label { font-weight: 700; }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
+.tag.ok { color: var(--ok); }
+.tag.no { color: var(--red); }
+.tag.warn { color: var(--warn-ink); }
+.tag.acc { color: var(--acc); }
+.tag.two { color: var(--two); }
+
+.verdict { border-radius: 8px; padding: 12px 14px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+.verdict.yes { background: var(--ok-soft); color: var(--ok); }
+.verdict.no { background: var(--red-soft); color: var(--red); }
+.verdict.mid { background: var(--warn-soft); color: var(--warn-ink); }
+.verdict span { font-weight: 400; color: var(--ink); }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc); }
+.top { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between; }
+
+/* Tri des données */
+.sort-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.sort-list li { border: 1.5px solid var(--line); border-left: 5px solid var(--line); border-radius: 10px; padding: 10px 12px; background: var(--paper); display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.sort-list li.good { border-left-color: var(--ok); }
+.sort-list li.bad { border-left-color: var(--red); }
+.sort-list .item { font-weight: 700; overflow-wrap: anywhere; }
+.sort-list .btns button { flex: 1 1 120px; font-size: .95rem; padding: 6px 8px; box-shadow: 2px 2px 0 var(--ink); }
+.sort-list .fbk { font-size: .95rem; }
+.sort-list .fbk:empty { display: none; }
+.sort-list .fbk.ok { color: var(--ok); }
+.sort-list .fbk.no { color: var(--red); }
+.sort-list .fbk span { color: var(--ink); }
+
+/* Photo */
+.hot { cursor: pointer; }
+.hot rect.zone { fill: transparent; stroke: var(--acc); stroke-width: 2; stroke-dasharray: 5 4; }
+.hot:hover rect.zone, .hot:focus rect.zone { stroke-width: 3.5; }
+.hot:focus { outline: none; }
+.hot.found rect.zone { fill: var(--acc); fill-opacity: .16; stroke-dasharray: none; stroke-width: 3; }
+.badge { display: none; }
+.found .badge { display: inline; }
+.badge circle { fill: var(--acc); }
+.badge text { fill: #fff; font-weight: 600; }
+#prudent { display: none; }
+.is-prudent #prudent { display: inline; }
+.is-prudent .hot { display: none; }
+.caption { background: var(--paper); border: 1.5px solid var(--line); border-radius: 10px; padding: 10px 12px; overflow-wrap: anywhere; }
+.caption .who { font-family: var(--f-display); font-weight: 700; }
+.clue { font: inherit; display: inline; -webkit-box-decoration-break: clone; box-decoration-break: clone; padding: 0 2px; min-height: 0; border: 0; box-shadow: none; border-radius: 4px; cursor: pointer; text-align: left; font-family: inherit; font-weight: inherit; color: inherit; background: transparent; border-bottom: 2.5px dashed var(--acc); }
+.clue:hover, .clue:active { transform: none; box-shadow: none; background: var(--acc-soft); }
+.clue.found { background: var(--acc-soft); }
+.deduce { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.deduce li { border-left: 4px solid var(--acc); background: var(--paper); border-radius: 0 8px 8px 0; padding: 6px 10px; font-size: .95rem; overflow-wrap: anywhere; }
+.deduce li.combo { border-left-color: var(--red); background: var(--red-soft); font-weight: 700; }
+.deduce li.calm { border-left-color: var(--ok); background: var(--ok-soft); }
+
+/* Métadonnées */
+.flow { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 640px) { .flow { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.flow > div { border: 1.5px dashed var(--line); border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 4px; font-size: .92rem; opacity: .45; transition: opacity .2s; min-width: 0; }
+.flow > div.on { opacity: 1; border-style: solid; border-color: var(--acc); background: var(--acc-soft); }
+.flow strong { font-family: var(--f-display); }
+.meta { font-family: var(--f-mono); font-size: .9rem; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; overflow-wrap: anywhere; }
+.meta .gps { color: var(--red); font-weight: 600; }
+.meta .off { color: var(--ok); }
+
+/* Faux quiz */
+.star { font-family: var(--f-display); font-weight: 800; font-size: clamp(1.4rem, 5vw, 2rem); color: var(--two); text-align: center; background: var(--two-soft); border-radius: 10px; padding: 14px; overflow-wrap: anywhere; }
+.reveal { width: 100%; border-collapse: collapse; font-size: .95rem; }
+.reveal th, .reveal td { border: 1.5px solid var(--line); padding: 6px 8px; text-align: left; vertical-align: top; overflow-wrap: anywhere; }
+.reveal th { font-family: var(--f-display); background: var(--paper); }
+.scroll { overflow-x: auto; }
+
+/* Réglages */
+.settings { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 700px) { .settings { grid-template-columns: minmax(0, 1fr); } }
+.set-list { display: flex; flex-direction: column; gap: 8px; }
+.set-row { display: grid; grid-template-columns: minmax(0, 1fr) 150px; gap: 8px; align-items: center; }
+.set-row label { font-weight: 700; font-size: .95rem; }
+@media (max-width: 380px) { .set-row { grid-template-columns: minmax(0, 1fr); gap: 2px; } }
+.profile { border: 1.5px solid var(--ink); border-radius: 14px; padding: 14px; background: var(--paper); display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.p-head { display: flex; gap: 12px; align-items: center; min-width: 0; }
+.p-head svg { width: 56px; height: 56px; flex: none; }
+.p-pseudo { font-family: var(--f-display); font-weight: 800; font-size: 1.15rem; overflow-wrap: anywhere; }
+.p-row { display: flex; justify-content: space-between; gap: 10px; border-bottom: 1px dashed var(--line); padding-block: 4px; font-size: .93rem; flex-wrap: wrap; }
+.p-row span:last-child { text-align: right; overflow-wrap: anywhere; min-width: 0; }
+.p-row.hid span:last-child { color: var(--ink-soft); font-style: italic; }
+.p-row.vis span:last-child { font-weight: 700; }
+
+/* Diffusion */
+.dots { display: grid; grid-template-columns: repeat(20, minmax(0, 1fr)); gap: 4px; max-width: 520px; }
+.dots i { aspect-ratio: 1; border-radius: 50%; background: var(--line); display: block; }
+.dots i.seen { background: var(--acc); }
+.dots i.copy { background: var(--warn); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: .9rem; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.sw { width: 14px; height: 14px; border-radius: 50%; display: inline-block; }
+.post { border: 1.5px solid var(--ink); border-radius: 12px; padding: 10px 12px; background: var(--paper); display: flex; flex-direction: column; gap: 4px; }
+.post.gone { border-style: dashed; opacity: .6; }
+.post.gone .post-body { text-decoration: line-through; }
+.stats { display: flex; flex-wrap: wrap; gap: 8px 20px; font-variant-numeric: tabular-nums; }
+.stats b { font-family: var(--f-display); font-size: 1.2rem; }
+
+/* Pub */
+.acts { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px; }
+.acts button { text-align: left; font-family: var(--f-body); font-weight: 400; box-shadow: 2px 2px 0 var(--ink); }
+.acts button[aria-pressed="true"] { background: var(--acc-soft); color: var(--ink); border-color: var(--acc); font-weight: 700; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-family: var(--f-mono); font-size: .82rem; border: 1.5px solid var(--acc); color: var(--acc); border-radius: 999px; padding: 2px 10px; }
+.chip.sens { border-color: var(--red); color: var(--red); background: var(--red-soft); }
+.ads { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.ads li { border: 1.5px dashed var(--warn); background: var(--warn-soft); border-radius: 8px; padding: 6px 10px; font-size: .93rem; overflow-wrap: anywhere; }
+.ads li b { font-family: var(--f-mono); font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--warn-ink); margin-right: 6px; }
+
+/* Checklist */
+.steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; counter-reset: st; }
+.steps li { counter-increment: st; display: grid; grid-template-columns: 34px 1fr; gap: 10px; align-items: start; border: 1.5px solid var(--line); border-radius: 10px; padding: 8px 10px; background: var(--card); }
+.steps li::before { content: counter(st); width: 30px; height: 30px; border-radius: 50%; background: var(--acc); color: var(--card); display: grid; place-items: center; font-family: var(--f-display); font-weight: 800; }
+.steps li.done::before { content: "✓"; background: var(--ok); }
+.steps label { display: flex; gap: 8px; align-items: flex-start; cursor: pointer; min-height: 32px; }
+.steps input { width: 22px; height: 22px; margin-top: 3px; accent-color: var(--ok); flex: none; }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 220px auto; gap: 10px; align-items: center; }
+.quiz li > span:first-child { min-width: 0; overflow-wrap: anywhere; }
+.quiz select { font-size: .95rem; padding: 6px 6px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb:empty { display: none; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 150px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); }
+details .msg { display: block; margin-top: 8px; font-weight: 400; font-family: var(--f-mono); font-size: .9rem; background: var(--paper); border: 1.5px dashed var(--line); border-radius: 8px; padding: 8px 10px; overflow-wrap: anywhere; color: var(--ink); }
+details ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+<!--ticons--><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Tutoriels"><script src="progress.js" defer></script><!--/ticons-->
+<style id="tnav-css">
+.tnav-top { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin: 0 0 4px; }
+.tnav-home { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font-weight: 700; font-size: .95rem; text-decoration: none; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tnav-home:hover, .tnav-home:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.tnav-bottom { margin-top: 8px; display: flex; flex-direction: column; gap: 12px; }
+.tnav-bottom h2 { margin: 0; }
+.tnav-pn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tnav-pn a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--ink, #222); border-radius: 10px;
+  background: var(--card, #fff); color: var(--ink, #222); text-decoration: none; box-shadow: 3px 3px 0 var(--ink, #222); min-width: 0; }
+.tnav-pn a span { font-size: .85rem; color: var(--ink-soft, #666); }
+.tnav-pn a strong { overflow-wrap: anywhere; }
+.tnav-pn a.next { text-align: right; grid-column: 2; }
+.tnav-bottom .tnav-home { align-self: center; }
+@media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
+.diff { font: 700 .72rem/1.2 var(--f-mono, monospace); padding: 2px 8px; border-radius: 99px; border: 1.5px solid; white-space: nowrap; }
+.diff.d1 { color: #15803d; border-color: #15803d; background: #dcf3e3; }
+.diff.d2 { color: #a15c07; border-color: #b45309; background: #fbe7cf; }
+.diff.d3 { color: #b91c1c; border-color: #b91c1c; background: #fde2e2; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root:not([data-theme="light"]) .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root:not([data-theme="light"]) .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; } }
+:root[data-theme="dark"] .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root[data-theme="dark"] .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root[data-theme="dark"] .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; }
+</style>
+</head>
+<body>
+<main class="page">
+<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="numerique.html">← Tous les tutoriels numériques</a><span class="diff d2" title="Difficulté : moyen">Moyen</span></nav><!--/tnav-->
+
+
+  <header class="hero">
+    <span class="eyebrow">Tutoriel numérique · niveau 9H–10H</span>
+    <h1>Les données personnelles et la vie privée</h1>
+    <p class="lead">Ton prénom, ta photo, ton école, l'heure de ton bus… Une seule info, ça paraît rien. Mises ensemble, elles racontent ta vie. Ici, tu vas apprendre ce que tu laisses derrière toi en ligne, et comment choisir toi-même qui sait quoi.</p>
+    <div class="box fig">
+      <svg viewBox="0 0 360 190" role="img" aria-label="Une silhouette entourée de petites étiquettes : nom, photo, école, position, voix, habitudes. Un cadenas protège une partie des étiquettes.">
+        <circle cx="180" cy="72" r="26" fill="var(--acc-soft)" stroke="var(--acc)" stroke-width="2.5"/>
+        <path d="M130 160 a50 50 0 0 1 100 0 z" fill="var(--acc-soft)" stroke="var(--acc)" stroke-width="2.5"/>
+        <g font-size="12">
+          <rect x="18" y="20" width="76" height="26" rx="13" fill="var(--card)" stroke="var(--ink)" stroke-width="1.5"/><text x="56" y="37" text-anchor="middle">nom</text>
+          <rect x="10" y="74" width="84" height="26" rx="13" fill="var(--card)" stroke="var(--ink)" stroke-width="1.5"/><text x="52" y="91" text-anchor="middle">photo</text>
+          <rect x="18" y="128" width="76" height="26" rx="13" fill="var(--card)" stroke="var(--ink)" stroke-width="1.5"/><text x="56" y="145" text-anchor="middle">école</text>
+          <rect x="262" y="20" width="88" height="26" rx="13" fill="var(--warn-soft)" stroke="var(--warn)" stroke-width="1.5"/><text x="306" y="37" text-anchor="middle">position</text>
+          <rect x="266" y="74" width="76" height="26" rx="13" fill="var(--card)" stroke="var(--ink)" stroke-width="1.5"/><text x="304" y="91" text-anchor="middle">voix</text>
+          <rect x="258" y="128" width="96" height="26" rx="13" fill="var(--warn-soft)" stroke="var(--warn)" stroke-width="1.5"/><text x="306" y="145" text-anchor="middle">habitudes</text>
+        </g>
+        <path d="M94 33 L150 58 M94 87 L150 80 M94 141 L140 130 M262 33 L210 58 M266 87 L210 80 M258 141 L222 130" stroke="var(--ink-soft)" stroke-width="1.5" stroke-dasharray="4 4" fill="none"/>
+        <rect x="160" y="150" width="40" height="32" rx="6" fill="var(--acc)"/>
+        <path d="M168 150 v-8 a12 12 0 0 1 24 0 v8" fill="none" stroke="var(--acc)" stroke-width="4"/>
+        <circle cx="180" cy="164" r="4" fill="var(--card)"/>
+      </svg>
+    </div>
+    <p class="soft">Tous les noms, lieux, applis et numéros de cette page sont <strong>inventés</strong>. Rien de ce que tu tapes ou coches n'est envoyé ni enregistré : tout reste sur ta page, et disparaît quand tu la fermes.</p>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · C'est quoi ?</span>
+    <h2>Une donnée personnelle, c'est tout ce qui parle de toi</h2>
+    <p>Une <strong>donnée personnelle</strong>, c'est une information qui permet de savoir <strong>qui tu es</strong>, directement ou en la combinant avec d'autres. Ton nom, bien sûr. Mais aussi ta photo, ta voix, ton adresse, ton école, ta position, ton numéro de téléphone, et même tes <strong>habitudes</strong> (le bus que tu prends, l'heure où tu te connectes).</p>
+    <p>Certaines données sont encore plus délicates. La loi suisse les appelle des <strong>données sensibles</strong> : ta <strong>santé</strong>, ta <strong>religion</strong> ou tes croyances, tes <strong>opinions politiques</strong>, ton origine, ta vie intime, ou encore les données de ton corps qui servent à te reconnaître (empreinte digitale, visage pour déverrouiller le téléphone). <span class="hl">Si elles tombent entre de mauvaises mains, elles peuvent servir à te juger ou à te mettre à l'écart.</span></p>
+    <div class="box">
+      <div class="top">
+        <h3>Le grand tri</h3>
+        <span class="score" id="sortScore">0 / 14</span>
+      </div>
+      <p class="soft">Pour chaque information : est-elle <strong>personnelle</strong>, <strong>sensible</strong> (personnelle et très délicate) ou <strong>pas personnelle</strong> (elle ne dit rien sur une personne précise) ?</p>
+      <ul class="sort-list" id="sortList"></ul>
+      <div class="btns"><span class="soft" id="sortProg">0 information triée sur 14</span><button type="button" id="sortReset">Recommencer</button></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Le puzzle</span>
+      <span>« Une fille de 13 ans » : ça ne dit pas qui c'est. « Une fille de 13 ans, en 9H au Collège du Lac, qui fait du skate le mercredi » : dans une petite ville, tout le monde sait de qui on parle. <strong>Chaque pièce seule semble anodine ; c'est l'ensemble qui dessine ton portrait.</strong></span>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · Le détective</span>
+    <h2>Que révèle cette photo ?</h2>
+    <p>Lina, 13 ans (inventée), publie cette photo <strong>en public</strong> le jour de la rentrée. Mets-toi à la place d'un inconnu qui ne la connaît pas : <strong>touche les indices</strong> cachés dans l'image et dans le texte. Qu'est-ce qu'il peut deviner ?</p>
+    <div class="box" id="photoBox">
+      <div class="top">
+        <span class="score" id="clueScore">0 / 7 indices</span>
+        <div class="btns"><button type="button" id="prudentBtn" aria-pressed="false">Voir la version prudente</button><button type="button" id="clueReset">Recommencer</button></div>
+      </div>
+      <div class="fig">
+        <svg id="scene" viewBox="0 0 400 280" role="group" aria-label="Photo inventée : une ado devant une maison, avec un panneau de rue, un numéro de maison, un arrêt de bus, un reflet dans la fenêtre et une gamelle de chien">
+          <defs>
+            <pattern id="blurPat" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="8" height="8" fill="var(--line)"/><rect width="4" height="8" fill="var(--ink-soft)" opacity=".35"/></pattern>
+          </defs>
+          <rect x="0" y="0" width="400" height="280" fill="var(--sky)"/>
+          <circle cx="250" cy="34" r="14" fill="#facc15" opacity=".8"/>
+          <rect x="0" y="236" width="400" height="16" fill="var(--line)"/>
+          <rect x="0" y="252" width="400" height="28" fill="var(--grass)"/>
+          <!-- maison -->
+          <polygon points="0,96 95,36 190,96" fill="var(--roof)" stroke="var(--ink)" stroke-width="2"/>
+          <rect x="10" y="96" width="170" height="140" fill="var(--wall)" stroke="var(--ink)" stroke-width="2"/>
+          <rect x="22" y="112" width="72" height="56" fill="var(--glass)" stroke="var(--ink)" stroke-width="2"/>
+          <g transform="translate(116 0) scale(-1 1)" opacity=".8">
+            <rect x="52" y="122" width="12" height="4" fill="#16a34a"/><rect x="56" y="118" width="4" height="12" fill="#16a34a"/>
+            <text x="58" y="150" text-anchor="middle" font-size="11" font-weight="600">PHARMACIE</text>
+          </g>
+          <path d="M28 160 L44 118 M40 164 L58 118" stroke="#fff" stroke-width="2" opacity=".5"/>
+          <rect x="118" y="160" width="42" height="76" fill="var(--two-soft)" stroke="var(--ink)" stroke-width="2"/>
+          <circle cx="152" cy="200" r="3" fill="var(--ink)"/>
+          <rect x="120" y="132" width="38" height="22" rx="3" fill="var(--card)" stroke="var(--ink)" stroke-width="1.5"/>
+          <text x="139" y="148" text-anchor="middle" font-size="14" font-weight="600">12</text>
+          <!-- gamelle -->
+          <path d="M66 240 h44 l-6 12 h-32 z" fill="var(--acc)" stroke="var(--ink)" stroke-width="1.5"/>
+          <text x="88" y="250" text-anchor="middle" font-size="9" font-weight="600" style="fill:#fff">FILOU</text>
+          <!-- ado -->
+          <circle cx="212" cy="140" r="16" fill="#e0ac7e" stroke="var(--ink)" stroke-width="1.5"/>
+          <path d="M196 138 a16 16 0 0 1 32 0 q-8 -8 -16 -6 q-8 -2 -16 6z" fill="#5b3a29"/>
+          <rect x="186" y="158" width="52" height="56" rx="8" fill="var(--acc)" stroke="var(--ink)" stroke-width="1.5"/>
+          <text x="212" y="181" text-anchor="middle" font-size="9" font-weight="600" style="fill:#fff">COLLÈGE</text>
+          <text x="212" y="195" text-anchor="middle" font-size="10" font-weight="600" style="fill:#fff">DU LAC</text>
+          <rect x="196" y="214" width="10" height="30" fill="var(--ink)"/><rect x="218" y="214" width="10" height="30" fill="var(--ink)"/>
+          <!-- chien -->
+          <ellipse cx="262" cy="232" rx="20" ry="10" fill="#b7793f" stroke="var(--ink)" stroke-width="1.5"/>
+          <circle cx="284" cy="221" r="9" fill="#b7793f" stroke="var(--ink)" stroke-width="1.5"/>
+          <path d="M248 240 v8 M256 241 v8 M268 241 v8 M276 240 v8 M242 228 l-8 -6" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round"/>
+          <!-- panneau de rue -->
+          <rect x="316" y="50" width="4" height="196" fill="var(--ink-soft)"/>
+          <rect x="276" y="26" width="90" height="26" rx="4" fill="#1d4ed8" stroke="var(--ink)" stroke-width="1.5"/>
+          <text x="321" y="44" text-anchor="middle" font-size="11" font-weight="600" style="fill:#fff">Ch. des Lilas</text>
+          <!-- arrêt de bus -->
+          <rect x="376" y="120" width="4" height="126" fill="var(--ink-soft)"/>
+          <rect x="348" y="58" width="50" height="66" rx="4" fill="#facc15" stroke="var(--ink)" stroke-width="1.5"/>
+          <text x="373" y="73" text-anchor="middle" font-size="10" font-weight="600" style="fill:#1f2937">BUS</text>
+          <text x="373" y="89" text-anchor="middle" font-size="9" style="fill:#1f2937">Arrêt</text>
+          <text x="373" y="102" text-anchor="middle" font-size="8.5" style="fill:#1f2937">Peupliers</text>
+          <text x="373" y="117" text-anchor="middle" font-size="9.5" font-weight="600" style="fill:#1f2937">07:32</text>
+          <!-- zones cliquables -->
+          <g class="hot" id="hot-sign" data-clue="sign" tabindex="0" role="button" aria-label="Indice : le panneau de rue"><rect class="zone" x="272" y="20" width="98" height="36" rx="6"/><g class="badge"><circle cx="272" cy="20" r="9"/><text x="272" y="24" text-anchor="middle" font-size="11">1</text></g></g>
+          <g class="hot" id="hot-num" data-clue="num" tabindex="0" role="button" aria-label="Indice : le numéro sur la façade"><rect class="zone" x="114" y="126" width="50" height="32" rx="6"/><g class="badge"><circle cx="114" cy="126" r="9"/><text x="114" y="130" text-anchor="middle" font-size="11">2</text></g></g>
+          <g class="hot" id="hot-jersey" data-clue="jersey" tabindex="0" role="button" aria-label="Indice : le t-shirt"><rect class="zone" x="182" y="164" width="60" height="44" rx="6"/><g class="badge"><circle cx="182" cy="164" r="9"/><text x="182" y="168" text-anchor="middle" font-size="11">3</text></g></g>
+          <g class="hot" id="hot-bus" data-clue="bus" tabindex="0" role="button" aria-label="Indice : le panneau de l'arrêt de bus"><rect class="zone" x="344" y="58" width="56" height="70" rx="6"/><g class="badge"><circle cx="350" cy="62" r="9"/><text x="350" y="66" text-anchor="middle" font-size="11">4</text></g></g>
+          <g class="hot" id="hot-refl" data-clue="refl" tabindex="0" role="button" aria-label="Indice : le reflet dans la fenêtre"><rect class="zone" x="18" y="108" width="80" height="64" rx="6"/><g class="badge"><circle cx="18" cy="108" r="9"/><text x="18" y="112" text-anchor="middle" font-size="11">5</text></g></g>
+          <g class="hot" id="hot-dog" data-clue="dog" tabindex="0" role="button" aria-label="Indice : la gamelle du chien"><rect class="zone" x="60" y="236" width="56" height="20" rx="6"/><g class="badge"><circle cx="60" cy="236" r="9"/><text x="60" y="240" text-anchor="middle" font-size="11">6</text></g></g>
+          <!-- version prudente : zones floutées -->
+          <g id="prudent">
+            <rect x="274" y="24" width="94" height="30" rx="4" fill="url(#blurPat)"/>
+            <rect x="118" y="130" width="42" height="26" rx="3" fill="url(#blurPat)"/>
+            <rect x="188" y="170" width="48" height="32" rx="4" fill="url(#blurPat)"/>
+            <rect x="346" y="56" width="54" height="70" rx="4" fill="url(#blurPat)"/>
+            <rect x="22" y="112" width="72" height="56" fill="url(#blurPat)"/>
+            <rect x="64" y="238" width="48" height="16" rx="3" fill="url(#blurPat)"/>
+          </g>
+        </svg>
+      </div>
+      <div class="caption" id="caption"></div>
+      <ul class="deduce" id="deduce" aria-live="polite"></ul>
+    </div>
+    <div class="note ok">
+      <span class="note-title">Pas de panique</span>
+      <span>La plupart des gens qui voient tes photos ne te veulent aucun mal. Mais une photo <strong>publique</strong> peut être vue par <strong>n'importe qui</strong>, et tu ne choisis pas qui. Le bon réflexe : avant de publier, <strong>regarde l'arrière-plan</strong> comme le ferait un détective.</span>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Ce qu'on ne voit pas</span>
+    <h2>La position et les infos cachées d'une photo</h2>
+    <p>Ton téléphone sait presque toujours où il est : grâce au <strong>GPS</strong> (des satellites), aux antennes et au wifi autour de toi. C'est la <strong>géolocalisation</strong>. C'est très pratique pour une carte ou pour retrouver un téléphone perdu, mais beaucoup d'applis aimeraient bien la connaître aussi.</p>
+    <p>Quand tu prends une photo, le téléphone peut écrire <strong>dans le fichier</strong> des informations qu'on ne voit pas sur l'image : la date, l'heure, le modèle du téléphone et, si la localisation de l'appareil photo est activée, <strong>l'endroit exact</strong>. On appelle ça les <strong>métadonnées</strong> (« des données sur les données »).</p>
+    <div class="box">
+      <h3>Le voyage d'une photo, pas à pas</h3>
+      <div class="btns" role="group" aria-label="Localisation de l'appareil photo">
+        <span style="font-weight:700">Localisation de l'appareil photo :</span>
+        <button type="button" id="gpsOn" aria-pressed="true">activée</button>
+        <button type="button" id="gpsOff" aria-pressed="false">désactivée</button>
+      </div>
+      <div class="flow" id="flow">
+        <div><strong>1. Clic !</strong><span>Tu prends une photo de ton chat sur ton lit.</span></div>
+        <div><strong>2. Le fichier</strong><span>Le téléphone range l'image et ajoute ses métadonnées.</span></div>
+        <div><strong>3. L'envoi</strong><span>Tu envoies le fichier original à quelqu'un (pièce jointe, transfert de fichier).</span></div>
+        <div><strong>4. La lecture</strong><span>La personne ouvre les « infos » du fichier. Il suffit de quelques clics.</span></div>
+      </div>
+      <div class="meta" id="meta" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="flowNext">Étape suivante</button><button type="button" id="flowReset">Revenir au début</button></div>
+      <p class="soft" id="flowTxt"></p>
+    </div>
+    <div class="note warn">
+      <span class="note-title">À savoir</span>
+      <span>Beaucoup de réseaux sociaux effacent la position quand tu publies une photo, mais <strong>pas tous, et pas toujours</strong>, surtout quand on envoie le fichier original. Le plus simple : <strong>désactive la localisation de l'appareil photo</strong> dans les réglages, et garde le <strong>partage de position en direct</strong> (sur une carte d'amis) pour ta famille seulement.</span>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · Les jeux « innocents »</span>
+    <h2>Découvre ton nom de star… ou pas</h2>
+    <p>Sur les réseaux, des jeux tournent en boucle : « Ton nom de star = ton premier animal + ta rue », « Ton nom de licorne = ton mois de naissance + ta ville ». C'est drôle, on répond en commentaire, et on tague ses amis. Essaie celui-ci (avec de vraies réponses ou des réponses inventées, comme tu veux : rien n'est envoyé ni enregistré).</p>
+    <div class="box">
+      <h3>Quel est ton nom de star ?</h3>
+      <div class="grid2">
+        <div class="param"><label for="qPet">Le nom de ton premier animal</label><input type="text" id="qPet" autocomplete="off" spellcheck="false" placeholder="par ex. Filou"></div>
+        <div class="param"><label for="qStreet">La rue où tu as grandi</label><input type="text" id="qStreet" autocomplete="off" spellcheck="false" placeholder="par ex. Lilas"></div>
+        <div class="param"><label for="qCity">La ville où tu es né·e</label><input type="text" id="qCity" autocomplete="off" spellcheck="false" placeholder="par ex. Montrivage"></div>
+        <div class="param"><label for="qMonth">Ton mois de naissance</label><select id="qMonth"></select></div>
+      </div>
+      <div class="btns"><button type="button" id="starGo">Découvrir mon nom de star</button><button type="button" id="starReset">Effacer</button></div>
+      <div id="starOut" aria-live="polite"></div>
+      <div id="revealOut" aria-live="polite"></div>
+    </div>
+    <div class="note two">
+      <span class="note-title">Pourquoi c'est un piège</span>
+      <span>Ces questions ressemblent beaucoup aux <strong>questions de sécurité</strong> qui servent à récupérer un compte (« Nom de votre premier animal ? »). Les réponses publiées en commentaire peuvent être lues et ramassées par n'importe qui, parfois par des robots. Certains de ces jeux sont créés exprès pour ça. Ce qu'il faut faire pour les questions de sécurité est expliqué dans le tutoriel sur <a class="tlink" href="les-mots-de-passe.html">les mots de passe</a>.</span>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Les réglages</span>
+    <h2>Qui voit quoi sur ton profil ?</h2>
+    <p>Sur la plupart des applis, tu peux choisir pour chaque information : <strong>public</strong> (tout le monde, même des inconnus), <strong>amis</strong> (les personnes que tu as acceptées) ou <strong>moi seulement</strong>. Voici le profil inventé de Lina sur l'appli « Bavardo ». Change les réglages et regarde ce qu'un inconnu voit.</p>
+    <div class="box">
+      <div class="btns">
+        <button type="button" id="setAllPub">Tout en public</button>
+        <button type="button" id="setSafe">Réglages prudents</button>
+      </div>
+      <div class="settings">
+        <div class="set-list" id="setList"></div>
+        <div class="profile">
+          <div class="btns" role="group" aria-label="Voir le profil comme">
+            <span style="font-weight:700">Voir comme :</span>
+            <button type="button" id="viewStranger" aria-pressed="true">un inconnu</button>
+            <button type="button" id="viewFriend" aria-pressed="false">un ami</button>
+          </div>
+          <div class="p-head"><svg viewBox="0 0 56 56" id="avatar" aria-hidden="true"></svg><div><div class="p-pseudo">lina_skate</div><div class="soft" id="pCount"></div></div></div>
+          <div id="pRows"></div>
+        </div>
+      </div>
+      <div id="setAdvice" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">« Amis », ça veut dire qui ?</span>
+      <span>Le réglage « amis » ne protège que si tes amis sont… vraiment tes amis. Accepte les personnes que tu connais <strong>en vrai</strong>. Et souviens-toi : un ami peut toujours faire une capture d'écran. Pour aller plus loin sur les abonnés, les stories et les algorithmes, regarde le tutoriel sur <a class="tlink" href="les-reseaux-sociaux-et-les-algorithmes.html">les réseaux sociaux</a>.</span>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · Internet n'oublie pas</span>
+    <h2>Une photo qui s'envole</h2>
+    <p>Une fois publiée, une image peut être <strong>capturée, copiée, transférée</strong>. Même si tu la supprimes, les copies, elles, restent chez les autres. Fais avancer le temps, et essaie de <strong>supprimer le post</strong> à différents moments.</p>
+    <div class="box">
+      <div class="post" id="post">
+        <span class="soft mono" style="font-size:.85rem">Bavardo · réglage : amis</span>
+        <span class="post-body"><strong>Toi :</strong> « Mdr regardez Zoé qui dort dans le bus » [photo de Zoé, la bouche ouverte]</span>
+      </div>
+      <div class="param">
+        <label for="tSlider">Le temps passe : <span class="mono" id="tLabel"></span></label>
+        <input type="range" id="tSlider" min="0" max="6" step="1" value="0">
+      </div>
+      <p id="tTxt"></p>
+      <div class="stats"><span>Personnes qui ont vu l'image : <b id="stViews">0</b></span><span>Personnes qui en ont une copie : <b id="stCopies">0</b></span></div>
+      <div class="dots" id="dots" aria-hidden="true"></div>
+      <div class="legend"><span><i class="sw" style="background:var(--acc)"></i>a vu l'image</span><span><i class="sw" style="background:var(--warn)"></i>en garde une copie</span><span><i class="sw" style="background:var(--line)"></i>pas encore</span><span class="soft">(1 point = 3 personnes)</span></div>
+      <div class="btns"><button type="button" id="delPost">Supprimer le post maintenant</button><button type="button" id="tReset">Recommencer</button></div>
+      <div id="tOut" aria-live="polite"></div>
+    </div>
+    <div class="note red">
+      <span class="note-title">Et Zoé, dans tout ça ?</span>
+      <span>Elle n'avait rien demandé. Avant de publier une photo de quelqu'un, <strong>demande-lui son accord</strong>. Et si tu reçois une capture gênante de quelqu'un, le meilleur geste est simple : <strong>ne la fais pas suivre</strong>. Les stories « qui disparaissent après 24 h » se capturent aussi très facilement.</span>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Si c'est gratuit…</span>
+    <h2>Comment les applis gratuites gagnent de l'argent</h2>
+    <p>Une appli coûte cher : des serveurs, des ingénieurs, de l'électricité. Si tu ne paies rien, quelqu'un d'autre paie. Souvent, ce sont des <strong>annonceurs</strong> qui achètent de la publicité. Et une pub vaut plus cher quand elle est montrée à la <strong>bonne personne</strong> : c'est la <strong>publicité ciblée</strong>. Pour ça, l'appli observe ce que tu regardes, likes, cherches, et où tu es.</p>
+    <p>On entend parfois : « Si c'est gratuit, c'est toi le produit. » C'est un peu exagéré, mais l'idée est juste : <span class="hl">tu paies souvent avec ton attention et avec tes données</span>.</p>
+    <div class="box">
+      <h3>Ton profil publicitaire</h3>
+      <p class="soft">Coche ce que tu fais cette semaine sur ton téléphone. Regarde ce qu'une appli pourrait en déduire, et quelles pubs tu risques de voir.</p>
+      <div class="acts" id="acts" role="group" aria-label="Tes activités"></div>
+      <div><strong>Ce que l'appli devine sur toi :</strong></div>
+      <div class="chips" id="adTags" aria-live="polite"></div>
+      <div><strong>Les pubs que tu vois :</strong></div>
+      <ul class="ads" id="adList"></ul>
+      <div id="adNote" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="adReset">Tout décocher</button></div>
+    </div>
+    <div class="cards">
+      <div class="box"><span class="tag ok">Pas forcément grave</span><strong>Une pub qui t'intéresse</strong><span class="soft">Voir une pub de baskets quand tu cherches des baskets, ce n'est pas un drame. La pub paie aussi des services utiles.</span></div>
+      <div class="box"><span class="tag warn">À surveiller</span><strong>Tes moments fragiles</strong><span class="soft">Quand tu es triste, fatigué·e ou complexé·e, tu es plus facile à convaincre. Un ciblage peut viser ces moments-là.</span></div>
+      <div class="box"><span class="tag two">Micro-ciblage</span><strong>Chacun sa version</strong><span class="soft">Le même principe sert à montrer des messages différents à des groupes précis (âge, région, croyances), même en politique. Tu ne vois pas ce que les autres reçoivent.</span></div>
+      <div class="box"><span class="tag acc">Tu peux agir</span><strong>Les réglages</strong><span class="soft">Beaucoup d'applis permettent de limiter la pub personnalisée et de refuser le suivi. Et tout n'est pas payé par la pub : Wikipédia, par exemple, vit de dons.</span></div>
+    </div>
+    <div class="note two">
+      <span class="note-title">Le réflexe</span>
+      <span>Une pub, une notification ou un « plus que 2 ! » qui te pousse à agir <strong>tout de suite</strong> ? Respire 5 à 10 secondes. <strong>Ce qui veut te faire réagir avant de réfléchir cherche à te manipuler.</strong> Les astuces qu'on utilise pour te convaincre sont expliquées dans le tutoriel sur <a class="tlink" href="comment-on-te-manipule.html">comment on te manipule</a>.</span>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Tes droits</span>
+    <h2>La loi te protège, en Suisse aussi</h2>
+    <p>En Suisse, une loi protège tes <strong>données personnelles</strong> (la loi sur la protection des données), et la loi protège aussi ton <strong>image</strong> et ta personnalité. En simple :</p>
+    <div class="cards">
+      <div class="box"><span class="tag acc">Ton image</span><strong>Ta photo t'appartient un peu</strong><span class="soft">En général, on ne doit pas publier une photo où l'on te reconnaît clairement sans ton accord, surtout si elle te gêne ou te ridiculise.</span></div>
+      <div class="box"><span class="tag acc">Savoir</span><strong>Demander ce qu'on a sur toi</strong><span class="soft">Tu peux demander à une entreprise quelles données elle garde sur toi (avec l'aide d'un adulte).</span></div>
+      <div class="box"><span class="tag acc">Corriger, effacer</span><strong>Demander de retirer</strong><span class="soft">Tu peux demander de corriger une info fausse, et souvent de supprimer des données ou une photo de toi.</span></div>
+      <div class="box"><span class="tag no">Très grave</span><strong>Les images intimes</strong><span class="soft">Partager une photo intime d'un mineur est grave et interdit, même si c'est un autre ado qui le fait. Dans ce cas : un adulte de confiance, et la police (117).</span></div>
+    </div>
+    <div class="box">
+      <h3>Que fais-tu ?</h3>
+      <div class="btns" id="rTabs" role="group" aria-label="Choisir une situation"></div>
+      <p id="rText"></p>
+      <div class="btns" id="rChoices" role="group" aria-label="Ta réaction"></div>
+      <div id="rOut" aria-live="polite"></div>
+    </div>
+    <div class="note ok">
+      <span class="note-title">Où trouver de l'aide, en Suisse</span>
+      <span>• D'abord, <strong>parles-en à un adulte de confiance</strong> (parent, enseignant·e, infirmier·ère scolaire).</span>
+      <span>• <strong>Pro Juventute, le 147</strong> : conseil gratuit et confidentiel pour les jeunes, par téléphone, SMS ou chat.</span>
+      <span>• Presque toutes les applis ont un bouton <strong>« Signaler »</strong>, souvent avec un choix « photo de moi publiée sans mon accord ».</span>
+      <span>• <strong>La police, le 117</strong> : en cas de menace, de chantage ou d'image intime. En cas d'urgence : 112, 117 ou 144.</span>
+      <span>• Si des moqueries ou des photos tournent en boucle, c'est peut-être du harcèlement : le tutoriel sur <a class="tlink" href="le-cyberharcelement.html">le cyberharcèlement</a> explique comment réagir.</span>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Les bonnes habitudes</span>
+    <h2>Ta checklist vie privée</h2>
+    <p>Coche ce que tu fais déjà. Ce n'est pas une note : c'est une liste d'idées pour la suite.</p>
+    <div class="box">
+      <ol class="steps" id="habits"></ol>
+      <div class="verdict mid" id="habitOut" aria-live="polite"></div>
+    </div>
+    <div class="box">
+      <h3>Les erreurs fréquentes</h3>
+      <div class="cards">
+        <div class="box"><span class="tag no">Faux</span><strong>« Je n'ai rien à cacher. »</strong><span class="soft">Tu fermes bien la porte de la salle de bain. La vie privée, ce n'est pas cacher : c'est <strong>choisir qui sait quoi</strong>.</span></div>
+        <div class="box"><span class="tag no">Faux</span><strong>« Mon compte est privé, donc personne ne voit. »</strong><span class="soft">Captures d'écran, amis d'amis, compte piraté : « privé » limite, mais ne garantit pas.</span></div>
+        <div class="box"><span class="tag no">Faux</span><strong>« Je l'ai supprimé, c'est effacé. »</strong><span class="soft">L'original disparaît, pas les copies faites entre-temps.</span></div>
+        <div class="box"><span class="tag no">Faux</span><strong>« Une seule info, ce n'est pas grave. »</strong><span class="soft">Ce sont les petites infos mises ensemble qui disent où te trouver.</span></div>
+        <div class="box"><span class="tag no">Faux</span><strong>« C'est juste un quiz pour rire. »</strong><span class="soft">Premier animal, rue, ville de naissance : ce sont des réponses aux questions de sécurité.</span></div>
+        <div class="box"><span class="tag no">Faux</span><strong>« Je publie mes vacances en direct. »</strong><span class="soft">Ça dit aussi que ta maison est vide. Publie plutôt au retour.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Choisis ta réponse, puis vérifie.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Recommencer</button>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · Le savais-tu ?</span>
+    <h2>Des fichiers en papier aux traces numériques</h2>
+    <ol class="timeline">
+      <li><span class="when">années 1970–1980</span><div class="what"><strong>Les premiers grands fichiers</strong><span>Les ordinateurs permettent de ranger des informations sur des millions de personnes. Plusieurs pays d'Europe créent alors les premières lois pour protéger les données.</span></div></li>
+      <li><span class="when">années 1990</span><div class="what"><strong>Une loi en Suisse, et les cookies</strong><span>La Suisse adopte une loi sur la protection des données au début des années 1990. Sur le web naissent les <strong>cookies</strong> : de petits fichiers qui permettent à un site de te reconnaître quand tu reviens.</span></div></li>
+      <li><span class="when">années 2000</span><div class="what"><strong>Les réseaux sociaux</strong><span>Des millions de personnes publient photos et goûts. La publicité ciblée devient la façon principale de gagner de l'argent pour beaucoup de services gratuits.</span></div></li>
+      <li><span class="when">années 2010</span><div class="what"><strong>Le smartphone dans la poche</strong><span>GPS, photos, applis partout : le téléphone collecte énormément de traces. On découvre aussi que des données de profils ont pu servir à cibler des messages politiques.</span></div></li>
+      <li><span class="when">années 2020</span><div class="what"><strong>Une loi modernisée</strong><span>La Suisse révise sa loi sur la protection des données (nouvelle version en 2023), et l'intelligence artificielle s'entraîne sur d'immenses quantités de textes et d'images.</span></div></li>
+    </ol>
+  </section>
+
+  <!-- 12 -->
+  <section>
+    <span class="eyebrow">Étape 12 · À toi de jouer</span>
+    <h2>Cinq situations à analyser</h2>
+    <p>Réfléchis seul·e ou à deux, puis ouvre la correction.</p>
+    <div class="exos">
+      <details>
+        <summary>La story du match<span class="msg">Story publique de Noah : « Match ce soir 18 h au terrain des Grillons, venez nous voir ! Après, je rentre à pied par le parc, comme d'hab » + selfie avec le maillot du FC Montrivage.</span></summary>
+        <div>
+          <span>Ce qu'un inconnu apprend :</span>
+          <ul>
+            <li>où Noah sera ce soir et à quelle heure ;</li>
+            <li>son club (le maillot), donc où le trouver chaque semaine ;</li>
+            <li>qu'il rentre <strong>à pied, par le parc</strong>, « comme d'hab » : une habitude.</li>
+          </ul>
+          <span><strong>Mieux :</strong> publier la story en « amis proches », ou après le match, sans le trajet du retour.</span>
+        </div>
+      </details>
+      <details>
+        <summary>Réécris le post<span class="msg">« Enfin en vacances à la mer pour 2 semaines !! La maison au 12, chemin des Lilas est toute à nous en septembre mdr »</span></summary>
+        <div>
+          <span>Problèmes : l'<strong>adresse exacte</strong>, et l'info que la maison est <strong>vide</strong> pendant deux semaines.</span>
+          <span><strong>Une version possible :</strong> au retour, « Super vacances à la mer ! » avec une photo de la plage, sans adresse ni dates.</span>
+        </div>
+      </details>
+      <details>
+        <summary>Le test « Quel animal es-tu ? »<span class="msg">Questions : 1. Ta couleur préférée ? 2. Le prénom de ta mère avant son mariage ? 3. Ta date de naissance ? 4. Le nom de ton école primaire ? 5. Chien ou chat ?</span></summary>
+        <div>
+          <span>Les questions <strong>2, 3 et 4</strong> ressemblent à des questions de sécurité ou servent à vérifier ton identité. Les questions 1 et 5 sont là pour faire « jeu ».</span>
+          <span><strong>Réflexe :</strong> ne pas répondre, surtout pas en commentaire public. Si tu veux jouer, réponds seulement « dans ta tête ».</span>
+        </div>
+      </details>
+      <details>
+        <summary>Qui voit quoi ?<span class="msg">Réglages de Mia : photo de profil = public ; école = amis ; date de naissance = moi seulement ; stories = amis ; liste d'amis = public. Que voit un inconnu ?</span></summary>
+        <div>
+          <span>Un inconnu voit la <strong>photo de profil</strong> et la <strong>liste d'amis</strong>.</span>
+          <span>Attention : la liste d'amis publique en dit beaucoup. Si plusieurs amis de Mia affichent « Collège du Lac » en public, on devine son école quand même. Mieux : liste d'amis en « moi seulement ».</span>
+        </div>
+      </details>
+      <details>
+        <summary>L'appli lampe de poche<span class="msg">Une appli de lampe de poche gratuite demande l'accès à : l'appareil photo (pour le flash), ta position, tes contacts, ton micro.</span></summary>
+        <div>
+          <span>Une lampe de poche a besoin du <strong>flash</strong>, et c'est tout. La position, les contacts et le micro n'ont <strong>aucun rapport</strong> avec ce qu'elle fait : c'est un signe qu'elle veut collecter tes données.</span>
+          <span><strong>Réflexe :</strong> refuser ces accès, ou mieux, utiliser la lampe déjà intégrée au téléphone. Demander à un adulte avant d'installer.</span>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• Une <strong>donnée personnelle</strong>, c'est tout ce qui permet de savoir qui tu es : nom, photo, voix, adresse, école, position, habitudes.</span>
+      <span>• Certaines sont <strong>sensibles</strong> : santé, religion, opinions politiques, vie intime, empreinte ou visage.</span>
+      <span>• Ce sont les <strong>petites infos mises ensemble</strong> qui révèlent où et quand te trouver : regarde l'arrière-plan avant de publier.</span>
+      <span>• Une photo peut cacher des <strong>métadonnées</strong>, dont ta position : désactive la localisation de l'appareil photo.</span>
+      <span>• Les quiz « nom de star » récoltent souvent des <strong>réponses aux questions de sécurité</strong>.</span>
+      <span>• Règle tes comptes en <strong>privé</strong> et accepte seulement des gens que tu connais en vrai.</span>
+      <span>• <strong>Internet n'oublie pas</strong> : une capture d'écran reste même si tu supprimes le post.</span>
+      <span>• Une appli gratuite gagne souvent de l'argent avec la <strong>publicité ciblée</strong>, grâce à tes données.</span>
+      <span>• En Suisse, la loi protège tes données et ton image : tu peux demander qu'on retire une photo de toi, et en parler à un adulte ou au 147.</span>
+    </div>
+  </section>
+
+  <!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"><a class="prev" href="naviguer-en-securite.html"><span>← Précédent</span><strong>Naviguer en sécurité : https, Wi-Fi et chiffrement</strong></a><a class="next" href="le-cyberharcelement.html"><span>Suivant →</span><strong>Le cyberharcèlement</strong></a></div><a class="tnav-home" href="numerique.html">⌂ Tous les tutoriels numériques</a></nav><!--/tnav-->
+<footer>Fiche de révision · Les données personnelles et la vie privée</footer>
+</main>
+
+<script>
+(function () {
+  /*
+   * Hooks de test : window.__don
+   *   items                     -> tableau des 14 infos du grand tri {id, text, cat, why} (cat : 'perso' | 'sensible' | 'non')
+   *   classifyItem(id)          -> 'perso' | 'sensible' | 'non' (null si id inconnu)
+   *   sortScore(answers)        -> {correct, answered, total} pour answers = {id: cat}
+   *   clues                     -> tableau des 7 indices de la photo {id, n, name, fact}
+   *   deduce(foundIds)          -> [{text, combo}] ce qu’un inconnu peut deviner (faits puis combinaisons ; ids inconnus ignorés, doublons comptés une fois)
+   *   metaOf(gpsOn)             -> [{k, v, gps}] métadonnées de la photo (avec ou sans position)
+   *   starName(pet, street)     -> chaîne « Prénom Nom » (champs vides remplacés par « ??? »)
+   *   collected(ans)            -> [{field, value, question}] pour ans = {pet, street, city, month} (seuls les champs remplis)
+   *   fields                    -> champs du profil {id, label, value, safe}
+   *   visibility(settings, who) -> tableau des ids visibles ; settings = {id: 'public'|'amis'|'moi'}, who = 'inconnu'|'ami'|'moi'
+   *   spread(step, delAt)       -> {step, time, text, views, copies, original} ; step 0..6, delAt = étape de suppression ou null
+   *   acts                      -> activités du profil publicitaire {id, label, tags, ads, sens}
+   *   adProfile(ids)            -> {tags:[{t, sens}], ads:[texte], sensitive:n}
+   *   habits, rights, quiz
+   * Tout est fictif : personnes, lieux, applis et marques inventés. Rien n’est envoyé ni enregistré.
+   */
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function fmtInt(n) { return Number(n).toLocaleString('fr-CH').replace(/[’' ]/g, ' '); }
+
+  /* ---------- 1. Le grand tri ---------- */
+  var CATS = { perso: 'Personnelle', sensible: 'Sensible', non: 'Pas personnelle' };
+  var ITEMS = [
+    { id: 'nom', text: 'Ton prénom et ton nom', cat: 'perso', why: 'C’est la donnée personnelle la plus évidente : elle dit qui tu es.' },
+    { id: 'photo', text: 'Une photo où l’on voit ton visage', cat: 'perso', why: 'Ton visage permet de te reconnaître.' },
+    { id: 'adresse', text: 'Ton adresse', cat: 'perso', why: 'Elle dit où te trouver.' },
+    { id: 'ecole', text: 'Le nom de ton école et ta classe', cat: 'perso', why: 'Avec un autre détail, elle permet de savoir qui tu es et où tu es la journée.' },
+    { id: 'voix', text: 'Ta voix dans un message vocal', cat: 'perso', why: 'Ta voix te reconnaît, et elle peut même être imitée par une IA.' },
+    { id: 'gps', text: 'Ta position en direct sur une carte', cat: 'perso', why: 'Elle dit où tu es en ce moment : très révélatrice, à garder pour ta famille.' },
+    { id: 'bus', text: 'Tu prends le bus de 7 h 32 tous les matins', cat: 'perso', why: 'Une habitude est une donnée personnelle : elle dit où et quand te trouver.' },
+    { id: 'tel', text: 'Ton numéro de téléphone (079 000 00 00)', cat: 'perso', why: 'Il permet de te contacter et de te retrouver sur des applis.' },
+    { id: 'sante', text: 'Ton allergie ou ta maladie', cat: 'sensible', why: 'La santé fait partie des données sensibles : elle mérite une protection spéciale.' },
+    { id: 'religion', text: 'Ta religion', cat: 'sensible', why: 'Les croyances sont des données sensibles : elles pourraient servir à te juger.' },
+    { id: 'empreinte', text: 'Ton empreinte digitale pour déverrouiller le téléphone', cat: 'sensible', why: 'Les données du corps qui servent à te reconnaître sont sensibles. Et une empreinte, on ne peut pas la changer comme un mot de passe.' },
+    { id: 'politique', text: 'Les opinions politiques de tes parents', cat: 'sensible', why: 'Les opinions politiques sont des données sensibles (ici, celles de tes parents : ce sont leurs données à eux).' },
+    { id: 'meteo', text: 'La météo de demain à Montrivage', cat: 'non', why: 'Elle ne parle d’aucune personne précise.' },
+    { id: 'capitale', text: 'La ville fédérale de la Suisse, c’est Berne', cat: 'non', why: 'C’est une connaissance générale, pas une info sur quelqu’un.' }
+  ];
+  var sortAns = {};
+  function classifyItem(id) { for (var i = 0; i < ITEMS.length; i++) if (ITEMS[i].id === id) return ITEMS[i].cat; return null; }
+  function sortScore(answers) {
+    var c = 0, a = 0;
+    ITEMS.forEach(function (it) { if (answers && answers[it.id]) { a++; if (answers[it.id] === it.cat) c++; } });
+    return { correct: c, answered: a, total: ITEMS.length };
+  }
+  function sortRender() {
+    $('sortList').innerHTML = ITEMS.map(function (it) {
+      var v = sortAns[it.id], cls = v ? (v === it.cat ? 'good' : 'bad') : '';
+      var fb = '';
+      if (v) fb = v === it.cat ? '<span class="fbk ok"><strong>Juste : ' + CATS[it.cat].toLowerCase() + '.</strong> <span>' + esc(it.why) + '</span></span>'
+                               : '<span class="fbk no"><strong>Non : c’est « ' + CATS[it.cat].toLowerCase() + ' ».</strong> <span>' + esc(it.why) + '</span></span>';
+      return '<li class="' + cls + '"><span class="item">' + esc(it.text) + '</span><div class="btns">' +
+        ['perso', 'sensible', 'non'].map(function (k) { return '<button type="button" data-id="' + it.id + '" data-cat="' + k + '" aria-pressed="' + (v === k ? 'true' : 'false') + '">' + CATS[k] + '</button>'; }).join('') +
+        '</div>' + fb + '</li>';
+    }).join('');
+    var s = sortScore(sortAns);
+    $('sortScore').textContent = s.correct + ' / ' + s.total;
+    $('sortProg').textContent = s.answered + (s.answered > 1 ? ' informations triées' : ' information triée') + ' sur ' + s.total;
+  }
+  $('sortList').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-id]'); if (!b) return;
+    sortAns[b.getAttribute('data-id')] = b.getAttribute('data-cat');
+    var y = window.scrollY; sortRender(); window.scrollTo(0, y);
+    var nb = $('sortList').querySelector('button[data-id="' + b.getAttribute('data-id') + '"][data-cat="' + b.getAttribute('data-cat') + '"]'); if (nb) nb.focus({ preventScroll: true });
+  });
+  $('sortReset').addEventListener('click', function () { sortAns = {}; sortRender(); });
+  sortRender();
+
+  /* ---------- 2. Que révèle cette photo ? ---------- */
+  var CLUES = [
+    { id: 'sign', n: 1, name: 'Le panneau de rue', fact: 'Lina habite (ou passe souvent) au chemin des Lilas.' },
+    { id: 'num', n: 2, name: 'Le numéro sur la façade', fact: 'La maison porte le numéro 12.' },
+    { id: 'jersey', n: 3, name: 'Le t-shirt', fact: 'Elle va au Collège du Lac.' },
+    { id: 'bus', n: 4, name: 'L’arrêt de bus', fact: 'Son arrêt s’appelle « Peupliers », avec un bus à 7 h 32.' },
+    { id: 'refl', n: 5, name: 'Le reflet dans la fenêtre', fact: 'En face de la maison, il y a une pharmacie (le mot est à l’envers dans le reflet) : ça aide à situer le quartier.' },
+    { id: 'dog', n: 6, name: 'La gamelle', fact: 'Son chien s’appelle Filou… peut-être la réponse à « Nom de ton premier animal ? » (étape 4).' },
+    { id: 'caption', n: 7, name: 'Le texte du post', fact: 'Chaque matin, elle prend le même bus, seule.' }
+  ];
+  var COMBOS = [
+    { need: ['sign', 'num'], text: 'Son adresse exacte : 12, chemin des Lilas.' },
+    { need: ['sign', 'refl'], text: 'Le quartier où elle vit, rien qu’en cherchant une pharmacie près du chemin des Lilas.' },
+    { need: ['bus', 'caption'], text: 'Où et quand la trouver seule : à l’arrêt Peupliers, vers 7 h 30, chaque matin.' },
+    { need: ['jersey', 'bus', 'caption'], text: 'Son trajet complet du matin, de l’arrêt jusqu’au collège.' }
+  ];
+  function deduce(found) {
+    var set = {}; (found || []).forEach(function (id) { set[id] = true; });
+    var out = [];
+    CLUES.forEach(function (c) { if (set[c.id]) out.push({ text: c.fact, combo: false }); });
+    COMBOS.forEach(function (c) { if (c.need.every(function (id) { return set[id]; })) out.push({ text: c.text, combo: true }); });
+    return out;
+  }
+  var found = [], prudent = false;
+  function captionRender() {
+    $('caption').innerHTML = prudent
+      ? '<span class="who">lina_skate</span> · public<br>« Vive la rentrée ! »'
+      : '<span class="who">lina_skate</span> · public<br>« Rentrée en 10H ! <button type="button" class="clue' + (found.indexOf('caption') >= 0 ? ' found' : '') + '" id="clueCap">Comme chaque matin, bus de 7 h 32 toute seule</button>… »';
+    var cb = $('clueCap'); if (cb) cb.addEventListener('click', function () { addClue('caption'); });
+  }
+  function photoRender() {
+    $('photoBox').classList.toggle('is-prudent', prudent);
+    $('prudentBtn').setAttribute('aria-pressed', prudent ? 'true' : 'false');
+    $('prudentBtn').textContent = prudent ? 'Revoir la photo d’origine' : 'Voir la version prudente';
+    CLUES.forEach(function (c) { var g = $('hot-' + c.id); if (g) g.classList.toggle('found', !prudent && found.indexOf(c.id) >= 0); });
+    captionRender();
+    var list = $('deduce');
+    if (prudent) {
+      $('clueScore').textContent = 'Version prudente';
+      list.innerHTML = '<li class="calm">Panneau, numéro, t-shirt, arrêt, reflet et gamelle sont floutés ou cadrés autrement, et le texte ne donne plus d’horaire.</li><li class="calm">Un inconnu apprend seulement que Lina a un chien et qu’elle est contente de la rentrée. La photo reste sympa !</li>';
+      return;
+    }
+    $('clueScore').textContent = found.length + ' / 7 indices';
+    var d = deduce(found);
+    var head = found.length === 0 ? 'Touche un indice dans la photo ou dans le texte (zones en pointillés).'
+      : found.length < 3 ? 'Un inconnu commence à deviner…'
+      : found.length < 6 ? 'Ça devient très précis.'
+      : 'Avec une seule photo publique, un inconnu sait où Lina habite, où elle va à l’école et quand elle est seule.';
+    list.innerHTML = '<li class="calm">' + esc(head) + '</li>' + d.map(function (x) { return '<li' + (x.combo ? ' class="combo"' : '') + '>' + (x.combo ? 'Combiné : ' : '') + esc(x.text) + '</li>'; }).join('');
+  }
+  function addClue(id) { if (prudent) return; if (found.indexOf(id) < 0) found.push(id); photoRender(); if (id === 'caption') { var cb = $('clueCap'); if (cb) cb.focus({ preventScroll: true }); } }
+  Array.prototype.forEach.call(document.querySelectorAll('#scene .hot'), function (g) {
+    g.addEventListener('click', function () { addClue(g.getAttribute('data-clue')); });
+    g.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); addClue(g.getAttribute('data-clue')); } });
+  });
+  $('prudentBtn').addEventListener('click', function () { prudent = !prudent; photoRender(); });
+  $('clueReset').addEventListener('click', function () { found = []; prudent = false; photoRender(); });
+  photoRender();
+
+  /* ---------- 3. Métadonnées pas à pas ---------- */
+  function metaOf(gpsOn) {
+    var m = [
+      { k: 'Date', v: 'mercredi 14 mai', gps: false },
+      { k: 'Heure', v: '16 h 42', gps: false },
+      { k: 'Appareil', v: 'Téléphone Zéphyr 8 (inventé)', gps: false }
+    ];
+    m.push(gpsOn ? { k: 'Position GPS', v: 'à quelques mètres près : ta chambre, 12, chemin des Lilas', gps: true }
+                 : { k: 'Position GPS', v: 'aucune (localisation désactivée)', gps: false });
+    return m;
+  }
+  var gps = true, flowStep = 0;
+  var FLOW_TXT = [
+    'Appuie sur « Étape suivante » pour suivre la photo.',
+    'Tu prends la photo. Sur l’image, on ne voit qu’un chat sur une couverture.',
+    'Le téléphone écrit les métadonnées dans le fichier. Tu ne les vois pas, mais elles voyagent avec l’image.',
+    'Tu envoies le fichier original. Les métadonnées partent avec lui.',
+    ''
+  ];
+  function flowRender() {
+    $('gpsOn').setAttribute('aria-pressed', gps ? 'true' : 'false');
+    $('gpsOff').setAttribute('aria-pressed', gps ? 'false' : 'true');
+    Array.prototype.forEach.call($('flow').children, function (d, i) { d.classList.toggle('on', i < flowStep); });
+    var meta = $('meta');
+    if (flowStep < 2) { meta.innerHTML = '<span class="soft">Fichier : chat.jpg</span><span class="soft">(métadonnées pas encore visibles)</span>'; }
+    else {
+      meta.innerHTML = '<span>Fichier : chat.jpg</span>' + metaOf(gps).map(function (r) { return '<span class="' + (r.gps ? 'gps' : (r.k === 'Position GPS' ? 'off' : '')) + '">' + esc(r.k) + ' : ' + esc(r.v) + '</span>'; }).join('');
+    }
+    var t = FLOW_TXT[flowStep];
+    if (flowStep === 4) t = gps ? 'La personne qui lit les infos du fichier connaît le jour, l’heure… et l’endroit exact où la photo a été prise. Une simple photo de chat dit où tu habites !'
+                               : 'Sans localisation, la personne voit la date et le téléphone, mais pas l’endroit. Beaucoup mieux !';
+    $('flowTxt').textContent = t;
+    $('flowNext').disabled = flowStep >= 4;
+  }
+  $('flowNext').addEventListener('click', function () { if (flowStep < 4) flowStep++; flowRender(); });
+  $('flowReset').addEventListener('click', function () { flowStep = 0; flowRender(); });
+  $('gpsOn').addEventListener('click', function () { gps = true; flowRender(); });
+  $('gpsOff').addEventListener('click', function () { gps = false; flowRender(); });
+  flowRender();
+
+  /* ---------- 4. Le faux quiz « nom de star » ---------- */
+  var MONTHS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+  $('qMonth').innerHTML = '<option value="">…</option>' + MONTHS.map(function (m) { return '<option value="' + m + '">' + m + '</option>'; }).join('');
+  function cap(s) { s = String(s == null ? '' : s).trim().replace(/\s+/g, ' '); return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
+  function cleanStreet(s) { return cap(String(s == null ? '' : s).trim().replace(/^(rue|chemin|ch\.|avenue|av\.|route|place|impasse|allée|boulevard)\s+(des|du|de la|de l’|de l'|de|d’|d')?\s*/i, '')); }
+  function starName(pet, street) { return (cap(pet) || '???') + ' ' + (cleanStreet(street) || cap(street) || '???'); }
+  function collected(ans) {
+    ans = ans || {};
+    var out = [];
+    if (cap(ans.pet)) out.push({ field: 'Premier animal', value: cap(ans.pet), question: '« Quel est le nom de votre premier animal ? » : une question de sécurité très courante pour récupérer un compte.' });
+    if (cap(ans.street)) out.push({ field: 'Rue où tu as grandi', value: cap(ans.street), question: '« Dans quelle rue avez-vous grandi ? » : autre question de sécurité classique. Et ça aide à trouver ton adresse.' });
+    if (cap(ans.city)) out.push({ field: 'Ville de naissance', value: cap(ans.city), question: '« Quelle est votre ville de naissance ? » : question de sécurité, et info souvent demandée pour vérifier une identité.' });
+    if (ans.month && MONTHS.indexOf(ans.month) >= 0) out.push({ field: 'Mois de naissance', value: ans.month, question: 'Avec ton âge (souvent visible ailleurs), on approche ta date de naissance, qui sert à vérifier ton identité.' });
+    return out;
+  }
+  function starAns() { return { pet: $('qPet').value, street: $('qStreet').value, city: $('qCity').value, month: $('qMonth').value }; }
+  $('starGo').addEventListener('click', function () {
+    var a = starAns(), n = collected(a).length;
+    if (n === 0) { $('starOut').innerHTML = '<div class="verdict mid">Remplis au moins une case (tu peux inventer !).</div>'; $('revealOut').innerHTML = ''; return; }
+    var city = cap(a.city) || 'Montrivage', month = a.month || 'juin';
+    $('starOut').innerHTML = '<div class="star">' + esc(starName(a.pet, a.street)) + '</div><p class="soft" style="text-align:center">Ta tournée mondiale commence à ' + esc(city) + ', en ' + esc(month) + ' ! Partage ton résultat en commentaire et tague 3 amis…</p><div class="btns"><button type="button" id="revealBtn">Attends… qu’est-ce que je viens de donner ?</button></div>';
+    $('revealOut').innerHTML = '';
+    $('revealBtn').addEventListener('click', function () {
+      var rows = collected(starAns());
+      $('revealOut').innerHTML = '<div class="verdict no">Le quiz vient de récolter ' + rows.length + (rows.length > 1 ? ' réponses' : ' réponse') + ' :<span>Si tu les avais publiées en commentaire, n’importe qui pourrait les lire, les copier, et les ajouter à ce qu’il sait déjà de toi.</span></div>' +
+        '<div class="scroll"><table class="reveal"><tr><th>Tu as donné</th><th>À quoi ça peut servir</th></tr>' +
+        rows.map(function (r) { return '<tr><td><strong>' + esc(r.field) + '</strong><br>' + esc(r.value) + '</td><td>' + esc(r.question) + '</td></tr>'; }).join('') + '</table></div>' +
+        '<p class="soft">Ici, rien n’est parti : tout est resté sur ta page. Ce jeu-là était un entraînement.</p>';
+    });
+  });
+  $('starReset').addEventListener('click', function () { ['qPet', 'qStreet', 'qCity'].forEach(function (id) { $(id).value = ''; }); $('qMonth').value = ''; $('starOut').innerHTML = ''; $('revealOut').innerHTML = ''; });
+
+  /* ---------- 5. Réglages de confidentialité ---------- */
+  var LEVELS = { 'public': 'Public', amis: 'Amis', moi: 'Moi seulement' };
+  var FIELDS = [
+    { id: 'photo', label: 'Photo de profil', value: 'ton visage', safe: 'amis' },
+    { id: 'nom', label: 'Nom complet', value: 'Lina Morand', safe: 'amis' },
+    { id: 'naissance', label: 'Date de naissance', value: '14 mars 2013', safe: 'moi' },
+    { id: 'ecole', label: 'École', value: 'Collège du Lac, 10H', safe: 'moi' },
+    { id: 'ville', label: 'Ville', value: 'Montrivage', safe: 'amis' },
+    { id: 'tel', label: 'Téléphone', value: '079 000 00 00', safe: 'moi' },
+    { id: 'posts', label: 'Photos et stories', value: '48 photos', safe: 'amis' },
+    { id: 'amis', label: 'Liste d’amis', value: '214 amis', safe: 'moi' },
+    { id: 'pos', label: 'Position en direct', value: 'chemin des Lilas, il y a 2 min', safe: 'moi' }
+  ];
+  var settings = {}; FIELDS.forEach(function (f) { settings[f.id] = 'public'; });
+  var viewer = 'inconnu';
+  function visibility(sets, who) {
+    sets = sets || {};
+    return FIELDS.filter(function (f) {
+      var l = sets[f.id] || 'public';
+      if (who === 'moi') return true;
+      if (who === 'ami') return l === 'public' || l === 'amis';
+      return l === 'public';
+    }).map(function (f) { return f.id; });
+  }
+  $('setList').innerHTML = FIELDS.map(function (f) {
+    return '<div class="set-row"><label for="set-' + f.id + '">' + esc(f.label) + '</label><select id="set-' + f.id + '" data-id="' + f.id + '">' +
+      Object.keys(LEVELS).map(function (k) { return '<option value="' + k + '">' + LEVELS[k] + '</option>'; }).join('') + '</select></div>';
+  }).join('');
+  function setRender() {
+    FIELDS.forEach(function (f) { $('set-' + f.id).value = settings[f.id]; });
+    $('viewStranger').setAttribute('aria-pressed', viewer === 'inconnu' ? 'true' : 'false');
+    $('viewFriend').setAttribute('aria-pressed', viewer === 'ami' ? 'true' : 'false');
+    var vis = visibility(settings, viewer);
+    var showPhoto = vis.indexOf('photo') >= 0;
+    $('avatar').innerHTML = showPhoto
+      ? '<circle cx="28" cy="28" r="27" fill="var(--acc-soft)" stroke="var(--acc)" stroke-width="2"/><circle cx="28" cy="23" r="10" fill="#e0ac7e"/><path d="M18 22 a10 10 0 0 1 20 0 q-5 -5 -10 -4 q-5 -1 -10 4z" fill="#5b3a29"/><path d="M12 48 a16 14 0 0 1 32 0" fill="var(--acc)"/>'
+      : '<circle cx="28" cy="28" r="27" fill="var(--line)" stroke="var(--ink-soft)" stroke-width="2"/><circle cx="28" cy="22" r="9" fill="var(--ink-soft)" opacity=".5"/><path d="M12 48 a16 14 0 0 1 32 0" fill="var(--ink-soft)" opacity=".5"/>';
+    $('pRows').innerHTML = FIELDS.filter(function (f) { return f.id !== 'photo'; }).map(function (f) {
+      var v = vis.indexOf(f.id) >= 0;
+      return '<div class="p-row ' + (v ? 'vis' : 'hid') + '"><span>' + esc(f.label) + '</span><span>' + (v ? esc(f.value) : 'caché') + '</span></div>';
+    }).join('');
+    var nStr = visibility(settings, 'inconnu').length;
+    $('pCount').textContent = (viewer === 'inconnu' ? 'Un inconnu' : 'Un ami') + ' voit ' + vis.length + ' info' + (vis.length > 1 ? 's' : '') + ' sur ' + FIELDS.length;
+    var risky = FIELDS.filter(function (f) { return f.safe === 'moi' && settings[f.id] === 'public'; }).map(function (f) { return f.label.toLowerCase(); });
+    var adv = $('setAdvice');
+    if (risky.length) adv.innerHTML = '<div class="verdict no">À protéger en priorité :<span>' + esc(risky.join(', ')) + '. Ces infos permettent de te trouver ou de te contacter : mets-les en « moi seulement ».</span></div>';
+    else if (nStr === 0) adv.innerHTML = '<div class="verdict yes">Un inconnu ne voit plus que ton pseudo.<span>Bravo ! Et vérifie tes réglages de temps en temps : les applis changent parfois leurs options.</span></div>';
+    else adv.innerHTML = '<div class="verdict mid">Pas mal !<span>Un inconnu voit encore ' + nStr + ' info' + (nStr > 1 ? 's' : '') + '. Demande-toi pour chacune : est-ce que j’ai envie qu’un inconnu la voie ?</span></div>';
+  }
+  $('setList').addEventListener('change', function (e) { var s = e.target.closest('select[data-id]'); if (!s) return; settings[s.getAttribute('data-id')] = s.value; setRender(); });
+  $('setAllPub').addEventListener('click', function () { FIELDS.forEach(function (f) { settings[f.id] = 'public'; }); setRender(); });
+  $('setSafe').addEventListener('click', function () { FIELDS.forEach(function (f) { settings[f.id] = f.safe; }); setRender(); });
+  $('viewStranger').addEventListener('click', function () { viewer = 'inconnu'; setRender(); });
+  $('viewFriend').addEventListener('click', function () { viewer = 'ami'; setRender(); });
+  setRender();
+
+  /* ---------- 6. Internet n'oublie pas ---------- */
+  var SPREAD = [
+    { time: '18 h 00', text: 'Tu publies la photo de Zoé, pour tes amis. Personne ne l’a encore vue.', views: 0, copies: 0 },
+    { time: '18 h 10', text: '30 amis l’ont vue. Ça rigole dans les commentaires.', views: 30, copies: 0 },
+    { time: '18 h 25', text: 'Un ami fait une capture d’écran. Tu n’en sais rien.', views: 34, copies: 1 },
+    { time: '19 h 00', text: 'La capture est envoyée dans le groupe de la classe : 25 personnes la reçoivent.', views: 60, copies: 26 },
+    { time: '21 h 00', text: 'Elle est transférée dans 3 autres groupes, jusque dans d’autres écoles.', views: 140, copies: 86 },
+    { time: 'le lendemain', text: 'Zoé l’apprend. Elle est très gênée et n’ose plus prendre le bus.', views: 190, copies: 120 },
+    { time: 'une semaine après', text: 'La capture circule toujours. Plus personne ne sait qui l’a.', views: 300, copies: 200 }
+  ];
+  function spread(step, delAt) {
+    step = Math.max(0, Math.min(SPREAD.length - 1, Math.round(Number(step) || 0)));
+    var hasDel = delAt !== null && delAt !== undefined && !isNaN(delAt);
+    var base = SPREAD[step], r = { step: step, time: base.time, text: base.text, views: base.views, copies: base.copies, original: true };
+    if (hasDel && step >= delAt) {
+      r.original = false;
+      if (delAt < 2) { r.views = SPREAD[delAt].views; r.copies = 0; r.text = 'Le post est supprimé. Personne n’avait encore fait de copie (en tout cas, pas à ta connaissance).'; }
+    }
+    return r;
+  }
+  var tStep = 0, delAt = null;
+  var dots = $('dots'); for (var di = 0; di < 100; di++) dots.appendChild(document.createElement('i'));
+  function tRender() {
+    var r = spread(tStep, delAt);
+    $('tSlider').value = String(tStep);
+    $('tLabel').textContent = r.time;
+    $('tTxt').textContent = r.text;
+    $('stViews').textContent = fmtInt(r.views);
+    $('stCopies').textContent = fmtInt(r.copies);
+    var seen = Math.round(r.views / 3), copy = Math.round(r.copies / 3);
+    if (r.copies > 0 && copy === 0) copy = 1;
+    Array.prototype.forEach.call(dots.children, function (d, i) { d.className = i < copy ? 'copy' : i < seen ? 'seen' : ''; });
+    $('post').classList.toggle('gone', !r.original);
+    $('delPost').disabled = delAt !== null;
+    var out = $('tOut');
+    if (delAt === null) out.innerHTML = tStep === SPREAD.length - 1 ? '<div class="verdict mid">Le post est toujours en ligne.<span>Essaie de le supprimer plus tôt avec « Recommencer ».</span></div>' : '';
+    else if (delAt < 2) out.innerHTML = '<div class="verdict yes">Supprimé très vite.<span>La diffusion s’arrête. Mais tu ne peux jamais être sûr·e que personne n’a fait de capture. Le mieux reste de réfléchir avant de publier, et de demander l’accord de Zoé.</span></div>';
+    else out.innerHTML = '<div class="verdict no">Supprimé à ' + esc(SPREAD[delAt].time) + '… trop tard.<span>Ton post a disparu, mais la capture existait déjà. Les copies continuent de circuler sans toi : tu ne peux plus les effacer.</span></div>';
+  }
+  $('tSlider').addEventListener('input', function () { tStep = Number(this.value) || 0; tRender(); });
+  $('delPost').addEventListener('click', function () { if (delAt === null) delAt = tStep; tRender(); });
+  $('tReset').addEventListener('click', function () { tStep = 0; delAt = null; tRender(); });
+  tRender();
+
+  /* ---------- 7. Profil publicitaire ---------- */
+  var ACTS = [
+    { id: 'foot', label: 'Tu regardes 10 vidéos de foot', tags: ['fan de foot'], ads: ['Maillot du FC Montrivage, 89 CHF'], sens: false },
+    { id: 'basket', label: 'Tu cherches « baskets taille 39 »', tags: ['veut des baskets', 'pointure 39'], ads: ['Baskets Zéphyr –20 % : plus que 2 paires !'], sens: false },
+    { id: 'chats', label: 'Tu likes des vidéos de chats', tags: ['aime les animaux'], ads: ['Peluche chat géant, 24,90 CHF'], sens: false },
+    { id: 'ville', label: 'Ton téléphone est souvent à Montrivage', tags: ['vit vers Montrivage'], ads: ['Nouveau magasin de skate à Montrivage'], sens: false },
+    { id: 'jeu', label: 'Tu joues tous les jours à un jeu de course', tags: ['joue beaucoup'], ads: ['Pack de voitures de course, 9,90 CHF'], sens: false },
+    { id: 'tard', label: 'Tu es en ligne à 23 h un soir d’école', tags: ['se couche tard'], ads: ['« Encore une partie ? Bonus de minuit ! »'], sens: false },
+    { id: 'peau', label: 'Tu cherches « boutons sur le visage »', tags: ['complexé·e par sa peau'], ads: ['Crème miracle : « Fini les boutons en 3 jours ! »'], sens: true },
+    { id: 'triste', label: 'Tu écoutes des chansons tristes depuis 2 h', tags: ['peut-être triste en ce moment'], ads: ['« Tu mérites de te faire plaisir » : skins à –50 %'], sens: true }
+  ];
+  var adOn = {};
+  function adProfile(ids) {
+    var set = {}; (ids || []).forEach(function (id) { set[id] = true; });
+    var tags = [], ads = [], sens = 0, n = 0;
+    ACTS.forEach(function (a) {
+      if (!set[a.id]) return;
+      n++;
+      a.tags.forEach(function (t) { tags.push({ t: t, sens: a.sens }); });
+      ads = ads.concat(a.ads);
+      if (a.sens) sens++;
+    });
+    if (n >= 3) tags.push({ t: 'âge probable : 12–15 ans', sens: false });
+    return { tags: tags, ads: ads, sensitive: sens };
+  }
+  $('acts').innerHTML = ACTS.map(function (a) { return '<button type="button" data-act="' + a.id + '" aria-pressed="false">' + esc(a.label) + '</button>'; }).join('');
+  function adRender() {
+    var ids = ACTS.filter(function (a) { return adOn[a.id]; }).map(function (a) { return a.id; });
+    Array.prototype.forEach.call($('acts').children, function (b) { b.setAttribute('aria-pressed', adOn[b.getAttribute('data-act')] ? 'true' : 'false'); });
+    var p = adProfile(ids);
+    $('adTags').innerHTML = p.tags.length ? p.tags.map(function (t) { return '<span class="chip' + (t.sens ? ' sens' : '') + '">' + esc(t.t) + '</span>'; }).join('') : '<span class="soft">Rien pour l’instant.</span>';
+    $('adList').innerHTML = p.ads.length ? p.ads.map(function (a) { return '<li><b>Pub</b>' + esc(a) + '</li>'; }).join('') : '<li><b>Pub</b>Une pub au hasard, pour tout le monde.</li>';
+    var note = '';
+    if (p.sensitive) note = '<div class="verdict no">Ciblage de tes émotions<span>Les étiquettes en rouge touchent à ce que tu ressens. Une pub qui arrive pile quand tu es triste ou complexé·e est plus efficace… pour celui qui vend.</span></div>';
+    else if (ids.length >= 3) note = '<div class="verdict mid">Un portrait se dessine<span>Quelques gestes banals suffisent pour deviner tes goûts, ta ville et ton âge, sans que tu aies rien écrit sur toi.</span></div>';
+    $('adNote').innerHTML = note;
+  }
+  $('acts').addEventListener('click', function (e) { var b = e.target.closest('button[data-act]'); if (!b) return; var id = b.getAttribute('data-act'); adOn[id] = !adOn[id]; adRender(); });
+  $('adReset').addEventListener('click', function () { adOn = {}; adRender(); });
+  adRender();
+
+  /* ---------- 8. Tes droits : que fais-tu ? ---------- */
+  var RIGHTS = [
+    { name: 'La photo gênante', text: 'Un camarade a publié dans le groupe de la classe une photo de toi en train de tomber à la gym. Tout le monde se moque.',
+      c: [['Je publie une photo gênante de lui pour me venger', 'no', 'Tu ajouterais un deuxième problème au premier, et tu ferais à ton tour ce qui n’est pas permis.'],
+          ['Je lui demande calmement de la retirer, et j’en parle à un adulte s’il refuse', 'yes', 'Bon réflexe. Ton image est protégée. Si ça continue, un adulte de confiance ou le 147 peuvent t’aider, et tu peux signaler la photo dans l’appli.'],
+          ['Je ne dis rien en espérant que ça passe', 'mid', 'C’est compréhensible, mais tu n’as pas à subir ça seul·e. En parler permet souvent de faire retirer la photo vite.']] },
+    { name: 'Le tournoi gratuit', text: 'Un site de jeu (tournoi-pixel.exemple) offre un tournoi gratuit. Pour t’inscrire, il demande ton nom, ton adresse, ta date de naissance, ton numéro de téléphone et une photo.',
+      c: [['Je remplis tout, c’est gratuit', 'no', 'Pour un tournoi en ligne, l’adresse, le téléphone et la photo ne sont pas nécessaires. Quand on demande trop, méfiance.'],
+          ['Je demande à un parent, et on ne donne que le strict nécessaire', 'yes', 'Exactement : moins tu donnes, moins il y a de risques. Un pseudo et une adresse e-mail suffisent souvent. Et si le site insiste pour tout avoir, on renonce.'],
+          ['J’invente une fausse adresse et je mets la photo d’un ami', 'no', 'La photo de ton ami est une donnée personnelle à lui : tu n’as pas le droit de la donner sans son accord. Mieux : en parler à un parent.']] },
+    { name: 'La photo de classe', text: 'Après la sortie au musée, tu as une super photo de groupe. Tu veux la publier sur ton compte public.',
+      c: [['Je la publie direct, tout le monde est beau', 'mid', 'Peut-être, mais chacun a son mot à dire sur son image. Certains ne veulent pas être en ligne, pour des raisons que tu ne connais pas.'],
+          ['Je demande d’abord à chacun s’il est d’accord', 'yes', 'Parfait. Et si quelqu’un refuse, tu peux le couper du cadre, flouter son visage, ou la partager seulement dans un groupe privé de la classe.'],
+          ['Je la publie, et je la retire si quelqu’un se plaint', 'no', 'Entre-temps, d’autres ont pu la copier. Pour les photos des autres, c’est l’accord avant, pas les excuses après.']] }
+  ];
+  RIGHTS.forEach(function (s, i) {
+    var b = document.createElement('button'); b.type = 'button'; b.id = 'rT' + i; b.textContent = s.name;
+    b.addEventListener('click', function () { rShow(i); }); $('rTabs').appendChild(b);
+  });
+  function rShow(i) {
+    RIGHTS.forEach(function (s, j) { $('rT' + j).setAttribute('aria-pressed', j === i ? 'true' : 'false'); });
+    $('rText').textContent = RIGHTS[i].text; $('rOut').innerHTML = ''; $('rChoices').innerHTML = '';
+    RIGHTS[i].c.forEach(function (c) {
+      var b = document.createElement('button'); b.type = 'button'; b.textContent = c[0];
+      b.addEventListener('click', function () {
+        var t = c[1] === 'yes' ? 'Bon réflexe !' : c[1] === 'mid' ? 'Pas idéal…' : 'Attention !';
+        $('rOut').innerHTML = '<div class="verdict ' + c[1] + '">' + t + '<span>' + esc(c[2]) + '</span></div>';
+      });
+      $('rChoices').appendChild(b);
+    });
+  }
+  rShow(0);
+
+  /* ---------- 9. Checklist ---------- */
+  var HABITS = [
+    'Mes comptes sont en privé, et je vérifie les réglages de temps en temps.',
+    'J’accepte seulement des personnes que je connais en vrai.',
+    'Avant de publier, je regarde l’arrière-plan : adresse, école, arrêt, plaque…',
+    'Je publie mes photos de vacances au retour, pas pendant.',
+    'Je ne réponds pas aux quiz qui demandent animal, rue, ville ou date de naissance.',
+    'La localisation est coupée pour l’appareil photo et les applis qui n’en ont pas besoin.',
+    'Je partage ma position en direct seulement avec ma famille.',
+    'Je demande l’accord avant de publier une photo de quelqu’un.',
+    'Je ne fais pas suivre une capture gênante.',
+    'Quand je m’inscris quelque part, je donne le minimum, avec l’aide d’un adulte.',
+    'Si quelque chose me gêne en ligne, j’en parle à un adulte de confiance ou au 147.'
+  ];
+  $('habits').innerHTML = HABITS.map(function (h, i) { return '<li><label><input type="checkbox" id="hb' + i + '">' + esc(h) + '</label></li>'; }).join('');
+  function habitRender() {
+    var n = 0;
+    HABITS.forEach(function (h, i) { var c = $('hb' + i).checked; if (c) n++; $('hb' + i).closest('li').classList.toggle('done', c); });
+    var t = n === HABITS.length ? 'Toutes cochées : tu es un·e pro de la vie privée !' : n >= 7 ? 'Très bien ! Il t’en reste quelques-unes à essayer.' : n >= 1 ? 'C’est un bon début. Choisis une habitude de plus à essayer cette semaine.' : 'Coche les habitudes que tu as déjà.';
+    $('habitOut').innerHTML = n + ' / ' + HABITS.length + '<span>' + esc(t) + '</span>';
+  }
+  $('habits').addEventListener('change', habitRender);
+  habitRender();
+
+  /* ---------- Quiz ---------- */
+  var QZ = [
+    { q: 'Laquelle de ces informations est une donnée personnelle ?', o: [['a', 'la météo de demain'], ['b', 'le nom de ton école et ta classe'], ['c', 'la ville fédérale de la Suisse']], a: 'b', how: 'Ton école et ta classe permettent de savoir qui tu es et où tu es la journée.' },
+    { q: 'Vrai ou faux : une photo peut contenir l’endroit où elle a été prise, même si on ne le voit pas sur l’image.', o: [['v', 'Vrai'], ['f', 'Faux']], a: 'v', how: 'Ce sont les métadonnées. Désactive la localisation de l’appareil photo.' },
+    { q: 'Le jeu « Ton nom de star = ton premier animal + ta rue » peut servir à…', o: [['a', 'rien du tout, c’est pour rire'], ['b', 'récolter des réponses aux questions de sécurité'], ['c', 'améliorer ta connexion']], a: 'b', how: 'Premier animal et rue sont des questions de sécurité classiques pour récupérer un compte.' },
+    { q: 'Ta story est réglée « amis ». Un ami en fait une capture et l’envoie dans un groupe. Qui peut la voir ?', o: [['a', 'seulement mes amis'], ['b', 'tous ceux qui reçoivent la capture']], a: 'b', how: 'Une capture échappe à tes réglages : elle va où l’on veut l’envoyer.' },
+    { q: 'Vrai ou faux : quand tu supprimes un post, toutes les copies disparaissent aussi.', o: [['v', 'Vrai'], ['f', 'Faux']], a: 'f', how: 'Seul l’original disparaît. Les captures et transferts restent chez les autres.' },
+    { q: 'Comment beaucoup d’applis gratuites gagnent-elles de l’argent ?', o: [['a', 'avec la publicité, souvent ciblée grâce à tes données'], ['b', 'elles ne gagnent jamais d’argent'], ['c', 'c’est l’école qui paie']], a: 'a', how: 'Une pub vaut plus cher quand elle est montrée à la bonne personne : d’où l’intérêt pour tes données.' },
+    { q: 'Un camarade publie une photo gênante de toi sans ton accord. Que fais-tu d’abord ?', o: [['a', 'je lui demande de la retirer, et j’en parle à un adulte si besoin'], ['b', 'je publie une photo de lui pour me venger'], ['c', 'rien, c’est permis']], a: 'a', how: 'En Suisse, la loi protège ton image. Tu peux aussi signaler la photo dans l’appli, ou appeler le 147.' },
+    { q: 'Laquelle est une donnée « sensible » ?', o: [['a', 'ta couleur préférée'], ['b', 'une information sur ta santé'], ['c', 'le nom de ton jeu préféré']], a: 'b', how: 'La santé, la religion, les opinions politiques ou ton empreinte sont des données sensibles.' }
+  ];
+  var quiz = $('quiz'), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ''; done = [];
+    QZ.forEach(function (Q, k) {
+      var li = document.createElement('li');
+      li.innerHTML = '<span>' + esc(Q.q) + '</span><select id="qa' + k + '" aria-label="Ta réponse à la question ' + (k + 1) + '"><option value="">…</option>' + Q.o.map(function (o) { return '<option value="' + o[0] + '">' + esc(o[1]) + '</option>'; }).join('') + '</select><button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+      quiz.appendChild(li);
+      function check() {
+        var fb = $('qf' + k), v = $('qa' + k).value;
+        if (!v) { fb.className = 'fb'; fb.textContent = 'Choisis une réponse.'; return; }
+        if (v === Q.a) { fb.className = 'fb ok'; fb.innerHTML = 'Bravo, c’est juste !<span>' + esc(Q.how) + '</span>'; done[k] = true; }
+        else {
+          done[k] = false;
+          var good = Q.o.filter(function (o) { return o[0] === Q.a; })[0][1];
+          fb.className = 'fb no'; fb.innerHTML = 'Pas tout à fait : la bonne réponse est « ' + esc(good) + ' ».<span>' + esc(Q.how) + '</span>';
+        }
+        $('score').textContent = done.filter(Boolean).length + ' / 8';
+      }
+      $('qb' + k).addEventListener('click', check);
+      $('qa' + k).addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+    });
+    $('score').textContent = '0 / 8';
+  }
+  $('newQuiz').addEventListener('click', newQuiz);
+  newQuiz();
+
+  window.__don = { items: ITEMS, classifyItem: classifyItem, sortScore: sortScore, clues: CLUES, deduce: deduce, metaOf: metaOf, starName: starName, collected: collected,
+    fields: FIELDS, visibility: visibility, spread: spread, acts: ACTS, adProfile: adProfile, habits: HABITS, rights: RIGHTS, quiz: QZ };
+})();
+</script>
+</body>
+</html>
