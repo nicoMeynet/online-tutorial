@@ -19,6 +19,7 @@ import difficulte  # noqa: E402
 ROOT = Path(__file__).resolve().parent.parent
 
 TOPICS = [
+    ("le sikhisme", "le-sikhisme.html"),
     ("les religions du monde", "les-religions-du-monde.html"),
     ("les religions", "les-religions-du-monde.html"),
     ("l'hindouisme", "l-hindouisme.html"),

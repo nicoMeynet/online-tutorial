@@ -34,7 +34,7 @@ DIFF = {
     "les-signaux-et-la-communication": 2, "le-ciel-bleu-et-l-arc-en-ciel": 2, "la-physique-du-sport": 2,
     "le-climat-et-l-effet-de-serre": 2, "revisions-brevet-physique": 3,
     # Religions
-    "les-religions-du-monde": 1, "l-hindouisme": 2, "le-bouddhisme": 2, "le-judaisme": 1, "le-christianisme": 1, "l-islam": 1, "les-sagesses-de-chine-et-du-japon": 2, "les-mythologies-antiques": 1, "les-fetes-et-calendriers": 2,
+    "les-religions-du-monde": 1, "l-hindouisme": 2, "le-bouddhisme": 2, "le-judaisme": 1, "le-christianisme": 1, "l-islam": 1, "les-sagesses-de-chine-et-du-japon": 2, "les-mythologies-antiques": 1, "les-fetes-et-calendriers": 2, "le-sikhisme": 1,
     # Numérique
     "reperer-les-arnaques": 1, "les-mots-de-passe": 1,
     "comment-on-te-manipule": 2, "les-virus-et-les-mises-a-jour": 1, "naviguer-en-securite": 2, "les-donnees-personnelles": 2, "le-cyberharcelement": 1, "vraie-ou-fausse-info": 2, "les-images-truquees-et-les-deepfakes": 2, "les-reseaux-sociaux-et-les-algorithmes": 2, "bien-utiliser-l-ia": 1, "comment-une-ia-ecrit": 3, "comment-marche-internet": 2, "les-octets-et-le-stockage": 1, "les-pixels-et-la-compression": 2, "programmer-pas-a-pas": 2, "le-temps-d-ecran-et-l-attention": 1, "les-achats-dans-les-jeux": 1,

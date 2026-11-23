@@ -120,6 +120,7 @@ Accueil des religions : [religions.html](religions.html). On apprend sur les rel
 | [Les religions du monde](les-religions-du-monde.html) | Qu'est-ce qu'une religion ? Croyances, rites et fêtes, les grandes familles, croire ou ne pas croire, et vivre ensemble en Suisse. |
 | [L'hindouisme](l-hindouisme.html) | Les Veda, les nombreuses formes du divin, karma et samsara, la puja, le temple et les fêtes comme Diwali et Holi. |
 | [Le bouddhisme](le-bouddhisme.html) | La vie du Bouddha, les Quatre Nobles Vérités, le Noble Chemin octuple, la méditation et les grandes branches. |
+| [Le sikhisme](le-sikhisme.html) | Guru Nanak et les dix Gurus, le Guru Granth Sahib, l’égalité, le langar, le gurdwara, les cinq K et le turban. |
 | [Le judaïsme](le-judaisme.html) | Abraham et Moïse, la Torah, la synagogue, le Shabbat, les fêtes et l'histoire des Juifs, aussi en Suisse. |
 | [Le christianisme](le-christianisme.html) | Jésus, la Bible, catholiques, orthodoxes et protestants, la Réforme à Genève et Zurich, les sacrements et la date de Pâques. |
 | [L'islam](l-islam.html) | Le prophète Muhammad, le Coran, les cinq piliers, la mosquée, le calendrier lunaire du ramadan et les arts géométriques. |

@@ -52,7 +52,7 @@ TRACKS = [
     ("ecrans", "numerique", "Bien vivre avec les écrans", "9H", "Ton temps, ton attention et ton argent dans les jeux.", [
         "le-temps-d-ecran-et-l-attention", "les-achats-dans-les-jeux"]),
     ("religions1", "religions", "Découvrir les religions du monde", "9H–11H", "Les grandes religions et sagesses, leurs croyances, leurs textes et leurs fêtes.", [
-        "les-religions-du-monde", "le-judaisme", "le-christianisme", "l-islam", "l-hindouisme", "le-bouddhisme",
+        "les-religions-du-monde", "le-judaisme", "le-christianisme", "l-islam", "l-hindouisme", "le-bouddhisme", "le-sikhisme",
         "les-sagesses-de-chine-et-du-japon", "les-mythologies-antiques", "les-fetes-et-calendriers"]),
     ("pcurio", "physique", "Physique et curiosités", "tous niveaux", "La physique du ciel, du sport et du climat.", [
         "le-ciel-bleu-et-l-arc-en-ciel", "la-physique-du-sport", "le-climat-et-l-effet-de-serre"]),
@@ -61,6 +61,7 @@ TRACKS = [
 # Ce qu'il vaut mieux connaître avant (seulement les liens importants).
 PRE = {
     "le-bouddhisme": ["l-hindouisme"],
+    "le-sikhisme": ["l-hindouisme"],
     "les-fetes-et-calendriers": ["les-religions-du-monde"],
     "naviguer-en-securite": ["reperer-les-arnaques"],
     "les-images-truquees-et-les-deepfakes": ["vraie-ou-fausse-info"],
