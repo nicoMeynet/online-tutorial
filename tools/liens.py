@@ -2,7 +2,7 @@
 
 - un lien « ← Tous les tutoriels » en haut de chaque page ;
 - les mentions « le tutoriel sur … » deviennent de vrais liens ;
-- en bas de page : tutoriel précédent / suivant (ordre de index.html) et retour à l'accueil.
+- en bas de page : tutoriel précédent / suivant (ordre des accueils de matière) et retour à l'accueil.
 
 Le script peut être relancé autant de fois qu'on veut : il remplace ce qu'il a déjà ajouté.
 Usage : python tools/liens.py            (toutes les pages)
@@ -20,6 +20,8 @@ ROOT = Path(__file__).resolve().parent.parent
 
 TOPICS = [
     ("le sikhisme", "le-sikhisme.html"),
+    ("les religions traditionnelles", "les-religions-traditionnelles.html"),
+    ("les conversions avancées", "les-conversions-avancees.html"),
     ("les religions du monde", "les-religions-du-monde.html"),
     ("les religions", "les-religions-du-monde.html"),
     ("l'hindouisme", "l-hindouisme.html"),
@@ -192,9 +194,9 @@ CSS = CSS.replace("</style>", difficulte.BADGE_CSS + "</style>", 1)
 
 # Une page d'accueil par matière : chaque tutoriel renvoie vers la sienne,
 # et « précédent / suivant » reste dans la même matière.
-LANDINGS = [("index.html", "Tous les tutoriels"), ("physique.html", "Tous les tutoriels de physique"), ("numerique.html", "Tous les tutoriels numériques"), ("religions.html", "Tous les tutoriels de religions")]
+LANDINGS = [("maths.html", "Tous les tutoriels de maths"), ("physique.html", "Tous les tutoriels de physique"), ("numerique.html", "Tous les tutoriels numériques"), ("religions.html", "Tous les tutoriels de religions")]
 # Pages de révision qui ne sont pas des cartes mais appartiennent à une matière.
-HOME_OF = {"physique.html": ("glossaire-physique.html", "revisions-brevet-physique.html")}
+HOME_OF = {"maths.html": ("glossaire.html", "revisions-brevet.html"), "physique.html": ("glossaire-physique.html", "revisions-brevet-physique.html")}
 
 
 def landing_order():
@@ -239,7 +241,7 @@ def process(path, order):
     body = linkify(body, path.name)
     src = body + tail
 
-    home, label, seq = order[0][0], order[0][1], []
+    home, label, seq = "index.html", "Accueil", []
     for landing, lab, cards in order:
         if path.name in HOME_OF.get(landing, ()):
             home, label = landing, lab
@@ -275,7 +277,7 @@ def process(path, order):
 def main():
     difficulte.apply_landings(ROOT)
     order = landing_order()
-    files = [ROOT / a for a in sys.argv[1:]] or sorted(p for p in ROOT.glob("*.html") if p.name not in dict(LANDINGS))
+    files = [ROOT / a for a in sys.argv[1:]] or sorted(p for p in ROOT.glob("*.html") if p.name not in dict(LANDINGS) and p.name != "index.html")
     for p in files:
         process(p, order)
         print("ok", p.name)

@@ -17,7 +17,7 @@ DIFF = {
     "les-arrondis-et-ordres-de-grandeur": 1, "le-calcul-litteral": 2, "les-identites-remarquables": 3,
     "les-equations": 2, "l-equation-produit-nul-et-les-systemes": 3, "les-inequations": 2, "les-fonctions": 3,
     "la-proportionnalite": 1, "les-pourcentages": 2, "la-vitesse": 1, "les-grandeurs-composees": 2,
-    "les-conversions": 1, "les-echelles": 1, "les-formes-geometriques": 1, "la-sphere-et-la-boule": 2,
+    "les-conversions": 1, "les-conversions-avancees": 2, "les-echelles": 1, "les-formes-geometriques": 1, "la-sphere-et-la-boule": 2,
     "les-angles-et-triangles": 1, "les-droites-remarquables": 2, "les-quadrilateres": 1,
     "le-theoreme-de-pythagore": 2, "le-theoreme-de-thales": 3, "la-trigonometrie": 3, "les-transformations": 1,
     "le-reperage": 1, "les-statistiques": 1, "les-probabilites": 2, "l-algorithmique": 1, "la-demonstration": 3,
@@ -34,7 +34,7 @@ DIFF = {
     "les-signaux-et-la-communication": 2, "le-ciel-bleu-et-l-arc-en-ciel": 2, "la-physique-du-sport": 2,
     "le-climat-et-l-effet-de-serre": 2, "revisions-brevet-physique": 3,
     # Religions
-    "les-religions-du-monde": 1, "l-hindouisme": 2, "le-bouddhisme": 2, "le-judaisme": 1, "le-christianisme": 1, "l-islam": 1, "les-sagesses-de-chine-et-du-japon": 2, "les-mythologies-antiques": 1, "les-fetes-et-calendriers": 2, "le-sikhisme": 1,
+    "les-religions-du-monde": 1, "l-hindouisme": 2, "le-bouddhisme": 2, "le-judaisme": 1, "le-christianisme": 1, "l-islam": 1, "les-sagesses-de-chine-et-du-japon": 2, "les-mythologies-antiques": 1, "les-fetes-et-calendriers": 2, "le-sikhisme": 1, "les-religions-traditionnelles": 1,
     # Numérique
     "reperer-les-arnaques": 1, "les-mots-de-passe": 1,
     "comment-on-te-manipule": 2, "les-virus-et-les-mises-a-jour": 1, "naviguer-en-securite": 2, "les-donnees-personnelles": 2, "le-cyberharcelement": 1, "vraie-ou-fausse-info": 2, "les-images-truquees-et-les-deepfakes": 2, "les-reseaux-sociaux-et-les-algorithmes": 2, "bien-utiliser-l-ia": 1, "comment-une-ia-ecrit": 3, "comment-marche-internet": 2, "les-octets-et-le-stockage": 1, "les-pixels-et-la-compression": 2, "programmer-pas-a-pas": 2, "le-temps-d-ecran-et-l-attention": 1, "les-achats-dans-les-jeux": 1,
@@ -61,7 +61,7 @@ def badge(page_id):
 
 def apply_landings(root):
     """Ajoute (ou met à jour) le badge de difficulté sur les cartes des accueils."""
-    for name in ("index.html", "physique.html", "numerique.html", "religions.html"):
+    for name in ("maths.html", "physique.html", "numerique.html", "religions.html"):
         f = Path(root) / name
         if not f.exists():
             continue

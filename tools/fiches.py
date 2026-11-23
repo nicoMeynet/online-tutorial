@@ -1,7 +1,7 @@
 """Construit fiches.html : les fiches « l'essentiel » à imprimer.
 
 Pour chaque tutoriel de l'accueil, on reprend sa section « À retenir »,
-dans l'ordre et les catégories de index.html. Relancer après tout ajout :
+dans l'ordre et les catégories des accueils de matière. Relancer après tout ajout :
     python tools/fiches.py && python tools/liens.py
 """
 import html
@@ -115,7 +115,7 @@ def summary(path):
 def main():
     out = []
     count = 0
-    subjects = [("index.html", "maths", "Maths"), ("physique.html", "physique", "Physique-chimie"), ("numerique.html", "numerique", "Numérique"), ("religions.html", "religions", "Religions")]
+    subjects = [("maths.html", "maths", "Maths"), ("physique.html", "physique", "Physique-chimie"), ("numerique.html", "numerique", "Numérique"), ("religions.html", "religions", "Religions")]
     for landing, sid, sname in subjects:
       if not (ROOT / landing).exists():
           continue

@@ -27,7 +27,7 @@ TRACKS = [
     ("brevet", "maths", "Objectif 11H", "11H", "Tout le programme de 11H, jusqu'au grand quiz de révision.", [
         "les-identites-remarquables", "l-equation-produit-nul-et-les-systemes", "les-inequations", "les-fonctions",
         "les-racines-carrees", "les-nombres-premiers", "le-theoreme-de-thales", "la-trigonometrie",
-        "les-echelles", "la-sphere-et-la-boule", "les-grandeurs-composees", "les-probabilites",
+        "les-echelles", "la-sphere-et-la-boule", "les-grandeurs-composees", "les-conversions-avancees", "les-probabilites",
         "l-algorithmique", "la-demonstration", "revisions-brevet"]),
     ("lycee", "maths", "Avant-goût du secondaire II", "11H → secondaire II", "Pour les curieux qui veulent prendre de l'avance.", [
         "les-ensembles-de-nombres", "le-second-degre", "les-vecteurs", "les-suites", "la-derivee", "les-nombres-complexes"]),
@@ -53,7 +53,7 @@ TRACKS = [
         "le-temps-d-ecran-et-l-attention", "les-achats-dans-les-jeux"]),
     ("religions1", "religions", "Découvrir les religions du monde", "9H–11H", "Les grandes religions et sagesses, leurs croyances, leurs textes et leurs fêtes.", [
         "les-religions-du-monde", "le-judaisme", "le-christianisme", "l-islam", "l-hindouisme", "le-bouddhisme", "le-sikhisme",
-        "les-sagesses-de-chine-et-du-japon", "les-mythologies-antiques", "les-fetes-et-calendriers"]),
+        "les-sagesses-de-chine-et-du-japon", "les-religions-traditionnelles", "les-mythologies-antiques", "les-fetes-et-calendriers"]),
     ("pcurio", "physique", "Physique et curiosités", "tous niveaux", "La physique du ciel, du sport et du climat.", [
         "le-ciel-bleu-et-l-arc-en-ciel", "la-physique-du-sport", "le-climat-et-l-effet-de-serre"]),
 ]
@@ -62,6 +62,7 @@ TRACKS = [
 PRE = {
     "le-bouddhisme": ["l-hindouisme"],
     "le-sikhisme": ["l-hindouisme"],
+    "les-religions-traditionnelles": ["les-religions-du-monde"],
     "les-fetes-et-calendriers": ["les-religions-du-monde"],
     "naviguer-en-securite": ["reperer-les-arnaques"],
     "les-images-truquees-et-les-deepfakes": ["vraie-ou-fausse-info"],
@@ -73,6 +74,7 @@ PRE = {
     "la-proportionnalite": ["les-fractions"],
     "les-pourcentages": ["la-proportionnalite", "les-fractions"],
     "les-conversions": ["les-arrondis-et-ordres-de-grandeur"],
+    "les-conversions-avancees": ["les-conversions", "les-puissances"],
     "les-puissances": ["les-priorites-de-calcul"],
     "le-calcul-litteral": ["les-priorites-de-calcul", "les-nombres-relatifs"],
     "les-equations": ["le-calcul-litteral"],
@@ -344,7 +346,7 @@ JS = r"""
 
 def landing_pages():
     pages = {}
-    for f in ("index.html", "physique.html", "numerique.html", "religions.html"):
+    for f in ("maths.html", "physique.html", "numerique.html", "religions.html"):
         s = (ROOT / f).read_text(encoding="utf-8")
         for href, title, desc in re.findall(r'<a class="card" href="([^"]+)\.html">.*?<strong>(.*?)</strong><span class="d">(.*?)</span>', s, re.S):
             pages[href] = {"t": html.unescape(re.sub(r"<[^>]+>", "", title)).strip(), "d": html.unescape(re.sub(r"<[^>]+>", "", desc)).strip()}

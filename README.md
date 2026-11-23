@@ -4,6 +4,8 @@ Petits tutoriels interactifs en français, pour les élèves du secondaire I (Su
 
 Chaque tutoriel est une seule page HTML, sans installation. Il suffit de l'ouvrir dans un navigateur, sur ordinateur ou sur téléphone.
 
+La page d'accueil ([index.html](index.html)) présente le site, les quatre matières (maths, physique-chimie, numérique, religions), une recherche dans tous les tutoriels et un bouton « Reprendre » vers le dernier tutoriel ouvert. Chaque matière a ensuite son propre accueil : [maths.html](maths.html), [physique.html](physique.html), [numerique.html](numerique.html) et [religions.html](religions.html).
+
 ## Tutoriels
 
 | Tutoriel | Sujet |
@@ -35,6 +37,7 @@ Chaque tutoriel est une seule page HTML, sans installation. Il suffit de l'ouvri
 | [Le repérage](le-reperage.html) | Abscisse, coordonnées, chasse au trésor, distance et milieu, l'espace, latitude et longitude, distances entre villes, un quiz. |
 | [Les inéquations](les-inequations.html) | Les signes < > ≤ ≥, tester une valeur, résoudre pas à pas (changement de sens), la droite graduée, des problèmes, un quiz. |
 | [Les conversions d'unités](les-conversions.html) | Le système métrique, les tableaux de conversion (longueurs, masses, capacités, aires, volumes), les durées, un convertisseur universel, un quiz. |
+| [Les conversions avancées](les-conversions-avancees.html) | Les préfixes de nano à téra, la méthode du facteur de conversion pas à pas, les unités anglo-saxonnes (pouce, pied, mile, livre), les températures °C, °F et K, des erreurs célèbres, un quiz et des problèmes. |
 | [Les échelles et les agrandissements](les-echelles.html) | Lire et calculer une échelle, mesurer sur une carte, plans et maquettes, agrandir et réduire (k, k², k³), un quiz. |
 | [L'algorithmique](l-algorithmique.html) | Un robot à programmer avec des blocs, boucles et polygones, conditions et nombre mystère (dichotomie), variables, somme de Gauss, un quiz. |
 | [Le nombre d'or](le-nombre-d-or.html) | Fibonacci, le rapport qui tend vers φ, le rectangle et la spirale d'or, le tournesol, le pentagone, mythes et réalités, un quiz. |
@@ -125,6 +128,7 @@ Accueil des religions : [religions.html](religions.html). On apprend sur les rel
 | [Le christianisme](le-christianisme.html) | Jésus, la Bible, catholiques, orthodoxes et protestants, la Réforme à Genève et Zurich, les sacrements et la date de Pâques. |
 | [L'islam](l-islam.html) | Le prophète Muhammad, le Coran, les cinq piliers, la mosquée, le calendrier lunaire du ramadan et les arts géométriques. |
 | [Les sagesses de Chine et du Japon](les-sagesses-de-chine-et-du-japon.html) | Confucius, le taoïsme et le yin et le yang, le shintoïsme et ses sanctuaires, le Nouvel An chinois. |
+| [Les religions traditionnelles](les-religions-traditionnelles.html) | Les religions liées à un peuple et à une terre : les mots justes, les idées communes (ancêtres, nature, rites de passage), une carte du monde (Afrique, Australie, Amériques, Arctique, Océanie, Europe ancienne), la transmission orale, les mélanges et le renouveau. |
 | [Les mythologies antiques](les-mythologies-antiques.html) | Dieux d'Égypte, de Grèce, de Rome et du Nord, héros et mythes, et les mots et jours de la semaine qui en viennent. |
 | [Les fêtes et calendriers](les-fetes-et-calendriers.html) | Soleil et Lune, années bissextiles, les grandes fêtes des religions, les jours fériés suisses et les lieux de culte. |
 
@@ -145,5 +149,5 @@ La **progression** (tutoriels ouverts, meilleur score à chaque quiz) est enregi
 
 1. Ajouter un fichier `nom-du-tutoriel.html` à la racine.
 2. Ajouter une ligne dans le tableau ci-dessus.
-3. Ajouter une carte dans `index.html` (maths), `physique.html` (physique-chimie) `numerique.html` (numérique) ou `religions.html` (religions), dans la bonne catégorie.
-4. Ajouter le tutoriel dans un parcours de `tools/parcours.py` (et ses prérequis), puis lancer `python tools/parcours.py`, `python tools/fiches.py` et `python tools/liens.py` : il ajoute le logo (icône d'onglet et d'écran d'accueil), le retour à l'accueil, les liens « précédent / suivant » (dans l'ordre de `index.html`) et transforme les mentions « le tutoriel sur … » en liens. On peut le relancer sans risque.
+3. Ajouter une carte dans `maths.html` (maths), `physique.html` (physique-chimie) `numerique.html` (numérique) ou `religions.html` (religions), dans la bonne catégorie.
+4. Ajouter le tutoriel dans un parcours de `tools/parcours.py` (et ses prérequis), puis lancer `python tools/parcours.py`, `python tools/fiches.py`, `python tools/accueil.py` (la page d'accueil générale `index.html`, avec la recherche dans toutes les matières) et `python tools/liens.py` : il ajoute le logo (icône d'onglet et d'écran d'accueil), le retour à l'accueil, les liens « précédent / suivant » (dans l'ordre de l'accueil de la matière) et transforme les mentions « le tutoriel sur … » en liens. On peut le relancer sans risque.

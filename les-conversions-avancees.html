@@ -1,0 +1,963 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Les conversions avancées</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, encre bleu-vert (la même que pour les conversions de base), marge rouge. Ici : préfixes, facteurs de conversion, unités anglo-saxonnes et températures. */
+:root {
+  --paper: #f6f9f8;
+  --grid: #dfeae7;
+  --card: #ffffff;
+  --ink: #13302c;
+  --ink-soft: #4d6662;
+  --acc: #0d9488;
+  --acc-ink: #0f766e;
+  --acc-soft: #d5f2ee;
+  --two: #b45309;
+  --two-soft: #fbe9d4;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #fff0a3;
+  --line: #cfe0dc;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0c1513; --grid: #16221f; --card: #111c1a; --ink: #e8f3f0; --ink-soft: #9fbab4;
+    --acc: #5eead4; --acc-ink: #5eead4; --acc-soft: #12342f; --two: #f5a35c; --two-soft: #3a2612;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #26403a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0c1513; --grid: #16221f; --card: #111c1a; --ink: #e8f3f0; --ink-soft: #9fbab4;
+  --acc: #5eead4; --acc-ink: #5eead4; --acc-soft: #12342f; --two: #f5a35c; --two-soft: #3a2612;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #26403a;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+@media (max-width: 420px) { .box { padding: 14px; } }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note.two { border-left-color: var(--two); background: var(--two-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+.fig svg { width: 100%; height: auto; display: block; }
+.fig.framed svg { background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 6px 12px; min-height: 40px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+button:disabled { opacity: .45; cursor: default; transform: none; box-shadow: 3px 3px 0 var(--ink); }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chips button { padding: 4px 10px; font-size: .95rem; }
+.chips button b { font-family: var(--f-mono); margin-right: 4px; }
+input[type="text"], select { font: inherit; font-family: var(--f-mono); font-size: 1.05rem; padding: 8px 10px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; min-height: 44px; }
+select { cursor: pointer; }
+input[type="range"] { width: 100%; accent-color: var(--acc); min-height: 40px; }
+.param { display: flex; flex-direction: column; gap: 2px; }
+.param label { font-weight: 700; }
+
+.inputs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 14px; align-items: end; }
+.inputs.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.inputs label { font-weight: 700; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+@media (max-width: 600px) { .inputs, .inputs.two { grid-template-columns: minmax(0, 1fr); } }
+.methods { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.method { border: 1.5px solid var(--line); border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; background: var(--paper); min-width: 0; }
+.method strong { font-family: var(--f-display); }
+.method .m { font-family: var(--f-mono); font-size: .95rem; overflow-wrap: anywhere; }
+.method .m b { color: var(--acc-ink); }
+.err { color: var(--red); font-weight: 700; }
+
+.verdict { border-radius: 8px; padding: 12px 14px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.verdict.yes { background: var(--acc-soft); color: var(--acc-ink); }
+.verdict.no { background: var(--red-soft); color: var(--red); }
+.verdict span { font-weight: 400; color: var(--ink); overflow-wrap: anywhere; }
+.verdict .big { font-family: var(--f-mono); font-weight: 600; font-size: 1.2rem; color: var(--ink); overflow-wrap: anywhere; }
+.verdict .big b { color: var(--acc-ink); }
+.big { font-family: var(--f-mono); font-size: 1.15rem; font-weight: 600; overflow-wrap: anywhere; }
+
+.results { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 420px) { .results { grid-template-columns: minmax(0, 1fr); } }
+.res { border: 1.5px solid var(--line); border-radius: 10px; padding: 10px 12px; background: var(--paper); display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.res .k { font-size: .85rem; color: var(--ink-soft); }
+.res .v { font-family: var(--f-mono); font-weight: 600; font-size: 1.2rem; overflow-wrap: anywhere; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
+.tag.ok { color: var(--acc-ink); }
+.tag.no { color: var(--red); }
+.tag.two { color: var(--two); }
+
+/* Tableau des unités */
+.scroll { overflow-x: auto; padding-bottom: 4px; }
+.utable { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+.utable th, .utable td { border: 1.5px solid var(--line); padding: 7px 10px; text-align: left; vertical-align: top; }
+.utable th { font-family: var(--f-display); background: var(--paper); white-space: nowrap; }
+.utable td.v { font-family: var(--f-mono); white-space: nowrap; }
+.utable td.s { font-family: var(--f-mono); color: var(--acc-ink); font-weight: 600; }
+@media (max-width: 520px) { .utable th, .utable td { padding: 5px 6px; font-size: .88rem; } }
+
+/* Chaîne de facteurs */
+.chain { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 8px; font-family: var(--f-mono); font-size: 1.1rem; min-height: 76px; padding: 8px 4px; }
+.frac { display: inline-flex; flex-direction: column; align-items: center; text-align: center; }
+.frac .nu { border-bottom: 2px solid var(--ink); padding: 0 6px 3px; white-space: nowrap; }
+.frac .de { padding: 3px 6px 0; white-space: nowrap; }
+.plain { white-space: nowrap; }
+.chain .op { font-weight: 600; color: var(--ink-soft); }
+.chain .resu { font-weight: 600; color: var(--acc-ink); background: var(--acc-soft); border-radius: 6px; padding: 2px 8px; white-space: nowrap; }
+.u { font-weight: 600; color: var(--two); transition: opacity .3s; }
+.u.x { text-decoration: line-through; text-decoration-color: var(--red); text-decoration-thickness: 3px; opacity: .5; }
+.frac.new { animation: pop .45s ease-out; }
+@keyframes pop { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .frac.new { animation: none; } }
+@media (max-width: 420px) { .chain { font-size: .98rem; gap: 8px 6px; } }
+.stepinfo { font-family: var(--f-mono); font-size: .85rem; color: var(--ink-soft); }
+
+/* Jeu plus ou moins */
+.sorter { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.sorter li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 10px; align-items: center; padding: 8px 12px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--paper); }
+.sorter .fb { grid-column: 1 / -1; font-size: .95rem; }
+.sorter .fb.ok { color: var(--ok); }
+.sorter .fb.no { color: var(--red); }
+.sorter .btns { gap: 8px; }
+@media (max-width: 520px) { .sorter li { grid-template-columns: minmax(0, 1fr); } }
+
+.errs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.errs li { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--paper); }
+.errs .bad { font-family: var(--f-mono); color: var(--red); text-decoration: line-through; overflow-wrap: anywhere; }
+.errs .good { font-family: var(--f-mono); color: var(--ok); font-weight: 600; overflow-wrap: anywhere; }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 130px auto; gap: 10px; align-items: center; }
+.quiz input[type="text"] { font-size: 1rem; padding: 6px 8px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc-ink); }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 120px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); overflow-wrap: anywhere; }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+<!--ticons--><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Tutoriels"><script src="progress.js" defer></script><!--/ticons-->
+<style id="tnav-css">
+.tnav-top { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin: 0 0 4px; }
+.tnav-home { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font-weight: 700; font-size: .95rem; text-decoration: none; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tnav-home:hover, .tnav-home:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.tnav-bottom { margin-top: 8px; display: flex; flex-direction: column; gap: 12px; }
+.tnav-bottom h2 { margin: 0; }
+.tnav-pn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tnav-pn a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--ink, #222); border-radius: 10px;
+  background: var(--card, #fff); color: var(--ink, #222); text-decoration: none; box-shadow: 3px 3px 0 var(--ink, #222); min-width: 0; }
+.tnav-pn a span { font-size: .85rem; color: var(--ink-soft, #666); }
+.tnav-pn a strong { overflow-wrap: anywhere; }
+.tnav-pn a.next { text-align: right; grid-column: 2; }
+.tnav-bottom .tnav-home { align-self: center; }
+@media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
+.diff { font: 700 .72rem/1.2 var(--f-mono, monospace); padding: 2px 8px; border-radius: 99px; border: 1.5px solid; white-space: nowrap; }
+.diff.d1 { color: #15803d; border-color: #15803d; background: #dcf3e3; }
+.diff.d2 { color: #a15c07; border-color: #b45309; background: #fbe7cf; }
+.diff.d3 { color: #b91c1c; border-color: #b91c1c; background: #fde2e2; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root:not([data-theme="light"]) .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root:not([data-theme="light"]) .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; } }
+:root[data-theme="dark"] .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root[data-theme="dark"] .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root[data-theme="dark"] .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; }
+</style>
+</head>
+<body>
+<main class="page">
+<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="maths.html">← Tous les tutoriels de maths</a><span class="diff d2" title="Difficulté : moyen">Moyen</span></nav><!--/tnav-->
+
+
+  <header class="hero">
+    <span class="eyebrow">Tutoriel de maths · niveau 10H–11H</span>
+    <h1>Les conversions avancées</h1>
+    <p class="lead">Des nanomètres aux téramètres, des pouces aux centimètres, des degrés Fahrenheit aux degrés Celsius. Avec une seule méthode, celle du facteur de conversion, tu peux convertir à peu près n'importe quoi, sans te tromper de sens.</p>
+    <div class="box">
+      <div class="fig"><svg id="heroRuler" viewBox="0 0 360 124" role="img" aria-label="Une règle en centimètres au-dessus d'une règle en pouces : 1 pouce correspond à 2,54 cm"></svg></div>
+      <span class="soft">En haut, des centimètres. En bas, des pouces. La ligne rouge : <strong>1 pouce = 2,54 cm</strong>, exactement.</span>
+    </div>
+    <p class="soft">Ce tutoriel suppose que tu connais déjà le tableau de conversion (longueurs, masses, capacités, aires, volumes) et les durées : tout ça est dans le tutoriel sur <a class="tlink" href="les-conversions.html">les conversions</a>.</p>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · Les préfixes du SI</span>
+    <h2>De nano à téra</h2>
+    <p>Tu connais déjà kilo, hecto, déca, déci, centi et milli. Le <strong>Système international d'unités</strong> (SI) en a d'autres, pour le très grand et le très petit. À partir de kilo, on saute de <strong>1 000 en 1 000</strong> : chaque préfixe correspond à une <strong>puissance de dix</strong> (le tutoriel sur <a class="tlink" href="les-puissances.html">les puissances</a> explique ces écritures).</p>
+    <div class="box">
+      <h3>L'échelle des préfixes</h3>
+      <div class="fig"><svg id="ladder" viewBox="0 0 360 78" role="img" aria-label="Échelle des puissances de dix de 10 puissance moins 9 à 10 puissance 12, avec les symboles des préfixes"></svg></div>
+      <div class="param"><label for="pRange">Déplace le curseur : <span class="mono" id="pName"></span></label><input id="pRange" type="range" min="0" max="11" step="1" value="8"></div>
+      <div class="chips" id="pChips" role="group" aria-label="Choisis un préfixe"></div>
+      <div class="methods" id="pOut" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Attention aux majuscules</span>
+      <span><strong>m</strong> (milli) et <strong>M</strong> (méga), ce n'est pas du tout la même chose : 1 mW est un milliardième de 1 MW. Et micro s'écrit avec la lettre grecque <strong>µ</strong> (« mu ») : 1 µm = 0,001 mm.</span>
+    </div>
+    <div class="box">
+      <h3>Sauter d'un préfixe à l'autre</h3>
+      <p class="soft">On compare les deux puissances de dix. Exemple : de kilo (10³) à milli (10⁻³), il y a 3 − (−3) = 6 crans, donc on multiplie par 10⁶.</p>
+      <div class="inputs">
+        <label for="pjVal">Valeur<input id="pjVal" type="text" inputmode="decimal" autocomplete="off" value="384"></label>
+        <label for="pjFrom">De<select id="pjFrom"></select></label>
+        <label for="pjTo">Vers<select id="pjTo"></select></label>
+      </div>
+      <div class="btns" id="pjUnits" role="group" aria-label="Choisis l'unité"></div>
+      <div class="verdict yes" id="pjOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · L'écriture scientifique</span>
+    <h2>Écrire les très grands et les très petits nombres</h2>
+    <p>384 000 000 m ou 0,000 07 m : trop de zéros, on se trompe vite. L'<strong>écriture scientifique</strong> écrit un nombre sous la forme <span class="hl">a × 10ⁿ</span>, avec <strong>a entre 1 et 10</strong> (10 exclu).</p>
+    <div class="cards">
+      <div class="box"><span class="tag ok">Très grand</span><span class="mono">384 000 000 = 3,84 × 10⁸</span><span class="soft">La virgule a reculé de 8 rangs vers la gauche : l'exposant est +8.</span></div>
+      <div class="box"><span class="tag no">Très petit</span><span class="mono">0,000 07 = 7 × 10⁻⁵</span><span class="soft">La virgule a avancé de 5 rangs vers la droite : l'exposant est −5.</span></div>
+    </div>
+    <p>L'<strong>ordre de grandeur</strong>, c'est la puissance de 10 la plus proche. Il sert à vérifier un résultat : si tu trouves qu'un cheveu fait 7 m d'épaisseur, l'ordre de grandeur te dit tout de suite qu'il y a une erreur.</p>
+    <div class="box">
+      <h3>L'écrivain scientifique</h3>
+      <div class="chips" id="sciPre" role="group" aria-label="Exemples"></div>
+      <div class="inputs two">
+        <label for="sciVal">Ton nombre<input id="sciVal" type="text" inputmode="decimal" autocomplete="off" value="384 000 000"></label>
+        <label for="sciUnit">Unité<select id="sciUnit"><option value="m">mètres (m)</option><option value="g">grammes (g)</option><option value="L">litres (L)</option><option value="">sans unité</option></select></label>
+      </div>
+      <div class="methods" id="sciOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · La méthode du facteur de conversion</span>
+    <h2>Multiplier par 1, sans changer la valeur</h2>
+    <p>Comme 1 h = 60 min, la fraction <span class="mono">1 h / 60 min</span> vaut <strong>1</strong> : en haut et en bas, c'est la même durée. Multiplier par 1 ne change pas une grandeur. Mais ça change son <strong>unité</strong> !</p>
+    <p>Les unités se comportent comme des lettres dans une fraction : une unité en haut et la même en bas <strong>se simplifient</strong>. On choisit donc le sens du facteur pour que l'unité qu'on veut faire disparaître soit de l'autre côté de la barre.</p>
+    <div class="note">
+      <span class="note-title">Exemple : 150 min en heures</span>
+      <span class="mono">150 min × (1 h / 60 min) = 150 ÷ 60 h = 2,5 h</span>
+      <span>Les « min » se simplifient, il reste des heures. C'est la même idée que dans le tutoriel sur <a class="tlink" href="les-grandeurs-composees.html">les grandeurs composées</a>, pour les km/h et les L/min.</span>
+    </div>
+    <div class="box">
+      <h3>Pas à pas : les unités qui se barrent</h3>
+      <div class="inputs two">
+        <label for="fcSel">Conversion<select id="fcSel"></select></label>
+        <label for="fcVal">Valeur de départ<input id="fcVal" type="text" inputmode="decimal" autocomplete="off" value="90"></label>
+      </div>
+      <div class="chain" id="fcChain" aria-live="polite"></div>
+      <p id="fcMsg"></p>
+      <div class="btns">
+        <button type="button" id="fcNext">Pas à pas ▸</button>
+        <button type="button" id="fcAll">Tout montrer</button>
+        <button type="button" id="fcReset">Recommencer</button>
+        <span class="stepinfo" id="fcInfo"></span>
+      </div>
+    </div>
+    <div class="note two">
+      <span class="note-title">Le test du bon sens</span>
+      <span>Si tu te trompes de sens (60 min / 1 h au lieu de 1 h / 60 min), les unités ne se barrent pas : tu obtiens des min²/h, une unité absurde. Les unités te préviennent de l'erreur !</span>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · Les unités anglo-saxonnes</span>
+    <h2>Pouces, pieds, miles et livres</h2>
+    <p>Aux États-Unis, et en partie au Royaume-Uni, on utilise encore des unités anciennes. Tu les croises aussi en Suisse : la diagonale d'un écran de téléphone (6,1 pouces), l'altitude des avions (en pieds), la taille des roues de vélo (29 pouces pour un VTT).</p>
+    <div class="box">
+      <h3>Les principales unités</h3>
+      <div class="scroll"><table class="utable" id="impTable" aria-label="Unités anglo-saxonnes et leur valeur dans le système métrique"></table></div>
+      <p class="soft">Depuis un accord international de 1959, le pouce vaut <strong>exactement</strong> 2,54 cm. Les valeurs avec « ≈ » sont arrondies.</p>
+    </div>
+    <div class="box">
+      <h3>Le convertisseur</h3>
+      <div class="chips" id="cvEx" role="group" aria-label="Exemples"></div>
+      <div class="inputs two">
+        <label for="cvUnit">Unité<select id="cvUnit"></select></label>
+        <label for="cvVal">Valeur<input id="cvVal" type="text" inputmode="decimal" autocomplete="off" value="6,1"></label>
+      </div>
+      <div class="btns" role="group" aria-label="Sens de la conversion">
+        <button type="button" id="cvTo" aria-pressed="true">→ vers le métrique</button>
+        <button type="button" id="cvFrom" aria-pressed="false">← depuis le métrique</button>
+      </div>
+      <div class="verdict yes" id="cvOut" aria-live="polite"></div>
+    </div>
+    <div class="note two">
+      <span class="note-title">Et en Suisse, autrefois ?</span>
+      <span>Avant le mètre, chaque canton (et parfois chaque ville) avait ses propres mesures : un « pied » ou une « livre » ne valaient pas tout à fait la même chose à Genève, à Berne ou à Zurich. Au XIX<sup>e</sup> siècle, la Suisse a d'abord unifié ces mesures (avec un « pied suisse » d'environ 30 cm et une « livre » d'environ 500 g), puis adopté le système métrique, définitivement vers 1875–1877. Au marché, on entend parfois encore « une livre » pour dire 500 g.</span>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Le jeu de l'estimation</span>
+    <h2>Plus ou moins ?</h2>
+    <p>Pas besoin de calculatrice : arrondis les facteurs (1 pied ≈ 30 cm, 1 mile ≈ 1,6 km, 1 once ≈ 28 g) et estime. Ensuite, regarde le calcul exact.</p>
+    <div class="box">
+      <ul class="sorter" id="estim"></ul>
+      <div class="btns">
+        <span class="score" id="estScore" aria-live="polite">0 / 9</span>
+        <button type="button" id="estReset">Recommencer</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · Les températures</span>
+    <h2>Celsius, Fahrenheit, kelvin : pas proportionnel !</h2>
+    <p>En Suisse, on mesure la température en <strong>degrés Celsius</strong> (°C) : 0 °C quand l'eau gèle, 100 °C quand elle bout (à la pression normale, au niveau de la mer). Les scientifiques utilisent aussi le <strong>kelvin</strong> (K, sans « degré »), et les États-Unis les <strong>degrés Fahrenheit</strong> (°F).</p>
+    <div class="methods">
+      <div class="method"><strong>Kelvin</strong><span class="m">T(K) = T(°C) + 273,15</span><span class="soft">0 K = −273,15 °C : le zéro absolu, la température la plus basse possible.</span></div>
+      <div class="method"><strong>Fahrenheit</strong><span class="m">F = 1,8 × C + 32</span><span class="m">C = (F − 32) ÷ 1,8</span></div>
+    </div>
+    <p>Ces conversions ne sont <strong>pas proportionnelles</strong> : il y a un « + 32 » (ou un « + 273,15 »). Le zéro n'est pas au même endroit ! On parle de conversion <strong>affine</strong>. Le tableau de conversion et la règle de trois ne marchent donc pas ici (voir le tutoriel sur <a class="tlink" href="la-proportionnalite.html">la proportionnalité</a>) : 10 °C = 50 °F, mais 20 °C ne fait pas 100 °F : seulement 68 °F.</p>
+    <div class="box">
+      <h3>Le double thermomètre</h3>
+      <div class="fig framed"><svg id="thermo" viewBox="0 0 360 320" role="img" aria-label="Deux thermomètres côte à côte, en degrés Celsius et en degrés Fahrenheit"></svg></div>
+      <div class="param"><label for="tC">Température : <span class="mono" id="tCo"></span></label><input id="tC" type="range" min="-60" max="110" step="0.5" value="20"></div>
+      <div class="chips" id="tMarks" role="group" aria-label="Repères"></div>
+      <div class="results" id="tRes" aria-live="polite"></div>
+      <div class="verdict no" id="tTrap" aria-live="polite"></div>
+      <div class="inputs two">
+        <label for="tF">Ou tape des °F<input id="tF" type="text" inputmode="decimal" autocomplete="off" placeholder="ex. 77"></label>
+      </div>
+      <p class="mono" id="tFo" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Des erreurs célèbres</span>
+    <h2>Quand une unité coûte très cher</h2>
+    <ol class="timeline">
+      <li><span class="when">1983</span><div class="what"><strong>Le « planeur de Gimli »</strong><span>Au Canada, qui passait alors au système métrique, un avion de ligne tombe en panne de carburant en plein vol. Pour calculer le carburant, on a utilisé un facteur en <strong>livres</strong> par litre au lieu de <strong>kilos</strong> par litre : l'avion n'avait qu'environ la moitié du carburant nécessaire. Les pilotes ont réussi à planer jusqu'à une ancienne base aérienne, à Gimli. Il n'y a pas eu de mort.</span></div></li>
+      <li><span class="when">1999</span><div class="what"><strong>La sonde Mars Climate Orbiter</strong><span>Une sonde de la NASA est perdue en arrivant près de Mars. L'enquête a montré qu'un logiciel donnait des valeurs en <strong>livres-force·seconde</strong> (une unité anglo-saxonne), alors que l'autre équipe les lisait en <strong>newtons·seconde</strong> (l'unité du SI). Comme 1 livre-force·seconde vaut environ 4,45 newtons·seconde, les calculs de trajectoire étaient faux : la sonde est passée beaucoup trop près de la planète.</span></div></li>
+    </ol>
+    <div class="note red">
+      <span class="note-title">La leçon</span>
+      <span>Écris <strong>toujours</strong> l'unité à côté de chaque nombre, à chaque ligne du calcul. Un nombre sans unité, c'est une information à moitié perdue.</span>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Attention</span>
+    <h2>Les erreurs fréquentes</h2>
+    <div class="box">
+      <ul class="errs">
+        <li><span class="bad">1 m² = 100 cm²</span><span class="good">1 m² = 100 × 100 = 10 000 cm²</span><span class="soft">Une aire a deux dimensions : on convertit le côté deux fois.</span></li>
+        <li><span class="bad">1 m³ = 100 L</span><span class="good">1 m³ = 1 000 dm³ = 1 000 L</span><span class="soft">Un volume a trois dimensions : 10 × 10 × 10 = 1 000. Et 1 dm³ = 1 L.</span></li>
+        <li><span class="bad">36 km/h = 36 × 3,6 = 129,6 m/s</span><span class="good">36 km/h = 36 ÷ 3,6 = 10 m/s</span><span class="soft">Multiplier au lieu de diviser : avec la méthode du facteur, les unités ne se barreraient pas.</span></li>
+        <li><span class="bad">1,5 h = 1 h 50 min</span><span class="good">1,5 h = 1 h 30 min</span><span class="soft">Une heure a 60 minutes, pas 100 : 0,5 h = 0,5 × 60 = 30 min.</span></li>
+        <li><span class="bad">10 °C = 50 °F, donc 20 °C = 100 °F</span><span class="good">20 °C = 1,8 × 20 + 32 = 68 °F</span><span class="soft">La conversion des températures n'est pas proportionnelle.</span></li>
+        <li><span class="bad">1 µm = 1 mm ÷ 100</span><span class="good">1 µm = 1 mm ÷ 1 000</span><span class="soft">Entre milli et micro, il y a 3 crans de puissance : 10⁻³ et 10⁻⁶.</span></li>
+        <li><span class="bad">5 MW = 5 mW</span><span class="good">5 MW = 5 000 000 W, 5 mW = 0,005 W</span><span class="soft">La majuscule compte : M = méga, m = milli.</span></li>
+        <li><span class="bad">5 miles ≈ 5 km</span><span class="good">5 miles ≈ 5 × 1,6 = 8 km</span><span class="soft">Un mile est bien plus long qu'un kilomètre.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Le savais-tu ?</span>
+    <h2>Les unités ont une histoire</h2>
+    <div class="cards">
+      <div class="box"><span class="tag ok">Le mètre</span><span>Depuis 1983, le mètre est défini grâce à la vitesse de la lumière : c'est la distance parcourue par la lumière dans le vide en 1/299 792 458 de seconde.</span></div>
+      <div class="box"><span class="tag ok">Le kilogramme</span><span>Jusqu'en 2019, le kilogramme était un vrai petit cylindre de métal (platine et iridium) gardé près de Paris. Depuis 2019, il est défini à partir d'une constante de la physique, la constante de Planck.</span></div>
+      <div class="box"><span class="tag two">Le mile nautique</span><span>1 852 m : c'est, à peu près, la longueur d'une minute d'angle le long d'un méridien. Pratique pour naviguer avec une carte ! Un nœud, c'est 1 mile nautique par heure.</span></div>
+      <div class="box"><span class="tag two">Deux gallons</span><span>Le gallon américain vaut environ 3,785 L, mais le gallon britannique environ 4,546 L. Même nom, deux valeurs : il faut toujours savoir de quelle unité on parle.</span></div>
+      <div class="box"><span class="tag no">0 °F</span><span>0 °F, c'est environ −17,8 °C : un froid de canard. Et à −40, les deux échelles se croisent : −40 °C = −40 °F.</span></div>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Écris seulement un nombre, dans l'unité demandée. La virgule ou le point sont acceptés.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Nouvelles questions</button>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · À toi de jouer</span>
+    <h2>Six problèmes</h2>
+    <div class="exos">
+      <details>
+        <summary>La roue de vélo<span class="q">Une roue de vélo de route fait environ 28 pouces de diamètre. Combien en centimètres ?</span></summary>
+        <div><span>28 in × (2,54 cm / 1 in) = 28 × 2,54 = <strong>71,12 cm</strong>, soit environ 71 cm.</span></div>
+      </details>
+      <details>
+        <summary>Le Cervin en pieds<span class="q">Le Cervin culmine à 4 478 m. Combien de pieds ?</span></summary>
+        <div><span>4 478 m × (1 ft / 0,3048 m) = 4 478 ÷ 0,3048 ≈ <strong>14 692 pieds</strong>.</span><span>Vérification avec l'ordre de grandeur : 1 pied ≈ 0,3 m, donc il y a environ 3 fois plus de pieds que de mètres, et 3 × 4 500 ≈ 13 500. C'est cohérent.</span></div>
+      </details>
+      <details>
+        <summary>L'avion de ligne<span class="q">Un avion vole à 36 000 pieds. À quelle altitude en mètres ? Et en km ?</span></summary>
+        <div><span>36 000 ft × (0,3048 m / 1 ft) = 36 000 × 0,3048 = <strong>10 972,8 m</strong>, soit environ <strong>11 km</strong>. Plus de deux fois la hauteur du Cervin !</span></div>
+      </details>
+      <details>
+        <summary>Le bateau sur le Léman<span class="q">Un bateau avance à 12 nœuds. Quelle est sa vitesse en km/h ?</span></summary>
+        <div><span>1 nœud = 1 mile nautique par heure = 1,852 km/h.</span><span>12 × 1,852 = <strong>22,224 km/h</strong>, soit environ 22 km/h.</span></div>
+      </details>
+      <details>
+        <summary>Vacances à New York<span class="q">La météo annonce 77 °F. Combien de degrés Celsius ? Et de kelvins ?</span></summary>
+        <div><span>C = (77 − 32) ÷ 1,8 = 45 ÷ 1,8 = <strong>25 °C</strong>. Il fait bon !</span><span>En kelvins : 25 + 273,15 = <strong>298,15 K</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Le chocolat suisse<span class="q">Une tablette de 100 g coûte 3,50 CHF. Quel est le prix en CHF/kg ? Et en centimes par gramme ?</span></summary>
+        <div><span>3,50 CHF / 100 g = 0,035 CHF/g. En CHF/kg : 0,035 CHF/g × (1 000 g / 1 kg) = <strong>35 CHF/kg</strong>.</span><span>En ct/g : 0,035 CHF/g × (100 ct / 1 CHF) = <strong>3,5 ct/g</strong>.</span></div>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• Les préfixes du SI suivent les puissances de dix : nano 10⁻⁹, micro (µ) 10⁻⁶, milli 10⁻³, kilo 10³, méga 10⁶, giga 10⁹, téra 10¹². Attention : m = milli, M = méga.</span>
+      <span>• L'écriture scientifique a × 10ⁿ (a entre 1 et 10) et l'ordre de grandeur aident à vérifier un résultat.</span>
+      <span>• Méthode du facteur de conversion : on multiplie par une fraction égale à 1 (comme 1 h / 60 min) et les unités se simplifient comme dans une fraction.</span>
+      <span>• 1 pouce = 2,54 cm, 1 pied = 30,48 cm, 1 mile ≈ 1,609 km, 1 mile nautique = 1 852 m, 1 livre ≈ 453,6 g, 1 once ≈ 28,35 g, 1 gallon US ≈ 3,785 L.</span>
+      <span>• Températures : T(K) = T(°C) + 273,15 et F = 1,8 × C + 32. Ce n'est pas proportionnel : pas de règle de trois !</span>
+      <span>• Écris toujours l'unité à chaque ligne du calcul.</span>
+    </div>
+  </section>
+
+  <!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"><a class="prev" href="les-conversions.html"><span>← Précédent</span><strong>Les conversions d&#x27;unités</strong></a><a class="next" href="les-echelles.html"><span>Suivant →</span><strong>Les échelles et les agrandissements</strong></a></div><a class="tnav-home" href="maths.html">⌂ Tous les tutoriels de maths</a></nav><!--/tnav-->
+<footer>Fiche de révision · Les conversions avancées</footer>
+</main>
+
+<script>
+(function () {
+  /*
+   * Test hooks : window.__cva
+   *   PREFIXES                  → [{ n, s, e, ex, also }] de nano (10⁻⁹) à téra (10¹²)
+   *   prefixJump(x, eFrom, eTo) → x × 10^(eFrom − eTo) (calcul exact par décalage d’exposant)
+   *   powDecimal(e)             → écriture décimale de 10^e (ex. "0,001")
+   *   sci(x)                    → { m, e } avec 1 ≤ |m| < 10 et x = m × 10^e
+   *   nearestPow(x)             → exposant de la puissance de 10 la plus proche (x > 0)
+   *   bestPrefix(x)             → { v, e } : valeur avec le préfixe multiple de 3 adapté
+   *   PRESETS                   → chaînes de facteurs de conversion (km/h → m/s, CHF/kg → ct/g, L/min → m³/h, an → s, mph → km/h)
+   *   chainValue(i, x)          → résultat de la chaîne i pour la valeur x
+   *   chainLast(i)              → numéro de la dernière étape du pas à pas de la chaîne i
+   *   IMPERIAL                  → [{ id, n, s, f, mu, fs, approx, ex }] ; 1 unité = f mu
+   *   toMetric(id, x), fromMetric(id, x)
+   *   cToF(c), fToC(f), cToK(c), kToC(k), fakeF(c) (règle de trois fausse : c × 2,12)
+   *   ESTIM                     → questions « plus ou moins » ; checkEstim(i, "plus"|"moins") → booléen
+   *   QTYPES                    → générateurs du quiz : { q, a, tol, how }
+   *   fmt(x, d), fmtSig(x), num(s), pw(n)
+   */
+  var NS = "http://www.w3.org/2000/svg";
+  function $(id) { return document.getElementById(id); }
+  function mk(svg, name, attrs, text) { var e = document.createElementNS(NS, name); for (var a in attrs) e.setAttribute(a, attrs[a]); if (text != null) e.textContent = text; svg.appendChild(e); return e; }
+  function clear(el) { while (el.firstChild) el.removeChild(el.firstChild); }
+  var SUP = { "-": "⁻", "0": "⁰", "1": "¹", "2": "²", "3": "³", "4": "⁴", "5": "⁵", "6": "⁶", "7": "⁷", "8": "⁸", "9": "⁹" };
+  function pw(n) { return "10" + String(n).split("").map(function (c) { return SUP[c] || c; }).join(""); }
+  function fmt(x, d) {
+    if (!isFinite(x)) return "?";
+    var dd = d == null ? 3 : d, p = Math.pow(10, dd), r = Math.round(x * p) / p;
+    if (Object.is(r, -0)) r = 0;
+    return r.toLocaleString("fr-FR", { maximumFractionDigits: dd }).replace("-", "−");
+  }
+  function money(x) { return (Math.round(x * 100) / 100).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+  function num(s) { var t = String(s == null ? "" : s).replace(/\s/g, "").replace(/[−–]/g, "-").replace(",", "."); if (t === "") return NaN; var x = Number(t); return isFinite(x) ? x : NaN; }
+  function eqs(x, d) { var p = Math.pow(10, d == null ? 3 : d); return Math.abs(x * p - Math.round(x * p)) < 1e-6 ? "= " : "≈ "; }
+  function shift(x, n) { var p = String(x).split("e"); return Number(p[0] + "e" + (Number(p[1] || 0) + n)); }
+  function sci(x) {
+    if (!isFinite(x) || x === 0) return { m: 0, e: 0 };
+    var e = Math.floor(Math.log10(Math.abs(x))), m = Number(shift(x, -e).toPrecision(12));
+    if (Math.abs(m) >= 10) { m = Number((m / 10).toPrecision(12)); e++; }
+    if (Math.abs(m) < 1) { m = Number((m * 10).toPrecision(12)); e--; }
+    return { m: m, e: e };
+  }
+  function fmtSig(x) {
+    if (!isFinite(x)) return "?";
+    if (x === 0) return "0";
+    var a = Math.abs(x);
+    if (a >= 1e-6 && a < 1e15) {
+      var r = Number(x.toPrecision(10)), dec = Math.max(0, Math.min(20, 9 - Math.floor(Math.log10(a))));
+      return r.toLocaleString("fr-FR", { maximumFractionDigits: dec }).replace("-", "−");
+    }
+    var s = sci(x); return fmt(s.m, 6) + " × " + pw(s.e);
+  }
+  function powDecimal(e) {
+    if (e >= 0) return Number("1e" + e).toLocaleString("fr-FR");
+    var d = new Array(-e).join("0") + "1";
+    return "0," + d.replace(/(\d{3})(?=\d)/g, "$1 ");
+  }
+  function nearestPow(x) { var s = sci(x); return Math.abs(s.m) < 5.5 ? s.e : s.e + 1; }
+
+  /* ---------- Héros : double règle ---------- */
+  (function () {
+    var g = $("heroRuler"), X0 = 20, CM = 24, IN = 2.54 * 24;
+    mk(g, "rect", { x: 12, y: 8, width: 336, height: 46, rx: 4, fill: "var(--card)", stroke: "var(--ink)", "stroke-width": 2 });
+    mk(g, "rect", { x: 12, y: 68, width: 336, height: 46, rx: 4, fill: "var(--two-soft)", stroke: "var(--ink)", "stroke-width": 2 });
+    for (var mm = 0; mm <= 135; mm++) {
+      var x = X0 + mm * CM / 10, L = mm % 10 === 0 ? 14 : (mm % 5 === 0 ? 10 : 5);
+      mk(g, "line", { x1: x, y1: 8, x2: x, y2: 8 + L, stroke: "var(--ink)", "stroke-width": mm % 10 === 0 ? 1.6 : 1 });
+      if (mm % 10 === 0 && mm <= 120) mk(g, "text", { x: x, y: 40, "text-anchor": "middle", "font-size": 13 }, String(mm / 10));
+    }
+    mk(g, "text", { x: 346, y: 50, "text-anchor": "end", "font-size": 12, fill: "var(--ink-soft)" }, "cm");
+    for (var k = 0; k <= 5 * 8; k++) {
+      var xi = X0 + k * IN / 8, Li = k % 8 === 0 ? 14 : (k % 4 === 0 ? 10 : (k % 2 === 0 ? 7 : 4));
+      mk(g, "line", { x1: xi, y1: 114, x2: xi, y2: 114 - Li, stroke: "var(--ink)", "stroke-width": k % 8 === 0 ? 1.6 : 1 });
+      if (k % 8 === 0) mk(g, "text", { x: xi, y: 96, "text-anchor": "middle", "font-size": 13 }, String(k / 8));
+    }
+    mk(g, "text", { x: 346, y: 82, "text-anchor": "end", "font-size": 12, fill: "var(--ink-soft)" }, "pouces");
+    mk(g, "line", { x1: X0 + IN, y1: 4, x2: X0 + IN, y2: 118, stroke: "var(--red)", "stroke-width": 2.5, "stroke-dasharray": "5 3" });
+  })();
+
+  /* ---------- Étape 1 : préfixes ---------- */
+  var PREFIXES = [
+    { n: "nano", s: "n", e: -9, ex: "Un virus de la grippe mesure environ 100 nm, soit 0,000 1 mm.", also: "On ne le voit qu’au microscope électronique." },
+    { n: "micro", s: "µ", e: -6, ex: "Un globule rouge mesure environ 7 µm. Un cheveu : environ 70 µm d’épaisseur.", also: "Aussi : les µg (microgrammes) des étiquettes de vitamines." },
+    { n: "milli", s: "m", e: -3, ex: "Un cheveu : environ 0,07 mm d’épaisseur. Une mine de crayon fin : environ 0,5 mm.", also: "Aussi : mL, mg (médicaments), ms (chronométrage)." },
+    { n: "centi", s: "c", e: -2, ex: "Une pièce de 1 franc : environ 2,3 cm de diamètre.", also: "Aussi : cL (une canette de 33 cL)." },
+    { n: "déci", s: "d", e: -1, ex: "Un smartphone : environ 1,5 dm de haut (15 cm).", also: "Aussi : dL (un verre d’environ 2 dL)." },
+    { n: "sans préfixe", s: "", e: 0, ex: "Une porte : environ 2 m de haut.", also: "L’unité « de base » : m, g, L, W…" },
+    { n: "déca", s: "da", e: 1, ex: "Un bassin de piscine de 25 m, c’est 2,5 dam.", also: "Rarement utilisé dans la vie de tous les jours." },
+    { n: "hecto", s: "h", e: 2, ex: "Un terrain de football : environ 1 hm de long (100 m).", also: "Aussi : l’hectare (ha), 1 hm² = 10 000 m²." },
+    { n: "kilo", s: "k", e: 3, ex: "Le Cervin culmine à 4 478 m, soit 4,478 km.", also: "Aussi : kg, kW, km/h." },
+    { n: "méga", s: "M", e: 6, ex: "La distance Terre–Lune : environ 384 000 km, soit 384 Mm (mégamètres).", also: "Aussi : MW (une grande éolienne : quelques MW), Mo." },
+    { n: "giga", s: "G", e: 9, ex: "La distance Terre–Soleil : environ 150 millions de km, soit 150 Gm.", also: "Aussi : Go (une clé USB de 64 Go), GHz." },
+    { n: "téra", s: "T", e: 12, ex: "Neptune est à environ 4,5 milliards de km du Soleil, soit 4,5 Tm.", also: "Aussi : To (un disque dur de 2 To)." }
+  ];
+  var pIdx = 8;
+  function lx(e) { return 24 + (e + 9) * (312 / 21); }
+  function drawLadder() {
+    var g = $("ladder"); clear(g);
+    mk(g, "line", { x1: lx(-9), y1: 40, x2: lx(12), y2: 40, stroke: "var(--ink)", "stroke-width": 2 });
+    for (var e = -9; e <= 12; e++) mk(g, "line", { x1: lx(e), y1: 36, x2: lx(e), y2: 44, stroke: "var(--ink-soft)", "stroke-width": 1 });
+    PREFIXES.forEach(function (P, i) {
+      var x = lx(P.e), on = i === pIdx, up = i % 2 === 0;
+      mk(g, "line", { x1: x, y1: 32, x2: x, y2: 48, stroke: "var(--ink)", "stroke-width": 2 });
+      if (on) mk(g, "circle", { cx: x, cy: 40, r: 7, fill: "var(--acc)", stroke: "var(--ink)", "stroke-width": 1.5 });
+      mk(g, "text", { x: x, y: up ? 24 : 66, "text-anchor": "middle", "font-size": 14, "font-weight": on ? 600 : 400, fill: on ? "var(--acc-ink)" : "var(--ink)" }, P.s || "1");
+    });
+    mk(g, "text", { x: 4, y: 74, "font-size": 12, fill: "var(--ink-soft)" }, pw(-9));
+    mk(g, "text", { x: 356, y: 74, "text-anchor": "end", "font-size": 12, fill: "var(--ink-soft)" }, pw(12));
+  }
+  PREFIXES.forEach(function (P, i) {
+    var b = document.createElement("button"); b.type = "button"; b.id = "pc" + i;
+    b.innerHTML = "<b>" + (P.s || "—") + "</b>" + P.n;
+    b.addEventListener("click", function () { setP(i); });
+    $("pChips").appendChild(b);
+  });
+  function setP(i) {
+    pIdx = i; $("pRange").value = String(i);
+    var P = PREFIXES[i];
+    PREFIXES.forEach(function (Q, j) { $("pc" + j).setAttribute("aria-pressed", j === i ? "true" : "false"); });
+    $("pName").textContent = P.n + (P.s ? " (" + P.s + ")" : "");
+    $("pOut").innerHTML = "<div class='method'><strong>" + P.n + (P.s ? " · symbole " + P.s : "") + "</strong><span class='m'>× " + pw(P.e) + "</span><span class='m'>= <b>" + powDecimal(P.e) + "</b></span><span class='m'>1 " + P.s + "m = " + powDecimal(P.e) + " m</span></div>" +
+      "<div class='method'><strong>Un exemple</strong><span>" + P.ex + "</span><span class='soft'>" + P.also + "</span></div>";
+    drawLadder();
+  }
+  $("pRange").addEventListener("input", function () { setP(parseInt($("pRange").value, 10)); });
+  setP(pIdx);
+
+  /* Saut de préfixe */
+  function prefixJump(x, a, b) { return shift(x, a - b); }
+  var PJ_UNITS = ["m", "g", "L", "W"], pjU = "m";
+  PREFIXES.forEach(function (P, i) {
+    ["pjFrom", "pjTo"].forEach(function (id) { var o = document.createElement("option"); o.value = String(i); o.textContent = P.n + " (" + (P.s || "—") + ")"; $(id).appendChild(o); });
+  });
+  $("pjFrom").value = "9"; $("pjTo").value = "8";
+  PJ_UNITS.forEach(function (u) {
+    var b = document.createElement("button"); b.type = "button"; b.id = "pju" + u; b.textContent = u;
+    b.setAttribute("aria-label", "Unité : " + u);
+    b.addEventListener("click", function () { pjU = u; pjRun(); });
+    $("pjUnits").appendChild(b);
+  });
+  function pjRun() {
+    PJ_UNITS.forEach(function (u) { $("pju" + u).setAttribute("aria-pressed", u === pjU ? "true" : "false"); });
+    var x = num($("pjVal").value), A = PREFIXES[parseInt($("pjFrom").value, 10)], B = PREFIXES[parseInt($("pjTo").value, 10)], o = $("pjOut");
+    if (isNaN(x)) { o.className = "verdict"; o.innerHTML = "<span class='err'>Écris un nombre.</span>"; return; }
+    var d = A.e - B.e, r = prefixJump(x, A.e, B.e), why;
+    if (d > 0) why = "De " + A.n + " (" + pw(A.e) + ") à " + B.n + " (" + pw(B.e) + ") : l’unité devient plus petite, il en faut plus. On multiplie par " + pw(d) + " = " + powDecimal(d) + ".";
+    else if (d < 0) why = "De " + A.n + " (" + pw(A.e) + ") à " + B.n + " (" + pw(B.e) + ") : l’unité devient plus grande, il en faut moins. On divise par " + pw(-d) + " = " + powDecimal(-d) + ".";
+    else why = "C’est la même unité : rien ne change.";
+    o.className = "verdict yes";
+    o.innerHTML = "<span class='big'>" + fmtSig(x) + " " + A.s + pjU + " = <b>" + fmtSig(r) + " " + B.s + pjU + "</b></span><span>" + why + "</span>";
+  }
+  ["pjVal"].forEach(function (id) { $(id).addEventListener("input", pjRun); });
+  ["pjFrom", "pjTo"].forEach(function (id) { $(id).addEventListener("change", pjRun); });
+  pjRun();
+
+  /* ---------- Étape 2 : écriture scientifique ---------- */
+  var SCIP = [
+    { n: "Terre–Lune", v: 384000000, u: "m" }, { n: "Cheveu", v: 0.00007, u: "m" }, { n: "Virus", v: 0.0000001, u: "m" },
+    { n: "Cervin", v: 4478, u: "m" }, { n: "Terre–Soleil", v: 150000000000, u: "m" }, { n: "Habitants en Suisse", v: 9000000, u: "" }
+  ];
+  function bestPrefix(x) { var s = sci(x), e3 = Math.max(-9, Math.min(12, Math.floor(s.e / 3) * 3)); return { v: shift(x, -e3), e: e3 }; }
+  function prefixOf(e) { for (var i = 0; i < PREFIXES.length; i++) if (PREFIXES[i].e === e) return PREFIXES[i]; return null; }
+  SCIP.forEach(function (S, i) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = S.n;
+    b.addEventListener("click", function () { $("sciVal").value = S.v.toLocaleString("fr-FR", { maximumFractionDigits: 20 }); $("sciUnit").value = S.u; sciRun(); });
+    $("sciPre").appendChild(b);
+  });
+  function sciRun() {
+    var x = num($("sciVal").value), u = $("sciUnit").value, o = $("sciOut");
+    if (isNaN(x) || x <= 0) { o.innerHTML = "<p class='err'>Écris un nombre positif (par exemple 0,000 07 ou 384 000 000).</p>"; return; }
+    var s = sci(x), n = nearestPow(x), ul = u ? " " + u : "";
+    var h = "<div class='method'><strong>Écriture scientifique</strong><span class='m'><b>" + fmt(s.m, 6) + " × " + pw(s.e) + "</b>" + ul + "</span><span class='soft'>" + (s.e > 0 ? "La virgule recule de " + s.e + " rang" + (s.e > 1 ? "s" : "") + "." : s.e < 0 ? "La virgule avance de " + (-s.e) + " rang" + (s.e < -1 ? "s" : "") + "." : "Le nombre est déjà entre 1 et 10.") + "</span></div>" +
+      "<div class='method'><strong>Ordre de grandeur</strong><span class='m'>entre " + pw(s.e) + " et " + pw(s.e + 1) + "</span><span class='m'>le plus proche : <b>" + pw(n) + "</b>" + ul + "</span><span class='soft'>" + fmt(s.m, 3) + (n === s.e ? " est plus près de 1 que de 10." : " est plus près de 10 que de 1.") + "</span></div>";
+    if (u) {
+      var bp = bestPrefix(x), P = prefixOf(bp.e);
+      h += "<div class='method'><strong>Avec un préfixe</strong><span class='m'><b>" + fmtSig(bp.v) + " " + P.s + u + "</b></span><span class='soft'>" + (bp.e === 0 ? "Pas besoin de préfixe ici." : P.n + " = " + pw(bp.e)) + "</span></div>";
+    }
+    o.innerHTML = h;
+  }
+  $("sciVal").addEventListener("input", sciRun); $("sciUnit").addEventListener("change", sciRun);
+  sciRun();
+
+  /* ---------- Étape 3 : facteur de conversion pas à pas ---------- */
+  var PRESETS = [
+    { label: "km/h → m/s", v: 90, s: { n: "km", d: "h" }, res: "m/s", f: [
+      { n: [1000, "m"], d: [1, "km"], x: ["s-n", "f0-d"], why: "1 km = 1 000 m : la fraction (1 000 m / 1 km) vaut 1. On met les km en bas, pour qu’ils se simplifient avec les km du haut." },
+      { n: [1, "h"], d: [3600, "s"], x: ["s-d", "f1-n"], why: "1 h = 3 600 s : la fraction (1 h / 3 600 s) vaut 1. Cette fois, les heures sont en bas au départ : on les met en haut." }] },
+    { label: "CHF/kg → ct/g", v: 25, s: { n: "CHF", d: "kg" }, res: "ct/g", f: [
+      { n: [100, "ct"], d: [1, "CHF"], x: ["s-n", "f0-d"], why: "1 CHF = 100 centimes : la fraction (100 ct / 1 CHF) vaut 1. Les CHF vont en bas." },
+      { n: [1, "kg"], d: [1000, "g"], x: ["s-d", "f1-n"], why: "1 kg = 1 000 g : la fraction (1 kg / 1 000 g) vaut 1. Les kg vont en haut, car ils sont en bas au départ." }] },
+    { label: "L/min → m³/h", v: 12, s: { n: "L", d: "min" }, res: "m³/h", f: [
+      { n: [1, "m³"], d: [1000, "L"], x: ["s-n", "f0-d"], why: "1 m³ = 1 000 L : la fraction (1 m³ / 1 000 L) vaut 1. Les litres vont en bas." },
+      { n: [60, "min"], d: [1, "h"], x: ["s-d", "f1-n"], why: "1 h = 60 min : la fraction (60 min / 1 h) vaut 1. Les minutes vont en haut." }] },
+    { label: "années → secondes", v: 1, s: { n: "an", d: null }, res: "s", f: [
+      { n: [365, "j"], d: [1, "an"], x: ["s-n", "f0-d"], why: "1 an = 365 jours (une année non bissextile) : (365 j / 1 an) vaut 1." },
+      { n: [24, "h"], d: [1, "j"], x: ["f0-n", "f1-d"], why: "1 jour = 24 h : (24 h / 1 j) vaut 1. Les jours vont en bas." },
+      { n: [3600, "s"], d: [1, "h"], x: ["f1-n", "f2-d"], why: "1 h = 3 600 s : (3 600 s / 1 h) vaut 1. Les heures vont en bas." }] },
+    { label: "mph → km/h", v: 60, s: { n: "mi", d: "h" }, res: "km/h", f: [
+      { n: [1.609344, "km"], d: [1, "mi"], x: ["s-n", "f0-d"], why: "1 mile = 1,609344 km : (1,609344 km / 1 mi) vaut 1. Les miles vont en bas ; les heures restent." }] }
+  ];
+  function chainValue(i, x) { var v = x; PRESETS[i].f.forEach(function (F) { v = v * F.n[0] / F.d[0]; }); return v; }
+  function chainLast(i) { return 2 * PRESETS[i].f.length + 1; }
+  PRESETS.forEach(function (P, i) { var o = document.createElement("option"); o.value = String(i); o.textContent = P.label; $("fcSel").appendChild(o); });
+  var fcI = 0, fcS = 0;
+  function tok(id, txt, crossed) { return "<span class='u" + (crossed[id] ? " x" : "") + "'>" + txt + "</span>"; }
+  function frac(top, bot, cls) { return "<span class='frac" + (cls ? " " + cls : "") + "'><span class='nu'>" + top + "</span><span class='de'>" + bot + "</span></span>"; }
+  function fcRender() {
+    var P = PRESETS[fcI], k = P.f.length, last = chainLast(fcI), x = num($("fcVal").value), xs = isNaN(x) ? "?" : fmtSig(x);
+    var added = fcS >= 1 ? Math.min(k, Math.ceil(fcS / 2)) : 0, crossedN = Math.min(k, Math.floor(fcS / 2)), crossed = {};
+    for (var c = 0; c < crossedN; c++) { crossed[P.f[c].x[0]] = true; crossed[P.f[c].x[1]] = true; }
+    var parts = [];
+    parts.push(P.s.d ? frac(xs + " " + tok("s-n", P.s.n, crossed), tok("s-d", P.s.d, crossed)) : "<span class='plain'>" + xs + " " + tok("s-n", P.s.n, crossed) + "</span>");
+    for (var i = 0; i < added; i++) {
+      var F = P.f[i], isNew = fcS % 2 === 1 && i === added - 1 && fcS < last;
+      parts.push("<span class='op'>×</span>" + frac(fmtSig(F.n[0]) + " " + tok("f" + i + "-n", F.n[1], crossed), fmtSig(F.d[0]) + " " + tok("f" + i + "-d", F.d[1], crossed), isNew ? "new" : ""));
+    }
+    var msg, v = isNaN(x) ? NaN : chainValue(fcI, x);
+    if (fcS === last) {
+      parts.push("<span class='op'>=</span><span class='resu'>" + (isNaN(v) ? "?" : fmtSig(Number(v.toPrecision(10)))) + " " + P.res + "</span>");
+      var tops = [xs], bots = [];
+      P.f.forEach(function (F) { if (F.n[0] !== 1) tops.push(fmtSig(F.n[0])); if (F.d[0] !== 1) bots.push(fmtSig(F.d[0])); });
+      msg = isNaN(x) ? "<span class='err'>Écris une valeur de départ.</span>" : "On calcule avec les nombres qui restent : <span class='mono'>" + tops.join(" × ") + (bots.length ? " ÷ " + bots.join(" ÷ ") : "") + " " + eqs(v, 4) + fmt(v, 4) + " " + P.res + "</span>. Il ne reste que les unités voulues : des " + P.res + ".";
+    } else if (fcS === 0) {
+      msg = "On part de " + xs + " " + P.s.n + (P.s.d ? "/" + P.s.d : "") + ". On veut des " + P.res + ". Appuie sur « Pas à pas ».";
+    } else if (fcS % 2 === 1) {
+      msg = P.f[(fcS - 1) / 2].why;
+    } else {
+      var Fc = P.f[fcS / 2 - 1], un = Fc.x[1].slice(-1) === "d" ? Fc.d[1] : Fc.n[1];
+      msg = "On barre « " + un + " » en haut et en bas : ces unités se simplifient, comme dans une fraction.";
+    }
+    $("fcChain").innerHTML = parts.join("");
+    $("fcMsg").innerHTML = msg;
+    $("fcInfo").textContent = "Étape " + fcS + " / " + last;
+    $("fcNext").disabled = fcS >= last;
+  }
+  $("fcNext").addEventListener("click", function () { if (fcS < chainLast(fcI)) fcS++; fcRender(); });
+  $("fcAll").addEventListener("click", function () { fcS = chainLast(fcI); fcRender(); });
+  $("fcReset").addEventListener("click", function () { fcS = 0; fcRender(); });
+  $("fcSel").addEventListener("change", function () { fcI = parseInt($("fcSel").value, 10); fcS = 0; $("fcVal").value = fmtSig(PRESETS[fcI].v); fcRender(); });
+  $("fcVal").addEventListener("input", fcRender);
+  fcRender();
+
+  /* ---------- Étape 4 : unités anglo-saxonnes ---------- */
+  var IMPERIAL = [
+    { id: "in", n: "pouce", s: "in", f: 2.54, mu: "cm", fs: "2,54", approx: false, ex: "écrans, jantes de vélo" },
+    { id: "ft", n: "pied", s: "ft", f: 0.3048, mu: "m", fs: "0,3048", approx: false, ex: "altitude des avions" },
+    { id: "yd", n: "yard", s: "yd", f: 0.9144, mu: "m", fs: "0,9144", approx: false, ex: "golf, football américain" },
+    { id: "mi", n: "mile", s: "mi", f: 1.609344, mu: "km", fs: "1,609344", approx: false, ex: "routes aux États-Unis et au Royaume-Uni" },
+    { id: "nmi", n: "mile nautique", s: "NM", f: 1.852, mu: "km", fs: "1,852", approx: false, ex: "bateaux et avions" },
+    { id: "kn", n: "nœud", s: "kn", f: 1.852, mu: "km/h", fs: "1,852", approx: false, ex: "vitesse des bateaux et des avions" },
+    { id: "mph", n: "mile par heure", s: "mph", f: 1.609344, mu: "km/h", fs: "1,609344", approx: false, ex: "panneaux de vitesse aux États-Unis" },
+    { id: "lb", n: "livre", s: "lb", f: 453.59237, mu: "g", fs: "453,6", approx: true, ex: "poids, bagages" },
+    { id: "oz", n: "once", s: "oz", f: 28.349523125, mu: "g", fs: "28,35", approx: true, ex: "recettes, chocolat" },
+    { id: "gal", n: "gallon US", s: "gal", f: 3.785411784, mu: "L", fs: "3,785", approx: true, ex: "essence aux États-Unis" }
+  ];
+  function impById(id) { for (var i = 0; i < IMPERIAL.length; i++) if (IMPERIAL[i].id === id) return IMPERIAL[i]; return null; }
+  function toMetric(id, x) { var U = impById(id); return U ? x * U.f : NaN; }
+  function fromMetric(id, x) { var U = impById(id); return U ? x / U.f : NaN; }
+  $("impTable").innerHTML = "<tr><th>Unité</th><th>Symbole</th><th>Vaut</th><th>Où ?</th></tr>" + IMPERIAL.map(function (U) {
+    return "<tr><td>" + U.n + "</td><td class='s'>" + U.s + "</td><td class='v'>" + (U.approx ? "≈ " : "") + U.fs + " " + U.mu + "</td><td>" + U.ex + "</td></tr>";
+  }).join("");
+  IMPERIAL.forEach(function (U) { var o = document.createElement("option"); o.value = U.id; o.textContent = U.n + " (" + U.s + ")"; $("cvUnit").appendChild(o); });
+  var cvDir = 1;
+  var CVEX = [
+    { n: "Écran de 6,1 pouces", id: "in", v: "6,1", d: 1 }, { n: "Avion à 35 000 pieds", id: "ft", v: "35 000", d: 1 },
+    { n: "VTT de 29 pouces", id: "in", v: "29", d: 1 }, { n: "Valise de 50 livres", id: "lb", v: "50", d: 1 },
+    { n: "Autoroute à 120 km/h", id: "mph", v: "120", d: -1 }
+  ];
+  CVEX.forEach(function (E) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = E.n;
+    b.addEventListener("click", function () { $("cvUnit").value = E.id; $("cvVal").value = E.v; cvDir = E.d; cvRun(); });
+    $("cvEx").appendChild(b);
+  });
+  function cvRun() {
+    $("cvTo").setAttribute("aria-pressed", cvDir === 1 ? "true" : "false");
+    $("cvFrom").setAttribute("aria-pressed", cvDir === -1 ? "true" : "false");
+    var U = impById($("cvUnit").value), x = num($("cvVal").value), o = $("cvOut");
+    if (isNaN(x)) { o.className = "verdict"; o.innerHTML = "<span class='err'>Écris un nombre.</span>"; return; }
+    var r, big, how, extra = "";
+    if (cvDir === 1) {
+      r = toMetric(U.id, x);
+      big = fmtSig(x) + " " + U.s + " " + eqs(r) + "<b>" + fmt(r, 3) + " " + U.mu + "</b>";
+      how = fmtSig(x) + " " + U.s + " × (" + U.fs + " " + U.mu + " / 1 " + U.s + ") = " + fmtSig(x) + " × " + U.fs + " " + eqs(r) + fmt(r, 3) + " " + U.mu;
+      if (U.mu === "g" && r >= 1000) extra = "Soit environ " + fmt(r / 1000, 2) + " kg.";
+      if (U.mu === "cm" && r >= 100) extra = "Soit environ " + fmt(r / 100, 2) + " m.";
+      if (U.mu === "m" && r >= 1000) extra = "Soit environ " + fmt(r / 1000, 2) + " km.";
+    } else {
+      r = fromMetric(U.id, x);
+      big = fmtSig(x) + " " + U.mu + " " + eqs(r) + "<b>" + fmt(r, 3) + " " + U.s + "</b>";
+      how = fmtSig(x) + " " + U.mu + " × (1 " + U.s + " / " + U.fs + " " + U.mu + ") = " + fmtSig(x) + " ÷ " + U.fs + " " + eqs(r) + fmt(r, 3) + " " + U.s;
+    }
+    o.className = "verdict yes";
+    o.innerHTML = "<span class='big'>" + big + "</span><span class='mono'>" + how + "</span>" + (U.approx ? "<span class='soft'>Calcul fait avec la valeur exacte : 1 " + U.s + " = " + fmtSig(U.f) + " " + U.mu + ".</span>" : "") + (extra ? "<span>" + extra + "</span>" : "");
+  }
+  $("cvTo").addEventListener("click", function () { cvDir = 1; cvRun(); });
+  $("cvFrom").addEventListener("click", function () { cvDir = -1; cvRun(); });
+  $("cvUnit").addEventListener("change", cvRun); $("cvVal").addEventListener("input", cvRun);
+  cvRun();
+
+  /* ---------- Étape 5 : plus ou moins ---------- */
+  var ESTIM = [
+    { q: "Le Cervin (4 478 m) mesure-t-il plus ou moins de 15 000 pieds ?", a: "moins", why: "4 478 ÷ 0,3048 ≈ 14 692 pieds : un peu moins de 15 000." },
+    { q: "Un marathon (42,195 km) fait-il plus ou moins de 26 miles ?", a: "plus", why: "42,195 ÷ 1,609 ≈ 26,2 miles." },
+    { q: "Un pied est-il plus long ou moins long que ta règle de 30 cm ?", a: "plus", why: "1 pied = 30,48 cm : un demi-centimètre de plus." },
+    { q: "Une tablette de chocolat de 100 g pèse-t-elle plus ou moins de 4 onces ?", a: "moins", why: "4 oz ≈ 4 × 28,35 = 113,4 g. 100 g, c’est environ 3,5 oz." },
+    { q: "30 °C, c’est plus ou moins que 90 °F ?", a: "moins", why: "1,8 × 30 + 32 = 86 °F." },
+    { q: "Le Léman (environ 73 km de long) fait-il plus ou moins de 40 miles ?", a: "plus", why: "73 ÷ 1,609 ≈ 45 miles." },
+    { q: "120 km/h sur l’autoroute, c’est plus ou moins que 70 mph ?", a: "plus", why: "120 ÷ 1,609 ≈ 74,6 mph." },
+    { q: "Une bouteille de 1,5 L contient-elle plus ou moins qu’un demi-gallon US ?", a: "moins", why: "Un demi-gallon US ≈ 3,785 ÷ 2 ≈ 1,89 L." },
+    { q: "Un bateau à 10 nœuds va-t-il plus ou moins vite qu’un vélo à 20 km/h ?", a: "moins", why: "10 × 1,852 = 18,52 km/h." }
+  ];
+  var estOk = [];
+  function checkEstim(i, ans) { return ESTIM[i] ? ESTIM[i].a === ans : false; }
+  function estScore() { return estOk.filter(Boolean).length; }
+  ESTIM.forEach(function (E, i) {
+    var li = document.createElement("li");
+    li.innerHTML = "<span>" + E.q + "</span><span class='btns'><button type='button' id='ep" + i + "'>Plus</button><button type='button' id='em" + i + "'>Moins</button></span><span class='fb' id='ef" + i + "' aria-live='polite'></span>";
+    $("estim").appendChild(li);
+    function answer(ans) {
+      $("ep" + i).setAttribute("aria-pressed", ans === "plus" ? "true" : "false");
+      $("em" + i).setAttribute("aria-pressed", ans === "moins" ? "true" : "false");
+      var ok = checkEstim(i, ans), fb = $("ef" + i);
+      estOk[i] = ok;
+      fb.className = "fb " + (ok ? "ok" : "no");
+      fb.textContent = (ok ? "Oui ! " : "Non, c’est " + E.a + ". ") + E.why;
+      $("estScore").textContent = estScore() + " / " + ESTIM.length;
+    }
+    $("ep" + i).addEventListener("click", function () { answer("plus"); });
+    $("em" + i).addEventListener("click", function () { answer("moins"); });
+  });
+  $("estReset").addEventListener("click", function () {
+    estOk = [];
+    ESTIM.forEach(function (E, i) { $("ep" + i).removeAttribute("aria-pressed"); $("em" + i).removeAttribute("aria-pressed"); $("ef" + i).className = "fb"; $("ef" + i).textContent = ""; });
+    $("estScore").textContent = "0 / " + ESTIM.length;
+  });
+  $("estScore").textContent = "0 / " + ESTIM.length;
+
+  /* ---------- Étape 6 : températures ---------- */
+  function cToF(c) { return 1.8 * c + 32; }
+  function fToC(f) { return (f - 32) / 1.8; }
+  function cToK(c) { return c + 273.15; }
+  function kToC(k) { return k - 273.15; }
+  function fakeF(c) { return c * 2.12; }
+  var TMARKS = [
+    { c: -40, n: "−40 °C", info: "−40 °C = −40 °F : le seul point où les deux échelles affichent le même nombre." },
+    { c: 0, n: "L’eau gèle", info: "0 °C = 32 °F : l’eau gèle. Le zéro des deux échelles n’est pas au même endroit !" },
+    { c: 20, n: "Une pièce", info: "Environ 20 °C dans une pièce, soit 68 °F." },
+    { c: 37, n: "Le corps", info: "La température du corps humain : environ 37 °C, soit environ 98,6 °F." },
+    { c: 100, n: "L’eau bout", info: "100 °C = 212 °F : l’eau bout à la pression normale. En montagne, l’air est moins dense : l’eau bout un peu avant 100 °C." }
+  ];
+  TMARKS.forEach(function (M, i) {
+    var b = document.createElement("button"); b.type = "button"; b.id = "tm" + i; b.textContent = M.n;
+    b.addEventListener("click", function () { $("tC").value = String(M.c); thermo(); });
+    $("tMarks").appendChild(b);
+  });
+  var TY0 = 250, TH = 210;
+  function ty(c) { return TY0 - (c + 60) / 170 * TH; }
+  function thermo() {
+    var c = parseFloat($("tC").value), f = cToF(c), k = cToK(c), g = $("thermo");
+    $("tCo").textContent = fmt(c, 1) + " °C";
+    clear(g);
+    mk(g, "text", { x: 100, y: 22, "text-anchor": "middle", "font-size": 16, "font-weight": 600 }, "°C");
+    mk(g, "text", { x: 260, y: 22, "text-anchor": "middle", "font-size": 16, "font-weight": 600 }, "°F");
+    [100, 260].forEach(function (x) {
+      mk(g, "rect", { x: x - 10, y: 32, width: 20, height: 240, rx: 10, fill: "var(--card)", stroke: "var(--ink)", "stroke-width": 2 });
+      mk(g, "circle", { cx: x, cy: 284, r: 18, fill: "var(--red)", stroke: "var(--ink)", "stroke-width": 2 });
+      mk(g, "rect", { x: x - 5, y: ty(c), width: 10, height: 280 - ty(c), fill: "var(--red)" });
+    });
+    for (var tc = -60; tc <= 100; tc += 20) {
+      mk(g, "line", { x1: 82, y1: ty(tc), x2: 90, y2: ty(tc), stroke: "var(--ink)", "stroke-width": 1.5 });
+      mk(g, "text", { x: 78, y: ty(tc) + 5, "text-anchor": "end", "font-size": 14 }, fmt(tc, 0));
+    }
+    for (var tf = -40; tf <= 200; tf += 40) {
+      var yy = ty(fToC(tf));
+      mk(g, "line", { x1: 270, y1: yy, x2: 278, y2: yy, stroke: "var(--ink)", "stroke-width": 1.5 });
+      mk(g, "text", { x: 282, y: yy + 5, "font-size": 14 }, fmt(tf, 0));
+    }
+    var y = ty(c);
+    mk(g, "line", { x1: 112, y1: y, x2: 248, y2: y, stroke: "var(--acc)", "stroke-width": 2, "stroke-dasharray": "5 4" });
+    mk(g, "text", { x: 180, y: y - 8, "text-anchor": "middle", "font-size": 14, "font-weight": 600, fill: "var(--acc-ink)" }, fmt(c, 1) + " = " + fmt(f, 1));
+    $("tRes").innerHTML = "<div class='res'><span class='k'>Celsius</span><span class='v'>" + fmt(c, 1) + " °C</span></div>" +
+      "<div class='res'><span class='k'>Fahrenheit : 1,8 × " + fmt(c, 1) + " + 32</span><span class='v'>" + fmt(f, 2) + " °F</span></div>" +
+      "<div class='res'><span class='k'>Kelvin : " + fmt(c, 1) + " + 273,15</span><span class='v'>" + fmt(k, 2) + " K</span></div>";
+    var info = "";
+    TMARKS.forEach(function (M, i) { var on = Math.abs(M.c - c) < 1e-9; $("tm" + i).setAttribute("aria-pressed", on ? "true" : "false"); if (on) info = M.info; });
+    var fk = fakeF(c);
+    $("tTrap").innerHTML = "Le piège de la règle de trois" +
+      "<span>« Si 100 °C = 212 °F, alors " + fmt(c, 1) + " °C = " + fmt(c, 1) + " × 2,12 = " + fmt(fk, 2) + " °F » : " +
+      (Math.abs(fk - f) < 0.005 ? "ici, par hasard, ça tombe juste (seulement à 100 °C)." : "faux ! La vraie valeur est " + fmt(f, 2) + " °F. La règle de trois oublie le « + 32 ».") + "</span>" +
+      (info ? "<span><strong>Repère :</strong> " + info + "</span>" : "");
+  }
+  $("tC").addEventListener("input", thermo);
+  thermo();
+  function tFRun() {
+    var o = $("tFo"), v = $("tF").value.trim(), F = num(v);
+    if (v === "") { o.textContent = "Exemple : 77 °F → (77 − 32) ÷ 1,8 = 25 °C."; return; }
+    if (isNaN(F)) { o.innerHTML = "<span class='err'>Écris un nombre.</span>"; return; }
+    var C = fToC(F);
+    if (C < -273.15) { o.innerHTML = "<span class='err'>Impossible : c’est plus froid que le zéro absolu (−459,67 °F).</span>"; return; }
+    o.textContent = fmtSig(F) + " °F → (" + fmtSig(F) + " − 32) ÷ 1,8 " + eqs(C, 2) + fmt(C, 2) + " °C, soit " + fmt(cToK(C), 2) + " K.";
+  }
+  $("tF").addEventListener("input", tFRun); tFRun();
+
+  /* ---------- Quiz ---------- */
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  var QTYPES = [
+    function () { var Q = pick([
+        { q: "Combien de nanomètres (nm) dans 1 micromètre (µm) ?", a: 1000, how: "De micro (10⁻⁶) à nano (10⁻⁹) : 3 crans, × 1 000." },
+        { q: "Écris 4,5 Gm en Mm.", a: 4500, how: "De giga (10⁹) à méga (10⁶) : 3 crans, 4,5 × 1 000 = 4 500 Mm." },
+        { q: "Écris 384 Mm en km.", a: 384000, how: "De méga (10⁶) à kilo (10³) : 384 × 1 000 = 384 000 km." },
+        { q: "Écris 70 µm en mm.", a: 0.07, how: "De micro (10⁻⁶) à milli (10⁻³) : 70 ÷ 1 000 = 0,07 mm." },
+        { q: "Combien de MW dans 2 500 kW ?", a: 2.5, how: "De kilo (10³) à méga (10⁶) : 2 500 ÷ 1 000 = 2,5 MW." }]);
+      return { q: Q.q, a: Q.a, how: Q.how }; },
+    function () { var S = pick([[384000, "km", 5, "3,84"], [0.00007, "m", -5, "7"], [150000000, "km", 8, "1,5"], [4478, "m", 3, "4,478"], [0.000002, "m", -6, "2"]]);
+      return { q: "On écrit " + fmtSig(S[0]) + " " + S[1] + " = a × 10ⁿ " + S[1] + ", avec a entre 1 et 10. Que vaut n ?", a: S[2], how: fmtSig(S[0]) + " = " + S[3] + " × " + pw(S[2]) }; },
+    function () { var v = pick([36, 54, 72, 90, 108, 126]), a = v / 3.6;
+      return { q: "Convertis " + v + " km/h en m/s.", a: a, how: v + " × 1 000 ÷ 3 600 = " + v + " ÷ 3,6 = " + fmt(a) + " m/s" }; },
+    function () { var p = pick([12, 18, 25, 32, 40, 45]), a = p / 10;
+      return { q: "Du fromage coûte " + p + " CHF/kg. Combien de centimes par gramme (ct/g) ?", a: a, how: p + " × 100 ct ÷ 1 000 g = " + fmt(a) + " ct/g" }; },
+    function () { var x = pick([5, 6.1, 6.7, 10, 13.3, 27]), a = x * 2.54;
+      return { q: "Un écran fait " + fmt(x) + " pouces de diagonale. Combien de cm ? (arrondis au dixième)", a: a, tol: 0.051, how: fmt(x) + " × 2,54 = " + fmt(a, 3) + " ≈ " + fmt(a, 1) + " cm" }; },
+    function () { var x = pick([10000, 20000, 30000, 35000, 40000]), a = x * 0.3048;
+      return { q: "Un avion vole à " + fmt(x) + " pieds. Combien de mètres ?", a: a, tol: 1, how: fmt(x) + " × 0,3048 = " + fmt(a, 1) + " m" }; },
+    function () {
+      if (Math.random() < 0.5) { var c = pick([-10, 0, 15, 20, 25, 30, 40]), f = cToF(c); return { q: "Convertis " + fmt(c) + " °C en °F.", a: f, how: "1,8 × " + fmt(c) + " + 32 = " + fmt(f) + " °F" }; }
+      var F = pick([14, 50, 68, 86, 104, 212]), C = fToC(F); return { q: "Convertis " + F + " °F en °C.", a: C, how: "(" + F + " − 32) ÷ 1,8 = " + fmt(C) + " °C" };
+    },
+    function () { var t = Math.floor(Math.random() * 3);
+      if (t === 0) { var x = pick([2, 3, 0.5, 1.5]); return { q: "Combien de cm² dans " + fmt(x) + " m² ?", a: x * 10000, how: "1 m² = 100 × 100 = 10 000 cm², donc " + fmt(x) + " × 10 000 = " + fmt(x * 10000) + " cm²" }; }
+      if (t === 1) { var y = pick([2, 0.5, 1.2, 3]); return { q: "Combien de litres dans " + fmt(y) + " m³ ?", a: y * 1000, how: "1 m³ = 1 000 L, donc " + fmt(y) + " × 1 000 = " + fmt(y * 1000) + " L" }; }
+      var z = pick([3, 4.5, 12, 0.8]); return { q: "Combien de mm² dans " + fmt(z) + " cm² ?", a: z * 100, how: "1 cm² = 10 × 10 = 100 mm², donc " + fmt(z) + " × 100 = " + fmt(z * 100) + " mm²" };
+    }
+  ];
+  var quiz = $("quiz"), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ""; done = [];
+    for (var k = 0; k < 8; k++) {
+      var Q = QTYPES[k](), li = document.createElement("li");
+      li.innerHTML = "<span>" + Q.q + "</span><input type='text' id='qa" + k + "' inputmode='decimal' autocomplete='off' aria-label='Ta réponse à la question " + (k + 1) + "'><button type='button' id='qb" + k + "'>Vérifier</button><span class='fb' id='qf" + k + "' aria-live='polite'></span>";
+      quiz.appendChild(li);
+      (function (k, Q) {
+        var tol = Q.tol != null ? Q.tol : Math.max(0.006, Math.abs(Q.a) * 1e-6);
+        function check() {
+          var fb = $("qf" + k), x = num($("qa" + k).value);
+          if (isNaN(x)) { fb.className = "fb"; fb.textContent = "Écris un nombre."; return; }
+          if (Math.abs(x - Q.a) <= tol) { fb.className = "fb ok"; fb.textContent = "Bravo, c’est juste !"; done[k] = true; }
+          else { done[k] = false; fb.className = "fb no"; fb.innerHTML = "Pas tout à fait : la réponse est " + (Q.tol ? "environ " : "") + fmt(Q.a, Q.tol === 0.051 ? 1 : 3) + ".<span>" + Q.how + "</span>"; }
+          $("score").textContent = done.filter(Boolean).length + " / 8";
+        }
+        $("qb" + k).addEventListener("click", check);
+        $("qa" + k).addEventListener("keydown", function (e) { if (e.key === "Enter") check(); });
+      })(k, Q);
+    }
+    $("score").textContent = "0 / 8";
+  }
+  $("newQuiz").addEventListener("click", newQuiz);
+  newQuiz();
+
+  window.__cva = {
+    PREFIXES: PREFIXES, prefixJump: prefixJump, powDecimal: powDecimal, sci: sci, nearestPow: nearestPow, bestPrefix: bestPrefix,
+    PRESETS: PRESETS, chainValue: chainValue, chainLast: chainLast,
+    IMPERIAL: IMPERIAL, toMetric: toMetric, fromMetric: fromMetric,
+    cToF: cToF, fToC: fToC, cToK: cToK, kToC: kToC, fakeF: fakeF,
+    ESTIM: ESTIM, checkEstim: checkEstim, estScore: estScore, QTYPES: QTYPES,
+    fmt: fmt, fmtSig: fmtSig, num: num, pw: pw
+  };
+})();
+</script>
+</body>
+</html>
