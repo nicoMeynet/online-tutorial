@@ -15,6 +15,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import difficulte  # noqa: E402
+import maj  # noqa: E402
+
+DATES = maj.Dates()
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -187,6 +190,8 @@ a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-dec
 .tnav-pn a.next { text-align: right; grid-column: 2; }
 .tnav-bottom .tnav-home { align-self: center; }
 .tnav-top [data-share] { margin-left: auto; }
+.tnav-short { display: none; }
+@media (max-width: 520px) { .tnav-top .tnav-long { display: none; } .tnav-top .tnav-short { display: inline; } .tnav-top { flex-wrap: nowrap; } .tnav-top > * { flex: none; } }
 .tnav-end { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
 @media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
 </style>
@@ -198,6 +203,7 @@ CSS = CSS.replace("</style>", difficulte.BADGE_CSS + "</style>", 1)
 # et « précédent / suivant » reste dans la même matière.
 LANDINGS = [("maths.html", "Tous les tutoriels de maths"), ("physique.html", "Tous les tutoriels de physique"), ("numerique.html", "Tous les tutoriels numériques"), ("religions.html", "Tous les tutoriels de religions")]
 # Pages de révision qui ne sont pas des cartes mais appartiennent à une matière.
+SHORT = {"index.html": "Accueil", "maths.html": "Maths", "physique.html": "Physique-chimie", "numerique.html": "Numérique", "religions.html": "Religions"}
 HOME_OF = {"maths.html": ("glossaire.html", "revisions-brevet.html"), "physique.html": ("glossaire-physique.html", "revisions-brevet-physique.html")}
 
 
@@ -251,7 +257,7 @@ def process(path, order):
             home, label, seq = landing, lab, cards
     names = [h for h, _ in seq]
     titles = dict(seq)
-    top = (f'<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="{home}">← {label}</a>'
+    top = (f'<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="{home}">← <span class="tnav-long">{label}</span><span class="tnav-short">{SHORT.get(home, label)}</span></a>'
            f'{difficulte.badge(path.stem)}<button type="button" data-share hidden>Partager</button></nav><!--/tnav-->\n')
     bottom = ""
     if path.name in names:
@@ -273,6 +279,7 @@ def process(path, order):
     at = foot if foot > src.index('<main class="page">') else end
     src = src[:at] + bottom + src[at:]
     src = src.replace("</head>", ICONS + CSS + "</head>", 1)
+    src = maj.put(src, DATES.page(path.name, src))
     path.write_text(src, encoding="utf-8", newline="\n")
 
 
@@ -283,6 +290,19 @@ def main():
     for p in files:
         process(p, order)
         print("ok", p.name)
+    # accueils : date la plus récente parmi leurs tutoriels (et leur propre contenu)
+    alld = []
+    for landing, _, cards in order:
+        f = ROOT / landing
+        src = f.read_text(encoding="utf-8")
+        ds = [DATES.page(landing, src)] + [DATES.data[h]["d"] for h, _ in cards if h in DATES.data]
+        alld += ds
+        f.write_text(maj.put(src, max(ds)), encoding="utf-8", newline="\n")
+    idx = ROOT / "index.html"
+    if idx.exists():
+        src = idx.read_text(encoding="utf-8")
+        idx.write_text(maj.put(src, max(alld + [DATES.page("index.html", src)])), encoding="utf-8", newline="\n")
+    DATES.save()
 
 
 if __name__ == "__main__":

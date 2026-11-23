@@ -40,6 +40,7 @@
     '.tshare-box .done{font-weight:700;color:var(--ok,#15803d);min-height:1.3em;text-align:center}' +
     '@media (max-width:520px){.tshare-back{align-items:flex-end;padding:0}.tshare-box{width:100%;border-radius:16px 16px 0 0;' +
     'padding-bottom:max(16px,env(safe-area-inset-bottom,0px))}}' +
+    '@media (max-width:520px){.tshare>span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}button.tshare[data-share]{padding:0;width:40px;height:40px;justify-content:center;flex:none}.tshare svg{width:20px;height:20px}}' +
     '@media print{.tshare{display:none!important}}';
 
   var ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
@@ -110,6 +111,7 @@
       b.classList.add('tshare');
       if (!b.querySelector('svg')) b.innerHTML = ICON + '<span>Partager</span>';
       b.hidden = false;
+      b.setAttribute('aria-label', 'Partager cette page');
       b.addEventListener('click', function () { open(b); });
     });
   }
