@@ -169,7 +169,7 @@ ICONS = ('<!--ticons--><link rel="icon" href="icon.svg" type="image/svg+xml">'
          '<link rel="apple-touch-icon" href="apple-touch-icon.png">'
          '<link rel="manifest" href="manifest.webmanifest">'
          '<meta name="apple-mobile-web-app-title" content="Tutoriels">'
-         '<script src="progress.js" defer></script><!--/ticons-->\n')
+         '<script src="progress.js" defer></script><script src="share.js" defer></script><!--/ticons-->\n')
 
 CSS = """<style id="tnav-css">
 .tnav-top { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin: 0 0 4px; }
@@ -186,6 +186,8 @@ a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-dec
 .tnav-pn a strong { overflow-wrap: anywhere; }
 .tnav-pn a.next { text-align: right; grid-column: 2; }
 .tnav-bottom .tnav-home { align-self: center; }
+.tnav-top [data-share] { margin-left: auto; }
+.tnav-end { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
 @media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
 </style>
 """
@@ -250,7 +252,7 @@ def process(path, order):
     names = [h for h, _ in seq]
     titles = dict(seq)
     top = (f'<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="{home}">← {label}</a>'
-           f'{difficulte.badge(path.stem)}</nav><!--/tnav-->\n')
+           f'{difficulte.badge(path.stem)}<button type="button" data-share hidden>Partager</button></nav><!--/tnav-->\n')
     bottom = ""
     if path.name in names:
         i = names.index(path.name)
@@ -263,7 +265,7 @@ def process(path, order):
             links += f'<a class="next" href="{nxt}"><span>Suivant →</span><strong>{html.escape(titles[nxt])}</strong></a>'
         bottom = ('<!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2>'
                   f'<div class="tnav-pn">{links}</div>'
-                  f'<a class="tnav-home" href="{home}">⌂ {label}</a></nav><!--/tnav-->\n')
+                  f'<div class="tnav-end"><a class="tnav-home" href="{home}">⌂ {label}</a><button type="button" data-share hidden>Partager</button></div></nav><!--/tnav-->\n')
 
     src = src.replace('<main class="page">', '<main class="page">\n' + top, 1)
     end = src.index("</main>")

@@ -102,6 +102,7 @@ a { color: inherit; }
 .eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
 .sr { position: absolute; left: -9999px; }
 [hidden] { display: none !important; }
+.toprow { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; justify-content: space-between; }
 
 header.hero { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 28px; align-items: center; }
 .hero .txt { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
@@ -185,12 +186,13 @@ footer { padding-top: 14px; border-top: 2px solid var(--ink); color: var(--soft)
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="apple-mobile-web-app-title" content="Tutoriels">
 <meta name="theme-color" content="#1f2a5c">
+<script src="share.js" defer></script>
 </head>
 <body>
 <main>
   <header class="hero">
     <div class="txt">
-      <span class="eyebrow">Tutoriels interactifs · secondaire I · Suisse romande</span>
+      <div class="toprow"><span class="eyebrow">Tutoriels interactifs · secondaire I · Suisse romande</span><button type="button" data-share hidden>Partager</button></div>
       <h1>Apprendre en manipulant</h1>
       <p class="lead">Des tutoriels gratuits en français, de la 8H à la 11H. Sur chaque page, tu bouges des curseurs, tu testes tes idées et la page t'explique ce qui se passe, étape par étape. Choisis une matière ou cherche un thème.</p>
       <div class="edu">
