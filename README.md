@@ -111,6 +111,22 @@ Accueil du numérique : [numerique.html](numerique.html).
 | [Le temps d'écran et l'attention](le-temps-d-ecran-et-l-attention.html) | Calculer son temps d'écran, repérer les astuces qui retiennent l'attention, le sommeil et son plan perso. |
 | [Les achats dans les jeux](les-achats-dans-les-jeux.html) | Gemmes, coffres, pass et abonnements : calculer le vrai prix en CHF, les probabilités et son budget. |
 
+## Religions
+
+Accueil des religions : [religions.html](religions.html). On apprend sur les religions (croyances, textes, fêtes, lieux), de façon neutre et respectueuse.
+
+| Tutoriel | Contenu |
+|---|---|
+| [Les religions du monde](les-religions-du-monde.html) | Qu'est-ce qu'une religion ? Croyances, rites et fêtes, les grandes familles, croire ou ne pas croire, et vivre ensemble en Suisse. |
+| [L'hindouisme](l-hindouisme.html) | Les Veda, les nombreuses formes du divin, karma et samsara, la puja, le temple et les fêtes comme Diwali et Holi. |
+| [Le bouddhisme](le-bouddhisme.html) | La vie du Bouddha, les Quatre Nobles Vérités, le Noble Chemin octuple, la méditation et les grandes branches. |
+| [Le judaïsme](le-judaisme.html) | Abraham et Moïse, la Torah, la synagogue, le Shabbat, les fêtes et l'histoire des Juifs, aussi en Suisse. |
+| [Le christianisme](le-christianisme.html) | Jésus, la Bible, catholiques, orthodoxes et protestants, la Réforme à Genève et Zurich, les sacrements et la date de Pâques. |
+| [L'islam](l-islam.html) | Le prophète Muhammad, le Coran, les cinq piliers, la mosquée, le calendrier lunaire du ramadan et les arts géométriques. |
+| [Les sagesses de Chine et du Japon](les-sagesses-de-chine-et-du-japon.html) | Confucius, le taoïsme et le yin et le yang, le shintoïsme et ses sanctuaires, le Nouvel An chinois. |
+| [Les mythologies antiques](les-mythologies-antiques.html) | Dieux d'Égypte, de Grèce, de Rome et du Nord, héros et mythes, et les mots et jours de la semaine qui en viennent. |
+| [Les fêtes et calendriers](les-fetes-et-calendriers.html) | Soleil et Lune, années bissextiles, les grandes fêtes des religions, les jours fériés suisses et les lieux de culte. |
+
 ## Pour réviser
 
 | Page | Contenu |
@@ -128,5 +144,5 @@ La **progression** (tutoriels ouverts, meilleur score à chaque quiz) est enregi
 
 1. Ajouter un fichier `nom-du-tutoriel.html` à la racine.
 2. Ajouter une ligne dans le tableau ci-dessus.
-3. Ajouter une carte dans `index.html` (maths), `physique.html` (physique-chimie) ou `numerique.html` (numérique), dans la bonne catégorie.
+3. Ajouter une carte dans `index.html` (maths), `physique.html` (physique-chimie) `numerique.html` (numérique) ou `religions.html` (religions), dans la bonne catégorie.
 4. Ajouter le tutoriel dans un parcours de `tools/parcours.py` (et ses prérequis), puis lancer `python tools/parcours.py`, `python tools/fiches.py` et `python tools/liens.py` : il ajoute le logo (icône d'onglet et d'écran d'accueil), le retour à l'accueil, les liens « précédent / suivant » (dans l'ordre de `index.html`) et transforme les mentions « le tutoriel sur … » en liens. On peut le relancer sans risque.

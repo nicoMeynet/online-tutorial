@@ -19,6 +19,22 @@ import difficulte  # noqa: E402
 ROOT = Path(__file__).resolve().parent.parent
 
 TOPICS = [
+    ("les religions du monde", "les-religions-du-monde.html"),
+    ("les religions", "les-religions-du-monde.html"),
+    ("l'hindouisme", "l-hindouisme.html"),
+    ("l’hindouisme", "l-hindouisme.html"),
+    ("le bouddhisme", "le-bouddhisme.html"),
+    ("le judaïsme", "le-judaisme.html"),
+    ("le christianisme", "le-christianisme.html"),
+    ("l'islam", "l-islam.html"),
+    ("l’islam", "l-islam.html"),
+    ("les sagesses de Chine et du Japon", "les-sagesses-de-chine-et-du-japon.html"),
+    ("le taoïsme", "les-sagesses-de-chine-et-du-japon.html"),
+    ("le shintoïsme", "les-sagesses-de-chine-et-du-japon.html"),
+    ("les mythologies antiques", "les-mythologies-antiques.html"),
+    ("les mythologies", "les-mythologies-antiques.html"),
+    ("les fêtes et calendriers", "les-fetes-et-calendriers.html"),
+    ("les fêtes religieuses", "les-fetes-et-calendriers.html"),
     ("comment on te manipule", "comment-on-te-manipule.html"),
     ("la manipulation", "comment-on-te-manipule.html"),
     ("les virus", "les-virus-et-les-mises-a-jour.html"),
@@ -175,7 +191,7 @@ CSS = CSS.replace("</style>", difficulte.BADGE_CSS + "</style>", 1)
 
 # Une page d'accueil par matière : chaque tutoriel renvoie vers la sienne,
 # et « précédent / suivant » reste dans la même matière.
-LANDINGS = [("index.html", "Tous les tutoriels"), ("physique.html", "Tous les tutoriels de physique"), ("numerique.html", "Tous les tutoriels numériques")]
+LANDINGS = [("index.html", "Tous les tutoriels"), ("physique.html", "Tous les tutoriels de physique"), ("numerique.html", "Tous les tutoriels numériques"), ("religions.html", "Tous les tutoriels de religions")]
 # Pages de révision qui ne sont pas des cartes mais appartiennent à une matière.
 HOME_OF = {"physique.html": ("glossaire-physique.html", "revisions-brevet-physique.html")}
 
