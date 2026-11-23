@@ -1,6 +1,6 @@
 """Génère index.html, la page d'accueil générale (intro + choix de la matière + recherche globale).
 
-Elle lit les quatre accueils de matière (cartes, catégories, mots-clés de recherche) : relancer
+Elle lit les accueils de matière (cartes, catégories, mots-clés de recherche) : relancer
 après tout ajout de tutoriel, après difficulte/parcours et avant liens.py :
     python tools/accueil.py
 La progression affichée vient du même localStorage que progress.js ; rien n'est envoyé.
@@ -21,12 +21,15 @@ SUBJECTS = [
      "Arnaques, manipulation, vie privée, IA, réseaux sociaux, et comment marchent Internet et les ordinateurs."),
     ("religions.html", "religions", "Religions", "#6d28d9", "#c4b5fd",
      "Les religions et les sagesses du monde : croyances, textes, fêtes et lieux, pour mieux comprendre les autres."),
+    ("geographie.html", "geographie", "Géographie et citoyenneté", "#15803d", "#4ade80",
+     "Le relief et les cantons de la Suisse, les pays et capitales du monde, et comment fonctionne la démocratie suisse."),
 ]
 
 ICONS = {
     "maths": '<text x="32" y="49" text-anchor="middle" font-family="Bricolage Grotesque, Segoe UI, sans-serif" font-weight="800" font-size="50" fill="currentColor">π</text>',
     "physique": '<g fill="none" stroke="currentColor" stroke-width="3"><ellipse cx="32" cy="32" rx="25" ry="10"/><ellipse cx="32" cy="32" rx="25" ry="10" transform="rotate(60 32 32)"/><ellipse cx="32" cy="32" rx="25" ry="10" transform="rotate(-60 32 32)"/></g><circle cx="32" cy="32" r="4.5" fill="currentColor"/>',
     "numerique": '<g fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"><rect x="8" y="12" width="48" height="32" rx="4"/><path d="M24 54h16M32 44v10"/></g><path d="M24 23l-6 5 6 5M40 23l6 5-6 5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>',
+    "geographie": '<path d="M4 52 L22 22 L31 35 L40 16 L60 52 Z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><path d="M36 23 L40 16 L44 23" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>',
     "religions": '<g fill="none" stroke="currentColor" stroke-width="3"><circle cx="32" cy="32" r="23"/><ellipse cx="32" cy="32" rx="10" ry="23"/><path d="M9 32h46M13 20h38M13 44h38"/></g>',
 }
 
@@ -60,7 +63,7 @@ PAGE = """<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Tutoriels interactifs</title>
-<meta name="description" content="Des tutoriels interactifs en français pour le secondaire I en Suisse romande : maths, physique-chimie, numérique et religions.">
+<meta name="description" content="Des tutoriels interactifs en français pour le secondaire I en Suisse romande : maths, physique-chimie, numérique, religions, géographie et citoyenneté.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=JetBrains+Mono:wght@500;600&display=swap">
@@ -202,7 +205,7 @@ footer { padding-top: 14px; border-top: 2px solid var(--ink); color: var(--soft)
     </div>
     <div class="stats" aria-label="En chiffres">
       <div class="stat"><b>__TOTAL__</b><span>tutoriels interactifs</span></div>
-      <div class="stat"><b>4</b><span>matières</span></div>
+      <div class="stat"><b>__NSUBJ__</b><span>matières</span></div>
       <div class="stat"><b>8</b><span>questions de quiz par tutoriel</span></div>
       <div class="stat"><b>Gratuit</b><span>sans compte ni publicité</span></div>
     </div>
@@ -229,7 +232,7 @@ __SUBJECTS__
       <span class="count" id="count"></span>
     </div>
     <div class="sugg" aria-label="Idées de recherche"><span class="soft">Par exemple :</span>
-      <button type="button">pourcentage</button><button type="button">énergie</button><button type="button">mot de passe</button><button type="button">IA</button><button type="button">fêtes</button><button type="button">conversion</button>
+      <button type="button">pourcentage</button><button type="button">énergie</button><button type="button">mot de passe</button><button type="button">IA</button><button type="button">fêtes</button><button type="button">conversion</button><button type="button">canton</button>
     </div>
     <div id="results" aria-live="polite"></div>
     <p class="more" id="more" hidden></p>
@@ -309,7 +312,7 @@ __SUBJECTS__
     return { seen: seen, last: last };
   }
 
-  /* Recherche dans les quatre matières */
+  /* Recherche dans toutes les matières */
   var q = document.getElementById('q'), out = document.getElementById('results'), more = document.getElementById('more'), count = document.getElementById('count');
   var MAX = 12;
   function search() {
@@ -362,7 +365,7 @@ def main():
     page = (PAGE.replace("__LIGHT__", "\n".join(light))
             .replace("__DARK__", "\n".join(dark))
             .replace("__SUBJECTS__", "\n".join(blocks))
-            .replace("__TOTAL__", str(len(data)))
+            .replace("__TOTAL__", str(len(data))).replace("__NSUBJ__", str(len(SUBJECTS)))
             .replace("__SUBJ_JSON__", json.dumps(subj_json, ensure_ascii=False))
             .replace("__DATA_JSON__", json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")))
     (ROOT / "index.html").write_text(page, encoding="utf-8", newline="\n")

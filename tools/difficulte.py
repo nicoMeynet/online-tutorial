@@ -33,6 +33,8 @@ DIFF = {
     "la-loi-d-ohm": 2, "la-puissance-et-l-energie-electrique": 2, "la-lumiere": 1, "le-son": 1,
     "les-signaux-et-la-communication": 2, "le-ciel-bleu-et-l-arc-en-ciel": 2, "la-physique-du-sport": 2,
     "le-climat-et-l-effet-de-serre": 2, "revisions-brevet-physique": 3,
+    # Géographie et citoyenneté
+    "la-geographie-de-la-suisse": 1, "la-geographie-du-monde": 1, "la-politique-suisse": 2,
     # Religions
     "les-religions-du-monde": 1, "l-hindouisme": 2, "le-bouddhisme": 2, "le-judaisme": 1, "le-christianisme": 1, "l-islam": 1, "les-sagesses-de-chine-et-du-japon": 2, "les-mythologies-antiques": 1, "les-fetes-et-calendriers": 2, "le-sikhisme": 1, "les-religions-traditionnelles": 1,
     # Numérique
@@ -61,7 +63,7 @@ def badge(page_id):
 
 def apply_landings(root):
     """Ajoute (ou met à jour) le badge de difficulté sur les cartes des accueils."""
-    for name in ("maths.html", "physique.html", "numerique.html", "religions.html"):
+    for name in ("maths.html", "physique.html", "numerique.html", "religions.html", "geographie.html"):
         f = Path(root) / name
         if not f.exists():
             continue

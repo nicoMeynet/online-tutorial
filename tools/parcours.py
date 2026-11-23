@@ -54,12 +54,15 @@ TRACKS = [
     ("religions1", "religions", "Découvrir les religions du monde", "9H–11H", "Les grandes religions et sagesses, leurs croyances, leurs textes et leurs fêtes.", [
         "les-religions-du-monde", "le-judaisme", "le-christianisme", "l-islam", "l-hindouisme", "le-bouddhisme", "le-sikhisme",
         "les-sagesses-de-chine-et-du-japon", "les-religions-traditionnelles", "les-mythologies-antiques", "les-fetes-et-calendriers"]),
+    ("geo1", "geographie", "Découvrir la Suisse et le monde", "9H–11H", "Le relief et les cantons de la Suisse, les pays du monde et la démocratie suisse.", [
+        "la-geographie-de-la-suisse", "la-geographie-du-monde", "la-politique-suisse"]),
     ("pcurio", "physique", "Physique et curiosités", "tous niveaux", "La physique du ciel, du sport et du climat.", [
         "le-ciel-bleu-et-l-arc-en-ciel", "la-physique-du-sport", "le-climat-et-l-effet-de-serre"]),
 ]
 
 # Ce qu'il vaut mieux connaître avant (seulement les liens importants).
 PRE = {
+    "la-politique-suisse": ["la-geographie-de-la-suisse"],
     "le-bouddhisme": ["l-hindouisme"],
     "le-sikhisme": ["l-hindouisme"],
     "les-religions-traditionnelles": ["les-religions-du-monde"],
@@ -141,17 +144,17 @@ CSS = r"""
 :root {
   --paper: #f6f7fb; --grid: #e2e6f0; --card: #ffffff; --ink: #1d2233; --soft: #545b72; --line: #d6dae6;
   --red: #cf3a52; --navy: #1f2a5c; --hl: #ffd34d; --ok: #15803d; --ok-s: #dcf3e3; --mid: #b45309; --mid-s: #fbe7cf;
-  --maths: #2346b5; --physique: #0e7490; --numerique: #b91c1c; --religions: #6d28d9;
+  --maths: #2346b5; --physique: #0e7490; --numerique: #b91c1c; --religions: #6d28d9; --geographie: #15803d;
   --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
   --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
   --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
   --paper: #10131c; --grid: #1a1f2c; --card: #171b27; --ink: #eceff7; --soft: #a9b0c6; --line: #2b3142; --red: #ff7d92;
-  --navy: #a9b8ff; --ok: #4ade80; --ok-s: #14301f; --mid: #f5a35c; --mid-s: #46301a; --maths: #8fb0ff; --physique: #67e8f9; --numerique: #fca5a5; --religions: #c4b5fd; color-scheme: dark; } }
+  --navy: #a9b8ff; --ok: #4ade80; --ok-s: #14301f; --mid: #f5a35c; --mid-s: #46301a; --maths: #8fb0ff; --physique: #67e8f9; --numerique: #fca5a5; --religions: #c4b5fd; --geographie: #4ade80; color-scheme: dark; } }
 :root[data-theme="dark"] {
   --paper: #10131c; --grid: #1a1f2c; --card: #171b27; --ink: #eceff7; --soft: #a9b0c6; --line: #2b3142; --red: #ff7d92;
-  --navy: #a9b8ff; --ok: #4ade80; --ok-s: #14301f; --mid: #f5a35c; --mid-s: #46301a; --maths: #8fb0ff; --physique: #67e8f9; --numerique: #fca5a5; --religions: #c4b5fd; color-scheme: dark; }
+  --navy: #a9b8ff; --ok: #4ade80; --ok-s: #14301f; --mid: #f5a35c; --mid-s: #46301a; --maths: #8fb0ff; --physique: #67e8f9; --numerique: #fca5a5; --religions: #c4b5fd; --geographie: #4ade80; color-scheme: dark; }
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
 body { margin: 0; color: var(--ink); font: 17px/1.6 var(--f-body);
@@ -249,6 +252,7 @@ JS = r"""
   if (location.hash === '#maths') subject = 'maths';
   if (location.hash === '#numerique') subject = 'numerique';
   if (location.hash === '#religions') subject = 'religions';
+  if (location.hash === '#geographie') subject = 'geographie';
   var current = pref.track;
 
   function trackById(id) { for (var i = 0; i < D.tracks.length; i++) if (D.tracks[i].id === id) return D.tracks[i]; return null; }
@@ -346,7 +350,7 @@ JS = r"""
 
 def landing_pages():
     pages = {}
-    for f in ("maths.html", "physique.html", "numerique.html", "religions.html"):
+    for f in ("maths.html", "physique.html", "numerique.html", "religions.html", "geographie.html"):
         s = (ROOT / f).read_text(encoding="utf-8")
         for href, title, desc in re.findall(r'<a class="card" href="([^"]+)\.html">.*?<strong>(.*?)</strong><span class="d">(.*?)</span>', s, re.S):
             pages[href] = {"t": html.unescape(re.sub(r"<[^>]+>", "", title)).strip(), "d": html.unescape(re.sub(r"<[^>]+>", "", desc)).strip()}
@@ -387,7 +391,7 @@ def main():
   <p class="lead">Choisis un parcours : la page suit ce que tu as déjà réussi, te dit quoi faire ensuite et te conseille de revoir une notion quand il en manque une. Une étape est réussie avec au moins 6 / 8 au quiz.</p>
   <p class="soft" id="summary"></p>
 </header>
-<nav class="subjects" aria-label="Choisir la matière"><button type="button" data-s="maths">Maths</button><button type="button" data-s="physique">Physique-chimie</button><button type="button" data-s="numerique">Numérique</button><button type="button" data-s="religions">Religions</button></nav>
+<nav class="subjects" aria-label="Choisir la matière"><button type="button" data-s="maths">Maths</button><button type="button" data-s="physique">Physique-chimie</button><button type="button" data-s="numerique">Numérique</button><button type="button" data-s="religions">Religions</button><button type="button" data-s="geographie">Géographie</button></nav>
 <section class="next" id="nextBox" aria-live="polite"></section>
 <section aria-labelledby="h-tracks"><h2 id="h-tracks" style="margin-bottom:12px">Choisis ton parcours</h2><div class="tracks" id="tracks"></div></section>
 <section aria-labelledby="h-reco"><h2 id="h-reco" style="margin-bottom:12px">Conseillé pour toi</h2><div class="reco" id="reco"></div></section>

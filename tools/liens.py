@@ -22,6 +22,11 @@ DATES = maj.Dates()
 ROOT = Path(__file__).resolve().parent.parent
 
 TOPICS = [
+    ("la géographie de la Suisse", "la-geographie-de-la-suisse.html"),
+    ("la géographie du monde", "la-geographie-du-monde.html"),
+    ("les pays et les capitales", "la-geographie-du-monde.html"),
+    ("la politique suisse", "la-politique-suisse.html"),
+    ("la démocratie suisse", "la-politique-suisse.html"),
     ("le sikhisme", "le-sikhisme.html"),
     ("les religions traditionnelles", "les-religions-traditionnelles.html"),
     ("les conversions avancées", "les-conversions-avancees.html"),
@@ -51,6 +56,7 @@ TOPICS = [
     ("la vie privée", "les-donnees-personnelles.html"),
     ("le cyberharcèlement", "le-cyberharcelement.html"),
     ("le harcèlement", "le-cyberharcelement.html"),
+    ("vraie ou fausse info", "vraie-ou-fausse-info.html"),
     ("les fausses infos", "vraie-ou-fausse-info.html"),
     ("les fake news", "vraie-ou-fausse-info.html"),
     ("les deepfakes", "les-images-truquees-et-les-deepfakes.html"),
@@ -201,9 +207,9 @@ CSS = CSS.replace("</style>", difficulte.BADGE_CSS + "</style>", 1)
 
 # Une page d'accueil par matière : chaque tutoriel renvoie vers la sienne,
 # et « précédent / suivant » reste dans la même matière.
-LANDINGS = [("maths.html", "Tous les tutoriels de maths"), ("physique.html", "Tous les tutoriels de physique"), ("numerique.html", "Tous les tutoriels numériques"), ("religions.html", "Tous les tutoriels de religions")]
+LANDINGS = [("maths.html", "Tous les tutoriels de maths"), ("physique.html", "Tous les tutoriels de physique"), ("numerique.html", "Tous les tutoriels numériques"), ("religions.html", "Tous les tutoriels de religions"), ("geographie.html", "Tous les tutoriels de géographie")]
 # Pages de révision qui ne sont pas des cartes mais appartiennent à une matière.
-SHORT = {"index.html": "Accueil", "maths.html": "Maths", "physique.html": "Physique-chimie", "numerique.html": "Numérique", "religions.html": "Religions"}
+SHORT = {"index.html": "Accueil", "maths.html": "Maths", "physique.html": "Physique-chimie", "numerique.html": "Numérique", "religions.html": "Religions", "geographie.html": "Géographie"}
 HOME_OF = {"maths.html": ("glossaire.html", "revisions-brevet.html"), "physique.html": ("glossaire-physique.html", "revisions-brevet-physique.html")}
 
 

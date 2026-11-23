@@ -4,7 +4,7 @@ Petits tutoriels interactifs en français, pour les élèves du secondaire I (Su
 
 Chaque tutoriel est une seule page HTML, sans installation. Il suffit de l'ouvrir dans un navigateur, sur ordinateur ou sur téléphone.
 
-La page d'accueil ([index.html](index.html)) présente le site, les quatre matières (maths, physique-chimie, numérique, religions), une recherche dans tous les tutoriels et un bouton « Reprendre » vers le dernier tutoriel ouvert. Chaque matière a ensuite son propre accueil : [maths.html](maths.html), [physique.html](physique.html), [numerique.html](numerique.html) et [religions.html](religions.html).
+La page d'accueil ([index.html](index.html)) présente le site, les cinq matières (maths, physique-chimie, numérique, religions, géographie et citoyenneté), une recherche dans tous les tutoriels et un bouton « Reprendre » vers le dernier tutoriel ouvert. Chaque matière a ensuite son propre accueil : [maths.html](maths.html), [physique.html](physique.html), [numerique.html](numerique.html) et [religions.html](religions.html) et [geographie.html](geographie.html).
 
 ## Tutoriels
 
@@ -116,7 +116,7 @@ Accueil du numérique : [numerique.html](numerique.html).
 
 ## Religions
 
-Accueil des religions : [religions.html](religions.html). On apprend sur les religions (croyances, textes, fêtes, lieux), de façon neutre et respectueuse.
+Accueil des religions : [religions.html](religions.html) et [geographie.html](geographie.html). On apprend sur les religions (croyances, textes, fêtes, lieux), de façon neutre et respectueuse.
 
 | Tutoriel | Contenu |
 |---|---|
@@ -131,6 +131,16 @@ Accueil des religions : [religions.html](religions.html). On apprend sur les rel
 | [Les religions traditionnelles](les-religions-traditionnelles.html) | Les religions liées à un peuple et à une terre : les mots justes, les idées communes (ancêtres, nature, rites de passage), une carte du monde (Afrique, Australie, Amériques, Arctique, Océanie, Europe ancienne), la transmission orale, les mélanges et le renouveau. |
 | [Les mythologies antiques](les-mythologies-antiques.html) | Dieux d'Égypte, de Grèce, de Rome et du Nord, héros et mythes, et les mots et jours de la semaine qui en viennent. |
 | [Les fêtes et calendriers](les-fetes-et-calendriers.html) | Soleil et Lune, années bissextiles, les grandes fêtes des religions, les jours fériés suisses et les lieux de culte. |
+
+## Géographie et citoyenneté
+
+Accueil : [geographie.html](geographie.html). La Suisse, le monde, et comment fonctionne la démocratie suisse (présentée de façon neutre).
+
+| Tutoriel | Contenu |
+|---|---|
+| [La géographie de la Suisse](la-geographie-de-la-suisse.html) | Jura, Plateau et Alpes, lacs et rivières, le château d'eau de l'Europe, les 26 cantons et les quatre langues nationales. |
+| [La géographie du monde](la-geographie-du-monde.html) | Continents et océans, pays et capitales en jeu, fuseaux horaires, records de la planète et cartes qui déforment. |
+| [La politique suisse](la-politique-suisse.html) | Commune, canton et Confédération, Parlement et Conseil fédéral, élections, votations, référendum et initiative. |
 
 ## Pour réviser
 
@@ -149,5 +159,5 @@ La **progression** (tutoriels ouverts, meilleur score à chaque quiz) est enregi
 
 1. Ajouter un fichier `nom-du-tutoriel.html` à la racine.
 2. Ajouter une ligne dans le tableau ci-dessus.
-3. Ajouter une carte dans `maths.html` (maths), `physique.html` (physique-chimie) `numerique.html` (numérique) ou `religions.html` (religions), dans la bonne catégorie.
+3. Ajouter une carte dans `maths.html` (maths), `physique.html` (physique-chimie) `numerique.html` (numérique) `religions.html` (religions) ou `geographie.html` (géographie et citoyenneté), dans la bonne catégorie.
 4. Ajouter le tutoriel dans un parcours de `tools/parcours.py` (et ses prérequis), puis lancer `python tools/parcours.py`, `python tools/fiches.py`, `python tools/accueil.py` (la page d'accueil générale `index.html`, avec la recherche dans toutes les matières) et `python tools/liens.py` : il ajoute le logo (icône d'onglet et d'écran d'accueil), le retour à l'accueil, les liens « précédent / suivant » (dans l'ordre de l'accueil de la matière) et transforme les mentions « le tutoriel sur … » en liens. Il ajoute aussi en bas de chaque page la date de dernière mise à jour et le copyright (`tools/maj.py`) : la date ne change que si le contenu de la page change (empreintes dans `tools/dates.json`). On peut le relancer sans risque.
