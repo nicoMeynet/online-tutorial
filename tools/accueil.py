@@ -21,8 +21,8 @@ SUBJECTS = [
      "Arnaques, manipulation, vie privée, IA, réseaux sociaux, et comment marchent Internet et les ordinateurs."),
     ("religions.html", "religions", "Religions", "#6d28d9", "#c4b5fd",
      "Les religions et les sagesses du monde : croyances, textes, fêtes et lieux, pour mieux comprendre les autres."),
-    ("geographie.html", "geographie", "Géographie et citoyenneté", "#15803d", "#4ade80",
-     "Le relief et les cantons de la Suisse, les pays et capitales du monde, et comment fonctionne la démocratie suisse."),
+    ("geographie.html", "geographie", "Histoire, géographie et citoyenneté", "#15803d", "#4ade80",
+     "Le relief, l'histoire et les cantons de la Suisse, les pays et capitales du monde, et comment fonctionne la démocratie suisse."),
 ]
 
 ICONS = {
@@ -63,7 +63,7 @@ PAGE = """<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Tutoriels interactifs</title>
-<meta name="description" content="Des tutoriels interactifs en français pour le secondaire I en Suisse romande : maths, physique-chimie, numérique, religions, géographie et citoyenneté.">
+<meta name="description" content="Des tutoriels interactifs en français pour le secondaire I en Suisse romande : maths, physique-chimie, numérique, religions, histoire, géographie et citoyenneté.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=JetBrains+Mono:wght@500;600&display=swap">

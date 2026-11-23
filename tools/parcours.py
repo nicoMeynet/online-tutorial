@@ -54,8 +54,8 @@ TRACKS = [
     ("religions1", "religions", "Découvrir les religions du monde", "9H–11H", "Les grandes religions et sagesses, leurs croyances, leurs textes et leurs fêtes.", [
         "les-religions-du-monde", "le-judaisme", "le-christianisme", "l-islam", "l-hindouisme", "le-bouddhisme", "le-sikhisme",
         "les-sagesses-de-chine-et-du-japon", "les-religions-traditionnelles", "les-mythologies-antiques", "les-fetes-et-calendriers"]),
-    ("geo1", "geographie", "Découvrir la Suisse et le monde", "9H–11H", "Le relief et les cantons de la Suisse, les pays du monde et la démocratie suisse.", [
-        "la-geographie-de-la-suisse", "la-geographie-du-monde", "la-politique-suisse"]),
+    ("geo1", "geographie", "Découvrir la Suisse et le monde", "9H–11H", "Le relief et les cantons de la Suisse, son histoire, les pays du monde et la démocratie suisse.", [
+        "la-geographie-de-la-suisse", "l-histoire-de-la-suisse", "la-geographie-du-monde", "la-politique-suisse"]),
     ("pcurio", "physique", "Physique et curiosités", "tous niveaux", "La physique du ciel, du sport et du climat.", [
         "le-ciel-bleu-et-l-arc-en-ciel", "la-physique-du-sport", "le-climat-et-l-effet-de-serre"]),
 ]
@@ -391,7 +391,7 @@ def main():
   <p class="lead">Choisis un parcours : la page suit ce que tu as déjà réussi, te dit quoi faire ensuite et te conseille de revoir une notion quand il en manque une. Une étape est réussie avec au moins 6 / 8 au quiz.</p>
   <p class="soft" id="summary"></p>
 </header>
-<nav class="subjects" aria-label="Choisir la matière"><button type="button" data-s="maths">Maths</button><button type="button" data-s="physique">Physique-chimie</button><button type="button" data-s="numerique">Numérique</button><button type="button" data-s="religions">Religions</button><button type="button" data-s="geographie">Géographie</button></nav>
+<nav class="subjects" aria-label="Choisir la matière"><button type="button" data-s="maths">Maths</button><button type="button" data-s="physique">Physique-chimie</button><button type="button" data-s="numerique">Numérique</button><button type="button" data-s="religions">Religions</button><button type="button" data-s="geographie">Histoire-géo</button></nav>
 <section class="next" id="nextBox" aria-live="polite"></section>
 <section aria-labelledby="h-tracks"><h2 id="h-tracks" style="margin-bottom:12px">Choisis ton parcours</h2><div class="tracks" id="tracks"></div></section>
 <section aria-labelledby="h-reco"><h2 id="h-reco" style="margin-bottom:12px">Conseillé pour toi</h2><div class="reco" id="reco"></div></section>
