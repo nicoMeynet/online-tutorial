@@ -1,0 +1,1398 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>La conjugaison</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels, marge rouge. Accent bleu-sarcelle profond (#0f5f8a), comme la page sur la langue française, avec une encre plus foncée (--acc-ink) pour le texte. Page pensée d'abord pour le téléphone : héros court, paragraphes courts, jeux à toucher (aucun glisser-déposer, aucune saisie obligatoire). Toutes les formes de la machine à conjuguer sont écrites en toutes lettres dans les données. */
+:root {
+  --paper: #f5f8fa;
+  --grid: #e0e9ee;
+  --card: #ffffff;
+  --ink: #0f1c24;
+  --ink-soft: #4a5b66;
+  --acc: #0f5f8a;
+  --acc-ink: #0b4a6c;
+  --acc-soft: #dcebf3;
+  --two: #6d28d9;
+  --two-soft: #ece4fb;
+  --warn: #b45309;
+  --warn-soft: #fbecd6;
+  --warn-ink: #92400e;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #ffe9a8;
+  --line: #d3dee4;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0c1418; --grid: #17232a; --card: #111b21; --ink: #eaf2f6; --ink-soft: #a9bcc6;
+    --acc: #5fb3dd; --acc-ink: #8fd0f0; --acc-soft: #0f2a3a; --two: #b69cff; --two-soft: #261a45;
+    --warn: #f5a524; --warn-soft: #3d2a0c; --warn-ink: #fbbf5a;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b3a18; --line: #2a3a44;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0c1418; --grid: #17232a; --card: #111b21; --ink: #eaf2f6; --ink-soft: #a9bcc6;
+  --acc: #5fb3dd; --acc-ink: #8fd0f0; --acc-soft: #0f2a3a; --two: #b69cff; --two-soft: #261a45;
+  --warn: #f5a524; --warn-soft: #3d2a0c; --warn-ink: #fbbf5a;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b3a18; --line: #2a3a44;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+@media (max-width: 520px) { .page { padding-block: 28px 64px; gap: 44px; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--acc-ink); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 14px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.15rem; color: var(--ink-soft); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+@media (max-width: 420px) { .box { padding: 14px; } }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note.warn { border-left-color: var(--warn); background: var(--warn-soft); }
+.note.ok { border-left-color: var(--ok); background: var(--ok-soft); }
+.note.two { border-left-color: var(--two); background: var(--two-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+.fig svg { width: 100%; height: auto; display: block; }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 8px 12px; min-height: 44px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button[aria-pressed="true"] { background: var(--acc-ink); color: var(--paper); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+button:disabled { cursor: default; }
+:focus-visible { outline: 3px solid var(--two); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.param { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.param label { font-weight: 700; }
+select { font: inherit; font-size: 1rem; padding: 8px 8px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; min-height: 44px; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
+.tag.ok { color: var(--ok); }
+.tag.no { color: var(--red); }
+.tag.acc { color: var(--acc-ink); }
+.tag.two { color: var(--two); }
+.tag.warn { color: var(--warn-ink); }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc-ink); }
+.fbk { border-radius: 8px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; min-width: 0; overflow-wrap: anywhere; }
+.fbk:empty { display: none; }
+.fbk.ok { background: var(--ok-soft); }
+.fbk.no { background: var(--red-soft); }
+.fbk.info { background: var(--two-soft); }
+.fbk.warn { background: var(--warn-soft); }
+.fbk strong { font-family: var(--f-display); }
+.fbk.ok strong { color: var(--ok); }
+.fbk.no strong { color: var(--red); }
+.fbk.info strong { color: var(--two); }
+.fbk.warn strong { color: var(--warn-ink); }
+.step-n { font-family: var(--f-mono); font-size: .85rem; color: var(--ink-soft); }
+button.right, button.right:disabled { background: var(--ok-soft); border-color: var(--ok); color: var(--ok); }
+button.wrong, button.wrong:disabled { background: var(--red-soft); border-color: var(--red); color: var(--red); }
+.choice button { flex: 1 1 130px; }
+.choice button:disabled:not(.right):not(.wrong) { opacity: .55; }
+.choice.many button { flex: 1 1 110px; font-size: .95rem; box-shadow: none; border-width: 1.5px; }
+.choice.many button:hover { box-shadow: none; }
+.card-big { background: var(--paper); border: 1.5px dashed var(--line); border-radius: 10px; padding: 14px; font-family: var(--f-display); font-weight: 700; font-size: 1.1rem; overflow-wrap: anywhere; }
+.card-big b { color: var(--acc-ink); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.card-big small { display: block; font-family: var(--f-mono); font-weight: 400; font-size: .8rem; color: var(--ink-soft); margin-top: 4px; }
+.small-btns button { box-shadow: none; border-width: 1.5px; font-size: .95rem; padding: 6px 10px; }
+.small-btns button:hover { box-shadow: none; }
+
+/* Héros : radical + terminaison */
+.hero-fig .tile { stroke: var(--ink); stroke-width: 2; }
+.hero-fig .t-rd { fill: var(--card); }
+.hero-fig .t-tm { fill: var(--acc-soft); stroke: var(--acc-ink); }
+.hero-fig .big { font-family: var(--f-display); font-weight: 800; }
+.hero-fig .acc { fill: var(--acc-ink); }
+.hero-fig .axis { stroke: var(--ink); stroke-width: 2; }
+.hero-fig .dot { fill: var(--acc-ink); }
+.fig.hero-fig svg { max-width: 340px; margin: 0 auto; }
+
+/* Formes découpées : radical / terminaison / auxiliaire */
+.form-big { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; font-family: var(--f-display); font-weight: 800; font-size: 1.6rem; background: var(--paper); border: 1.5px dashed var(--line); border-radius: 10px; padding: 12px 14px; overflow-wrap: anywhere; min-width: 0; }
+.form-big .pr { color: var(--ink-soft); font-weight: 500; }
+.rd { color: var(--ink); }
+.tm { color: var(--acc-ink); background: var(--acc-soft); border-radius: 4px; padding: 0 2px; }
+.ax { color: var(--two); }
+.pp { color: var(--ok); }
+.irr { color: var(--warn-ink); background: var(--warn-soft); border-radius: 4px; padding: 0 3px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: .9rem; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { display: inline-block; width: 14px; height: 14px; border-radius: 3px; border: 1.5px solid var(--line); }
+.legend .k-rd { background: var(--card); }
+.legend .k-tm { background: var(--acc-soft); border-color: var(--acc-ink); }
+.legend .k-ax { background: var(--two-soft); border-color: var(--two); }
+.legend .k-pp { background: var(--ok-soft); border-color: var(--ok); }
+.legend .k-irr { background: var(--warn-soft); border-color: var(--warn); }
+.mc-row { display: flex; flex-direction: column; gap: 6px; }
+.mc-row .rowh { font-family: var(--f-mono); font-size: .8rem; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-soft); }
+.mc-row .btns button { flex: 1 1 auto; }
+.ctable { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 6px; }
+.ctable li { background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; padding: 6px 10px; min-width: 0; overflow-wrap: anywhere; font-size: 1rem; }
+.ctable li.cur { border-color: var(--acc-ink); box-shadow: inset 0 0 0 1px var(--acc-ink); }
+.ctable li .pr { color: var(--ink-soft); }
+
+/* Ligne du temps */
+.tl .axis { stroke: var(--ink); stroke-width: 2.5; }
+.tl .now { stroke: var(--red); stroke-width: 2; stroke-dasharray: 4 4; }
+.tl .lbl { font-size: 14px; fill: var(--ink-soft); }
+.tl .mk { fill: var(--acc-ink); }
+.tl .bar { fill: var(--acc); opacity: .55; stroke: var(--acc-ink); stroke-width: 1.5; }
+.tl .cloud { fill: var(--two-soft); stroke: var(--two); stroke-width: 2; stroke-dasharray: 5 4; }
+.tl .mlab { font-size: 14px; font-weight: 600; fill: var(--acc-ink); }
+.tl .clab { font-size: 14px; font-weight: 600; fill: var(--two); }
+.tl .ghost { fill: var(--line); }
+.tl-btns button { flex: 1 1 130px; font-size: .95rem; box-shadow: none; border-width: 1.5px; }
+.tl-btns button:hover { box-shadow: none; }
+
+/* Cartes à retourner */
+.flips { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+.flips button { box-shadow: none; border-width: 1.5px; display: flex; flex-direction: column; align-items: center; gap: 0; line-height: 1.25; min-height: 64px; }
+.flips button:hover { box-shadow: none; }
+.flips button .w { font-size: 1.1rem; }
+.flips button .k { font-family: var(--f-mono); font-weight: 400; font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-soft); }
+.flips button.nv { background: var(--acc-soft); border-color: var(--acc-ink); color: var(--acc-ink); }
+
+/* Tableau */
+.scroll { overflow-x: auto; padding-bottom: 4px; }
+.ptable { border-collapse: collapse; width: 100%; }
+.ptable th, .ptable td { border: 1.5px solid var(--line); padding: 8px 10px; text-align: left; vertical-align: top; }
+.ptable th { font-family: var(--f-display); background: var(--paper); }
+.ptable td:first-child { font-family: var(--f-display); font-weight: 700; color: var(--acc-ink); }
+@media (max-width: 520px) { .ptable th, .ptable td { padding: 5px 6px; font-size: .9rem; } }
+
+/* Idées reçues */
+.myth .btns button { flex: 1 1 100px; }
+.myth .stmt { font-family: var(--f-display); font-weight: 700; }
+
+/* Glossaire */
+.gloss { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px 18px; margin: 0; }
+.gloss div { border-bottom: 1px dashed var(--line); padding-bottom: 6px; }
+.gloss dt { font-family: var(--f-display); font-weight: 700; color: var(--acc-ink); }
+.gloss dd { margin: 0; font-size: .95rem; }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 220px auto; gap: 10px; align-items: center; }
+.quiz li > span:first-child { min-width: 0; overflow-wrap: anywhere; }
+.quiz select { font-size: .95rem; padding: 6px 6px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb:empty { display: none; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--acc-ink); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); overflow-wrap: anywhere; }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+details ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+<!--ticons--><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Tutoriels"><script src="progress.js" defer></script><script src="share.js" defer></script><!--/ticons-->
+<style id="tnav-css">
+.tnav-top { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin: 0 0 4px; }
+.tnav-home { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font-weight: 700; font-size: .95rem; text-decoration: none; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tnav-home:hover, .tnav-home:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.tnav-bottom { margin-top: 8px; display: flex; flex-direction: column; gap: 12px; }
+.tnav-bottom h2 { margin: 0; }
+.tnav-pn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tnav-pn a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--ink, #222); border-radius: 10px;
+  background: var(--card, #fff); color: var(--ink, #222); text-decoration: none; box-shadow: 3px 3px 0 var(--ink, #222); min-width: 0; }
+.tnav-pn a span { font-size: .85rem; color: var(--ink-soft, #666); }
+.tnav-pn a strong { overflow-wrap: anywhere; }
+.tnav-pn a.next { text-align: right; grid-column: 2; }
+.tnav-bottom .tnav-home { align-self: center; }
+.tnav-top [data-share] { margin-left: auto; }
+.tnav-short { display: none; }
+.tprint-h { display: none; }
+@media (max-width: 600px) { header.hero { gap: 8px !important; } header.hero > .fig, header.hero > .box.fig, header.hero .hero-top .fig { display: none !important; }
+  header.hero p.lead { font-size: 1rem !important; line-height: 1.5 !important; } header.hero > p.soft { font-size: .88rem !important; line-height: 1.45 !important; }
+  header.hero h1 { font-size: clamp(1.7rem, 8vw, 2.2rem) !important; } }
+.tprint-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 14px 0 0; }
+.tprint-row span { font-size: .9rem; opacity: .8; }
+.tprint { display: inline-flex; align-items: center; gap: 8px; min-height: 42px; padding: 8px 16px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font: inherit; font-weight: 700; cursor: pointer; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tprint:hover, .tprint:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+@media print { [data-tp-hide] { display: none !important; } html.tp-on, html.tp-on body { background: #fff !important; color: #111 !important; padding: 0 !important; margin: 0 !important; }
+  html.tp-on [data-fiche] { color: #111; } html.tp-on [data-fiche] * { color: #111 !important; background: transparent !important; box-shadow: none !important; }
+  html.tp-on .tprint-h { display: block; font-size: 1.4rem; font-weight: 800; margin: 0 0 10px; } .tprint-row { display: none !important; } }
+@media (max-width: 520px) { .tnav-top .tnav-long { display: none; } .tnav-top .tnav-short { display: inline; } .tnav-top { flex-wrap: nowrap; } .tnav-top > * { flex: none; } }
+.tnav-end { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+@media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
+.diff { font: 700 .72rem/1.2 var(--f-mono, monospace); padding: 2px 8px; border-radius: 99px; border: 1.5px solid; white-space: nowrap; }
+.diff.d1 { color: #15803d; border-color: #15803d; background: #dcf3e3; }
+.diff.d2 { color: #a15c07; border-color: #b45309; background: #fbe7cf; }
+.diff.d3 { color: #b91c1c; border-color: #b91c1c; background: #fde2e2; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root:not([data-theme="light"]) .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root:not([data-theme="light"]) .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; } }
+:root[data-theme="dark"] .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root[data-theme="dark"] .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root[data-theme="dark"] .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; }
+</style>
+</head>
+<body>
+<main class="page">
+<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="francais.html">← <span class="tnav-long">Tous les tutoriels de français</span><span class="tnav-short">Français</span></a><span class="diff d2" title="Difficulté : moyen">Moyen</span><button type="button" data-share hidden>Partager</button></nav><!--/tnav-->
+
+
+  <header class="hero">
+    <span class="eyebrow">Tutoriel de français · niveau 9H–11H</span>
+    <h1>La conjugaison</h1>
+    <p class="lead">Un verbe change de forme selon la personne et le moment. Ici, tu apprends à le découper en radical et terminaison, à reconnaître les temps et à éviter les pièges, avec une machine à conjuguer de 25 verbes.</p>
+    <div class="box fig hero-fig">
+      <svg viewBox="0 0 340 130" role="img" aria-label="Le verbe chanter découpé : le radical chant et la terminaison ons, sur une ligne du temps">
+        <rect class="tile t-rd" x="40" y="10" width="120" height="50" rx="8"/>
+        <text class="big" x="100" y="45" text-anchor="middle" font-size="26">chant</text>
+        <text class="big" x="178" y="45" text-anchor="middle" font-size="24">+</text>
+        <rect class="tile t-tm" x="196" y="10" width="104" height="50" rx="8"/>
+        <text class="big acc" x="248" y="45" text-anchor="middle" font-size="26">ons</text>
+        <line class="axis" x1="20" y1="96" x2="318" y2="96"/>
+        <path class="dot" d="M318 90 L330 96 L318 102 Z"/>
+        <circle class="dot" cx="70" cy="96" r="6"/><circle class="dot" cx="170" cy="96" r="6"/><circle class="dot" cx="270" cy="96" r="6"/>
+        <text x="70" y="122" text-anchor="middle" font-size="13">hier</text>
+        <text x="170" y="122" text-anchor="middle" font-size="13">maintenant</text>
+        <text x="270" y="122" text-anchor="middle" font-size="13">demain</text>
+      </svg>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · Radical et terminaison</span>
+    <h2>Un verbe en deux morceaux</h2>
+    <p>Dans le tutoriel sur <a class="tlink" href="la-langue-francaise.html">la langue française</a>, tu as vu que le <strong>verbe</strong> est le mot qui se conjugue, et qu'un mot a un <strong>radical</strong> qui porte le sens. Pour un verbe conjugué, c'est pareil :</p>
+    <div class="cards">
+      <div class="box"><span class="tag acc">Le radical</span><strong>Le sens</strong><span class="soft">Il dit <strong>de quelle action</strong> on parle. Dans « nous <strong>chant</strong>ons », c'est <strong>chant</strong>. Souvent, il ne change pas. Dans certains verbes, il change : je <strong>vien</strong>s, nous <strong>ven</strong>ons, ils <strong>vienn</strong>ent.</span></div>
+      <div class="box"><span class="tag two">La terminaison</span><strong>La personne et le temps</strong><span class="soft">Elle dit <strong>qui</strong> fait l'action et <strong>quand</strong>. Dans « nous chant<strong>ons</strong> », -ons dit « nous, au présent ». Dans « nous chant<strong>ions</strong> », -ions dit « nous, à l'imparfait ».</span></div>
+      <div class="box"><span class="tag warn">L'infinitif</span><strong>Le nom du verbe</strong><span class="soft">C'est la forme du dictionnaire, non conjuguée : chanter, finir, prendre. Elle se termine par -er, -ir, -re ou -oir.</span></div>
+    </div>
+    <div class="box">
+      <h3>Coupe le verbe</h3>
+      <p class="soft">Où passe la frontière entre le radical et la terminaison ? Choisis le bon découpage.</p>
+      <div class="btns"><span class="score" id="spScore">0 / 7</span><span class="step-n" id="spPos"></span></div>
+      <div class="card-big" id="spCard" aria-live="polite"></div>
+      <div class="btns choice" id="spBtns" role="group" aria-label="Choisir le découpage"></div>
+      <div class="fbk" id="spOut" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="spPrev">← Précédent</button><button type="button" id="spNext">Suivant →</button><button type="button" id="spReset">Recommencer</button></div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · Les personnes</span>
+    <h2>Qui fait l'action ?</h2>
+    <p>Un verbe se conjugue à <strong>six personnes</strong> : trois au singulier, trois au pluriel. Chaque personne a son <strong>pronom</strong> de conjugaison.</p>
+    <div class="scroll"><table class="ptable" aria-label="Les six personnes de conjugaison">
+      <tr><th>Personne</th><th>Singulier</th><th>Pluriel</th></tr>
+      <tr><td>1re</td><td>je (j' devant une voyelle) : celui ou celle qui parle</td><td>nous : moi et d'autres</td></tr>
+      <tr><td>2e</td><td>tu : la personne à qui je parle</td><td>vous : plusieurs personnes, ou une seule qu'on vouvoie</td></tr>
+      <tr><td>3e</td><td>il, elle, on : celui ou celle dont on parle</td><td>ils, elles : ceux ou celles dont on parle</td></tr>
+    </table></div>
+    <div class="note">
+      <span class="note-title">Deux remarques</span>
+      <span><strong>On</strong> se conjugue toujours comme « il », même quand il veut dire « nous » : <em>on part</em> en course d'école. Et le <strong>vous de politesse</strong> se conjugue au pluriel, même pour une seule personne : <em>Madame, vous êtes</em> la nouvelle enseignante ?</span>
+    </div>
+    <div class="box">
+      <h3>Trouve le pronom</h3>
+      <p class="soft">La terminaison te dit qui fait l'action. Quel pronom manque ?</p>
+      <div class="btns"><span class="score" id="peScore">0 / 11</span><span class="step-n" id="pePos"></span></div>
+      <div class="card-big" id="peCard" aria-live="polite"></div>
+      <div class="btns choice many" id="peBtns" role="group" aria-label="Choisir le pronom"></div>
+      <div class="fbk" id="peOut" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="pePrev">← Précédent</button><button type="button" id="peNext">Suivant →</button><button type="button" id="peReset">Recommencer</button></div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Les groupes</span>
+    <h2>Trois familles de verbes</h2>
+    <p>On range les verbes en <strong>trois groupes</strong>. Les verbes d'un même groupe se conjuguent souvent de la même façon.</p>
+    <div class="cards">
+      <div class="box"><span class="tag acc">1er groupe</span><strong>Infinitif en -er</strong><span class="soft">chanter, jouer, manger, envoyer… C'est le plus grand groupe, et le plus régulier. <strong>Sauf aller</strong>, qui est du 3e groupe.</span></div>
+      <div class="box"><span class="tag two">2e groupe</span><strong>-ir, avec « nous …issons »</strong><span class="soft">finir → nous fin<strong>issons</strong>, choisir → nous chois<strong>issons</strong>, grandir, rougir, réussir. Le test : mets « nous » devant.</span></div>
+      <div class="box"><span class="tag warn">3e groupe</span><strong>Tous les autres</strong><span class="soft">aller, les -ir sans -issons (partir → nous partons, venir, courir, dormir), les -re (prendre, faire, dire) et les -oir (voir, pouvoir, savoir).</span></div>
+    </div>
+    <p class="soft">Être et avoir sont souvent mis à part : ce sont les <strong>auxiliaires</strong>. Certains livres les rangent avec le 3e groupe.</p>
+    <div class="box">
+      <h3>Range le verbe dans son groupe</h3>
+      <p class="soft">Pour les verbes en -ir, fais le test « nous …issons ».</p>
+      <div class="btns"><span class="score" id="grScore">0 / 18</span><span class="step-n" id="grPos"></span></div>
+      <div class="card-big" id="grCard" aria-live="polite"></div>
+      <div class="btns choice" id="grBtns" role="group" aria-label="Choisir le groupe"></div>
+      <div class="fbk" id="grOut" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="grPrev">← Précédent</button><button type="button" id="grNext">Suivant →</button><button type="button" id="grReset">Recommencer</button></div>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · Le présent de l'indicatif</span>
+    <h2>Le présent : ce qui se passe maintenant</h2>
+    <p>Le présent sert pour ce qui se passe <strong>maintenant</strong> (je lis), pour les <strong>habitudes</strong> (je prends le bus chaque matin) et pour les <strong>vérités générales</strong> (l'eau gèle à 0 °C).</p>
+    <div class="scroll"><table class="ptable" aria-label="Les terminaisons du présent">
+      <tr><th>Groupe</th><th>je</th><th>tu</th><th>il</th><th>nous</th><th>vous</th><th>ils</th></tr>
+      <tr><td>1er</td><td>-e</td><td>-es</td><td>-e</td><td>-ons</td><td>-ez</td><td>-ent</td></tr>
+      <tr><td>2e</td><td>-is</td><td>-is</td><td>-it</td><td>-issons</td><td>-issez</td><td>-issent</td></tr>
+      <tr><td>3e (souvent)</td><td>-s</td><td>-s</td><td>-t ou -d</td><td>-ons</td><td>-ez</td><td>-ent</td></tr>
+    </table></div>
+    <div class="cards">
+      <div class="box"><span class="tag acc">Régularités</span><strong>Ce qui revient presque toujours</strong><span class="soft">Avec <strong>tu</strong> : -s (ou -x : tu peux, tu veux). Avec <strong>nous</strong> : -ons (sauf nous sommes). Avec <strong>vous</strong> : -ez (sauf vous êtes, vous faites, vous dites). Avec <strong>ils</strong> : -ent (sauf ils sont, ont, vont, font).</span></div>
+      <div class="box"><span class="tag warn">Les dix plus fréquents</span><strong>À savoir par cœur</strong><span class="soft">être, avoir, aller, faire, dire, pouvoir, vouloir, venir, prendre, voir. Ils sont irréguliers, mais on les rencontre partout. La machine de l'étape 10 les contient tous.</span></div>
+    </div>
+    <div class="box">
+      <h3>Choisis la bonne forme</h3>
+      <div class="btns"><span class="score" id="prScore">0 / 10</span><span class="step-n" id="prPos"></span></div>
+      <div class="card-big" id="prCard" aria-live="polite"></div>
+      <div class="btns choice" id="prBtns" role="group" aria-label="Choisir la forme du présent"></div>
+      <div class="fbk" id="prOut" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="prPrev">← Précédent</button><button type="button" id="prNext">Suivant →</button><button type="button" id="prReset">Recommencer</button></div>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · La ligne du temps</span>
+    <h2>Passé, présent, futur</h2>
+    <p>Chaque temps place l'action sur une ligne : avant maintenant (le <strong>passé</strong>), maintenant (le <strong>présent</strong>) ou après (le <strong>futur</strong>). Touche un temps pour le voir sur la ligne.</p>
+    <div class="box">
+      <h3>Où se place ce temps ?</h3>
+      <div class="fig tl">
+        <svg viewBox="0 0 360 160" role="img" aria-label="Ligne du temps : passé à gauche, maintenant au milieu, futur à droite" id="tlSvg">
+          <line class="axis" x1="14" y1="112" x2="338" y2="112"/>
+          <path class="mk" d="M336 105 L350 112 L336 119 Z"/>
+          <line class="now" x1="220" y1="70" x2="220" y2="128"/>
+          <text class="lbl" x="90" y="146" text-anchor="middle">passé</text>
+          <text class="lbl" x="220" y="146" text-anchor="middle">maintenant</text>
+          <text class="lbl" x="306" y="146" text-anchor="middle">futur</text>
+          <g id="tlMark"></g>
+        </svg>
+      </div>
+      <div class="btns tl-btns" id="tlBtns" role="group" aria-label="Choisir un temps"></div>
+      <div class="fbk info" id="tlOut" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Temps simple ou temps composé ?</span>
+      <span>Un <strong>temps simple</strong> s'écrit en un mot (je chante, je chantais). Un <strong>temps composé</strong> s'écrit en deux mots : un <strong>auxiliaire</strong> (être ou avoir) et un <strong>participe passé</strong> (j'ai chanté, j'avais chanté). On en parle à l'étape 8.</span>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · L'imparfait et le passé simple</span>
+    <h2>Les temps du récit</h2>
+    <p>Pour raconter une histoire au passé, les livres utilisent deux temps qui travaillent en équipe.</p>
+    <div class="cards">
+      <div class="box"><span class="tag acc">L'imparfait</span><strong>Le décor, ce qui dure</strong><span class="soft">Il décrit, il montre une action qui dure ou se répète. Terminaisons pour tous les verbes : <strong>-ais, -ais, -ait, -ions, -iez, -aient</strong>. Le radical est celui de « nous » au présent : nous fais|ons → je fais<strong>ais</strong>. Seule exception : être → j'<strong>ét</strong>ais.</span></div>
+      <div class="box"><span class="tag two">Le passé simple</span><strong>Les actions, une à une</strong><span class="soft">Il raconte les actions courtes qui font avancer l'histoire. On le trouve surtout <strong>à l'écrit</strong>, dans les romans et les contes, et surtout <strong>à la 3e personne</strong> : il chanta, elle finit, ils prirent, elle vint.</span></div>
+    </div>
+    <div class="scroll"><table class="ptable" aria-label="Les terminaisons du passé simple à la 3e personne">
+      <tr><th>Type</th><th>il, elle</th><th>ils, elles</th><th>Exemples</th></tr>
+      <tr><td>en -a</td><td>-a</td><td>-èrent</td><td>tous les verbes en -er, aller compris : il chanta, ils allèrent</td></tr>
+      <tr><td>en -i</td><td>-it</td><td>-irent</td><td>le 2e groupe et beaucoup d'autres : il finit, elle fit, ils prirent, elles dirent</td></tr>
+      <tr><td>en -u</td><td>-ut</td><td>-urent</td><td>il fut, il eut, elle put, ils voulurent, ils lurent</td></tr>
+      <tr><td>en -in</td><td>-int</td><td>-inrent</td><td>venir, tenir et leurs familles : il vint, elles revinrent</td></tr>
+    </table></div>
+    <div class="box">
+      <h3>Décor ou action ?</h3>
+      <p class="soft">Une petite histoire sur le Léman. Pour chaque verbe, choisis l'imparfait (le décor, ce qui dure) ou le passé simple (une action qui fait avancer l'histoire).</p>
+      <div class="btns"><span class="score" id="stScore">0 / 6</span><span class="step-n" id="stPos"></span></div>
+      <div class="card-big" id="stCard" aria-live="polite"></div>
+      <div class="btns choice" id="stBtns" role="group" aria-label="Choisir le temps du récit"></div>
+      <div class="fbk" id="stOut" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="stPrev">← Précédent</button><button type="button" id="stNext">Suivant →</button><button type="button" id="stReset">Recommencer</button></div>
+    </div>
+    <p class="soft">Parfois, les deux temps sont possibles : le sens change un peu. « Il pleuvait » montre un décor ; « il plut » raconte un moment de l'histoire.</p>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Le futur et le conditionnel</span>
+    <h2>Ce qui viendra, ce qu'on imagine</h2>
+    <div class="cards">
+      <div class="box"><span class="tag acc">Le futur simple</span><strong>Ce qui arrivera</strong><span class="soft">On part souvent de l'<strong>infinitif</strong> et on ajoute <strong>-ai, -as, -a, -ons, -ez, -ont</strong> : chanter → je chanter<strong>ai</strong>, finir → je finir<strong>ai</strong>. Pour les verbes en -re, le « e » tombe : prendre → je prendr<strong>ai</strong>.</span></div>
+      <div class="box"><span class="tag two">Le conditionnel présent</span><strong>Ce qu'on imagine</strong><span class="soft">Même début que le futur, mais avec les terminaisons de l'imparfait : <strong>-ais, -ais, -ait, -ions, -iez, -aient</strong>. Je chanter<strong>ais</strong> si j'avais le temps. Il sert aussi à être poli : « Je <strong>voudrais</strong> un billet pour Sion. »</span></div>
+    </div>
+    <div class="box">
+      <h3>Les futurs qui changent de radical</h3>
+      <p class="soft">Pour certains verbes, le radical du futur est spécial. Touche un verbe pour voir son futur (le conditionnel utilise le même radical).</p>
+      <div class="flips" id="fuGrid" role="group" aria-label="Verbes au futur irrégulier"></div>
+      <div class="fbk info" id="fuOut" aria-live="polite"></div>
+    </div>
+    <p class="soft">Selon les livres, le conditionnel est présenté comme un mode à part ou comme un temps de l'indicatif. Ce qui compte, c'est de savoir le former et l'utiliser.</p>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Les temps composés</span>
+    <h2>Passé composé et plus-que-parfait</h2>
+    <p>Un temps composé = un <strong>auxiliaire</strong> (avoir ou être) conjugué + le <strong>participe passé</strong> du verbe.</p>
+    <div class="cards">
+      <div class="box"><span class="tag acc">Passé composé</span><strong>Auxiliaire au présent</strong><span class="soft">j'<strong>ai</strong> mangé, elle <strong>est</strong> partie. Une action passée et terminée. C'est le temps du passé le plus utilisé à l'oral.</span></div>
+      <div class="box"><span class="tag two">Plus-que-parfait</span><strong>Auxiliaire à l'imparfait</strong><span class="soft">j'<strong>avais</strong> mangé, elle <strong>était</strong> partie. Une action passée qui a eu lieu <strong>avant</strong> une autre : quand je suis arrivé à la gare, le train <strong>était</strong> déjà <strong>parti</strong>.</span></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Avoir ou être ?</span>
+      <span>La plupart des verbes utilisent <strong>avoir</strong>. Une petite liste utilise <strong>être</strong> : aller, venir, arriver, partir, entrer, sortir, monter, descendre, naître, mourir, rester, tomber, retourner, devenir, revenir… ainsi que les verbes pronominaux (se lever, s'habiller). Avec <strong>être</strong>, le participe passé <strong>s'accorde avec le sujet</strong> : Léa est parti<strong>e</strong>, mes cousins sont venu<strong>s</strong>, elles sont arrivé<strong>es</strong>.</span>
+    </div>
+    <div class="box">
+      <h3>Le bon auxiliaire, le bon accord</h3>
+      <div class="btns"><span class="score" id="axScore">0 / 12</span><span class="step-n" id="axPos"></span></div>
+      <div class="card-big" id="axCard" aria-live="polite"></div>
+      <div class="btns choice" id="axBtns" role="group" aria-label="Choisir l'auxiliaire ou l'accord"></div>
+      <div class="fbk" id="axOut" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="axPrev">← Précédent</button><button type="button" id="axNext">Suivant →</button><button type="button" id="axReset">Recommencer</button></div>
+    </div>
+    <div class="box">
+      <h3>Participe passé : é, i, u, s ou t ?</h3>
+      <p>L'astuce : <strong>mets le participe au féminin</strong>. Si tu entends une lettre en plus, elle est là au masculin aussi : une affaire pri<strong>s</strong>e → pri<strong>s</strong> ; une lettre écri<strong>t</strong>e → écri<strong>t</strong> ; une course fini<strong>e</strong> → fini (rien à ajouter).</p>
+      <div class="btns"><span class="score" id="ppScore">0 / 10</span><span class="step-n" id="ppPos"></span></div>
+      <div class="card-big" id="ppCard" aria-live="polite"></div>
+      <div class="btns choice" id="ppBtns" role="group" aria-label="Choisir l'orthographe du participe passé"></div>
+      <div class="fbk" id="ppOut" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="ppPrev">← Précédent</button><button type="button" id="ppNext">Suivant →</button><button type="button" id="ppReset">Recommencer</button></div>
+    </div>
+    <details>
+      <summary>Pour aller plus loin : l'accord avec avoir</summary>
+      <div>
+        <span>Avec <strong>avoir</strong>, en général, le participe passé <strong>ne s'accorde pas</strong> avec le sujet : <em>Léa a mangé</em>, <em>les élèves ont chanté</em>.</span>
+        <span>Une règle simple pour commencer : il s'accorde avec le <strong>complément direct (COD)</strong> seulement si celui-ci est <strong>placé avant</strong> le verbe. <em>J'ai pris des photos</em> (COD après : pas d'accord). <em>Les photos que j'ai pris<strong>es</strong></em> (que = les photos, placé avant : accord). Le complément direct est expliqué dans le tutoriel sur <a class="tlink" href="la-grammaire.html">la grammaire</a>.</span>
+        <span>Autre détail : monter, descendre, sortir, rentrer prennent <strong>avoir</strong> quand ils ont un complément direct : <em>j'ai monté les valises</em>, mais <em>je suis monté au grenier</em>.</span>
+      </div>
+    </details>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · L'impératif et le subjonctif</span>
+    <h2>Donner un ordre, exprimer une nécessité</h2>
+    <div class="cards">
+      <div class="box"><span class="tag acc">L'impératif présent</span><strong>Ordre, conseil, invitation</strong><span class="soft">Trois personnes seulement, <strong>sans pronom</strong> : <em>Range</em> ta chambre ! <em>Partons</em> ! <em>Venez</em> voir ! Attention : au 1er groupe, pas de « s » avec tu : <strong>chante</strong>, <strong>mange</strong>, <strong>va</strong>. Irréguliers : sois, soyons, soyez ; aie, ayons, ayez ; sache ; veuillez.</span></div>
+      <div class="box"><span class="tag two">Le subjonctif présent</span><strong>Après « il faut que… »</strong><span class="soft">Il exprime une nécessité, un souhait, un doute. Le test : mets « <strong>il faut que</strong> » devant. Terminaisons : <strong>-e, -es, -e, -ions, -iez, -ent</strong>. Il faut que je <em>finisse</em>, que tu <em>prennes</em>, qu'il <em>vienne</em>.</span></div>
+    </div>
+    <div class="scroll"><table class="ptable" aria-label="Subjonctif présent de quelques verbes irréguliers">
+      <tr><th>Il faut que…</th><th>je</th><th>nous</th><th>ils</th></tr>
+      <tr><td>être</td><td>sois</td><td>soyons</td><td>soient</td></tr>
+      <tr><td>avoir</td><td>aie</td><td>ayons</td><td>aient</td></tr>
+      <tr><td>aller</td><td>aille</td><td>allions</td><td>aillent</td></tr>
+      <tr><td>faire</td><td>fasse</td><td>fassions</td><td>fassent</td></tr>
+      <tr><td>pouvoir</td><td>puisse</td><td>puissions</td><td>puissent</td></tr>
+      <tr><td>savoir</td><td>sache</td><td>sachions</td><td>sachent</td></tr>
+    </table></div>
+    <div class="note warn">
+      <span class="note-title">Un piège courant</span>
+      <span>« Il faut que tu <s>viens</s> » → il faut que tu <strong>viennes</strong>. « Il faut que je <s>suis</s> à l'heure » → il faut que je <strong>sois</strong> à l'heure. Avec « il faut que », c'est le subjonctif.</span>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · La machine à conjuguer</span>
+    <h2>25 verbes, 9 temps</h2>
+    <p>Choisis un verbe, un temps et une personne. La machine montre la forme et la découpe. Toutes les formes sont écrites à la main dans la machine : elle ne devine rien.</p>
+    <div class="box">
+      <div class="param">
+        <label for="mcVerb">Verbe</label>
+        <select id="mcVerb"></select>
+      </div>
+      <div class="btns small-btns"><button type="button" id="mcRand">Un verbe au hasard</button></div>
+      <div class="mc-row"><span class="rowh">Temps</span><div class="btns small-btns" id="mcTense" role="group" aria-label="Choisir le temps"></div></div>
+      <div class="mc-row"><span class="rowh">Personne</span><div class="btns small-btns" id="mcPers" role="group" aria-label="Choisir la personne"></div></div>
+      <div class="form-big" id="mcForm" aria-live="polite"></div>
+      <div class="legend" aria-hidden="true"><span><i class="k-rd"></i>radical</span><span><i class="k-tm"></i>terminaison</span><span><i class="k-ax"></i>auxiliaire</span><span><i class="k-pp"></i>participe passé</span><span><i class="k-irr"></i>forme irrégulière</span></div>
+      <div class="fbk info" id="mcOut" aria-live="polite"></div>
+      <ul class="ctable" id="mcTable" aria-label="Le verbe à toutes les personnes de ce temps"></ul>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · Reconnaître et éviter les pièges</span>
+    <h2>Quel temps ? Quelle terminaison ?</h2>
+    <div class="box">
+      <h3>Quel temps ?</h3>
+      <p class="soft">Le verbe souligné est à quel temps ? Regarde la terminaison, l'auxiliaire, et les mots autour (hier, demain, si, il faut que…).</p>
+      <div class="btns"><span class="score" id="qtScore">0 / 12</span><span class="step-n" id="qtPos"></span></div>
+      <div class="card-big" id="qtCard" aria-live="polite"></div>
+      <div class="btns choice many" id="qtBtns" role="group" aria-label="Choisir le temps"></div>
+      <div class="fbk" id="qtOut" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="qtPrev">← Précédent</button><button type="button" id="qtNext">Suivant →</button><button type="button" id="qtReset">Recommencer</button></div>
+    </div>
+    <div class="scroll"><table class="ptable" aria-label="Les astuces contre les pièges">
+      <tr><th>Le piège</th><th>L'astuce</th></tr>
+      <tr><td>-er, -é, -ez, -ait</td><td>Remplace par un verbe du 3e groupe comme <strong>vendre</strong> : « vendre » → <strong>-er</strong> (infinitif) ; « vendu » → <strong>-é</strong> (participe) ; « vous vendez » → <strong>-ez</strong> ; « il vendait » → <strong>-ait</strong> (imparfait).</td></tr>
+      <tr><td>-rai ou -rais ?</td><td>Remplace « je » par « nous » : nous mangerons → futur, <strong>je mangerai</strong> ; nous mangerions → conditionnel, <strong>je mangerais</strong>.</td></tr>
+      <tr><td>ils … -ent</td><td>Avec ils ou elles (ou un sujet au pluriel), la terminaison <strong>-ent</strong> ne s'entend pas, mais elle s'écrit : ils chant<strong>ent</strong>, elles jou<strong>ent</strong>.</td></tr>
+    </table></div>
+    <div class="box">
+      <h3>Évite le piège</h3>
+      <div class="btns"><span class="score" id="trScore">0 / 10</span><span class="step-n" id="trPos"></span></div>
+      <div class="card-big" id="trCard" aria-live="polite"></div>
+      <div class="btns choice" id="trBtns" role="group" aria-label="Choisir l'orthographe"></div>
+      <div class="fbk" id="trOut" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="trPrev">← Précédent</button><button type="button" id="trNext">Suivant →</button><button type="button" id="trReset">Recommencer</button></div>
+    </div>
+    <p class="soft">Les homophones comme a/à ou et/est sont expliqués dans le tutoriel sur <a class="tlink" href="la-langue-francaise.html">la langue française</a>.</p>
+  </section>
+
+  <section>
+    <span class="eyebrow">Les idées reçues</span>
+    <h2>Vrai ou idée reçue ?</h2>
+    <p>Pour chaque phrase, choisis : <strong>vrai</strong> ou <strong>idée reçue</strong> ?</p>
+    <div class="btns"><span class="score" id="mythScore">0 / 8</span><button type="button" id="mythReset">Recommencer</button></div>
+    <div class="cards" id="myths"></div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Le savais-tu ?</span>
+    <h2>Quelques curiosités</h2>
+    <div class="cards">
+      <div class="box"><span class="tag two">Le grand groupe</span><strong>Environ 9 verbes sur 10</strong><span class="soft">La très grande majorité des verbes français sont du 1er groupe. Et les verbes nouveaux y vont presque tous : scanner, zapper, liker…</span></div>
+      <div class="box"><span class="tag two">Verbes incomplets</span><strong>Il pleut, il faut</strong><span class="soft">Pleuvoir et falloir s'emploient presque seulement avec « il » : il pleut, il faut. On ne dit pas « je pleus ». On les appelle des verbes <strong>impersonnels</strong>.</span></div>
+      <div class="box"><span class="tag two">Un verbe, trois radicaux</span><strong>Aller vient de loin</strong><span class="soft">Je <strong>v</strong>ais, nous <strong>all</strong>ons, j'<strong>ir</strong>ai : aller mélange trois anciens verbes latins. C'est pour cela qu'il est si irrégulier.</span></div>
+      <div class="box"><span class="tag two">Passé simple</span><strong>Rare à l'oral</strong><span class="soft">À l'oral, on ne dit presque jamais « nous chantâmes ». Mais le passé simple est bien vivant dans les livres, surtout à la 3e personne.</span></div>
+      <div class="box"><span class="tag two">Politesse</span><strong>Le conditionnel poli</strong><span class="soft">« Je veux un croissant » est correct, mais « je <strong>voudrais</strong> un croissant » est plus poli. Le conditionnel adoucit la demande.</span></div>
+    </div>
+    <div class="box">
+      <h3>Mots à connaître</h3>
+      <dl class="gloss">
+        <div><dt>Infinitif</dt><dd>la forme non conjuguée du verbe, celle du dictionnaire : chanter, prendre.</dd></div>
+        <div><dt>Radical</dt><dd>la partie du verbe qui porte le sens.</dd></div>
+        <div><dt>Terminaison</dt><dd>la fin du verbe ; elle change selon la personne et le temps.</dd></div>
+        <div><dt>Personne</dt><dd>qui fait l'action : je, tu, il / elle / on, nous, vous, ils / elles.</dd></div>
+        <div><dt>Temps simple</dt><dd>un temps en un seul mot : présent, imparfait, futur…</dd></div>
+        <div><dt>Temps composé</dt><dd>auxiliaire + participe passé : passé composé, plus-que-parfait.</dd></div>
+        <div><dt>Auxiliaire</dt><dd>être ou avoir, quand ils aident à former un temps composé.</dd></div>
+        <div><dt>Participe passé</dt><dd>la forme chanté, fini, pris, venu, utilisée dans les temps composés.</dd></div>
+        <div><dt>Mode</dt><dd>la façon de voir l'action : indicatif (réel), impératif (ordre), subjonctif (nécessité, souhait).</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- 12 -->
+  <section>
+    <span class="eyebrow">Étape 12 · Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Choisis ta réponse, puis vérifie.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Recommencer</button>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À toi de jouer</span>
+    <h2>Six exercices</h2>
+    <p>Réfléchis, écris ta réponse sur une feuille, puis ouvre la correction.</p>
+    <div class="exos">
+      <details>
+        <summary>Finir au présent<span class="q">Conjugue « finir » au présent, aux six personnes. Souligne la terminaison.</span></summary>
+        <div>
+          <span>je fin<strong>is</strong>, tu fin<strong>is</strong>, il fin<strong>it</strong>, nous fin<strong>issons</strong>, vous fin<strong>issez</strong>, ils fin<strong>issent</strong>.</span>
+          <span>C'est le modèle du 2e groupe : choisir, grandir, réussir se conjuguent pareil.</span>
+        </div>
+      </details>
+      <details>
+        <summary>Les trois groupes<span class="q">Classe ces verbes : courir, réussir, envoyer, sortir, applaudir, aller.</span></summary>
+        <div>
+          <ul>
+            <li>1er groupe : <strong>envoyer</strong> (infinitif en -er).</li>
+            <li>2e groupe : <strong>réussir</strong> (nous réussissons), <strong>applaudir</strong> (nous applaudissons).</li>
+            <li>3e groupe : <strong>courir</strong> (nous courons), <strong>sortir</strong> (nous sortons), <strong>aller</strong> (la grande exception en -er).</li>
+          </ul>
+        </div>
+      </details>
+      <details>
+        <summary>Au passé composé<span class="q">Mets au passé composé : « Les filles partent à Zermatt. Elles prennent le train. »</span></summary>
+        <div>
+          <span>Les filles <strong>sont parties</strong> à Zermatt. Elles <strong>ont pris</strong> le train.</span>
+          <span>Partir utilise <strong>être</strong> : le participe s'accorde avec « les filles » (féminin pluriel, -es). Prendre utilise <strong>avoir</strong> : pas d'accord avec le sujet.</span>
+        </div>
+      </details>
+      <details>
+        <summary>Futur ou conditionnel ?<span class="q">Complète avec « aller » : « Demain, nous ___ au bord du lac. » puis « Si tu venais, nous ___ au bord du lac. »</span></summary>
+        <div>
+          <span>Demain, nous <strong>irons</strong> au bord du lac (futur : c'est prévu).</span>
+          <span>Si tu venais, nous <strong>irions</strong> au bord du lac (conditionnel : c'est imaginé, avec « si »).</span>
+        </div>
+      </details>
+      <details>
+        <summary>Raconte au passé<span class="q">Récris au passé, avec l'imparfait et le passé simple : « Il pleut sur Fribourg. Soudain, l'orage éclate et les enfants rentrent en courant. »</span></summary>
+        <div>
+          <span>Il <strong>pleuvait</strong> sur Fribourg (le décor : imparfait). Soudain, l'orage <strong>éclata</strong> et les enfants <strong>rentrèrent</strong> en courant (les actions : passé simple).</span>
+        </div>
+      </details>
+      <details>
+        <summary>Corrige les erreurs<span class="q">Trouve et corrige les quatre erreurs : « Demain, je mangerais chez ma tante. Il faut que tu viens. Vous disez la vérité. Mes amis chante. »</span></summary>
+        <div>
+          <ul>
+            <li>Demain, je <strong>mangerai</strong> (futur : « nous mangerons »).</li>
+            <li>Il faut que tu <strong>viennes</strong> (subjonctif).</li>
+            <li>Vous <strong>dites</strong> (comme vous faites, vous êtes).</li>
+            <li>Mes amis <strong>chantent</strong> (sujet au pluriel : -ent).</li>
+          </ul>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section data-fiche><!--tprint--><p class="tprint-h">Fiche de révision · La conjugaison</p><!--/tprint-->    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• Un verbe conjugué = un <strong>radical</strong> (le sens) + une <strong>terminaison</strong> (la personne et le temps). Certains verbes changent de radical : je viens, nous venons.</span>
+      <span>• Six personnes : je, tu, il / elle / on, nous, vous, ils / elles. « On » se conjugue comme « il ».</span>
+      <span>• 1er groupe : -er (sauf aller). 2e groupe : -ir avec « nous …issons ». 3e groupe : tous les autres.</span>
+      <span>• Présent : tu → -s ou -x ; nous → -ons ; vous → -ez ; ils → -ent. Exceptions à connaître : sommes, êtes, faites, dites, sont, ont, vont, font.</span>
+      <span>• Imparfait : -ais, -ais, -ait, -ions, -iez, -aient (le décor). Passé simple : il chanta, il finit, il fut, il vint (les actions du récit).</span>
+      <span>• Futur : je chanterai, je prendrai ; conditionnel : je chanterais (imaginé, poli). Test : « nous » → mangerons / mangerions.</span>
+      <span>• Temps composés : auxiliaire + participe passé. Avec <strong>être</strong>, accord avec le sujet : elle est partie. Pour le participe : mets-le au féminin (prise → pris).</span>
+      <span>• Impératif : trois personnes, sans pronom (chante !, finis !). Subjonctif : après « il faut que » (que je sois, que tu viennes).</span>
+      <span>• -er, -é, -ez, -ait : remplace par vendre, vendu, vendez, vendait.</span>
+    </div>
+  <!--tprint--><p class="tprint-row"><button type="button" class="tprint" data-print><span aria-hidden="true">🖨</span> Imprimer la fiche</button><span>Seulement ce résumé, sur une page.</span></p><!--/tprint-->
+</section>
+
+  <!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"><a class="prev" href="la-grammaire.html"><span>← Précédent</span><strong>La grammaire de la phrase</strong></a></div><div class="tnav-end"><a class="tnav-home" href="francais.html">⌂ Tous les tutoriels de français</a><button type="button" data-share hidden>Partager</button></div></nav><!--/tnav-->
+<footer>Fiche de révision · La conjugaison<!--tmaj--><span class="tmaj" style="display:block;margin-top:6px;font-size:.85rem;opacity:.85">Dernière mise à jour : 24 novembre 2026 · © 2026 Nicolas Meynet</span><!--/tmaj--></footer>
+</main>
+
+<script>
+(function () {
+  /*
+   * Hooks de test : window.__conj
+   *   persons                    -> [{k, pr, label}] (0 = je … 5 = ils / elles)
+   *   tenses                     -> [{k, name, mode, kind:'simple'|'compose', auxT?, ends, use}]
+   *   verbs                      -> [{k, inf, g:0|1|2|3, aux:'avoir'|'etre', pp, t:{pres, imp, ps, fut, cond, ipr, subj}}]
+   *                                 chaque temps simple = 6 formes séparées par des espaces (ipr : 3 formes tu/nous/vous, ou null) ;
+   *                                 « | » sépare radical et terminaison ; une forme sans « | » est irrégulière (affichée en entier).
+   *   conjugate(verbKey, tenseKey, personIndex) -> {text, html, parts:[{t, c}], note} ou null (personne impossible)
+   *   form(verbKey, tenseKey, personIndex)      -> le texte seul, ex. form('chanter','pres',3) = 'nous chantons'
+   *   table(verbKey, tenseKey)                  -> les formes de ce temps (6, ou 3 pour l’impératif)
+   *   splits, checkSplit(k, c)   -> coupe le verbe
+   *   pronouns, checkPronoun(k, c) -> trouve le pronom
+   *   groups, checkGroup(k, c)   -> les groupes ('g1'|'g2'|'g3')
+   *   present, checkPresent(k, c) -> le présent
+   *   timeline                   -> [{k, name, x | x1,x2, ex, txt}]
+   *   story, checkStory(k, c)    -> décor ou action
+   *   futureStems                -> [{inf, f}]
+   *   auxItems, checkAux(k, c)   -> auxiliaire et accord
+   *   participles, checkParticiple(k, c) -> é, i, u, s, t
+   *   whichTense, tenseNames, checkTense(k, c) -> quel temps ?
+   *   traps, checkTrap(k, c)     -> les pièges
+   *   myths, checkMyth(k, c)     -> idées reçues ('vrai'|'mythe')
+   *   quiz                       -> les 8 questions
+   */
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function clamp(i, n) { i = Math.floor(Number(i)); if (!isFinite(i)) i = 0; return Math.max(0, Math.min(n - 1, i)); }
+  function each(list, fn) { Array.prototype.forEach.call(list, fn); }
+  function by(list, k) { return list.filter(function (x) { return x.k === k; })[0] || null; }
+
+  /* Trieur générique (cartes une par une), comme dans les autres tutoriels.
+     Si un item a sa propre liste o (options), elle remplace les boutons communs.
+     Si un item a un champ h (HTML écrit ici), il est affiché à la place de s. */
+  function makeSorter(o) {
+    var idx = 0, ans = {};
+    function opts(it) { return it.o ? it.o : o.order; }
+    function name(c) { return o.names && o.names[c] ? o.names[c] : c; }
+    function render() {
+      var it = o.items[idx], a = ans[it.k];
+      $(o.card).innerHTML = it.h ? it.h : esc(it.s);
+      $(o.pos).textContent = o.word + ' ' + (idx + 1) + ' / ' + o.items.length;
+      $(o.btns).innerHTML = opts(it).map(function (c) {
+        var cls = a ? (c === it.a ? 'right' : (c === a ? 'wrong' : '')) : '';
+        return '<button type="button" data-c="' + esc(c) + '"' + (cls ? ' class="' + cls + '"' : '') + (a ? ' disabled' : '') + '>' + esc(name(c)) + '</button>';
+      }).join('');
+      var out = $(o.out);
+      if (!a) { out.className = 'fbk'; out.innerHTML = ''; }
+      else {
+        var ok = a === it.a;
+        out.className = 'fbk ' + (ok ? 'ok' : 'no');
+        out.innerHTML = '<strong>' + (ok ? 'Bien vu !' : 'Pas tout à fait. Réponse : ' + esc(name(it.a)) + '.') + '</strong><span>' + esc(it.why) + '</span>';
+      }
+      var s = o.score(ans);
+      $(o.score_).textContent = s.correct + ' / ' + s.total;
+      if (s.answered === s.total) $(o.pos).textContent = 'Terminé : ' + s.correct + ' bonnes réponses sur ' + s.total + '.';
+      $(o.prev).disabled = idx === 0;
+      $(o.next).disabled = idx === o.items.length - 1;
+    }
+    $(o.btns).addEventListener('click', function (ev) {
+      var b = ev.target.closest('button'); if (!b || b.disabled) return;
+      var it = o.items[idx]; if (!ans[it.k]) ans[it.k] = b.getAttribute('data-c');
+      render();
+    });
+    $(o.prev).addEventListener('click', function () { idx = clamp(idx - 1, o.items.length); render(); });
+    $(o.next).addEventListener('click', function () { idx = clamp(idx + 1, o.items.length); render(); });
+    $(o.reset).addEventListener('click', function () { ans = {}; idx = 0; render(); });
+    render();
+  }
+  function scorer(items) {
+    return function (ans) { var correct = 0, answered = 0; items.forEach(function (x) { if (ans && ans[x.k]) { answered++; if (ans[x.k] === x.a) correct++; } }); return { correct: correct, answered: answered, total: items.length }; };
+  }
+  function checker(items, valid) {
+    return function (k, c) { var x = by(items, k); if (!x) return null; var ok = valid ? valid(x, c) : true; if (!ok) return null; return { ok: x.a === c, answer: x.a, why: x.why }; };
+  }
+  function inOpts(x, c) { return x.o.indexOf(c) >= 0; }
+  function sorter(id, items, extra) {
+    var o = { items: items, names: null, order: [], btns: id + 'Btns', card: id + 'Card', pos: id + 'Pos', out: id + 'Out', score_: id + 'Score', prev: id + 'Prev', next: id + 'Next', reset: id + 'Reset', word: 'Question', score: scorer(items) };
+    if (extra) for (var key in extra) o[key] = extra[key];
+    makeSorter(o);
+    return o.score;
+  }
+
+  /* ---------- La machine : les données ---------- */
+  var PERSONS = [
+    { k: 0, pr: 'je', label: '1re personne du singulier' },
+    { k: 1, pr: 'tu', label: '2e personne du singulier' },
+    { k: 2, pr: 'il / elle / on', label: '3e personne du singulier' },
+    { k: 3, pr: 'nous', label: '1re personne du pluriel' },
+    { k: 4, pr: 'vous', label: '2e personne du pluriel' },
+    { k: 5, pr: 'ils / elles', label: '3e personne du pluriel' }
+  ];
+  var SUBJ_PR = ['que je', 'que tu', 'qu’il / qu’elle / qu’on', 'que nous', 'que vous', 'qu’ils / qu’elles'];
+  var TENSES = [
+    { k: 'pres', name: 'Présent', mode: 'Indicatif', kind: 'simple', use: 'ce qui se passe maintenant, les habitudes, les vérités générales.' },
+    { k: 'imp', name: 'Imparfait', mode: 'Indicatif', kind: 'simple', ends: '-ais, -ais, -ait, -ions, -iez, -aient', use: 'le décor, ce qui dure ou se répète dans le passé.' },
+    { k: 'ps', name: 'Passé simple', mode: 'Indicatif', kind: 'simple', use: 'les actions d’un récit écrit, surtout à la 3e personne.' },
+    { k: 'pc', name: 'Passé composé', mode: 'Indicatif', kind: 'compose', auxT: 'pres', use: 'une action passée et terminée ; le passé de l’oral.' },
+    { k: 'pqp', name: 'Plus-que-parfait', mode: 'Indicatif', kind: 'compose', auxT: 'imp', use: 'une action passée, avant une autre action passée.' },
+    { k: 'fut', name: 'Futur simple', mode: 'Indicatif', kind: 'simple', ends: '-ai, -as, -a, -ons, -ez, -ont', use: 'ce qui arrivera.' },
+    { k: 'cond', name: 'Conditionnel', mode: 'Conditionnel', kind: 'simple', ends: '-ais, -ais, -ait, -ions, -iez, -aient', use: 'ce qu’on imagine (si…), une demande polie.' },
+    { k: 'ipr', name: 'Impératif', mode: 'Impératif', kind: 'simple', use: 'un ordre, un conseil, une invitation (tu, nous, vous).' },
+    { k: 'subj', name: 'Subjonctif', mode: 'Subjonctif', kind: 'simple', ends: '-e, -es, -e, -ions, -iez, -ent', use: 'après « il faut que », pour une nécessité ou un souhait.' }
+  ];
+  var IPR_P = [1, 3, 4];
+
+  var VERBS = [
+    { k: 'etre', inf: 'être', g: 0, aux: 'avoir', pp: 'été', t: {
+      pres: 'suis es est sommes êtes sont',
+      imp: 'ét|ais ét|ais ét|ait ét|ions ét|iez ét|aient',
+      ps: 'f|us f|us f|ut f|ûmes f|ûtes f|urent',
+      fut: 'ser|ai ser|as ser|a ser|ons ser|ez ser|ont',
+      cond: 'ser|ais ser|ais ser|ait ser|ions ser|iez ser|aient',
+      ipr: 'sois soyons soyez',
+      subj: 'sois sois soit soyons soyez soient' } },
+    { k: 'avoir', inf: 'avoir', g: 0, aux: 'avoir', pp: 'eu', t: {
+      pres: 'ai as a av|ons av|ez ont',
+      imp: 'av|ais av|ais av|ait av|ions av|iez av|aient',
+      ps: 'e|us e|us e|ut e|ûmes e|ûtes e|urent',
+      fut: 'aur|ai aur|as aur|a aur|ons aur|ez aur|ont',
+      cond: 'aur|ais aur|ais aur|ait aur|ions aur|iez aur|aient',
+      ipr: 'aie ayons ayez',
+      subj: 'aie aies ait ayons ayez aient' } },
+    { k: 'chanter', inf: 'chanter', g: 1, aux: 'avoir', pp: 'chanté', t: {
+      pres: 'chant|e chant|es chant|e chant|ons chant|ez chant|ent',
+      imp: 'chant|ais chant|ais chant|ait chant|ions chant|iez chant|aient',
+      ps: 'chant|ai chant|as chant|a chant|âmes chant|âtes chant|èrent',
+      fut: 'chanter|ai chanter|as chanter|a chanter|ons chanter|ez chanter|ont',
+      cond: 'chanter|ais chanter|ais chanter|ait chanter|ions chanter|iez chanter|aient',
+      ipr: 'chant|e chant|ons chant|ez',
+      subj: 'chant|e chant|es chant|e chant|ions chant|iez chant|ent' } },
+    { k: 'jouer', inf: 'jouer', g: 1, aux: 'avoir', pp: 'joué', t: {
+      pres: 'jou|e jou|es jou|e jou|ons jou|ez jou|ent',
+      imp: 'jou|ais jou|ais jou|ait jou|ions jou|iez jou|aient',
+      ps: 'jou|ai jou|as jou|a jou|âmes jou|âtes jou|èrent',
+      fut: 'jouer|ai jouer|as jouer|a jouer|ons jouer|ez jouer|ont',
+      cond: 'jouer|ais jouer|ais jouer|ait jouer|ions jouer|iez jouer|aient',
+      ipr: 'jou|e jou|ons jou|ez',
+      subj: 'jou|e jou|es jou|e jou|ions jou|iez jou|ent' } },
+    { k: 'manger', inf: 'manger', g: 1, aux: 'avoir', pp: 'mangé', note: 'Devant a et o, on garde un « e » pour entendre « j » : nous mangeons, il mangeait.', t: {
+      pres: 'mang|e mang|es mang|e mange|ons mang|ez mang|ent',
+      imp: 'mange|ais mange|ais mange|ait mang|ions mang|iez mange|aient',
+      ps: 'mange|ai mange|as mange|a mange|âmes mange|âtes mang|èrent',
+      fut: 'manger|ai manger|as manger|a manger|ons manger|ez manger|ont',
+      cond: 'manger|ais manger|ais manger|ait manger|ions manger|iez manger|aient',
+      ipr: 'mang|e mange|ons mang|ez',
+      subj: 'mang|e mang|es mang|e mang|ions mang|iez mang|ent' } },
+    { k: 'arriver', inf: 'arriver', g: 1, aux: 'etre', pp: 'arrivé', t: {
+      pres: 'arriv|e arriv|es arriv|e arriv|ons arriv|ez arriv|ent',
+      imp: 'arriv|ais arriv|ais arriv|ait arriv|ions arriv|iez arriv|aient',
+      ps: 'arriv|ai arriv|as arriv|a arriv|âmes arriv|âtes arriv|èrent',
+      fut: 'arriver|ai arriver|as arriver|a arriver|ons arriver|ez arriver|ont',
+      cond: 'arriver|ais arriver|ais arriver|ait arriver|ions arriver|iez arriver|aient',
+      ipr: 'arriv|e arriv|ons arriv|ez',
+      subj: 'arriv|e arriv|es arriv|e arriv|ions arriv|iez arriv|ent' } },
+    { k: 'tomber', inf: 'tomber', g: 1, aux: 'etre', pp: 'tombé', t: {
+      pres: 'tomb|e tomb|es tomb|e tomb|ons tomb|ez tomb|ent',
+      imp: 'tomb|ais tomb|ais tomb|ait tomb|ions tomb|iez tomb|aient',
+      ps: 'tomb|ai tomb|as tomb|a tomb|âmes tomb|âtes tomb|èrent',
+      fut: 'tomber|ai tomber|as tomber|a tomber|ons tomber|ez tomber|ont',
+      cond: 'tomber|ais tomber|ais tomber|ait tomber|ions tomber|iez tomber|aient',
+      ipr: 'tomb|e tomb|ons tomb|ez',
+      subj: 'tomb|e tomb|es tomb|e tomb|ions tomb|iez tomb|ent' } },
+    { k: 'finir', inf: 'finir', g: 2, aux: 'avoir', pp: 'fini', t: {
+      pres: 'fin|is fin|is fin|it fin|issons fin|issez fin|issent',
+      imp: 'fin|issais fin|issais fin|issait fin|issions fin|issiez fin|issaient',
+      ps: 'fin|is fin|is fin|it fin|îmes fin|îtes fin|irent',
+      fut: 'finir|ai finir|as finir|a finir|ons finir|ez finir|ont',
+      cond: 'finir|ais finir|ais finir|ait finir|ions finir|iez finir|aient',
+      ipr: 'fin|is fin|issons fin|issez',
+      subj: 'fin|isse fin|isses fin|isse fin|issions fin|issiez fin|issent' } },
+    { k: 'choisir', inf: 'choisir', g: 2, aux: 'avoir', pp: 'choisi', t: {
+      pres: 'chois|is chois|is chois|it chois|issons chois|issez chois|issent',
+      imp: 'chois|issais chois|issais chois|issait chois|issions chois|issiez chois|issaient',
+      ps: 'chois|is chois|is chois|it chois|îmes chois|îtes chois|irent',
+      fut: 'choisir|ai choisir|as choisir|a choisir|ons choisir|ez choisir|ont',
+      cond: 'choisir|ais choisir|ais choisir|ait choisir|ions choisir|iez choisir|aient',
+      ipr: 'chois|is chois|issons chois|issez',
+      subj: 'chois|isse chois|isses chois|isse chois|issions chois|issiez chois|issent' } },
+    { k: 'grandir', inf: 'grandir', g: 2, aux: 'avoir', pp: 'grandi', t: {
+      pres: 'grand|is grand|is grand|it grand|issons grand|issez grand|issent',
+      imp: 'grand|issais grand|issais grand|issait grand|issions grand|issiez grand|issaient',
+      ps: 'grand|is grand|is grand|it grand|îmes grand|îtes grand|irent',
+      fut: 'grandir|ai grandir|as grandir|a grandir|ons grandir|ez grandir|ont',
+      cond: 'grandir|ais grandir|ais grandir|ait grandir|ions grandir|iez grandir|aient',
+      ipr: 'grand|is grand|issons grand|issez',
+      subj: 'grand|isse grand|isses grand|isse grand|issions grand|issiez grand|issent' } },
+    { k: 'aller', inf: 'aller', g: 3, aux: 'etre', pp: 'allé', note: 'Aller est le seul verbe en -er du 3e groupe. Il a trois radicaux : v-, all-, ir-.', t: {
+      pres: 'vais vas va all|ons all|ez vont',
+      imp: 'all|ais all|ais all|ait all|ions all|iez all|aient',
+      ps: 'all|ai all|as all|a all|âmes all|âtes all|èrent',
+      fut: 'ir|ai ir|as ir|a ir|ons ir|ez ir|ont',
+      cond: 'ir|ais ir|ais ir|ait ir|ions ir|iez ir|aient',
+      ipr: 'va all|ons all|ez',
+      subj: 'aill|e aill|es aill|e all|ions all|iez aill|ent' } },
+    { k: 'faire', inf: 'faire', g: 3, aux: 'avoir', pp: 'fait', t: {
+      pres: 'fai|s fai|s fai|t fais|ons faites font',
+      imp: 'fais|ais fais|ais fais|ait fais|ions fais|iez fais|aient',
+      ps: 'f|is f|is f|it f|îmes f|îtes f|irent',
+      fut: 'fer|ai fer|as fer|a fer|ons fer|ez fer|ont',
+      cond: 'fer|ais fer|ais fer|ait fer|ions fer|iez fer|aient',
+      ipr: 'fai|s fais|ons faites',
+      subj: 'fass|e fass|es fass|e fass|ions fass|iez fass|ent' } },
+    { k: 'dire', inf: 'dire', g: 3, aux: 'avoir', pp: 'dit', t: {
+      pres: 'di|s di|s di|t dis|ons dites dis|ent',
+      imp: 'dis|ais dis|ais dis|ait dis|ions dis|iez dis|aient',
+      ps: 'd|is d|is d|it d|îmes d|îtes d|irent',
+      fut: 'dir|ai dir|as dir|a dir|ons dir|ez dir|ont',
+      cond: 'dir|ais dir|ais dir|ait dir|ions dir|iez dir|aient',
+      ipr: 'di|s dis|ons dites',
+      subj: 'dis|e dis|es dis|e dis|ions dis|iez dis|ent' } },
+    { k: 'pouvoir', inf: 'pouvoir', g: 3, aux: 'avoir', pp: 'pu', t: {
+      pres: 'peu|x peu|x peu|t pouv|ons pouv|ez peuv|ent',
+      imp: 'pouv|ais pouv|ais pouv|ait pouv|ions pouv|iez pouv|aient',
+      ps: 'p|us p|us p|ut p|ûmes p|ûtes p|urent',
+      fut: 'pourr|ai pourr|as pourr|a pourr|ons pourr|ez pourr|ont',
+      cond: 'pourr|ais pourr|ais pourr|ait pourr|ions pourr|iez pourr|aient',
+      ipr: null,
+      subj: 'puiss|e puiss|es puiss|e puiss|ions puiss|iez puiss|ent' } },
+    { k: 'vouloir', inf: 'vouloir', g: 3, aux: 'avoir', pp: 'voulu', t: {
+      pres: 'veu|x veu|x veu|t voul|ons voul|ez veul|ent',
+      imp: 'voul|ais voul|ais voul|ait voul|ions voul|iez voul|aient',
+      ps: 'voul|us voul|us voul|ut voul|ûmes voul|ûtes voul|urent',
+      fut: 'voudr|ai voudr|as voudr|a voudr|ons voudr|ez voudr|ont',
+      cond: 'voudr|ais voudr|ais voudr|ait voudr|ions voudr|iez voudr|aient',
+      ipr: 'veuill|e veuill|ons veuill|ez',
+      subj: 'veuill|e veuill|es veuill|e voul|ions voul|iez veuill|ent' } },
+    { k: 'venir', inf: 'venir', g: 3, aux: 'etre', pp: 'venu', t: {
+      pres: 'vien|s vien|s vien|t ven|ons ven|ez vienn|ent',
+      imp: 'ven|ais ven|ais ven|ait ven|ions ven|iez ven|aient',
+      ps: 'v|ins v|ins v|int v|înmes v|întes v|inrent',
+      fut: 'viendr|ai viendr|as viendr|a viendr|ons viendr|ez viendr|ont',
+      cond: 'viendr|ais viendr|ais viendr|ait viendr|ions viendr|iez viendr|aient',
+      ipr: 'vien|s ven|ons ven|ez',
+      subj: 'vienn|e vienn|es vienn|e ven|ions ven|iez vienn|ent' } },
+    { k: 'prendre', inf: 'prendre', g: 3, aux: 'avoir', pp: 'pris', note: 'Il prend : pas de terminaison, le « d » fait partie du radical.', t: {
+      pres: 'prend|s prend|s prend| pren|ons pren|ez prenn|ent',
+      imp: 'pren|ais pren|ais pren|ait pren|ions pren|iez pren|aient',
+      ps: 'pr|is pr|is pr|it pr|îmes pr|îtes pr|irent',
+      fut: 'prendr|ai prendr|as prendr|a prendr|ons prendr|ez prendr|ont',
+      cond: 'prendr|ais prendr|ais prendr|ait prendr|ions prendr|iez prendr|aient',
+      ipr: 'prend|s pren|ons pren|ez',
+      subj: 'prenn|e prenn|es prenn|e pren|ions pren|iez prenn|ent' } },
+    { k: 'voir', inf: 'voir', g: 3, aux: 'avoir', pp: 'vu', t: {
+      pres: 'voi|s voi|s voi|t voy|ons voy|ez voi|ent',
+      imp: 'voy|ais voy|ais voy|ait voy|ions voy|iez voy|aient',
+      ps: 'v|is v|is v|it v|îmes v|îtes v|irent',
+      fut: 'verr|ai verr|as verr|a verr|ons verr|ez verr|ont',
+      cond: 'verr|ais verr|ais verr|ait verr|ions verr|iez verr|aient',
+      ipr: 'voi|s voy|ons voy|ez',
+      subj: 'voi|e voi|es voi|e voy|ions voy|iez voi|ent' } },
+    { k: 'savoir', inf: 'savoir', g: 3, aux: 'avoir', pp: 'su', t: {
+      pres: 'sai|s sai|s sai|t sav|ons sav|ez sav|ent',
+      imp: 'sav|ais sav|ais sav|ait sav|ions sav|iez sav|aient',
+      ps: 's|us s|us s|ut s|ûmes s|ûtes s|urent',
+      fut: 'saur|ai saur|as saur|a saur|ons saur|ez saur|ont',
+      cond: 'saur|ais saur|ais saur|ait saur|ions saur|iez saur|aient',
+      ipr: 'sach|e sach|ons sach|ez',
+      subj: 'sach|e sach|es sach|e sach|ions sach|iez sach|ent' } },
+    { k: 'devoir', inf: 'devoir', g: 3, aux: 'avoir', pp: 'dû', note: 'Le participe dû prend un accent circonflexe au masculin singulier seulement : dû, mais due, dus, dues.', t: {
+      pres: 'doi|s doi|s doi|t dev|ons dev|ez doiv|ent',
+      imp: 'dev|ais dev|ais dev|ait dev|ions dev|iez dev|aient',
+      ps: 'd|us d|us d|ut d|ûmes d|ûtes d|urent',
+      fut: 'devr|ai devr|as devr|a devr|ons devr|ez devr|ont',
+      cond: 'devr|ais devr|ais devr|ait devr|ions devr|iez devr|aient',
+      ipr: null,
+      subj: 'doiv|e doiv|es doiv|e dev|ions dev|iez doiv|ent' } },
+    { k: 'mettre', inf: 'mettre', g: 3, aux: 'avoir', pp: 'mis', note: 'Il met : pas de terminaison. Un seul t au singulier, deux t au pluriel.', t: {
+      pres: 'met|s met|s met| mett|ons mett|ez mett|ent',
+      imp: 'mett|ais mett|ais mett|ait mett|ions mett|iez mett|aient',
+      ps: 'm|is m|is m|it m|îmes m|îtes m|irent',
+      fut: 'mettr|ai mettr|as mettr|a mettr|ons mettr|ez mettr|ont',
+      cond: 'mettr|ais mettr|ais mettr|ait mettr|ions mettr|iez mettr|aient',
+      ipr: 'met|s mett|ons mett|ez',
+      subj: 'mett|e mett|es mett|e mett|ions mett|iez mett|ent' } },
+    { k: 'partir', inf: 'partir', g: 3, aux: 'etre', pp: 'parti', note: 'Partir est du 3e groupe : nous partons (et pas « partissons »).', t: {
+      pres: 'par|s par|s par|t part|ons part|ez part|ent',
+      imp: 'part|ais part|ais part|ait part|ions part|iez part|aient',
+      ps: 'part|is part|is part|it part|îmes part|îtes part|irent',
+      fut: 'partir|ai partir|as partir|a partir|ons partir|ez partir|ont',
+      cond: 'partir|ais partir|ais partir|ait partir|ions partir|iez partir|aient',
+      ipr: 'par|s part|ons part|ez',
+      subj: 'part|e part|es part|e part|ions part|iez part|ent' } },
+    { k: 'lire', inf: 'lire', g: 3, aux: 'avoir', pp: 'lu', t: {
+      pres: 'li|s li|s li|t lis|ons lis|ez lis|ent',
+      imp: 'lis|ais lis|ais lis|ait lis|ions lis|iez lis|aient',
+      ps: 'l|us l|us l|ut l|ûmes l|ûtes l|urent',
+      fut: 'lir|ai lir|as lir|a lir|ons lir|ez lir|ont',
+      cond: 'lir|ais lir|ais lir|ait lir|ions lir|iez lir|aient',
+      ipr: 'li|s lis|ons lis|ez',
+      subj: 'lis|e lis|es lis|e lis|ions lis|iez lis|ent' } },
+    { k: 'ecrire', inf: 'écrire', g: 3, aux: 'avoir', pp: 'écrit', t: {
+      pres: 'écri|s écri|s écri|t écriv|ons écriv|ez écriv|ent',
+      imp: 'écriv|ais écriv|ais écriv|ait écriv|ions écriv|iez écriv|aient',
+      ps: 'écriv|is écriv|is écriv|it écriv|îmes écriv|îtes écriv|irent',
+      fut: 'écrir|ai écrir|as écrir|a écrir|ons écrir|ez écrir|ont',
+      cond: 'écrir|ais écrir|ais écrir|ait écrir|ions écrir|iez écrir|aient',
+      ipr: 'écri|s écriv|ons écriv|ez',
+      subj: 'écriv|e écriv|es écriv|e écriv|ions écriv|iez écriv|ent' } },
+    { k: 'rendre', inf: 'rendre', g: 3, aux: 'avoir', pp: 'rendu', note: 'Il rend : pas de terminaison, le « d » fait partie du radical.', t: {
+      pres: 'rend|s rend|s rend| rend|ons rend|ez rend|ent',
+      imp: 'rend|ais rend|ais rend|ait rend|ions rend|iez rend|aient',
+      ps: 'rend|is rend|is rend|it rend|îmes rend|îtes rend|irent',
+      fut: 'rendr|ai rendr|as rendr|a rendr|ons rendr|ez rendr|ont',
+      cond: 'rendr|ais rendr|ais rendr|ait rendr|ions rendr|iez rendr|aient',
+      ipr: 'rend|s rend|ons rend|ez',
+      subj: 'rend|e rend|es rend|e rend|ions rend|iez rend|ent' } }
+  ];
+  /* Accord du participe avec être (formes écrites ici, pas calculées au hasard) */
+  var PP_ETRE = {
+    arriver: ['arrivé(e)', 'arrivé(e)s'], tomber: ['tombé(e)', 'tombé(e)s'], aller: ['allé(e)', 'allé(e)s'],
+    venir: ['venu(e)', 'venu(e)s'], partir: ['parti(e)', 'parti(e)s']
+  };
+
+  function vowel(s) { return /^[aeéèêiîoôuyh]/i.test(s); }
+  function parse(f) {
+    var i = f.indexOf('|');
+    if (i < 0) return [{ t: f, c: 'irr' }];
+    var r = f.slice(0, i), e = f.slice(i + 1);
+    return e ? [{ t: r, c: 'rd' }, { t: e, c: 'tm' }] : [{ t: r, c: 'rd' }];
+  }
+  function plain(f) { return f.replace('|', ''); }
+  function pronoun(tk, p, first) {
+    if (tk === 'ipr') return '';
+    if (tk === 'subj') return p === 0 && vowel(first) ? 'que j’' : SUBJ_PR[p] + ' ';
+    return p === 0 && vowel(first) ? 'j’' : PERSONS[p].pr + ' ';
+  }
+  function conjugate(vk, tk, p) {
+    var V = by(VERBS, vk), T = by(TENSES, tk); p = Math.floor(Number(p));
+    if (!V || !T || !(p >= 0 && p <= 5)) return null;
+    var parts, note = '';
+    if (T.kind === 'compose') {
+      var AUX = by(VERBS, V.aux === 'etre' ? 'etre' : 'avoir');
+      var af = plain(AUX.t[T.auxT].split(' ')[p]);
+      var pp = V.aux === 'etre' ? PP_ETRE[V.k][p < 3 ? 0 : 1] : V.pp;
+      parts = [{ t: af, c: 'ax' }, { t: ' ', c: '' }, { t: pp, c: 'pp' }];
+      note = 'Auxiliaire ' + (V.aux === 'etre' ? 'être' : 'avoir') + ' ' + (T.auxT === 'pres' ? 'au présent' : 'à l’imparfait') + ' + participe passé « ' + V.pp + ' ».' + (V.aux === 'etre' ? ' Avec être, le participe s’accorde avec le sujet : (e) au féminin, s au pluriel.' : '');
+      var pr = pronoun(tk, p, af);
+      return { text: pr + af + ' ' + pp, html: '<span class="pr">' + esc(pr) + '</span>' + html(parts), parts: parts, note: note };
+    }
+    var raw = V.t[tk];
+    if (!raw) return { text: '', html: '', parts: [], note: 'Ce verbe ne s’emploie pas (ou presque jamais) à l’impératif.', none: true };
+    var forms = raw.split(' '), f;
+    if (tk === 'ipr') { var j = IPR_P.indexOf(p); if (j < 0) return null; f = forms[j]; }
+    else f = forms[p];
+    parts = parse(f);
+    var txt = plain(f), pr2 = pronoun(tk, p, txt);
+    if (parts.length === 1 && parts[0].c === 'irr') note = 'Forme irrégulière : à apprendre par cœur.';
+    else if (parts.length === 1) note = 'Radical « ' + parts[0].t + ' », sans terminaison.';
+    else note = 'Radical « ' + parts[0].t + ' » + terminaison « -' + parts[1].t + ' ».';
+    return { text: pr2 + txt, html: (pr2 ? '<span class="pr">' + esc(pr2) + '</span>' : '') + html(parts), parts: parts, note: note };
+  }
+  function html(parts) { return parts.map(function (x) { return x.c ? '<span class="' + x.c + '">' + esc(x.t) + '</span>' : esc(x.t); }).join(''); }
+  function form(vk, tk, p) { var r = conjugate(vk, tk, p); return r ? r.text : null; }
+  function table(vk, tk) {
+    var ps = tk === 'ipr' ? IPR_P : [0, 1, 2, 3, 4, 5];
+    return ps.map(function (p) { return form(vk, tk, p); });
+  }
+
+  /* ---------- 1. Coupe le verbe ---------- */
+  var SPLIT = [
+    { k: 'chantons', s: 'nous chantons', o: ['cha + ntons', 'chant + ons', 'chanto + ns'], a: 'chant + ons', why: 'Le radical chant porte le sens (chanter) ; -ons dit « nous, au présent ».' },
+    { k: 'jouaient', s: 'ils jouaient', o: ['jou + aient', 'joua + ient', 'jouai + ent'], a: 'jou + aient', why: 'Radical jou- (jouer) ; -aient dit « ils, à l’imparfait ».' },
+    { k: 'arrivez', s: 'vous arrivez', o: ['arri + vez', 'arriv + ez', 'arrive + z'], a: 'arriv + ez', why: 'Radical arriv- ; -ez, la terminaison de « vous ».' },
+    { k: 'parles', s: 'tu parles', o: ['par + les', 'parl + es', 'parle + s'], a: 'parl + es', why: 'Radical parl- ; au 1er groupe, tu → -es.' },
+    { k: 'finis', s: 'je finis', o: ['fin + is', 'fini + s', 'f + inis'], a: 'fin + is', why: 'Au 2e groupe, on apprend le radical fin- et les terminaisons -is, -is, -it, -issons, -issez, -issent.' },
+    { k: 'lisons', s: 'nous lisons', o: ['li + sons', 'lis + ons', 'liso + ns'], a: 'lis + ons', why: 'Au pluriel, le radical de lire devient lis- : nous lisons, vous lisez. Au singulier : je li|s.' },
+    { k: 'ecrivent', s: 'ils écrivent', o: ['écri + vent', 'écriv + ent', 'écrive + nt'], a: 'écriv + ent', why: 'Le radical change : j’écris, mais nous écrivons, ils écrivent. Beaucoup de verbes du 3e groupe ont plusieurs radicaux.' }
+  ];
+  var checkSplit = checker(SPLIT, inOpts);
+  sorter('sp', SPLIT, { word: 'Verbe' });
+
+  /* ---------- 2. Trouve le pronom ---------- */
+  var PRNAMES = { p1: 'je (j’)', p2: 'tu', p3: 'il / elle / on', p4: 'nous', p5: 'vous', p6: 'ils / elles' };
+  var PRON = [
+    { k: 'chantons', s: '___ chantons dans le chœur de l’école.', a: 'p4', why: '-ons : c’est « nous ».' },
+    { k: 'finissez', s: '___ finissez vos devoirs avant le souper ?', a: 'p5', why: '-ez : c’est « vous ».' },
+    { k: 'prennent', s: '___ prennent le train de 7 h 12.', a: 'p6', why: '-ent : c’est « ils » ou « elles ».' },
+    { k: 'vais', s: '___ vais à la piscine.', a: 'p1', why: 'Je vais, tu vas, il va : « vais » va avec je.' },
+    { k: 'vas', s: '___ vas au cours de vélo ?', a: 'p2', why: 'Tu vas : avec tu, la terminaison finit par s.' },
+    { k: 'sommes', s: '___ sommes en 10H.', a: 'p4', why: 'Nous sommes : une forme irrégulière du verbe être.' },
+    { k: 'etes', s: '___ êtes en avance.', a: 'p5', why: 'Vous êtes : une des trois formes en -tes (êtes, faites, dites).' },
+    { k: 'suis', s: '___ suis content de te voir.', a: 'p1', why: 'Je suis : verbe être.' },
+    { k: 'font', s: '___ font du ski à Verbier.', a: 'p6', why: 'Ils font, comme ils sont, ils ont, ils vont.' },
+    { k: 'a', s: '___ a oublié son natel.', a: 'p3', why: 'Il a, elle a, on a : verbe avoir, 3e personne du singulier.' },
+    { k: 'es', s: '___ es déjà là ?', a: 'p2', why: 'Tu es : verbe être.' }
+  ];
+  var checkPronoun = checker(PRON, function (x, c) { return !!PRNAMES[c]; });
+  sorter('pe', PRON, { names: PRNAMES, order: ['p1', 'p2', 'p3', 'p4', 'p5', 'p6'], word: 'Phrase' });
+
+  /* ---------- 3. Les groupes ---------- */
+  var GRNAMES = { g1: '1er groupe', g2: '2e groupe', g3: '3e groupe' };
+  var GROUPS = [
+    { k: 'chanter', s: 'chanter', a: 'g1', why: 'Infinitif en -er : 1er groupe.' },
+    { k: 'aller', s: 'aller', a: 'g3', why: 'Le piège ! Aller finit en -er, mais il est très irrégulier (je vais, j’irai). C’est le seul verbe en -er du 3e groupe.' },
+    { k: 'finir', s: 'finir', a: 'g2', why: 'Nous finissons : -ir avec -issons, 2e groupe.' },
+    { k: 'partir', s: 'partir', a: 'g3', why: 'Nous partons (et pas « partissons ») : 3e groupe.' },
+    { k: 'choisir', s: 'choisir', a: 'g2', why: 'Nous choisissons : 2e groupe.' },
+    { k: 'courir', s: 'courir', a: 'g3', why: 'Nous courons : pas de -issons, 3e groupe.' },
+    { k: 'manger', s: 'manger', a: 'g1', why: 'Infinitif en -er : 1er groupe (avec un « e » en plus dans nous mangeons).' },
+    { k: 'grandir', s: 'grandir', a: 'g2', why: 'Nous grandissons : 2e groupe.' },
+    { k: 'venir', s: 'venir', a: 'g3', why: 'Nous venons : 3e groupe.' },
+    { k: 'voir', s: 'voir', a: 'g3', why: 'Infinitif en -oir : 3e groupe.' },
+    { k: 'prendre', s: 'prendre', a: 'g3', why: 'Infinitif en -re : 3e groupe.' },
+    { k: 'envoyer', s: 'envoyer', a: 'g1', why: 'Infinitif en -er : 1er groupe, même si son futur est spécial (j’enverrai).' },
+    { k: 'rougir', s: 'rougir', a: 'g2', why: 'Nous rougissons : 2e groupe.' },
+    { k: 'sortir', s: 'sortir', a: 'g3', why: 'Nous sortons : 3e groupe.' },
+    { k: 'reussir', s: 'réussir', a: 'g2', why: 'Nous réussissons : 2e groupe.' },
+    { k: 'faire', s: 'faire', a: 'g3', why: 'Infinitif en -re : 3e groupe.' },
+    { k: 'dormir', s: 'dormir', a: 'g3', why: 'Nous dormons : 3e groupe.' },
+    { k: 'applaudir', s: 'applaudir', a: 'g2', why: 'Nous applaudissons : 2e groupe.' }
+  ];
+  var checkGroup = checker(GROUPS, function (x, c) { return !!GRNAMES[c]; });
+  sorter('gr', GROUPS, { names: GRNAMES, order: ['g1', 'g2', 'g3'], word: 'Verbe' });
+
+  /* ---------- 4. Le présent ---------- */
+  var PRES = [
+    { k: 'faisons', h: 'Nous ___ une sortie au Creux-du-Van.<small>verbe faire</small>', s: 'Nous ___ une sortie au Creux-du-Van. (faire)', o: ['faisons', 'fesons', 'faissons'], a: 'faisons', why: 'Nous faisons : on prononce « fe », mais on écrit « fai ».' },
+    { k: 'dites', h: 'Vous ___ toujours la vérité.<small>verbe dire</small>', s: 'Vous ___ toujours la vérité. (dire)', o: ['disez', 'dites', 'dîtes'], a: 'dites', why: 'Vous dites, comme vous faites et vous êtes. « Vous dîtes », avec un accent, c’est le passé simple.' },
+    { k: 'vont', h: 'Mes parents ___ à Berne en train.<small>verbe aller</small>', s: 'Mes parents ___ à Berne en train. (aller)', o: ['allent', 'vont', 'vas'], a: 'vont', why: 'Ils vont : aller est très irrégulier au présent.' },
+    { k: 'veux', h: 'Je ___ un chocolat chaud.<small>verbe vouloir</small>', s: 'Je ___ un chocolat chaud. (vouloir)', o: ['veut', 'veux', 'voulx'], a: 'veux', why: 'Je veux, tu veux (avec x), il veut (avec t).' },
+    { k: 'peux', h: 'Tu ___ venir avec nous.<small>verbe pouvoir</small>', s: 'Tu ___ venir avec nous. (pouvoir)', o: ['peux', 'peut', 'peus'], a: 'peux', why: 'Tu peux, avec x. Il peut, avec t.' },
+    { k: 'vient', h: 'Léa ___ de Neuchâtel.<small>verbe venir</small>', s: 'Léa ___ de Neuchâtel. (venir)', o: ['vient', 'viens', 'vien'], a: 'vient', why: 'Léa = elle : elle vient, avec t.' },
+    { k: 'prennent', h: 'Les élèves ___ le bus.<small>verbe prendre</small>', s: 'Les élèves ___ le bus. (prendre)', o: ['prendent', 'prennent', 'prenent'], a: 'prennent', why: 'Ils prennent : le d disparaît et on double le n.' },
+    { k: 'voyons', h: 'Nous ___ le lac depuis la fenêtre.<small>verbe voir</small>', s: 'Nous ___ le lac depuis la fenêtre. (voir)', o: ['voions', 'voyons', 'voyions'], a: 'voyons', why: 'Nous voyons. « Voyions » est l’imparfait (ou le subjonctif).' },
+    { k: 'etes', h: 'Vous ___ en avance.<small>verbe être</small>', s: 'Vous ___ en avance. (être)', o: ['êtes', 'étez', 'sommez'], a: 'êtes', why: 'Vous êtes : forme irrégulière, à connaître par cœur.' },
+    { k: 'font', h: 'Ils ___ du vélo le dimanche.<small>verbe faire</small>', s: 'Ils ___ du vélo le dimanche. (faire)', o: ['faisent', 'font', 'fonts'], a: 'font', why: 'Ils font, comme ils sont, ils ont, ils vont.' }
+  ];
+  var checkPresent = checker(PRES, inOpts);
+  sorter('pr', PRES, { word: 'Phrase' });
+
+  /* ---------- 5. La ligne du temps ---------- */
+  var TL = [
+    { k: 'pqp', name: 'Plus-que-parfait', x: 62, ex: 'Quand je suis arrivé à la gare, le train était déjà parti.', txt: 'Une action passée, terminée AVANT une autre action passée.' },
+    { k: 'ps', name: 'Passé simple', x: 120, ex: 'La skieuse s’élança et descendit la piste.', txt: 'Une action passée et courte, dans un récit écrit.' },
+    { k: 'imp', name: 'Imparfait', x1: 86, x2: 176, ex: 'Quand j’étais petit, j’allais à l’école à pied.', txt: 'Une action passée qui dure ou qui se répète, ou une description (le décor).' },
+    { k: 'pc', name: 'Passé composé', x: 168, ex: 'Hier, j’ai pris le train pour Sion.', txt: 'Une action passée et terminée. C’est le temps du passé le plus utilisé quand on parle.' },
+    { k: 'pres', name: 'Présent', x1: 206, x2: 234, ex: 'En ce moment, je lis ce tutoriel.', txt: 'Ce qui se passe maintenant. Aussi les habitudes et les vérités générales.' },
+    { k: 'fut', name: 'Futur simple', x: 300, ex: 'L’été prochain, nous irons au Tessin.', txt: 'Ce qui arrivera après maintenant.' },
+    { k: 'cond', name: 'Conditionnel', cloud: true, x: 290, ex: 'Si j’avais un vélo électrique, je monterais au Chasseral.', txt: 'Pas vraiment sur la ligne : une action imaginée, possible si une condition est remplie. Aussi pour être poli : « Je voudrais… ».' }
+  ];
+  var tlCur = 'pres';
+  function tlLabelX(x, label) { var w = label.length * 8.6; return Math.max(w / 2 + 4, Math.min(356 - w / 2, x)); }
+  function tlRender() {
+    var T = by(TL, tlCur) || TL[0], g = '';
+    TL.forEach(function (o) { if (!o.cloud) { var cx = o.x != null ? o.x : (o.x1 + o.x2) / 2; g += '<circle class="ghost" cx="' + cx + '" cy="112" r="4"/>'; } });
+    if (T.cloud) {
+      g += '<ellipse class="cloud" cx="' + T.x + '" cy="52" rx="58" ry="24"/>';
+      g += '<text class="clab" x="' + tlLabelX(T.x, 'si… alors…') + '" y="57" text-anchor="middle">si… alors…</text>';
+      g += '<text class="clab" x="' + tlLabelX(T.x, T.name) + '" y="20" text-anchor="middle">' + esc(T.name) + '</text>';
+    } else if (T.x1 != null) {
+      g += '<rect class="bar" x="' + T.x1 + '" y="104" width="' + (T.x2 - T.x1) + '" height="16" rx="4"/>';
+      var cx2 = (T.x1 + T.x2) / 2;
+      g += '<text class="mlab" x="' + tlLabelX(cx2, T.name) + '" y="90" text-anchor="middle">' + esc(T.name) + '</text>';
+    } else {
+      g += '<circle class="mk" cx="' + T.x + '" cy="112" r="9"/>';
+      g += '<text class="mlab" x="' + tlLabelX(T.x, T.name) + '" y="90" text-anchor="middle">' + esc(T.name) + '</text>';
+      if (T.k === 'pqp') g += '<line x1="74" y1="112" x2="164" y2="112" style="stroke:var(--acc-ink);stroke-width:5;opacity:.5"/><circle class="ghost" cx="168" cy="112" r="7" style="fill:var(--two)"/><text class="lbl" x="120" y="62" text-anchor="middle">avant un autre passé</text>';
+    }
+    $('tlMark').innerHTML = g;
+    each($('tlBtns').querySelectorAll('button'), function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-k') === T.k ? 'true' : 'false'); });
+    $('tlOut').innerHTML = '<strong>' + esc(T.name) + '</strong><span>' + esc(T.txt) + '</span><span><em>' + esc(T.ex) + '</em></span>';
+  }
+  $('tlBtns').innerHTML = TL.map(function (o) { return '<button type="button" data-k="' + o.k + '" aria-pressed="false">' + esc(o.name) + '</button>'; }).join('');
+  $('tlBtns').addEventListener('click', function (e) { var b = e.target.closest('button'); if (!b) return; tlCur = b.getAttribute('data-k'); tlRender(); });
+  tlRender();
+
+  /* ---------- 6. Décor ou action ? ---------- */
+  var STORY = [
+    { k: 's1', s: 'Ce matin-là, il ___ beau sur le Léman.', o: ['faisait', 'fit'], a: 'faisait', why: 'C’est le décor : le temps qu’il fait. Imparfait.' },
+    { k: 's2', s: 'Des voiliers ___ doucement près de Morges.', o: ['glissaient', 'glissèrent'], a: 'glissaient', why: 'Une action qui dure, en arrière-plan : imparfait.' },
+    { k: 's3', s: 'Soudain, le vent ___.', o: ['se levait', 'se leva'], a: 'se leva', why: '« Soudain » annonce une action brève qui fait avancer l’histoire : passé simple.' },
+    { k: 's4', s: 'Aussitôt, la capitaine ___ la voile.', o: ['baissait', 'baissa'], a: 'baissa', why: 'Une action courte, l’une après l’autre : passé simple.' },
+    { k: 's5', s: 'Pendant tout ce temps, une mouette ___ au-dessus du bateau.', o: ['tournait', 'tourna'], a: 'tournait', why: '« Pendant tout ce temps » : une action qui dure. Imparfait.' },
+    { k: 's6', s: 'Enfin, le bateau ___ au port d’Ouchy.', o: ['arrivait', 'arriva'], a: 'arriva', why: 'L’action qui termine l’histoire : passé simple.' }
+  ];
+  var checkStory = checker(STORY, inOpts);
+  sorter('st', STORY, { word: 'Phrase' });
+
+  /* ---------- 7. Futurs à radical spécial ---------- */
+  var FUTR = [
+    { inf: 'être', f: 'je serai' }, { inf: 'avoir', f: 'j’aurai' }, { inf: 'aller', f: 'j’irai' }, { inf: 'faire', f: 'je ferai' },
+    { inf: 'pouvoir', f: 'je pourrai' }, { inf: 'vouloir', f: 'je voudrai' }, { inf: 'venir', f: 'je viendrai' }, { inf: 'voir', f: 'je verrai' },
+    { inf: 'savoir', f: 'je saurai' }, { inf: 'devoir', f: 'je devrai' }, { inf: 'envoyer', f: 'j’enverrai' }, { inf: 'courir', f: 'je courrai' }
+  ];
+  var fuState = FUTR.map(function () { return false; });
+  function fuRender(active) {
+    $('fuGrid').innerHTML = FUTR.map(function (r, i) {
+      var nv = fuState[i];
+      return '<button type="button" data-i="' + i + '"' + (nv ? ' class="nv"' : '') + '><span class="w">' + esc(nv ? r.f : r.inf) + '</span><span class="k">' + (nv ? 'futur' : 'infinitif') + '</span></button>';
+    }).join('');
+    var out = $('fuOut');
+    if (active == null) { out.innerHTML = '<strong>Touche un verbe</strong><span>Le conditionnel garde le même radical : je serai → je serais, j’irai → j’irais.</span>'; return; }
+    var r = FUTR[active], c = r.f.replace(/ai$/, 'ais');
+    out.innerHTML = '<strong>' + esc(r.inf) + ' → ' + esc(r.f) + '</strong><span>Au conditionnel : ' + esc(c) + '.</span>';
+  }
+  $('fuGrid').addEventListener('click', function (e) { var b = e.target.closest('button'); if (!b) return; var i = clamp(b.getAttribute('data-i'), FUTR.length); fuState[i] = !fuState[i]; fuRender(i); });
+  fuRender(null);
+
+  /* ---------- 8. Auxiliaire et accord ---------- */
+  var AUXQ = [
+    { k: 'a1', s: 'Nous ___ arrivés à la gare de Lausanne.', o: ['sommes', 'avons'], a: 'sommes', why: 'Arriver se conjugue avec être : nous sommes arrivés.' },
+    { k: 'a2', s: 'Léa ___ mangé une fondue.', o: ['a', 'est'], a: 'a', why: 'Manger se conjugue avec avoir : elle a mangé.' },
+    { k: 'a3', s: 'Mes frères ___ tombés du vélo.', o: ['ont', 'sont'], a: 'sont', why: 'Tomber se conjugue avec être.' },
+    { k: 'a4', s: 'Tu ___ fini tes devoirs ?', o: ['as', 'es'], a: 'as', why: 'Finir se conjugue avec avoir : tu as fini.' },
+    { k: 'a5', s: 'Elle ___ allée à Fribourg.', o: ['a', 'est'], a: 'est', why: 'Aller se conjugue avec être : elle est allée.' },
+    { k: 'a6', s: 'Ils ___ pris le bus.', o: ['ont', 'sont'], a: 'ont', why: 'Prendre se conjugue avec avoir : ils ont pris.' },
+    { k: 'a7', s: 'Je ___ resté à la maison.', o: ['ai', 'suis'], a: 'suis', why: 'Rester se conjugue avec être : je suis resté.' },
+    { k: 'a8', s: 'Vous ___ vu le Cervin ?', o: ['avez', 'êtes'], a: 'avez', why: 'Voir se conjugue avec avoir : vous avez vu.' },
+    { k: 'a9', s: 'Mes cousines sont ___ hier. (venir)', o: ['venu', 'venus', 'venues'], a: 'venues', why: 'Avec être, accord avec le sujet « mes cousines » : féminin pluriel, -es.' },
+    { k: 'a10', s: 'Léa est ___ à 8 h. (partir)', o: ['parti', 'partie', 'partis'], a: 'partie', why: 'Avec être, accord avec « Léa » : féminin singulier, -e.' },
+    { k: 'a11', s: 'Les élèves ont ___ une chanson. (chanter)', o: ['chanté', 'chantés', 'chantée'], a: 'chanté', why: 'Avec avoir, pas d’accord avec le sujet : ils ont chanté.' },
+    { k: 'a12', s: 'Tom et Noé se sont ___ tôt. (se lever)', o: ['levé', 'levés', 'levées'], a: 'levés', why: 'Verbe pronominal, donc être ; accord avec « Tom et Noé » : masculin pluriel, -és.' }
+  ];
+  var checkAux = checker(AUXQ, inOpts);
+  sorter('ax', AUXQ, { word: 'Phrase' });
+
+  var PPQ = [
+    { k: 'pris', s: 'Elle a ___ le train de 8 h. (prendre)', o: ['pri', 'pris', 'prit'], a: 'pris', why: 'Au féminin : prise. On entend le s, donc pris.' },
+    { k: 'fini', s: 'Tom a ___ ses devoirs. (finir)', o: ['fini', 'finit', 'finis'], a: 'fini', why: 'Au féminin : finie. Rien de plus à entendre : fini.' },
+    { k: 'mis', s: 'J’ai ___ mon casque de vélo. (mettre)', o: ['mi', 'mis', 'mit'], a: 'mis', why: 'Au féminin : mise. On entend le s : mis.' },
+    { k: 'dit', s: 'Il a ___ bonjour. (dire)', o: ['di', 'dis', 'dit'], a: 'dit', why: 'Au féminin : dite. On entend le t : dit.' },
+    { k: 'fait', s: 'Nous avons ___ une tarte. (faire)', o: ['fais', 'fait', 'fai'], a: 'fait', why: 'Au féminin : faite. On entend le t : fait.' },
+    { k: 'ecrit', s: 'Tu as ___ une carte à ta grand-mère. (écrire)', o: ['écri', 'écris', 'écrit'], a: 'écrit', why: 'Au féminin : écrite. On entend le t : écrit.' },
+    { k: 'vendu', s: 'Ils ont ___ leur vieux vélo. (vendre)', o: ['vendu', 'vendus', 'vendut'], a: 'vendu', why: 'Au féminin : vendue. Rien de plus : vendu. Et avec avoir, pas d’accord avec le sujet.' },
+    { k: 'conduit', s: 'Papa a ___ jusqu’à Martigny. (conduire)', o: ['condui', 'conduis', 'conduit'], a: 'conduit', why: 'Au féminin : conduite. On entend le t : conduit.' },
+    { k: 'compris', s: 'As-tu ___ la consigne ? (comprendre)', o: ['compri', 'compris', 'comprit'], a: 'compris', why: 'Comme prendre : comprise, donc compris.' },
+    { k: 'peint', s: 'Elle a ___ le Cervin à l’aquarelle. (peindre)', o: ['pein', 'peins', 'peint'], a: 'peint', why: 'Au féminin : peinte. On entend le t : peint.' }
+  ];
+  var checkParticiple = checker(PPQ, inOpts);
+  sorter('pp', PPQ, { word: 'Phrase' });
+
+  /* ---------- 10. La machine à conjuguer ---------- */
+  var GLAB = { 0: 'Auxiliaires (être, avoir)', 1: '1er groupe', 2: '2e groupe', 3: '3e groupe' };
+  var mc = { v: 'chanter', t: 'pres', p: 3 };
+  $('mcVerb').innerHTML = [0, 1, 2, 3].map(function (g) {
+    return '<optgroup label="' + esc(GLAB[g]) + '">' + VERBS.filter(function (v) { return v.g === g; }).map(function (v) { return '<option value="' + v.k + '">' + esc(v.inf) + '</option>'; }).join('') + '</optgroup>';
+  }).join('');
+  $('mcTense').innerHTML = TENSES.map(function (t) { return '<button type="button" data-t="' + t.k + '" aria-pressed="false">' + esc(t.name) + '</button>'; }).join('');
+  $('mcPers').innerHTML = PERSONS.map(function (p) { return '<button type="button" data-p="' + p.k + '" aria-pressed="false">' + esc(p.pr) + '</button>'; }).join('');
+  function mcRender() {
+    var V = by(VERBS, mc.v), T = by(TENSES, mc.t);
+    if (mc.t === 'ipr' && IPR_P.indexOf(mc.p) < 0) mc.p = 1;
+    $('mcVerb').value = mc.v;
+    each($('mcTense').querySelectorAll('button'), function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-t') === mc.t ? 'true' : 'false'); });
+    each($('mcPers').querySelectorAll('button'), function (b) {
+      var p = Number(b.getAttribute('data-p')), off = mc.t === 'ipr' && IPR_P.indexOf(p) < 0;
+      b.disabled = off; b.style.opacity = off ? '.4' : '';
+      b.setAttribute('aria-pressed', p === mc.p ? 'true' : 'false');
+    });
+    var R = conjugate(mc.v, mc.t, mc.p), out = $('mcOut');
+    var head = '<strong>' + esc(V.inf) + ' · ' + esc(T.name) + (mc.t === 'ipr' ? '' : ' · ' + esc(PERSONS[mc.p].label)) + '</strong>';
+    if (!R || R.none) {
+      $('mcForm').innerHTML = '<span class="pr">—</span>';
+      out.innerHTML = head + '<span>' + esc(R ? R.note : 'Personne impossible à ce temps.') + '</span>';
+      $('mcTable').innerHTML = '';
+      return;
+    }
+    $('mcForm').innerHTML = R.html + (mc.t === 'ipr' ? ' !' : '');
+    var info = '<span>' + esc(R.note) + '</span>';
+    if (T.ends) info += '<span>Terminaisons de ce temps : ' + esc(T.ends) + '.</span>';
+    info += '<span class="soft">Ce temps sert pour ' + esc(T.use) + '</span>';
+    if (V.note) info += '<span>' + esc(V.note) + '</span>';
+    out.innerHTML = head + info;
+    var ps = mc.t === 'ipr' ? IPR_P : [0, 1, 2, 3, 4, 5];
+    $('mcTable').innerHTML = ps.map(function (p) { var r = conjugate(mc.v, mc.t, p); return '<li' + (p === mc.p ? ' class="cur"' : '') + '>' + r.html + '</li>'; }).join('');
+  }
+  $('mcVerb').addEventListener('change', function () { if (by(VERBS, this.value)) { mc.v = this.value; mcRender(); } });
+  $('mcRand').addEventListener('click', function () { var v; do { v = VERBS[Math.floor(Math.random() * VERBS.length)].k; } while (v === mc.v); mc.v = v; mcRender(); });
+  $('mcTense').addEventListener('click', function (e) { var b = e.target.closest('button'); if (!b) return; mc.t = b.getAttribute('data-t'); mcRender(); });
+  $('mcPers').addEventListener('click', function (e) { var b = e.target.closest('button'); if (!b || b.disabled) return; mc.p = clamp(b.getAttribute('data-p'), 6); mcRender(); });
+  mcRender();
+
+  /* ---------- 11. Quel temps ? ---------- */
+  var TNAMES = { pres: 'Présent', imp: 'Imparfait', ps: 'Passé simple', pc: 'Passé composé', pqp: 'Plus-que-parfait', fut: 'Futur simple', cond: 'Conditionnel', ipr: 'Impératif', subj: 'Subjonctif' };
+  var QT = [
+    { k: 'q1', h: 'Demain, nous <b>prendrons</b> le train pour Brigue.', s: 'Demain, nous prendrons le train pour Brigue.', a: 'fut', why: '« Demain » et la terminaison -rons : futur simple.' },
+    { k: 'q2', h: 'Quand j’étais petite, je <b>jouais</b> au bord du lac.', s: 'Quand j’étais petite, je jouais au bord du lac.', a: 'imp', why: 'Une habitude dans le passé, terminaison -ais : imparfait.' },
+    { k: 'q3', h: 'Le chevalier ouvrit la porte et <b>entra</b>.', s: 'Le chevalier ouvrit la porte et entra.', a: 'ps', why: 'Une action courte dans un récit, terminaison -a : passé simple.' },
+    { k: 'q4', h: 'Hier, Léa <b>a raté</b> le bus.', s: 'Hier, Léa a raté le bus.', a: 'pc', why: 'Auxiliaire avoir au présent (a) + participe passé (raté) : passé composé.' },
+    { k: 'q5', h: 'Si j’avais un vélo électrique, je <b>monterais</b> jusqu’à Lavaux.', s: 'Si j’avais un vélo électrique, je monterais jusqu’à Lavaux.', a: 'cond', why: 'Une action imaginée (si…), terminaison -rais : conditionnel.' },
+    { k: 'q6', h: 'Il faut que tu <b>finisses</b> tes devoirs.', s: 'Il faut que tu finisses tes devoirs.', a: 'subj', why: 'Après « il faut que » : subjonctif.' },
+    { k: 'q7', h: '<b>Range</b> ta chambre, s’il te plaît !', s: 'Range ta chambre, s’il te plaît !', a: 'ipr', why: 'Un ordre, sans pronom : impératif.' },
+    { k: 'q8', h: 'Quand nous sommes arrivés, le train <b>était</b> déjà <b>parti</b>.', s: 'Quand nous sommes arrivés, le train était déjà parti.', a: 'pqp', why: 'Auxiliaire à l’imparfait (était) + participe passé (parti) : plus-que-parfait.' },
+    { k: 'q9', h: 'Chaque matin, Noé <b>prend</b> le bus de 7 h 12.', s: 'Chaque matin, Noé prend le bus de 7 h 12.', a: 'pres', why: 'Une habitude d’aujourd’hui : présent.' },
+    { k: 'q10', h: 'Je <b>voudrais</b> un renseignement, s’il vous plaît.', s: 'Je voudrais un renseignement, s’il vous plaît.', a: 'cond', why: 'Une demande polie, terminaison -rais : conditionnel.' },
+    { k: 'q11', h: 'Elles <b>finirent</b> leur voyage à Genève.', s: 'Elles finirent leur voyage à Genève.', a: 'ps', why: 'Terminaison -irent : passé simple, 3e personne du pluriel.' },
+    { k: 'q12', h: 'Nous <b>sommes allés</b> à la Fête des Vignerons.', s: 'Nous sommes allés à la Fête des Vignerons.', a: 'pc', why: 'Auxiliaire être au présent (sommes) + participe passé (allés) : passé composé.' }
+  ];
+  var checkTense = checker(QT, function (x, c) { return !!TNAMES[c]; });
+  sorter('qt', QT, { names: TNAMES, order: ['pres', 'imp', 'ps', 'pc', 'pqp', 'fut', 'cond', 'ipr', 'subj'], word: 'Phrase' });
+
+  var TRAPS = [
+    { k: 't1', s: 'Je vais ___ mon vélo.', o: ['réparer', 'réparé', 'réparez'], a: 'réparer', why: 'Remplace par « vendre » : « je vais vendre ». C’est l’infinitif : -er.' },
+    { k: 't2', s: 'Hier, j’ai ___ mon vélo.', o: ['réparer', 'réparé', 'réparais'], a: 'réparé', why: 'Remplace par « vendu » : « j’ai vendu ». C’est le participe passé : -é.' },
+    { k: 't3', s: 'Vous ___ vos vélos ce soir ?', o: ['réparer', 'réparé', 'réparez'], a: 'réparez', why: 'Avec « vous », la terminaison est -ez : vous vendez, vous réparez.' },
+    { k: 't4', s: 'Quand je suis arrivé, il ___ son vélo.', o: ['réparer', 'réparait', 'réparé'], a: 'réparait', why: 'Une action en cours dans le passé : imparfait. Remplace par « vendait » : -ait.' },
+    { k: 't5', s: 'Demain, je ___ une raclette.', o: ['mangerai', 'mangerais'], a: 'mangerai', why: 'C’est prévu pour demain : futur. Avec « nous » : nous mangerons.' },
+    { k: 't6', s: 'Si j’avais faim, je ___ une raclette.', o: ['mangerai', 'mangerais'], a: 'mangerais', why: 'C’est imaginé (si…) : conditionnel. Avec « nous » : nous mangerions.' },
+    { k: 't7', s: 'Je ___ un billet pour Zurich, s’il vous plaît.', o: ['voudrai', 'voudrais'], a: 'voudrais', why: 'Pour demander poliment : conditionnel, je voudrais.' },
+    { k: 't8', s: 'Les enfants ___ dans la cour.', o: ['joue', 'jouent', 'joues'], a: 'jouent', why: 'Le sujet « les enfants » = ils : -ent, qu’on n’entend pas mais qu’on écrit.' },
+    { k: 't9', s: 'Mes amies ___ le français et l’allemand.', o: ['parle', 'parles', 'parlent'], a: 'parlent', why: 'Sujet au pluriel (elles) : -ent.' },
+    { k: 't10', s: 'Tu ___ au bord du Léman. (courir)', o: ['cours', 'court', 'coure'], a: 'cours', why: 'Avec tu, la terminaison est -s : tu cours. Il court, avec t.' }
+  ];
+  var checkTrap = checker(TRAPS, inOpts);
+  sorter('tr', TRAPS, { word: 'Phrase' });
+
+  /* ---------- Idées reçues ---------- */
+  var MYTHS = [
+    { k: 'ir', s: '« Tous les verbes en -ir sont du 2e groupe. »', a: 'mythe', why: 'Seulement ceux qui font « nous …issons » (finir, choisir). Partir, venir, courir, dormir sont du 3e groupe.' },
+    { k: 'aller', s: '« Aller est du 1er groupe, puisqu’il finit en -er. »', a: 'mythe', why: 'Aller est l’exception : il est du 3e groupe, car il est très irrégulier (je vais, j’irai).' },
+    { k: 'ent', s: '« Avec ils, on entend toujours la terminaison -ent. »', a: 'mythe', why: 'Dans « ils chantent », -ent ne s’entend pas. Il faut l’écrire quand même.' },
+    { k: 'ps', s: '« Le passé simple ne sert plus à rien. »', a: 'mythe', why: 'Il est rare à l’oral, mais très utilisé dans les livres et les récits, surtout à la 3e personne.' },
+    { k: 'rai', s: '« Je mangerai et je mangerais, c’est la même chose. »', a: 'mythe', why: 'Je mangerai : futur (c’est prévu). Je mangerais : conditionnel (c’est imaginé). Test : nous mangerons / nous mangerions.' },
+    { k: 'etre', s: '« Avec être, le participe passé s’accorde avec le sujet. »', a: 'vrai', why: 'Elle est partie, ils sont venus, elles sont arrivées.' },
+    { k: 'tu', s: '« Avec tu, le verbe finit presque toujours par s ou x. »', a: 'vrai', why: 'Tu chantes, tu finis, tu peux. Grande exception : l’impératif du 1er groupe (chante !).' },
+    { k: 'cond', s: '« Le conditionnel sert seulement après si. »', a: 'mythe', why: 'Il sert aussi à être poli (je voudrais) et à donner une information pas encore sûre (le train aurait du retard).' }
+  ];
+  function checkMyth(k, choice) { var m = by(MYTHS, k); if (!m || (choice !== 'vrai' && choice !== 'mythe')) return null; return { ok: m.a === choice, answer: m.a, why: m.why }; }
+  var mythAns = {};
+  $('myths').innerHTML = MYTHS.map(function (m) {
+    return '<div class="box myth" data-k="' + m.k + '"><span class="stmt">' + esc(m.s) + '</span><div class="btns"><button type="button" data-c="vrai">Vrai</button><button type="button" data-c="mythe">Idée reçue</button></div><div class="fbk" aria-live="polite"></div></div>';
+  }).join('');
+  function mythRender() {
+    var correct = 0;
+    each($('myths').querySelectorAll('.myth'), function (box) {
+      var k = box.getAttribute('data-k'), a = mythAns[k], m = by(MYTHS, k), out = box.querySelector('.fbk');
+      each(box.querySelectorAll('button'), function (b) { var c = b.getAttribute('data-c'); b.disabled = !!a; b.className = a ? (c === m.a ? 'right' : (c === a ? 'wrong' : '')) : ''; });
+      if (!a) { out.className = 'fbk'; out.innerHTML = ''; return; }
+      var ok = a === m.a; if (ok) correct++;
+      out.className = 'fbk ' + (ok ? 'ok' : 'no');
+      out.innerHTML = '<strong>' + (m.a === 'vrai' ? 'Vrai.' : 'Idée reçue.') + (ok ? ' Bien joué !' : '') + '</strong><span>' + esc(m.why) + '</span>';
+    });
+    $('mythScore').textContent = correct + ' / ' + MYTHS.length;
+  }
+  $('myths').addEventListener('click', function (ev) {
+    var b = ev.target.closest('button'); if (!b || b.disabled) return;
+    var k = b.closest('.myth').getAttribute('data-k');
+    if (!mythAns[k]) mythAns[k] = b.getAttribute('data-c');
+    mythRender();
+  });
+  $('mythReset').addEventListener('click', function () { mythAns = {}; mythRender(); });
+  mythRender();
+
+  /* ---------- Quiz ---------- */
+  var QZ = [
+    { q: 'À quel groupe appartient le verbe « choisir » ?', o: [['a', 'au 1er groupe'], ['b', 'au 2e groupe'], ['c', 'au 3e groupe']], a: 'b', how: 'Nous choisissons : -ir avec -issons, 2e groupe.' },
+    { q: 'À quel groupe appartient le verbe « aller » ?', o: [['a', 'au 1er groupe'], ['b', 'au 2e groupe'], ['c', 'au 3e groupe']], a: 'c', how: 'C’est le seul verbe en -er du 3e groupe : je vais, j’irai.' },
+    { q: 'Futur de « venir » avec « je » :', o: [['a', 'je venirai'], ['b', 'je viendrai'], ['c', 'je viendrais']], a: 'b', how: 'Radical spécial viendr- + -ai. « Je viendrais » est le conditionnel.' },
+    { q: 'Complète : « Si j’avais le temps, je ___ te voir. »', o: [['a', 'viendrai'], ['b', 'viendrais'], ['c', 'viens']], a: 'b', how: 'Une action imaginée après « si » : conditionnel, je viendrais.' },
+    { q: 'Passé simple de « faire » avec « il » :', o: [['a', 'il fit'], ['b', 'il fut'], ['c', 'il faisa']], a: 'a', how: 'Il fit. « Il fut » est le passé simple d’être.' },
+    { q: 'Complète : « Elles ___ arrivées à Sion. »', o: [['a', 'ont'], ['b', 'sont'], ['c', 'avaient']], a: 'b', how: 'Arriver se conjugue avec être : elles sont arrivées (accord -ées).' },
+    { q: 'Complète : « J’ai ___ la porte. » (ouvrir)', o: [['a', 'ouvri'], ['b', 'ouvris'], ['c', 'ouvert']], a: 'c', how: 'Le participe passé d’ouvrir est ouvert (au féminin : ouverte).' },
+    { q: 'Complète : « Il faut que tu ___ à l’heure. » (être)', o: [['a', 'sois'], ['b', 'soit'], ['c', 'es']], a: 'a', how: 'Après « il faut que » : subjonctif. Que tu sois (avec s, comme souvent avec tu).' }
+  ];
+  var quiz = $('quiz'), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ''; done = [];
+    QZ.forEach(function (Q, k) {
+      var li = document.createElement('li');
+      li.innerHTML = '<span>' + esc(Q.q) + '</span><select id="qa' + k + '" aria-label="Ta réponse à la question ' + (k + 1) + '"><option value="">…</option>' + Q.o.map(function (o) { return '<option value="' + o[0] + '">' + esc(o[1]) + '</option>'; }).join('') + '</select><button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+      quiz.appendChild(li);
+      function check() {
+        var fb = $('qf' + k), v = $('qa' + k).value;
+        if (!v) { fb.className = 'fb'; fb.textContent = 'Choisis une réponse.'; return; }
+        if (v === Q.a) { fb.className = 'fb ok'; fb.innerHTML = 'Bravo, c’est juste !<span>' + esc(Q.how) + '</span>'; done[k] = true; }
+        else {
+          done[k] = false;
+          var good = Q.o.filter(function (o) { return o[0] === Q.a; })[0][1];
+          fb.className = 'fb no'; fb.innerHTML = 'Pas tout à fait : la bonne réponse est « ' + esc(good) + ' ».<span>' + esc(Q.how) + '</span>';
+        }
+        $('score').textContent = done.filter(Boolean).length + ' / 8';
+      }
+      $('qb' + k).addEventListener('click', check);
+      $('qa' + k).addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+    });
+    $('score').textContent = '0 / 8';
+  }
+  $('newQuiz').addEventListener('click', newQuiz);
+  newQuiz();
+
+  window.__conj = {
+    persons: PERSONS, tenses: TENSES, verbs: VERBS,
+    conjugate: conjugate, form: form, table: table,
+    splits: SPLIT, checkSplit: checkSplit,
+    pronouns: PRON, checkPronoun: checkPronoun,
+    groups: GROUPS, checkGroup: checkGroup,
+    present: PRES, checkPresent: checkPresent,
+    timeline: TL,
+    story: STORY, checkStory: checkStory,
+    futureStems: FUTR,
+    auxItems: AUXQ, checkAux: checkAux,
+    participles: PPQ, checkParticiple: checkParticiple,
+    whichTense: QT, tenseNames: TNAMES, checkTense: checkTense,
+    traps: TRAPS, checkTrap: checkTrap,
+    myths: MYTHS, checkMyth: checkMyth, quiz: QZ
+  };
+})();
+</script>
+</body>
+</html>

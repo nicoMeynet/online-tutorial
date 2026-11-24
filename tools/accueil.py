@@ -17,7 +17,7 @@ SUBJECTS = [
     ("maths.html", "maths", "Maths", "#2346b5", "#8fb0ff",
      "Nombres, algèbre, géométrie, proportions, statistiques… et des curiosités comme π ou les fractales."),
     ("francais.html", "francais", "Français", "#0f5f8a", "#7cc4ec",
-     "D'où vient notre langue, les mots venus d'ailleurs, le français de Suisse romande et les pièges d'orthographe."),
+     "D'où vient notre langue, la grammaire de la phrase, la conjugaison, le français de Suisse romande et l'orthographe."),
     ("physique.html", "physique", "Physique-chimie", "#0e7490", "#67e8f9",
      "La matière, le mouvement, les forces, l'énergie, l'électricité, la lumière et le son, en simulations."),
     ("numerique.html", "numerique", "Numérique", "#b91c1c", "#fca5a5",

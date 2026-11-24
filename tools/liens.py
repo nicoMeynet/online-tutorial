@@ -22,6 +22,9 @@ DATES = maj.Dates()
 ROOT = Path(__file__).resolve().parent.parent
 
 TOPICS = [
+    ("la grammaire", "la-grammaire.html"),
+    ("la grammaire de la phrase", "la-grammaire.html"),
+    ("la conjugaison", "la-conjugaison.html"),
     ("la langue française", "la-langue-francaise.html"),
     ("l'histoire de la Suisse", "l-histoire-de-la-suisse.html"),
     ("l’histoire de la Suisse", "l-histoire-de-la-suisse.html"),

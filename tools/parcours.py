@@ -56,14 +56,15 @@ TRACKS = [
         "les-sagesses-de-chine-et-du-japon", "les-religions-traditionnelles", "les-mythologies-antiques", "les-fetes-et-calendriers"]),
     ("geo1", "geographie", "Découvrir la Suisse et le monde", "9H–11H", "Le relief et les cantons de la Suisse, son histoire, les pays du monde et la démocratie suisse.", [
         "la-geographie-de-la-suisse", "l-histoire-de-la-suisse", "la-geographie-du-monde", "la-politique-suisse"]),
-    ("fr1", "francais", "Découvrir la langue française", "9H–11H", "D'où vient le français, comment il change et comment on l'écrit.", [
-        "la-langue-francaise"]),
+    ("fr1", "francais", "Découvrir la langue française", "9H–11H", "D'où vient le français, comment se construit une phrase et comment on conjugue.", [
+        "la-langue-francaise", "la-grammaire", "la-conjugaison"]),
     ("pcurio", "physique", "Physique et curiosités", "tous niveaux", "La physique du ciel, du sport et du climat.", [
         "le-ciel-bleu-et-l-arc-en-ciel", "la-physique-du-sport", "le-climat-et-l-effet-de-serre"]),
 ]
 
 # Ce qu'il vaut mieux connaître avant (seulement les liens importants).
 PRE = {
+    "la-conjugaison": ["la-grammaire"],
     "la-politique-suisse": ["la-geographie-de-la-suisse"],
     "le-bouddhisme": ["l-hindouisme"],
     "le-sikhisme": ["l-hindouisme"],
