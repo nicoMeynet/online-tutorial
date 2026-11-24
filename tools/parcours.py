@@ -26,7 +26,7 @@ TRACKS = [
         "les-quadrilateres", "les-statistiques", "tableaux-et-diagrammes"]),
     ("brevet", "maths", "Objectif 11H", "11H", "Tout le programme de 11H, jusqu'au grand quiz de révision.", [
         "les-identites-remarquables", "l-equation-produit-nul-et-les-systemes", "les-inequations", "les-fonctions", "les-fonctions-affines",
-        "les-racines-carrees", "les-nombres-premiers", "le-theoreme-de-thales", "les-triangles-isometriques-et-semblables", "le-cercle-et-ses-angles", "la-trigonometrie",
+        "les-racines-carrees", "calculer-avec-les-racines", "les-nombres-premiers", "le-theoreme-de-thales", "les-triangles-isometriques-et-semblables", "le-cercle-et-ses-angles", "la-trigonometrie",
         "les-echelles", "la-sphere-et-la-boule", "les-grandeurs-composees", "les-conversions-avancees", "les-probabilites", "arbres-et-tableaux-de-probabilites",
         "l-algorithmique", "la-demonstration", "revisions-brevet"]),
     ("lycee", "maths", "Avant-goût du secondaire II", "11H → secondaire II", "Pour les curieux qui veulent prendre de l'avance.", [
@@ -64,6 +64,7 @@ TRACKS = [
 
 # Ce qu'il vaut mieux connaître avant (seulement les liens importants).
 PRE = {
+    "calculer-avec-les-racines": ["les-racines-carrees"],
     "les-regles-de-calcul-des-puissances": ["les-puissances"],
     "arbres-et-tableaux-de-probabilites": ["les-probabilites"],
     "tableaux-et-diagrammes": ["les-statistiques"],

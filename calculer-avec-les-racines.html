@@ -1,0 +1,1319 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Calculer avec les racines</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels de maths, marge rouge. Accent violet (#6d28d9, encre #4c1d95 pour le texte), même violet que la page sur les racines carrées. Facteurs premiers en tuiles : chaque paire a sa couleur (violet, orange, vert, jaune). Le signe √ est suivi d'une barre (bordure haute) au-dessus du nombre sous la racine. */
+:root {
+  --paper: #f8f7fc;
+  --grid: #e7e3f2;
+  --card: #ffffff;
+  --ink: #1f1b2e;
+  --ink-soft: #5d5873;
+  --acc: #6d28d9;
+  --acc-ink: #4c1d95;
+  --acc-soft: #ede5fb;
+  --two: #c2410c;
+  --two-soft: #fde5d6;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --warn: #d97706;
+  --warn-soft: #fdf0d6;
+  --warn-ink: #92400e;
+  --hl: #fff0a3;
+  --line: #ddd7ea;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #121019; --grid: #1e1a28; --card: #191623; --ink: #eeeaf7; --ink-soft: #b0a9c6;
+    --acc: #c4b5fd; --acc-ink: #ddd6fe; --acc-soft: #2e2450; --two: #ff9a5c; --two-soft: #3a2112;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27;
+    --warn: #f5a524; --warn-soft: #3d2a0c; --warn-ink: #fbbf5a; --hl: #4b4318; --line: #332c45;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #121019; --grid: #1e1a28; --card: #191623; --ink: #eeeaf7; --ink-soft: #b0a9c6;
+  --acc: #c4b5fd; --acc-ink: #ddd6fe; --acc-soft: #2e2450; --two: #ff9a5c; --two-soft: #3a2112;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27;
+  --warn: #f5a524; --warn-soft: #3d2a0c; --warn-ink: #fbbf5a; --hl: #4b4318; --line: #332c45;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+@media (max-width: 520px) { .page { padding-block: 28px 64px; gap: 44px; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+sup { font-size: .74em; line-height: 0; vertical-align: .5em; font-weight: inherit; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero-top { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+.hero-top svg { width: 170px; height: auto; flex: none; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+
+/* Le signe racine : √ suivi d'une barre au-dessus du radicande */
+.rad { display: inline-flex; align-items: baseline; white-space: nowrap; }
+.rad .rs { padding-right: .02em; }
+.rad .rc { border-top: .085em solid currentColor; padding: .04em .12em 0 .06em; margin-left: -.06em; line-height: 1.15; }
+.fr { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; font-size: .9em; line-height: 1.2; margin: 0 .12em; }
+.fr > span { padding: 0 .15em; white-space: nowrap; }
+.fr > span:first-child { border-bottom: .09em solid currentColor; }
+.rad .fr { font-size: .85em; }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+@media (max-width: 520px) { .box { padding: 16px 14px; } }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note.ok { border-left-color: var(--ok); background: var(--ok-soft); }
+.note.two { border-left-color: var(--two); background: var(--two-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+svg text.cl { font-family: var(--f-body); font-weight: 700; }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 8px 12px; min-height: 44px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button.main { background: var(--acc); color: var(--card); }
+button[aria-pressed="true"] { background: var(--acc-ink); color: var(--paper); }
+button.ex { font-family: var(--f-mono); font-weight: 600; font-size: .92rem; }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+button:disabled { cursor: default; opacity: .5; }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.presets { gap: 8px; }
+.presets button { min-width: 52px; padding: 6px 10px; }
+label { font-weight: 700; }
+input[type="range"] { width: 100%; accent-color: var(--acc); min-height: 40px; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
+.tag.ok { color: var(--ok); }
+.tag.no { color: var(--red); }
+.tag.acc { color: var(--acc-ink); }
+.tag.two { color: var(--two); }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc-ink); }
+.fbk { border-radius: 8px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; min-width: 0; overflow-wrap: anywhere; }
+.fbk:empty { display: none; }
+.fbk.ok { background: var(--ok-soft); }
+.fbk.no { background: var(--red-soft); }
+.fbk.info { background: var(--acc-soft); }
+.fbk.warn { background: var(--warn-soft); }
+.fbk strong { font-family: var(--f-display); }
+.fbk.ok strong { color: var(--ok); }
+.fbk.no strong { color: var(--red); }
+.fbk.info strong { color: var(--acc-ink); }
+.fbk.warn strong { color: var(--warn-ink); }
+.say { min-height: 4.2em; }
+.step-n { font-family: var(--f-mono); font-size: .85rem; color: var(--ink-soft); }
+button.right, button.right:disabled { background: var(--ok-soft); border-color: var(--ok); color: var(--ok); opacity: 1; }
+button.wrong, button.wrong:disabled { background: var(--red-soft); border-color: var(--red); color: var(--red); opacity: 1; }
+.choice button { flex: 1 1 130px; }
+.choice button:disabled:not(.right):not(.wrong) { opacity: .55; }
+.card-big { background: var(--paper); border: 1.5px dashed var(--line); border-radius: 10px; padding: 14px; font-family: var(--f-display); font-weight: 700; font-size: 1.15rem; overflow-wrap: anywhere; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.card-big .ask { font-family: var(--f-body); font-weight: 400; font-size: 1rem; color: var(--ink-soft); }
+.card-big .expr { font-family: var(--f-mono); font-weight: 600; font-size: clamp(1.3rem, 6vw, 1.7rem); color: var(--acc-ink); line-height: 1.6; }
+.sorter-end { margin-top: .6rem; }
+.sorter-end strong { font-size: 1.05rem; }
+
+.scroll { overflow-x: auto; max-width: 100%; }
+table.tb { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+table.tb th, table.tb td { border: 1.5px solid var(--line); padding: 6px 8px; text-align: center; font-family: var(--f-mono); font-size: .95rem; }
+table.tb thead th { font-family: var(--f-display); background: var(--acc-soft); }
+table.tb tbody th { font-family: var(--f-body); background: var(--paper); text-align: left; }
+@media (max-width: 520px) { table.tb th, table.tb td { padding: 5px 3px; font-size: .82rem; } }
+.ctrls { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+.ctrl { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; align-items: center; gap: 6px; border: 1.5px dashed var(--line); border-radius: 8px; padding: 6px 8px; background: var(--paper); min-width: 0; }
+.ctrl.ctrl4 { grid-template-columns: 48px 44px minmax(0, 1fr) 44px 48px; max-width: 420px; }
+.ctrl .n { grid-column: 1 / -1; font-weight: 700; font-size: .92rem; overflow-wrap: anywhere; }
+.ctrl button { padding: 0; min-width: 44px; font-size: 1.3rem; line-height: 1; }
+.ctrl.ctrl4 button { font-size: 1rem; font-family: var(--f-mono); }
+.ctrl .v { text-align: center; font-family: var(--f-mono); font-weight: 600; font-size: 1.15rem; }
+.formula { font-family: var(--f-mono); font-weight: 600; font-size: clamp(1.1rem, 4.4vw, 1.35rem); color: var(--acc-ink); overflow-wrap: anywhere; line-height: 1.7; }
+.readout { font-family: var(--f-mono); font-size: 1rem; display: flex; flex-direction: column; gap: 8px; overflow-wrap: anywhere; min-width: 0; line-height: 1.6; }
+
+.stage { background: var(--paper); border: 1.5px dashed var(--line); border-radius: 10px; padding: 14px; min-height: 120px; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 12px; min-width: 0; overflow-wrap: anywhere; }
+.big { font-family: var(--f-mono); font-weight: 600; font-size: clamp(1.25rem, 5.6vw, 1.7rem); color: var(--acc-ink); overflow-wrap: anywhere; line-height: 1.7; }
+.fx { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; min-width: 0; }
+.f { position: relative; font-family: var(--f-mono); font-weight: 600; font-size: 1.05rem; min-width: 34px; padding: 3px 7px; text-align: center; border: 1.5px solid var(--ink); border-radius: 6px; background: var(--card); }
+.f.c1 { background: var(--acc-soft); border-color: var(--acc); }
+.f.c2 { background: var(--two-soft); border-color: var(--two); }
+.f.c3 { background: var(--ok-soft); border-color: var(--ok); }
+.f.c4 { background: var(--warn-soft); border-color: var(--warn); }
+.f.in { animation: pop .45s ease-out; }
+@keyframes pop { from { transform: translateY(-10px); opacity: 0; } to { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .f.in { animation: none; } }
+.op { font-family: var(--f-mono); color: var(--ink-soft); font-weight: 600; }
+.bigrad { display: inline-flex; align-items: stretch; min-width: 0; max-width: 100%; }
+.bigrad .rs { font-family: var(--f-mono); font-size: 2.3rem; line-height: 1; color: var(--ink); align-self: flex-end; padding-bottom: 2px; }
+.bigrad .rc { border-top: 3px solid var(--ink); padding: 8px 6px 2px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; min-width: 0; margin-left: -2px; }
+.badge { display: inline-block; font-family: var(--f-mono); font-weight: 600; background: var(--hl); border: 1.5px solid var(--ink); border-radius: 6px; padding: 2px 8px; }
+.figure svg { width: 100%; height: auto; display: block; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; }
+.res { border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 12px; display: flex; flex-direction: column; gap: 2px; min-width: 0; overflow-wrap: anywhere; }
+.res.on { border-color: var(--acc); background: var(--acc-soft); }
+.res-name { font-family: var(--f-display); font-weight: 700; }
+.res-val { font-family: var(--f-mono); font-weight: 600; color: var(--acc-ink); font-size: 1.05rem; line-height: 1.7; }
+.results { display: flex; flex-direction: column; gap: 8px; }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 200px auto; gap: 10px; align-items: center; }
+.quiz li > span:first-child { min-width: 0; overflow-wrap: anywhere; line-height: 1.7; }
+.quiz select { font: inherit; font-size: 1rem; padding: 6px 6px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; min-height: 44px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb:empty { display: none; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; overflow-wrap: anywhere; line-height: 1.7; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; min-width: 0; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); min-width: 0; overflow-wrap: anywhere; line-height: 1.7; }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; line-height: 1.7; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+<!--ticons--><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Tutoriels"><script src="progress.js" defer></script><script src="share.js" defer></script><!--/ticons-->
+<style id="tnav-css">
+.tnav-top { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin: 0 0 4px; }
+.tnav-home { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font-weight: 700; font-size: .95rem; text-decoration: none; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tnav-home:hover, .tnav-home:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.tnav-bottom { margin-top: 8px; display: flex; flex-direction: column; gap: 12px; }
+.tnav-bottom h2 { margin: 0; }
+.tnav-pn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tnav-pn a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--ink, #222); border-radius: 10px;
+  background: var(--card, #fff); color: var(--ink, #222); text-decoration: none; box-shadow: 3px 3px 0 var(--ink, #222); min-width: 0; }
+.tnav-pn a span { font-size: .85rem; color: var(--ink-soft, #666); }
+.tnav-pn a strong { overflow-wrap: anywhere; }
+.tnav-pn a.next { text-align: right; grid-column: 2; }
+.tnav-bottom .tnav-home { align-self: center; }
+.tnav-top [data-share] { margin-left: auto; }
+.tnav-short { display: none; }
+.tprint-h { display: none; }
+@media (max-width: 600px) { header.hero { gap: 8px !important; } header.hero > .fig, header.hero > .box.fig, header.hero .hero-top .fig { display: none !important; }
+  header.hero p.lead { font-size: 1rem !important; line-height: 1.5 !important; } header.hero > p.soft { font-size: .88rem !important; line-height: 1.45 !important; }
+  header.hero h1 { font-size: clamp(1.7rem, 8vw, 2.2rem) !important; } }
+.tprint-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 14px 0 0; }
+.tprint-row span { font-size: .9rem; opacity: .8; }
+.tprint { display: inline-flex; align-items: center; gap: 8px; min-height: 42px; padding: 8px 16px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font: inherit; font-weight: 700; cursor: pointer; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tprint:hover, .tprint:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+@media print { [data-tp-hide] { display: none !important; } html.tp-on, html.tp-on body { background: #fff !important; color: #111 !important; padding: 0 !important; margin: 0 !important; }
+  html.tp-on [data-fiche] { color: #111; } html.tp-on [data-fiche] * { color: #111 !important; background: transparent !important; box-shadow: none !important; }
+  html.tp-on .tprint-h { display: block; font-size: 1.4rem; font-weight: 800; margin: 0 0 10px; } .tprint-row { display: none !important; } }
+@media (max-width: 520px) { .tnav-top .tnav-long { display: none; } .tnav-top .tnav-short { display: inline; } .tnav-top { flex-wrap: nowrap; } .tnav-top > * { flex: none; } }
+.tnav-end { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+@media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
+.diff { font: 700 .72rem/1.2 var(--f-mono, monospace); padding: 2px 8px; border-radius: 99px; border: 1.5px solid; white-space: nowrap; }
+.diff.d1 { color: #15803d; border-color: #15803d; background: #dcf3e3; }
+.diff.d2 { color: #a15c07; border-color: #b45309; background: #fbe7cf; }
+.diff.d3 { color: #b91c1c; border-color: #b91c1c; background: #fde2e2; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root:not([data-theme="light"]) .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root:not([data-theme="light"]) .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; } }
+:root[data-theme="dark"] .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root[data-theme="dark"] .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root[data-theme="dark"] .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; }
+</style>
+</head>
+<body>
+<main class="page">
+<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="maths.html">← <span class="tnav-long">Tous les tutoriels de maths</span><span class="tnav-short">Maths</span></a><span class="diff d3" title="Difficulté : difficile">Difficile</span><button type="button" data-share hidden>Partager</button></nav><!--/tnav-->
+
+
+  <header class="hero">
+    <div class="hero-top">
+      <svg class="fig" viewBox="0 0 200 170" aria-hidden="true">
+        <rect x="4" y="4" width="192" height="162" rx="10" fill="var(--card)" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M18 58 L26 53 L38 82 L52 26 L124 26" fill="none" stroke="var(--acc-ink)" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+        <text x="58" y="78" font-size="44" class="cl" style="fill:var(--acc-ink)">72</text>
+        <rect x="134" y="20" width="26" height="24" rx="4" fill="var(--acc-soft)" stroke="var(--acc)" stroke-width="1.5"/>
+        <rect x="164" y="20" width="26" height="24" rx="4" fill="var(--acc-soft)" stroke="var(--acc)" stroke-width="1.5"/>
+        <rect x="134" y="50" width="26" height="24" rx="4" fill="var(--two-soft)" stroke="var(--two)" stroke-width="1.5"/>
+        <rect x="164" y="50" width="26" height="24" rx="4" fill="var(--two-soft)" stroke="var(--two)" stroke-width="1.5"/>
+        <rect x="149" y="80" width="26" height="24" rx="4" fill="var(--card)" stroke="var(--ink)" stroke-width="1.5"/>
+        <text x="147" y="38" font-size="15" text-anchor="middle" style="font-weight:600">2</text>
+        <text x="177" y="38" font-size="15" text-anchor="middle" style="font-weight:600">2</text>
+        <text x="147" y="68" font-size="15" text-anchor="middle" style="font-weight:600">3</text>
+        <text x="177" y="68" font-size="15" text-anchor="middle" style="font-weight:600">3</text>
+        <text x="162" y="98" font-size="15" text-anchor="middle" style="font-weight:600">2</text>
+        <text x="20" y="146" font-size="38" class="cl" style="fill:var(--ink)">= 6</text>
+        <path d="M92 128 L98 124 L106 146 L116 110 L146 110" fill="none" stroke="var(--ink)" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"/>
+        <text x="120" y="146" font-size="38" class="cl" style="fill:var(--ink)">2</text>
+      </svg>
+      <div style="display:flex;flex-direction:column;gap:10px;min-width:0;flex:1 1 280px">
+        <span class="eyebrow">Tutoriel de maths · niveau 11H</span>
+        <h1>Simplifier, multiplier, rendre rationnel</h1>
+        <p class="lead">Tu sais ce qu'est une racine carrée. Maintenant, on apprend à <strong>calculer</strong> avec : la simplifier, la multiplier, l'additionner quand c'est permis, la chasser d'un dénominateur, et l'utiliser pour résoudre x² = a.</p>
+      </div>
+    </div>
+    <p class="soft">Une idée guide tout le tutoriel : on garde la <strong>valeur exacte</strong> (avec √) le plus longtemps possible, et on n'arrondit qu'à la fin.</p>
+  </header>
+
+  <!-- 1 -->
+  <section data-f>
+    <span class="eyebrow">Étape 1 · Rappel express</span>
+    <h2>Trois choses à savoir avant de commencer</h2>
+    <div class="cards">
+      <div class="box"><span class="tag acc">Signe</span><strong>√a ≥ 0</strong><span class="soft">Pour a ≥ 0, √a est le nombre <strong>positif ou nul</strong> dont le carré vaut a. √9 = 3, jamais −3.</span></div>
+      <div class="box"><span class="tag acc">Carré d'une racine</span><strong>(√a)² = a</strong><span class="soft">Pour a ≥ 0 : la racine et le carré s'annulent. (√7)² = √7 × √7 = 7.</span></div>
+      <div class="box"><span class="tag two">Racine d'un carré</span><strong>√{a²} = |a|</strong><span class="soft">|a| est la valeur absolue : le nombre sans son signe. √{(−3)²} = √9 = 3 = |−3|.</span></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Déjà vu ailleurs</span>
+      <span>Ce qu'est une racine, les carrés parfaits, l'encadrement de √50 entre 7 et 8, la diagonale √2 du carré avec Pythagore et les nombres irrationnels : tout cela est expliqué dans le tutoriel sur <a class="tlink" href="les-racines-carrees.html">les racines carrées</a>. Ici, on va plus loin.</span>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section data-f>
+    <span class="eyebrow">Étape 2 · Le produit</span>
+    <h2>Multiplier deux racines</h2>
+    <p>√4 × √9 = 2 × 3 = 6, et √{4 × 9} = √36 = 6. Même résultat ! Ce n'est pas un hasard : on peut toujours rassembler deux racines en une seule.</p>
+    <div class="box"><p class="formula" id="r2Formula"></p><p class="soft">Pour a ≥ 0 et b ≥ 0. Dans les deux sens : on peut rassembler, ou couper un produit en deux racines.</p></div>
+    <div class="box">
+      <h3>La balance du produit</h3>
+      <p class="soft">Choisis a et b avec − et +, ou un exemple tout prêt. Les deux côtés donnent-ils le même nombre ?</p>
+      <div class="btns presets" id="pdPre" role="group" aria-label="Exemples"></div>
+      <div class="ctrls" id="pdCtrls"></div>
+      <div class="stage" id="pdVis" aria-live="polite"></div>
+      <div class="fbk ok" id="pdOut" aria-live="polite"></div>
+    </div>
+    <div class="note ok">
+      <span class="note-title">Astuce de calcul mental</span>
+      <span id="r2Tip"></span>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Le quotient</span>
+    <h2>Diviser deux racines</h2>
+    <p>Pour la division, c'est pareil : la racine d'un quotient est le quotient des racines.</p>
+    <div class="box"><p class="formula" id="r3Formula"></p><p class="soft">Pour a ≥ 0 et b &gt; 0 (on ne divise jamais par 0).</p></div>
+    <div class="cards" id="r3Cards"></div>
+    <div class="note two">
+      <span class="note-title">Les nombres à virgule</span>
+      <span id="r3Dec"></span>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section data-f>
+    <span class="eyebrow">Étape 4 · Simplifier une racine</span>
+    <h2>L'extracteur de carrés</h2>
+    <p>Simplifier une racine, c'est faire <strong>sortir</strong> tout ce qui peut sortir, pour garder sous la racine le plus petit nombre entier possible. Le secret : on décompose le nombre en facteurs premiers, et chaque <strong>paire</strong> de facteurs égaux sort de la racine, en un seul exemplaire, car √{p × p} = p.</p>
+    <div class="box">
+      <h3>Fais sortir les paires</h3>
+      <p class="soft">Choisis n (de 2 à 500) avec les boutons ou un exemple, puis avance pas à pas.</p>
+      <div class="btns presets" id="exPre" role="group" aria-label="Exemples de nombres"></div>
+      <div id="exCtrls"></div>
+      <div class="btns"><span class="score" id="exPos"></span></div>
+      <div class="stage" id="exVis" aria-live="polite"></div>
+      <div class="fbk info say" id="exSay" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="exPrev">← Précédent</button><button type="button" id="exNext" class="main">Suivant →</button><button type="button" id="exReset">Recommencer</button></div>
+    </div>
+    <div class="note ok">
+      <span class="note-title">Le raccourci</span>
+      <span id="r4Short"></span>
+    </div>
+    <div class="note">
+      <span class="note-title">Quand est-ce « fini » ?</span>
+      <span>Une racine est simplifiée quand le nombre sous la racine n'a plus <strong>aucun</strong> carré parfait comme diviseur (à part 1). √12 = 2√3 est simplifié ; 2√12 ne l'est pas, car 12 = 4 × 3.</span>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section data-f>
+    <span class="eyebrow">Étape 5 · Additionner</span>
+    <h2>Seules les racines semblables se regroupent</h2>
+    <p>3√2 + 5√2, c'est « 3 fois √2 plus 5 fois √2 », donc 8 fois √2. C'est exactement comme 3x + 5x = 8x. Deux termes avec <strong>la même racine</strong> sont appelés <strong>racines semblables</strong> : on additionne les nombres devant, la racine ne change pas.</p>
+    <div class="cards" id="r5Cards"></div>
+    <div class="box">
+      <h3>Le testeur de sommes</h3>
+      <p class="soft">Compare √{a + b} et √a + √b. Essaie plusieurs paires : arrives-tu à les rendre égaux ?</p>
+      <div class="btns presets" id="smPre" role="group" aria-label="Exemples"></div>
+      <div class="ctrls" id="smCtrls"></div>
+      <div class="stage" id="smVis" aria-live="polite"></div>
+      <div class="fbk" id="smOut" aria-live="polite"></div>
+    </div>
+    <div class="box">
+      <h3>On peut regrouper ?</h3>
+      <p class="soft">Pour chaque somme : peut-on l'écrire avec une seule racine ?</p>
+      <div class="btns"><span class="score" id="s5Score">Question 1 / 12</span><span class="step-n" id="s5Pos"></span></div>
+      <div class="card-big" id="s5Card" aria-live="polite"></div>
+      <div class="btns choice" id="s5Btns" role="group" aria-label="Peut-on regrouper ?"></div>
+      <div class="fbk" id="s5Out" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="s5Prev">← Précédent</button><button type="button" id="s5Next">Suivant →</button><button type="button" id="s5Reset">Recommencer</button></div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section data-f>
+    <span class="eyebrow">Étape 6 · Développer</span>
+    <h2>Des parenthèses avec des racines</h2>
+    <p>On développe comme d'habitude : chaque terme multiplie chaque terme. Il faut juste se souvenir que <strong>√a × √a = a</strong>. Les formules (a + b)², (a − b)² et (a − b)(a + b) sont expliquées dans le tutoriel sur <a class="tlink" href="les-identites-remarquables.html">les identités remarquables</a>.</p>
+    <div class="box">
+      <h3>Développe pas à pas</h3>
+      <div class="btns" id="dvBtns" role="group" aria-label="Choisir une expression"></div>
+      <div class="btns"><span class="score" id="dvPos"></span></div>
+      <div class="stage" id="dvVis" aria-live="polite"></div>
+      <div class="fbk info say" id="dvSay" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="dvPrev">← Précédent</button><button type="button" id="dvNext" class="main">Suivant →</button><button type="button" id="dvReset">Recommencer</button></div>
+    </div>
+    <div class="note red">
+      <span class="note-title">Le piège du carré</span>
+      <span id="r6Trap"></span>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Rendre le dénominateur rationnel</span>
+    <h2>Chasser la racine du bas</h2>
+    <p>Par habitude, on n'aime pas laisser une racine au <strong>dénominateur</strong> (en bas d'une fraction). On la fait disparaître en multipliant le haut et le bas par le même nombre : la fraction garde sa valeur. On dit qu'on <strong>rend le dénominateur rationnel</strong>.</p>
+    <div class="cards" id="r7Cards"></div>
+    <div class="box">
+      <h3>Le chasseur de racines</h3>
+      <p class="soft">Choisis une fraction ou demande-en une autre, puis avance pas à pas. Les deux dernières sont « pour aller plus loin ».</p>
+      <div class="btns" id="raBtns" role="group" aria-label="Choisir une fraction"></div>
+      <div class="btns"><span class="score" id="raPos"></span></div>
+      <div class="stage" id="raVis" aria-live="polite"></div>
+      <div class="fbk info say" id="raSay" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="raPrev">← Précédent</button><button type="button" id="raNext" class="main">Suivant →</button><button type="button" id="raReset">Recommencer</button></div>
+    </div>
+    <div class="note two">
+      <span class="note-title">Pour aller plus loin : le conjugué</span>
+      <span id="r7Conj"></span>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section data-f>
+    <span class="eyebrow">Étape 8 · Résoudre x² = a</span>
+    <h2>Deux solutions, une seule ou aucune</h2>
+    <p>Quels nombres ont un carré égal à 9 ? Il y en a deux : 3 et −3, car 3² = 9 et (−3)² = 9. Attention : √9 = 3 seulement, mais l'<strong>équation</strong> x² = 9 a deux solutions.</p>
+    <div class="cards">
+      <div class="box"><span class="tag ok">a &gt; 0</span><strong>Deux solutions</strong><span class="soft" id="r8Pos"></span></div>
+      <div class="box"><span class="tag acc">a = 0</span><strong>Une seule solution</strong><span class="soft">x² = 0 donne x = 0.</span></div>
+      <div class="box"><span class="tag no">a &lt; 0</span><strong>Aucune solution dans ℝ</strong><span class="soft">Un carré n'est jamais négatif : x² = −4 est impossible avec des nombres réels.</span></div>
+    </div>
+    <div class="box">
+      <h3>La parabole et la droite</h3>
+      <p class="soft">La courbe y = x² est une <strong>parabole</strong>. Les solutions de x² = a sont les points où elle croise la droite horizontale y = a. Bouge a.</p>
+      <div class="btns presets" id="eqPre" role="group" aria-label="Valeurs de a"></div>
+      <div>
+        <label for="eqA">a = <span class="mono" id="eqAOut">5</span></label>
+        <input id="eqA" type="range" min="-4" max="12" step="1" value="5">
+      </div>
+      <div class="figure"><svg id="eqSvg" viewBox="0 0 480 360" role="img" aria-label="La parabole y = x au carré et la droite y = a"></svg></div>
+      <div class="fbk" id="eqOut" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Avec une parenthèse</span>
+      <span id="r8Par"></span>
+      <span>Pour des équations comme x² − 5x + 6 = 0, il faut d'autres outils : ils sont dans le tutoriel sur <a class="tlink" href="le-second-degre.html">le second degré</a>.</span>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section data-f>
+    <span class="eyebrow">Étape 9 · Racines et puissances</span>
+    <h2>Racine carrée, racine cubique</h2>
+    <p id="r9Half"></p>
+    <div class="note two">
+      <span class="note-title">Un aperçu</span>
+      <span id="r9Pow"></span>
+    </div>
+    <p>La <strong>racine cubique</strong> ∛a est le nombre dont le <strong>cube</strong> vaut a. C'est le côté d'un cube dont on connaît le volume.</p>
+    <div class="cards" id="r9Cards"></div>
+    <div class="box">
+      <h3>Du volume au côté</h3>
+      <p class="soft">Choisis le volume V d'un cube (en cm³). Quel est son côté c ?</p>
+      <div class="btns presets" id="cbPre" role="group" aria-label="Volumes"></div>
+      <div id="cbCtrls"></div>
+      <div class="figure"><svg id="cbSvg" viewBox="0 0 480 280" role="img" aria-label="Un cube dont le volume est choisi"></svg></div>
+      <div class="fbk info" id="cbOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · Racines et géométrie</span>
+    <h2>Valeur exacte ou valeur approchée ?</h2>
+    <p>Trois longueurs reviennent sans cesse en géométrie. On les trouve avec le théorème de Pythagore, et elles contiennent toutes une racine.</p>
+    <div class="box">
+      <h3>Trois figures, un côté c</h3>
+      <div class="btns" id="gmBtns" role="group" aria-label="Choisir la figure"></div>
+      <div id="gmCtrls"></div>
+      <div class="figure"><svg id="gmSvg" viewBox="0 0 480 300" role="img" aria-label="La figure choisie"></svg></div>
+      <div class="results" id="gmOut" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Quand garder la racine ?</span>
+      <span id="r10Keep"></span>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · Les erreurs fréquentes</span>
+    <h2>Trouve l'erreur</h2>
+    <p>Des élèves ont fait des calculs… avec une erreur à chaque fois. À toi de trouver ce qui est juste. Si tu te trompes, l'explication te dit quelle confusion se cache derrière ton choix.</p>
+    <div class="box">
+      <h3>Douze calculs à corriger</h3>
+      <div class="btns"><span class="score" id="s11Score">Question 1 / 12</span><span class="step-n" id="s11Pos"></span></div>
+      <div class="card-big" id="s11Card" aria-live="polite"></div>
+      <div class="btns choice" id="s11Btns" role="group" aria-label="Ta réponse"></div>
+      <div class="fbk" id="s11Out" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="s11Prev">← Précédent</button><button type="button" id="s11Next">Suivant →</button><button type="button" id="s11Reset">Recommencer</button></div>
+    </div>
+  </section>
+
+  <!-- 12 -->
+  <section>
+    <span class="eyebrow">Étape 12 · Atelier final</span>
+    <h2>Simplifie, étape par étape</h2>
+    <p>Huit expressions à simplifier. À chaque étape, choisis la bonne suite parmi trois.</p>
+    <div class="box">
+      <h3>Huit expressions, seize choix</h3>
+      <div class="btns"><span class="score" id="atScore">Étape 1 / 16</span><span class="step-n" id="atPos"></span></div>
+      <div class="card-big" id="atCard" aria-live="polite"></div>
+      <div class="btns choice" id="atBtns" role="group" aria-label="Ta réponse"></div>
+      <div class="fbk" id="atOut" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="atPrev">← Précédent</button><button type="button" id="atNext">Suivant →</button><button type="button" id="atReset">Recommencer</button></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Les idées reçues</span>
+    <h2>Vrai ou faux ?</h2>
+    <div class="cards" id="irCards"></div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Le savais-tu ?</span>
+    <h2>Petite histoire du signe √</h2>
+    <div class="cards" id="svCards"></div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Choisis ta réponse, puis vérifie.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Recommencer</button>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À toi de jouer</span>
+    <h2>Six exercices</h2>
+    <p>Fais chaque exercice sur une feuille, puis ouvre la correction pour comparer.</p>
+    <div class="exos" id="exos"></div>
+  </section>
+
+  <section data-fiche><!--tprint--><p class="tprint-h">Fiche de révision · Simplifier, multiplier, rendre rationnel</p><!--/tprint-->    <span class="eyebrow">À retenir</span>
+    <div class="box" id="memo"></div>
+  <!--tprint--><p class="tprint-row"><button type="button" class="tprint" data-print><span aria-hidden="true">🖨</span> Imprimer la fiche</button><span>Seulement ce résumé, sur une page.</span></p><!--/tprint-->
+</section>
+
+  <!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"><a class="prev" href="les-racines-carrees.html"><span>← Précédent</span><strong>Les racines carrées</strong></a><a class="next" href="les-nombres-premiers.html"><span>Suivant →</span><strong>Les nombres premiers</strong></a></div><div class="tnav-end"><a class="tnav-home" href="maths.html">⌂ Tous les tutoriels de maths</a><button type="button" data-share hidden>Partager</button></div></nav><!--/tnav-->
+<footer>Fiche de révision · Calculer avec les racines<!--tmaj--><span class="tmaj" style="display:block;margin-top:6px;font-size:.85rem;opacity:.85">Dernière mise à jour : 24 novembre 2026 · © 2026 Nicolas Meynet</span><!--/tmaj--></footer>
+</main>
+
+<script>
+(function () {
+  /*
+   * Hooks de test : window.__rac2
+   *   Écriture : fmt(s) -> HTML. Balisage : « √12 » ou « √{a + b} » (racine avec barre), « ∛8 », « [haut|bas] » (fraction),
+   *              « ^2 », « ^{1/2} » (exposants), « **gras** ». uni(s) -> texte simple (pour les <option>).
+   *   Calcul : ev(s) -> valeur numérique d'une expression écrite avec ce balisage (Math.sqrt, Math.cbrt), NaN si illisible
+   *   Entiers : gcd(a, b), factor(n) -> facteurs premiers, sqf(n) -> {k, b} avec n = k² × b et b sans facteur carré,
+   *             radS(k, b) -> « k√b », exactSqrt(n) -> écriture simplifiée de √n
+   *   Étape 2 : prodInfo(a, b) ; étape 5 : sumInfo(a, b)
+   *   Étape 4 : exSteps(n) -> {steps, k, b} ; EXP (exemples)
+   *   Étape 6 : DEV (expressions et étapes, chaque étape « f » doit valoir la même chose)
+   *   Étape 7 : ratSteps(F) -> {steps, f0, R} avec F = {t: 'r', a, b} (a/√b) ou {t: 'c', a, b, c, s} (a/(√b ± c)) ; RAP ; ratRandom()
+   *   Étape 8 : solveSq(a) -> {n, sols}
+   *   Étape 9 : cubeInfo(V) -> {c, exact, lo}
+   *   Étape 10 : geo(c) -> {sq, tri, cube} (valeurs exactes en balisage)
+   *   Jeux : groupCards (étape 5), errCards (étape 11), atelierCards (étape 12), scorer(items), isOk(item, c)
+   *   quiz : les 8 questions ; EXOS : les 6 exercices ; CHECKS : égalités affichées dans le texte, à vérifier
+   */
+  var NB = ' ', MI = '−';
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function clamp(i, n) { i = Math.floor(Number(i)); if (!isFinite(i)) i = 0; return Math.max(0, Math.min(n - 1, i)); }
+  function rint(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+
+  /* ---------- Écriture : exposants, racines, fractions ---------- */
+  var SUPU = { '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '−': '⁻', '-': '⁻', '+': '⁺', 'n': 'ⁿ', 'm': 'ᵐ', '(': '⁽', ')': '⁾', '/': 'ᐟ' };
+  function radH(sign) { return function (m, g) { return '<span class="rad"><span class="rs">' + sign + '</span><span class="rc">' + g + '</span></span>'; }; }
+  function fmt(s) {
+    var h = esc(s).replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    h = h.replace(/\^\{([^}]*)\}/g, '<sup>$1</sup>').replace(/\^(−?\d+|[a-z])/g, '<sup>$1</sup>');
+    h = h.replace(/√\{([^{}]*)\}/g, radH('√')).replace(/∛\{([^{}]*)\}/g, radH('∛'));
+    h = h.replace(/√(\d+(?:,\d+)?|[a-z])/g, radH('√')).replace(/∛(\d+(?:,\d+)?|[a-z])/g, radH('∛'));
+    h = h.replace(/\[([^\[\]|]*)\|([^\[\]]*)\]/g, '<span class="fr"><span>$1</span><span>$2</span></span>');
+    return h;
+  }
+  function supU(g) { return g.split('').map(function (ch) { return SUPU[ch] || ch; }).join(''); }
+  function wrapP(x) { return /[ +−\-×]/.test(x) ? '(' + x + ')' : x; }
+  function uni(s) {
+    var t = String(s).replace(/\*\*([^*]+)\*\*/g, '$1');
+    t = t.replace(/\[([^\[\]|]*)\|([^\[\]]*)\]/g, function (m, a, b) { return wrapP(a) + '/' + wrapP(b); });
+    t = t.replace(/([√∛])\{([^{}]*)\}/g, function (m, r, g) { return r + (/^[\d,]+$/.test(g) ? g : '(' + g + ')'); });
+    return t.replace(/\^\{([^}]*)\}/g, function (m, g) { return supU(g); }).replace(/\^(−?\d+|[a-z])/g, function (m, g) { return supU(g); });
+  }
+
+  /* ---------- Calcul numérique d'une expression écrite avec le balisage ---------- */
+  function ev(src) {
+    var s = String(src).replace(/[\s  ]+/g, ''), i = 0;
+    function peek() { return s.charAt(i); }
+    function num() { var m = /^\d+(,\d+)?/.exec(s.slice(i)); if (!m) throw 0; i += m[0].length; return parseFloat(m[0].replace(',', '.')); }
+    function expr() { var v = term(); for (;;) { var c = peek(); if (c === '+') { i++; v += term(); } else if (c === '−' || c === '-') { i++; v -= term(); } else return v; } }
+    function term() { var v = unary(); for (;;) { var c = peek(); if (c === '×' || c === '·') { i++; v *= unary(); } else if (c === '÷' || c === '/') { i++; v /= unary(); } else if (c && /[\d√∛(\[]/.test(c)) { v *= power(); } else return v; } }
+    function unary() { var c = peek(); if (c === '−' || c === '-') { i++; return -unary(); } return power(); }
+    function power() {
+      var b = atom();
+      if (peek() !== '^') return b;
+      i++; var e;
+      if (peek() === '{') { i++; e = expr(); if (peek() !== '}') throw 0; i++; } else if (peek() === '−') { i++; e = -num(); } else e = num();
+      return Math.pow(b, e);
+    }
+    function atom() {
+      var c = peek(), v;
+      if (/\d/.test(c)) return num();
+      if (c === '√' || c === '∛') { i++; if (peek() === '{') { i++; v = expr(); if (peek() !== '}') throw 0; i++; } else v = num(); return c === '√' ? (v < 0 ? NaN : Math.sqrt(v)) : Math.cbrt(v); }
+      if (c === '(') { i++; v = expr(); if (peek() !== ')') throw 0; i++; return v; }
+      if (c === '[') { i++; var a = expr(); if (peek() !== '|') throw 0; i++; var d = expr(); if (peek() !== ']') throw 0; i++; return a / d; }
+      throw 0;
+    }
+    try { var r = expr(); return i === s.length ? r : NaN; } catch (e) { return NaN; }
+  }
+
+  /* ---------- Nombres à la française ---------- */
+  function fd(x, d) {
+    if (!isFinite(x)) return '?';
+    var p = Math.pow(10, d), s = (Math.round(x * p) / p).toFixed(d);
+    if (/^-0(\.0+)?$/.test(s)) s = s.slice(1);
+    return s.replace('-', MI).replace('.', ',');
+  }
+  function fz(x, d) { var s = fd(x, d); return s.indexOf(',') >= 0 ? s.replace(/0+$/, '').replace(/,$/, '') : s; }
+  function sgn(n) { return n < 0 ? MI + (-n) : String(n); }
+
+  /* ---------- Entiers : décomposition et racines simplifiées (calcul exact) ---------- */
+  function gcd(a, b) { a = Math.abs(a); b = Math.abs(b); while (b) { var t = a % b; a = b; b = t; } return a; }
+  function factor(n) { var f = [], p = 2; n = Math.floor(n); while (n > 1 && p * p <= n) { while (n % p === 0) { f.push(p); n /= p; } p++; } if (n > 1) f.push(n); return f; }
+  function sqf(n) {
+    if (n === 0) return { k: 0, b: 1 };
+    var f = factor(n), k = 1, b = 1, i = 0;
+    while (i < f.length) { if (i + 1 < f.length && f[i] === f[i + 1]) { k *= f[i]; i += 2; } else { b *= f[i]; i++; } }
+    return { k: k, b: b };
+  }
+  function radS(k, b) { if (k === 0) return '0'; if (b === 1) return String(k); return (k === 1 ? '' : String(k)) + '√' + b; }
+  function exactSqrt(n) { var s = sqf(n); return radS(s.k, s.b); }
+  function isSq(n) { return n >= 0 && sqf(n).b === 1; }
+
+  /* ---------- Petits morceaux d'affichage ---------- */
+  var TIMES = '<span class="op">×</span>';
+  function tile(p, cls, anim) { return '<span class="f ' + (cls || '') + (anim ? ' in' : '') + '">' + p + '</span>'; }
+  function big(h) { return '<div class="big">' + h + '</div>'; }
+  function bigRad(inner) { return '<span class="bigrad"><span class="rs">√</span><span class="rc">' + inner + '</span></span>'; }
+  function badge(t) { return '<span class="badge">' + t + '</span>'; }
+  function cardsHtml(list) { return list.map(function (c) { return '<div class="box"><span class="tag ' + (c.tag || 'acc') + '">' + fmt(c.t) + '</span><strong>' + fmt(c.h) + '</strong><span class="soft">' + fmt(c.p) + '</span></div>'; }).join(''); }
+
+  /* ---------- Textes écrits dans le HTML : racines avec barre (sections marquées data-f) ---------- */
+  function walkF(n) {
+    for (var c = n.firstChild; c; ) {
+      var nx = c.nextSibling;
+      if (c.nodeType === 3) { if (/[√∛]/.test(c.nodeValue)) { var sp = document.createElement('span'); sp.innerHTML = fmt(c.nodeValue); n.replaceChild(sp, c); } }
+      else if (c.nodeType === 1) walkF(c);
+      c = nx;
+    }
+  }
+  if (document.querySelectorAll) Array.prototype.forEach.call(document.querySelectorAll('[data-f]'), walkF);
+
+  /* ---------- Textes fixes (avec racines) ---------- */
+  $('r2Formula').innerHTML = fmt('√a × √b = √{ab}');
+  $('r2Tip').innerHTML = fmt('√2 × √8 : aucune des deux n’est « jolie », mais leur produit l’est ! √2 × √8 = √{16} = 4. Et √3 × √12 = √{36} = 6.');
+  $('r3Formula').innerHTML = fmt('[√a|√b] = √{[a|b]}');
+  $('r3Cards').innerHTML = cardsHtml([
+    { t: 'Rassembler', h: '[√50|√2] = √{[50|2]} = √25 = 5', p: 'Ni √50 ni √2 ne tombent juste, mais leur quotient, si.' },
+    { t: 'Couper', h: '√{[9|16]} = [√9|√16] = [3|4]', p: 'On prend la racine du haut et celle du bas. Contrôle : [3|4] × [3|4] = [9|16].' },
+    { t: 'Rassembler', h: '[√12|√3] = √{[12|3]} = √4 = 2', p: 'Contrôle : 2 × √3 ≈ 3,464 et √12 ≈ 3,464.' }
+  ]);
+  $('r3Dec').innerHTML = fmt('√{0,49} = √{[49|100]} = [7|10] = 0,7. Contrôle : 0,7 × 0,7 = 0,49. Écrire le nombre en fraction décimale aide beaucoup.');
+  $('r4Short').innerHTML = fmt('Cherche le **plus grand carré parfait** qui divise n. Pour 72, c’est 36 : √72 = √{36 × 2} = √36 × √2 = 6√2. Si tu prends un carré plus petit (√72 = √{4 × 18} = 2√18), tu n’as pas fini : √18 = 3√2, donc 2√18 = 6√2.');
+  $('r5Cards').innerHTML = cardsHtml([
+    { t: 'Semblables', tag: 'ok', h: '3√2 + 5√2 = 8√2', p: 'Comme 3x + 5x = 8x. Et 7√5 − 2√5 = 5√5.' },
+    { t: 'Simplifier d’abord', tag: 'ok', h: '√8 + √18 = 5√2', p: '√8 = 2√2 et √18 = 3√2. Elles sont semblables en cachette : 2√2 + 3√2 = 5√2.' },
+    { t: 'Pas semblables', tag: 'no', h: '√2 + √3', p: 'On ne peut rien faire, comme x + y. Surtout pas √5 : √2 + √3 ≈ 3,146 mais √5 ≈ 2,236.' },
+    { t: 'Piège', tag: 'no', h: '√9 + √16 = 7 ≠ √25 = 5', p: '√{a + b} ≠ √a + √b : la racine ne se coupe jamais sur une addition (ni sur une soustraction).' }
+  ]);
+  $('r6Trap').innerHTML = fmt('(√5 + 1)^2 ≠ 5 + 1. Il ne faut pas oublier le double produit : (√5 + 1)^2 = 5 + 2√5 + 1 = 6 + 2√5 ≈ 10,47.');
+  $('r7Cards').innerHTML = cardsHtml([
+    { t: 'Le plus simple', h: '[1|√2] = [√2|2]', p: 'On multiplie en haut et en bas par √2 : [1 × √2|√2 × √2] = [√2|2] ≈ 0,707.' },
+    { t: 'Avec simplification', h: '[6|√3] = 2√3', p: '[6 × √3|√3 × √3] = [6√3|3] = 2√3 ≈ 3,464.' }
+  ]);
+  $('r7Conj').innerHTML = fmt('Pour [1|√3 − 1], multiplier par √3 laisse encore une racine en bas. On multiplie par le **conjugué** √3 + 1 : en bas, (√3 − 1)(√3 + 1) = (√3)^2 − 1^2 = 2. Donc [1|√3 − 1] = [√3 + 1|2] ≈ 1,366.');
+  $('r8Pos').innerHTML = fmt('x^2 = a donne x = √a ou x = −√a. Par exemple, x^2 = 12 donne x = 2√3 ou x = −2√3.');
+  $('r8Par').innerHTML = fmt('(x − 3)^2 = 5 donne x − 3 = √5 ou x − 3 = −√5. Donc x = 3 + √5 ≈ 5,24 ou x = 3 − √5 ≈ 0,76.');
+  $('r9Half').innerHTML = fmt('Avec les règles des puissances, a^n × a^m = a^{n+m}. Quel exposant faudrait-il mettre à la place de ? pour que a^{?} × a^{?} = a^1 = a ? Il faut ? + ? = 1, donc ? = [1|2]. Et justement, √a × √a = a.');
+  $('r9Pow').innerHTML = fmt('C’est pour cela qu’on écrit parfois **√a = a^{1/2}** (pour a ≥ 0). De même, ∛a = a^{1/3}. Les règles de calcul des exposants entiers sont dans le tutoriel sur les règles de calcul des puissances ; les exposants fractionnaires, on les étudie plus tard.');
+  $('r9Cards').innerHTML = cardsHtml([
+    { t: 'Cube parfait', h: '∛8 = 2', p: 'Car 2^3 = 2 × 2 × 2 = 8. Et ∛27 = 3, ∛1000 = 10.' },
+    { t: 'Nombre négatif', tag: 'two', h: '∛{−27} = −3', p: 'Car (−3)^3 = −27. Contrairement à √, la racine cubique **existe** pour les nombres négatifs : un cube peut être négatif.' },
+    { t: 'Approchée', h: '∛2 ≈ 1,26', p: '1,26^3 ≈ 2,0004. Comme √2, ∛2 est irrationnel.' },
+    { t: 'Racine n-ième', tag: 'two', h: '^4√{16} = 2', p: 'Le petit 4 dit : quel nombre, à la puissance 4, donne 16 ? C’est 2, car 2^4 = 16.' }
+  ]);
+  $('r10Keep').innerHTML = fmt('Pour la **valeur exacte**, on garde la racine : la diagonale d’un carré de côté 5 cm mesure 5√2 cm. Pour **mesurer** ou **construire**, on prend une **valeur approchée** : 5√2 ≈ 7,07 cm. Si on arrondit trop tôt, les erreurs s’accumulent : on arrondit à la fin seulement.');
+
+  /* ---------- Moteurs : réglages − / + et pas à pas ---------- */
+  function makeCtrls(id, defs, st, onChange) {
+    function render() {
+      $(id).innerHTML = defs.map(function (d) {
+        var v = st[d.k];
+        return '<div class="ctrl"><span class="n">' + d.label + '</span><button type="button" data-k="' + d.k + '" data-d="-1" aria-label="' + esc(d.aria) + ' : moins"' + (v > d.min ? '' : ' disabled') + '>' + MI + '</button><span class="v">' + v + '</span><button type="button" data-k="' + d.k + '" data-d="1" aria-label="' + esc(d.aria) + ' : plus"' + (v < d.max ? '' : ' disabled') + '>+</button></div>';
+      }).join('');
+    }
+    $(id).addEventListener('click', function (ev) {
+      var b = ev.target.closest('button'); if (!b || b.disabled) return;
+      var d = defs.filter(function (x) { return x.k === b.getAttribute('data-k'); })[0]; if (!d) return;
+      st[d.k] = Math.max(d.min, Math.min(d.max, st[d.k] + Number(b.getAttribute('data-d'))));
+      render(); onChange();
+    });
+    render();
+    return { render: render };
+  }
+  /* Réglage à quatre boutons : −10, −1, +1, +10 */
+  function makeCtrl4(id, d, st, onChange) {
+    function btn(s, v) { var ok = s < 0 ? v > d.min : v < d.max; return '<button type="button" data-d="' + s + '" aria-label="' + esc(d.aria) + (s < 0 ? ' moins ' : ' plus ') + Math.abs(s) + '"' + (ok ? '' : ' disabled') + '>' + (s < 0 ? MI : '+') + Math.abs(s) + '</button>'; }
+    function render() { var v = st[d.k]; $(id).innerHTML = '<div class="ctrl ctrl4"><span class="n">' + d.label + '</span>' + btn(-10, v) + btn(-1, v) + '<span class="v">' + v + '</span>' + btn(1, v) + btn(10, v) + '</div>'; }
+    $(id).addEventListener('click', function (ev) {
+      var b = ev.target.closest('button'); if (!b || b.disabled) return;
+      st[d.k] = Math.max(d.min, Math.min(d.max, st[d.k] + Number(b.getAttribute('data-d'))));
+      render(); onChange();
+    });
+    render();
+    return { render: render };
+  }
+  function makeStepper(o) {
+    var idx = 0;
+    function render() {
+      var S = o.get(); idx = clamp(idx, S.length);
+      var st = S[idx], last = idx === S.length - 1;
+      $(o.id + 'Pos').textContent = 'Étape ' + (idx + 1) + ' / ' + S.length;
+      $(o.id + 'Vis').innerHTML = st.vis;
+      var say = $(o.id + 'Say');
+      say.className = 'fbk say ' + (st.done ? 'ok' : 'info');
+      say.innerHTML = (st.done ? '<strong>' + (o.doneTitle || 'Terminé !') + '</strong>' : '') + '<span>' + st.say + '</span>';
+      $(o.id + 'Prev').disabled = idx === 0;
+      $(o.id + 'Next').disabled = last;
+      $(o.id + 'Next').style.display = last ? 'none' : '';
+    }
+    $(o.id + 'Prev').addEventListener('click', function () { idx--; render(); });
+    $(o.id + 'Next').addEventListener('click', function () { idx++; render(); });
+    $(o.id + 'Reset').addEventListener('click', function () { idx = 0; render(); });
+    render();
+    return { render: render, restart: function () { idx = 0; render(); } };
+  }
+  function presetRow(id, list, cur, label) {
+    $(id).innerHTML = list.map(function (p, i) { return '<button type="button" class="ex" data-i="' + i + '" aria-pressed="' + (i === cur ? 'true' : 'false') + '">' + fmt(label(p)) + '</button>'; }).join('');
+  }
+
+  /* ---------- Étape 2 : la balance du produit ---------- */
+  function prodInfo(a, b) {
+    var sa = Math.sqrt(a), sb = Math.sqrt(b), ab = a * b;
+    return { sa: sa, sb: sb, ab: ab, left: sa * sb, right: Math.sqrt(ab), exact: exactSqrt(ab), perfect: isSq(ab) };
+  }
+  function rootVal(n) { return isSq(n) ? '= ' + exactSqrt(n) : '≈ ' + fd(Math.sqrt(n), 4); }
+  var pd = { a: 2, b: 8 }, PDP = [[2, 8], [3, 12], [4, 9], [2, 3], [5, 20], [2, 50], [6, 10]], pdSel = 0;
+  function pdRender() {
+    presetRow('pdPre', PDP, pdSel, function (p) { return '√' + p[0] + ' × √' + p[1]; });
+    var a = pd.a, b = pd.b, I = prodInfo(a, b);
+    $('pdVis').innerHTML = '<div class="readout">' +
+      '<span>' + fmt('√' + a) + ' ' + rootVal(a) + ' et ' + fmt('√' + b) + ' ' + rootVal(b) + '</span>' +
+      '<span><strong>Gauche :</strong> ' + fmt('√' + a + ' × √' + b) + ' ≈ ' + fd(I.left, 4) + '</span>' +
+      '<span><strong>Droite :</strong> ' + fmt('√{' + a + ' × ' + b + '} = √' + I.ab) + ' ≈ ' + fd(I.right, 4) + '</span></div>';
+    var t = '<strong>Les deux côtés sont égaux.</strong>';
+    if (I.perfect) t += '<span>' + I.ab + ' est un carré parfait : ' + fmt('√' + a + ' × √' + b + ' = √' + I.ab + ' = ' + I.exact) + ' <strong>exactement</strong>.</span>';
+    else if (I.exact !== '√' + I.ab) t += '<span>Valeur exacte : ' + fmt('√' + a + ' × √' + b + ' = √' + I.ab + ' = ' + I.exact) + ' (on simplifie à l’étape 4).</span>';
+    else t += '<span>Valeur exacte : ' + fmt('√' + a + ' × √' + b + ' = √' + I.ab) + '. Ici, √' + I.ab + ' ne se simplifie pas.</span>';
+    t += '<span class="soft">Les valeurs approchées sont calculées avec toutes les décimales, puis arrondies au dix-millième.</span>';
+    $('pdOut').innerHTML = t;
+  }
+  var PDM = makeCtrls('pdCtrls', [{ k: 'a', label: 'a', aria: 'Nombre a', min: 0, max: 50 }, { k: 'b', label: 'b', aria: 'Nombre b', min: 0, max: 50 }], pd, function () { pdSel = -1; pdRender(); });
+  $('pdPre').addEventListener('click', function (ev) {
+    var bt = ev.target.closest('button'); if (!bt) return;
+    pdSel = clamp(bt.getAttribute('data-i'), PDP.length); pd.a = PDP[pdSel][0]; pd.b = PDP[pdSel][1];
+    PDM.render(); pdRender();
+  });
+  pdRender();
+
+  /* ---------- Étape 4 : l'extracteur de carrés ---------- */
+  var EXP = [8, 12, 18, 20, 27, 32, 45, 48, 50, 72, 75, 98, 128, 200, 300];
+  function exSteps(n) {
+    var f = factor(n), S = [], cls = [], pairs = [], singles = [], j = 0, pc = 0;
+    while (j < f.length) {
+      if (j + 1 < f.length && f[j] === f[j + 1]) { cls[j] = cls[j + 1] = 'c' + (pc % 4 + 1); pairs.push(f[j]); pc++; j += 2; }
+      else { cls[j] = ''; singles.push(f[j]); j++; }
+    }
+    var k = pairs.reduce(function (x, y) { return x * y; }, 1), b = singles.reduce(function (x, y) { return x * y; }, 1);
+    var plain = f.map(function (p) { return tile(p, '', true); }).join(TIMES);
+    var colored = f.map(function (p, i) { return tile(p, cls[i]); }).join(TIMES);
+    var prod = f.join(' × ');
+    S.push({ vis: big(fmt('√' + n)), say: fmt('On veut simplifier √' + n + '. D’abord, on décompose ' + n + ' en **facteurs premiers** : on le divise par 2 tant qu’on peut, puis par 3, par 5, etc.') });
+    S.push({ vis: bigRad(plain), say: f.length === 1 ? fmt(n + ' est un nombre premier : il n’a qu’un seul facteur.') : fmt(n + ' = ' + prod + '. On l’écrit sous la racine, facteur par facteur.') });
+    if (!pairs.length) {
+      S.push({ done: true, vis: bigRad(colored) + big(fmt('√' + n + ' ≈ ' + fd(Math.sqrt(n), 4))), say: fmt('Aucune paire de facteurs égaux : rien ne peut sortir. √' + n + ' est déjà simplifiée.') });
+      return { steps: S, k: 1, b: n };
+    }
+    var pairTxt = pairs.map(function (p) { return p + ' × ' + p; }).join(', ');
+    S.push({ vis: bigRad(colored), say: fmt('On repère les **paires** de facteurs égaux (même couleur) : ' + pairTxt + '. ' + (singles.length ? 'Les facteurs sans partenaire (en blanc) resteront sous la racine.' : 'Tous les facteurs ont un partenaire !')) });
+    var outside = pairs.map(function (p, i) { return tile(p, 'c' + (i % 4 + 1), true); }).join(TIMES);
+    var inside = singles.map(function (p) { return tile(p, ''); }).join(TIMES);
+    S.push({ vis: '<div class="fx">' + outside + (singles.length ? TIMES + bigRad(inside) : '') + '</div>', say: fmt('Chaque paire sort de la racine **en un seul exemplaire**, car √{p × p} = p. ' + (singles.length ? 'Sous la racine, il reste ' + singles.join(' × ') + ' = ' + b + '.' : 'Il ne reste plus rien sous la racine.')) });
+    var res = radS(k, b), K = k * k;
+    var say = 'Dehors : ' + (pairs.length > 1 ? pairs.join(' × ') + ' = ' : '') + k + '. ';
+    if (b === 1) say += 'Donc √' + n + ' = ' + k + ' : ' + n + ' = ' + k + '^2 est un carré parfait.';
+    else say += 'Donc √' + n + ' = ' + res + '. Contrôle : ' + k + '^2 × ' + b + ' = ' + K + ' × ' + b + ' = ' + n + '. Raccourci : ' + K + ' est le plus grand carré parfait qui divise ' + n + ', et √' + n + ' = √{' + K + ' × ' + b + '} = √' + K + ' × √' + b + ' = ' + res + '.';
+    S.push({ done: true, vis: big(fmt('√' + n + ' = ' + res)) + '<div class="readout">' + fmt('≈ ' + fd(Math.sqrt(n), 4)) + '</div>', say: fmt(say) });
+    return { steps: S, k: k, b: b };
+  }
+  var ex = { n: 72 }, exSel = EXP.indexOf(72);
+  var EX = makeStepper({ id: 'ex', doneTitle: 'Racine simplifiée', get: function () { return exSteps(ex.n).steps; } });
+  var EXC = makeCtrl4('exCtrls', { k: 'n', label: 'Le nombre n', aria: 'Nombre n', min: 2, max: 500 }, ex, function () { exSel = EXP.indexOf(ex.n); exPre(); EX.restart(); });
+  function exPre() { presetRow('exPre', EXP, exSel, function (p) { return String(p); }); }
+  exPre();
+  $('exPre').addEventListener('click', function (ev) {
+    var b = ev.target.closest('button'); if (!b) return;
+    exSel = clamp(b.getAttribute('data-i'), EXP.length); ex.n = EXP[exSel];
+    exPre(); EXC.render(); EX.restart();
+  });
+
+  /* ---------- Étape 5 : le testeur de sommes ---------- */
+  function sumInfo(a, b) { var l = Math.sqrt(a + b), r = Math.sqrt(a) + Math.sqrt(b); return { l: l, r: r, equal: Math.abs(l - r) < 1e-12 }; }
+  var sm = { a: 9, b: 16 }, SMP = [[9, 16], [36, 64], [1, 1], [2, 2], [25, 144], [0, 25]], smSel = 0;
+  function smRender() {
+    presetRow('smPre', SMP, smSel, function (p) { return p[0] + ' et ' + p[1]; });
+    var a = sm.a, b = sm.b, I = sumInfo(a, b);
+    $('smVis').innerHTML = '<div class="readout"><span>' + fmt('√{' + a + ' + ' + b + '} = √' + (a + b)) + ' ' + rootVal(a + b) + '</span>' +
+      '<span>' + fmt('√' + a + ' + √' + b) + ' ' + (isSq(a) && isSq(b) ? '= ' + exactSqrt(a) + ' + ' + exactSqrt(b) + ' = ' + fz(I.r, 6) : '≈ ' + fd(I.r, 4)) + '</span></div>';
+    var o = $('smOut');
+    if (I.equal) { o.className = 'fbk warn'; o.innerHTML = '<strong>Égaux… mais seulement parce que ' + (a === 0 ? 'a' : 'b') + ' = 0.</strong><span>Dès que a et b sont tous les deux positifs, ça ne marche plus.</span>'; }
+    else { o.className = 'fbk no'; o.innerHTML = '<strong>Différents !</strong><span>' + fmt('√' + a + ' + √' + b) + ' est plus grand que ' + fmt('√{' + a + ' + ' + b + '}') + '. On ne coupe jamais une racine sur une somme.</span>'; }
+  }
+  var SMC = makeCtrls('smCtrls', [{ k: 'a', label: 'a', aria: 'Nombre a', min: 0, max: 100 }, { k: 'b', label: 'b', aria: 'Nombre b', min: 0, max: 100 }], sm, function () { smSel = -1; smRender(); });
+  $('smPre').addEventListener('click', function (ev) {
+    var bt = ev.target.closest('button'); if (!bt) return;
+    smSel = clamp(bt.getAttribute('data-i'), SMP.length); sm.a = SMP[smSel][0]; sm.b = SMP[smSel][1];
+    SMC.render(); smRender();
+  });
+  smRender();
+
+  /* ---------- Trieur générique (cartes une par une), comme dans les autres tutoriels.
+     Si un item a sa propre liste o (options), elle remplace les boutons communs.
+     Si un item a une liste alt, ces réponses sont aussi acceptées.
+     Si un item a un objet bad, l’explication de la mauvaise réponse choisie s’ajoute.
+     Les textes passent par fmt() pour afficher les exposants (et ici les racines et les fractions).
+     o.cardHtml(it, answered) renvoie le contenu HTML de la carte. ---------- */
+  function isOk(it, c) { return c === it.a || !!(it.alt && it.alt.indexOf(c) >= 0); }
+  function makeSorter(o) {
+    var idx = 0, ans = {};
+    function opts(it) { return it.o ? it.o : o.order; }
+    function name(c) { return o.names && o.names[c] ? o.names[c] : c; }
+    function render() {
+      var it = o.items[idx], a = ans[it.k];
+      if (o.cardHtml) $(o.card).innerHTML = o.cardHtml(it, !!a); else $(o.card).textContent = it.s;
+      $(o.pos).textContent = o.word + ' ' + (idx + 1) + ' / ' + o.items.length;
+      $(o.btns).innerHTML = opts(it).map(function (c) {
+        var cls = a ? (c === it.a || (c === a && isOk(it, a)) ? 'right' : (c === a ? 'wrong' : '')) : '';
+        return '<button type="button" data-c="' + esc(c) + '"' + (cls ? ' class="' + cls + '"' : '') + (a ? ' disabled' : '') + '>' + fmt(name(c)) + '</button>';
+      }).join('');
+      var out = $(o.out);
+      if (!a) { out.className = 'fbk'; out.innerHTML = ''; }
+      else {
+        var ok = isOk(it, a);
+        out.className = 'fbk ' + (ok ? 'ok' : 'no');
+        out.innerHTML = '<strong>' + (ok ? 'Bien vu !' : 'Pas tout à fait. Réponse : ' + fmt(name(it.a)) + '.') + '</strong>' + (!ok && it.bad && it.bad[a] ? '<span>Ton choix : ' + fmt(it.bad[a]) + '</span>' : '') + '<span>' + fmt(it.why) + '</span>';
+      }
+      var s = o.score(ans), last = idx === o.items.length - 1, left = s.total - s.answered;
+      $(o.score_).textContent = (o.word ? o.word + ' ' : '') + (idx + 1) + ' / ' + s.total;
+      $(o.pos).textContent = s.answered ? 'Bonnes réponses : ' + s.correct + ' sur ' + s.answered : '';
+      $(o.prev).disabled = idx === 0;
+      $(o.next).disabled = last;
+      $(o.next).style.display = last ? 'none' : '';
+      var end = $(o.out + 'End');
+      if (!end) { end = document.createElement('div'); end.id = o.out + 'End'; end.setAttribute('aria-live', 'polite'); $(o.out).insertAdjacentElement('afterend', end); }
+      if (!left) {
+        var r = s.correct / s.total;
+        end.className = 'fbk ok sorter-end';
+        end.innerHTML = '<strong>Terminé ! ' + s.correct + ' / ' + s.total + ' bonnes réponses</strong><span>' +
+          (r === 1 ? 'Parfait, tout est juste !' : r >= .7 ? 'Très bien !' : r >= .5 ? 'Pas mal ! Relis les explications des erreurs.' : 'Relis les explications, puis réessaie.') +
+          ' Touche « Recommencer » pour rejouer.</span>';
+      } else if (last && ans[it.k]) {
+        end.className = 'fbk warn sorter-end';
+        end.innerHTML = '<strong>C’était la dernière carte.</strong><span>Il te reste ' + left + ' réponse' + (left > 1 ? 's' : '') + ' à donner : reviens en arrière avec « ← Précédent ».</span>';
+      } else { end.className = ''; end.innerHTML = ''; }
+    }
+    $(o.btns).addEventListener('click', function (ev) {
+      var b = ev.target.closest('button'); if (!b || b.disabled) return;
+      var it = o.items[idx]; if (!ans[it.k]) ans[it.k] = b.getAttribute('data-c');
+      render();
+    });
+    $(o.prev).addEventListener('click', function () { idx = clamp(idx - 1, o.items.length); render(); });
+    $(o.next).addEventListener('click', function () { idx = clamp(idx + 1, o.items.length); render(); });
+    $(o.reset).addEventListener('click', function () { ans = {}; idx = 0; render(); });
+    render();
+  }
+  function scorer(items) {
+    return function (ans) { var correct = 0, answered = 0; items.forEach(function (x) { if (ans && ans[x.k]) { answered++; if (isOk(x, ans[x.k])) correct++; } }); return { correct: correct, answered: answered, total: items.length }; };
+  }
+  function exprCard(ask) { return function (it) { return '<span class="expr">' + fmt(it.s) + '</span><span class="ask">' + (it.q || ask) + '</span>'; }; }
+
+  /* ---------- Étape 5 : on peut regrouper ? (r = résultat exact, vérifié) ---------- */
+  var GROUP_NAMES = { oui: 'Oui, tout de suite', apres: 'Oui, après avoir simplifié', non: 'Non, on ne peut pas' };
+  var groupCards = [
+    { k: 'g1', s: '3√2 + 5√2', a: 'oui', r: '8√2', why: 'Même racine √2 : comme 3x + 5x = 8x, on obtient 8√2.' },
+    { k: 'g2', s: '√2 + √3', a: 'non', why: 'Racines différentes, et √2, √3 ne se simplifient pas. √2 + √3 ≈ 3,146 reste tel quel (ce n’est pas √5 ≈ 2,236).' },
+    { k: 'g3', s: '√8 + √18', a: 'apres', r: '5√2', why: '√8 = √{4 × 2} = 2√2 et √18 = √{9 × 2} = 3√2. Donc 2√2 + 3√2 = 5√2.' },
+    { k: 'g4', s: '4√3 − √3', a: 'oui', r: '3√3', why: '√3, c’est 1√3 : 4√3 − 1√3 = 3√3.' },
+    { k: 'g5', s: '2√5 + 3√7', a: 'non', why: '√5 et √7 ne sont pas semblables et ne se simplifient pas : on laisse 2√5 + 3√7.' },
+    { k: 'g6', s: '√50 − √2', a: 'apres', r: '4√2', why: '√50 = √{25 × 2} = 5√2. Donc 5√2 − √2 = 4√2.' },
+    { k: 'g7', s: '√9 + √16', a: 'apres', r: '7', why: 'Ce sont des carrés parfaits : √9 = 3 et √16 = 4, donc 3 + 4 = 7. Surtout pas √25 = 5 !' },
+    { k: 'g8', s: '5 + √3', a: 'non', why: 'Un entier et une racine ne sont pas semblables (comme 5 + x). Ce n’est ni 5√3, ni √8.' },
+    { k: 'g9', s: '√3 + √3', a: 'oui', r: '2√3', why: '1√3 + 1√3 = 2√3. Ce n’est pas √6 : √6 ≈ 2,449 alors que 2√3 ≈ 3,464.' },
+    { k: 'g10', s: '√18 + √12', a: 'non', why: 'On simplifie : √18 = 3√2 et √12 = 2√3. Même simplifiées, √2 et √3 ne sont pas semblables : on laisse 3√2 + 2√3.' },
+    { k: 'g11', s: '√45 − √20', a: 'apres', r: '√5', why: '√45 = √{9 × 5} = 3√5 et √20 = √{4 × 5} = 2√5. Donc 3√5 − 2√5 = √5.' },
+    { k: 'g12', s: '√20 + √5', a: 'apres', r: '3√5', why: '√20 = 2√5. Donc 2√5 + √5 = 3√5.' }
+  ];
+  makeSorter({ items: groupCards, names: GROUP_NAMES, order: ['oui', 'apres', 'non'], btns: 's5Btns', card: 's5Card', pos: 's5Pos', out: 's5Out', score_: 's5Score', prev: 's5Prev', next: 's5Next', reset: 's5Reset', word: 'Question', score: scorer(groupCards),
+    cardHtml: exprCard('Peut-on écrire cette somme avec une seule racine ?') });
+
+  /* ---------- Étape 6 : développer (chaque ligne f vaut la même chose que la première) ---------- */
+  var DEV = [
+    { k: 'd1', label: '√3 × (√3 + 4)', steps: [
+      { f: '√3 × (√3 + 4)', say: 'Distributivité : √3 multiplie chacun des deux termes de la parenthèse.' },
+      { f: '√3 × √3 + √3 × 4', say: 'Deux produits à calculer.' },
+      { f: '3 + 4√3', say: '√3 × √3 = 3 et √3 × 4 = 4√3. Le nombre 3 et le terme 4√3 ne sont pas semblables : on s’arrête là.' }] },
+    { k: 'd2', label: '(2 + √3)(1 − √3)', steps: [
+      { f: '(2 + √3)(1 − √3)', say: 'Double distributivité : chaque terme de la première parenthèse multiplie chaque terme de la deuxième. 2 × 2 = 4 produits.' },
+      { f: '2 × 1 + 2 × (−√3) + √3 × 1 + √3 × (−√3)', say: 'Les quatre produits, avec leurs signes.' },
+      { f: '2 − 2√3 + √3 − 3', say: 'Le dernier produit : √3 × (−√3) = −(√3 × √3) = −3.' },
+      { f: '−1 − √3', say: 'On regroupe les nombres : 2 − 3 = −1. Et les racines semblables : −2√3 + √3 = −√3.' }] },
+    { k: 'd3', label: '(√5 + 1)^2', steps: [
+      { f: '(√5 + 1)^2', say: 'Le carré d’une somme : (a + b)^2 = a^2 + 2ab + b^2, avec a = √5 et b = 1.' },
+      { f: '(√5)^2 + 2 × √5 × 1 + 1^2', say: 'On remplace a par √5 et b par 1.' },
+      { f: '5 + 2√5 + 1', say: '(√5)^2 = 5, 2 × √5 × 1 = 2√5 et 1^2 = 1.' },
+      { f: '6 + 2√5', say: '5 + 1 = 6 ; le terme 2√5 reste à part. Sans le double produit, on aurait trouvé 6 : c’est faux !' }] },
+    { k: 'd4', label: '(3 − √2)^2', steps: [
+      { f: '(3 − √2)^2', say: 'Le carré d’une différence : (a − b)^2 = a^2 − 2ab + b^2, avec a = 3 et b = √2.' },
+      { f: '3^2 − 2 × 3 × √2 + (√2)^2', say: 'On remplace a et b.' },
+      { f: '9 − 6√2 + 2', say: '3^2 = 9, 2 × 3 × √2 = 6√2 et (√2)^2 = 2.' },
+      { f: '11 − 6√2', say: '9 + 2 = 11. Le résultat est petit (environ 2,5) : c’est normal, car 3 − √2 ≈ 1,59.' }] },
+    { k: 'd5', label: '(√7 − √2)(√7 + √2)', steps: [
+      { f: '(√7 − √2)(√7 + √2)', say: 'Une différence fois une somme : (a − b)(a + b) = a^2 − b^2, avec a = √7 et b = √2.' },
+      { f: '(√7)^2 − (√2)^2', say: 'Les deux produits « croisés » (−√{14} et +√{14}) s’annulent : il ne reste que les deux carrés.' },
+      { f: '7 − 2', say: '(√7)^2 = 7 et (√2)^2 = 2.' },
+      { f: '5', say: 'Plus aucune racine : le résultat est un entier ! C’est cette astuce qui sert à l’étape 7.' }] }
+  ];
+  function chainSteps(list, f0) {
+    return list.map(function (s, i, A) {
+      var last = i === A.length - 1, vis = big(fmt(last ? f0 + ' = ' + s.f : s.f)), say = s.say;
+      if (last) { vis += '<div class="readout">' + fmt('Contrôle : ' + f0 + ' ≈ ' + fd(ev(f0), 4) + ' et ' + s.f + ' ≈ ' + fd(ev(s.f), 4)) + '</div>'; }
+      return { vis: vis, say: fmt(say), done: last };
+    });
+  }
+  var dvCur = 0;
+  presetRow('dvBtns', DEV, 0, function (d) { return d.label; });
+  var DV = makeStepper({ id: 'dv', doneTitle: 'Expression développée', get: function () { return chainSteps(DEV[dvCur].steps, DEV[dvCur].steps[0].f); } });
+  $('dvBtns').addEventListener('click', function (ev) {
+    var b = ev.target.closest('button'); if (!b) return;
+    dvCur = clamp(b.getAttribute('data-i'), DEV.length);
+    presetRow('dvBtns', DEV, dvCur, function (d) { return d.label; });
+    DV.restart();
+  });
+
+  /* ---------- Étape 7 : rendre le dénominateur rationnel (calcul exact) ---------- */
+  function ratSteps(F) {
+    var S = [], a = F.a, b = F.b, f0, R, g, A, D;
+    if (F.t === 'r') {
+      g = gcd(a, b); A = a / g; D = b / g;
+      f0 = '[' + a + '|√' + b + ']';
+      var num = (a === 1 ? '' : a) + '√' + b;
+      R = D === 1 ? radS(A, b) : '[' + radS(A, b) + '|' + D + ']';
+      S.push({ f: f0, say: 'Une racine au dénominateur. Objectif : la faire disparaître du bas, sans changer la valeur de la fraction.' });
+      S.push({ f: '[' + a + ' × √' + b + '|√' + b + ' × √' + b + ']', say: 'On multiplie le haut et le bas par √' + b + '. C’est multiplier par [√' + b + '|√' + b + '] = 1 : la valeur ne change pas.' });
+      S.push({ f: '[' + num + '|' + b + ']', say: 'En bas, √' + b + ' × √' + b + ' = ' + b + ' : plus de racine au dénominateur !' + (g > 1 ? ' On peut encore simplifier par ' + g + '.' : '') });
+      if (g > 1) S.push({ f: R, say: 'On simplifie par ' + g + ' : ' + a + ' ÷ ' + g + ' = ' + A + ' et ' + b + ' ÷ ' + g + ' = ' + D + '.' + (D === 1 ? ' Il n’y a même plus de fraction.' : '') });
+    } else {
+      var c = F.c, den = '√' + b + ' ' + (F.s < 0 ? '−' : '+') + ' ' + c, conj = '√' + b + ' ' + (F.s < 0 ? '+' : '−') + ' ' + c, d = b - c * c;
+      var top = a === 1 ? conj : a + '(' + conj + ')';
+      g = gcd(a, d); A = a / g; D = d / g;
+      var topR = A === 1 ? conj : A + '(' + conj + ')';
+      R = D === 1 ? topR : '[' + topR + '|' + D + ']';
+      f0 = '[' + a + '|' + den + ']';
+      S.push({ f: f0, say: 'Une somme (ou une différence) en bas. Multiplier par √' + b + ' ne suffit pas : il resterait une racine. L’astuce : le **conjugué** ' + conj + ' (on change le signe du milieu).' });
+      S.push({ f: '[' + top + '|(' + den + ')(' + conj + ')]', say: 'On multiplie le haut et le bas par le conjugué ' + conj + '.' });
+      S.push({ f: '[' + top + '|(√' + b + ')^2 − ' + c + '^2]', say: 'En bas, identité remarquable : (x ' + (F.s < 0 ? '−' : '+') + ' y)(x ' + (F.s < 0 ? '+' : '−') + ' y) = x^2 − y^2. Les racines croisées s’annulent.' });
+      S.push({ f: '[' + top + '|' + d + ']', say: '(√' + b + ')^2 − ' + c + '^2 = ' + b + ' − ' + (c * c) + ' = ' + d + '. Plus de racine en bas !' + (g > 1 ? ' On peut encore simplifier par ' + g + '.' : '') });
+      if (g > 1) S.push({ f: R, say: 'On simplifie par ' + g + '.' + (D === 1 ? ' Il n’y a même plus de fraction.' : '') });
+    }
+    return { steps: S, f0: f0, R: R };
+  }
+  var RAP = [{ t: 'r', a: 1, b: 2 }, { t: 'r', a: 6, b: 3 }, { t: 'r', a: 5, b: 5 }, { t: 'r', a: 3, b: 6 }, { t: 'c', a: 1, b: 3, c: 1, s: -1 }, { t: 'c', a: 2, b: 5, c: 1, s: 1 }];
+  function ratLabel(F) { return F.t === 'r' ? '[' + F.a + '|√' + F.b + ']' : '[' + F.a + '|√' + F.b + ' ' + (F.s < 0 ? '−' : '+') + ' ' + F.c + ']'; }
+  function ratRandom(prev) {
+    var F, guard = 0, B = [2, 3, 5, 6, 7, 10, 11];
+    do {
+      if (Math.random() < .7) F = { t: 'r', a: rint(1, 12), b: pick(B) };
+      else { var b = pick(B), c = rint(1, 3); while (c * c >= b) c--; F = { t: 'c', a: rint(1, 6), b: b, c: Math.max(1, c), s: Math.random() < .5 ? -1 : 1 }; }
+      guard++;
+    } while (prev && ratLabel(F) === ratLabel(prev) && guard < 20);
+    return F;
+  }
+  var raCur = RAP[0], raSel = 0;
+  function raBtns() {
+    $('raBtns').innerHTML = RAP.map(function (F, i) { return '<button type="button" class="ex" data-i="' + i + '" aria-pressed="' + (i === raSel ? 'true' : 'false') + '">' + fmt(ratLabel(F)) + '</button>'; }).join('') + '<button type="button" data-i="new">Autre fraction</button>';
+  }
+  raBtns();
+  var RA = makeStepper({ id: 'ra', doneTitle: 'Dénominateur rationnel', get: function () { var X = ratSteps(raCur); return chainSteps(X.steps, X.f0); } });
+  $('raBtns').addEventListener('click', function (ev) {
+    var b = ev.target.closest('button'); if (!b) return;
+    var v = b.getAttribute('data-i');
+    if (v === 'new') { raCur = ratRandom(raCur); raSel = -1; } else { raSel = clamp(v, RAP.length); raCur = RAP[raSel]; }
+    raBtns(); RA.restart();
+  });
+
+  /* ---------- Étape 8 : x² = a ---------- */
+  var NS = 'http://www.w3.org/2000/svg';
+  function mk(svg, name, attrs, text) { var e = document.createElementNS(NS, name); for (var k in attrs) e.setAttribute(k, attrs[k]); if (text != null) e.textContent = text; svg.appendChild(e); return e; }
+  function clearEl(el) { while (el.firstChild) el.removeChild(el.firstChild); }
+  function solveSq(a) {
+    if (a < 0) return { n: 0, sols: [] };
+    if (a === 0) return { n: 1, sols: ['0'] };
+    var s = exactSqrt(a); return { n: 2, sols: [s, MI + s], v: Math.sqrt(a) };
+  }
+  var EQP = [-4, -1, 0, 1, 2, 4, 5, 9, 12];
+  function eqRender() {
+    var a = parseInt($('eqA').value, 10); if (!isFinite(a)) a = 5;
+    $('eqAOut').textContent = sgn(a);
+    presetRow('eqPre', EQP, EQP.indexOf(a), function (p) { return 'a = ' + sgn(p); });
+    var svg = $('eqSvg'); clearEl(svg);
+    function X(x) { return 240 + x * 55; } function Y(y) { return 270 - y * 19; }
+    mk(svg, 'line', { x1: 10, y1: Y(0), x2: 470, y2: Y(0), stroke: 'var(--ink-soft)', 'stroke-width': 1.5 });
+    mk(svg, 'line', { x1: X(0), y1: 10, x2: X(0), y2: 350, stroke: 'var(--ink-soft)', 'stroke-width': 1.5 });
+    for (var t = -4; t <= 4; t++) { if (t) { mk(svg, 'line', { x1: X(t), y1: Y(0) - 5, x2: X(t), y2: Y(0) + 5, stroke: 'var(--ink-soft)', 'stroke-width': 1.5 }); if (t % 2 === 0) mk(svg, 'text', { x: X(t), y: Y(0) + 24, 'text-anchor': 'middle', 'font-size': 18 }, sgn(t)); } }
+    var pts = [];
+    for (var x = -3.55; x <= 3.551; x += 0.05) pts.push(X(x).toFixed(1) + ',' + Y(x * x).toFixed(1));
+    mk(svg, 'polyline', { points: pts.join(' '), fill: 'none', stroke: 'var(--acc)', 'stroke-width': 4, 'stroke-linejoin': 'round' });
+    mk(svg, 'text', { x: X(2.35), y: Y(11), 'font-size': 19, 'font-weight': 600, style: 'fill:var(--acc-ink)' }, 'y = x²');
+    mk(svg, 'line', { x1: 14, y1: Y(a), x2: 466, y2: Y(a), stroke: 'var(--red)', 'stroke-width': 3, 'stroke-dasharray': '10 6' });
+    mk(svg, 'text', { x: 18, y: Y(a) - 8, 'font-size': 19, 'font-weight': 600, style: 'fill:var(--red)' }, 'y = ' + sgn(a));
+    var S = solveSq(a), out = $('eqOut');
+    if (S.n === 2) {
+      [-S.v, S.v].forEach(function (r) {
+        mk(svg, 'line', { x1: X(r), y1: Y(a), x2: X(r), y2: Y(0), stroke: 'var(--ok)', 'stroke-width': 2, 'stroke-dasharray': '4 4' });
+        mk(svg, 'circle', { cx: X(r), cy: Y(a), r: 8, fill: 'var(--ok)', stroke: 'var(--card)', 'stroke-width': 2 });
+        mk(svg, 'circle', { cx: X(r), cy: Y(0), r: 5, fill: 'var(--ok)' });
+      });
+      out.className = 'fbk ok';
+      var ex2 = S.sols[0] !== '√' + a ? ' = ' + S.sols[0] : '';
+      out.innerHTML = '<strong>Deux solutions</strong><span>' + fmt('x^2 = ' + a + ' donne x = √' + a + ex2 + ' ou x = −√' + a + (ex2 ? ' = ' + S.sols[1] : '') + '.') + '</span><span>' + fmt((isSq(a) ? 'Exactement : x = ' + S.sols[0] + ' ou x = ' + S.sols[1] : 'Valeurs approchées : x ≈ ' + fd(S.v, 3) + ' ou x ≈ ' + fd(-S.v, 3)) + '. Contrôle : (√' + a + ')^2 = ' + a + ' et (−√' + a + ')^2 = ' + a + '.') + '</span>';
+    } else if (S.n === 1) {
+      mk(svg, 'circle', { cx: X(0), cy: Y(0), r: 8, fill: 'var(--ok)', stroke: 'var(--card)', 'stroke-width': 2 });
+      out.className = 'fbk info';
+      out.innerHTML = '<strong>Une seule solution</strong><span>' + fmt('x^2 = 0 donne x = 0. La droite touche la parabole en un seul point, tout en bas.') + '</span>';
+    } else {
+      out.className = 'fbk no';
+      out.innerHTML = '<strong>Aucune solution dans ℝ</strong><span>' + fmt('x^2 = ' + sgn(a) + ' est impossible : un carré n’est jamais négatif. La droite passe sous la parabole, elles ne se croisent pas.') + '</span>';
+    }
+  }
+  $('eqA').addEventListener('input', eqRender);
+  $('eqPre').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b) return; $('eqA').value = EQP[clamp(b.getAttribute('data-i'), EQP.length)]; eqRender(); });
+  eqRender();
+
+  /* ---------- Étape 9 : le cube ---------- */
+  function cubeInfo(V) { var c = Math.cbrt(V), k = Math.round(c), exact = k * k * k === V, lo = Math.floor(c + 1e-9); return { c: exact ? k : c, exact: exact, lo: lo }; }
+  var CBP = [1, 2, 8, 10, 27, 50, 64, 100, 125, 216, 343, 1000], cb = { V: 27 };
+  function cbRender() {
+    presetRow('cbPre', CBP, CBP.indexOf(cb.V), function (p) { return String(p); });
+    var I = cubeInfo(cb.V), svg = $('cbSvg'); clearEl(svg);
+    var s = 20 + 14 * Math.min(I.c, 10), dx = s * .5, dy = s * .35, x0 = 50, y0 = 255;
+    var F = [[x0, y0], [x0 + s, y0], [x0 + s, y0 - s], [x0, y0 - s]];
+    function pt(p) { return p[0].toFixed(1) + ',' + p[1].toFixed(1); }
+    mk(svg, 'polygon', { points: [F[3], F[2], [F[2][0] + dx, F[2][1] - dy], [F[3][0] + dx, F[3][1] - dy]].map(pt).join(' '), fill: 'var(--acc-soft)', stroke: 'var(--ink)', 'stroke-width': 2, 'stroke-linejoin': 'round' });
+    mk(svg, 'polygon', { points: [F[1], [F[1][0] + dx, F[1][1] - dy], [F[2][0] + dx, F[2][1] - dy], F[2]].map(pt).join(' '), fill: 'var(--two-soft)', stroke: 'var(--ink)', 'stroke-width': 2, 'stroke-linejoin': 'round' });
+    mk(svg, 'polygon', { points: F.map(pt).join(' '), fill: 'var(--card)', stroke: 'var(--ink)', 'stroke-width': 2.5, 'stroke-linejoin': 'round' });
+    mk(svg, 'text', { x: x0 + s / 2, y: y0 + 22, 'text-anchor': 'middle', 'font-size': 19, 'font-weight': 600 }, 'c');
+    var cx = 300;
+    mk(svg, 'text', { x: cx, y: 110, 'font-size': 22, 'font-weight': 600 }, 'V = ' + cb.V + ' cm³');
+    mk(svg, 'text', { x: cx, y: 150, 'font-size': 22, 'font-weight': 600, style: 'fill:var(--acc-ink)' }, 'c ' + (I.exact ? '= ' + I.c : '≈ ' + fd(I.c, 3)) + ' cm');
+    var t = '<strong>' + fmt('c = ∛' + cb.V + (I.exact ? ' = ' + I.c : ' ≈ ' + fd(I.c, 3))) + ' cm</strong>';
+    if (I.exact) t += '<span>' + fmt(cb.V + ' est un **cube parfait** : ' + I.c + ' × ' + I.c + ' × ' + I.c + ' = ' + cb.V + '.') + '</span>';
+    else t += '<span>' + fmt(cb.V + ' n’est pas un cube parfait. Encadrement : ' + I.lo + '^3 = ' + Math.pow(I.lo, 3) + ' < ' + cb.V + ' < ' + Math.pow(I.lo + 1, 3) + ' = ' + (I.lo + 1) + '^3, donc ' + I.lo + ' < ∛' + cb.V + ' < ' + (I.lo + 1) + '. Contrôle : ' + fd(I.c, 3) + '^3 ≈ ' + fd(Math.pow(Math.round(I.c * 1000) / 1000, 3), 3) + '.') + '</span>';
+    $('cbOut').innerHTML = t;
+  }
+  var CBC = makeCtrl4('cbCtrls', { k: 'V', label: 'Volume V (cm³)', aria: 'Volume', min: 1, max: 1000 }, cb, cbRender);
+  $('cbPre').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b) return; cb.V = CBP[clamp(b.getAttribute('data-i'), CBP.length)]; CBC.render(); cbRender(); });
+  cbRender();
+
+  /* ---------- Étape 10 : géométrie ---------- */
+  function geo(c) {
+    return { sq: radS(c, 2), tri: c % 2 === 0 ? radS(c / 2, 3) : '[' + radS(c, 3) + '|2]', cube: radS(c, 3),
+      vsq: c * Math.SQRT2, vtri: c * Math.sqrt(3) / 2, vcube: c * Math.sqrt(3) };
+  }
+  var GM = ['Carré', 'Triangle équilatéral', 'Cube'], gm = { c: 5 }, gmSel = 0;
+  function gmRender() {
+    $('gmBtns').innerHTML = GM.map(function (g, i) { return '<button type="button" data-i="' + i + '" aria-pressed="' + (i === gmSel ? 'true' : 'false') + '">' + g + '</button>'; }).join('');
+    var svg = $('gmSvg'); clearEl(svg);
+    var lab = { 'font-size': 20, 'font-weight': 600 }, G = geo(gm.c);
+    function T(x, y, s, extra) { var a = { x: x, y: y, 'text-anchor': 'middle' }; for (var k in lab) a[k] = lab[k]; for (var k2 in extra || {}) a[k2] = extra[k2]; mk(svg, 'text', a, s); }
+    if (gmSel === 0) {
+      mk(svg, 'rect', { x: 150, y: 50, width: 190, height: 190, fill: 'var(--acc-soft)', stroke: 'var(--ink)', 'stroke-width': 2.5 });
+      mk(svg, 'line', { x1: 150, y1: 240, x2: 340, y2: 50, stroke: 'var(--red)', 'stroke-width': 4 });
+      T(245, 270, 'c'); T(360, 152, 'c'); T(228, 135, 'd', { style: 'fill:var(--red)' });
+    } else if (gmSel === 1) {
+      mk(svg, 'polygon', { points: '130,260 350,260 240,69.5', fill: 'var(--acc-soft)', stroke: 'var(--ink)', 'stroke-width': 2.5, 'stroke-linejoin': 'round' });
+      mk(svg, 'line', { x1: 240, y1: 69.5, x2: 240, y2: 260, stroke: 'var(--red)', 'stroke-width': 4 });
+      mk(svg, 'polyline', { points: '240,244 256,244 256,260', fill: 'none', stroke: 'var(--ink)', 'stroke-width': 2 });
+      T(240, 288, 'c'); T(166, 160, 'c'); T(314, 160, 'c'); T(222, 180, 'h', { style: 'fill:var(--red)' });
+    } else {
+      var f = [[120, 260], [280, 260], [280, 100], [120, 100]], d = [80, -60];
+      function q(p) { return (p[0] + d[0]) + ',' + (p[1] + d[1]); }
+      mk(svg, 'polygon', { points: q(f[3]) + ' ' + q(f[2]) + ' ' + f[2].join(',') + ' ' + f[3].join(','), fill: 'var(--acc-soft)', stroke: 'var(--ink)', 'stroke-width': 2, 'stroke-linejoin': 'round' });
+      mk(svg, 'polygon', { points: f[1].join(',') + ' ' + q(f[1]) + ' ' + q(f[2]) + ' ' + f[2].join(','), fill: 'var(--two-soft)', stroke: 'var(--ink)', 'stroke-width': 2, 'stroke-linejoin': 'round' });
+      mk(svg, 'polygon', { points: f.map(function (p) { return p.join(','); }).join(' '), fill: 'var(--card)', 'fill-opacity': .55, stroke: 'var(--ink)', 'stroke-width': 2.5, 'stroke-linejoin': 'round' });
+      mk(svg, 'line', { x1: 120, y1: 260, x2: 360, y2: 40, stroke: 'var(--red)', 'stroke-width': 4 });
+      T(200, 288, 'c'); T(258, 140, 'D', { style: 'fill:var(--red)' });
+    }
+    var rows = [
+      { n: 'Diagonale du carré', f: 'd = c√2', ex: G.sq, v: G.vsq, why: 'd^2 = c^2 + c^2 = 2c^2, donc d = √{2c^2} = c√2.' },
+      { n: 'Hauteur du triangle équilatéral', f: 'h = [c√3|2]', ex: G.tri, v: G.vtri, why: 'h^2 = c^2 − ([c|2])^2 = [3c^2|4], donc h = [c√3|2].' },
+      { n: 'Diagonale du cube', f: 'D = c√3', ex: G.cube, v: G.vcube, why: 'Diagonale d’une face : c√2. Puis D^2 = c^2 + (c√2)^2 = 3c^2, donc D = c√3.' }
+    ];
+    $('gmOut').innerHTML = rows.map(function (r, i) {
+      return '<div class="res' + (i === gmSel ? ' on' : '') + '"><span class="res-name">' + r.n + ' : ' + fmt(r.f) + '</span><span class="res-val">' + fmt('Valeur exacte : ' + r.ex + ' cm') + '</span><span class="res-val">' + fmt('Valeur approchée : ≈ ' + fd(r.v, 2) + ' cm') + '</span>' + (i === gmSel ? '<span class="soft">' + fmt(r.why) + '</span>' : '') + '</div>';
+    }).join('');
+  }
+  makeCtrls('gmCtrls', [{ k: 'c', label: 'Côté c (cm)', aria: 'Côté c', min: 1, max: 12 }], gm, gmRender);
+  $('gmBtns').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b) return; gmSel = clamp(b.getAttribute('data-i'), GM.length); gmRender(); });
+  gmRender();
+
+  /* ---------- Étape 11 : trouve l'erreur (v = valeur juste, vérifiée) ---------- */
+  var NX = 'Ça n’existe pas';
+  var errCards = [
+    { k: 'e1', who: 'Léa', s: '√{9 + 16} = √9 + √16 = 7', q: 'Combien vaut vraiment √{9 + 16} ?', o: ['5', '7', '25'], a: '5', v: '√{9 + 16}', why: 'On calcule d’abord sous la racine : 9 + 16 = 25, et √25 = 5. La racine ne se coupe jamais sur une somme : √{a + b} ≠ √a + √b.',
+      bad: { '7': 'c’est l’erreur de Léa : elle a coupé la racine en deux sur une addition.', '25': 'tu as calculé 9 + 16, mais oublié de prendre la racine.' } },
+    { k: 'e2', who: 'Tom', s: '√{−4} = −2', q: 'Que vaut √{−4} avec les nombres réels ?', o: [NX, '−2', '2'], a: NX, why: 'Un carré n’est jamais négatif : 2^2 = 4 et (−2)^2 = 4. Aucun nombre réel au carré ne donne −4. Attention : −√4 = −2 existe, lui.',
+      bad: { '−2': '(−2)^2 = 4, pas −4. Et une racine carrée n’est jamais négative.', '2': '2^2 = 4, pas −4.' } },
+    { k: 'e3', who: 'Noé', s: '2√3 = √6', q: '2√3 est égal à…', o: ['√12', '√6', '√5'], a: '√12', v: '2√3', why: 'Pour faire entrer le 2 sous la racine, il faut le mettre au carré : 2 = √4, donc 2√3 = √4 × √3 = √12 ≈ 3,464.',
+      bad: { '√6': 'c’est l’erreur de Noé : le 2 est hors de la racine, on ne peut pas juste le multiplier par 3. √6 ≈ 2,449.', '√5': 'tu as additionné 2 + 3 : il n’y a pas d’addition ici.' } },
+    { k: 'e4', who: 'Inès', s: '(√3)^2 = 9', q: 'Combien vaut (√3)^2 ?', o: ['3', '9', '6'], a: '3', v: '(√3)^2', why: '(√3)^2 = √3 × √3 = 3 : la racine et le carré s’annulent.',
+      bad: { '9': 'c’est l’erreur d’Inès : elle a calculé 3^2 au lieu de (√3)^2.', '6': 'tu as calculé 3 × 2 : l’exposant 2 ne veut pas dire « fois 2 ».' } },
+    { k: 'e5', who: 'Max', s: '√{(−5)^2} = −5', q: 'Combien vaut √{(−5)^2} ?', o: ['5', '−5', NX], a: '5', v: '√{(−5)^2}', why: '(−5)^2 = 25 et √25 = 5. En général, √{x^2} = |x| : c’est x si x ≥ 0, et −x si x < 0.',
+      bad: { '−5': 'c’est l’erreur de Max : une racine carrée n’est jamais négative.', 'Ça n’existe pas': '(−5)^2 = 25 est positif : sa racine existe.' } },
+    { k: 'e6', who: 'Sam', s: '√2 + √3 = √5', q: 'Comment écrire √2 + √3 plus simplement ?', o: ['On ne peut pas', '√5', '√6'], a: 'On ne peut pas', v: '√2 + √3', why: '√2 et √3 ne sont pas semblables : √2 + √3 ≈ 1,414 + 1,732 = 3,146 reste tel quel. √5 ≈ 2,236, ce n’est pas le même nombre.',
+      bad: { '√5': 'c’est l’erreur de Sam : on n’additionne pas sous la racine.', '√6': '√6 = √2 × √3 : c’est le produit, pas la somme.' } },
+    { k: 'e7', who: 'Zoé', s: '√16 = 4 ou −4', q: '√16 vaut…', o: ['4', '4 et −4', '8'], a: '4', v: '√16', why: 'Le signe √ désigne toujours le nombre positif (ou nul) : √16 = 4. C’est l’équation x^2 = 16 qui a deux solutions, 4 et −4 (étape 8).',
+      bad: { '4 et −4': 'c’est l’erreur de Zoé : elle confond √16 et les solutions de x^2 = 16.', '8': 'tu as divisé par 2 : 8 × 8 = 64, pas 16.' } },
+    { k: 'e8', who: 'Léo', s: '3√2 × 2√2 = 6√2', q: 'Combien vaut 3√2 × 2√2 ?', o: ['12', '6√2', '5√2'], a: '12', v: '3√2 × 2√2', why: 'On multiplie les nombres ensemble et les racines ensemble : (3 × 2) × (√2 × √2) = 6 × 2 = 12.',
+      bad: { '6√2': 'c’est l’erreur de Léo : il a oublié que √2 × √2 = 2.', '5√2': 'tu as additionné 3 + 2 : c’est un produit, pas une somme.' } },
+    { k: 'e9', who: 'Mia', s: '√{[9|4]} = [9|2]', q: '√{[9|4]} vaut…', o: ['[3|2]', '[9|2]', '[3|4]'], a: '[3|2]', v: '√{[9|4]}', why: 'Racine d’un quotient : √{[9|4]} = [√9|√4] = [3|2]. Contrôle : [3|2] × [3|2] = [9|4].',
+      bad: { '[9|2]': 'c’est l’erreur de Mia : elle a pris la racine seulement en bas.', '[3|4]': 'tu as pris la racine seulement en haut.' } },
+    { k: 'e10', who: 'Ethan', s: '[1|√2] = [1|2]', q: '[1|√2] est égal à…', o: ['[√2|2]', '[1|2]', '√2'], a: '[√2|2]', v: '[1|√2]', why: 'On multiplie en haut et en bas par √2 : [1 × √2|√2 × √2] = [√2|2]. Contrôle : environ 0,707 des deux côtés.',
+      bad: { '[1|2]': 'c’est l’erreur d’Ethan : il a enlevé la racine du bas sans rien faire en haut. [1|2] = 0,5 mais [1|√2] ≈ 0,707.', '√2': '√2 ≈ 1,414 : c’est l’inverse. [1|√2] est plus petit que 1.' } },
+    { k: 'e11', who: 'Lina', s: '(1 + √2)^2 = 1 + 2 = 3', q: 'Combien vaut (1 + √2)^2 ?', o: ['3 + 2√2', '3', '1 + 2√2'], a: '3 + 2√2', v: '(1 + √2)^2', why: '(a + b)^2 = a^2 + 2ab + b^2 : 1 + 2√2 + 2 = 3 + 2√2 ≈ 5,83.',
+      bad: { '3': 'c’est l’erreur de Lina : elle a oublié le double produit 2 × 1 × √2 = 2√2.', '1 + 2√2': 'tu as oublié le dernier carré : (√2)^2 = 2.' } },
+    { k: 'e12', who: 'Hugo', s: '√{0,04} = 0,02', q: 'Combien vaut √{0,04} ?', o: ['0,2', '0,02', '0,4'], a: '0,2', v: '√{0,04}', why: '0,2 × 0,2 = 0,04, donc √{0,04} = 0,2.',
+      bad: { '0,02': 'c’est l’erreur de Hugo : 0,02 × 0,02 = 0,0004.', '0,4': '0,4 × 0,4 = 0,16.' } }
+  ];
+  makeSorter({ items: errCards, names: null, order: [], btns: 's11Btns', card: 's11Card', pos: 's11Pos', out: 's11Out', score_: 's11Score', prev: 's11Prev', next: 's11Next', reset: 's11Reset', word: 'Question', score: scorer(errCards),
+    cardHtml: function (it) { return '<span class="ask">' + esc(it.who) + ' a écrit :</span><span class="expr">' + fmt(it.s) + '</span><span class="ask">' + fmt(it.q) + '</span>'; } });
+
+  /* ---------- Étape 12 : atelier ---------- */
+  var atelierCards = [
+    { k: 'a1', e: 1, s: '√50 + √8', o: ['5√2 + 2√2', '√58', '25√2 + 4√2'], a: '5√2 + 2√2', why: '50 = 25 × 2 et 8 = 4 × 2 : √50 = 5√2 et √8 = 2√2. On simplifie d’abord !',
+      bad: { '√58': 'on n’additionne pas sous la racine : √50 + √8 ≈ 9,90 mais √58 ≈ 7,62.', '25√2 + 4√2': 'tu as sorti 25 et 4 au lieu de leurs racines : √{25 × 2} = 5√2.' } },
+    { k: 'a2', e: 1, s: '5√2 + 2√2', o: ['7√2', '7√4', '10√2'], a: '7√2', why: 'Racines semblables : comme 5x + 2x = 7x, 5√2 + 2√2 = 7√2 ≈ 9,90.',
+      bad: { '7√4': 'on additionne les nombres devant ; la racine √2 ne change pas (dans 5x + 2x, x ne devient pas x^2).', '10√2': 'tu as multiplié 5 × 2 au lieu d’additionner.' } },
+    { k: 'a3', e: 2, s: '√12 × √3', o: ['√36', '√15', '12√3'], a: '√36', why: 'Produit : √a × √b = √{ab}, donc √{12 × 3} = √36.',
+      bad: { '√15': 'tu as additionné 12 + 3 sous la racine : c’est un produit.', '12√3': 'le 12 est sous une racine : il ne peut pas sortir tel quel.' } },
+    { k: 'a4', e: 2, s: '√36', o: ['6', '18', '√6'], a: '6', why: '6 × 6 = 36, donc √36 = 6.',
+      bad: { '18': 'tu as divisé par 2 : 18 × 18 = 324.', '√6': '√36 = 6, pas √6 ≈ 2,449.' } },
+    { k: 'a5', e: 3, s: '[10|√5]', o: ['[10√5|5]', '[10|5]', '[10√5|25]'], a: '[10√5|5]', why: 'On multiplie en haut et en bas par √5 : en bas, √5 × √5 = 5.',
+      bad: { '[10|5]': 'tu as enlevé la racine du bas sans rien faire en haut : la valeur a changé (2 au lieu d’environ 4,47).', '[10√5|25]': '√5 × √5 = 5, pas 25.' } },
+    { k: 'a6', e: 3, s: '[10√5|5]', o: ['2√5', '2', '√50'], a: '2√5', why: '10 ÷ 5 = 2, et √5 reste : 2√5 ≈ 4,47.',
+      bad: { '2': 'la racine √5 du haut ne disparaît pas.', '√50': '√50 = 5√2 ≈ 7,07 : ce n’est pas le même nombre.' } },
+    { k: 'a7', e: 4, s: '(1 + √2)^2', o: ['1 + 2√2 + 2', '1 + 2', '1 + √2 + 2'], a: '1 + 2√2 + 2', why: '(a + b)^2 = a^2 + 2ab + b^2, avec a = 1 et b = √2 : 1 + 2√2 + 2.',
+      bad: { '1 + 2': 'il manque le double produit 2 × 1 × √2.', '1 + √2 + 2': 'le double produit vaut 2 × 1 × √2 = 2√2, pas √2.' } },
+    { k: 'a8', e: 4, s: '1 + 2√2 + 2', o: ['3 + 2√2', '5√2', '3√2'], a: '3 + 2√2', why: '1 + 2 = 3, et 2√2 reste à part : 3 + 2√2 ≈ 5,83.',
+      bad: { '5√2': '3 et 2√2 ne sont pas semblables : on ne les additionne pas.', '3√2': 'on ne peut pas « coller » la racine sur le 3.' } },
+    { k: 'a9', e: 5, s: '√{[4|9]}', o: ['[√4|√9]', '[√4|9]', '[4|√9]'], a: '[√4|√9]', why: 'Racine d’un quotient : on prend la racine en haut ET en bas.',
+      bad: { '[√4|9]': 'la racine doit aussi s’appliquer au dénominateur.', '[4|√9]': 'la racine doit aussi s’appliquer au numérateur.' } },
+    { k: 'a10', e: 5, s: '[√4|√9]', o: ['[2|3]', '[4|9]', '0,6'], a: '[2|3]', why: '√4 = 2 et √9 = 3. Contrôle : [2|3] × [2|3] = [4|9].',
+      bad: { '[4|9]': 'tu as enlevé les racines sans les calculer.', '0,6': '[2|3] = 0,666…, pas 0,6. Garde la fraction : c’est la valeur exacte.' } },
+    { k: 'a11', e: 6, s: '3√20 − √45', o: ['6√5 − 3√5', '6√5 − 5√3', '2√5 − 3√5'], a: '6√5 − 3√5', why: '20 = 4 × 5, donc √20 = 2√5 et 3√20 = 3 × 2√5 = 6√5. Et 45 = 9 × 5, donc √45 = 3√5.',
+      bad: { '6√5 − 5√3': '45 = 9 × 5, et non 25 × 3 : √45 = 3√5.', '2√5 − 3√5': 'tu as oublié le 3 devant : 3√20 = 3 × 2√5 = 6√5.' } },
+    { k: 'a12', e: 6, s: '6√5 − 3√5', o: ['3√5', '3', '3√10'], a: '3√5', why: 'Semblables : (6 − 3)√5 = 3√5 ≈ 6,71.',
+      bad: { '3': 'la racine √5 ne disparaît pas.', '3√10': 'on ne touche pas au nombre sous la racine : 6√5 − 3√5 = 3√5.' } },
+    { k: 'a13', e: 7, s: '(√6)^2 − √36', o: ['6 − 6', '36 − 6', '6 − 18'], a: '6 − 6', why: '(√6)^2 = 6 et √36 = 6.',
+      bad: { '36 − 6': '(√6)^2 = 6, pas 36 : la racine et le carré s’annulent.', '6 − 18': '√36 = 6, pas 36 ÷ 2.' } },
+    { k: 'a14', e: 7, s: '6 − 6', o: ['0', '12', '−6'], a: '0', why: '6 − 6 = 0. Toute l’expression vaut 0 !',
+      bad: { '12': 'c’est une soustraction, pas une addition.', '−6': '6 − 6 = 0.' } },
+    { k: 'a15', e: 8, s: '√{0,25}', o: ['√{[25|100]}', '√{[25|10]}', '√{[1|25]}'], a: '√{[25|100]}', why: '0,25, c’est 25 centièmes : [25|100].',
+      bad: { '√{[25|10]}': '[25|10] = 2,5, pas 0,25.', '√{[1|25]}': '[1|25] = 0,04. (En revanche, 0,25 = [1|4].)' } },
+    { k: 'a16', e: 8, s: '√{[25|100]}', o: ['[5|10]', '[5|100]', '[25|10]'], a: '[5|10]', why: '√25 = 5 et √100 = 10 : [5|10] = 0,5. Contrôle : 0,5 × 0,5 = 0,25.',
+      bad: { '[5|100]': 'la racine s’applique aussi au dénominateur : √100 = 10.', '[25|10]': 'tu as pris la racine seulement en bas.' } }
+  ];
+  makeSorter({ items: atelierCards, names: null, order: [], btns: 'atBtns', card: 'atCard', pos: 'atPos', out: 'atOut', score_: 'atScore', prev: 'atPrev', next: 'atNext', reset: 'atReset', word: 'Étape', score: scorer(atelierCards),
+    cardHtml: function (it) { return '<span class="ask">Expression ' + it.e + ' / 8</span><span class="expr">' + fmt(it.s) + '</span><span class="ask">' + fmt(it.q || 'Quelle est la bonne étape suivante ?') + '</span>'; } });
+
+  /* ---------- Idées reçues et Le savais-tu ? ---------- */
+  $('irCards').innerHTML = cardsHtml([
+    { t: 'Idée reçue', tag: 'no', h: '« √{a + b} = √a + √b »', p: 'Non : √{9 + 16} = 5 mais √9 + √16 = 7. La racine ne se coupe que sur un produit ou un quotient.' },
+    { t: 'Idée reçue', tag: 'no', h: '« Une racine, c’est toujours un nombre à virgule »', p: 'Non : √49 = 7, √{[4|9]} = [2|3] et √{0,25} = 0,5. Seules les racines qui ne tombent pas juste sont irrationnelles.' },
+    { t: 'Idée reçue', tag: 'no', h: '« Il faut toujours arrondir le résultat »', p: 'Non : 5√2 est la valeur **exacte**. 7,07 n’est qu’une valeur approchée. En maths, on garde souvent la racine.' },
+    { t: 'Idée reçue', tag: 'no', h: '« La racine d’un nombre négatif n’existe jamais »', p: 'Vrai pour la racine **carrée** (dans ℝ). Mais la racine **cubique** existe : ∛{−8} = −2, car (−2)^3 = −8.' }
+  ]);
+  $('svCards').innerHTML = cardsHtml([
+    { t: '1525', tag: 'two', h: 'Christoph Rudolff', p: 'Ce mathématicien allemand utilise le signe √ dans un livre d’algèbre imprimé. Le signe viendrait peut-être d’une lettre r déformée, pour **radix**, « racine » en latin.' },
+    { t: '1637', tag: 'two', h: 'La barre au-dessus', p: 'Dans **La Géométrie**, René Descartes accroche au signe √ une barre horizontale au-dessus du nombre, ce qui montre jusqu’où va la racine. C’est en gros l’écriture d’aujourd’hui.' },
+    { t: 'Antiquité', tag: 'two', h: 'Les Grecs et √2', p: 'Les mathématiciens grecs (d’après la tradition, dans l’école de Pythagore) savaient déjà que √2 ne peut pas s’écrire comme une fraction. Qui l’a découvert, et comment, reste mal connu.' },
+    { t: 'Papier A4', tag: 'two', h: 'Une feuille en √2', p: 'Une feuille A4 mesure 21 cm sur 29,7 cm : [29,7|21] ≈ 1,414 ≈ √2. Grâce à ce rapport, une feuille pliée en deux (A5) a exactement la même forme.' }
+  ]);
+
+  /* ---------- Quiz ---------- */
+  var QZ = [
+    { q: '√3 × √12 = ?', o: [['a', '6'], ['b', '√15'], ['c', '36']], a: 'a', how: '√3 × √12 = √36 = 6.' },
+    { q: 'Écris √72 sous forme simplifiée.', o: [['a', '6√2'], ['b', '8√3'], ['c', '36√2']], a: 'a', how: '72 = 36 × 2, donc √72 = √36 × √2 = 6√2.' },
+    { q: '3√5 + 2√5 = ?', o: [['a', '5√10'], ['b', '5√5'], ['c', '6√5']], a: 'b', how: 'Racines semblables : (3 + 2)√5 = 5√5.' },
+    { q: '√{[9|25]} = ?', o: [['a', '[3|5]'], ['b', '[9|5]'], ['c', '[3|25]']], a: 'a', how: '√9 = 3 et √25 = 5, donc [3|5].' },
+    { q: '[1|√3] = ?', o: [['a', '[√3|3]'], ['b', '[1|3]'], ['c', '3√3']], a: 'a', how: 'On multiplie en haut et en bas par √3 : [√3|3] ≈ 0,577.' },
+    { q: '(√7 − √2)(√7 + √2) = ?', o: [['a', '5'], ['b', '√5'], ['c', '9']], a: 'a', how: '(a − b)(a + b) = a^2 − b^2 : 7 − 2 = 5.' },
+    { q: 'Les solutions de x^2 = 16 sont…', o: [['a', '4 seulement'], ['b', '−4 et 4'], ['c', 'aucune']], a: 'b', how: '4^2 = 16 et (−4)^2 = 16 : deux solutions. (Mais √16 = 4 seulement.)' },
+    { q: '∛{−27} = ?', o: [['a', '−3'], ['b', 'n’existe pas'], ['c', '3']], a: 'a', how: '(−3)^3 = −27 : la racine cubique d’un nombre négatif existe.' }
+  ];
+  var quiz = $('quiz'), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ''; done = [];
+    QZ.forEach(function (Q, k) {
+      var li = document.createElement('li');
+      li.innerHTML = '<span>' + fmt(Q.q) + '</span><select id="qa' + k + '" aria-label="Ta réponse à la question ' + (k + 1) + '"><option value="">…</option>' + Q.o.map(function (o) { return '<option value="' + o[0] + '">' + esc(uni(o[1])) + '</option>'; }).join('') + '</select><button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+      quiz.appendChild(li);
+      function check() {
+        var fb = $('qf' + k), v = $('qa' + k).value;
+        if (!v) { fb.className = 'fb'; fb.textContent = 'Choisis une réponse.'; return; }
+        if (v === Q.a) { fb.className = 'fb ok'; fb.innerHTML = 'Bravo, c’est juste !<span>' + fmt(Q.how) + '</span>'; done[k] = true; }
+        else {
+          done[k] = false;
+          var good = Q.o.filter(function (o) { return o[0] === Q.a; })[0][1];
+          fb.className = 'fb no'; fb.innerHTML = 'Pas tout à fait : la bonne réponse est « ' + fmt(good) + ' ».<span>' + fmt(Q.how) + '</span>';
+        }
+        $('score').textContent = done.filter(Boolean).length + ' / 8';
+      }
+      $('qb' + k).addEventListener('click', check);
+      $('qa' + k).addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+    });
+    $('score').textContent = '0 / 8';
+  }
+  $('newQuiz').addEventListener('click', newQuiz);
+  newQuiz();
+
+  /* ---------- À toi de jouer ---------- */
+  var EXOS = [
+    { t: 'Simplifier', q: 'Écris sous la forme a√b, avec b le plus petit possible : a) √48 &nbsp; b) √75 &nbsp; c) √200', r: [
+      'a) 48 = 16 × 3, donc √48 = **4√3**.', 'b) 75 = 25 × 3, donc √75 = **5√3**.', 'c) 200 = 100 × 2, donc √200 = **10√2**.'] },
+    { t: 'Réduire', q: 'Réduis : 2√12 + √27 − √3', r: [
+      'On simplifie : √12 = 2√3, donc 2√12 = 4√3 ; et √27 = 3√3.', '4√3 + 3√3 − √3 = (4 + 3 − 1)√3 = **6√3** ≈ 10,39.'] },
+    { t: 'Développer', q: 'Développe et réduis : a) (3 + √2)(3 − √2) &nbsp; b) (2√3 + 1)^2', r: [
+      'a) (a + b)(a − b) = a^2 − b^2 : 9 − 2 = **7**.', 'b) (2√3)^2 + 2 × 2√3 × 1 + 1^2 = 12 + 4√3 + 1 = **13 + 4√3**. Attention : (2√3)^2 = 4 × 3 = 12.'] },
+    { t: 'Rendre rationnel', q: 'Écris sans racine au dénominateur : a) [4|√2] &nbsp; b) [3|√6] &nbsp; c) [2|√5 − 1] (pour aller plus loin)', r: [
+      'a) [4√2|2] = **2√2**.', 'b) [3√6|6] = **[√6|2]**.', 'c) Conjugué √5 + 1 : [2(√5 + 1)|5 − 1] = [2(√5 + 1)|4] = **[√5 + 1|2]** ≈ 1,618.'] },
+    { t: 'Équation', q: 'Résous (x − 1)^2 = 12. Donne les valeurs exactes, puis approchées au centième.', r: [
+      'x − 1 = √12 ou x − 1 = −√12, avec √12 = 2√3.', 'Donc **x = 1 + 2√3 ≈ 4,46** ou **x = 1 − 2√3 ≈ −2,46**.'] },
+    { t: 'Géométrie', q: 'a) Combien mesure la diagonale d’un cube de 4 cm de côté ? b) Quel est le côté d’un cube de 50 cm³ ?', r: [
+      'a) D = c√3 = **4√3 cm** ≈ 6,93 cm.', 'b) c = ∛50 ≈ **3,68 cm**. Encadrement : 3^3 = 27 < 50 < 64 = 4^3, donc c est entre 3 et 4.'] }
+  ];
+  $('exos').innerHTML = EXOS.map(function (E) {
+    return '<details><summary>' + E.t + '<span class="q">' + fmt(E.q).replace(/&amp;nbsp;/g, '&nbsp;') + '</span></summary><div>' + E.r.map(function (r) { return '<span>' + fmt(r) + '</span>'; }).join('') + '</div></details>';
+  }).join('');
+
+  /* ---------- À retenir ---------- */
+  var MEMO = [
+    ['Produit', '√a × √b = √{ab}', '√2 × √8 = √16 = 4'],
+    ['Quotient', '[√a|√b] = √{[a|b]}', '[√50|√2] = √25 = 5'],
+    ['Carré d’une racine', '(√a)^2 = a', '(√7)^2 = 7'],
+    ['Racine d’un carré', '√{a^2} = |a|', '√{(−3)^2} = 3'],
+    ['Simplifier', '√{k^2 × b} = k√b', '√72 = √{36 × 2} = 6√2'],
+    ['Somme', 'p√a + q√a = (p + q)√a', '3√2 + 5√2 = 8√2'],
+    ['Rendre rationnel', '[1|√a] = [√a|a]', '[6|√3] = 2√3'],
+    ['Équation', 'x^2 = a (a > 0) : x = ±√a', 'x^2 = 12 : x = ±2√3']
+  ];
+  $('memo').innerHTML = '<div class="scroll"><table class="tb" aria-label="Les règles de calcul avec les racines"><thead><tr><th>Règle</th><th>Formule</th><th>Exemple</th></tr></thead><tbody>' +
+    MEMO.map(function (m) { return '<tr><th>' + m[0] + '</th><td>' + fmt(m[1]) + '</td><td>' + fmt(m[2]) + '</td></tr>'; }).join('') + '</tbody></table></div>' +
+    [
+      '• **Domaines** : √a existe pour a ≥ 0. Produit : a ≥ 0 et b ≥ 0. Quotient : a ≥ 0 et b > 0. On ne divise jamais par 0.',
+      '• **Interdit** : √{a + b} ≠ √a + √b (et pareil avec −). Seules les **racines semblables** s’additionnent, comme 3x + 5x.',
+      '• **Simplifier** : on décompose en facteurs premiers, chaque paire sort ; ou on sort le plus grand carré parfait.',
+      '• **Développer** : √a × √a = a. N’oublie pas le double produit : (√5 + 1)^2 = 6 + 2√5.',
+      '• **x^2 = a** : deux solutions ±√a si a > 0, une seule (0) si a = 0, aucune dans ℝ si a < 0.',
+      '• **Racine cubique** : ∛8 = 2, ∛{−27} = −3 (elle existe pour les négatifs). √a = a^{1/2}.',
+      '• On garde la **valeur exacte** (5√2) et on n’arrondit qu’à la fin (≈ 7,07).'
+    ].map(function (s) { return '<span>' + fmt(s) + '</span>'; }).join('');
+
+  /* Égalités écrites dans le texte (contrôlées par les tests) */
+  var CHECKS = [
+    ['√2 × √8', '4'], ['√3 × √12', '6'], ['[√50|√2]', '5'], ['√{[9|16]}', '[3|4]'], ['[√12|√3]', '2'], ['√{0,49}', '0,7'],
+    ['√72', '6√2'], ['2√18', '6√2'], ['√8 + √18', '5√2'], ['(√5 + 1)^2', '6 + 2√5'], ['[1|√2]', '[√2|2]'], ['[6|√3]', '2√3'],
+    ['[1|√3 − 1]', '[√3 + 1|2]'], ['3 + √5', '5,236068'], ['3 − √5', '0,763932'], ['∛8', '2'], ['∛{−27}', '−3'], ['∛50', '3,684031'],
+    ['√{[4|9]}', '[2|3]'], ['√{0,25}', '0,5'], ['5√2', '7,071068'], ['√48', '4√3'], ['√75', '5√3'], ['√200', '10√2'],
+    ['2√12 + √27 − √3', '6√3'], ['(3 + √2)(3 − √2)', '7'], ['(2√3 + 1)^2', '13 + 4√3'], ['[4|√2]', '2√2'], ['[3|√6]', '[√6|2]'],
+    ['[2|√5 − 1]', '[√5 + 1|2]'], ['1 + 2√3', '4,464102'], ['1 − 2√3', '−2,464102'], ['4√3', '6,928203'], ['√12', '2√3'],
+    ['√3 × √3 + √3 × 4', '3 + 4√3'], ['[29,7|21]', '1,414286'], ['1,26^3', '2,000376']
+  ];
+
+  window.__rac2 = {
+    fmt: fmt, uni: uni, ev: ev, fd: fd, gcd: gcd, factor: factor, sqf: sqf, radS: radS, exactSqrt: exactSqrt, isSq: isSq,
+    prodInfo: prodInfo, sumInfo: sumInfo, exSteps: exSteps, EXP: EXP, DEV: DEV, ratSteps: ratSteps, RAP: RAP, ratRandom: ratRandom, ratLabel: ratLabel,
+    solveSq: solveSq, cubeInfo: cubeInfo, geo: geo,
+    groupCards: groupCards, errCards: errCards, atelierCards: atelierCards, scorer: scorer, isOk: isOk, quiz: QZ, EXOS: EXOS, CHECKS: CHECKS
+  };
+})();
+</script>
+</body>
+</html>
