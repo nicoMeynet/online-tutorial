@@ -1,0 +1,1453 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Arbres et tableaux de probabilités</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels de maths, marge rouge. Accent violet (#6d28d9, encre #5b21b6 pour le texte). Dans les arbres : chemins choisis en orange (--two), probabilités des branches en violet. Dans les tableaux : événement A en violet clair, B en orange clair, « A et B » en jaune. Les données des classes sont inventées. */
+:root {
+  --paper: #f8f7fb;
+  --grid: #e6e2f0;
+  --card: #ffffff;
+  --ink: #1d1830;
+  --ink-soft: #5a5470;
+  --acc: #6d28d9;
+  --acc-ink: #5b21b6;
+  --acc-soft: #ede4fc;
+  --two: #c2410c;
+  --two-soft: #fde5d6;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --warn: #d97706;
+  --warn-soft: #fdf0d6;
+  --warn-ink: #92400e;
+  --hl: #fff0a3;
+  --line: #ddd7ea;
+  --s1: #6d28d9; --s2: #ea7a3a; --s3: #0e7490; --s4: #d4a72c; --s5: #d0467f;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #120f1a; --grid: #1c1828; --card: #191526; --ink: #eeeaf6; --ink-soft: #b0a8c4;
+    --acc: #b49cff; --acc-ink: #cfc0ff; --acc-soft: #2a2142; --two: #ff9a5c; --two-soft: #3a2112;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27;
+    --warn: #f5a524; --warn-soft: #3d2a0c; --warn-ink: #fbbf5a; --hl: #4b4318; --line: #2f2942;
+    --s1: #b49cff; --s2: #ff9a5c; --s3: #3fc1d9; --s4: #f0cc5a; --s5: #f27aac;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #120f1a; --grid: #1c1828; --card: #191526; --ink: #eeeaf6; --ink-soft: #b0a8c4;
+  --acc: #b49cff; --acc-ink: #cfc0ff; --acc-soft: #2a2142; --two: #ff9a5c; --two-soft: #3a2112;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27;
+  --warn: #f5a524; --warn-soft: #3d2a0c; --warn-ink: #fbbf5a; --hl: #4b4318; --line: #2f2942;
+  --s1: #b49cff; --s2: #ff9a5c; --s3: #3fc1d9; --s4: #f0cc5a; --s5: #f27aac;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+@media (max-width: 520px) { .page { padding-block: 28px 64px; gap: 44px; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero-top { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+.hero-top svg { width: 170px; height: auto; flex: none; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+@media (max-width: 520px) { .box { padding: 16px 14px; } }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note.ok { border-left-color: var(--ok); background: var(--ok-soft); }
+.note.two { border-left-color: var(--two); background: var(--two-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+svg text.cl { font-family: var(--f-body); font-weight: 700; }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 8px 12px; min-height: 44px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button.main { background: var(--acc); color: var(--card); }
+button[aria-pressed="true"] { background: var(--acc-ink); color: var(--paper); }
+button.ex { font-family: var(--f-mono); font-weight: 600; font-size: .92rem; }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+button:disabled { cursor: default; opacity: .5; }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+label { font-weight: 700; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
+.tag.ok { color: var(--ok); }
+.tag.no { color: var(--red); }
+.tag.acc { color: var(--acc-ink); }
+.tag.two { color: var(--two); }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc-ink); }
+.fbk { border-radius: 8px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; min-width: 0; overflow-wrap: anywhere; }
+.fbk:empty { display: none; }
+.fbk.ok { background: var(--ok-soft); }
+.fbk.no { background: var(--red-soft); }
+.fbk.info { background: var(--acc-soft); }
+.fbk.warn { background: var(--warn-soft); }
+.fbk strong { font-family: var(--f-display); }
+.fbk.ok strong { color: var(--ok); }
+.fbk.no strong { color: var(--red); }
+.fbk.info strong { color: var(--acc-ink); }
+.fbk.warn strong { color: var(--warn-ink); }
+.say { min-height: 4.2em; }
+.step-n { font-family: var(--f-mono); font-size: .85rem; color: var(--ink-soft); }
+button.right, button.right:disabled { background: var(--ok-soft); border-color: var(--ok); color: var(--ok); opacity: 1; }
+button.wrong, button.wrong:disabled { background: var(--red-soft); border-color: var(--red); color: var(--red); opacity: 1; }
+.choice button { flex: 1 1 130px; }
+.choice button:disabled:not(.right):not(.wrong) { opacity: .55; }
+.card-big { background: var(--paper); border: 1.5px dashed var(--line); border-radius: 10px; padding: 14px; font-family: var(--f-display); font-weight: 700; font-size: 1.15rem; overflow-wrap: anywhere; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.card-big .ask { font-family: var(--f-body); font-weight: 400; font-size: 1rem; color: var(--ink-soft); }
+.sorter-end { margin-top: .6rem; }
+.sorter-end strong { font-size: 1.05rem; }
+
+/* Arbres et grilles dessinés par le script */
+.graph { min-width: 0; }
+.graph svg { width: 100%; height: auto; display: block; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; max-width: 560px; margin: 0 auto; }
+.duo { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 14px; }
+.duo > div { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.cap { font-family: var(--f-display); font-weight: 700; text-align: center; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: .92rem; color: var(--ink-soft); }
+.sw { display: inline-block; width: 13px; height: 13px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; border: 1px solid var(--ink); }
+.sw.a { background: var(--acc-soft); border-color: var(--acc); }
+.sw.b { background: var(--two-soft); border-color: var(--two); }
+.sw.ab { background: var(--hl); }
+.scroll { overflow-x: auto; max-width: 100%; }
+table.tb { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+table.tb th, table.tb td { border: 1.5px solid var(--line); padding: 6px 8px; text-align: center; font-family: var(--f-mono); font-size: .95rem; }
+table.tb thead th { font-family: var(--f-display); background: var(--acc-soft); }
+table.tb tbody th, table.tb tfoot th { font-family: var(--f-body); background: var(--paper); text-align: left; }
+table.tb tfoot th, table.tb tfoot td { border-top: 2.5px solid var(--ink); font-weight: 700; }
+table.tb td.a { background: var(--acc-soft); }
+table.tb td.b { background: var(--two-soft); }
+table.tb td.ab { background: var(--hl); font-weight: 700; }
+table.tb td[data-cell] { cursor: pointer; }
+table.tb th button { min-height: 40px; padding: 4px 8px; font-size: .9rem; box-shadow: 2px 2px 0 var(--ink); }
+@media (max-width: 520px) { table.tb th, table.tb td { padding: 5px 3px; font-size: .84rem; } table.tb th button { padding: 4px 5px; font-size: .82rem; } }
+table.dice { border-collapse: collapse; width: 100%; max-width: 420px; margin: 0 auto; table-layout: fixed; font-variant-numeric: tabular-nums; }
+table.dice th, table.dice td { border: 1.5px solid var(--line); height: 42px; text-align: center; font-family: var(--f-mono); font-size: .95rem; }
+table.dice th { background: var(--acc-soft); font-family: var(--f-display); }
+table.dice th.corner { font-size: .7rem; font-family: var(--f-body); line-height: 1.1; color: var(--ink-soft); background: var(--paper); }
+table.dice td { cursor: pointer; background: var(--card); }
+table.dice td.on { background: var(--acc); color: var(--card); font-weight: 700; }
+table.dice td.sel { outline: 3px solid var(--red); outline-offset: -3px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chips button { font-family: var(--f-body); font-weight: 700; font-size: .92rem; padding: 6px 10px; box-shadow: 2px 2px 0 var(--ink); }
+.ctrls { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.ctrl { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; align-items: center; gap: 6px; border: 1.5px dashed var(--line); border-radius: 8px; padding: 6px 8px; background: var(--paper); min-width: 0; }
+.ctrl .n { grid-column: 1 / -1; font-weight: 700; font-size: .92rem; overflow-wrap: anywhere; }
+.ctrl button { padding: 0; min-width: 44px; font-size: 1.3rem; line-height: 1; }
+.ctrl .v { text-align: center; font-family: var(--f-mono); font-weight: 600; font-size: 1.15rem; }
+.formula { font-family: var(--f-mono); font-weight: 600; font-size: clamp(1.05rem, 4.2vw, 1.3rem); color: var(--acc-ink); overflow-wrap: anywhere; }
+.readout { font-family: var(--f-mono); font-size: .95rem; display: flex; flex-direction: column; gap: 6px; overflow-wrap: anywhere; min-width: 0; }
+.readout strong { font-family: var(--f-display); }
+.outs { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; }
+.outs span { border: 1.5px dashed var(--line); border-radius: 8px; min-height: 48px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: var(--f-mono); font-size: .9rem; background: var(--paper); line-height: 1.15; text-align: center; }
+.outs span small { font-size: .72rem; color: var(--ink-soft); }
+.outs span.seen { border-style: solid; border-color: var(--acc); background: var(--acc-soft); font-weight: 600; }
+.outs span.last { box-shadow: inset 0 0 0 2px var(--red); }
+@media (max-width: 520px) { .outs { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.slots { display: flex; flex-wrap: wrap; gap: 8px; }
+.slots div { border: 2px dashed var(--line); border-radius: 8px; padding: 6px 10px; min-width: 84px; flex: 1 1 84px; max-width: 150px; text-align: center; display: flex; flex-direction: column; background: var(--paper); }
+.slots div.on { border-style: solid; border-color: var(--acc); background: var(--acc-soft); }
+.slots b { font-family: var(--f-mono); font-size: 1.4rem; color: var(--acc-ink); }
+.slots small { font-size: .78rem; color: var(--ink-soft); }
+.meters { display: flex; flex-direction: column; gap: 8px; }
+.meter { position: relative; height: 30px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); overflow: hidden; }
+.meter i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--acc); }
+.meter.two i { background: var(--two); }
+.meter b { position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; background: var(--red); }
+.meter span { position: absolute; left: 8px; top: 2px; font-family: var(--f-mono); font-size: .85rem; font-weight: 600; color: var(--ink); background: var(--card); padding: 0 4px; border-radius: 4px; }
+.mg { display: grid; gap: 3px; max-width: 460px; }
+.mg span { border: 1px solid var(--line); border-radius: 4px; text-align: center; font-family: var(--f-mono); font-size: .8rem; padding: 3px 0; background: var(--card); font-weight: 400; min-width: 0; }
+.mg span.h { border: none; background: none; color: var(--ink-soft); font-weight: 600; }
+.mg span.rs { color: var(--red); }
+.mg span.a { background: var(--acc-soft); border-color: var(--acc); }
+.mg span.b { background: var(--two-soft); border-color: var(--two); }
+.mg span.ab { background: var(--hl); border-color: var(--ink); font-weight: 700; }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 200px auto; gap: 10px; align-items: center; }
+.quiz li > span:first-child { min-width: 0; overflow-wrap: anywhere; }
+.quiz select { font: inherit; font-size: .95rem; padding: 6px 6px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; min-height: 44px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb:empty { display: none; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; min-width: 0; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); min-width: 0; overflow-wrap: anywhere; }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+<!--ticons--><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Tutoriels"><script src="progress.js" defer></script><script src="share.js" defer></script><!--/ticons-->
+<style id="tnav-css">
+.tnav-top { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin: 0 0 4px; }
+.tnav-home { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font-weight: 700; font-size: .95rem; text-decoration: none; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tnav-home:hover, .tnav-home:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.tnav-bottom { margin-top: 8px; display: flex; flex-direction: column; gap: 12px; }
+.tnav-bottom h2 { margin: 0; }
+.tnav-pn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tnav-pn a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--ink, #222); border-radius: 10px;
+  background: var(--card, #fff); color: var(--ink, #222); text-decoration: none; box-shadow: 3px 3px 0 var(--ink, #222); min-width: 0; }
+.tnav-pn a span { font-size: .85rem; color: var(--ink-soft, #666); }
+.tnav-pn a strong { overflow-wrap: anywhere; }
+.tnav-pn a.next { text-align: right; grid-column: 2; }
+.tnav-bottom .tnav-home { align-self: center; }
+.tnav-top [data-share] { margin-left: auto; }
+.tnav-short { display: none; }
+.tprint-h { display: none; }
+@media (max-width: 600px) { header.hero { gap: 8px !important; } header.hero > .fig, header.hero > .box.fig, header.hero .hero-top .fig { display: none !important; }
+  header.hero p.lead { font-size: 1rem !important; line-height: 1.5 !important; } header.hero > p.soft { font-size: .88rem !important; line-height: 1.45 !important; }
+  header.hero h1 { font-size: clamp(1.7rem, 8vw, 2.2rem) !important; } }
+.tprint-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 14px 0 0; }
+.tprint-row span { font-size: .9rem; opacity: .8; }
+.tprint { display: inline-flex; align-items: center; gap: 8px; min-height: 42px; padding: 8px 16px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font: inherit; font-weight: 700; cursor: pointer; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tprint:hover, .tprint:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+@media print { [data-tp-hide] { display: none !important; } html.tp-on, html.tp-on body { background: #fff !important; color: #111 !important; padding: 0 !important; margin: 0 !important; }
+  html.tp-on [data-fiche] { color: #111; } html.tp-on [data-fiche] * { color: #111 !important; background: transparent !important; box-shadow: none !important; }
+  html.tp-on .tprint-h { display: block; font-size: 1.4rem; font-weight: 800; margin: 0 0 10px; } .tprint-row { display: none !important; } }
+@media (max-width: 520px) { .tnav-top .tnav-long { display: none; } .tnav-top .tnav-short { display: inline; } .tnav-top { flex-wrap: nowrap; } .tnav-top > * { flex: none; } }
+.tnav-end { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+@media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
+.diff { font: 700 .72rem/1.2 var(--f-mono, monospace); padding: 2px 8px; border-radius: 99px; border: 1.5px solid; white-space: nowrap; }
+.diff.d1 { color: #15803d; border-color: #15803d; background: #dcf3e3; }
+.diff.d2 { color: #a15c07; border-color: #b45309; background: #fbe7cf; }
+.diff.d3 { color: #b91c1c; border-color: #b91c1c; background: #fde2e2; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root:not([data-theme="light"]) .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root:not([data-theme="light"]) .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; } }
+:root[data-theme="dark"] .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root[data-theme="dark"] .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root[data-theme="dark"] .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; }
+</style>
+</head>
+<body>
+<main class="page">
+<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="maths.html">← <span class="tnav-long">Tous les tutoriels de maths</span><span class="tnav-short">Maths</span></a><span class="diff d2" title="Difficulté : moyen">Moyen</span><button type="button" data-share hidden>Partager</button></nav><!--/tnav-->
+
+
+  <header class="hero">
+    <div class="hero-top">
+      <svg class="fig" viewBox="0 0 200 170" aria-hidden="true">
+        <rect x="4" y="4" width="192" height="162" rx="10" fill="var(--card)" stroke="var(--ink)" stroke-width="2"/>
+        <line x1="26" y1="85" x2="84" y2="46" stroke="var(--two)" stroke-width="3.5"/>
+        <line x1="26" y1="85" x2="84" y2="124" stroke="var(--ink-soft)" stroke-width="2"/>
+        <line x1="96" y1="46" x2="150" y2="28" stroke="var(--two)" stroke-width="3.5"/>
+        <line x1="96" y1="46" x2="150" y2="64" stroke="var(--ink-soft)" stroke-width="2"/>
+        <line x1="96" y1="124" x2="150" y2="106" stroke="var(--ink-soft)" stroke-width="2"/>
+        <line x1="96" y1="124" x2="150" y2="142" stroke="var(--ink-soft)" stroke-width="2"/>
+        <circle cx="24" cy="85" r="6" fill="var(--ink)"/>
+        <rect x="80" y="35" width="22" height="22" rx="6" fill="var(--red-soft)" stroke="var(--two)" stroke-width="2.5"/>
+        <rect x="80" y="113" width="22" height="22" rx="6" fill="var(--ok-soft)" stroke="var(--ink)" stroke-width="1.5"/>
+        <rect x="150" y="17" width="22" height="22" rx="6" fill="var(--red-soft)" stroke="var(--two)" stroke-width="2.5"/>
+        <rect x="150" y="53" width="22" height="22" rx="6" fill="var(--ok-soft)" stroke="var(--ink)" stroke-width="1.5"/>
+        <rect x="150" y="95" width="22" height="22" rx="6" fill="var(--red-soft)" stroke="var(--ink)" stroke-width="1.5"/>
+        <rect x="150" y="131" width="22" height="22" rx="6" fill="var(--ok-soft)" stroke="var(--ink)" stroke-width="1.5"/>
+        <text x="91" y="51" font-size="13" text-anchor="middle" style="font-weight:600">R</text>
+        <text x="91" y="129" font-size="13" text-anchor="middle" style="font-weight:600">V</text>
+        <text x="161" y="33" font-size="13" text-anchor="middle" style="font-weight:600">R</text>
+        <text x="161" y="69" font-size="13" text-anchor="middle" style="font-weight:600">V</text>
+        <text x="161" y="111" font-size="13" text-anchor="middle" style="font-weight:600">R</text>
+        <text x="161" y="147" font-size="13" text-anchor="middle" style="font-weight:600">V</text>
+        <text x="46" y="56" font-size="12" text-anchor="middle" style="fill:var(--acc-ink);font-weight:600">3/5</text>
+        <text x="122" y="30" font-size="12" text-anchor="middle" style="fill:var(--acc-ink);font-weight:600">2/4</text>
+      </svg>
+      <div style="display:flex;flex-direction:column;gap:10px;min-width:0;flex:1 1 280px">
+        <span class="eyebrow">Tutoriel de maths · niveau 10H–11H</span>
+        <h1>Compter les chemins du hasard</h1>
+        <p class="lead">Une pièce puis un dé, deux bonbons tirés d'un sachet, la météo du week-end : dès qu'il y a plusieurs épreuves, on se perd vite. Un arbre ou un tableau range toutes les issues, et quelques règles simples donnent les probabilités sans rien oublier.</p>
+      </div>
+    </div>
+    <div class="note">
+      <span class="note-title">Ce que tu sais déjà</span>
+      <span>Une <strong>expérience aléatoire</strong> a des <strong>issues</strong> ; un <strong>événement</strong> est un groupe d'issues. Si les issues ont toutes la même chance, P(événement) = nombre d'issues favorables ÷ nombre d'issues possibles. Une probabilité est toujours entre 0 et 1, et les probabilités de toutes les issues font 1. Tout cela est expliqué dans le tutoriel sur <a class="tlink" href="les-probabilites.html">les probabilités</a>. Ici, on va plus loin : <strong>plusieurs épreuves à la suite</strong>.</span>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · Plusieurs épreuves</span>
+    <h2>Une pièce, puis un dé</h2>
+    <p>On lance une pièce de 5 francs (pile ou face), <strong>puis</strong> un dé. C'est une expérience à <strong>deux épreuves</strong>. Une issue, c'est un couple de résultats : par exemple (pile ; 3), qu'on note <span class="mono">(P ; 3)</span>. Combien y a-t-il d'issues ? Essaie de les trouver en lançant au hasard.</p>
+    <div class="box">
+      <h3>Lance et note les issues</h3>
+      <p class="soft">Chaque case est une issue possible. Elle se découvre quand le lancer la donne.</p>
+      <div class="btns"><span class="score" id="s1Count">0 lancer</span><span class="step-n" id="s1Found"></span></div>
+      <div class="outs" id="s1Grid" aria-live="polite"></div>
+      <div class="fbk" id="s1Out" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="s1One" class="main">Lancer une fois</button><button type="button" id="s1All">Lancer jusqu'à tout trouver</button><button type="button" id="s1List">Liste organisée</button><button type="button" id="s1Reset">Recommencer</button></div>
+    </div>
+    <div class="note two">
+      <span class="note-title">Pourquoi une méthode ?</span>
+      <span>Au hasard, il faut souvent plus de 30 lancers pour voir les 12 issues, et on n'est jamais sûr d'avoir fini. Avec une <strong>méthode</strong>, on fixe la pièce (pile), on passe le dé de 1 à 6, puis on recommence avec face. Aucun oubli, aucun doublon. Cette méthode a un dessin : l'<strong>arbre</strong>.</span>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · L'arbre des possibles</span>
+    <h2>Un étage de branches par épreuve</h2>
+    <p>On part d'un point, la <strong>racine</strong>. Pour la première épreuve, on dessine une branche par issue. Puis, au bout de <strong>chaque</strong> branche, on dessine les issues de la deuxième épreuve, et ainsi de suite. Chaque <strong>chemin</strong> de la racine jusqu'au bout (une <strong>feuille</strong>) est une issue.</p>
+    <div class="box">
+      <h3>Construis l'arbre, étage par étage</h3>
+      <div class="btns" role="group" aria-label="Choisir l'expérience" id="s2Pre"></div>
+      <div class="btns"><span class="score" id="s2Pos"></span></div>
+      <div class="graph" id="s2Graph"></div>
+      <div class="fbk info say" id="s2Say" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="s2Prev">← Précédent</button><button type="button" id="s2Next" class="main">Suivant →</button><button type="button" id="s2Reset">Recommencer</button></div>
+    </div>
+    <div class="box"><p class="formula">nombre d'issues = n₁ × n₂ × n₃ × …</p><p class="soft">C'est le <strong>principe multiplicatif</strong> : si la 1<sup>re</sup> épreuve a n₁ issues et que, pour chacune, la 2<sup>e</sup> en a n₂, il y a n₁ × n₂ chemins. Pièce puis dé : 2 × 6 = 12. Trois pièces : 2 × 2 × 2 = 8.</p></div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · L'arbre pondéré</span>
+    <h2>Des probabilités sur les branches</h2>
+    <p>Souvent, les issues n'ont pas toutes la même chance. On écrit alors sur chaque branche sa <strong>probabilité</strong> : c'est un <strong>arbre pondéré</strong>. Trois règles suffisent pour tout calculer.</p>
+    <div class="cards">
+      <div class="box"><span class="tag acc">Règle 1</span><strong>Les branches d'un même nœud font 1</strong><span class="soft">À partir d'un point, une des branches arrive forcément : leurs probabilités s'additionnent pour donner 1.</span></div>
+      <div class="box"><span class="tag acc">Règle 2</span><strong>Le long d'un chemin, on multiplie</strong><span class="soft">P(pluie puis pluie) = P(pluie samedi) × P(pluie dimanche). Pour multiplier des fractions, il y a le tutoriel sur <a class="tlink" href="les-fractions.html">les fractions</a>.</span></div>
+      <div class="box"><span class="tag acc">Règle 3</span><strong>Pour un événement, on additionne ses chemins</strong><span class="soft">« Exactement un jour de pluie » = le chemin pluie-soleil + le chemin soleil-pluie.</span></div>
+    </div>
+    <div class="box">
+      <h3>La météo du week-end</h3>
+      <p class="soft">Règle les probabilités de pluie (en dixièmes), puis choisis un événement : ses chemins s'allument et le calcul s'écrit.</p>
+      <div class="ctrls" id="s3Ctrls"></div>
+      <div class="btns" id="s3Ev" role="group" aria-label="Choisir l'événement"></div>
+      <div class="graph" id="s3Graph"></div>
+      <div class="readout" id="s3Out" aria-live="polite"></div>
+      <div class="btns"><button type="button" class="pctT" aria-pressed="false">Voir aussi en décimal et en %</button><button type="button" id="s3Reset">Revenir au départ</button></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Une hypothèse cachée</span>
+      <span>Ici, on suppose que la pluie du dimanche ne dépend pas de celle du samedi. En vrai, la météo d'un jour dépend souvent de la veille. Un arbre sait aussi le montrer : les probabilités du 2<sup>e</sup> étage changent alors d'une branche à l'autre. C'est exactement ce qui se passe à l'étape suivante.</span>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · Avec ou sans remise</span>
+    <h2>Le sachet de bonbons</h2>
+    <p>Un sachet contient des bonbons rouges (R) et verts (V). On en prend un au hasard, puis un deuxième. <strong>Avec remise</strong> : on remet le premier avant de reprendre, le sachet est le même aux deux tirages. <strong>Sans remise</strong> : on le mange ! Au 2<sup>e</sup> tirage, il reste un bonbon de moins, et les probabilités changent.</p>
+    <div class="box">
+      <h3>Compare les deux arbres</h3>
+      <div class="ctrls" id="s4Ctrls"></div>
+      <div class="btns" role="group" aria-label="Type de tirage">
+        <button type="button" id="s4A" aria-pressed="false">Avec remise</button>
+        <button type="button" id="s4S" aria-pressed="false">Sans remise</button>
+        <button type="button" id="s4B" aria-pressed="true">Les deux côte à côte</button>
+      </div>
+      <div class="btns" id="s4Ev" role="group" aria-label="Choisir l'événement"></div>
+      <div class="duo" id="s4Graph"></div>
+      <div class="readout" id="s4Out" aria-live="polite"></div>
+      <div class="btns"><button type="button" class="pctT" aria-pressed="false">Voir aussi en décimal et en %</button><button type="button" id="s4Reset">Revenir au départ</button></div>
+    </div>
+    <div class="note two">
+      <span class="note-title">À retenir sur les tirages</span>
+      <span>Avec remise, les deux étages ont les <strong>mêmes</strong> branches. Sans remise, les branches du 2<sup>e</sup> étage <strong>dépendent</strong> du premier tirage, et leurs dénominateurs diminuent de 1. Avec 3 rouges et 2 vertes : 9/25 avec remise, mais 3/10 sans remise.</span>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Le tableau à double entrée</span>
+    <h2>Deux dés, 36 cases</h2>
+    <p>Quand il y a deux épreuves avec beaucoup d'issues, l'arbre devient touffu (6 × 6 = 36 feuilles). Un <strong>tableau à double entrée</strong> fait le même travail : les lignes pour le dé rouge, les colonnes pour le dé bleu. Les 36 cases ont toutes la même chance, donc P = nombre de cases ÷ 36. Le tutoriel sur <a class="tlink" href="les-probabilites.html">les probabilités</a> montre déjà la somme de deux dés ; ici, on cherche d'autres événements.</p>
+    <div class="box">
+      <h3>Colorie un événement</h3>
+      <p class="soft">Touche un événement : ses cases se colorient. Touche aussi une case pour la lire.</p>
+      <div class="btns" id="s5Ev" role="group" aria-label="Choisir l'événement"></div>
+      <div class="ctrls"><div class="ctrl"><span class="n">Somme choisie</span><button type="button" id="s5m" aria-label="Somme plus petite">−</button><span class="v" id="s5v">7</span><button type="button" id="s5p" aria-label="Somme plus grande">+</button></div></div>
+      <div class="scroll"><table class="dice" id="s5Table" aria-label="Les 36 issues de deux dés"></table></div>
+      <div class="fbk info" id="s5Out" aria-live="polite"></div>
+      <div class="btns"><button type="button" class="pctT" aria-pressed="false">Voir aussi en décimal et en %</button></div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · Tableau d'effectifs</span>
+    <h2>Tirer un élève au sort</h2>
+    <p>Dans une classe de 25 élèves, on note qui est fille ou garçon et quel sport chacun pratique (un seul sport par élève, données inventées). On tire <strong>un élève au sort</strong> pour présenter la classe : tous ont la même chance. Chaque case du tableau est un groupe d'élèves. Ranger des données dans un tel tableau est expliqué dans le tutoriel sur <a class="tlink" href="tableaux-et-diagrammes.html">tableaux et diagrammes</a>.</p>
+    <div class="box">
+      <h3>Choisis A et B, puis un calcul</h3>
+      <p class="soft">Touche un en-tête de ligne ou de colonne pour l'événement A, puis un autre pour B. Toucher une case choisit directement « ligne ET colonne ».</p>
+      <div class="btns" role="group" aria-label="Quel événement je choisis">
+        <button type="button" id="s6SA" aria-pressed="true">Je choisis A</button>
+        <button type="button" id="s6SB" aria-pressed="false">Je choisis B</button>
+        <span class="step-n" id="s6AB"></span>
+      </div>
+      <div class="scroll"><table class="tb" id="s6Table"></table></div>
+      <div class="legend"><span><i class="sw a"></i>A seulement</span><span><i class="sw b"></i>B seulement</span><span><i class="sw ab"></i>A et B</span></div>
+      <div class="btns" id="s6Op" role="group" aria-label="Choisir le calcul"></div>
+      <div class="readout" id="s6Out" aria-live="polite"></div>
+      <div class="btns"><button type="button" class="pctT" aria-pressed="false">Voir aussi en décimal et en %</button><button type="button" id="s6New">Autre classe</button><button type="button" id="s6Reset">Revenir au départ</button></div>
+    </div>
+    <div class="box"><p class="formula">P(A ou B) = P(A) + P(B) − P(A et B)</p><p class="soft">Si on additionne simplement P(A) et P(B), les élèves qui sont à la fois A et B sont comptés <strong>deux fois</strong>. On les enlève une fois. « Ou » veut dire « l'un, l'autre, ou les deux ».</p></div>
+    <div class="note">
+      <span class="note-title">« Parmi les filles », ce n'est pas « fille et foot »</span>
+      <span>P(fille et foot) = 4/25 : on divise par toute la classe. « Parmi les filles, quelle part fait du foot ? » = 4/12 : on ne regarde plus que la ligne des filles, et on divise par 12.</span>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · L'événement contraire</span>
+    <h2>« Au moins un » : passe par le contraire</h2>
+    <p>Le <strong>contraire</strong> de A, noté « non A », contient toutes les issues qui ne sont pas dans A. Comme A et non A font tout : <span class="hl">P(non A) = 1 − P(A)</span>. C'est très utile pour « au moins un » : le contraire de « au moins un 6 » est « aucun 6 », un seul chemin facile à calculer.</p>
+    <div class="box"><p class="formula">P(au moins un 6 en n lancers) = 1 − (5/6)ⁿ</p><p class="soft">À chaque lancer, P(pas de 6) = 5/6. Pour « aucun 6 » en n lancers, on suit un seul chemin de l'arbre : 5/6 × 5/6 × … (n fois) = (5/6)ⁿ.</p></div>
+    <div class="box">
+      <h3>Le pari du chevalier de Méré</h3>
+      <p class="soft">Combien de lancers faut-il pour que « au moins un 6 » soit plus probable que le contraire ? Change n avec − et +, ou touche un raccourci.</p>
+      <div class="btns" role="group" aria-label="Choisir le pari">
+        <button type="button" id="s7One" aria-pressed="true">Un 6 avec un dé</button>
+        <button type="button" id="s7Dbl" aria-pressed="false">Un double 6 avec deux dés</button>
+      </div>
+      <div class="ctrls"><div class="ctrl"><span class="n">Nombre de lancers n</span><button type="button" id="s7m" aria-label="Un lancer de moins">−</button><span class="v" id="s7v">4</span><button type="button" id="s7p" aria-label="Un lancer de plus">+</button></div></div>
+      <div class="chips" id="s7Pre" role="group" aria-label="Raccourcis"></div>
+      <div class="readout" id="s7Out" aria-live="polite"></div>
+      <div class="meters" id="s7Meter"></div>
+      <div class="fbk" id="s7Say" aria-live="polite"></div>
+    </div>
+    <div class="note two">
+      <span class="note-title">Un peu d'histoire</span>
+      <span>Au XVII<sup>e</sup> siècle, en France, le chevalier de Méré était un grand amateur de jeux. Selon le récit habituel, il savait que parier sur « au moins un 6 en 4 lancers » faisait gagner un peu plus souvent que perdre. Il pensait que « au moins un double 6 en 24 lancers de deux dés » était aussi favorable… et il perdait. Il posa ce genre de questions à Blaise Pascal. Essaie les deux paris ci-dessus !</span>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · ET et OU</span>
+    <h2>Incompatibles ou pas ?</h2>
+    <p>Deux événements sont <strong>incompatibles</strong> s'ils ne peuvent pas arriver en même temps : aucune issue commune, P(A et B) = 0. Alors, et seulement alors, <span class="hl">P(A ou B) = P(A) + P(B)</span>. Sinon, il faut enlever P(A et B).</p>
+    <div class="cards">
+      <div class="box"><span class="tag ok">Incompatibles</span><strong>Un roi ou une dame</strong><span class="soft">Une carte ne peut pas être les deux. Au jass : 4/36 + 4/36 = 8/36 = 2/9.</span></div>
+      <div class="box"><span class="tag two">Pas incompatibles</span><strong>Un cœur ou un as</strong><span class="soft">L'as de cœur est les deux à la fois. 9/36 + 4/36 − 1/36 = 12/36 = 1/3.</span></div>
+      <div class="box"><span class="tag acc">Le jeu de jass</span><strong>36 cartes</strong><span class="soft">4 couleurs (♠ pique, ♥ cœur, ♦ carreau, ♣ trèfle) de 9 cartes : 6, 7, 8, 9, 10, valet (V), dame (D), roi (R), as (A).</span></div>
+    </div>
+    <div class="box">
+      <h3>Ces deux événements sont-ils incompatibles ?</h3>
+      <p class="soft">Lis A et B, cherche une issue qui serait dans les deux. Après ta réponse, la grille montre A, B et leurs issues communes.</p>
+      <div class="btns"><span class="score" id="s8Score">Question 1 / 10</span><span class="step-n" id="s8Pos"></span></div>
+      <div class="card-big" id="s8Card" aria-live="polite"></div>
+      <div class="btns choice" id="s8Btns" role="group" aria-label="Incompatibles ou pas ?"></div>
+      <div class="fbk" id="s8Out" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="s8Prev">← Précédent</button><button type="button" id="s8Next">Suivant →</button><button type="button" id="s8Reset">Recommencer</button></div>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Dénombrer sans arbre</span>
+    <h2>Combien de possibilités ?</h2>
+    <p>Pour un cadenas à 4 chiffres, l'arbre aurait 10 000 feuilles : impossible à dessiner ! Mais le principe multiplicatif suffit. On imagine des <strong>cases à remplir</strong> l'une après l'autre, et on multiplie le nombre de choix de chaque case. Attention : selon la situation, le nombre de choix reste le même… ou diminue.</p>
+    <div class="box">
+      <h3>Remplis les cases, une à une</h3>
+      <div class="btns" role="group" aria-label="Choisir la situation" id="s9Pre"></div>
+      <div class="ctrls" id="s9Par"></div>
+      <div class="btns"><span class="score" id="s9Pos"></span></div>
+      <div class="slots" id="s9Slots" aria-live="polite"></div>
+      <p class="formula" id="s9F"></p>
+      <div class="fbk info say" id="s9Say" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="s9Prev">← Précédent</button><button type="button" id="s9Next" class="main">Suivant →</button><button type="button" id="s9Reset">Recommencer</button></div>
+    </div>
+    <div class="cards">
+      <div class="box"><span class="tag acc">Avec répétition</span><strong>Le même nombre de choix</strong><span class="soft">Code de cadenas : 10 × 10 × 10 × 10 = 10 000. Un chiffre peut revenir.</span></div>
+      <div class="box"><span class="tag two">Sans répétition</span><strong>Un choix de moins à chaque case</strong><span class="soft">Podium de 3 parmi 8 coureurs : 8 × 7 × 6 = 336. Un coureur ne peut pas être 1<sup>er</sup> et 2<sup>e</sup>.</span></div>
+      <div class="box"><span class="tag acc">Factorielle</span><strong>Ranger tout le monde</strong><span class="soft">4 personnes en file : 4 × 3 × 2 × 1 = 24. On écrit 4! et on lit « factorielle 4 ».</span></div>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · Simuler pour vérifier</span>
+    <h2>L'ordinateur lance pour toi</h2>
+    <p>Un calcul peut contenir une erreur. Pour le vérifier, on peut <strong>simuler</strong> l'expérience des milliers de fois et comparer la <strong>fréquence</strong> obtenue avec la probabilité calculée. Plus on fait d'essais, plus elles sont proches en général : c'est la loi des grands nombres, vue dans le tutoriel sur <a class="tlink" href="les-probabilites.html">les probabilités</a>.</p>
+    <div class="box">
+      <h3>Calcul contre simulation</h3>
+      <div class="btns" role="group" aria-label="Choisir la situation" id="s10Pre"></div>
+      <p class="soft" id="s10Txt"></p>
+      <div class="btns">
+        <button type="button" id="s10a" class="main">+ 100 essais</button>
+        <button type="button" id="s10b" class="main">+ 1 000</button>
+        <button type="button" id="s10c" class="main">+ 10 000</button>
+        <button type="button" id="s10Reset">Recommencer</button>
+      </div>
+      <div class="meters" id="s10Meter"></div>
+      <div class="readout" id="s10Out" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · Atelier final</span>
+    <h2>Le bon outil, le bon calcul</h2>
+    <p>Six problèmes. Pour chacun, trois questions : quel outil utiliser (arbre, tableau, contraire ou dénombrement), quel calcul faire, et quel est le résultat.</p>
+    <div class="box">
+      <h3>Six problèmes, dix-huit choix</h3>
+      <div class="btns"><span class="score" id="atScore">Question 1 / 18</span><span class="step-n" id="atPos"></span></div>
+      <div class="card-big" id="atCard" aria-live="polite"></div>
+      <div class="btns choice" id="atBtns" role="group" aria-label="Ta réponse"></div>
+      <div class="fbk" id="atOut" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="atPrev">← Précédent</button><button type="button" id="atNext">Suivant →</button><button type="button" id="atReset">Recommencer</button></div>
+    </div>
+  </section>
+
+  <!-- 12 -->
+  <section>
+    <span class="eyebrow">Étape 12 · Pour aller plus loin</span>
+    <h2>Le problème des partis</h2>
+    <p>En 1654, Blaise Pascal et Pierre de Fermat s'écrivent des lettres sur une question de joueurs : une partie s'arrête avant la fin. Comment partager l'argent misé de façon juste ? Leur idée : partager selon la <strong>probabilité de gagner</strong> de chacun si la partie avait continué. Un arbre suffit.</p>
+    <div class="box">
+      <h3>Partager les 64 pistoles</h3>
+      <p class="soft">Anne (A) et Bastien (B) misent 32 pistoles chacun (une pistole est une ancienne pièce d'or). Le premier à 3 points gagne tout. Chaque manche : 1 chance sur 2 pour chacun. La partie s'arrête au score indiqué.</p>
+      <div class="btns" role="group" aria-label="Score au moment de l'arrêt" id="s12Pre"></div>
+      <div class="btns"><span class="score" id="s12Pos"></span></div>
+      <div class="graph" id="s12Graph"></div>
+      <div class="fbk info say" id="s12Say" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="s12Prev">← Précédent</button><button type="button" id="s12Next" class="main">Suivant →</button><button type="button" id="s12Reset">Recommencer</button></div>
+    </div>
+    <div class="box">
+      <h3>Et le jeu des trois portes ?</h3>
+      <p>Derrière une des trois portes, une voiture ; derrière les deux autres, une chèvre. Tu choisis une porte, l'animateur ouvre une autre porte avec une chèvre, et te propose de changer. L'arbre du premier choix règle la question : si tu gardes ta porte, tu gagnes seulement si ton premier choix était la voiture.</p>
+      <div class="graph" id="s12Monty"></div>
+      <p class="soft">Garder gagne avec 1/3, changer gagne avec 2/3. Le jeu complet, avec mille parties simulées, est dans le tutoriel sur <a class="tlink" href="les-paradoxes-de-probabilite.html">les paradoxes de probabilité</a>.</p>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Les idées reçues</span>
+    <h2>Vrai ou faux ?</h2>
+    <div class="cards">
+      <div class="box"><span class="tag no">Idée reçue</span><strong>« Avec deux dés, toutes les sommes ont la même chance. »</strong><span class="soft">Non : la somme 7 occupe 6 cases sur 36 (1/6), la somme 2 une seule (1/36). Il y a 11 sommes, mais 36 issues équiprobables.</span></div>
+      <div class="box"><span class="tag no">Idée reçue</span><strong>« Avec ou sans remise, c'est pareil. »</strong><span class="soft">Non : avec 3 rouges et 2 vertes, P(2 rouges) vaut 9/25 avec remise et 3/10 sans remise. La différence est faible seulement si le sachet contient beaucoup de bonbons.</span></div>
+      <div class="box"><span class="tag no">Idée reçue</span><strong>« P(A ou B) = P(A) + P(B), toujours. »</strong><span class="soft">Seulement si A et B sont incompatibles. Pour « cœur ou as » au jass, l'as de cœur serait compté deux fois : il faut enlever 1/36.</span></div>
+      <div class="box"><span class="tag no">Idée reçue</span><strong>« En 6 lancers, un 6 est sûr : 6 × 1/6 = 1. »</strong><span class="soft">Non : P(au moins un 6) = 1 − (5/6)⁶ ≈ 66,5 %. On ne peut pas additionner, car « 6 au 1<sup>er</sup> lancer » et « 6 au 2<sup>e</sup> » ne sont pas incompatibles.</span></div>
+      <div class="box"><span class="tag no">Idée reçue</span><strong>« Pile-face et face-pile, c'est la même issue. »</strong><span class="soft">Ce sont deux chemins différents de l'arbre. Donc P(un pile et un face) = 2/4 = 1/2, et pas 1/3.</span></div>
+      <div class="box"><span class="tag no">Idée reçue</span><strong>« Le long d'un chemin, on additionne. »</strong><span class="soft">Le long d'un chemin, on <strong>multiplie</strong>. On additionne seulement des chemins différents qui forment un même événement.</span></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Le savais-tu ?</span>
+    <h2>Joueurs, lettres et cartes</h2>
+    <div class="cards">
+      <div class="box"><span class="tag two">1654</span><strong>Pascal et Fermat</strong><span class="soft">Pendant l'été et l'automne 1654, Blaise Pascal et Pierre de Fermat échangent des lettres sur le problème des partis. On y voit souvent la naissance du calcul des probabilités.</span></div>
+      <div class="box"><span class="tag two">XVII<sup>e</sup> siècle</span><strong>Le chevalier de Méré</strong><span class="soft">Ce joueur et écrivain français a posé à Pascal des questions sur les jeux de dés et sur le partage des mises. Ses questions ont lancé les célèbres lettres.</span></div>
+      <div class="box"><span class="tag two">1657</span><strong>Le premier livre</strong><span class="soft">Le savant néerlandais Christiaan Huygens publie en 1657 un petit traité sur les calculs dans les jeux de hasard, souvent considéré comme le premier livre imprimé sur les probabilités.</span></div>
+      <div class="box"><span class="tag two">36 cartes</span><strong>Le jass</strong><span class="soft">Le jeu de cartes le plus populaire de Suisse se joue avec 36 cartes, du 6 à l'as dans 4 couleurs. En Suisse romande, on joue plutôt avec les couleurs françaises ; en Suisse alémanique, souvent avec les couleurs « allemandes » : roses, grelots, écussons et glands.</span></div>
+      <div class="box"><span class="tag two">36!</span><strong>Mélanger un jeu de jass</strong><span class="soft">Il y a 36! façons de ranger 36 cartes, environ 3,7 × 10⁴¹ : un nombre de 42 chiffres. Un jeu bien mélangé est donc presque sûrement dans un ordre que personne n'a jamais vu.</span></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Choisis ta réponse, puis vérifie.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Recommencer</button>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À toi de jouer</span>
+    <h2>Six exercices</h2>
+    <p>Fais chaque exercice sur une feuille, avec un arbre ou un tableau, puis ouvre la correction pour comparer.</p>
+    <div class="exos">
+      <details>
+        <summary>Les menus de la cantine<span class="q">La cantine propose 2 entrées (soupe, salade), 3 plats (pâtes, poisson, risotto) et 2 desserts (fruit, yogourt). Un menu = une entrée, un plat, un dessert. Combien de menus différents ? Si on choisit tout au hasard, quelle est la probabilité d'avoir soupe et pâtes ?</span></summary>
+        <div>
+          <span>Arbre à trois étages : 2 branches, puis 3 au bout de chacune, puis 2. Principe multiplicatif : 2 × 3 × 2 = <strong>12 menus</strong>.</span>
+          <span>« Soupe et pâtes » : 2 menus (avec fruit ou avec yogourt). P = 2/12 = <strong>1/6</strong>. Avec l'arbre pondéré : 1/2 × 1/3 = 1/6, pareil.</span>
+        </div>
+      </details>
+      <details>
+        <summary>Trois pièces<span class="q">On lance trois fois une pièce. Quelle est la probabilité d'obtenir exactement deux piles ?</span></summary>
+        <div>
+          <div class="graph" id="ex2Tree"></div>
+          <span>8 chemins, tous à 1/2 × 1/2 × 1/2 = 1/8. Exactement deux piles : PPF, PFP, FPP, soit 3 chemins.</span>
+          <span>P = 3 × 1/8 = <strong>3/8</strong> = 37,5 %.</span>
+        </div>
+      </details>
+      <details>
+        <summary>Deux bonbons de la même couleur<span class="q">Un sachet contient 2 bonbons rouges et 3 jaunes. On en prend deux, sans remise. Quelle est la probabilité qu'ils soient de la même couleur ?</span></summary>
+        <div>
+          <div class="graph" id="ex3Tree"></div>
+          <span>Même couleur = R puis R, ou J puis J. P(RR) = 2/5 × 1/4 = 2/20. P(JJ) = 3/5 × 2/4 = 6/20.</span>
+          <span>P = 2/20 + 6/20 = 8/20 = <strong>2/5</strong> = 40 %.</span>
+        </div>
+      </details>
+      <details>
+        <summary>Somme 8 et au moins un 6<span class="q">On lance deux dés. Calcule P(somme = 8), puis P(au moins un 6) avec le contraire.</span></summary>
+        <div>
+          <div class="scroll" id="ex4Table"></div>
+          <span>Somme 8 : (2 ; 6), (3 ; 5), (4 ; 4), (5 ; 3), (6 ; 2), soit 5 cases. P = <strong>5/36</strong>.</span>
+          <span>Aucun 6 : 5 × 5 = 25 cases. P(au moins un 6) = 1 − 25/36 = <strong>11/36</strong> (la dernière ligne et la dernière colonne : 6 + 6 − 1 = 11 cases).</span>
+        </div>
+      </details>
+      <details>
+        <summary>Au moins un pile en 5 lancers<span class="q">On lance 5 fois une pièce de 5 francs. Quelle est la probabilité d'obtenir au moins un pile ?</span></summary>
+        <div>
+          <span>L'arbre aurait 2⁵ = 32 feuilles. Le contraire est plus rapide : « aucun pile » = « face 5 fois », un seul chemin, P = (1/2)⁵ = 1/32.</span>
+          <span>P(au moins un pile) = 1 − 1/32 = <strong>31/32</strong> ≈ 96,9 %.</span>
+        </div>
+      </details>
+      <details>
+        <summary>Ski, foot et danse<span class="q">Une classe de 28 élèves (données inventées) : filles : 6 ski, 3 foot, 5 danse ; garçons : 5 ski, 7 foot, 2 danse. On tire un élève au sort. Calcule P(garçon ou ski). Puis : parmi les skieurs, quelle part sont des filles ?</span></summary>
+        <div>
+          <div class="scroll"><table class="tb"><thead><tr><th></th><th>Ski</th><th>Foot</th><th>Danse</th><th>Total</th></tr></thead><tbody><tr><th>Filles</th><td>6</td><td>3</td><td>5</td><td>14</td></tr><tr><th>Garçons</th><td>5</td><td>7</td><td>2</td><td>14</td></tr></tbody><tfoot><tr><th>Total</th><td>11</td><td>10</td><td>7</td><td>28</td></tr></tfoot></table></div>
+          <span>P(garçon) = 14/28, P(ski) = 11/28, P(garçon et ski) = 5/28. P(garçon ou ski) = 14/28 + 11/28 − 5/28 = 20/28 = <strong>5/7</strong>. Contrôle : 14 garçons + 6 skieuses = 20 élèves.</span>
+          <span>Parmi les 11 skieurs, 6 sont des filles : <strong>6/11</strong> ≈ 54,5 %.</span>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section data-fiche><!--tprint--><p class="tprint-h">Fiche de révision · Compter les chemins du hasard</p><!--/tprint-->    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• Plusieurs épreuves : un <strong>arbre</strong> (un étage par épreuve) ou un <strong>tableau à double entrée</strong> (deux épreuves) liste toutes les issues sans oubli.</span>
+      <span>• <strong>Principe multiplicatif</strong> : nombre d'issues = n₁ × n₂ × … (pièce puis dé : 2 × 6 = 12).</span>
+      <span>• Arbre pondéré : les branches d'un même nœud font <strong>1</strong> ; le long d'un chemin, on <strong>multiplie</strong> ; pour un événement, on <strong>additionne</strong> ses chemins.</span>
+      <span>• <strong>Sans remise</strong>, les probabilités du 2<sup>e</sup> tirage changent selon le 1<sup>er</sup> (3 R et 2 V : 9/25 avec remise, 3/10 sans).</span>
+      <span>• <strong>Contraire</strong> : P(non A) = 1 − P(A). « Au moins un 6 en n lancers » = 1 − (5/6)ⁿ.</span>
+      <span>• <strong>P(A ou B) = P(A) + P(B) − P(A et B)</strong> ; si A et B sont <strong>incompatibles</strong>, P(A et B) = 0.</span>
+      <span>• Dénombrer : avec répétition 10 × 10 × 10 × 10 ; sans répétition 8 × 7 × 6 ; tout ranger : 4! = 24.</span>
+    </div>
+  <!--tprint--><p class="tprint-row"><button type="button" class="tprint" data-print><span aria-hidden="true">🖨</span> Imprimer la fiche</button><span>Seulement ce résumé, sur une page.</span></p><!--/tprint-->
+</section>
+
+  <!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"><a class="prev" href="les-probabilites.html"><span>← Précédent</span><strong>Les probabilités</strong></a><a class="next" href="l-algorithmique.html"><span>Suivant →</span><strong>L&#x27;algorithmique</strong></a></div><div class="tnav-end"><a class="tnav-home" href="maths.html">⌂ Tous les tutoriels de maths</a><button type="button" data-share hidden>Partager</button></div></nav><!--/tnav-->
+<footer>Fiche de révision · Arbres et tableaux de probabilités<!--tmaj--><span class="tmaj" style="display:block;margin-top:6px;font-size:.85rem;opacity:.85">Dernière mise à jour : 24 novembre 2026 · © 2026 Nicolas Meynet</span><!--/tmaj--></footer>
+</main>
+
+<script>
+(function () {
+  /*
+   * Hooks de test : window.__arbres
+   *   Arithmétique exacte (entiers) : gcd(a, b), R(n, d) -> [n, d] simplifiée, rmul, radd, rsub, rcmp, fs(a) (écriture simplifiée), fracEq(n, d),
+   *     roundRat, decStr(n, d, p), pctStr(n, d, p), pv(a) (fraction + décimal/% si le bouton « Voir aussi en % » est actif)
+   *   Arbres : build(fn, depth), buildRec(fn), uTree(levels), leaves(root) -> [{path, raw:[n,d] non simplifié, p:[n,d]}], probOf(root, pred), rule1(root)
+   *     weatherTree(p1, p2) (dixièmes), WEV (événements météo), bagTree(r, v, avecRemise), BAGEV, partisTree(a, b), partis(a, b) -> P(A gagne)
+   *   Dés : DICE (36 couples), DEV (événements), diceCount(key, s)
+   *   Classe : CL0 (effectifs), s6Calc(cl, A, B, op) -> {n, d, ...}
+   *   Contraire : noneProb(mode, n) -> probabilité (nombre à virgule) de « aucun succès », exactNone(mode, n) -> [n, d] ou null, threshold(mode)
+   *   Jass et dés pour ET/OU : SPACES, incCards, incInfo(it)
+   *   Dénombrement : S9P, s9Total(key, n)
+   *   Simulation : S10 (p exacte et fonction run)
+   *   Jeux : incCards (étape 8), atelierCards (étape 11), scorer(items), isOk(item, c), quiz : les 8 questions
+   */
+  var NB = ' ', NBS = ' ', MI = '−';
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function clamp(i, n) { i = Math.floor(Number(i)); if (!isFinite(i)) i = 0; return Math.max(0, Math.min(n - 1, i)); }
+  function rint(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+  function sum(a) { return a.reduce(function (s, x) { return s + x; }, 0); }
+
+  /* ---------- Arithmétique exacte et écriture à la française ---------- */
+  function gcd(a, b) { a = Math.abs(a); b = Math.abs(b); while (b) { var t = a % b; a = b; b = t; } return a || 1; }
+  function grp(n) { var s = String(Math.abs(n)).replace(/\B(?=(\d{3})+(?!\d))/g, NB); return (n < 0 ? MI : '') + s; }
+  function roundRat(n, d, p) { var m = Math.pow(10, p || 0); return Math.floor((2 * n * m + d) / (2 * d)); }
+  function fixStr(v, p) {
+    p = p || 0; var neg = v < 0; v = Math.abs(v);
+    var s = String(v);
+    if (p) { while (s.length < p + 1) s = '0' + s; s = grp(+s.slice(0, s.length - p)) + ',' + s.slice(s.length - p); }
+    else s = grp(v);
+    return (neg ? MI : '') + s;
+  }
+  function trimZ(s) { if (s.indexOf(',') < 0) return s; return s.replace(/0+$/, '').replace(/,$/, ''); }
+  function isExact(n, d, p) { return (n * Math.pow(10, p)) % d === 0; }
+  function decStr(n, d, p) { p = p == null ? 3 : p; if (!d) return '—'; var r = trimZ(fixStr(roundRat(n, d, p), p)); return isExact(n, d, p) ? r : '≈' + NBS + r; }
+  function pctStr(n, d, p) { p = p == null ? 1 : p; if (!d) return '—'; var r = trimZ(fixStr(roundRat(100 * n, d, p), p)); return (isExact(100 * n, d, p) ? '' : '≈' + NBS) + r + NBS + '%'; }
+  function floatPct(x) { var v = Math.round(x * 1000); return '≈' + NBS + trimZ(fixStr(v, 1)) + NBS + '%'; }
+
+  function R(n, d) { if (d == null) d = 1; if (d < 0) { n = -n; d = -d; } var g = gcd(n, d); return [n / g, d / g]; }
+  function rmul(a, b) { return R(a[0] * b[0], a[1] * b[1]); }
+  function radd(a, b) { return R(a[0] * b[1] + b[0] * a[1], a[1] * b[1]); }
+  function rsub(a, b) { return R(a[0] * b[1] - b[0] * a[1], a[1] * b[1]); }
+  function rcmp(a, b) { return a[0] * b[1] - b[0] * a[1]; }
+  function fs(a) { return a[1] === 1 ? grp(a[0]) : grp(a[0]) + '/' + grp(a[1]); }
+  function raw(n, d) { return grp(n) + '/' + grp(d); }
+  function fracEq(n, d) { var r = R(n, d); return (r[0] === n && r[1] === d) ? raw(n, d) : raw(n, d) + ' = ' + fs(r); }
+  var SHOW = false, RENDER = [];
+  function tail(a) {
+    if (!SHOW) return '';
+    var p = pctStr(a[0], a[1], 1);
+    if (a[1] === 1) return ' = ' + p;
+    var d = decStr(a[0], a[1], 3);
+    return (d.charAt(0) === '≈' ? ' ' : ' = ') + d + (p.charAt(0) === '≈' ? ' ' : ' = ') + p;
+  }
+  function pv(a) { return fs(a) + tail(a); }
+  function pvRaw(n, d) { return fracEq(n, d) + tail(R(n, d)); }
+  function pctSync() { document.querySelectorAll('.pctT').forEach(function (b) { b.setAttribute('aria-pressed', SHOW ? 'true' : 'false'); b.textContent = SHOW ? 'Fractions seulement' : 'Voir aussi en décimal et en %'; }); }
+  document.addEventListener('click', function (ev) {
+    var b = ev.target && ev.target.closest ? ev.target.closest('.pctT') : null; if (!b) return;
+    SHOW = !SHOW; pctSync(); RENDER.forEach(function (f) { f(); });
+  });
+
+  /* ---------- Arbres ---------- */
+  function build(fn, depth) {
+    function mk(path, k) { if (k >= depth) return []; return fn(path, k).map(function (b) { return { lab: b.lab, p: b.p, kids: mk(path.concat([b.lab]), k + 1) }; }); }
+    return { lab: '', kids: mk([], 0) };
+  }
+  function buildRec(fn) {
+    function mk(path) { var br = fn(path); if (!br) return []; return br.map(function (b) { return { lab: b.lab, p: b.p, kids: mk(path.concat([b.lab])) }; }); }
+    return { lab: '', kids: mk([]) };
+  }
+  function uTree(levels) { return build(function (path, k) { return levels[k].map(function (l) { return { lab: l }; }); }, levels.length); }
+  function leaves(root) {
+    var out = [];
+    (function go(n, path, rn, rd) {
+      if (!n.kids.length) { out.push({ path: path, raw: [rn, rd], p: R(rn, rd) }); return; }
+      n.kids.forEach(function (c) { go(c, path.concat([c.lab]), c.p ? rn * c.p[0] : rn, c.p ? rd * c.p[1] : rd); });
+    })(root, [], 1, 1);
+    return out;
+  }
+  function probOf(root, pred) { return leaves(root).filter(function (l) { return pred(l.path); }).reduce(function (s, l) { return radd(s, l.p); }, [0, 1]); }
+  function rule1(root) {
+    var ok = true;
+    (function go(n) { if (!n.kids.length) return; if (n.kids[0].p) { var s = n.kids.reduce(function (t, c) { return radd(t, c.p); }, [0, 1]); if (s[0] !== 1 || s[1] !== 1) ok = false; } n.kids.forEach(go); })(root);
+    return ok;
+  }
+  /* Somme des chemins choisis, écrite avec les fractions non simplifiées des feuilles */
+  function sumLine(ls, noTail) {
+    if (!ls.length) return '0';
+    if (noTail) { var keep = SHOW; SHOW = false; var out = sumLine(ls); SHOW = keep; return out; }
+    var D = ls[0].raw[1], same = ls.every(function (l) { return l.raw[1] === D; });
+    var tot = ls.reduce(function (s, l) { return radd(s, l.p); }, [0, 1]);
+    var t = ls.map(function (l) { return raw(l.raw[0], l.raw[1]); }).join(' + ');
+    if (same) {
+      var N = sum(ls.map(function (l) { return l.raw[0]; })), r = R(N, D);
+      if (ls.length > 1) t += ' = ' + raw(N, D);
+      return t + ((r[0] !== N || r[1] !== D) ? ' = ' + fs(r) : '') + tail(r);
+    }
+    return t + ' = ' + pv(tot);
+  }
+
+  /* ---------- Dessins SVG ---------- */
+  function r1(x) { return String(Math.round(x * 10) / 10); }
+  function Ln(x1, y1, x2, y2, col, w, extra) { return '<line x1="' + r1(x1) + '" y1="' + r1(y1) + '" x2="' + r1(x2) + '" y2="' + r1(y2) + '" style="stroke:' + col + ';stroke-width:' + w + '"' + (extra || '') + '/>'; }
+  function Tx(x, y, s, o) { o = o || {}; return '<text x="' + r1(x) + '" y="' + r1(y) + '" font-size="' + (o.fs || 14) + '"' + (o.a ? ' text-anchor="' + o.a + '"' : '') + (o.cls ? ' class="' + o.cls + '"' : '') + (o.st ? ' style="' + o.st + '"' : '') + '>' + esc(s) + '</text>'; }
+  function halo(col) { return 'fill:' + col + ';stroke:var(--paper);stroke-width:4px;paint-order:stroke;font-weight:600'; }
+  /* Arbre couché : racine à gauche, feuilles empilées à droite (lisible sur téléphone).
+     o.W largeur du viewBox, o.leafW place du texte des feuilles, o.gap écart entre feuilles, o.heads titres des étages,
+     o.upto nombre d'étages dessinés, o.hl(path) chemins à allumer, o.fill(lab) couleur d'un nœud, o.leafText(path, leaf, i) */
+  function treeSvg(root, o) {
+    o = o || {};
+    var W = o.W || 360, LW = o.leafW == null ? 100 : o.leafW, S = o.gap || 28, TOP = o.heads ? 30 : 10, X0 = 14;
+    function depth(n) { return n.kids.length ? 1 + Math.max.apply(null, n.kids.map(depth)) : 0; }
+    var D = Math.max(1, depth(root)), colW = (W - X0 - 10 - LW) / D, row = 0, show = o.upto == null ? D : o.upto;
+    var all = leaves(root), byKey = {};
+    all.forEach(function (l) { byKey[l.path.join('|')] = l; });
+    var hlL = o.hl ? all.filter(function (l) { return o.hl(l.path); }).map(function (l) { return l.path.join('|'); }) : [];
+    function isHl(path) { var p = path.join('|'); return hlL.some(function (q) { return q === p || q.indexOf(p + '|') === 0; }); }
+    function wOf(n) { return Math.max(24, 8.4 * String(n.lab).length + 12); }
+    (function place(n, k, path) {
+      n._x = X0 + k * colW; n._k = k; n._path = path;
+      if (!n.kids.length) { n._y = TOP + row * S + S / 2; row++; }
+      else { n.kids.forEach(function (c) { place(c, k + 1, path.concat([c.lab])); }); n._y = (n.kids[0]._y + n.kids[n.kids.length - 1]._y) / 2; }
+    })(root, 0, []);
+    var H = Math.round(TOP + row * S + 6), eS = '', nS = '', pS = '', lS = '', li = 0;
+    var s = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + esc(o.label || 'Arbre') + '">';
+    if (o.heads) o.heads.forEach(function (h, k) { if (k < show) s += Tx(X0 + (k + 1) * colW, 19, h, { fs: 13, a: 'middle', st: 'fill:var(--ink-soft)' }); });
+    nS += '<circle cx="' + X0 + '" cy="' + r1(root._y) + '" r="5" style="fill:var(--ink)"/>';
+    (function draw(n) {
+      n.kids.forEach(function (c, ci) {
+        if (c._k > show) return;
+        var hl = hlL.length > 0 && isHl(c._path), x1 = n === root ? X0 + 5 : n._x + wOf(n) / 2, w = wOf(c), x2 = c._x - w / 2;
+        eS += Ln(x1, n._y, x2, c._y, hl ? 'var(--two)' : 'var(--ink-soft)', hl ? 3.5 : 1.6);
+        if (c.p && o.weights !== false) {
+          var t = .56, mx = x1 + (x2 - x1) * t, my = n._y + (c._y - n._y) * t, up = ci < n.kids.length / 2;
+          pS += Tx(mx, up ? my - 8 : my + 18, raw(c.p[0], c.p[1]), { fs: 13, a: 'middle', st: halo(hl ? 'var(--two)' : 'var(--acc-ink)') });
+        }
+        var fill = o.fill ? o.fill(c.lab) : 'var(--card)';
+        nS += '<rect x="' + r1(c._x - w / 2) + '" y="' + r1(c._y - 11) + '" width="' + r1(w) + '" height="22" rx="6" style="fill:' + fill + ';stroke:' + (hl ? 'var(--two)' : 'var(--ink)') + ';stroke-width:' + (hl ? 2.5 : 1.5) + '"/>' + Tx(c._x, c._y + 5, c.lab, { fs: 14, a: 'middle', st: 'font-weight:600' });
+        if (!c.kids.length && o.leafText) {
+          lS += Tx(c._x + w / 2 + 7, c._y + 5, o.leafText(c._path, byKey[c._path.join('|')], li), { fs: 13, st: hl ? 'fill:var(--two);font-weight:600' : 'fill:var(--ink)' });
+          li++;
+        }
+        draw(c);
+      });
+    })(root);
+    return s + eS + nS + pS + lS + '</svg>';
+  }
+  function bagFill(l) { return l === 'R' ? 'var(--red-soft)' : l === 'V' || l === 'J' ? 'var(--ok-soft)' : 'var(--card)'; }
+  function ctrlHtml(id, name, v, canDown, canUp, aDown, aUp) {
+    return '<div class="ctrl"><span class="n">' + name + '</span><button type="button" data-k="' + id + '" data-d="-1" aria-label="' + esc(aDown) + '"' + (canDown ? '' : ' disabled') + '>' + MI + '</button><span class="v">' + v + '</span><button type="button" data-k="' + id + '" data-d="1" aria-label="' + esc(aUp) + '"' + (canUp ? '' : ' disabled') + '>+</button></div>';
+  }
+  function pressed(container, attr, val) { $(container).querySelectorAll('button[' + attr + ']').forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute(attr) === String(val) ? 'true' : 'false'); }); }
+
+  /* ---------- Trieur générique (cartes une par une), comme dans les autres tutoriels.
+     Si un item a sa propre liste o (options), elle remplace les boutons communs.
+     Si un item a une liste alt, ces réponses sont aussi acceptées.
+     o.cardHtml(it, answered) renvoie le contenu HTML de la carte. ---------- */
+  function isOk(it, c) { return c === it.a || !!(it.alt && it.alt.indexOf(c) >= 0); }
+  function makeSorter(o) {
+    var idx = 0, ans = {};
+    function opts(it) { return it.o ? it.o : o.order; }
+    function name(c) { return o.names && o.names[c] ? o.names[c] : c; }
+    function render() {
+      var it = o.items[idx], a = ans[it.k];
+      if (o.cardHtml) $(o.card).innerHTML = o.cardHtml(it, !!a); else $(o.card).textContent = it.s;
+      $(o.pos).textContent = o.word + ' ' + (idx + 1) + ' / ' + o.items.length;
+      $(o.btns).innerHTML = opts(it).map(function (c) {
+        var cls = a ? (c === it.a || (c === a && isOk(it, a)) ? 'right' : (c === a ? 'wrong' : '')) : '';
+        return '<button type="button" data-c="' + esc(c) + '"' + (cls ? ' class="' + cls + '"' : '') + (a ? ' disabled' : '') + '>' + esc(name(c)) + '</button>';
+      }).join('');
+      var out = $(o.out);
+      if (!a) { out.className = 'fbk'; out.innerHTML = ''; }
+      else {
+        var ok = isOk(it, a);
+        out.className = 'fbk ' + (ok ? 'ok' : 'no');
+        out.innerHTML = '<strong>' + (ok ? 'Bien vu !' : 'Pas tout à fait. Réponse : ' + esc(name(it.a)) + '.') + '</strong><span>' + esc(it.why) + '</span>';
+      }
+      var s = o.score(ans), last = idx === o.items.length - 1, left = s.total - s.answered;
+      $(o.score_).textContent = (o.word ? o.word + ' ' : '') + (idx + 1) + ' / ' + s.total;
+      $(o.pos).textContent = s.answered ? 'Bonnes réponses : ' + s.correct + ' sur ' + s.answered : '';
+      $(o.prev).disabled = idx === 0;
+      $(o.next).disabled = last;
+      $(o.next).style.display = last ? 'none' : '';
+      var end = $(o.out + 'End');
+      if (!end) { end = document.createElement('div'); end.id = o.out + 'End'; end.setAttribute('aria-live', 'polite'); $(o.out).insertAdjacentElement('afterend', end); }
+      if (!left) {
+        var r = s.correct / s.total;
+        end.className = 'fbk ok sorter-end';
+        end.innerHTML = '<strong>Terminé ! ' + s.correct + ' / ' + s.total + ' bonnes réponses</strong><span>' +
+          (r === 1 ? 'Parfait, tout est juste !' : r >= .7 ? 'Très bien !' : r >= .5 ? 'Pas mal ! Relis les explications des erreurs.' : 'Relis les explications, puis réessaie.') +
+          ' Touche « Recommencer » pour rejouer.</span>';
+      } else if (last && ans[it.k]) {
+        end.className = 'fbk warn sorter-end';
+        end.innerHTML = '<strong>C’était la dernière carte.</strong><span>Il te reste ' + left + ' réponse' + (left > 1 ? 's' : '') + ' à donner : reviens en arrière avec « ← Précédent ».</span>';
+      } else { end.className = ''; end.innerHTML = ''; }
+    }
+    $(o.btns).addEventListener('click', function (ev) {
+      var b = ev.target.closest('button'); if (!b || b.disabled) return;
+      var it = o.items[idx]; if (!ans[it.k]) ans[it.k] = b.getAttribute('data-c');
+      render();
+    });
+    $(o.prev).addEventListener('click', function () { idx = clamp(idx - 1, o.items.length); render(); });
+    $(o.next).addEventListener('click', function () { idx = clamp(idx + 1, o.items.length); render(); });
+    $(o.reset).addEventListener('click', function () { ans = {}; idx = 0; render(); });
+    render();
+  }
+  function scorer(items) {
+    return function (ans) { var correct = 0, answered = 0; items.forEach(function (x) { if (ans && ans[x.k]) { answered++; if (isOk(x, ans[x.k])) correct++; } }); return { correct: correct, answered: answered, total: items.length }; };
+  }
+  function tapKeys(el, fn) {
+    el.addEventListener('click', function (ev) { var g = ev.target.closest('[data-i]'); if (g && el.contains(g)) fn(+g.getAttribute('data-i')); });
+    el.addEventListener('keydown', function (ev) { if (ev.key !== 'Enter' && ev.key !== ' ') return; var g = ev.target.closest('[data-i]'); if (g) { ev.preventDefault(); fn(+g.getAttribute('data-i')); } });
+  }
+  /* Petit pas à pas générique : steps() renvoie la liste, render(st, i, last) dessine */
+  function stepper(p, steps, draw) {
+    var st = { i: 0 };
+    function render() {
+      var S = steps();
+      st.i = clamp(st.i, S.length);
+      var last = st.i === S.length - 1;
+      $(p + 'Pos').textContent = 'Étape ' + (st.i + 1) + ' / ' + S.length;
+      draw(S[st.i], st.i, last);
+      var say = $(p + 'Say'), cur = S[st.i];
+      say.className = 'fbk say ' + (cur.done ? 'ok' : 'info');
+      say.innerHTML = cur.done ? '<strong>Terminé</strong><span>' + esc(cur.text) + '</span>' : '<span>' + esc(cur.text) + '</span>';
+      $(p + 'Prev').disabled = st.i === 0; $(p + 'Next').disabled = last; $(p + 'Next').style.display = last ? 'none' : '';
+    }
+    $(p + 'Prev').addEventListener('click', function () { st.i = Math.max(0, st.i - 1); render(); });
+    $(p + 'Next').addEventListener('click', function () { st.i = Math.min(steps().length - 1, st.i + 1); render(); });
+    $(p + 'Reset').addEventListener('click', function () { st.i = 0; render(); });
+    st.render = render; st.reset = function () { st.i = 0; render(); };
+    return st;
+  }
+
+  /* ---------- Étape 1 : pièce puis dé ---------- */
+  var S1K = [];
+  ['P', 'F'].forEach(function (c) { for (var d = 1; d <= 6; d++) S1K.push(c + d); });
+  var s1Seen = {}, s1N = 0, s1Last = null, s1Org = false;
+  function s1Throw() { var k = (rint(0, 1) ? 'F' : 'P') + rint(1, 6); s1N++; s1Seen[k] = (s1Seen[k] || 0) + 1; s1Last = k; }
+  function s1Found() { return S1K.filter(function (k) { return s1Seen[k]; }).length; }
+  function s1Render() {
+    $('s1Grid').innerHTML = S1K.map(function (k) {
+      var seen = s1Org || s1Seen[k], c = k.charAt(0) === 'P' ? 'pile' : 'face';
+      return '<span class="' + (seen ? 'seen' : '') + (k === s1Last && !s1Org ? ' last' : '') + '" aria-label="' + (seen ? esc(c + ' et ' + k.slice(1)) : 'issue pas encore vue') + '">' + (seen ? '(' + k.charAt(0) + NBS + ';' + NBS + k.slice(1) + ')' + (s1Seen[k] ? '<small>' + s1Seen[k] + '×</small>' : '') : '?') + '</span>';
+    }).join('');
+    var f = s1Found();
+    $('s1Count').textContent = grp(s1N) + ' lancer' + (s1N > 1 ? 's' : '');
+    $('s1Found').textContent = s1N ? f + ' issue' + (f > 1 ? 's' : '') + ' trouvée' + (f > 1 ? 's' : '') + ' sur 12' : '';
+    var out = $('s1Out');
+    if (s1Org) { out.className = 'fbk ok'; out.innerHTML = '<strong>La liste organisée : 12 issues</strong><span>On fixe la pièce sur pile et on passe le dé de 1 à 6, puis on recommence avec face : (P ; 1), (P ; 2)… (F ; 6). 2 issues pour la pièce, 6 pour le dé : 2 × 6 = 12, sans oubli ni doublon.</span>'; }
+    else if (f === 12) { out.className = 'fbk ok'; out.innerHTML = '<strong>Les 12 issues sont trouvées, en ' + grp(s1N) + ' lancers</strong><span>Au hasard, il en faut souvent bien plus que 12, car les mêmes issues reviennent. Et avant la fin, rien ne te disait combien il en manquait. Touche « Liste organisée » pour voir la méthode.</span>'; }
+    else if (s1N) { out.className = 'fbk info'; out.innerHTML = '<span>Dernier lancer : ' + (s1Last.charAt(0) === 'P' ? 'pile' : 'face') + ' et ' + s1Last.slice(1) + '. Il manque encore ' + (12 - f) + ' issue' + (12 - f > 1 ? 's' : '') + '… mais sans la grille, le saurais-tu ?</span>'; }
+    else { out.className = 'fbk'; out.innerHTML = ''; }
+  }
+  $('s1One').addEventListener('click', function () { s1Org = false; s1Throw(); s1Render(); });
+  $('s1All').addEventListener('click', function () { s1Org = false; var g = 0; while (s1Found() < 12 && g < 100000) { s1Throw(); g++; } s1Render(); });
+  $('s1List').addEventListener('click', function () { s1Org = true; s1Render(); });
+  $('s1Reset').addEventListener('click', function () { s1Seen = {}; s1N = 0; s1Last = null; s1Org = false; s1Render(); });
+  s1Render();
+
+  /* ---------- Étape 2 : arbre des possibles ---------- */
+  var S2X = {
+    pp: { name: 'Pièce, puis pièce', levels: [['P', 'F'], ['P', 'F']], heads: ['1ʳᵉ pièce', '2ᵉ pièce'], words: ['la 1ʳᵉ pièce', 'la 2ᵉ pièce'] },
+    pd: { name: 'Pièce, puis dé', levels: [['P', 'F'], ['1', '2', '3', '4', '5', '6']], heads: ['pièce', 'dé'], words: ['la pièce', 'le dé'] },
+    ppp: { name: 'Trois pièces', levels: [['P', 'F'], ['P', 'F'], ['P', 'F']], heads: ['1ʳᵉ', '2ᵉ', '3ᵉ'], words: ['la 1ʳᵉ pièce', 'la 2ᵉ pièce', 'la 3ᵉ pièce'] }
+  };
+  var ORD = ['Première', 'Deuxième', 'Troisième', 'Quatrième'];
+  function s2Steps(X) {
+    var st = [{ up: 0, text: 'On part d’un point, la racine. Chaque épreuve va ajouter un étage de branches (P = pile, F = face).' }], prod = 1, parts = [];
+    X.levels.forEach(function (L, k) {
+      var before = prod; prod *= L.length; parts.push(L.length);
+      st.push({ up: k + 1, text: k === 0 ? 'Première épreuve, ' + X.words[0] + ' : ' + L.length + ' issues possibles (' + L.join(', ') + '), donc ' + L.length + ' branches.' : ORD[k] + ' épreuve, ' + X.words[k] + ' : au bout de chacune des ' + before + ' branches, on dessine ' + L.length + ' nouvelles branches. ' + before + ' × ' + L.length + ' = ' + prod + ' chemins.' });
+    });
+    st.push({ up: X.levels.length, done: true, leaves: true, text: 'L’arbre a ' + prod + ' feuilles, donc ' + prod + ' issues, toutes numérotées. Principe multiplicatif : ' + parts.join(' × ') + ' = ' + prod + '. On multiplie le nombre d’issues de chaque épreuve.' });
+    return st;
+  }
+  var s2Key = 'pd';
+  $('s2Pre').innerHTML = Object.keys(S2X).map(function (k) { return '<button type="button" data-x="' + k + '">' + esc(S2X[k].name) + '</button>'; }).join('');
+  var s2 = stepper('s2', function () { return s2Steps(S2X[s2Key]); }, function (st) {
+    var X = S2X[s2Key], T = uTree(X.levels);
+    $('s2Graph').innerHTML = treeSvg(T, { upto: st.up, heads: X.heads, gap: X.levels[1].length > 2 ? 24 : 28, leafW: X.levels.length > 2 ? 124 : 104, label: 'Arbre des possibles : ' + X.name,
+      leafText: st.leaves ? function (path, l, i) { return (i + 1) + '. (' + path.join(' ; ') + ')'; } : null });
+    pressed('s2Pre', 'data-x', s2Key);
+  });
+  $('s2Pre').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b) return; s2Key = b.getAttribute('data-x'); s2.reset(); });
+  s2.render();
+
+  /* ---------- Étape 3 : arbre pondéré (météo) ---------- */
+  function weatherTree(p1, p2) { return build(function (path, k) { var p = k ? p2 : p1; return [{ lab: 'pluie', p: [p, 10] }, { lab: 'soleil', p: [10 - p, 10] }]; }, 2); }
+  function nRain(path) { return path.filter(function (x) { return x === 'pluie'; }).length; }
+  var WEV = {
+    two: { t: 'Deux jours de pluie', f: function (p) { return nRain(p) === 2; } },
+    one: { t: 'Exactement un jour', f: function (p) { return nRain(p) === 1; } },
+    least: { t: 'Au moins un jour', f: function (p) { return nRain(p) >= 1; } },
+    none: { t: 'Aucun jour de pluie', f: function (p) { return nRain(p) === 0; } }
+  };
+  var s3p = [3, 6], s3e = 'one';
+  $('s3Ev').innerHTML = Object.keys(WEV).map(function (k) { return '<button type="button" data-e="' + k + '">' + esc(WEV[k].t) + '</button>'; }).join('');
+  function s3Render() {
+    var T = weatherTree(s3p[0], s3p[1]), E = WEV[s3e];
+    $('s3Ctrls').innerHTML = ctrlHtml(0, 'Pluie samedi : ' + s3p[0] + '/10', s3p[0], s3p[0] > 0, s3p[0] < 10, 'Moins de pluie samedi', 'Plus de pluie samedi') + ctrlHtml(1, 'Pluie dimanche : ' + s3p[1] + '/10', s3p[1], s3p[1] > 0, s3p[1] < 10, 'Moins de pluie dimanche', 'Plus de pluie dimanche');
+    pressed('s3Ev', 'data-e', s3e);
+    $('s3Graph').innerHTML = treeSvg(T, { W: 360, leafW: 90, gap: 36, heads: ['samedi', 'dimanche'], hl: E.f, label: 'Arbre pondéré de la météo du week-end',
+      leafText: function (path, l) { return raw(l.raw[0], l.raw[1]); } });
+    var ls = leaves(T).filter(function (l) { return E.f(l.path); }), h = '';
+    h += '<span><strong>Règle 1</strong> : ' + s3p[0] + '/10 + ' + (10 - s3p[0]) + '/10 = 1 (samedi) et ' + s3p[1] + '/10 + ' + (10 - s3p[1]) + '/10 = 1 (dimanche).</span>';
+    h += '<span><strong>Règle 2</strong>, chemin par chemin :</span>';
+    ls.forEach(function (l) { h += '<span>' + esc(l.path.join(' → ')) + ' : ' + (l.path[0] === 'pluie' ? s3p[0] : 10 - s3p[0]) + '/10 × ' + (l.path[1] === 'pluie' ? s3p[1] : 10 - s3p[1]) + '/10 = ' + raw(l.raw[0], l.raw[1]) + '</span>'; });
+    h += '<span><strong>Règle 3</strong> : P(' + esc(E.t.toLowerCase()) + ') = ' + esc(sumLine(ls)) + '</span>';
+    if (s3e === 'least') { var no = probOf(T, WEV.none.f); h += '<span class="soft">Plus court avec le contraire (étape 7) : 1 − P(aucun jour) = 1 − ' + esc(fs(no)) + ' = ' + esc(pv(rsub([1, 1], no))) + '.</span>'; }
+    $('s3Out').innerHTML = h;
+  }
+  $('s3Ctrls').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b || b.disabled) return; var k = +b.getAttribute('data-k'); s3p[k] = Math.max(0, Math.min(10, s3p[k] + +b.getAttribute('data-d'))); s3Render(); });
+  $('s3Ev').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b) return; s3e = b.getAttribute('data-e'); s3Render(); });
+  $('s3Reset').addEventListener('click', function () { s3p = [3, 6]; s3e = 'one'; s3Render(); });
+  RENDER.push(s3Render); s3Render();
+
+  /* ---------- Étape 4 : avec ou sans remise ---------- */
+  function bagTree(r, v, repl) {
+    return build(function (path) {
+      var rr = r, vv = v;
+      if (!repl) path.forEach(function (l) { if (l === 'R') rr--; else vv--; });
+      var t = rr + vv; return [{ lab: 'R', p: [rr, t] }, { lab: 'V', p: [vv, t] }];
+    }, 2);
+  }
+  var BAGEV = {
+    rr: { t: '2 rouges', f: function (p) { return p[0] === 'R' && p[1] === 'R'; } },
+    vv: { t: '2 vertes', f: function (p) { return p[0] === 'V' && p[1] === 'V'; } },
+    mix: { t: 'Une de chaque couleur', f: function (p) { return p[0] !== p[1]; } }
+  };
+  var s4c = [3, 2], s4m = 'both', s4e = 'rr';
+  $('s4Ev').innerHTML = Object.keys(BAGEV).map(function (k) { return '<button type="button" data-e="' + k + '">' + esc(BAGEV[k].t) + '</button>'; }).join('');
+  function s4One(repl) {
+    var T = bagTree(s4c[0], s4c[1], repl), E = BAGEV[s4e], ls = leaves(T).filter(function (l) { return E.f(l.path); });
+    var svg = treeSvg(T, { W: 340, leafW: 64, gap: 36, heads: ['1ᵉʳ bonbon', '2ᵉ bonbon'], hl: E.f, fill: bagFill, label: 'Arbre ' + (repl ? 'avec' : 'sans') + ' remise',
+      leafText: function (path, l) { return raw(l.raw[0], l.raw[1]); } });
+    var calc = ls.map(function (l) { var T0 = bagTree(s4c[0], s4c[1], repl), a = T0.kids[l.path[0] === 'R' ? 0 : 1], b = a.kids[l.path[1] === 'R' ? 0 : 1]; return l.path.join('') + ' : ' + raw(a.p[0], a.p[1]) + ' × ' + raw(b.p[0], b.p[1]) + ' = ' + raw(l.raw[0], l.raw[1]); }).join(' ; ');
+    return { svg: svg, calc: calc, line: sumLine(ls), p: probOf(T, E.f) };
+  }
+  function s4Render() {
+    $('s4Ctrls').innerHTML = ctrlHtml(0, 'Bonbons rouges', s4c[0], s4c[0] > 1, s4c[0] < 8, 'Un bonbon rouge de moins', 'Un bonbon rouge de plus') + ctrlHtml(1, 'Bonbons verts', s4c[1], s4c[1] > 1, s4c[1] < 8, 'Un bonbon vert de moins', 'Un bonbon vert de plus');
+    pressed('s4Ev', 'data-e', s4e);
+    ['s4A', 's4S', 's4B'].forEach(function (id, i) { $(id).setAttribute('aria-pressed', ['with', 'without', 'both'][i] === s4m ? 'true' : 'false'); });
+    var A = s4One(true), S = s4One(false), h = '', g = '', ev = BAGEV[s4e].t.toLowerCase();
+    if (s4m !== 'without') g += '<div><span class="cap">Avec remise</span><div class="graph">' + A.svg + '</div></div>';
+    if (s4m !== 'with') g += '<div><span class="cap">Sans remise</span><div class="graph">' + S.svg + '</div></div>';
+    $('s4Graph').innerHTML = g;
+    var tot = s4c[0] + s4c[1];
+    h += '<span class="soft">Le sachet : ' + s4c[0] + ' rouge' + (s4c[0] > 1 ? 's' : '') + ' et ' + s4c[1] + ' verte' + (s4c[1] > 1 ? 's' : '') + ', ' + tot + ' bonbons en tout.</span>';
+    if (s4m !== 'without') h += '<span><strong>Avec remise</strong> : ' + esc(A.calc) + '. P(' + esc(ev) + ') = ' + esc(A.line) + '</span>';
+    if (s4m !== 'with') h += '<span><strong>Sans remise</strong> : ' + esc(S.calc) + '. P(' + esc(ev) + ') = ' + esc(S.line) + '</span>';
+    if (s4m === 'both') {
+      var c = rcmp(S.p, A.p);
+      h += '<span>' + (c === 0 ? 'Ici, les deux probabilités sont égales.' : 'Sans remise, la probabilité est plus ' + (c < 0 ? 'petite' : 'grande') + ' : ' + esc(fs(S.p)) + ' au lieu de ' + esc(fs(A.p)) + '. ' + (s4e === 'mix' ? 'Après un bonbon, il reste proportionnellement plus de bonbons de l’autre couleur.' : 'Après un premier bonbon de cette couleur, il en reste un de moins.')) + '</span>';
+    }
+    $('s4Out').innerHTML = h;
+  }
+  $('s4Ctrls').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b || b.disabled) return; var k = +b.getAttribute('data-k'); s4c[k] = Math.max(1, Math.min(8, s4c[k] + +b.getAttribute('data-d'))); s4Render(); });
+  $('s4Ev').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b) return; s4e = b.getAttribute('data-e'); s4Render(); });
+  $('s4A').addEventListener('click', function () { s4m = 'with'; s4Render(); });
+  $('s4S').addEventListener('click', function () { s4m = 'without'; s4Render(); });
+  $('s4B').addEventListener('click', function () { s4m = 'both'; s4Render(); });
+  $('s4Reset').addEventListener('click', function () { s4c = [3, 2]; s4m = 'both'; s4e = 'rr'; s4Render(); });
+  RENDER.push(s4Render); s4Render();
+
+  /* ---------- Étape 5 : deux dés ---------- */
+  var DICE = [];
+  for (var da = 1; da <= 6; da++) for (var db = 1; db <= 6; db++) DICE.push({ a: da, b: db });
+  var DEV = {
+    sum: { t: function (s) { return 'Somme = ' + s; }, f: function (o, s) { return o.a + o.b === s; } },
+    dbl: { t: function () { return 'Un double'; }, f: function (o) { return o.a === o.b; } },
+    six: { t: function () { return 'Au moins un 6'; }, f: function (o) { return o.a === 6 || o.b === 6; } },
+    nosix: { t: function () { return 'Aucun 6'; }, f: function (o) { return o.a !== 6 && o.b !== 6; } },
+    prod: { t: function () { return 'Produit pair'; }, f: function (o) { return (o.a * o.b) % 2 === 0; } },
+    ge10: { t: function () { return 'Somme ≥ 10'; }, f: function (o) { return o.a + o.b >= 10; } }
+  };
+  function diceCount(key, s) { return DICE.filter(function (o) { return DEV[key].f(o, s); }).length; }
+  var s5e = 'sum', s5s = 7, s5sel = null;
+  function s5Render() {
+    $('s5Ev').innerHTML = Object.keys(DEV).map(function (k) { return '<button type="button" data-e="' + k + '" aria-pressed="' + (k === s5e) + '">' + esc(DEV[k].t(s5s)) + '</button>'; }).join('');
+    $('s5v').textContent = s5s; $('s5m').disabled = s5s <= 2; $('s5p').disabled = s5s >= 12;
+    var E = DEV[s5e], prodMode = s5e === 'prod';
+    var h = '<thead><tr><th class="corner">rouge ↓<br>bleu →</th>' + [1, 2, 3, 4, 5, 6].map(function (v) { return '<th scope="col">' + v + '</th>'; }).join('') + '</tr></thead><tbody>';
+    for (var a = 1; a <= 6; a++) {
+      h += '<tr><th scope="row">' + a + '</th>';
+      for (var b = 1; b <= 6; b++) {
+        var i = (a - 1) * 6 + (b - 1), on = E.f(DICE[i], s5s);
+        h += '<td data-i="' + i + '" tabindex="0" role="button" class="' + (on ? 'on' : '') + (i === s5sel ? ' sel' : '') + '" aria-label="Rouge ' + a + ', bleu ' + b + (on ? ', dans l’événement' : '') + '">' + (prodMode ? a * b : a + b) + '</td>';
+      }
+      h += '</tr>';
+    }
+    $('s5Table').innerHTML = h + '</tbody>';
+    var k = diceCount(s5e, s5s), list = DICE.filter(function (o) { return E.f(o, s5s); }), t = '';
+    t += '<strong>' + esc(E.t(s5s)) + ' : ' + k + ' case' + (k > 1 ? 's' : '') + ' sur 36</strong>';
+    t += '<span>P = ' + esc(pvRaw(k, 36)) + '</span>';
+    if (k && k <= 11) t += '<span class="mono">' + esc(list.map(function (o) { return '(' + o.a + ' ; ' + o.b + ')'; }).join(', ')) + '</span>';
+    if (s5e === 'six') t += '<span>Astuce : le contraire, « aucun 6 », occupe 5 × 5 = 25 cases. 36 − 25 = 11.</span>';
+    if (s5e === 'nosix') t += '<span>C’est le contraire de « au moins un 6 » : 25/36 = 1 − 11/36.</span>';
+    if (s5e === 'prod') t += '<span>Les cases montrent le produit. Il est impair seulement si les deux dés sont impairs : 3 × 3 = 9 cases. Pair : 36 − 9 = 27.</span>';
+    if (s5e === 'sum') t += '<span>Les cases d’une même somme forment une diagonale.</span>';
+    if (s5sel != null) { var o = DICE[s5sel]; t += '<span>Case touchée : rouge ' + o.a + ', bleu ' + o.b + ' → somme ' + (o.a + o.b) + ', produit ' + o.a * o.b + '. ' + (E.f(o, s5s) ? 'Elle est dans l’événement.' : 'Elle n’est pas dans l’événement.') + '</span>'; }
+    $('s5Out').innerHTML = t;
+  }
+  $('s5Ev').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b) return; s5e = b.getAttribute('data-e'); s5Render(); });
+  $('s5m').addEventListener('click', function () { s5s = Math.max(2, s5s - 1); s5e = 'sum'; s5Render(); });
+  $('s5p').addEventListener('click', function () { s5s = Math.min(12, s5s + 1); s5e = 'sum'; s5Render(); });
+  tapKeys($('s5Table'), function (i) { s5sel = s5sel === i ? null : clamp(i, 36); s5Render(); });
+  RENDER.push(s5Render); s5Render();
+
+  /* ---------- Étape 6 : tableau d'effectifs ---------- */
+  var CL0 = { rows: ['Filles', 'Garçons'], cols: ['Foot', 'Unihockey', 'Natation'], c: [[4, 5, 3], [7, 4, 2]] };
+  var ROWN = ['fille', 'garçon'], COLN = ['foot', 'unihockey', 'natation'];
+  var GRP = { r: ['les filles', 'les garçons'], c: ['les élèves qui font du foot', 'les élèves qui font de l’unihockey', 'les élèves qui font de la natation'] };
+  var DESC1 = { r: ['est une fille', 'est un garçon'], c: ['fait du foot', 'fait de l’unihockey', 'fait de la natation'] };
+  var DESCN = { r: ['sont des filles', 'sont des garçons'], c: ['font du foot', 'font de l’unihockey', 'font de la natation'] };
+  var cl = JSON.parse(JSON.stringify(CL0)), s6A = 'r0', s6B = 'c0', s6op = 'or', s6slot = 'A';
+  function evName(e) { return e.charAt(0) === 'r' ? ROWN[+e.slice(1)] : COLN[+e.slice(1)]; }
+  function inEv(e, i, j) { return e.charAt(0) === 'r' ? i === +e.slice(1) : j === +e.slice(1); }
+  function s6Count(c, pred) { var n = 0; c.c.forEach(function (row, i) { row.forEach(function (v, j) { if (pred(i, j)) n += v; }); }); return n; }
+  function s6Calc(c, A, B, op) {
+    var T = s6Count(c, function () { return true; }), nA = s6Count(c, function (i, j) { return inEv(A, i, j); }), nB = s6Count(c, function (i, j) { return inEv(B, i, j); }), nAB = s6Count(c, function (i, j) { return inEv(A, i, j) && inEv(B, i, j); });
+    var r = { T: T, nA: nA, nB: nB, nAB: nAB, nOr: nA + nB - nAB };
+    r.n = op === 'A' ? nA : op === 'B' ? nB : op === 'and' ? nAB : op === 'or' ? r.nOr : nAB;
+    r.d = op === 'given' ? nB : T;
+    return r;
+  }
+  var S6OPS = [['A', 'P(A)'], ['B', 'P(B)'], ['and', 'P(A et B)'], ['or', 'P(A ou B)'], ['given', 'Parmi les B, part des A']];
+  $('s6Op').innerHTML = S6OPS.map(function (x) { return '<button type="button" data-o="' + x[0] + '">' + esc(x[1]) + '</button>'; }).join('');
+  function s6Render() {
+    var a = s6A, b = s6B, h = '<thead><tr><th></th>';
+    cl.cols.forEach(function (n, j) { var e = 'c' + j, tag = (e === a ? ' (A)' : '') + (e === b ? ' (B)' : ''); h += '<th><button type="button" data-e="' + e + '" aria-pressed="' + (e === a || e === b) + '">' + esc(n + tag) + '</button></th>'; });
+    h += '<th>Total</th></tr></thead><tbody>';
+    cl.rows.forEach(function (n, i) {
+      var e = 'r' + i, tag = (e === a ? ' (A)' : '') + (e === b ? ' (B)' : '');
+      h += '<tr><th><button type="button" data-e="' + e + '" aria-pressed="' + (e === a || e === b) + '">' + esc(n + tag) + '</button></th>';
+      cl.c[i].forEach(function (v, j) { var ia = inEv(a, i, j), ib = inEv(b, i, j); h += '<td data-cell="' + i + ',' + j + '" tabindex="0" role="button" class="' + (ia && ib ? 'ab' : ia ? 'a' : ib ? 'b' : '') + '" aria-label="' + esc(n + ' et ' + cl.cols[j] + ' : ' + v) + '">' + v + '</td>'; });
+      h += '<td>' + sum(cl.c[i]) + '</td></tr>';
+    });
+    var T = s6Count(cl, function () { return true; });
+    h += '</tbody><tfoot><tr><th>Total</th>' + cl.cols.map(function (n, j) { return '<td>' + sum(cl.c.map(function (row) { return row[j]; })) + '</td>'; }).join('') + '<td>' + T + '</td></tr></tfoot>';
+    $('s6Table').innerHTML = h;
+    $('s6SA').setAttribute('aria-pressed', s6slot === 'A' ? 'true' : 'false'); $('s6SB').setAttribute('aria-pressed', s6slot === 'B' ? 'true' : 'false');
+    $('s6AB').textContent = 'A = « ' + evName(a) + ' », B = « ' + evName(b) + ' »';
+    pressed('s6Op', 'data-o', s6op);
+    var C = s6Calc(cl, a, b, s6op), nA = evName(a), nB = evName(b), t = '';
+    if (s6op === 'A' || s6op === 'B') {
+      var e = s6op === 'A' ? a : b, n = s6op === 'A' ? C.nA : C.nB;
+      t += '<span><strong>P(' + esc(evName(e)) + ') = ' + esc(pvRaw(n, C.T)) + '</strong></span><span>' + n + ' élève' + (n > 1 ? 's' : '') + ' sur ' + C.T + ' (le total de la ' + (e.charAt(0) === 'r' ? 'ligne' : 'colonne') + ' divisé par le total de la classe).</span>';
+    } else if (s6op === 'and') {
+      t += '<span><strong>P(' + esc(nA + ' et ' + nB) + ') = ' + esc(pvRaw(C.nAB, C.T)) + '</strong></span>';
+      t += C.nAB ? '<span>Les élèves à la fois « ' + esc(nA) + ' » et « ' + esc(nB) + ' » : ' + C.nAB + ' sur ' + C.T + ' (la case jaune).</span>' : '<span>Aucun élève n’est à la fois « ' + esc(nA) + ' » et « ' + esc(nB) + ' » : ces événements sont incompatibles, P(A et B) = 0.</span>';
+    } else if (s6op === 'or') {
+      t += '<span><strong>P(' + esc(nA + ' ou ' + nB) + ') = ' + esc(pvRaw(C.nOr, C.T)) + '</strong></span>';
+      t += '<span>P(A) + P(B) − P(A et B) = ' + C.nA + '/' + C.T + ' + ' + C.nB + '/' + C.T + ' − ' + C.nAB + '/' + C.T + ' = ' + C.nOr + '/' + C.T + '</span>';
+      var cells = []; cl.c.forEach(function (row, i) { row.forEach(function (v, j) { if (inEv(a, i, j) || inEv(b, i, j)) cells.push(v); }); });
+      t += '<span>Contrôle en comptant les cases colorées : ' + cells.join(' + ') + ' = ' + sum(cells) + '.</span>';
+      t += C.nAB ? '<span class="soft">Sans le « − ' + C.nAB + '/' + C.T + ' », les ' + C.nAB + ' élève' + (C.nAB > 1 ? 's' : '') + ' de la case jaune seraient comptés deux fois.</span>' : '<span class="soft">A et B sont incompatibles : on enlève 0.</span>';
+    } else {
+      var d1 = C.nAB === 1 ? DESC1 : DESCN;
+      t += '<span><strong>Parmi ' + esc(GRP[b.charAt(0)][+b.slice(1)]) + ' (' + C.nB + '), ' + C.nAB + ' ' + esc(d1[a.charAt(0)][+a.slice(1)]) + ' : ' + esc(pvRaw(C.nAB, C.nB)) + '</strong></span>';
+      t += '<span>On ne regarde plus que la ' + (b.charAt(0) === 'r' ? 'ligne' : 'colonne') + ' de B, et on divise par son total, ' + C.nB + '. Ce n’est pas P(A et B) = ' + esc(fracEq(C.nAB, C.T)) + ', où l’on divise par toute la classe.</span>';
+    }
+    $('s6Out').innerHTML = t;
+  }
+  $('s6Table').addEventListener('click', function (ev) {
+    var b = ev.target.closest('[data-e]');
+    if (b) { var e = b.getAttribute('data-e'); if (s6slot === 'A') { s6A = e; s6slot = 'B'; } else { s6B = e; s6slot = 'A'; } s6Render(); return; }
+    var c = ev.target.closest('[data-cell]');
+    if (c) { var ij = c.getAttribute('data-cell').split(','); s6A = 'r' + ij[0]; s6B = 'c' + ij[1]; s6op = 'and'; s6slot = 'A'; s6Render(); }
+  });
+  $('s6Table').addEventListener('keydown', function (ev) { if (ev.key !== 'Enter' && ev.key !== ' ') return; var c = ev.target.closest('[data-cell]'); if (!c) return; ev.preventDefault(); var ij = c.getAttribute('data-cell').split(','); s6A = 'r' + ij[0]; s6B = 'c' + ij[1]; s6op = 'and'; s6Render(); });
+  $('s6SA').addEventListener('click', function () { s6slot = 'A'; s6Render(); });
+  $('s6SB').addEventListener('click', function () { s6slot = 'B'; s6Render(); });
+  $('s6Op').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b) return; s6op = b.getAttribute('data-o'); s6Render(); });
+  $('s6New').addEventListener('click', function () { cl.c = cl.c.map(function (row) { return row.map(function () { return rint(1, 8); }); }); s6Render(); });
+  $('s6Reset').addEventListener('click', function () { cl = JSON.parse(JSON.stringify(CL0)); s6A = 'r0'; s6B = 'c0'; s6op = 'or'; s6slot = 'A'; s6Render(); });
+  RENDER.push(s6Render); s6Render();
+
+  /* ---------- Étape 7 : événement contraire ---------- */
+  var S7M = { one: { q: [5, 6], what: 'un 6', none: 'aucun 6', with: 'd’un dé' }, dbl: { q: [35, 36], what: 'un double 6', none: 'aucun double 6', with: 'de deux dés' } };
+  function noneProb(mode, n) { var q = S7M[mode].q; return Math.pow(q[0] / q[1], n); }
+  function exactNone(mode, n) { var q = S7M[mode].q, d = Math.pow(q[1], n); if (d > 1e6) return null; return [Math.pow(q[0], n), d]; }
+  function threshold(mode) { for (var n = 1; n < 200; n++) if (noneProb(mode, n) < .5) return n; return null; }
+  var s7mode = 'one', s7n = 4, S7PRE = [1, 2, 3, 4, 6, 10, 24, 25];
+  $('s7Pre').innerHTML = S7PRE.map(function (n) { return '<button type="button" data-n="' + n + '">n = ' + n + '</button>'; }).join('');
+  function s7Render() {
+    var M = S7M[s7mode], n = s7n, ex = exactNone(s7mode, n), pn = noneProb(s7mode, n), pa = 1 - pn, th = threshold(s7mode), h = '';
+    $('s7v').textContent = n; $('s7m').disabled = n <= 1; $('s7p').disabled = n >= 40;
+    $('s7One').setAttribute('aria-pressed', s7mode === 'one' ? 'true' : 'false'); $('s7Dbl').setAttribute('aria-pressed', s7mode === 'dbl' ? 'true' : 'false');
+    var qs = M.q[0] + '/' + M.q[1];
+    h += '<span>À chaque lancer ' + M.with + ' : P(pas ' + M.what.replace('un ', 'de ') + ') = ' + qs + '.</span>';
+    if (ex) {
+      var pA = rsub([1, 1], R(ex[0], ex[1]));
+      h += '<span>P(' + esc(M.none) + ') = (' + qs + ')<sup>' + n + '</sup> = ' + esc(fracEq(ex[0], ex[1])) + ' ' + esc(pctStr(ex[0], ex[1], 1)) + '</span>';
+      h += '<span><strong>P(au moins ' + esc(M.what) + ') = 1 − ' + esc(fs(R(ex[0], ex[1]))) + ' = ' + esc(fs(pA)) + ' ' + esc(pctStr(pA[0], pA[1], 1)) + '</strong></span>';
+    } else {
+      h += '<span>P(' + esc(M.none) + ') = (' + qs + ')<sup>' + n + '</sup> ' + esc(floatPct(pn)) + '</span>';
+      h += '<span><strong>P(au moins ' + esc(M.what) + ') = 1 − (' + qs + ')<sup>' + n + '</sup> ' + esc(floatPct(pa)) + '</strong></span>';
+    }
+    $('s7Out').innerHTML = h;
+    var w = Math.max(0, Math.min(100, pa * 100));
+    $('s7Meter').innerHTML = '<div class="meter" role="img" aria-label="Probabilité d’au moins ' + esc(M.what) + ' : ' + esc(floatPct(pa)) + '"><i style="width:' + w.toFixed(1) + '%"></i><b></b><span>au moins ' + esc(M.what) + ' ' + esc(floatPct(pa)) + '</span></div><span class="soft" style="font-size:.85rem">Le trait rouge marque 50 %.</span>';
+    var say = $('s7Say'), naive = s7mode === 'one' ? n + '/6' : n + '/36';
+    if (pa > .5) { say.className = 'fbk ok'; say.innerHTML = '<strong>Pari favorable : plus de 50 %</strong><span>' + (n === th ? 'C’est le plus petit n qui dépasse 50 % ! ' : 'Dès n = ' + th + ', on dépasse 50 %. ') + (s7mode === 'one' ? 'Le pari de 4 lancers gagne un peu plus d’une fois sur deux.' : 'Il faut 25 lancers, et non 24 comme le pensait le chevalier de Méré.') + '</span>'; }
+    else { say.className = 'fbk warn'; say.innerHTML = '<strong>Pari défavorable : moins de 50 %</strong><span>Il faut au moins n = ' + th + ' lancers pour dépasser 50 %.' + (n >= 2 && n < M.q[1] ? ' Attention, ce n’est pas ' + naive + ' : on ne peut pas additionner les lancers.' : '') + '</span>'; }
+  }
+  $('s7m').addEventListener('click', function () { s7n = Math.max(1, s7n - 1); s7Render(); });
+  $('s7p').addEventListener('click', function () { s7n = Math.min(40, s7n + 1); s7Render(); });
+  $('s7Pre').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b) return; s7n = clamp(+b.getAttribute('data-n') - 1, 40) + 1; s7Render(); });
+  $('s7One').addEventListener('click', function () { s7mode = 'one'; s7Render(); });
+  $('s7Dbl').addEventListener('click', function () { s7mode = 'dbl'; s7Render(); });
+  s7Render();
+
+  /* ---------- Étape 8 : incompatibles ou pas ---------- */
+  var SUITS = [{ s: '♠', n: 'pique', red: false }, { s: '♥', n: 'cœur', red: true }, { s: '♦', n: 'carreau', red: true }, { s: '♣', n: 'trèfle', red: false }];
+  var RANKS = ['6', '7', '8', '9', '10', 'V', 'D', 'R', 'A'], RANKN = ['6', '7', '8', '9', '10', 'valet', 'dame', 'roi', 'as'];
+  var SPACES = {
+    de: { intro: 'On lance un dé.', out: [1, 2, 3, 4, 5, 6].map(function (v) { return { v: v }; }), name: function (o) { return String(o.v); } },
+    des: { intro: 'On lance deux dés, un rouge et un bleu.', out: DICE, name: function (o) { return '(' + o.a + ' ; ' + o.b + ')'; } },
+    jass: { intro: 'On tire une carte au hasard dans un jeu de jass de 36 cartes.', out: [], name: function (o) { return RANKN[o.r] + ' de ' + SUITS[o.s].n; } },
+    p2: { intro: 'On lance deux fois une pièce (P = pile, F = face).', out: ['PP', 'PF', 'FP', 'FF'].map(function (x) { return { x: x }; }), name: function (o) { return o.x; } }
+  };
+  SUITS.forEach(function (su, i) { RANKS.forEach(function (r, j) { SPACES.jass.out.push({ s: i, r: j }); }); });
+  function nP(o) { return o.x.split('').filter(function (c) { return c === 'P'; }).length; }
+  var incCards = [
+    { k: 'i1', sp: 'de', sA: 'obtenir 2', sB: 'obtenir un nombre impair', fA: function (o) { return o.v === 2; }, fB: function (o) { return o.v % 2 === 1; }, a: 'inc', why: '2 est pair : il n’est jamais impair.' },
+    { k: 'i2', sp: 'de', sA: 'obtenir un nombre pair', sB: 'obtenir 5 ou plus', fA: function (o) { return o.v % 2 === 0; }, fB: function (o) { return o.v >= 5; }, a: 'comp', why: 'Le 6 est pair et plus grand que 5.' },
+    { k: 'i3', sp: 'jass', sA: 'tirer un cœur', sB: 'tirer un as', fA: function (o) { return o.s === 1; }, fB: function (o) { return o.r === 8; }, a: 'comp', why: 'L’as de cœur est les deux à la fois.' },
+    { k: 'i4', sp: 'jass', sA: 'tirer un roi', sB: 'tirer une dame', fA: function (o) { return o.r === 7; }, fB: function (o) { return o.r === 6; }, a: 'inc', why: 'Une carte ne peut pas être à la fois un roi et une dame.' },
+    { k: 'i5', sp: 'jass', sA: 'tirer un pique', sB: 'tirer une carte rouge (cœur ou carreau)', fA: function (o) { return o.s === 0; }, fB: function (o) { return SUITS[o.s].red; }, a: 'inc', why: 'Les piques sont noirs.' },
+    { k: 'i6', sp: 'des', sA: 'la somme vaut 12', sB: 'faire un double', fA: function (o) { return o.a + o.b === 12; }, fB: function (o) { return o.a === o.b; }, a: 'comp', why: 'La seule façon de faire 12, c’est (6 ; 6), et c’est un double.' },
+    { k: 'i7', sp: 'des', sA: 'la somme vaut 7', sB: 'faire un double', fA: function (o) { return o.a + o.b === 7; }, fB: function (o) { return o.a === o.b; }, a: 'inc', why: 'Un double donne toujours une somme paire (2, 4… 12), et 7 est impair.' },
+    { k: 'i8', sp: 'p2', sA: 'obtenir au moins un pile', sB: 'obtenir deux faces', fA: function (o) { return nP(o) >= 1; }, fB: function (o) { return o.x === 'FF'; }, a: 'inc', why: 'Deux faces, c’est zéro pile. Ici, B est même le contraire de A.' },
+    { k: 'i9', sp: 'jass', sA: 'tirer un 6, un 7 ou un 8', sB: 'tirer un trèfle', fA: function (o) { return o.r <= 2; }, fB: function (o) { return o.s === 3; }, a: 'comp', why: 'Le 6, le 7 et le 8 de trèfle sont dans les deux.' },
+    { k: 'i10', sp: 'des', sA: 'obtenir au moins un 6', sB: 'la somme vaut 6 ou moins', fA: function (o) { return o.a === 6 || o.b === 6; }, fB: function (o) { return o.a + o.b <= 6; }, a: 'inc', why: 'Avec un 6, la somme vaut au moins 6 + 1 = 7.' }
+  ];
+  function incInfo(it) {
+    var S = SPACES[it.sp], N = S.out.length, nA = 0, nB = 0, nAB = 0, com = [];
+    S.out.forEach(function (o) { var x = it.fA(o), y = it.fB(o); if (x) nA++; if (y) nB++; if (x && y) { nAB++; com.push(S.name(o)); } });
+    return { N: N, nA: nA, nB: nB, nAB: nAB, com: com };
+  }
+  incCards.forEach(function (it) {
+    var I = incInfo(it), N = I.N;
+    it.why += I.nAB ? ' Issue' + (I.nAB > 1 ? 's' : '') + ' commune' + (I.nAB > 1 ? 's' : '') + ' : ' + I.com.join(', ') + '. P(A ou B) = ' + I.nA + '/' + N + ' + ' + I.nB + '/' + N + ' − ' + I.nAB + '/' + N + ' = ' + fracEq(I.nA + I.nB - I.nAB, N) + '.'
+      : ' Aucune issue commune : P(A ou B) = ' + I.nA + '/' + N + ' + ' + I.nB + '/' + N + ' = ' + fracEq(I.nA + I.nB, N) + '.';
+  });
+  function miniGrid(it, show) {
+    var S = SPACES[it.sp];
+    function cls(o) { if (!show) return ''; var x = it.fA(o), y = it.fB(o); return x && y ? 'ab' : x ? 'a' : y ? 'b' : ''; }
+    var h = '';
+    if (it.sp === 'jass') {
+      h = '<div class="mg" style="grid-template-columns:26px repeat(9,minmax(0,1fr))" aria-hidden="true"><span class="h"></span>' + RANKS.map(function (r) { return '<span class="h">' + r + '</span>'; }).join('');
+      SUITS.forEach(function (su, i) { h += '<span class="h' + (su.red ? ' rs' : '') + '">' + su.s + '</span>'; S.out.filter(function (o) { return o.s === i; }).forEach(function (o) { h += '<span class="' + cls(o) + (su.red ? ' rs' : '') + '">' + RANKS[o.r] + '</span>'; }); });
+      h += '</div>';
+    } else if (it.sp === 'des') {
+      h = '<div class="mg" style="grid-template-columns:22px repeat(6,minmax(0,1fr))" aria-hidden="true"><span class="h"></span>' + [1, 2, 3, 4, 5, 6].map(function (v) { return '<span class="h">' + v + '</span>'; }).join('');
+      for (var a = 1; a <= 6; a++) { h += '<span class="h">' + a + '</span>'; S.out.filter(function (o) { return o.a === a; }).forEach(function (o) { h += '<span class="' + cls(o) + '">' + (o.a + o.b) + '</span>'; }); }
+      h += '</div><span class="ask">Lignes : dé rouge ; colonnes : dé bleu ; dans les cases : la somme.</span>';
+    } else {
+      h = '<div class="mg" style="grid-template-columns:repeat(' + S.out.length + ',minmax(0,1fr));max-width:' + (S.out.length * 56) + 'px" aria-hidden="true">' + S.out.map(function (o) { return '<span class="' + cls(o) + '">' + S.name(o) + '</span>'; }).join('') + '</div>';
+    }
+    if (show) h += '<div class="legend"><span><i class="sw a"></i>A seulement</span><span><i class="sw b"></i>B seulement</span><span><i class="sw ab"></i>A et B</span></div>';
+    return h;
+  }
+  makeSorter({ items: incCards, names: { inc: 'Incompatibles', comp: 'Pas incompatibles' }, order: ['inc', 'comp'], btns: 's8Btns', card: 's8Card', pos: 's8Pos', out: 's8Out', score_: 's8Score', prev: 's8Prev', next: 's8Next', reset: 's8Reset', word: 'Question', score: scorer(incCards),
+    cardHtml: function (it, answered) { return '<span class="ask">' + esc(SPACES[it.sp].intro) + '</span><span>A : « ' + esc(it.sA) + ' »</span><span>B : « ' + esc(it.sB) + ' »</span>' + miniGrid(it, answered); } });
+
+  /* ---------- Étape 9 : dénombrer ---------- */
+  var MENU = { e: ['soupe', 'salade', 'crudités'], p: ['pâtes', 'risotto', 'poisson', 'curry'], d: ['fruit', 'yogourt', 'tarte', 'glace', 'mousse'] };
+  function ordF(i) { return i === 0 ? '1ʳᵉ' : (i + 1) + 'ᵉ'; }
+  var S9P = {
+    cad: { name: 'Cadenas', par: 'Nombre de chiffres', min: 2, max: 6, def: 4,
+      intro: function (n) { return 'Le cadenas de ton casier a un code de ' + n + ' chiffres. Chaque chiffre va de 0 à 9, et un chiffre peut revenir (0 0 7 7 est permis).'; },
+      slots: function (n) { var a = []; for (var i = 0; i < n; i++) a.push({ lab: (i === 0 ? '1ᵉʳ' : (i + 1) + 'ᵉ') + ' chiffre', c: 10, why: 'de 0 à 9, même s’il est déjà utilisé' }); return a; } },
+    menu: { name: 'Menus', par: 'Nombre de desserts', min: 1, max: 5, def: 2,
+      intro: function (n) { return 'À la cantine, un menu = une entrée, un plat et un dessert. Il y a 3 entrées (' + MENU.e.join(', ') + '), 4 plats (' + MENU.p.join(', ') + ') et ' + n + ' dessert' + (n > 1 ? 's' : '') + ' (' + MENU.d.slice(0, n).join(', ') + ').'; },
+      slots: function (n) { return [{ lab: 'entrée', c: 3, why: 'une des 3 entrées' }, { lab: 'plat', c: 4, why: 'un des 4 plats, quelle que soit l’entrée' }, { lab: 'dessert', c: n, why: 'un des ' + n + ' desserts' }]; } },
+    pod: { name: 'Podium', par: 'Nombre de coureurs', min: 3, max: 12, def: 8,
+      intro: function (n) { return n + ' coureurs font la finale du 80 m. Combien de podiums (1ᵉʳ, 2ᵉ, 3ᵉ) différents sont possibles ?'; },
+      slots: function (n) { return [{ lab: '1ʳᵉ place', c: n, why: 'n’importe lequel des ' + n }, { lab: '2ᵉ place', c: n - 1, why: 'tous sauf le 1ᵉʳ' }, { lab: '3ᵉ place', c: n - 2, why: 'ni le 1ᵉʳ, ni le 2ᵉ' }]; } },
+    ord: { name: 'Faire la file', par: 'Nombre de personnes', min: 2, max: 8, def: 4,
+      intro: function (n) { return n + ' amis font la file à la caisse du cinéma. De combien de façons peuvent-ils se ranger ?'; },
+      slots: function (n) { var a = []; for (var i = 0; i < n; i++) a.push({ lab: ordF(i) + ' place', c: n - i, why: i === 0 ? 'n’importe qui' : i === n - 1 ? 'la dernière personne qui reste' : 'il reste ' + (n - i) + ' personnes' }); return a; } },
+    hand: { name: 'Poignées de main', par: 'Nombre de personnes', min: 2, max: 10, def: 5, div: 2,
+      intro: function (n) { return n + ' personnes se rencontrent et chacune serre la main de chaque autre, une seule fois. Combien de poignées de main en tout ?'; },
+      slots: function (n) { return [{ lab: '1ʳᵉ personne', c: n, why: 'n’importe laquelle des ' + n }, { lab: '2ᵉ personne', c: n - 1, why: 'une des ' + (n - 1) + ' autres' }]; } }
+  };
+  function s9Total(key, n) { var P = S9P[key], t = P.slots(n).reduce(function (s, x) { return s * x.c; }, 1); return P.div ? t / P.div : t; }
+  var s9k = 'cad', s9n = {};
+  Object.keys(S9P).forEach(function (k) { s9n[k] = S9P[k].def; });
+  $('s9Pre').innerHTML = Object.keys(S9P).map(function (k) { return '<button type="button" data-x="' + k + '">' + esc(S9P[k].name) + '</button>'; }).join('');
+  function s9Steps() {
+    var P = S9P[s9k], n = s9n[s9k], sl = P.slots(n), st = [{ up: 0, text: P.intro(n) + ' On remplit des cases, l’une après l’autre.' }], prod = 1, parts = [];
+    sl.forEach(function (x, i) { prod *= x.c; parts.push(x.c); st.push({ up: i + 1, text: 'Case « ' + x.lab + ' » : ' + x.c + ' choix (' + x.why + ').' + (i ? ' Jusqu’ici : ' + parts.join(' × ') + ' = ' + grp(prod) + '.' : '') }); });
+    var tot = s9Total(s9k, n), f = parts.join(' × ');
+    if (P.div) {
+      st.push({ up: sl.length, div: true, text: n + ' × ' + (n - 1) + ' = ' + grp(prod) + ' compte chaque poignée de main deux fois : Léa serre la main de Noah, et Noah celle de Léa, c’est la même ! On divise par 2.' });
+      st.push({ up: sl.length, div: true, done: true, text: f + ' ÷ 2 = ' + grp(tot) + ' poignées de main.' });
+    } else st.push({ up: sl.length, done: true, text: 'Principe multiplicatif : ' + f + ' = ' + grp(tot) + (s9k === 'cad' ? ' codes. Dessiner l’arbre serait impossible !' : s9k === 'ord' ? ' façons. On écrit ' + n + '! (« factorielle ' + n + ' »).' : s9k === 'pod' ? ' podiums.' : ' menus.') });
+    return st;
+  }
+  var s9 = stepper('s9', s9Steps, function (st) {
+    var P = S9P[s9k], n = s9n[s9k], sl = P.slots(n);
+    $('s9Slots').innerHTML = sl.map(function (x, i) { var on = i < st.up; return '<div class="' + (on ? 'on' : '') + '"><small>' + esc(x.lab) + '</small><b>' + (on ? x.c : '?') + '</b></div>'; }).join('');
+    var shown = sl.slice(0, st.up).map(function (x) { return x.c; }), f = shown.length ? shown.join(' × ') : '…';
+    var prod = shown.reduce(function (s, x) { return s * x; }, 1);
+    $('s9F').textContent = shown.length ? (st.div ? f + ' ÷ 2' + (st.done ? ' = ' + grp(prod / 2) : '') : f + (shown.length > 1 || st.done ? ' = ' + grp(prod) : '')) : 'nombre de possibilités = ?';
+    $('s9Par').innerHTML = ctrlHtml(0, esc(P.par), n, n > P.min, n < P.max, 'Moins', 'Plus');
+    pressed('s9Pre', 'data-x', s9k);
+  });
+  $('s9Pre').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b) return; s9k = b.getAttribute('data-x'); s9.reset(); });
+  $('s9Par').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b || b.disabled) return; var P = S9P[s9k]; s9n[s9k] = Math.max(P.min, Math.min(P.max, s9n[s9k] + +b.getAttribute('data-d'))); s9.reset(); });
+  s9.render();
+
+  /* ---------- Étape 10 : simulation ---------- */
+  var S10 = {
+    bag: { name: 'Sachet sans remise', t: 'Sachet de 3 bonbons rouges et 2 verts : on en prend 2, sans remise. Événement : « 2 rouges ». Calcul (étape 4) : 3/5 × 2/4.', p: R(3, 10),
+      run: function () { var b = ['R', 'R', 'R', 'V', 'V'], i = rint(0, 4), x = b[i]; b.splice(i, 1); return x === 'R' && b[rint(0, 3)] === 'R'; } },
+    rain: { name: 'Météo', t: 'Pluie samedi avec 3/10, dimanche avec 6/10. Événement : « au moins un jour de pluie ». Calcul (étapes 3 et 7) : 1 − 7/10 × 4/10.', p: rsub([1, 1], rmul(R(7, 10), R(4, 10))),
+      run: function () { return rint(1, 10) <= 3 || rint(1, 10) <= 6; } },
+    six: { name: 'Pari de Méré', t: 'On lance 4 fois un dé. Événement : « au moins un 6 ». Calcul (étape 7) : 1 − (5/6)⁴.', p: rsub([1, 1], R(625, 1296)),
+      run: function () { for (var i = 0; i < 4; i++) if (rint(1, 6) === 6) return true; return false; } },
+    s7: { name: 'Somme 7', t: 'On lance deux dés. Événement : « la somme vaut 7 ». Calcul (étape 5) : 6 cases sur 36.', p: R(1, 6),
+      run: function () { return rint(1, 6) + rint(1, 6) === 7; } }
+  };
+  var s10k = 'bag', s10N = 0, s10K = 0;
+  $('s10Pre').innerHTML = Object.keys(S10).map(function (k) { return '<button type="button" data-x="' + k + '">' + esc(S10[k].name) + '</button>'; }).join('');
+  function s10Render() {
+    var X = S10[s10k], p = X.p;
+    pressed('s10Pre', 'data-x', s10k);
+    $('s10Txt').textContent = X.t;
+    var pp = 100 * p[0] / p[1], fp = s10N ? 100 * s10K / s10N : 0;
+    $('s10Meter').innerHTML = '<div class="meter two" role="img" aria-label="Probabilité calculée"><i style="width:' + pp.toFixed(1) + '%"></i><span>calcul : ' + esc(pctStr(p[0], p[1], 1)) + '</span></div>' +
+      '<div class="meter" role="img" aria-label="Fréquence simulée"><i style="width:' + fp.toFixed(1) + '%"></i><span>simulation : ' + (s10N ? esc(pctStr(s10K, s10N, 1)) : '—') + '</span></div>';
+    var pc = pctStr(p[0], p[1], 1);
+    var h = '<span><strong>Probabilité calculée</strong> : ' + esc(fs(p)) + (pc.charAt(0) === '≈' ? ' ' : ' = ') + esc(pc) + '</span>';
+    if (s10N) {
+      var gap = roundRat(100 * Math.abs(s10K * p[1] - p[0] * s10N), s10N * p[1], 1);
+      h += '<span><strong>Simulation</strong> : ' + grp(s10K) + ' réussites sur ' + grp(s10N) + ' essais, fréquence ' + esc(pctStr(s10K, s10N, 1)) + '</span>';
+      h += '<span>Écart : environ ' + esc(trimZ(fixStr(gap, 1))) + ' point' + (gap >= 20 ? 's' : '') + ' de pourcentage. ' + (s10N < 1000 ? 'Avec peu d’essais, l’écart peut être grand.' : 'Avec beaucoup d’essais, la fréquence se rapproche en général de la probabilité.') + '</span>';
+    } else h += '<span class="soft">Touche « + 100 essais » pour lancer la simulation.</span>';
+    $('s10Out').innerHTML = h;
+  }
+  function s10Run(m) { var X = S10[s10k]; m = Math.min(m, 1000000 - s10N); for (var i = 0; i < m; i++) if (X.run()) s10K++; s10N += Math.max(0, m); s10Render(); }
+  $('s10Pre').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b) return; s10k = b.getAttribute('data-x'); s10N = 0; s10K = 0; s10Render(); });
+  $('s10a').addEventListener('click', function () { s10Run(100); });
+  $('s10b').addEventListener('click', function () { s10Run(1000); });
+  $('s10c').addEventListener('click', function () { s10Run(10000); });
+  $('s10Reset').addEventListener('click', function () { s10N = 0; s10K = 0; s10Render(); });
+  s10Render();
+
+  /* ---------- Étape 11 : atelier ---------- */
+  var TOOLS = ['Un arbre', 'Un tableau', 'Le contraire', 'Dénombrer'];
+  var ATP = [
+    { k: 'p1', title: 'Problème 1 · Le casier', s: 'Le cadenas de ton casier a un code de 3 chiffres, chacun de 0 à 9. Combien de codes différents existent ?',
+      tool: 'Dénombrer', toolWhy: 'On cherche un nombre de possibilités : on multiplie les choix de chaque case. Un arbre aurait 1 000 feuilles.',
+      calc: ['10 × 10 × 10', '10 + 10 + 10', '10 × 9 × 8'], calcWhy: 'Un chiffre peut revenir : 10 choix à chaque case. 10 × 9 × 8 serait juste si les 3 chiffres devaient être différents.',
+      ans: ['1 000', '30', '720'], ansWhy: '10 × 10 × 10 = 1 000 codes, de 000 à 999.' },
+    { k: 'p2', title: 'Problème 2 · Le jass', s: 'Tu tires une carte d’un jeu de jass de 36 cartes. Quelle est la probabilité d’avoir un as ou un cœur ?',
+      tool: 'Un tableau', toolWhy: 'Le jeu se range en tableau : 4 couleurs × 9 valeurs = 36 cases équiprobables.',
+      calc: ['4/36 + 9/36 − 1/36', '4/36 + 9/36', '4/36 × 9/36'], calcWhy: 'As et cœur ne sont pas incompatibles : l’as de cœur serait compté deux fois.',
+      ans: ['1/3', '13/36', '1/36'], ansWhy: '4/36 + 9/36 − 1/36 = 12/36 = 1/3.' },
+    { k: 'p3', title: 'Problème 3 · Deux dés', s: 'Tu lances deux dés. Quelle est la probabilité que la somme vaille au moins 10 ?',
+      tool: 'Un tableau', toolWhy: 'Deux dés : le tableau de 36 cases équiprobables est l’outil idéal.',
+      calc: ['6 cases sur 36', '3 sommes sur 11', '3 cases sur 36'], calcWhy: 'Les cases : (4 ; 6), (5 ; 5), (6 ; 4), (5 ; 6), (6 ; 5), (6 ; 6). Les 11 sommes n’ont pas la même chance.',
+      ans: ['1/6', '3/11', '1/12'], ansWhy: '6/36 = 1/6.' },
+    { k: 'p4', title: 'Problème 4 · Les bonbons', s: 'Un sachet contient 4 bonbons à la fraise et 2 à la menthe. Tu en prends deux, sans remettre le premier. Probabilité d’avoir deux bonbons à la menthe ?',
+      tool: 'Un arbre', toolWhy: 'Deux tirages qui dépendent l’un de l’autre : un arbre pondéré.',
+      calc: ['2/6 × 1/5', '2/6 × 2/6', '2/6 + 1/5'], calcWhy: 'Sans remise : après une menthe, il reste 1 menthe sur 5 bonbons. Le long d’un chemin, on multiplie.',
+      ans: ['1/15', '1/9', '8/15'], ansWhy: '2/6 × 1/5 = 2/30 = 1/15.' },
+    { k: 'p5', title: 'Problème 5 · Trois lancers', s: 'Tu lances 3 fois une pièce de 5 francs. Quelle est la probabilité d’avoir au moins un pile ?',
+      tool: 'Le contraire', alt: ['Un arbre'], toolWhy: '« Au moins un » : le contraire « aucun pile » est un seul chemin. Un arbre à 8 feuilles marche aussi, mais c’est plus long.',
+      calc: ['1 − (1/2)³', '3 × 1/2', '(1/2)³'], calcWhy: 'P(aucun pile) = 1/2 × 1/2 × 1/2. 3 × 1/2 = 3/2 dépasse 1 : impossible pour une probabilité !',
+      ans: ['7/8', '3/2', '1/8'], ansWhy: '1 − 1/8 = 7/8.' },
+    { k: 'p6', title: 'Problème 6 · Le week-end', s: 'Pluie samedi avec 2/5, dimanche avec 1/2 (on suppose que les deux jours ne dépendent pas l’un de l’autre). Probabilité qu’il pleuve exactement un des deux jours ?',
+      tool: 'Un arbre', toolWhy: 'Deux épreuves avec des probabilités différentes : un arbre pondéré.',
+      calc: ['2/5 × 1/2 + 3/5 × 1/2', '2/5 × 1/2', '2/5 + 1/2'], calcWhy: 'Deux chemins : pluie puis soleil, et soleil puis pluie. On multiplie le long de chaque chemin, puis on additionne.',
+      ans: ['1/2', '1/5', '9/10'], ansWhy: '2/10 + 3/10 = 5/10 = 1/2.' }
+  ];
+  var atelierCards = [];
+  ATP.forEach(function (P) {
+    atelierCards.push({ k: P.k + 't', P: P, q: '1/3 · Quel outil ?', o: TOOLS, a: P.tool, alt: P.alt, why: P.toolWhy });
+    atelierCards.push({ k: P.k + 'c', P: P, q: '2/3 · Quel calcul ?', o: P.calc, a: P.calc[0], why: P.calcWhy });
+    atelierCards.push({ k: P.k + 'a', P: P, q: '3/3 · Quel résultat ?', o: P.ans, a: P.ans[0], why: P.ansWhy });
+  });
+  /* Ordre des boutons mélangé une fois, de façon fixe, pour que la bonne réponse ne soit pas toujours la première */
+  atelierCards.forEach(function (it, i) { if (it.o !== TOOLS) { var r = (Math.floor(i / 3) + i) % 3; it.o = it.o.slice(r).concat(it.o.slice(0, r)); } });
+  makeSorter({ items: atelierCards, names: null, order: [], btns: 'atBtns', card: 'atCard', pos: 'atPos', out: 'atOut', score_: 'atScore', prev: 'atPrev', next: 'atNext', reset: 'atReset', word: 'Question', score: scorer(atelierCards),
+    cardHtml: function (it) { return '<span class="ask">' + esc(it.P.title) + '</span><span>' + esc(it.P.s) + '</span><span class="ask">' + esc(it.q) + '</span>'; } });
+
+  /* ---------- Étape 12 : problème des partis et trois portes ---------- */
+  function partisTree(a, b) {
+    return buildRec(function (path) {
+      var wa = path.filter(function (x) { return x === 'A'; }).length, wb = path.length - wa;
+      if (wa >= a || wb >= b) return null;
+      return [{ lab: 'A', p: [1, 2] }, { lab: 'B', p: [1, 2] }];
+    });
+  }
+  function winner(path, a) { return path.filter(function (x) { return x === 'A'; }).length >= a ? 'A' : 'B'; }
+  function partis(a, b) { if (a === 0) return [1, 1]; if (b === 0) return [0, 1]; return rmul(radd(partis(a - 1, b), partis(a, b - 1)), [1, 2]); }
+  var S12P = [{ sa: 2, sb: 1 }, { sa: 2, sb: 0 }, { sa: 1, sb: 0 }], s12i = 0;
+  $('s12Pre').innerHTML = S12P.map(function (x, i) { return '<button type="button" data-x="' + i + '">Arrêt à ' + x.sa + ' – ' + x.sb + '</button>'; }).join('');
+  function s12Steps() {
+    var X = S12P[s12i], a = 3 - X.sa, b = 3 - X.sb, T = partisTree(a, b), ls = leaves(T).filter(function (l) { return winner(l.path, a) === 'A'; }), pA = partis(a, b), pB = rsub([1, 1], pA);
+    var gA = 64 * pA[0] / pA[1];
+    return [
+      { up: 0, text: 'Score ' + X.sa + ' – ' + X.sb + ' pour Anne. Pour gagner, Anne a encore besoin de ' + a + ' point' + (a > 1 ? 's' : '') + ', Bastien de ' + b + '. On imagine les manches qui auraient suivi.' },
+      { up: 1, text: 'L’arbre des manches restantes : chaque manche est gagnée par A ou par B, avec 1/2. Une branche s’arrête dès que quelqu’un a ses 3 points. Au bout : le gagnant de la partie et la probabilité du chemin.' },
+      { up: 1, hl: true, text: 'Chemins où Anne gagne : ' + ls.map(function (l) { return l.path.join(''); }).join(', ') + '. P(Anne gagne) = ' + sumLine(ls, true) + '.' },
+      { up: 1, hl: true, done: true, text: 'Partage juste : Anne reçoit ' + fs(pA) + ' × 64 = ' + gA + ' pistoles, Bastien ' + fs(pB) + ' × 64 = ' + (64 - gA) + ' pistoles.' + (X.sa === 2 && X.sb === 1 ? ' C’est l’exemple que donne Pascal à Fermat dans une lettre de 1654 : 48 pistoles pour celui qui mène 2 à 1.' : '') }
+    ];
+  }
+  var s12 = stepper('s12', s12Steps, function (st) {
+    var X = S12P[s12i], a = 3 - X.sa, b = 3 - X.sb, T = partisTree(a, b);
+    $('s12Graph').innerHTML = st.up ? treeSvg(T, { W: 360, leafW: 84, gap: 30, hl: st.hl ? function (p) { return winner(p, a) === 'A'; } : null, fill: function (l) { return l === 'A' ? 'var(--acc-soft)' : 'var(--two-soft)'; }, label: 'Arbre des manches restantes',
+      leafText: function (path, l) { return winner(path, a) + ' · ' + raw(l.raw[0], l.raw[1]); } }) : '<p class="soft" style="text-align:center">Anne ' + X.sa + ' – ' + X.sb + ' Bastien · premier à 3 points</p>';
+    pressed('s12Pre', 'data-x', s12i);
+  });
+  $('s12Pre').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b) return; s12i = clamp(+b.getAttribute('data-x'), S12P.length); s12.reset(); });
+  s12.render();
+  var MONTY = { lab: '', kids: [{ lab: 'voiture', p: [1, 3], kids: [] }, { lab: 'chèvre', p: [2, 3], kids: [] }] };
+  $('s12Monty').innerHTML = treeSvg(MONTY, { W: 360, leafW: 150, gap: 44, heads: ['1ᵉʳ choix'], label: 'Arbre du premier choix au jeu des trois portes',
+    leafText: function (path) { return path[0] === 'voiture' ? '→ garder gagne' : '→ changer gagne'; } });
+
+  /* ---------- Exercices : petits arbres et tableau ---------- */
+  var EX2 = build(function () { return [{ lab: 'P', p: [1, 2] }, { lab: 'F', p: [1, 2] }]; }, 3);
+  function twoP(p) { return p.filter(function (x) { return x === 'P'; }).length === 2; }
+  $('ex2Tree').innerHTML = treeSvg(EX2, { W: 360, leafW: 90, gap: 30, weights: false, hl: twoP, label: 'Arbre de trois lancers de pièce', leafText: function (path) { return path.join('') + ' · 1/8'; } });
+  var EX3 = build(function (path) { var r = 2, j = 3; path.forEach(function (l) { if (l === 'R') r--; else j--; }); return [{ lab: 'R', p: [r, r + j] }, { lab: 'J', p: [j, r + j] }]; }, 2);
+  $('ex3Tree').innerHTML = treeSvg(EX3, { W: 340, leafW: 64, gap: 36, fill: bagFill, hl: function (p) { return p[0] === p[1]; }, label: 'Arbre sans remise, 2 rouges et 3 jaunes', leafText: function (path, l) { return raw(l.raw[0], l.raw[1]); } });
+  (function () {
+    var h = '<table class="dice" aria-label="Tableau de deux dés : somme 8 et au moins un 6"><thead><tr><th class="corner">rouge ↓<br>bleu →</th>' + [1, 2, 3, 4, 5, 6].map(function (v) { return '<th>' + v + '</th>'; }).join('') + '</tr></thead><tbody>';
+    for (var a = 1; a <= 6; a++) { h += '<tr><th>' + a + '</th>'; for (var b = 1; b <= 6; b++) h += '<td class="' + (a + b === 8 ? 'on' : '') + '" style="cursor:default' + (a === 6 || b === 6 ? ';font-weight:700;text-decoration:underline' : '') + '">' + (a + b) + '</td>'; h += '</tr>'; }
+    $('ex4Table').innerHTML = h + '</tbody></table><p class="soft" style="font-size:.9rem">En couleur : somme 8. Soulignées : au moins un 6.</p>';
+  })();
+
+  /* ---------- Quiz ---------- */
+  var QZ = [
+    { q: 'On lance une pièce, puis un dé. Combien y a-t-il d’issues ?', o: [['a', '8'], ['b', '12'], ['c', '36']], a: 'b', how: 'Principe multiplicatif : 2 × 6 = 12.' },
+    { q: 'Dans un arbre pondéré, les branches qui partent d’un même nœud ont une somme égale à…', o: [['a', '1'], ['b', 'leur produit'], ['c', 'ça dépend']], a: 'a', how: 'Règle 1 : une des branches arrive forcément, donc leurs probabilités font 1.' },
+    { q: 'Sachet de 3 rouges et 2 vertes, deux tirages AVEC remise. P(2 rouges) ?', o: [['a', '3/10'], ['b', '6/25'], ['c', '9/25']], a: 'c', how: '3/5 × 3/5 = 9/25.' },
+    { q: 'Même sachet, deux tirages SANS remise. P(2 rouges) ?', o: [['a', '3/10'], ['b', '9/25'], ['c', '1/2']], a: 'a', how: '3/5 × 2/4 = 6/20 = 3/10.' },
+    { q: 'On lance deux dés. Quelle est la probabilité d’obtenir un double ?', o: [['a', '1/36'], ['b', '1/6'], ['c', '1/12']], a: 'b', how: '6 doubles sur 36 cases : 6/36 = 1/6.' },
+    { q: 'P(A) = 0,3. Que vaut P(non A) ?', o: [['a', '0,3'], ['b', '0,7'], ['c', '1,3']], a: 'b', how: 'P(non A) = 1 − 0,3 = 0,7.' },
+    { q: 'Au jass (36 cartes), quelle est la probabilité de tirer un roi ou une dame ?', o: [['a', '2/9'], ['b', '1/81'], ['c', '1/9']], a: 'a', how: 'Incompatibles : 4/36 + 4/36 = 8/36 = 2/9.' },
+    { q: '6 coureurs. Combien de podiums (1ᵉʳ, 2ᵉ, 3ᵉ) différents ?', o: [['a', '18'], ['b', '216'], ['c', '120']], a: 'c', how: '6 × 5 × 4 = 120 : un coureur ne peut pas avoir deux places.' }
+  ];
+  var quiz = $('quiz'), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ''; done = [];
+    QZ.forEach(function (Q, k) {
+      var li = document.createElement('li');
+      li.innerHTML = '<span>' + esc(Q.q) + '</span><select id="qa' + k + '" aria-label="Ta réponse à la question ' + (k + 1) + '"><option value="">…</option>' + Q.o.map(function (o) { return '<option value="' + o[0] + '">' + esc(o[1]) + '</option>'; }).join('') + '</select><button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+      quiz.appendChild(li);
+      function check() {
+        var fb = $('qf' + k), v = $('qa' + k).value;
+        if (!v) { fb.className = 'fb'; fb.textContent = 'Choisis une réponse.'; return; }
+        if (v === Q.a) { fb.className = 'fb ok'; fb.innerHTML = 'Bravo, c’est juste !<span>' + esc(Q.how) + '</span>'; done[k] = true; }
+        else {
+          done[k] = false;
+          var good = Q.o.filter(function (o) { return o[0] === Q.a; })[0][1];
+          fb.className = 'fb no'; fb.innerHTML = 'Pas tout à fait : la bonne réponse est « ' + esc(good) + ' ».<span>' + esc(Q.how) + '</span>';
+        }
+        $('score').textContent = done.filter(Boolean).length + ' / 8';
+      }
+      $('qb' + k).addEventListener('click', check);
+      $('qa' + k).addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+    });
+    $('score').textContent = '0 / 8';
+  }
+  $('newQuiz').addEventListener('click', newQuiz);
+  newQuiz();
+  pctSync();
+
+  window.__arbres = {
+    gcd: gcd, R: R, rmul: rmul, radd: radd, rsub: rsub, rcmp: rcmp, fs: fs, fracEq: fracEq, roundRat: roundRat, decStr: decStr, pctStr: pctStr, pv: pv,
+    build: build, buildRec: buildRec, uTree: uTree, leaves: leaves, probOf: probOf, rule1: rule1, treeSvg: treeSvg,
+    weatherTree: weatherTree, WEV: WEV, bagTree: bagTree, BAGEV: BAGEV, partisTree: partisTree, partis: partis,
+    DICE: DICE, DEV: DEV, diceCount: diceCount, CL0: CL0, s6Calc: s6Calc,
+    noneProb: noneProb, exactNone: exactNone, threshold: threshold,
+    SPACES: SPACES, incCards: incCards, incInfo: incInfo, S9P: S9P, s9Total: s9Total, S10: S10,
+    atelierCards: atelierCards, ATP: ATP, scorer: scorer, isOk: isOk, quiz: QZ
+  };
+})();
+</script>
+</body>
+</html>

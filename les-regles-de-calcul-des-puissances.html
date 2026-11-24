@@ -1,0 +1,1150 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Les règles de calcul des puissances</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels de maths, marge rouge. Accent bleu outremer (#1d4ed8, encre #1e3a8a pour le texte). Facteurs : bleu = premier bloc, orange = deuxième bloc, vert et jaune pour les blocs suivants ; un facteur simplifié est barré en rouge. */
+:root {
+  --paper: #f6f8fc;
+  --grid: #dfe5f1;
+  --card: #ffffff;
+  --ink: #121a2e;
+  --ink-soft: #4d5770;
+  --acc: #1d4ed8;
+  --acc-ink: #1e3a8a;
+  --acc-soft: #dde6fb;
+  --two: #c2410c;
+  --two-soft: #fde5d6;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --warn: #d97706;
+  --warn-soft: #fdf0d6;
+  --warn-ink: #92400e;
+  --hl: #fff0a3;
+  --line: #d3dbea;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0b101c; --grid: #141c2e; --card: #111a2b; --ink: #e6ebf5; --ink-soft: #a2adc4;
+    --acc: #7ea6ff; --acc-ink: #b3c9ff; --acc-soft: #16213f; --two: #ff9a5c; --two-soft: #3a2112;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27;
+    --warn: #f5a524; --warn-soft: #3d2a0c; --warn-ink: #fbbf5a; --hl: #4b4318; --line: #24304a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0b101c; --grid: #141c2e; --card: #111a2b; --ink: #e6ebf5; --ink-soft: #a2adc4;
+  --acc: #7ea6ff; --acc-ink: #b3c9ff; --acc-soft: #16213f; --two: #ff9a5c; --two-soft: #3a2112;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27;
+  --warn: #f5a524; --warn-soft: #3d2a0c; --warn-ink: #fbbf5a; --hl: #4b4318; --line: #24304a;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+@media (max-width: 520px) { .page { padding-block: 28px 64px; gap: 44px; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+sup { font-size: .74em; line-height: 0; vertical-align: .5em; font-weight: inherit; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero-top { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+.hero-top svg { width: 170px; height: auto; flex: none; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+@media (max-width: 520px) { .box { padding: 16px 14px; } }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note.ok { border-left-color: var(--ok); background: var(--ok-soft); }
+.note.two { border-left-color: var(--two); background: var(--two-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+svg text.cl { font-family: var(--f-body); font-weight: 700; }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 8px 12px; min-height: 44px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button.main { background: var(--acc); color: var(--card); }
+button[aria-pressed="true"] { background: var(--acc-ink); color: var(--paper); }
+button.ex { font-family: var(--f-mono); font-weight: 600; font-size: .92rem; }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+button:disabled { cursor: default; opacity: .5; }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+label { font-weight: 700; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
+.tag.ok { color: var(--ok); }
+.tag.no { color: var(--red); }
+.tag.acc { color: var(--acc-ink); }
+.tag.two { color: var(--two); }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc-ink); }
+.fbk { border-radius: 8px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; min-width: 0; overflow-wrap: anywhere; }
+.fbk:empty { display: none; }
+.fbk.ok { background: var(--ok-soft); }
+.fbk.no { background: var(--red-soft); }
+.fbk.info { background: var(--acc-soft); }
+.fbk.warn { background: var(--warn-soft); }
+.fbk strong { font-family: var(--f-display); }
+.fbk.ok strong { color: var(--ok); }
+.fbk.no strong { color: var(--red); }
+.fbk.info strong { color: var(--acc-ink); }
+.fbk.warn strong { color: var(--warn-ink); }
+.say { min-height: 4.2em; }
+.step-n { font-family: var(--f-mono); font-size: .85rem; color: var(--ink-soft); }
+button.right, button.right:disabled { background: var(--ok-soft); border-color: var(--ok); color: var(--ok); opacity: 1; }
+button.wrong, button.wrong:disabled { background: var(--red-soft); border-color: var(--red); color: var(--red); opacity: 1; }
+.choice button { flex: 1 1 130px; }
+.choice button:disabled:not(.right):not(.wrong) { opacity: .55; }
+.card-big { background: var(--paper); border: 1.5px dashed var(--line); border-radius: 10px; padding: 14px; font-family: var(--f-display); font-weight: 700; font-size: 1.15rem; overflow-wrap: anywhere; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.card-big .ask { font-family: var(--f-body); font-weight: 400; font-size: 1rem; color: var(--ink-soft); }
+.card-big .expr { font-family: var(--f-mono); font-weight: 600; font-size: clamp(1.35rem, 6vw, 1.75rem); color: var(--acc-ink); }
+.sorter-end { margin-top: .6rem; }
+.sorter-end strong { font-size: 1.05rem; }
+
+.scroll { overflow-x: auto; max-width: 100%; }
+table.tb { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+table.tb th, table.tb td { border: 1.5px solid var(--line); padding: 6px 8px; text-align: center; font-family: var(--f-mono); font-size: .95rem; }
+table.tb thead th { font-family: var(--f-display); background: var(--acc-soft); }
+table.tb tbody th { font-family: var(--f-body); background: var(--paper); text-align: left; }
+table.tb td.al { text-align: left; font-family: var(--f-body); }
+@media (max-width: 520px) { table.tb th, table.tb td { padding: 5px 3px; font-size: .84rem; } }
+.ctrls { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+.ctrl { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; align-items: center; gap: 6px; border: 1.5px dashed var(--line); border-radius: 8px; padding: 6px 8px; background: var(--paper); min-width: 0; }
+.ctrl .n { grid-column: 1 / -1; font-weight: 700; font-size: .92rem; overflow-wrap: anywhere; }
+.ctrl button { padding: 0; min-width: 44px; font-size: 1.3rem; line-height: 1; }
+.ctrl .v { text-align: center; font-family: var(--f-mono); font-weight: 600; font-size: 1.15rem; }
+.formula { font-family: var(--f-mono); font-weight: 600; font-size: clamp(1.1rem, 4.4vw, 1.35rem); color: var(--acc-ink); overflow-wrap: anywhere; }
+.readout { font-family: var(--f-mono); font-size: 1rem; display: flex; flex-direction: column; gap: 6px; overflow-wrap: anywhere; min-width: 0; }
+
+/* Le dérouleur : facteurs écrits un par un */
+.stage { background: var(--paper); border: 1.5px dashed var(--line); border-radius: 10px; padding: 14px; min-height: 120px; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 12px; min-width: 0; overflow-wrap: anywhere; }
+.big { font-family: var(--f-mono); font-weight: 600; font-size: clamp(1.3rem, 6vw, 1.75rem); color: var(--acc-ink); overflow-wrap: anywhere; line-height: 1.5; }
+.fx { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; min-width: 0; }
+.g { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 5px; min-width: 0; }
+.f { position: relative; font-family: var(--f-mono); font-weight: 600; font-size: 1.05rem; min-width: 32px; padding: 3px 7px; text-align: center; border: 1.5px solid var(--ink); border-radius: 6px; background: var(--card); }
+.f.c1 { background: var(--acc-soft); border-color: var(--acc); }
+.f.c2 { background: var(--two-soft); border-color: var(--two); }
+.f.c3 { background: var(--ok-soft); border-color: var(--ok); }
+.f.c4 { background: var(--warn-soft); border-color: var(--warn); }
+.f.x { opacity: .6; }
+.f.x::after { content: ""; position: absolute; left: -4px; right: -4px; top: calc(50% - 1.5px); height: 3px; border-radius: 2px; background: var(--red); transform: rotate(-32deg); }
+.f.xnew::after { animation: strike .55s ease-out; }
+@keyframes strike { from { transform: rotate(-32deg) scaleX(0); } to { transform: rotate(-32deg) scaleX(1); } }
+@media (prefers-reduced-motion: reduce) { .f.xnew::after { animation: none; } }
+.op { font-family: var(--f-mono); color: var(--ink-soft); font-weight: 600; }
+.par { font-family: var(--f-mono); font-size: 1.5rem; color: var(--ink-soft); line-height: 1; }
+.frac { display: inline-flex; flex-direction: column; align-items: center; gap: 8px; max-width: 100%; }
+.frac > .fx { justify-content: center; }
+.frac .bar { height: 3px; background: var(--ink); align-self: stretch; border-radius: 2px; }
+.badge { display: inline-block; font-family: var(--f-mono); font-weight: 600; background: var(--hl); border: 1.5px solid var(--ink); border-radius: 6px; padding: 2px 8px; }
+.stair { display: flex; flex-direction: column; gap: 5px; width: 100%; }
+.stair div { margin-left: calc(var(--i) * min(3.2vw, 22px)); border: 1.5px solid var(--line); background: var(--card); border-radius: 6px; padding: 4px 10px; font-family: var(--f-mono); display: flex; gap: 4px 10px; flex-wrap: wrap; align-items: baseline; min-width: 0; }
+.stair div b { color: var(--acc-ink); font-size: 1.15rem; }
+.stair div.on { background: var(--hl); border-color: var(--ink); }
+.stair .dv { color: var(--red); font-size: .85rem; }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 200px auto; gap: 10px; align-items: center; }
+.quiz li > span:first-child { min-width: 0; overflow-wrap: anywhere; }
+.quiz select { font: inherit; font-size: 1rem; padding: 6px 6px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; min-height: 44px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb:empty { display: none; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; min-width: 0; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); min-width: 0; overflow-wrap: anywhere; }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+<!--ticons--><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Tutoriels"><script src="progress.js" defer></script><script src="share.js" defer></script><!--/ticons-->
+<style id="tnav-css">
+.tnav-top { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin: 0 0 4px; }
+.tnav-home { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font-weight: 700; font-size: .95rem; text-decoration: none; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tnav-home:hover, .tnav-home:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.tnav-bottom { margin-top: 8px; display: flex; flex-direction: column; gap: 12px; }
+.tnav-bottom h2 { margin: 0; }
+.tnav-pn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tnav-pn a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--ink, #222); border-radius: 10px;
+  background: var(--card, #fff); color: var(--ink, #222); text-decoration: none; box-shadow: 3px 3px 0 var(--ink, #222); min-width: 0; }
+.tnav-pn a span { font-size: .85rem; color: var(--ink-soft, #666); }
+.tnav-pn a strong { overflow-wrap: anywhere; }
+.tnav-pn a.next { text-align: right; grid-column: 2; }
+.tnav-bottom .tnav-home { align-self: center; }
+.tnav-top [data-share] { margin-left: auto; }
+.tnav-short { display: none; }
+.tprint-h { display: none; }
+@media (max-width: 600px) { header.hero { gap: 8px !important; } header.hero > .fig, header.hero > .box.fig, header.hero .hero-top .fig { display: none !important; }
+  header.hero p.lead { font-size: 1rem !important; line-height: 1.5 !important; } header.hero > p.soft { font-size: .88rem !important; line-height: 1.45 !important; }
+  header.hero h1 { font-size: clamp(1.7rem, 8vw, 2.2rem) !important; } }
+.tprint-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 14px 0 0; }
+.tprint-row span { font-size: .9rem; opacity: .8; }
+.tprint { display: inline-flex; align-items: center; gap: 8px; min-height: 42px; padding: 8px 16px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font: inherit; font-weight: 700; cursor: pointer; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tprint:hover, .tprint:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+@media print { [data-tp-hide] { display: none !important; } html.tp-on, html.tp-on body { background: #fff !important; color: #111 !important; padding: 0 !important; margin: 0 !important; }
+  html.tp-on [data-fiche] { color: #111; } html.tp-on [data-fiche] * { color: #111 !important; background: transparent !important; box-shadow: none !important; }
+  html.tp-on .tprint-h { display: block; font-size: 1.4rem; font-weight: 800; margin: 0 0 10px; } .tprint-row { display: none !important; } }
+@media (max-width: 520px) { .tnav-top .tnav-long { display: none; } .tnav-top .tnav-short { display: inline; } .tnav-top { flex-wrap: nowrap; } .tnav-top > * { flex: none; } }
+.tnav-end { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+@media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
+.diff { font: 700 .72rem/1.2 var(--f-mono, monospace); padding: 2px 8px; border-radius: 99px; border: 1.5px solid; white-space: nowrap; }
+.diff.d1 { color: #15803d; border-color: #15803d; background: #dcf3e3; }
+.diff.d2 { color: #a15c07; border-color: #b45309; background: #fbe7cf; }
+.diff.d3 { color: #b91c1c; border-color: #b91c1c; background: #fde2e2; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root:not([data-theme="light"]) .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root:not([data-theme="light"]) .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; } }
+:root[data-theme="dark"] .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root[data-theme="dark"] .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root[data-theme="dark"] .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; }
+</style>
+</head>
+<body>
+<main class="page">
+<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="maths.html">← <span class="tnav-long">Tous les tutoriels de maths</span><span class="tnav-short">Maths</span></a><span class="diff d2" title="Difficulté : moyen">Moyen</span><button type="button" data-share hidden>Partager</button></nav><!--/tnav-->
+
+
+  <header class="hero">
+    <div class="hero-top">
+      <svg class="fig" viewBox="0 0 200 170" aria-hidden="true">
+        <rect x="4" y="4" width="192" height="162" rx="10" fill="var(--card)" stroke="var(--ink)" stroke-width="2"/>
+        <text x="16" y="100" font-size="72" class="cl" style="fill:var(--acc-ink)">2<tspan dy="-34" font-size="38" style="fill:var(--red)">5</tspan></text>
+        <rect x="124" y="18" width="52" height="22" rx="4" fill="var(--acc-soft)" stroke="var(--acc)" stroke-width="1.5"/>
+        <rect x="124" y="44" width="52" height="22" rx="4" fill="var(--acc-soft)" stroke="var(--acc)" stroke-width="1.5"/>
+        <rect x="124" y="70" width="52" height="22" rx="4" fill="var(--acc-soft)" stroke="var(--acc)" stroke-width="1.5"/>
+        <rect x="124" y="96" width="52" height="22" rx="4" fill="var(--two-soft)" stroke="var(--two)" stroke-width="1.5"/>
+        <rect x="124" y="122" width="52" height="22" rx="4" fill="var(--two-soft)" stroke="var(--two)" stroke-width="1.5"/>
+        <text x="150" y="34" font-size="15" text-anchor="middle" style="font-weight:600">2</text>
+        <text x="150" y="60" font-size="15" text-anchor="middle" style="font-weight:600">× 2</text>
+        <text x="150" y="86" font-size="15" text-anchor="middle" style="font-weight:600">× 2</text>
+        <text x="150" y="112" font-size="15" text-anchor="middle" style="font-weight:600">× 2</text>
+        <text x="150" y="138" font-size="15" text-anchor="middle" style="font-weight:600">× 2</text>
+        <text x="20" y="150" font-size="17" style="font-weight:600">2<tspan dy="-7" font-size="12">3</tspan><tspan dy="7"> × 2</tspan><tspan dy="-7" font-size="12">2</tspan><tspan dy="7"> = 32</tspan></text>
+      </svg>
+      <div style="display:flex;flex-direction:column;gap:10px;min-width:0;flex:1 1 280px">
+        <span class="eyebrow">Tutoriel de maths · niveau 10H–11H</span>
+        <h1>Calculer avec les exposants</h1>
+        <p class="lead">Multiplier, diviser, élever à une puissance… Avec les exposants, il y a des raccourcis. Tu vas les retrouver toi-même en comptant les facteurs, puis les utiliser avec des nombres, des lettres et la notation scientifique.</p>
+      </div>
+    </div>
+    <p class="soft">Une seule idée pour tout comprendre : <strong>un exposant compte des facteurs</strong>. En cas de doute, écris les facteurs en entier et compte.</p>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · Rappel express</span>
+    <h2>Base, exposant, puissance</h2>
+    <div class="box">
+      <p class="formula">a<sup>n</sup> = a × a × … × a <span class="soft" style="font-family:var(--f-body);font-weight:400">(n facteurs)</span></p>
+      <p>Exemple : 2<sup>5</sup> = 2 × 2 × 2 × 2 × 2 = 32. On lit « 2 exposant 5 » ou « 2 puissance 5 ». Cas spéciaux : a<sup>2</sup> se lit « a au carré », a<sup>3</sup> « a au cube ». Et 10<sup>n</sup>, c'est un 1 suivi de n zéros.</p>
+      <p class="soft">La définition, les puissances de 10 et la notation scientifique sont expliquées dans le tutoriel sur <a class="tlink" href="les-puissances.html">les puissances</a>. Ici, on apprend à <strong>calculer</strong> avec.</p>
+    </div>
+    <div class="cards">
+      <div class="box"><span class="tag acc">Base</span><strong>Le nombre qu'on multiplie</strong><span class="soft">Dans 2<sup>5</sup>, la base est 2. C'est elle qui est écrite plusieurs fois.</span></div>
+      <div class="box"><span class="tag acc">Exposant</span><strong>Combien de fois</strong><span class="soft">Dans 2<sup>5</sup>, l'exposant est 5 : il compte les facteurs. Il s'écrit petit, en haut à droite.</span></div>
+      <div class="box"><span class="tag acc">Puissance</span><strong>Le tout</strong><span class="soft">2<sup>5</sup> est une puissance de 2. Sa valeur est 32.</span></div>
+    </div>
+    <div class="note red">
+      <span class="note-title">Le piège n° 1</span>
+      <span>2<sup>3</sup> n'est <strong>pas</strong> 2 × 3 = 6. C'est 2 × 2 × 2 = 8. L'exposant ne multiplie pas la base : il dit combien de fois on l'écrit.</span>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · Le produit</span>
+    <h2>Multiplier deux puissances de même base</h2>
+    <p>Que vaut 2<sup>3</sup> × 2<sup>2</sup> ? On écrit les facteurs : (2 × 2 × 2) × (2 × 2). Ça fait 2 multiplié 5 fois par lui-même, donc 2<sup>5</sup>. On a simplement <strong>compté</strong> : 3 + 2 = 5.</p>
+    <div class="box"><p class="formula">a<sup>n</sup> × a<sup>m</sup> = a<sup>n+m</sup></p><p class="soft">Même base : on garde la base et on <strong>additionne</strong> les exposants.</p></div>
+    <div class="box">
+      <h3>Le dérouleur</h3>
+      <p class="soft">Choisis la base a et les exposants n et m avec − et +, puis avance pas à pas : les facteurs se déroulent, puis se regroupent en un seul bloc.</p>
+      <div class="ctrls" id="d1Ctrls"></div>
+      <div class="btns"><span class="score" id="d1Pos"></span></div>
+      <div class="stage" id="d1Vis" aria-live="polite"></div>
+      <div class="fbk info say" id="d1Say" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="d1Prev">← Précédent</button><button type="button" id="d1Next" class="main">Suivant →</button><button type="button" id="d1Reset">Recommencer</button></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Même base obligatoire</span>
+      <span>La règle marche seulement si les deux puissances ont la <strong>même base</strong>. 2<sup>3</sup> × 5<sup>2</sup> ne devient pas une seule puissance : on calcule 8 × 25 = 200.</span>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Le quotient</span>
+    <h2>Diviser : on barre les facteurs en double</h2>
+    <p>Pour diviser 2<sup>5</sup> par 2<sup>2</sup>, on écrit une fraction avec les facteurs en haut et en bas. Chaque 2 du haut peut se simplifier avec un 2 du bas, car 2 ÷ 2 = 1. Il reste 5 − 2 = 3 facteurs : 2<sup>3</sup>.</p>
+    <div class="box"><p class="formula">a<sup>n</sup> ÷ a<sup>m</sup> = a<sup>n−m</sup></p><p class="soft">Même base (et a ≠ 0) : on <strong>soustrait</strong> les exposants, celui du haut moins celui du bas.</p></div>
+    <div class="box">
+      <h3>Le dérouleur, en mode division</h3>
+      <p class="soft">Essaie n plus grand que m, puis n égal à m, puis n plus petit que m : que se passe-t-il ?</p>
+      <div class="ctrls" id="d2Ctrls"></div>
+      <div class="btns"><span class="score" id="d2Pos"></span></div>
+      <div class="stage" id="d2Vis" aria-live="polite"></div>
+      <div class="fbk info say" id="d2Say" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="d2Prev">← Précédent</button><button type="button" id="d2Next" class="main">Suivant →</button><button type="button" id="d2Reset">Recommencer</button></div>
+    </div>
+    <div class="note two">
+      <span class="note-title">Quand il y a plus de facteurs en bas</span>
+      <span>2<sup>2</sup> ÷ 2<sup>5</sup> : il reste 1 en haut et 3 facteurs en bas, donc 1/2<sup>3</sup>. La règle donne 2<sup>2−5</sup> = 2<sup>−3</sup>. Un exposant négatif veut donc dire « 1 sur… » : on y revient à l'étape 6.</span>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · La puissance d'une puissance</span>
+    <h2>Un bloc répété plusieurs fois</h2>
+    <p>(2<sup>3</sup>)<sup>2</sup>, c'est le bloc 2<sup>3</sup> multiplié 2 fois par lui-même : 2<sup>3</sup> × 2<sup>3</sup> = (2 × 2 × 2) × (2 × 2 × 2) = 2<sup>6</sup>. On a 2 blocs de 3 facteurs : 2 × 3 = 6.</p>
+    <div class="box"><p class="formula">(a<sup>n</sup>)<sup>m</sup> = a<sup>n·m</sup></p><p class="soft">On <strong>multiplie</strong> les exposants. Le point « · » veut dire « fois ».</p></div>
+    <div class="box">
+      <h3>Le dérouleur, en mode blocs</h3>
+      <div class="ctrls" id="d3Ctrls"></div>
+      <div class="btns"><span class="score" id="d3Pos"></span></div>
+      <div class="stage" id="d3Vis" aria-live="polite"></div>
+      <div class="fbk info say" id="d3Say" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="d3Prev">← Précédent</button><button type="button" id="d3Next" class="main">Suivant →</button><button type="button" id="d3Reset">Recommencer</button></div>
+    </div>
+    <div class="note red">
+      <span class="note-title">Additionner ou multiplier ?</span>
+      <span>a<sup>2</sup> × a<sup>3</sup> = a<sup>5</sup> (deux puissances côte à côte : on additionne). (a<sup>2</sup>)<sup>3</sup> = a<sup>6</sup> (une puissance de puissance : on multiplie). Si tu hésites, déroule les facteurs.</span>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Exposant 0 et exposant 1</span>
+    <h2>L'escalier des puissances</h2>
+    <p>Que veut dire 2<sup>0</sup> ? « Zéro facteur 2 », ça ne parle pas beaucoup. Mais regarde l'escalier : chaque fois qu'on descend d'une marche, l'exposant baisse de 1 et le nombre est <strong>divisé par la base</strong>. Si on continue la logique, on tombe forcément sur 1.</p>
+    <div class="box">
+      <h3>Descends l'escalier</h3>
+      <p class="soft">Choisis la base, puis descends marche après marche avec « Suivant ».</p>
+      <div class="ctrls" id="stCtrls"></div>
+      <div class="btns"><span class="score" id="stPos"></span></div>
+      <div class="stage" id="stVis" aria-live="polite"></div>
+      <div class="fbk info say" id="stSay" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="stPrev">← Précédent</button><button type="button" id="stNext" class="main">Suivant →</button><button type="button" id="stReset">Recommencer</button></div>
+    </div>
+    <div class="cards">
+      <div class="box"><span class="tag ok">Exposant 1</span><strong>a<sup>1</sup> = a</strong><span class="soft">Un seul facteur : 7<sup>1</sup> = 7. On n'écrit d'habitude pas l'exposant 1.</span></div>
+      <div class="box"><span class="tag ok">Exposant 0</span><strong>a<sup>0</sup> = 1</strong><span class="soft">Pour tout a différent de 0 : 5<sup>0</sup> = 1, 10<sup>0</sup> = 1, 1000<sup>0</sup> = 1. Pas 0 !</span></div>
+      <div class="box"><span class="tag two">Cas spécial</span><strong>Et 0<sup>0</sup> ?</strong><span class="soft">L'escalier ne marche pas avec la base 0, car on ne peut pas diviser par 0. 0<sup>0</sup> est un cas spécial : on ne s'en occupe pas ici.</span></div>
+    </div>
+    <p class="soft">L'étape 3 donne la même chose : a<sup>3</sup> ÷ a<sup>3</sup> = 1 (tout se simplifie) et la règle donne a<sup>3−3</sup> = a<sup>0</sup>. Donc a<sup>0</sup> = 1.</p>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · Les exposants négatifs</span>
+    <h2>Un exposant négatif donne un petit nombre</h2>
+    <p>Sous la marche a<sup>0</sup> = 1, l'escalier continue : 2<sup>−1</sup> = 1/2, 2<sup>−2</sup> = 1/4, 2<sup>−3</sup> = 1/8… Un exposant négatif veut dire : <strong>« 1 divisé par la puissance positive »</strong>.</p>
+    <div class="box"><p class="formula">a<sup>−n</sup> = 1 / a<sup>n</sup></p><p class="soft">Pour a ≠ 0. Le résultat est petit, mais il reste <strong>positif</strong> si a est positif.</p></div>
+    <div class="cards">
+      <div class="box"><span class="tag acc">Base 10</span><strong>10<sup>−3</sup> = 1/1000 = 0,001</strong><span class="soft">Un millième. L'exposant −3 donne 3 chiffres après la virgule.</span></div>
+      <div class="box"><span class="tag acc">Base 2</span><strong>2<sup>−3</sup> = 1/8 = 0,125</strong><span class="soft">2<sup>3</sup> = 8, donc 2<sup>−3</sup> est l'inverse de 8.</span></div>
+    </div>
+    <div class="box">
+      <h3>Explore les exposants négatifs</h3>
+      <div class="btns" id="ngBases" role="group" aria-label="Choisir la base"></div>
+      <div class="ctrls" id="ngCtrls"></div>
+      <div class="stage" id="ngVis" aria-live="polite"></div>
+      <div class="fbk info" id="ngOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Bases différentes</span>
+    <h2>Même exposant : ça marche. Sinon : attention !</h2>
+    <p>Quand les bases sont différentes mais que l'exposant est le même, on peut aussi regrouper : 2<sup>3</sup> × 5<sup>3</sup> = (2 × 2 × 2) × (5 × 5 × 5) = (2 × 5) × (2 × 5) × (2 × 5) = 10<sup>3</sup>.</p>
+    <div class="cards">
+      <div class="box"><span class="tag ok">Produit</span><strong>(ab)<sup>n</sup> = a<sup>n</sup>b<sup>n</sup></strong><span class="soft">Exemple : (2x)<sup>3</sup> = 2<sup>3</sup>x<sup>3</sup> = 8x<sup>3</sup>. Et 3<sup>2</sup> × 5<sup>2</sup> = 15<sup>2</sup> = 225.</span></div>
+      <div class="box"><span class="tag ok">Quotient</span><strong>(a/b)<sup>n</sup> = a<sup>n</sup>/b<sup>n</sup></strong><span class="soft">Exemple : (1/2)<sup>3</sup> = 1<sup>3</sup>/2<sup>3</sup> = 1/8. Et 6<sup>4</sup> ÷ 3<sup>4</sup> = 2<sup>4</sup> = 16 (b ≠ 0).</span></div>
+    </div>
+    <div class="cards">
+      <div class="box"><span class="tag no">Interdit</span><strong>(a + b)<sup>n</sup> ≠ a<sup>n</sup> + b<sup>n</sup></strong><span class="soft">Avec a = 3 et b = 4 : (3 + 4)<sup>2</sup> = 49, mais 3<sup>2</sup> + 4<sup>2</sup> = 25. La puissance ne se « distribue » pas sur une addition. (En fait, (a + b)<sup>2</sup> = a<sup>2</sup> + 2ab + b<sup>2</sup>, une identité remarquable.)</span></div>
+      <div class="box"><span class="tag no">Impossible</span><strong>a<sup>n</sup> × b<sup>m</sup></strong><span class="soft">Bases différentes <strong>et</strong> exposants différents : aucune règle. 2<sup>3</sup> × 5<sup>2</sup> = 8 × 25 = 200, on calcule et c'est tout.</span></div>
+      <div class="box"><span class="tag no">Pas de règle</span><strong>a<sup>n</sup> + a<sup>m</sup></strong><span class="soft">Pour une addition, il n'y a pas de raccourci : 2<sup>2</sup> + 2<sup>3</sup> = 4 + 8 = 12, et pas 2<sup>5</sup> = 32.</span></div>
+    </div>
+    <div class="box">
+      <h3>On peut simplifier ?</h3>
+      <p class="soft">Pour chaque expression : une règle des puissances permet-elle de la simplifier ?</p>
+      <div class="btns"><span class="score" id="s7Score">Question 1 / 13</span><span class="step-n" id="s7Pos"></span></div>
+      <div class="card-big" id="s7Card" aria-live="polite"></div>
+      <div class="btns choice" id="s7Btns" role="group" aria-label="Peut-on simplifier ?"></div>
+      <div class="fbk" id="s7Out" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="s7Prev">← Précédent</button><button type="button" id="s7Next">Suivant →</button><button type="button" id="s7Reset">Recommencer</button></div>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Les signes et les priorités</span>
+    <h2>Une parenthèse change tout</h2>
+    <p>La puissance se calcule <strong>avant</strong> les multiplications, les additions et le signe « − » placé devant. Les parenthèses, elles, passent avant tout. Revois au besoin le tutoriel sur <a class="tlink" href="les-priorites-de-calcul.html">les priorités de calcul</a>.</p>
+    <div class="cards">
+      <div class="box"><span class="tag acc">Avec parenthèses</span><strong>(−2)<sup>2</sup> = 4</strong><span class="soft">C'est −2 qui est au carré : (−2) × (−2) = 4.</span></div>
+      <div class="box"><span class="tag two">Sans parenthèses</span><strong>−2<sup>2</sup> = −4</strong><span class="soft">Seul le 2 est au carré, puis on met le signe : −(2 × 2) = −4.</span></div>
+      <div class="box"><span class="tag acc">Exposant impair</span><strong>(−2)<sup>3</sup> = −8</strong><span class="soft">(−2) × (−2) × (−2) = 4 × (−2) = −8.</span></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Pair ou impair ?</span>
+      <span>Une puissance d'un nombre négatif est <strong>positive</strong> si l'exposant est <strong>pair</strong> (les signes « − » vont par deux) et <strong>négative</strong> si l'exposant est <strong>impair</strong>. Exemples : (−1)<sup>10</sup> = 1, (−1)<sup>7</sup> = −1. La règle des signes est expliquée dans le tutoriel sur <a class="tlink" href="les-nombres-relatifs.html">les nombres relatifs</a>.</span>
+    </div>
+    <div class="cards">
+      <div class="box"><span class="tag acc">Priorité</span><strong>2 × 3<sup>2</sup> = 18</strong><span class="soft">La puissance d'abord : 3<sup>2</sup> = 9, puis 2 × 9 = 18.</span></div>
+      <div class="box"><span class="tag acc">Parenthèses</span><strong>(2 × 3)<sup>2</sup> = 36</strong><span class="soft">La parenthèse d'abord : 6<sup>2</sup> = 36. Ou bien 2<sup>2</sup> × 3<sup>2</sup> = 4 × 9 = 36.</span></div>
+    </div>
+    <div class="box">
+      <h3>Évite les pièges</h3>
+      <p class="soft">Calcule de tête, puis choisis la bonne valeur.</p>
+      <div class="btns"><span class="score" id="s8Score">Question 1 / 12</span><span class="step-n" id="s8Pos"></span></div>
+      <div class="card-big" id="s8Card" aria-live="polite"></div>
+      <div class="btns choice" id="s8Btns" role="group" aria-label="Ta réponse"></div>
+      <div class="fbk" id="s8Out" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="s8Prev">← Précédent</button><button type="button" id="s8Next">Suivant →</button><button type="button" id="s8Reset">Recommencer</button></div>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Avec des lettres</span>
+    <h2>Les mêmes règles pour x et y</h2>
+    <p>Une lettre remplace un nombre : les règles restent exactement les mêmes. En algèbre, on écrit souvent « · » ou rien du tout à la place de « × » : 3x<sup>2</sup> veut dire 3 × x<sup>2</sup>. Pour réduire et développer des expressions, il y a le tutoriel sur <a class="tlink" href="le-calcul-litteral.html">le calcul littéral</a>.</p>
+    <div class="box">
+      <h3>Simplifie pas à pas</h3>
+      <div class="btns" id="ltBtns" role="group" aria-label="Choisir une expression"></div>
+      <div class="btns"><span class="score" id="ltPos"></span></div>
+      <div class="stage" id="ltVis" aria-live="polite"></div>
+      <div class="fbk info say" id="ltSay" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="ltPrev">← Précédent</button><button type="button" id="ltNext" class="main">Suivant →</button><button type="button" id="ltReset">Recommencer</button></div>
+    </div>
+    <div class="note red">
+      <span class="note-title">Le coefficient aussi</span>
+      <span>(2x<sup>3</sup>)<sup>2</sup> = 4x<sup>6</sup>, et pas 2x<sup>6</sup> : le 2 est dans la parenthèse, il est donc aussi au carré. Mais dans 2x<sup>3</sup> (sans parenthèse), l'exposant 3 ne concerne que le x.</span>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · La notation scientifique</span>
+    <h2>Calculer avec des nombres géants ou minuscules</h2>
+    <p>En notation scientifique, un nombre s'écrit <span class="mono">m × 10<sup>n</sup></span>, avec 1 ≤ m &lt; 10 (voir le tutoriel sur <a class="tlink" href="les-puissances.html">les puissances</a>). Pour multiplier ou diviser, on traite à part les nombres m et les puissances de 10. À la fin, on vérifie que m est bien entre 1 et 10 ; sinon, on « renormalise ».</p>
+    <div class="cards">
+      <div class="box"><span class="tag acc">Produit</span><span class="soft">(3 × 10<sup>4</sup>) × (2 × 10<sup>5</sup>) = (3 × 2) × 10<sup>4+5</sup> = 6 × 10<sup>9</sup></span></div>
+      <div class="box"><span class="tag acc">Quotient</span><span class="soft">(6 × 10<sup>8</sup>) ÷ (3 × 10<sup>2</sup>) = (6 ÷ 3) × 10<sup>8−2</sup> = 2 × 10<sup>6</sup></span></div>
+      <div class="box"><span class="tag two">Renormaliser</span><span class="soft">(5 × 10<sup>3</sup>) × (4 × 10<sup>2</sup>) = 20 × 10<sup>5</sup> = 2 × 10<sup>1</sup> × 10<sup>5</sup> = 2 × 10<sup>6</sup></span></div>
+    </div>
+    <div class="box">
+      <h3>Le calcul pas à pas</h3>
+      <div class="btns" id="scBtns" role="group" aria-label="Choisir un calcul"></div>
+      <div class="btns"><span class="score" id="scPos"></span></div>
+      <div class="stage" id="scVis" aria-live="polite"></div>
+      <div class="fbk info say" id="scSay" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="scPrev">← Précédent</button><button type="button" id="scNext" class="main">Suivant →</button><button type="button" id="scReset">Recommencer</button></div>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · Les préfixes</span>
+    <h2>Kilo, méga, micro : des puissances de 10 cachées</h2>
+    <p>Les préfixes des unités sont des puissances de 10 avec un nom. « Kilo » veut dire 10<sup>3</sup> = 1000 : 1 km = 10<sup>3</sup> m. « Milli » veut dire 10<sup>−3</sup> : 1 mm = 10<sup>−3</sup> m. Les ordres de grandeur ci-dessous sont arrondis.</p>
+    <div class="scroll">
+      <table class="tb" aria-label="Les préfixes du Système international">
+        <thead><tr><th>Préfixe</th><th>Symbole</th><th>Puissance</th><th>Exemple</th></tr></thead>
+        <tbody>
+          <tr><th>téra</th><td>T</td><td>10<sup>12</sup></td><td class="al">un disque de 1 To (téraoctet)</td></tr>
+          <tr><th>giga</th><td>G</td><td>10<sup>9</sup></td><td class="al">le Wi-Fi à 5 GHz</td></tr>
+          <tr><th>méga</th><td>M</td><td>10<sup>6</sup></td><td class="al">un mégapixel = un million de pixels</td></tr>
+          <tr><th>kilo</th><td>k</td><td>10<sup>3</sup></td><td class="al">1 km = 1000 m</td></tr>
+          <tr><th>(aucun)</th><td>—</td><td>10<sup>0</sup> = 1</td><td class="al">1 m, 1 g, 1 s…</td></tr>
+          <tr><th>centi</th><td>c</td><td>10<sup>−2</sup></td><td class="al">1 cm = 0,01 m</td></tr>
+          <tr><th>milli</th><td>m</td><td>10<sup>−3</sup></td><td class="al">1 mm, 1 ml</td></tr>
+          <tr><th>micro</th><td>µ</td><td>10<sup>−6</sup></td><td class="al">un cheveu : environ 70 µm d'épaisseur</td></tr>
+          <tr><th>nano</th><td>n</td><td>10<sup>−9</sup></td><td class="al">1 nm : environ la taille de quelques atomes côte à côte</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="box">
+      <h3>Associe préfixes et puissances</h3>
+      <div class="btns"><span class="score" id="pfScore">Question 1 / 13</span><span class="step-n" id="pfPos"></span></div>
+      <div class="card-big" id="pfCard" aria-live="polite"></div>
+      <div class="btns choice" id="pfBtns" role="group" aria-label="Ta réponse"></div>
+      <div class="fbk" id="pfOut" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="pfPrev">← Précédent</button><button type="button" id="pfNext">Suivant →</button><button type="button" id="pfReset">Recommencer</button></div>
+    </div>
+    <div class="note two">
+      <span class="note-title">ko ou kio ?</span>
+      <span>En informatique, on rencontre aussi kio, Mio, Gio (kibioctet, mébioctet, gibioctet), basés sur les puissances de 2 : 1 kio = 2<sup>10</sup> = 1024 octets et 1 Mio = 2<sup>20</sup> = 1&#8239;048&#8239;576 octets. Comme 2<sup>10</sup> = 1024 est proche de 10<sup>3</sup> = 1000, on les confond souvent. Un disque vendu « 1 To » (10<sup>12</sup> octets) fait environ 931 Gio : l'ordinateur peut afficher « 931 Go ». Plus de détails dans le tutoriel sur <a class="tlink" href="les-octets-et-le-stockage.html">les octets</a> et le stockage.</span>
+    </div>
+  </section>
+
+  <!-- 12 -->
+  <section>
+    <span class="eyebrow">Étape 12 · Atelier final</span>
+    <h2>Simplifie, étape par étape</h2>
+    <p>Huit expressions à simplifier. À chaque étape, choisis la bonne suite parmi trois. Si tu te trompes, l'explication te dit quelle erreur classique se cache derrière ton choix.</p>
+    <div class="box">
+      <h3>Huit expressions, seize choix</h3>
+      <div class="btns"><span class="score" id="atScore">Étape 1 / 16</span><span class="step-n" id="atPos"></span></div>
+      <div class="card-big" id="atCard" aria-live="polite"></div>
+      <div class="btns choice" id="atBtns" role="group" aria-label="Ta réponse"></div>
+      <div class="fbk" id="atOut" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="atPrev">← Précédent</button><button type="button" id="atNext">Suivant →</button><button type="button" id="atReset">Recommencer</button></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Les idées reçues</span>
+    <h2>Vrai ou faux ?</h2>
+    <div class="cards">
+      <div class="box"><span class="tag no">Idée reçue</span><strong>« 2<sup>3</sup> = 6 »</strong><span class="soft">Non : 2<sup>3</sup> = 2 × 2 × 2 = 8. L'exposant compte les facteurs, il ne multiplie pas la base. 2 × 3 = 6, c'est autre chose.</span></div>
+      <div class="box"><span class="tag no">Idée reçue</span><strong>« a<sup>0</sup> = 0 »</strong><span class="soft">Non : a<sup>0</sup> = 1 pour tout a ≠ 0. L'escalier le montre : on divise a<sup>1</sup> = a par a, et a ÷ a = 1.</span></div>
+      <div class="box"><span class="tag no">Idée reçue</span><strong>« Un exposant négatif donne un nombre négatif »</strong><span class="soft">Non : 10<sup>−2</sup> = 1/100 = 0,01, un petit nombre <strong>positif</strong>. Le signe « − » de l'exposant veut dire « 1 sur… ».</span></div>
+      <div class="box"><span class="tag no">Idée reçue</span><strong>« (a + b)<sup>2</sup> = a<sup>2</sup> + b<sup>2</sup> »</strong><span class="soft">Non : avec a = b = 1, (1 + 1)<sup>2</sup> = 4, mais 1<sup>2</sup> + 1<sup>2</sup> = 2. Il manque le terme 2ab : (a + b)<sup>2</sup> = a<sup>2</sup> + 2ab + b<sup>2</sup>.</span></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Le savais-tu ?</span>
+    <h2>Petite histoire des exposants</h2>
+    <div class="cards">
+      <div class="box"><span class="tag two">1637</span><strong>René Descartes</strong><span class="soft">Dans son livre <em>La Géométrie</em>, le savant français écrit les puissances avec un petit nombre en haut à droite, comme a<sup>3</sup>. Cette notation devient ensuite celle de tout le monde.</span></div>
+      <div class="box"><span class="tag two">10<sup>100</sup></span><strong>Le « googol »</strong><span class="soft">C'est le nom donné à 10<sup>100</sup>, un 1 suivi de cent zéros. Il a été rendu célèbre par le mathématicien américain Edward Kasner, et il a inspiré le nom de Google.</span></div>
+      <div class="box"><span class="tag two">1960, 1991, 2022</span><strong>De nouveaux préfixes</strong><span class="soft">En 1960, le Système international d'unités (SI) allait de pico (10<sup>−12</sup>) à téra (10<sup>12</sup>). En 1991, on a ajouté notamment zetta (10<sup>21</sup>) et yotta (10<sup>24</sup>). En 2022 sont arrivés ronna (10<sup>27</sup>) et quetta (10<sup>30</sup>).</span></div>
+      <div class="box"><span class="tag two">2<sup>10</sup></span><strong>1024, presque 1000</strong><span class="soft">2<sup>10</sup> = 1024 est très proche de 10<sup>3</sup> = 1000. C'est pour cela qu'en informatique, « kilo » a longtemps voulu dire 1024 au lieu de 1000.</span></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Choisis ta réponse, puis vérifie.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Recommencer</button>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À toi de jouer</span>
+    <h2>Six exercices</h2>
+    <p>Fais chaque exercice sur une feuille, puis ouvre la correction pour comparer.</p>
+    <div class="exos">
+      <details>
+        <summary>Une seule puissance<span class="q">Écris avec une seule puissance : a) 3<sup>4</sup> × 3<sup>6</sup> &nbsp; b) 7<sup>9</sup> ÷ 7<sup>4</sup> &nbsp; c) (2<sup>3</sup>)<sup>4</sup></span></summary>
+        <div>
+          <span>a) Même base, on additionne : 4 + 6 = 10, donc <strong>3<sup>10</sup></strong>.</span>
+          <span>b) On soustrait : 9 − 4 = 5, donc <strong>7<sup>5</sup></strong>.</span>
+          <span>c) Puissance de puissance, on multiplie : 3 × 4 = 12, donc <strong>2<sup>12</sup></strong> (= 4096).</span>
+        </div>
+      </details>
+      <details>
+        <summary>Sans calculatrice<span class="q">Calcule : a) 5<sup>0</sup> &nbsp; b) 10<sup>−4</sup> &nbsp; c) 2<sup>−5</sup> &nbsp; d) (−1)<sup>2025</sup></span></summary>
+        <div>
+          <span>a) <strong>1</strong> (exposant 0, base non nulle).</span>
+          <span>b) 1/10<sup>4</sup> = 1/10&#8239;000 = <strong>0,0001</strong>.</span>
+          <span>c) 1/2<sup>5</sup> = <strong>1/32</strong> = 0,031&#8239;25.</span>
+          <span>d) 2025 est impair, donc <strong>−1</strong>.</span>
+        </div>
+      </details>
+      <details>
+        <summary>Vrai ou faux ?<span class="q">a) (a + b)<sup>2</sup> = a<sup>2</sup> + b<sup>2</sup> &nbsp; b) 2<sup>3</sup> × 5<sup>3</sup> = 10<sup>3</sup> &nbsp; c) −4<sup>2</sup> = 16</span></summary>
+        <div>
+          <span>a) <strong>Faux</strong> : avec a = b = 1, on trouve 4 d'un côté et 2 de l'autre.</span>
+          <span>b) <strong>Vrai</strong> : même exposant, (2 × 5)<sup>3</sup> = 10<sup>3</sup> = 1000. Contrôle : 8 × 125 = 1000.</span>
+          <span>c) <strong>Faux</strong> : sans parenthèses, −4<sup>2</sup> = −(4 × 4) = −16. C'est (−4)<sup>2</sup> qui vaut 16.</span>
+        </div>
+      </details>
+      <details>
+        <summary>Avec des lettres<span class="q">Simplifie : a) (3x<sup>2</sup>)<sup>3</sup> &nbsp; b) x<sup>4</sup> · x<sup>−6</sup> &nbsp; c) 6x<sup>5</sup> ÷ (2x<sup>2</sup>) (avec x ≠ 0)</span></summary>
+        <div>
+          <span>a) 3<sup>3</sup> · (x<sup>2</sup>)<sup>3</sup> = <strong>27x<sup>6</sup></strong>.</span>
+          <span>b) 4 + (−6) = −2, donc <strong>x<sup>−2</sup> = 1/x<sup>2</sup></strong>.</span>
+          <span>c) 6 ÷ 2 = 3 et x<sup>5−2</sup> = x<sup>3</sup>, donc <strong>3x<sup>3</sup></strong>.</span>
+        </div>
+      </details>
+      <details>
+        <summary>Notation scientifique<span class="q">Donne le résultat en notation scientifique : a) (2,5 × 10<sup>6</sup>) × (4 × 10<sup>−2</sup>) &nbsp; b) (9 × 10<sup>7</sup>) ÷ (3 × 10<sup>−2</sup>)</span></summary>
+        <div>
+          <span>a) 2,5 × 4 = 10 et 10<sup>6</sup> × 10<sup>−2</sup> = 10<sup>4</sup>. Donc 10 × 10<sup>4</sup> : on renormalise, <strong>1 × 10<sup>5</sup></strong>.</span>
+          <span>b) 9 ÷ 3 = 3 et 10<sup>7 − (−2)</sup> = 10<sup>9</sup>. Donc <strong>3 × 10<sup>9</sup></strong>.</span>
+        </div>
+      </details>
+      <details>
+        <summary>Des films sur un disque<span class="q">Un film fait 4 Go. Écris sa taille en octets avec une puissance de 10. Combien de films de 4 Go tiennent sur un disque de 1 To ?</span></summary>
+        <div>
+          <span>4 Go = <strong>4 × 10<sup>9</sup> octets</strong>.</span>
+          <span>1 To = 10<sup>12</sup> octets. 10<sup>12</sup> ÷ (4 × 10<sup>9</sup>) = (1 ÷ 4) × 10<sup>3</sup> = 0,25 × 1000 = <strong>250 films</strong>.</span>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section data-fiche><!--tprint--><p class="tprint-h">Fiche de révision · Calculer avec les exposants</p><!--/tprint-->    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <div class="scroll">
+        <table class="tb" aria-label="Les règles de calcul des puissances">
+          <thead><tr><th>Règle</th><th>Formule</th><th>Exemple</th></tr></thead>
+          <tbody>
+            <tr><th>Produit, même base</th><td>a<sup>n</sup> × a<sup>m</sup> = a<sup>n+m</sup></td><td>2<sup>3</sup> × 2<sup>4</sup> = 2<sup>7</sup></td></tr>
+            <tr><th>Quotient, même base</th><td>a<sup>n</sup> ÷ a<sup>m</sup> = a<sup>n−m</sup></td><td>5<sup>6</sup> ÷ 5<sup>2</sup> = 5<sup>4</sup></td></tr>
+            <tr><th>Puissance de puissance</th><td>(a<sup>n</sup>)<sup>m</sup> = a<sup>n·m</sup></td><td>(3<sup>2</sup>)<sup>3</sup> = 3<sup>6</sup></td></tr>
+            <tr><th>Exposants 0 et 1</th><td>a<sup>0</sup> = 1 ; a<sup>1</sup> = a</td><td>7<sup>0</sup> = 1</td></tr>
+            <tr><th>Exposant négatif</th><td>a<sup>−n</sup> = 1/a<sup>n</sup></td><td>2<sup>−3</sup> = 1/8</td></tr>
+            <tr><th>Produit, même exposant</th><td>(ab)<sup>n</sup> = a<sup>n</sup>b<sup>n</sup></td><td>(2x)<sup>3</sup> = 8x<sup>3</sup></td></tr>
+            <tr><th>Quotient, même exposant</th><td>(a/b)<sup>n</sup> = a<sup>n</sup>/b<sup>n</sup></td><td>(1/2)<sup>3</sup> = 1/8</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <span>• Toutes les règles viennent d'une seule idée : <strong>l'exposant compte les facteurs</strong>. En cas de doute, déroule les facteurs.</span>
+      <span>• Les règles du produit et du quotient demandent la <strong>même base</strong> (a ≠ 0 pour diviser ou pour un exposant 0 ou négatif).</span>
+      <span>• <strong>Interdit</strong> : (a + b)<sup>n</sup> ≠ a<sup>n</sup> + b<sup>n</sup>, et a<sup>n</sup> + a<sup>m</sup> n'a pas de règle.</span>
+      <span>• <strong>Signes</strong> : (−2)<sup>2</sup> = 4 mais −2<sup>2</sup> = −4. Base négative : exposant pair → positif, impair → négatif.</span>
+      <span>• <strong>Notation scientifique</strong> : on multiplie (ou divise) les nombres, on additionne (ou soustrait) les exposants de 10, puis on renormalise pour avoir 1 ≤ m &lt; 10.</span>
+      <span>• <strong>Préfixes</strong> : nano 10<sup>−9</sup>, micro 10<sup>−6</sup>, milli 10<sup>−3</sup>, centi 10<sup>−2</sup>, kilo 10<sup>3</sup>, méga 10<sup>6</sup>, giga 10<sup>9</sup>, téra 10<sup>12</sup>.</span>
+    </div>
+  <!--tprint--><p class="tprint-row"><button type="button" class="tprint" data-print><span aria-hidden="true">🖨</span> Imprimer la fiche</button><span>Seulement ce résumé, sur une page.</span></p><!--/tprint-->
+</section>
+
+  <!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"><a class="prev" href="les-puissances.html"><span>← Précédent</span><strong>Les puissances</strong></a><a class="next" href="les-racines-carrees.html"><span>Suivant →</span><strong>Les racines carrées</strong></a></div><div class="tnav-end"><a class="tnav-home" href="maths.html">⌂ Tous les tutoriels de maths</a><button type="button" data-share hidden>Partager</button></div></nav><!--/tnav-->
+<footer>Fiche de révision · Les règles de calcul des puissances<!--tmaj--><span class="tmaj" style="display:block;margin-top:6px;font-size:.85rem;opacity:.85">Dernière mise à jour : 24 novembre 2026 · © 2026 Nicolas Meynet</span><!--/tmaj--></footer>
+</main>
+
+<script>
+(function () {
+  /*
+   * Hooks de test : window.__pregles
+   *   Écriture : fmt(s) -> HTML avec <sup> (balisage « ^3 », « ^n », « ^{n+m} », « ^{−2} ») ; uni(s) -> même texte avec exposants Unicode (pour les <option>)
+   *   Arithmétique exacte (BigInt) : pw(a, e), bigStr(b), decStr(n, scale) (n / 10^scale, à la française), fracDec(num, den) -> {exact, s}
+   *   Dérouleurs : prodSteps(a, n, m), quotSteps(a, n, m), powSteps(a, n, m) -> [{vis, say, done}]
+   *   Escalier : stairSteps(a) (de a^4 à a^−3), stairVal(a, e)
+   *   Exposants négatifs : negInfo(a, n) -> {den, exact, dec, html}
+   *   Lettres : LET (expressions et étapes)
+   *   Notation scientifique : sciSteps(c) avec c = {op: 'x'|'d', A, ea, B, eb} (mantisses en dixièmes entiers : A = 30 pour 3,0) -> {steps, M, e} ; sciRandom() ; SCP (exemples)
+   *   Jeux : simplCards (étape 7), signCards (étape 8), prefixCards (étape 11), atelierCards (étape 12), scorer(items), isOk(item, c) ; PREFIXES
+   *   quiz : les 8 questions du quiz
+   */
+  var NB = ' ', MI = '−';
+  var B0 = BigInt(0), B1 = BigInt(1), B10 = BigInt(10);
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function clamp(i, n) { i = Math.floor(Number(i)); if (!isFinite(i)) i = 0; return Math.max(0, Math.min(n - 1, i)); }
+  function rint(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+
+  /* ---------- Exposants : balisage « ^ » -> <sup> ou caractères Unicode ---------- */
+  var SUPU = { '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '−': '⁻', '-': '⁻', '+': '⁺', 'n': 'ⁿ', 'm': 'ᵐ', '(': '⁽', ')': '⁾' };
+  function fmt(s) { return esc(s).replace(/\^\{([^}]*)\}/g, '<sup>$1</sup>').replace(/\^(−?\d+|[a-z])/g, '<sup>$1</sup>'); }
+  function supU(g) { return g.split('').map(function (ch) { return SUPU[ch] || ch; }).join(''); }
+  function uni(s) { return String(s).replace(/\^\{([^}]*)\}/g, function (m, g) { return supU(g); }).replace(/\^(−?\d+|[a-z])/g, function (m, g) { return supU(g); }); }
+  function ex(n) { return n < 0 ? MI + (-n) : String(n); }
+  function par(n) { return n < 0 ? '(' + MI + (-n) + ')' : String(n); }
+  function P(b, e) { var bs = String(b); if (/^[−-]/.test(bs)) bs = '(' + bs + ')'; return bs + '<sup>' + (typeof e === 'number' ? ex(e) : e) + '</sup>'; }
+
+  /* ---------- Arithmétique exacte et écriture à la française ---------- */
+  function grpInt(s) { return s.replace(/\B(?=(\d{3})+(?!\d))/g, NB); }
+  function pw(a, e) { return BigInt(a) ** BigInt(e); }
+  function bigStr(b) { b = BigInt(b); var neg = b < B0; return (neg ? MI : '') + grpInt((neg ? -b : b).toString()); }
+  function decStr(n, scale) {
+    n = BigInt(n); scale = scale || 0;
+    var neg = n < B0, s = (neg ? -n : n).toString();
+    while (s.length <= scale) s = '0' + s;
+    var ip = s.slice(0, s.length - scale), fp = scale ? s.slice(s.length - scale) : '';
+    fp = fp.replace(/0+$/, '');
+    if (fp.length > 4) fp = fp.replace(/(\d{3})(?=\d)/g, '$1' + NB);
+    return (neg ? MI : '') + grpInt(ip) + (fp ? ',' + fp : '');
+  }
+  function fracDec(num, den) {
+    num = BigInt(num); den = BigInt(den);
+    var p = B1, t;
+    for (t = 0; t <= 40; t++) { if ((num * p) % den === B0) return { exact: true, s: decStr(num * p / den, t) }; p *= B10; }
+    p = B1;
+    for (t = 0; t <= 80; t++) { if (num * p / den >= BigInt(100000)) break; p *= B10; }
+    return { exact: false, s: decStr(num * p / den, t) + '…' };
+  }
+  var LIM = pw(10, 12);
+  function valLine(a, e) { var v = pw(a, e); return v <= LIM ? bigStr(v) : null; }
+  function fac(k) { return k + ' facteur' + (k > 1 ? 's' : ''); }
+
+  /* ---------- Petits morceaux d'affichage ---------- */
+  var TIMES = '<span class="op">×</span>';
+  function chip(a, cls, x) { return '<span class="f ' + (cls || '') + (x ? ' x' + (x === 2 ? ' xnew' : '') : '') + '">' + a + '</span>'; }
+  function row(a, n, cls, xs) { var h = []; for (var i = 0; i < n; i++) h.push(chip(a, typeof cls === 'function' ? cls(i) : cls, xs ? xs(i) : 0)); return h.join(TIMES); }
+  function g(inner) { return '<span class="g"><span class="par">(</span>' + inner + '<span class="par">)</span></span>'; }
+  function fx(inner) { return '<div class="fx">' + inner + '</div>'; }
+  function big(h) { return '<div class="big">' + h + '</div>'; }
+  function badge(t) { return '<span class="badge">' + t + '</span>'; }
+  function fracH(top, bot) { return '<div class="frac"><div class="fx">' + top + '</div><div class="bar"></div><div class="fx">' + bot + '</div></div>'; }
+  function tooBig(a, e) { return P(a, e) + ' est un nombre à ' + pw(a, e).toString().length + ' chiffres : la puissance est bien plus courte à écrire !'; }
+
+  /* ---------- Étapes 2 à 4 : les dérouleurs ---------- */
+  function prodSteps(a, n, m) {
+    var t = n + m, v = valLine(a, t), S = [];
+    S.push({ vis: big(P(a, n) + ' × ' + P(a, m)), say: 'On veut écrire ' + P(a, n) + ' × ' + P(a, m) + ' avec <strong>une seule</strong> puissance. L’idée : écrire tous les facteurs.' });
+    S.push({ vis: fx(g(row(a, n, 'c1')) + TIMES + g(row(a, m, 'c2'))), say: P(a, n) + ', c’est ' + fac(n) + ' ' + a + ' (en bleu). ' + P(a, m) + ', c’est ' + fac(m) + ' ' + a + ' (en orange).' });
+    S.push({ vis: fx(row(a, t, function (i) { return i < n ? 'c1' : 'c2'; })) + '<div>' + badge(n + ' + ' + m + ' = ' + fac(t)) + '</div>', say: 'Dans une multiplication, les parenthèses ne changent rien : on met tous les facteurs à la suite. On compte : ' + n + ' + ' + m + ' = ' + fac(t) + ' ' + a + '.' });
+    S.push({ done: true, vis: big(P(a, n) + ' × ' + P(a, m) + ' = ' + P(a, n + '+' + m) + ' = ' + P(a, t)) + (v ? '<div class="readout">= ' + v + '</div>' : ''), say: 'On garde la base et on <strong>additionne les exposants</strong> : a<sup>n</sup> × a<sup>m</sup> = a<sup>n+m</sup>. ' + (v ? P(a, t) + ' = ' + v + '.' : tooBig(a, t)) });
+    return S;
+  }
+  function quotSteps(a, n, m) {
+    var k = Math.min(n, m), r = n - m, S = [], j;
+    S.push({ vis: fracH('<span class="big">' + P(a, n) + '</span>', '<span class="big">' + P(a, m) + '</span>'), say: 'Un quotient de deux puissances de même base (' + a + ' ≠ 0). On va écrire les facteurs en haut et en bas.' });
+    S.push({ vis: fracH(row(a, n, 'c1'), row(a, m, 'c2')), say: 'En haut : ' + fac(n) + ' ' + a + '. En bas : ' + fac(m) + ' ' + a + '.' });
+    for (j = 1; j <= k; j++) {
+      (function (j) {
+        var xs = function (i) { return i < j ? (i === j - 1 ? 2 : 1) : 0; };
+        S.push({ vis: fracH(row(a, n, 'c1', xs), row(a, m, 'c2', xs)), say: 'Paire ' + j + ' sur ' + k + ' : on barre un ' + a + ' en haut et un ' + a + ' en bas, car ' + a + ' ÷ ' + a + ' = 1.' + (j === k ? ' Il n’y a plus de paire à barrer.' : '') });
+      })(j);
+    }
+    var head = P(a, n) + ' ÷ ' + P(a, m) + ' = ' + P(a, n + MI + m) + ' = ' + P(a, r);
+    if (r > 0) {
+      var v = valLine(a, r);
+      S.push({ done: true, vis: big(head) + (v ? '<div class="readout">= ' + v + '</div>' : ''), say: 'Il reste ' + n + ' − ' + m + ' = ' + fac(r) + ' en haut. On <strong>soustrait les exposants</strong> : a<sup>n</sup> ÷ a<sup>m</sup> = a<sup>n−m</sup>. ' + (v ? P(a, r) + ' = ' + v + '.' : tooBig(a, r)) });
+    } else if (r === 0) {
+      S.push({ done: true, vis: big(head + ' = 1'), say: 'Tout se simplifie : il reste 1. Et la règle donne ' + P(a, n + MI + m) + ' = ' + P(a, 0) + '. C’est une des raisons pour lesquelles <strong>a<sup>0</sup> = 1</strong> (étape 5).' });
+    } else {
+      var d = pw(a, -r), f = fracDec(1, d);
+      S.push({ done: true, vis: big(head + ' = 1/' + P(a, -r)) + '<div class="readout">= 1/' + bigStr(d) + (f.exact ? ' = ' + f.s : '') + '</div>', say: 'Il reste 1 en haut et ' + fac(-r) + ' en bas : 1/' + P(a, -r) + '. La règle donne ' + P(a, r) + ' : un <strong>exposant négatif</strong>, qui veut dire « 1 sur » (étape 6).' });
+    }
+    return S;
+  }
+  var BCL = ['c1', 'c2', 'c3', 'c4'];
+  function powSteps(a, n, m) {
+    var t = n * m, v = valLine(a, t), blocks = [], groups = [], i, S = [];
+    for (i = 0; i < m; i++) { blocks.push(P(a, n)); groups.push(g(row(a, n, BCL[i % 4]))); }
+    var pp = '(' + P(a, n) + ')<sup>' + m + '</sup>';
+    S.push({ vis: big(pp), say: 'Une puissance de puissance : le bloc ' + P(a, n) + ' est élevé à la puissance ' + m + '.' });
+    S.push({ vis: big(blocks.join(' × ')), say: m === 1 ? 'Exposant 1 : un seul bloc ' + P(a, n) + '.' : 'Exposant ' + m + ' : on multiplie ' + m + ' blocs ' + P(a, n) + ' entre eux.' });
+    S.push({ vis: fx(groups.join(TIMES)) + '<div>' + badge(m + ' × ' + n + ' = ' + fac(t)) + '</div>', say: 'Chaque bloc contient ' + fac(n) + ' ' + a + ', et il y a ' + m + ' bloc' + (m > 1 ? 's' : '') + ' : ' + m + ' × ' + n + ' = ' + fac(t) + '.' });
+    S.push({ done: true, vis: big(pp + ' = ' + P(a, n + '·' + m) + ' = ' + P(a, t)) + (v ? '<div class="readout">= ' + v + '</div>' : ''), say: 'On <strong>multiplie les exposants</strong> : (a<sup>n</sup>)<sup>m</sup> = a<sup>n·m</sup>. ' + (v ? P(a, t) + ' = ' + v + '.' : tooBig(a, t)) });
+    return S;
+  }
+
+  /* ---------- Moteurs : réglages − / + et pas à pas ---------- */
+  function makeCtrls(id, defs, st, onChange) {
+    function render() {
+      $(id).innerHTML = defs.map(function (d) {
+        var v = st[d.k];
+        return '<div class="ctrl"><span class="n">' + d.label + '</span><button type="button" data-k="' + d.k + '" data-d="-1" aria-label="' + esc(d.aria) + ' : moins"' + (v > d.min ? '' : ' disabled') + '>' + MI + '</button><span class="v">' + v + '</span><button type="button" data-k="' + d.k + '" data-d="1" aria-label="' + esc(d.aria) + ' : plus"' + (v < d.max ? '' : ' disabled') + '>+</button></div>';
+      }).join('');
+    }
+    $(id).addEventListener('click', function (ev) {
+      var b = ev.target.closest('button'); if (!b || b.disabled) return;
+      var d = defs.filter(function (x) { return x.k === b.getAttribute('data-k'); })[0]; if (!d) return;
+      st[d.k] = Math.max(d.min, Math.min(d.max, st[d.k] + Number(b.getAttribute('data-d'))));
+      render(); onChange();
+    });
+    render();
+  }
+  function makeStepper(o) {
+    var idx = 0;
+    function render() {
+      var S = o.get(); idx = clamp(idx, S.length);
+      var st = S[idx], last = idx === S.length - 1;
+      $(o.id + 'Pos').textContent = 'Étape ' + (idx + 1) + ' / ' + S.length;
+      $(o.id + 'Vis').innerHTML = st.vis;
+      var say = $(o.id + 'Say');
+      say.className = 'fbk say ' + (st.done ? 'ok' : 'info');
+      say.innerHTML = (st.done ? '<strong>' + (o.doneTitle || 'Terminé !') + '</strong>' : '') + '<span>' + st.say + '</span>';
+      $(o.id + 'Prev').disabled = idx === 0;
+      $(o.id + 'Next').disabled = last;
+      $(o.id + 'Next').style.display = last ? 'none' : '';
+    }
+    $(o.id + 'Prev').addEventListener('click', function () { idx--; render(); });
+    $(o.id + 'Next').addEventListener('click', function () { idx++; render(); });
+    $(o.id + 'Reset').addEventListener('click', function () { idx = 0; render(); });
+    render();
+    return { render: render, restart: function () { idx = 0; render(); } };
+  }
+
+  var d1 = { a: 2, n: 3, m: 2 }, d2 = { a: 2, n: 5, m: 2 }, d3 = { a: 2, n: 3, m: 2 };
+  var DEF_A = { k: 'a', label: 'Base a', aria: 'Base a', min: 2, max: 10 };
+  var D1 = makeStepper({ id: 'd1', doneTitle: 'Règle du produit', get: function () { return prodSteps(d1.a, d1.n, d1.m); } });
+  makeCtrls('d1Ctrls', [DEF_A, { k: 'n', label: 'Exposant n', aria: 'Exposant n', min: 1, max: 6 }, { k: 'm', label: 'Exposant m', aria: 'Exposant m', min: 1, max: 6 }], d1, D1.restart);
+  var D2 = makeStepper({ id: 'd2', doneTitle: 'Simplification terminée', get: function () { return quotSteps(d2.a, d2.n, d2.m); } });
+  makeCtrls('d2Ctrls', [DEF_A, { k: 'n', label: 'Exposant n (en haut)', aria: 'Exposant n', min: 1, max: 7 }, { k: 'm', label: 'Exposant m (en bas)', aria: 'Exposant m', min: 1, max: 7 }], d2, D2.restart);
+  var D3 = makeStepper({ id: 'd3', doneTitle: 'Règle de la puissance de puissance', get: function () { return powSteps(d3.a, d3.n, d3.m); } });
+  makeCtrls('d3Ctrls', [DEF_A, { k: 'n', label: 'Exposant n (dans le bloc)', aria: 'Exposant n', min: 1, max: 4 }, { k: 'm', label: 'Exposant m (nombre de blocs)', aria: 'Exposant m', min: 1, max: 4 }], d3, D3.restart);
+
+  /* ---------- Étape 5 : l'escalier ---------- */
+  function stairVal(a, e) {
+    if (e >= 0) return bigStr(pw(a, e));
+    var d = pw(a, -e), f = fracDec(1, d);
+    return '1/' + bigStr(d) + (f.exact ? ' = ' + f.s : '');
+  }
+  function stairSteps(a) {
+    var S = [], i, j;
+    for (i = 0; i < 8; i++) {
+      var e = 4 - i, rows = '';
+      for (j = 0; j <= i; j++) rows += '<div style="--i:' + j + '"' + (j === i ? ' class="on"' : '') + '><b>' + P(a, 4 - j) + '</b><span>= ' + stairVal(a, 4 - j) + '</span>' + (j ? '<span class="dv">(÷ ' + a + ')</span>' : '') + '</div>';
+      var prev = e < 4 ? (e + 1 >= 0 ? bigStr(pw(a, e + 1)) : '1/' + bigStr(pw(a, -(e + 1)))) : '', say;
+      if (e === 4) say = 'On part du haut : ' + P(a, 4) + ' = ' + bigStr(pw(a, 4)) + '. Descendre d’une marche, c’est <strong>diviser par ' + a + '</strong> : l’exposant baisse de 1.';
+      else if (e >= 2) say = P(a, e) + ' = ' + prev + ' ÷ ' + a + ' = ' + bigStr(pw(a, e)) + '. Un facteur ' + a + ' de moins.';
+      else if (e === 1) say = P(a, 1) + ' = ' + prev + ' ÷ ' + a + ' = ' + a + '. Un seul facteur : <strong>' + P(a, 1) + ' = ' + a + '</strong>.';
+      else if (e === 0) say = P(a, 0) + ' = ' + a + ' ÷ ' + a + ' = 1. Plus aucun facteur, et l’escalier donne 1 : c’est pour cela que <strong>a<sup>0</sup> = 1</strong> (pour a ≠ 0).';
+      else if (e === -1) say = P(a, -1) + ' = 1 ÷ ' + a + ' = 1/' + a + '. On peut continuer : l’exposant devient négatif, mais le nombre reste <strong>positif</strong>.';
+      else if (e === -2) say = P(a, -2) + ' = 1/' + a + ' ÷ ' + a + ' = 1/' + bigStr(pw(a, 2)) + ' = 1/' + P(a, 2) + '.';
+      else say = P(a, -3) + ' = 1/' + bigStr(pw(a, 2)) + ' ÷ ' + a + ' = 1/' + bigStr(pw(a, 3)) + ' = 1/' + P(a, 3) + '. En descendant, on divise par ' + a + ' ; en montant, on multiplie par ' + a + '.';
+      S.push({ vis: '<div class="stair">' + rows + '</div>', say: say, done: i === 7 });
+    }
+    return S;
+  }
+  var st5 = { a: 2 };
+  var ST = makeStepper({ id: 'st', doneTitle: 'Escalier terminé', get: function () { return stairSteps(st5.a); } });
+  makeCtrls('stCtrls', [{ k: 'a', label: 'Base', aria: 'Base de l’escalier', min: 2, max: 10 }], st5, ST.render);
+
+  /* ---------- Étape 6 : exposants négatifs ---------- */
+  var NEG10 = ['un dixième', 'un centième', 'un millième', 'un dix-millième', 'un cent-millième', 'un millionième'];
+  function negInfo(a, n) {
+    var d = pw(a, n), f = fracDec(1, d);
+    return { den: d, exact: f.exact, dec: f.s, html: P(a, -n) + ' = 1/' + P(a, n) + ' = 1/' + bigStr(d) + ' ' + (f.exact ? '=' : '≈') + ' ' + f.s };
+  }
+  var ng = { a: 2, n: 3 }, NGB = [2, 3, 4, 5, 10];
+  function ngRender() {
+    $('ngBases').innerHTML = NGB.map(function (b) { return '<button type="button" class="ex" data-b="' + b + '" aria-pressed="' + (b === ng.a ? 'true' : 'false') + '">Base ' + b + '</button>'; }).join('');
+    var I = negInfo(ng.a, ng.n), a = ng.a, n = ng.n;
+    $('ngVis').innerHTML = big(I.html);
+    var t = '<strong>' + P(a, -n) + ' est l’inverse de ' + P(a, n) + ' = ' + bigStr(I.den) + '</strong>';
+    if (a === 10) t += '<span>' + P(10, -n) + ' = ' + NEG10[n - 1] + ' : ' + n + ' chiffre' + (n > 1 ? 's' : '') + ' après la virgule, et le 1 est le dernier.</span>';
+    if (!I.exact) t += '<span>Ici, la division ne s’arrête jamais (comme 1/3 = 0,333…) : on garde de préférence la fraction.</span>';
+    t += '<span>Contrôle : ' + P(a, n) + ' × ' + P(a, -n) + ' = ' + P(a, n + ' + (' + MI + n + ')') + ' = ' + P(a, 0) + ' = 1. Le résultat est petit, mais toujours positif.</span>';
+    $('ngOut').innerHTML = t;
+  }
+  $('ngBases').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b) return; ng.a = Number(b.getAttribute('data-b')); ngRender(); });
+  makeCtrls('ngCtrls', [{ k: 'n', label: 'n (dans a<sup>−n</sup>)', aria: 'Exposant n', min: 1, max: 6 }], ng, ngRender);
+  ngRender();
+
+  /* ---------- Trieur générique (cartes une par une), comme dans les autres tutoriels.
+     Si un item a sa propre liste o (options), elle remplace les boutons communs.
+     Si un item a une liste alt, ces réponses sont aussi acceptées.
+     Si un item a un objet bad, l’explication de la mauvaise réponse choisie s’ajoute.
+     Les textes passent par fmt() pour afficher les exposants.
+     o.cardHtml(it, answered) renvoie le contenu HTML de la carte. ---------- */
+  function isOk(it, c) { return c === it.a || !!(it.alt && it.alt.indexOf(c) >= 0); }
+  function makeSorter(o) {
+    var idx = 0, ans = {};
+    function opts(it) { return it.o ? it.o : o.order; }
+    function name(c) { return o.names && o.names[c] ? o.names[c] : c; }
+    function render() {
+      var it = o.items[idx], a = ans[it.k];
+      if (o.cardHtml) $(o.card).innerHTML = o.cardHtml(it, !!a); else $(o.card).textContent = it.s;
+      $(o.pos).textContent = o.word + ' ' + (idx + 1) + ' / ' + o.items.length;
+      $(o.btns).innerHTML = opts(it).map(function (c) {
+        var cls = a ? (c === it.a || (c === a && isOk(it, a)) ? 'right' : (c === a ? 'wrong' : '')) : '';
+        return '<button type="button" data-c="' + esc(c) + '"' + (cls ? ' class="' + cls + '"' : '') + (a ? ' disabled' : '') + '>' + fmt(name(c)) + '</button>';
+      }).join('');
+      var out = $(o.out);
+      if (!a) { out.className = 'fbk'; out.innerHTML = ''; }
+      else {
+        var ok = isOk(it, a);
+        out.className = 'fbk ' + (ok ? 'ok' : 'no');
+        out.innerHTML = '<strong>' + (ok ? 'Bien vu !' : 'Pas tout à fait. Réponse : ' + fmt(name(it.a)) + '.') + '</strong>' + (!ok && it.bad && it.bad[a] ? '<span>Ton choix : ' + fmt(it.bad[a]) + '</span>' : '') + '<span>' + fmt(it.why) + '</span>';
+      }
+      var s = o.score(ans), last = idx === o.items.length - 1, left = s.total - s.answered;
+      $(o.score_).textContent = (o.word ? o.word + ' ' : '') + (idx + 1) + ' / ' + s.total;
+      $(o.pos).textContent = s.answered ? 'Bonnes réponses : ' + s.correct + ' sur ' + s.answered : '';
+      $(o.prev).disabled = idx === 0;
+      $(o.next).disabled = last;
+      $(o.next).style.display = last ? 'none' : '';
+      var end = $(o.out + 'End');
+      if (!end) { end = document.createElement('div'); end.id = o.out + 'End'; end.setAttribute('aria-live', 'polite'); $(o.out).insertAdjacentElement('afterend', end); }
+      if (!left) {
+        var r = s.correct / s.total;
+        end.className = 'fbk ok sorter-end';
+        end.innerHTML = '<strong>Terminé ! ' + s.correct + ' / ' + s.total + ' bonnes réponses</strong><span>' +
+          (r === 1 ? 'Parfait, tout est juste !' : r >= .7 ? 'Très bien !' : r >= .5 ? 'Pas mal ! Relis les explications des erreurs.' : 'Relis les explications, puis réessaie.') +
+          ' Touche « Recommencer » pour rejouer.</span>';
+      } else if (last && ans[it.k]) {
+        end.className = 'fbk warn sorter-end';
+        end.innerHTML = '<strong>C’était la dernière carte.</strong><span>Il te reste ' + left + ' réponse' + (left > 1 ? 's' : '') + ' à donner : reviens en arrière avec « ← Précédent ».</span>';
+      } else { end.className = ''; end.innerHTML = ''; }
+    }
+    $(o.btns).addEventListener('click', function (ev) {
+      var b = ev.target.closest('button'); if (!b || b.disabled) return;
+      var it = o.items[idx]; if (!ans[it.k]) ans[it.k] = b.getAttribute('data-c');
+      render();
+    });
+    $(o.prev).addEventListener('click', function () { idx = clamp(idx - 1, o.items.length); render(); });
+    $(o.next).addEventListener('click', function () { idx = clamp(idx + 1, o.items.length); render(); });
+    $(o.reset).addEventListener('click', function () { ans = {}; idx = 0; render(); });
+    render();
+  }
+  function scorer(items) {
+    return function (ans) { var correct = 0, answered = 0; items.forEach(function (x) { if (ans && ans[x.k]) { answered++; if (isOk(x, ans[x.k])) correct++; } }); return { correct: correct, answered: answered, total: items.length }; };
+  }
+  function exprCard(ask) { return function (it) { return '<span class="expr">' + fmt(it.s) + '</span><span class="ask">' + (it.q || ask) + '</span>'; }; }
+
+  /* ---------- Étape 7 : on peut simplifier ? ---------- */
+  var SIMPL_NAMES = { oui: 'Oui, une règle s’applique', non: 'Non, pas de règle' };
+  var simplCards = [
+    { k: 'c1', s: 'a^5 × a^3', a: 'oui', why: 'Même base a : on additionne les exposants. a^5 × a^3 = a^8.' },
+    { k: 'c2', s: '3^2 × 5^2', a: 'oui', why: 'Bases différentes mais même exposant : 3^2 × 5^2 = (3 × 5)^2 = 15^2 = 225. Contrôle : 9 × 25 = 225.' },
+    { k: 'c3', s: '2^3 × 5^2', a: 'non', why: 'Bases différentes ET exposants différents : aucune règle. On calcule chaque puissance : 8 × 25 = 200.' },
+    { k: 'c4', s: '(a + b)^2', a: 'non', why: '(a + b)^2 ≠ a^2 + b^2. Avec a = 3 et b = 4 : 7^2 = 49, mais 9 + 16 = 25. (On peut développer : a^2 + 2ab + b^2, mais ce n’est pas une règle des puissances.)' },
+    { k: 'c5', s: '6^4 ÷ 3^4', a: 'oui', why: 'Même exposant : 6^4 ÷ 3^4 = (6 ÷ 3)^4 = 2^4 = 16. Contrôle : 1 296 ÷ 81 = 16.' },
+    { k: 'c6', s: 'a^4 + a^3', a: 'non', why: 'C’est une addition : il n’y a pas de règle pour a^n + a^m. Ce n’est pas a^7 (ça, c’est a^4 × a^3).' },
+    { k: 'c7', s: '(2a)^3', a: 'oui', why: '(ab)^n = a^n b^n : (2a)^3 = 2^3 × a^3 = 8a^3.' },
+    { k: 'c8', s: 'x^2 × y^3', a: 'non', why: 'Bases différentes (x et y) et exposants différents : on laisse x^2y^3.' },
+    { k: 'c9', s: '10^5 ÷ 10^2', a: 'oui', why: 'Même base 10 : on soustrait, 10^{5−2} = 10^3 = 1000.' },
+    { k: 'c10', s: '(a − b)^2', a: 'non', why: '(a − b)^2 ≠ a^2 − b^2. Avec a = 5 et b = 3 : 2^2 = 4, mais 25 − 9 = 16.' },
+    { k: 'c11', s: 'a^3 × b^3', a: 'oui', why: 'Même exposant : a^3 × b^3 = (ab)^3.' },
+    { k: 'c12', s: '4^3 × 4^{−1}', a: 'oui', why: 'Même base 4 : 3 + (−1) = 2, donc 4^2 = 16.' },
+    { k: 'c13', s: '2^2 + 2^3', a: 'non', why: 'Une addition : on calcule chaque puissance, 4 + 8 = 12. Ce n’est pas 2^5 = 32.' }
+  ];
+  makeSorter({ items: simplCards, names: SIMPL_NAMES, order: ['oui', 'non'], btns: 's7Btns', card: 's7Card', pos: 's7Pos', out: 's7Out', score_: 's7Score', prev: 's7Prev', next: 's7Next', reset: 's7Reset', word: 'Question', score: scorer(simplCards),
+    cardHtml: exprCard('Une règle des puissances permet-elle de simplifier ?') });
+
+  /* ---------- Étape 8 : signes et priorités ---------- */
+  var signCards = [
+    { k: 's1', s: '(−2)^2', o: ['4', '−4', '−8'], a: '4', why: 'La parenthèse dit que c’est −2 qui est au carré : (−2) × (−2) = 4.' },
+    { k: 's2', s: '−2^2', o: ['4', '−4', '2'], a: '−4', why: 'Sans parenthèse, la puissance passe avant le signe : −2^2 = −(2 × 2) = −4.' },
+    { k: 's3', s: '(−2)^3', o: ['8', '−8', '−6'], a: '−8', why: '(−2) × (−2) × (−2) = 4 × (−2) = −8. Exposant impair : résultat négatif.' },
+    { k: 's4', s: '−3^2', o: ['9', '−9', '−6'], a: '−9', why: 'La puissance d’abord, le signe ensuite : −(3 × 3) = −9.' },
+    { k: 's5', s: '(−3)^2', o: ['9', '−9', '6'], a: '9', why: '(−3) × (−3) = 9. Exposant pair : résultat positif.' },
+    { k: 's6', s: '(−1)^{10}', o: ['1', '−1', '−10'], a: '1', why: 'Exposant pair : les signes « − » vont par paires, le résultat est positif.' },
+    { k: 's7', s: '(−1)^7', o: ['1', '−1', '−7'], a: '−1', why: 'Exposant impair : il reste un signe « − » tout seul.' },
+    { k: 's8', s: '2 × 3^2', o: ['36', '18', '12'], a: '18', why: 'La puissance d’abord : 3^2 = 9, puis 2 × 9 = 18.' },
+    { k: 's9', s: '(2 × 3)^2', o: ['36', '18', '12'], a: '36', why: 'La parenthèse d’abord : 6^2 = 36. Ou bien 2^2 × 3^2 = 4 × 9 = 36.' },
+    { k: 's10', s: '−(−2)^2', o: ['4', '−4', '−16'], a: '−4', why: 'D’abord (−2)^2 = 4, puis le signe « − » devant : −4.' },
+    { k: 's11', s: '(−2)^4', o: ['16', '−16', '−8'], a: '16', why: 'Exposant pair : positif. 2^4 = 16.' },
+    { k: 's12', s: '3 + 2^3', o: ['125', '11', '9'], a: '11', why: 'La puissance passe avant l’addition : 2^3 = 8, puis 3 + 8 = 11. (125, c’est (3 + 2)^3.)' }
+  ];
+  makeSorter({ items: signCards, names: null, order: [], btns: 's8Btns', card: 's8Card', pos: 's8Pos', out: 's8Out', score_: 's8Score', prev: 's8Prev', next: 's8Next', reset: 's8Reset', word: 'Question', score: scorer(signCards),
+    cardHtml: exprCard('Combien ça vaut ?') });
+
+  /* ---------- Étape 9 : avec des lettres ---------- */
+  var LET = [
+    { k: 'l1', label: 'x^3 · x^5', steps: [
+      { f: 'x^3 · x^5', say: 'Le point « · » veut dire « fois ». Même base x : la règle du produit s’applique.' },
+      { f: '(x · x · x) · (x · x · x · x · x)', say: 'On écrit les facteurs : 3 facteurs x, puis 5 facteurs x.' },
+      { f: 'x^{3+5}', say: 'En tout, 3 + 5 = 8 facteurs x : on additionne les exposants.' },
+      { f: 'x^3 · x^5 = x^8', say: 'Résultat : x^8. Contrôle avec x = 2 : 2^3 · 2^5 = 8 · 32 = 256 = 2^8.' }] },
+    { k: 'l2', label: '(x^2)^4', steps: [
+      { f: '(x^2)^4', say: 'Une puissance de puissance : le bloc x^2 est élevé à la puissance 4.' },
+      { f: 'x^2 · x^2 · x^2 · x^2', say: 'Exposant 4 : on multiplie 4 blocs x^2.' },
+      { f: 'x^{2+2+2+2} = x^{2·4}', say: '4 blocs de 2 facteurs : 2 · 4 = 8 facteurs.' },
+      { f: '(x^2)^4 = x^8', say: 'Résultat : x^8. Piège : ce n’est pas x^6 (on n’additionne pas 2 + 4).' }] },
+    { k: 'l3', label: '(2x^3)^2', steps: [
+      { f: '(2x^3)^2', say: 'Tout ce qui est dans la parenthèse est au carré : le x^3, et le 2 aussi.' },
+      { f: '2x^3 · 2x^3', say: 'Au carré, c’est 2 fois le bloc 2x^3.' },
+      { f: '2 · 2 · x^3 · x^3', say: 'Dans une multiplication, on peut changer l’ordre : les nombres ensemble, les x ensemble.' },
+      { f: '(2x^3)^2 = 4x^6', say: '2 · 2 = 4 et x^3 · x^3 = x^6. Avec la règle (ab)^n = a^n b^n : 2^2 · (x^3)^2 = 4x^6. Piège fréquent : écrire 2x^6.' }] },
+    { k: 'l4', label: 'x^7 ÷ x^2', steps: [
+      { f: 'x^7 ÷ x^2', say: 'Un quotient de même base (avec x ≠ 0).' },
+      { f: '(x · x · x · x · x · x · x) ÷ (x · x)', say: 'On écrit les facteurs : 7 en haut, 2 en bas.' },
+      { f: 'x^{7−2}', say: 'On simplifie 2 paires, car x ÷ x = 1. Il reste 7 − 2 = 5 facteurs.' },
+      { f: 'x^7 ÷ x^2 = x^5', say: 'Résultat : x^5. Contrôle avec x = 2 : 128 ÷ 4 = 32 = 2^5.' }] },
+    { k: 'l5', label: '3x^2 · 4x^5', steps: [
+      { f: '3x^2 · 4x^5', say: 'Deux monômes : un nombre devant, une puissance de x derrière.' },
+      { f: '3 · 4 · x^2 · x^5', say: 'On change l’ordre : les nombres ensemble, les puissances de x ensemble.' },
+      { f: '12 · x^{2+5}', say: 'Les nombres se multiplient : 3 · 4 = 12. Les exposants s’additionnent : 2 + 5.' },
+      { f: '3x^2 · 4x^5 = 12x^7', say: 'Résultat : 12x^7. Piège : on multiplie les nombres (12), mais on additionne les exposants (7).' }] },
+    { k: 'l6', label: '(x^3y)^2', steps: [
+      { f: '(x^3y)^2', say: 'Deux lettres dans la parenthèse : chacune est élevée au carré.' },
+      { f: '(x^3)^2 · y^2', say: 'Règle (ab)^n = a^n b^n.' },
+      { f: '(x^3y)^2 = x^6y^2', say: '(x^3)^2 = x^{3·2} = x^6, et y^2 reste y^2.' }] },
+    { k: 'l7', label: 'x^{−2} · x^5', steps: [
+      { f: 'x^{−2} · x^5', say: 'Un exposant négatif : la règle du produit marche aussi (x ≠ 0).' },
+      { f: 'x^{−2+5}', say: 'On additionne les exposants : −2 + 5 = 3.' },
+      { f: 'x^{−2} · x^5 = x^3', say: 'Résultat : x^3. Autre façon : x^{−2} = 1/x^2, et x^5 ÷ x^2 = x^3. Même résultat !' }] }
+  ];
+  var ltCur = 0;
+  $('ltBtns').innerHTML = LET.map(function (L, i) { return '<button type="button" class="ex" data-i="' + i + '" aria-pressed="' + (i === 0 ? 'true' : 'false') + '">' + fmt(L.label) + '</button>'; }).join('');
+  var LT = makeStepper({ id: 'lt', doneTitle: 'Expression simplifiée', get: function () { return LET[ltCur].steps.map(function (s, i, A) { return { vis: big(fmt(s.f)), say: fmt(s.say), done: i === A.length - 1 }; }); } });
+  $('ltBtns').addEventListener('click', function (ev) {
+    var b = ev.target.closest('button'); if (!b) return;
+    ltCur = clamp(b.getAttribute('data-i'), LET.length);
+    $('ltBtns').querySelectorAll('button').forEach(function (x, k) { x.setAttribute('aria-pressed', k === ltCur ? 'true' : 'false'); });
+    LT.restart();
+  });
+
+  /* ---------- Étape 10 : notation scientifique (mantisses en dixièmes entiers, calcul exact) ---------- */
+  function sci(m, e) { return m + ' × 10^{' + ex(e) + '}'; }
+  function sciSteps(c) {
+    var mA = decStr(c.A, 1), mB = decStr(c.B, 1), S = [], isX = c.op === 'x', op = isX ? '×' : '÷', M, e, e0;
+    var start = '(' + sci(mA, c.ea) + ') ' + op + ' (' + sci(mB, c.eb) + ')';
+    S.push({ f: start, say: 'Deux nombres en notation scientifique. On veut ' + (isX ? 'leur produit' : 'leur quotient') + ', en notation scientifique aussi.' });
+    S.push({ f: '(' + mA + ' ' + op + ' ' + mB + ') × (10^{' + ex(c.ea) + '} ' + op + ' 10^{' + ex(c.eb) + '})', say: isX ? 'Dans une multiplication, on peut changer l’ordre : les nombres ensemble, les puissances de 10 ensemble.' : 'On divise les nombres entre eux, et les puissances de 10 entre elles.' });
+    if (isX) {
+      var Pn = c.A * c.B; e0 = c.ea + c.eb;
+      S.push({ f: sci(decStr(Pn, 2), e0), say: mA + ' × ' + mB + ' = ' + decStr(Pn, 2) + '. Et 10^{' + ex(c.ea) + '} × 10^{' + ex(c.eb) + '} = 10^{' + c.ea + ' + ' + par(c.eb) + '} = 10^{' + ex(e0) + '} : on additionne les exposants.' });
+      if (Pn >= 1000) {
+        M = decStr(Pn, 3); e = e0 + 1;
+        S.push({ f: M + ' × 10^1 × 10^{' + ex(e0) + '} = ' + sci(M, e), say: decStr(Pn, 2) + ' n’est pas entre 1 et 10. On écrit ' + decStr(Pn, 2) + ' = ' + M + ' × 10^1, puis 10^1 × 10^{' + ex(e0) + '} = 10^{' + ex(e) + '} : l’exposant augmente de 1.' });
+      } else { M = decStr(Pn, 2); e = e0; }
+    } else {
+      var Q = c.A * 100 / c.B; e0 = c.ea - c.eb;
+      S.push({ f: sci(decStr(Q, 2), e0), say: mA + ' ÷ ' + mB + ' = ' + decStr(Q, 2) + '. Et 10^{' + ex(c.ea) + '} ÷ 10^{' + ex(c.eb) + '} = 10^{' + c.ea + ' − ' + par(c.eb) + '} = 10^{' + ex(e0) + '} : on soustrait les exposants.' });
+      if (Q < 100) {
+        M = decStr(Q, 1); e = e0 - 1;
+        S.push({ f: M + ' × 10^{−1} × 10^{' + ex(e0) + '} = ' + sci(M, e), say: decStr(Q, 2) + ' est plus petit que 1. On écrit ' + decStr(Q, 2) + ' = ' + M + ' × 10^{−1}, puis l’exposant baisse de 1.' });
+      } else { M = decStr(Q, 2); e = e0; }
+    }
+    S.push({ done: true, f: start + ' = ' + sci(M, e), say: 'Résultat : ' + sci(M, e) + '. Contrôle : ' + M + ' est bien entre 1 et 10.' });
+    return { steps: S, M: M, e: e };
+  }
+  function sciRandom() {
+    var op = Math.random() < .5 ? 'x' : 'd', A, B, tries = 0;
+    do { A = rint(10, 99); B = rint(10, 99); tries++; } while (op === 'd' && (A * 100) % B !== 0 && tries < 500);
+    if (op === 'd' && (A * 100) % B !== 0) { A = 60; B = 30; }
+    return { op: op, A: A, ea: rint(-9, 12), B: B, eb: rint(-9, 12) };
+  }
+  var SCP = [{ op: 'x', A: 30, ea: 4, B: 20, eb: 5 }, { op: 'd', A: 60, ea: 8, B: 30, eb: 2 }, { op: 'x', A: 50, ea: 3, B: 40, eb: 2 }];
+  var scCur = SCP[0], scSel = 0;
+  function scBtns() {
+    $('scBtns').innerHTML = SCP.map(function (c, i) { return '<button type="button" data-i="' + i + '" aria-pressed="' + (i === scSel ? 'true' : 'false') + '">Exemple ' + (i + 1) + '</button>'; }).join('') + '<button type="button" id="scNew" data-i="new">Autre calcul</button>';
+  }
+  scBtns();
+  var SC = makeStepper({ id: 'sc', doneTitle: 'Calcul terminé', get: function () { return sciSteps(scCur).steps.map(function (s) { return { vis: big(fmt(s.f)), say: fmt(s.say), done: !!s.done }; }); } });
+  $('scBtns').addEventListener('click', function (ev) {
+    var b = ev.target.closest('button'); if (!b) return;
+    var v = b.getAttribute('data-i');
+    if (v === 'new') { scCur = sciRandom(); scSel = -1; } else { scSel = clamp(v, SCP.length); scCur = SCP[scSel]; }
+    scBtns(); SC.restart();
+  });
+
+  /* ---------- Étape 11 : préfixes ---------- */
+  var PREFIXES = [{ p: 'téra', s: 'T', e: 12 }, { p: 'giga', s: 'G', e: 9 }, { p: 'méga', s: 'M', e: 6 }, { p: 'kilo', s: 'k', e: 3 }, { p: 'centi', s: 'c', e: -2 }, { p: 'milli', s: 'm', e: -3 }, { p: 'micro', s: 'µ', e: -6 }, { p: 'nano', s: 'n', e: -9 }];
+  var prefixCards = [
+    { k: 'p1', s: 'kilo (k)', o: ['10^3', '10^6', '10^{−3}'], a: '10^3', why: 'kilo = mille = 10^3. 1 km = 1000 m.' },
+    { k: 'p2', s: 'milli (m)', o: ['10^{−3}', '10^3', '10^{−6}'], a: '10^{−3}', why: 'milli = un millième = 10^{−3}. 1 mm = 0,001 m.' },
+    { k: 'p3', s: 'méga (M)', o: ['10^9', '10^6', '10^3'], a: '10^6', why: 'méga = un million = 10^6.' },
+    { k: 'p4', s: 'micro (µ)', o: ['10^{−9}', '10^{−3}', '10^{−6}'], a: '10^{−6}', why: 'micro = un millionième = 10^{−6}.' },
+    { k: 'p5', s: 'giga (G)', o: ['10^9', '10^{12}', '10^6'], a: '10^9', why: 'giga = un milliard = 10^9.' },
+    { k: 'p6', s: 'nano (n)', o: ['10^{−6}', '10^{−9}', '10^{−12}'], a: '10^{−9}', why: 'nano = un milliardième = 10^{−9}.' },
+    { k: 'p7', s: 'téra (T)', o: ['10^{12}', '10^9', '10^{15}'], a: '10^{12}', why: 'téra = mille milliards = 10^{12}.' },
+    { k: 'p8', s: 'centi (c)', o: ['10^{−1}', '10^{−2}', '10^2'], a: '10^{−2}', why: 'centi = un centième = 10^{−2}. 1 cm = 0,01 m.' },
+    { k: 'p9', s: 'Un cheveu', q: 'Son épaisseur est d’environ 0,07 mm (un ordre de grandeur). Ça fait environ…', o: ['7 µm', '70 µm', '700 µm'], a: '70 µm', why: '1 mm = 1000 µm, donc 0,07 mm = 0,07 × 1000 µm = 70 µm. Les cheveux sont plus ou moins épais, mais l’ordre de grandeur est de quelques dizaines de micromètres.' },
+    { k: 'p10', s: 'Le Wi-Fi « 5 GHz »', q: 'Combien d’oscillations par seconde ?', o: ['5 × 10^6', '5 × 10^9', '5 × 10^{12}'], a: '5 × 10^9', why: 'giga = 10^9 : 5 GHz = 5 × 10^9 Hz, cinq milliards d’oscillations par seconde.' },
+    { k: 'p11', s: 'Un disque de 1 To', q: 'Combien d’octets ?', o: ['10^6', '10^9', '10^{12}'], a: '10^{12}', why: 'téra = 10^{12} : 1 To = 10^{12} octets, mille milliards d’octets.' },
+    { k: 'p12', s: '1 nm (nanomètre)', q: 'En mètres, c’est…', o: ['0,000 001 m', '0,000 000 001 m', '0,001 m'], a: '0,000 000 001 m', why: 'nano = 10^{−9} : 9 chiffres après la virgule, le 1 en dernier.' },
+    { k: 'p13', s: 'Genève – Lausanne : environ 60 km', q: 'En mètres, en notation scientifique ?', o: ['6 × 10^3 m', '6 × 10^4 m', '6 × 10^5 m'], a: '6 × 10^4 m', why: '60 km = 60 × 10^3 m = 60 000 m = 6 × 10^4 m.' }
+  ];
+  makeSorter({ items: prefixCards, names: null, order: [], btns: 'pfBtns', card: 'pfCard', pos: 'pfPos', out: 'pfOut', score_: 'pfScore', prev: 'pfPrev', next: 'pfNext', reset: 'pfReset', word: 'Question', score: scorer(prefixCards),
+    cardHtml: function (it) { return '<span>' + fmt(it.s) + '</span><span class="ask">' + fmt(it.q || 'Ce préfixe vaut…') + '</span>'; } });
+
+  /* ---------- Étape 12 : atelier ---------- */
+  var atelierCards = [
+    { k: 'a1', e: 1, s: '2^3 × 2^4', o: ['2^7', '2^{12}', '4^7'], a: '2^7', why: 'Même base 2 : on additionne les exposants, 3 + 4 = 7.',
+      bad: { '2^{12}': 'tu as multiplié les exposants (3 × 4). On les multiplie seulement pour une puissance de puissance, comme (2^3)^4.', '4^7': 'tu as additionné (ou multiplié) les bases : 2 + 2 = 4. La base ne change pas, on compte seulement les facteurs.' } },
+    { k: 'a2', e: 1, s: '2^7', q: 'Combien vaut ce nombre ?', o: ['128', '14', '49'], a: '128', why: '2^7 = 2 × 2 × 2 × 2 × 2 × 2 × 2 = 128.',
+      bad: { '14': 'tu as calculé 2 × 7. L’exposant compte les facteurs, il ne multiplie pas la base.', '49': 'tu as calculé 7^2 : base et exposant sont inversés.' } },
+    { k: 'a3', e: 2, s: '5^6 ÷ 5^2', o: ['5^4', '5^3', '1^4'], a: '5^4', why: 'Même base 5 : on soustrait les exposants, 6 − 2 = 4.',
+      bad: { '5^3': 'tu as divisé les exposants (6 ÷ 2). Pour un quotient, on les soustrait.', '1^4': 'tu as divisé les bases (5 ÷ 5 = 1). La base reste 5.' } },
+    { k: 'a4', e: 2, s: '5^4', q: 'Combien vaut ce nombre ?', o: ['625', '20', '1024'], a: '625', why: '5^4 = 5 × 5 × 5 × 5 = 25 × 25 = 625.',
+      bad: { '20': 'tu as calculé 5 × 4.', '1024': 'c’est 4^5 : base et exposant sont inversés.' } },
+    { k: 'a5', e: 3, s: '(3^2)^3', o: ['3^6', '3^5', '3^8'], a: '3^6', why: 'Puissance de puissance : on multiplie les exposants, 2 × 3 = 6.',
+      bad: { '3^5': 'tu as additionné les exposants (2 + 3). Or (3^2)^3 = 3^2 × 3^2 × 3^2 : 3 blocs de 2 facteurs, donc 6 facteurs.', '3^8': 'tu as calculé 2^3 = 8 avec les exposants. On les multiplie : 2 × 3 = 6.' } },
+    { k: 'a6', e: 3, s: '3^6', q: 'Combien vaut ce nombre ?', o: ['729', '243', '18'], a: '729', why: '3^3 = 27, et 3^6 = 3^3 × 3^3 = 27 × 27 = 729.',
+      bad: { '243': 'c’est 3^5, un facteur 3 de moins.', '18': 'tu as calculé 3 × 6.' } },
+    { k: 'a7', e: 4, s: 'x^3 · x^5 · x', o: ['x^9', 'x^8', 'x^{15}'], a: 'x^9', why: 'Le dernier x compte pour x^1 : 3 + 5 + 1 = 9.',
+      bad: { 'x^8': 'tu as oublié le dernier x. Il vaut x^1, donc il ajoute 1 à l’exposant.', 'x^{15}': 'tu as multiplié les exposants (3 × 5). Pour un produit, on les additionne.' } },
+    { k: 'a8', e: 5, s: '(2x^4)^3', o: ['2^3 · (x^4)^3', '2 · (x^4)^3', '6x^7'], a: '2^3 · (x^4)^3', why: 'Tout ce qui est dans la parenthèse est élevé au cube, le 2 aussi : (ab)^n = a^n b^n.',
+      bad: { '2 · (x^4)^3': 'tu as oublié d’élever le 2 au cube.', '6x^7': 'tu as calculé 2 × 3 et 4 + 3 : deux erreurs d’un coup.' } },
+    { k: 'a9', e: 5, s: '2^3 · (x^4)^3', o: ['8x^{12}', '6x^{12}', '8x^7'], a: '8x^{12}', why: '2^3 = 8 et (x^4)^3 = x^{4·3} = x^{12}.',
+      bad: { '6x^{12}': '2^3 n’est pas 2 × 3 = 6, c’est 2 × 2 × 2 = 8.', '8x^7': 'tu as additionné 4 + 3. Pour une puissance de puissance, on multiplie.' } },
+    { k: 'a10', e: 6, s: '(−2)^3 × (−2)^2', o: ['(−2)^5', '(−2)^6', '4^5'], a: '(−2)^5', why: 'Même base −2 : on additionne les exposants, 3 + 2 = 5.',
+      bad: { '(−2)^6': 'tu as multiplié les exposants (3 × 2).', '4^5': 'tu as multiplié les bases : (−2) × (−2) = 4. La base reste −2.' } },
+    { k: 'a11', e: 6, s: '(−2)^5', q: 'Combien vaut ce nombre ?', o: ['−32', '32', '−10'], a: '−32', why: '2^5 = 32 et l’exposant 5 est impair : (−2)^5 = −32.',
+      bad: { '32': 'erreur de signe : 5 facteurs négatifs, c’est un nombre impair de signes « − », le résultat est donc négatif.', '−10': 'tu as calculé −2 × 5.' } },
+    { k: 'a12', e: 7, s: 'a^2 · a^{−5}', o: ['a^{−3}', 'a^{−10}', 'a^7'], a: 'a^{−3}', why: 'Même base a : 2 + (−5) = −3.',
+      bad: { 'a^{−10}': 'tu as multiplié les exposants : 2 × (−5).', 'a^7': 'erreur de signe : tu as calculé 2 + 5 au lieu de 2 + (−5).' } },
+    { k: 'a13', e: 7, s: 'a^{−3}', q: 'Comment l’écrire sans exposant négatif ?', o: ['1/a^3', '−a^3', '−3a'], a: '1/a^3', why: 'a^{−n} = 1/a^n : un exposant négatif donne l’inverse.',
+      bad: { '−a^3': 'un exposant négatif ne rend pas le nombre négatif : il donne l’inverse.', '−3a': 'l’exposant ne multiplie pas la base : a^{−3} n’est pas −3 × a.' } },
+    { k: 'a14', e: 8, s: '(10^3 × 10^{−1}) ÷ 10^4', o: ['10^2 ÷ 10^4', '10^{−3} ÷ 10^4', '100^2 ÷ 10^4'], a: '10^2 ÷ 10^4', why: 'Dans la parenthèse, même base 10 : 3 + (−1) = 2.',
+      bad: { '10^{−3} ÷ 10^4': 'tu as multiplié les exposants : 3 × (−1).', '100^2 ÷ 10^4': 'tu as multiplié les bases (10 × 10 = 100). La base reste 10.' } },
+    { k: 'a15', e: 8, s: '10^2 ÷ 10^4', o: ['10^{−2}', '10^2', '10^6'], a: '10^{−2}', why: 'On soustrait : 2 − 4 = −2.',
+      bad: { '10^2': 'tu as calculé 4 − 2 : l’ordre compte ! C’est l’exposant du haut (du nombre divisé) moins celui du bas.', '10^6': 'tu as additionné les exposants. Pour un quotient, on les soustrait.' } },
+    { k: 'a16', e: 8, s: '10^{−2}', q: 'Quelle est son écriture décimale ?', o: ['0,01', '−100', '0,001'], a: '0,01', why: '10^{−2} = 1/10^2 = 1/100 = 0,01.',
+      bad: { '−100': 'un exposant négatif ne donne pas un nombre négatif : 10^{−2} = 1/100.', '0,001': 'c’est 10^{−3}. L’exposant −2 donne 2 chiffres après la virgule : 0,01.' } }
+  ];
+  makeSorter({ items: atelierCards, names: null, order: [], btns: 'atBtns', card: 'atCard', pos: 'atPos', out: 'atOut', score_: 'atScore', prev: 'atPrev', next: 'atNext', reset: 'atReset', word: 'Étape', score: scorer(atelierCards),
+    cardHtml: function (it) { return '<span class="ask">Expression ' + it.e + ' / 8</span><span class="expr">' + fmt(it.s) + '</span><span class="ask">' + fmt(it.q || 'Quelle est la bonne étape suivante ?') + '</span>'; } });
+
+  /* ---------- Quiz ---------- */
+  var QZ = [
+    { q: '2^3 × 2^5 = ?', o: [['a', '2^8'], ['b', '2^{15}'], ['c', '4^8']], a: 'a', how: 'Même base : on additionne les exposants, 3 + 5 = 8.' },
+    { q: '7^0 = ?', o: [['a', '0'], ['b', '1'], ['c', '7']], a: 'b', how: 'a^0 = 1 pour tout a ≠ 0.' },
+    { q: '2^{−3} = ?', o: [['a', '−8'], ['b', '1/8'], ['c', '−6']], a: 'b', how: '2^{−3} = 1/2^3 = 1/8 = 0,125. Positif !' },
+    { q: '(5^2)^3 = ?', o: [['a', '5^5'], ['b', '5^6'], ['c', '5^8']], a: 'b', how: 'Puissance de puissance : 2 × 3 = 6.' },
+    { q: '−3^2 = ?', o: [['a', '9'], ['b', '−9'], ['c', '−6']], a: 'b', how: 'Sans parenthèses, la puissance d’abord : −(3 × 3) = −9.' },
+    { q: '10^8 ÷ 10^{−2} = ?', o: [['a', '10^6'], ['b', '10^{10}'], ['c', '10^{−4}']], a: 'b', how: '8 − (−2) = 8 + 2 = 10.' },
+    { q: '(3 × 10^4) × (4 × 10^5) en notation scientifique = ?', o: [['a', '12 × 10^9'], ['b', '1,2 × 10^{10}'], ['c', '1,2 × 10^{20}']], a: 'b', how: '3 × 4 = 12 et 10^{4+5} = 10^9. Puis 12 × 10^9 = 1,2 × 10^{10} (renormaliser).' },
+    { q: '1 µm (micromètre) = ?', o: [['a', '10^{−3} m'], ['b', '10^{−6} m'], ['c', '10^6 m']], a: 'b', how: 'micro = 10^{−6} : un millionième de mètre.' }
+  ];
+  var quiz = $('quiz'), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ''; done = [];
+    QZ.forEach(function (Q, k) {
+      var li = document.createElement('li');
+      li.innerHTML = '<span>' + fmt(Q.q) + '</span><select id="qa' + k + '" aria-label="Ta réponse à la question ' + (k + 1) + '"><option value="">…</option>' + Q.o.map(function (o) { return '<option value="' + o[0] + '">' + esc(uni(o[1])) + '</option>'; }).join('') + '</select><button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+      quiz.appendChild(li);
+      function check() {
+        var fb = $('qf' + k), v = $('qa' + k).value;
+        if (!v) { fb.className = 'fb'; fb.textContent = 'Choisis une réponse.'; return; }
+        if (v === Q.a) { fb.className = 'fb ok'; fb.innerHTML = 'Bravo, c’est juste !<span>' + fmt(Q.how) + '</span>'; done[k] = true; }
+        else {
+          done[k] = false;
+          var good = Q.o.filter(function (o) { return o[0] === Q.a; })[0][1];
+          fb.className = 'fb no'; fb.innerHTML = 'Pas tout à fait : la bonne réponse est « ' + fmt(good) + ' ».<span>' + fmt(Q.how) + '</span>';
+        }
+        $('score').textContent = done.filter(Boolean).length + ' / 8';
+      }
+      $('qb' + k).addEventListener('click', check);
+      $('qa' + k).addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+    });
+    $('score').textContent = '0 / 8';
+  }
+  $('newQuiz').addEventListener('click', newQuiz);
+  newQuiz();
+
+  window.__pregles = {
+    fmt: fmt, uni: uni, pw: pw, bigStr: bigStr, decStr: decStr, fracDec: fracDec,
+    prodSteps: prodSteps, quotSteps: quotSteps, powSteps: powSteps, stairSteps: stairSteps, stairVal: stairVal, negInfo: negInfo,
+    LET: LET, sciSteps: sciSteps, sciRandom: sciRandom, SCP: SCP, PREFIXES: PREFIXES,
+    simplCards: simplCards, signCards: signCards, prefixCards: prefixCards, atelierCards: atelierCards, scorer: scorer, isOk: isOk, quiz: QZ
+  };
+})();
+</script>
+</body>
+</html>

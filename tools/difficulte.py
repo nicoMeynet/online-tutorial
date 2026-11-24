@@ -18,7 +18,7 @@ DIFF = {
     "les-equations": 2, "l-equation-produit-nul-et-les-systemes": 3, "les-inequations": 2, "les-fonctions": 3,
     "la-proportionnalite": 1, "les-pourcentages": 2, "la-vitesse": 1, "les-grandeurs-composees": 2,
     "les-conversions": 1, "les-conversions-avancees": 2, "les-echelles": 1, "les-formes-geometriques": 1, "la-sphere-et-la-boule": 2,
-    "les-angles-et-triangles": 1, "tableaux-et-diagrammes": 1, "les-fonctions-affines": 2, "mettre-en-equation": 2, "fractions-decimaux-et-pourcentages": 1, "les-nombres-decimaux": 1, "les-triangles-isometriques-et-semblables": 2, "les-operations-posees": 1, "les-constructions-a-la-regle-et-au-compas": 1, "les-projections-et-les-vues": 2, "le-cercle-et-ses-angles": 2, "les-droites-remarquables": 2, "les-quadrilateres": 1,
+    "les-angles-et-triangles": 1, "les-regles-de-calcul-des-puissances": 2, "arbres-et-tableaux-de-probabilites": 2, "tableaux-et-diagrammes": 1, "les-fonctions-affines": 2, "mettre-en-equation": 2, "fractions-decimaux-et-pourcentages": 1, "les-nombres-decimaux": 1, "les-triangles-isometriques-et-semblables": 2, "les-operations-posees": 1, "les-constructions-a-la-regle-et-au-compas": 1, "les-projections-et-les-vues": 2, "le-cercle-et-ses-angles": 2, "les-droites-remarquables": 2, "les-quadrilateres": 1,
     "le-theoreme-de-pythagore": 2, "le-theoreme-de-thales": 3, "la-trigonometrie": 3, "les-transformations": 1,
     "le-reperage": 1, "les-statistiques": 1, "les-probabilites": 2, "l-algorithmique": 1, "la-demonstration": 3,
     "le-second-degre": 3, "les-vecteurs": 3, "les-suites": 3, "la-derivee": 3, "l-integrale": 3, "les-nombres-complexes": 3,

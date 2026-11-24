@@ -22,6 +22,10 @@ DATES = maj.Dates()
 ROOT = Path(__file__).resolve().parent.parent
 
 TOPICS = [
+    ("les règles de calcul des puissances", "les-regles-de-calcul-des-puissances.html"),
+    ("les règles des puissances", "les-regles-de-calcul-des-puissances.html"),
+    ("les arbres et tableaux de probabilités", "arbres-et-tableaux-de-probabilites.html"),
+    ("arbres et tableaux de probabilités", "arbres-et-tableaux-de-probabilites.html"),
     ("les tableaux et diagrammes", "tableaux-et-diagrammes.html"),
     ("tableaux et diagrammes", "tableaux-et-diagrammes.html"),
     ("les fonctions affines", "les-fonctions-affines.html"),

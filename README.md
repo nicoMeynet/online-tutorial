@@ -16,6 +16,7 @@ La page d'accueil ([index.html](index.html)) ne montre que les matières. La pag
 | [Le théorème de Pythagore](le-theoreme-de-pythagore.html) | Le triangle rectangle et l'hypoténuse, a² + b² = c² avec les trois carrés, la preuve du puzzle, calculer un côté, la réciproque, les triplets, l'histoire et des exercices. |
 | [Le théorème de Thalès](le-theoreme-de-thales.html) | Les rapports égaux avec des parallèles, une figure à déformer (triangle et papillon), le produit en croix, la mesure de la pyramide avec un bâton, la réciproque, l'histoire de Thalès et des exercices. |
 | [Les priorités de calcul](les-priorites-de-calcul.html) | L'ordre des opérations (parenthèses, puissances, × et ÷, + et −), de gauche à droite, un calculateur pas à pas, les pièges (× caché, −3², barre de fraction), un quiz et des problèmes à mettre en calcul. |
+| [Les règles de calcul des puissances](les-regles-de-calcul-des-puissances.html) | Produit, quotient et puissance de puissance, a⁰ = 1, les exposants négatifs, les signes, la notation scientifique et les préfixes. |
 | [Les nombres décimaux](les-nombres-decimaux.html) | Dixièmes et centièmes, la droite graduée qui zoome, comparer sans se piéger, × 10 et ÷ 10, et le ticket de caisse. |
 | [Les opérations posées](les-operations-posees.html) | Additionner, soustraire, multiplier et diviser par écrit en colonnes, avec une machine qui montre chaque étape. |
 | [Les fractions](les-fractions.html) | Numérateur et dénominateur, fractions égales et simplification, comparer, les quatre opérations avec une calculatrice pas à pas, fractions, décimaux et pourcentages, un quiz en images et des exercices. |
@@ -32,6 +33,7 @@ La page d'accueil ([index.html](index.html)) ne montre que les matières. La pag
 | [Les identités remarquables](les-identites-remarquables.html) | (a + b)², (a − b)² et (a + b)(a − b) : la preuve avec des carrés, le piège a² + b², développer pas à pas, le calcul mental (99², 102 × 98), factoriser, (a + b)³ et le triangle de Pascal, un quiz. |
 | [Les fonctions](les-fonctions.html) | La machine à nombres, image et antécédent, tableau de valeurs et courbe, fonctions linéaires et affines, comparer deux forfaits, un quiz. |
 | [Les statistiques](les-statistiques.html) | Effectifs et fréquences, moyenne, médiane, étendue, moyenne pondérée, valeurs extrêmes, graphiques et graphiques trompeurs, un quiz. |
+| [Arbres et tableaux de probabilités](arbres-et-tableaux-de-probabilites.html) | Arbres pondérés, avec ou sans remise, tableau à double entrée, événement contraire, ET et OU, et compter les possibilités. |
 | [Tableaux et diagrammes](tableaux-et-diagrammes.html) | Effectifs et fréquences, regrouper en classes, barres, camembert, histogramme et courbe, choisir le bon diagramme et la boîte à moustaches. |
 | [Les probabilités](les-probabilites.html) | Vocabulaire, l'urne, la loi des grands nombres simulée, deux épreuves (arbre, somme de deux dés), les pièges, le Loto, un quiz. |
 | [Les angles et les triangles](les-angles-et-triangles.html) | Le rapporteur virtuel, la somme des angles d'un triangle, les triangles particuliers, l'inégalité triangulaire, les parallèles, les polygones, un quiz. |
