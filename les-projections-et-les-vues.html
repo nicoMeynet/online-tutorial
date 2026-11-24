@@ -1,0 +1,1343 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Les projections et les vues</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels de géométrie, encre sarcelle (la couleur d'un lac de montagne à l'ombre), marge rouge. Le soleil et les rayons sont orange, les projetés en sarcelle. */
+:root {
+  --paper: #f6faf9;
+  --grid: #e0ecea;
+  --card: #ffffff;
+  --ink: #13232a;
+  --ink-soft: #4f6469;
+  --acc: #0f766e;
+  --acc-soft: #d5f2ee;
+  --acc-mid: #7fcdc3;
+  --two: #1c64c8;
+  --two-soft: #dbe8fa;
+  --sun: #c2410c;
+  --sun-soft: #fde4d4;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --four: #7c3aed;
+  --four-soft: #ede4fd;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --warn: #b45309;
+  --warn-soft: #fbecd6;
+  --warn-ink: #92400e;
+  --tree: #2f7d4a;
+  --cube-front: #cfe9e5;
+  --cube-top: #eef8f6;
+  --cube-side: #a6d3cc;
+  --hl: #fff0a3;
+  --line: #d3e3e1;
+  --figgrid: #e2edeb;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0c1615; --grid: #152321; --card: #111d1c; --ink: #e7f3f1; --ink-soft: #a3bbb8;
+    --acc: #5eead4; --acc-soft: #123a36; --acc-mid: #2b8a7f; --two: #7fb0ff; --two-soft: #1a2a45;
+    --sun: #fb923c; --sun-soft: #3d2212; --ok: #6fd39f; --ok-soft: #173a29; --four: #c4a5ff; --four-soft: #2e2050;
+    --red: #ff7d92; --red-soft: #3a1c27; --warn: #f5a524; --warn-soft: #3d2a0c; --warn-ink: #fbbf5a;
+    --tree: #4fbf7a; --cube-front: #1f4a45; --cube-top: #2c605a; --cube-side: #163633;
+    --hl: #4b4318; --line: #263a38; --figgrid: #1a2a28;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0c1615; --grid: #152321; --card: #111d1c; --ink: #e7f3f1; --ink-soft: #a3bbb8;
+  --acc: #5eead4; --acc-soft: #123a36; --acc-mid: #2b8a7f; --two: #7fb0ff; --two-soft: #1a2a45;
+  --sun: #fb923c; --sun-soft: #3d2212; --ok: #6fd39f; --ok-soft: #173a29; --four: #c4a5ff; --four-soft: #2e2050;
+  --red: #ff7d92; --red-soft: #3a1c27; --warn: #f5a524; --warn-soft: #3d2a0c; --warn-ink: #fbbf5a;
+  --tree: #4fbf7a; --cube-front: #1f4a45; --cube-top: #2c605a; --cube-side: #163633;
+  --hl: #4b4318; --line: #263a38; --figgrid: #1a2a28;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+@media (max-width: 520px) { .page { gap: 44px; padding-block: 28px 64px; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero-top { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+.hero-top svg { width: 170px; height: auto; flex: none; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+@media (max-width: 520px) { .box { padding: 14px; } }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note.blue { border-left-color: var(--two); background: var(--two-soft); }
+.note.sun { border-left-color: var(--sun); background: var(--sun-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 8px 12px; min-height: 44px; min-width: 44px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); touch-action: manipulation; }
+button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+button:disabled { opacity: .45; cursor: default; transform: none; box-shadow: 3px 3px 0 var(--ink); }
+button.right, button.right:disabled { background: var(--ok-soft); border-color: var(--ok); color: var(--ok); opacity: 1; }
+button.wrong, button.wrong:disabled { background: var(--red-soft); border-color: var(--red); color: var(--red); opacity: 1; }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.btns .lbl { font-family: var(--f-mono); font-size: .8rem; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .08em; }
+.choice button { flex: 1 1 130px; }
+.choice button:disabled:not(.right):not(.wrong) { opacity: .55; }
+.pad button { font-size: 1.2rem; }
+input[type="text"] { font: inherit; font-family: var(--f-mono); font-size: 1.05rem; padding: 8px 10px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; }
+input[type="range"] { width: 100%; accent-color: var(--acc); min-height: 36px; }
+.param { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.param label { font-weight: 700; }
+.sliders { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 18px; }
+.sliders.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (max-width: 600px) { .sliders, .sliders.three { grid-template-columns: 1fr; } }
+
+/* Figures à carreaux (1 carreau = 1 cm sur les figures de 480 px de large) */
+.fig { display: block; width: 100%; height: auto; background-color: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; overflow: hidden;
+  background-image: linear-gradient(var(--figgrid) 1px, transparent 1px), linear-gradient(90deg, var(--figgrid) 1px, transparent 1px); background-size: 6.25% 8.3333%; }
+.fig.g10 { background-size: 6.25% 10%; }
+.fig.plain { background-image: none; }
+.fig .handle { cursor: grab; touch-action: none; }
+.fig .handle:active { cursor: grabbing; }
+.fig.tap { cursor: crosshair; }
+.hint { font-size: .9rem; color: var(--ink-soft); }
+
+.results { display: flex; flex-direction: column; gap: 8px; font-variant-numeric: tabular-nums; }
+.res { border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 12px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; align-items: baseline; }
+.res-name { font-family: var(--f-display); font-weight: 700; }
+.res-val { font-family: var(--f-mono); font-weight: 600; color: var(--acc); font-size: 1.05rem; white-space: nowrap; }
+.res-calc { grid-column: 1 / -1; font-family: var(--f-mono); font-size: .9rem; color: var(--ink-soft); overflow-wrap: anywhere; }
+.res.c2 .res-name { color: var(--two); } .res.c3 .res-name { color: var(--sun); } .res.c4 .res-name { color: var(--four); }
+.verdict { border-radius: 8px; padding: 12px 14px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+.verdict:empty { display: none; }
+.verdict.yes { background: var(--ok-soft); color: var(--ok); }
+.verdict.no { background: var(--red-soft); color: var(--red); }
+.verdict.mid { background: var(--two-soft); color: var(--two); }
+.verdict span { font-weight: 400; color: var(--ink); }
+
+/* Jeux « une carte à la fois » (moteur makeSorter) */
+.fbk { border-radius: 8px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; min-width: 0; overflow-wrap: anywhere; }
+.fbk:empty { display: none; }
+.fbk.ok { background: var(--ok-soft); }
+.fbk.no { background: var(--red-soft); }
+.fbk.warn { background: var(--warn-soft); }
+.fbk strong { font-family: var(--f-display); }
+.fbk.ok strong { color: var(--ok); }
+.fbk.no strong { color: var(--red); }
+.fbk.warn strong { color: var(--warn-ink); }
+.step-n { font-family: var(--f-mono); font-size: .85rem; color: var(--ink-soft); }
+.card-big { background: var(--paper); border: 1.5px dashed var(--line); border-radius: 10px; padding: 14px; font-family: var(--f-display); font-weight: 700; font-size: 1.1rem; overflow-wrap: anywhere; display: flex; flex-direction: column; gap: 8px; }
+.card-big svg { display: block; width: 100%; height: auto; max-width: 460px; margin: 0 auto; }
+.sorter-end { margin-top: .6rem; }
+.sorter-end strong { font-size: 1.05rem; }
+
+/* Constructeur de solide */
+.builder { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 16px; align-items: center; }
+@media (max-width: 560px) { .builder { grid-template-columns: 1fr; } }
+.grid3 { display: grid; grid-template-columns: repeat(3, 60px); gap: 8px; justify-content: center; }
+.grid3 button { width: 60px; height: 60px; padding: 0; font-family: var(--f-mono); font-size: 1.4rem; }
+.grid3 button.h0 { background: var(--paper); color: var(--ink-soft); font-weight: 400; }
+.grid3 button.h1 { background: var(--cube-top); }
+.grid3 button.h2 { background: var(--cube-front); }
+.grid3 button.h3 { background: var(--acc-mid); }
+.gwrap { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.gwrap .lbl { font-family: var(--f-mono); font-size: .8rem; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .08em; }
+
+.gal { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
+.gal figure { margin: 0; display: flex; flex-direction: column; gap: 4px; align-items: center; }
+.gal svg { width: 100%; height: auto; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; }
+.gal figcaption { font-family: var(--f-mono); font-size: .8rem; color: var(--ink-soft); }
+.gal[hidden] { display: none; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; color: var(--acc); }
+
+.errs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.errs li { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--paper); }
+.errs .bad { color: var(--red); text-decoration: line-through; overflow-wrap: anywhere; }
+.errs .good { color: var(--ok); font-weight: 700; overflow-wrap: anywhere; }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 110px auto; gap: 10px; align-items: center; }
+.quiz li.ch { grid-template-columns: 1fr; }
+.quiz li > span:first-child { overflow-wrap: anywhere; min-width: 0; }
+.quiz input[type="text"] { font-size: 1rem; padding: 6px 8px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb:empty { display: none; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } .quiz li.ch { grid-template-columns: 1fr; } }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc); }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); overflow-wrap: anywhere; }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+@media (prefers-reduced-motion: reduce) { button:hover, button:active { transform: none; } }
+</style>
+
+<!--ticons--><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Tutoriels"><script src="progress.js" defer></script><script src="share.js" defer></script><!--/ticons-->
+<style id="tnav-css">
+.tnav-top { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin: 0 0 4px; }
+.tnav-home { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font-weight: 700; font-size: .95rem; text-decoration: none; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tnav-home:hover, .tnav-home:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.tnav-bottom { margin-top: 8px; display: flex; flex-direction: column; gap: 12px; }
+.tnav-bottom h2 { margin: 0; }
+.tnav-pn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tnav-pn a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--ink, #222); border-radius: 10px;
+  background: var(--card, #fff); color: var(--ink, #222); text-decoration: none; box-shadow: 3px 3px 0 var(--ink, #222); min-width: 0; }
+.tnav-pn a span { font-size: .85rem; color: var(--ink-soft, #666); }
+.tnav-pn a strong { overflow-wrap: anywhere; }
+.tnav-pn a.next { text-align: right; grid-column: 2; }
+.tnav-bottom .tnav-home { align-self: center; }
+.tnav-top [data-share] { margin-left: auto; }
+.tnav-short { display: none; }
+.tprint-h { display: none; }
+@media (max-width: 600px) { header.hero { gap: 8px !important; } header.hero > .fig, header.hero > .box.fig, header.hero .hero-top .fig { display: none !important; }
+  header.hero p.lead { font-size: 1rem !important; line-height: 1.5 !important; } header.hero > p.soft { font-size: .88rem !important; line-height: 1.45 !important; }
+  header.hero h1 { font-size: clamp(1.7rem, 8vw, 2.2rem) !important; } }
+.tprint-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 14px 0 0; }
+.tprint-row span { font-size: .9rem; opacity: .8; }
+.tprint { display: inline-flex; align-items: center; gap: 8px; min-height: 42px; padding: 8px 16px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font: inherit; font-weight: 700; cursor: pointer; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tprint:hover, .tprint:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+@media print { [data-tp-hide] { display: none !important; } html.tp-on, html.tp-on body { background: #fff !important; color: #111 !important; padding: 0 !important; margin: 0 !important; }
+  html.tp-on [data-fiche] { color: #111; } html.tp-on [data-fiche] * { color: #111 !important; background: transparent !important; box-shadow: none !important; }
+  html.tp-on .tprint-h { display: block; font-size: 1.4rem; font-weight: 800; margin: 0 0 10px; } .tprint-row { display: none !important; } }
+@media (max-width: 520px) { .tnav-top .tnav-long { display: none; } .tnav-top .tnav-short { display: inline; } .tnav-top { flex-wrap: nowrap; } .tnav-top > * { flex: none; } }
+.tnav-end { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+@media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
+.diff { font: 700 .72rem/1.2 var(--f-mono, monospace); padding: 2px 8px; border-radius: 99px; border: 1.5px solid; white-space: nowrap; }
+.diff.d1 { color: #15803d; border-color: #15803d; background: #dcf3e3; }
+.diff.d2 { color: #a15c07; border-color: #b45309; background: #fbe7cf; }
+.diff.d3 { color: #b91c1c; border-color: #b91c1c; background: #fde2e2; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root:not([data-theme="light"]) .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root:not([data-theme="light"]) .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; } }
+:root[data-theme="dark"] .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root[data-theme="dark"] .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root[data-theme="dark"] .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; }
+</style>
+</head>
+<body>
+<main class="page">
+<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="maths.html">← <span class="tnav-long">Tous les tutoriels de maths</span><span class="tnav-short">Maths</span></a><span class="diff d2" title="Difficulté : moyen">Moyen</span><button type="button" data-share hidden>Partager</button></nav><!--/tnav-->
+
+
+  <header class="hero">
+    <div class="hero-top">
+      <svg viewBox="0 0 200 150" aria-hidden="true">
+        <circle cx="30" cy="30" r="16" fill="var(--sun)"></circle>
+        <line x1="44" y1="40" x2="190" y2="140" stroke="var(--sun)" stroke-width="2.5" stroke-dasharray="6 5"></line>
+        <line x1="24" y1="60" x2="140" y2="140" stroke="var(--sun)" stroke-width="2.5" stroke-dasharray="6 5"></line>
+        <polygon points="75,138 190,138 190,142 75,142" fill="var(--ink)" fill-opacity=".4"></polygon>
+        <polygon points="75,62 60,90 90,90" fill="var(--tree)"></polygon>
+        <polygon points="75,78 55,110 95,110" fill="var(--tree)"></polygon>
+        <polygon points="75,96 50,132 100,132" fill="var(--tree)"></polygon>
+        <rect x="71" y="132" width="8" height="8" fill="var(--ink-soft)"></rect>
+        <line x1="0" y1="140" x2="200" y2="140" stroke="var(--ink)" stroke-width="3"></line>
+      </svg>
+      <div style="display:flex;flex-direction:column;gap:10px;min-width:0;flex:1 1 260px">
+        <span class="eyebrow">Tutoriel de maths · niveau 9H–11H</span>
+        <h1>Les projections et les vues</h1>
+        <p class="lead">Une ombre, un plan de chalet, une carte du monde : à chaque fois, on « aplatit » quelque chose sur une surface. C'est une projection. Voici comment ça marche, et comment dessiner un objet en 3D sur une feuille.</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · Projeter un point</span>
+    <h2>Faire tomber un point sur une droite</h2>
+    <p>Projeter un point P sur une droite d, c'est le <strong>« faire tomber »</strong> sur d par le chemin le plus direct : <span class="hl">perpendiculairement à d</span>. Le point d'arrivée s'appelle le <strong>projeté orthogonal</strong> de P sur d. On le note souvent H.</p>
+    <p>« Orthogonal » veut dire « à angle droit ». En classe, on le trace avec l'équerre : un côté de l'équerre sur d, l'autre qui passe par P.</p>
+    <div class="box">
+      <div class="btns" id="w1Lines" role="group" aria-label="Choisir la droite d"></div>
+      <svg class="fig g10" id="w1" viewBox="0 0 480 300" role="img" aria-label="Un point P, une droite d et le projeté H de P sur d, avec l'angle droit"></svg>
+      <p class="hint">Fais glisser P, ou utilise les flèches. 1 carreau = 1 cm.</p>
+      <div class="btns pad" role="group" aria-label="Déplacer P">
+        <span class="lbl">Déplacer P</span>
+        <button type="button" id="w1L" aria-label="P vers la gauche">←</button>
+        <button type="button" id="w1R" aria-label="P vers la droite">→</button>
+        <button type="button" id="w1U" aria-label="P vers le haut">↑</button>
+        <button type="button" id="w1D" aria-label="P vers le bas">↓</button>
+        <button type="button" id="w1New">Autre position</button>
+      </div>
+      <div class="results" id="w1Out" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · La distance à une droite</span>
+    <h2>Le chemin le plus court</h2>
+    <p>Tu es au bord du Léman et tu veux toucher l'eau le plus vite possible. Tu ne marches pas en biais : tu vas tout droit, perpendiculairement au rivage.</p>
+    <p>C'est une règle générale : <span class="hl">la distance d'un point P à une droite d, c'est la longueur PH</span>, où H est le projeté de P. Pour tout autre point M de d, PM est plus long. Pourquoi ? Le triangle PHM est rectangle en H, donc PM² = PH² + HM² : c'est le théorème vu dans le tutoriel sur <a class="tlink" href="le-theoreme-de-pythagore.html">le théorème de Pythagore</a>. Et PM est l'hypoténuse, le plus grand côté.</p>
+    <div class="box">
+      <svg class="fig g10" id="w2" viewBox="0 0 480 300" role="img" aria-label="Le point P, son projeté H sur la droite et un autre point M de la droite"></svg>
+      <div class="sliders">
+        <div class="param"><label for="w2t">Position de M : <span class="mono" id="w2tOut">3</span> cm de H</label><input id="w2t" type="range" min="-7" max="7" step="0.5" value="3"></div>
+        <div class="param"><label for="w2h">Distance PH : <span class="mono" id="w2hOut">4</span> cm</label><input id="w2h" type="range" min="1" max="7" step="1" value="4"></div>
+      </div>
+      <p class="hint">Tu peux aussi faire glisser M sur la droite. Le cercle pointillé a pour rayon PH : il ne touche la droite qu'en H.</p>
+      <div class="results" id="w2Out" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Projeter un segment</span>
+    <h2>Un segment qui rétrécit</h2>
+    <p>Pour projeter un segment [AB] sur une droite d, on projette ses deux extrémités : on obtient le segment [A′B′]. Plus [AB] est penché par rapport à d, plus [A′B′] est court.</p>
+    <p>Il existe une formule : <span class="mono">A′B′ = AB × cos α</span>, où α est l'angle entre [AB] et d. Le « cos » (cosinus) est une touche de la calculatrice ; tu le découvriras dans le tutoriel sur <a class="tlink" href="la-trigonometrie.html">la trigonométrie</a>. Pour l'instant, retiens deux cas faciles : à 0°, rien ne change ; à 90°, le segment devient un point.</p>
+    <div class="box">
+      <div class="btns" id="w3Pre" role="group" aria-label="Angles prêts à l'emploi"></div>
+      <svg class="fig" id="w3" viewBox="0 0 480 360" role="img" aria-label="Un segment AB penché et son projeté A′B′ sur la droite d"></svg>
+      <div class="sliders">
+        <div class="param"><label for="w3a">Angle α : <span class="mono" id="w3aOut">40°</span></label><input id="w3a" type="range" min="0" max="90" step="5" value="40"></div>
+        <div class="param"><label for="w3L">Longueur AB : <span class="mono" id="w3LOut">6</span> cm</label><input id="w3L" type="range" min="2" max="9" step="1" value="6"></div>
+      </div>
+      <div class="results" id="w3Out" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · Les coordonnées</span>
+    <h2>Projeter sur les axes</h2>
+    <p>Tu connais déjà une projection sans le savoir ! Dans un repère, l'<strong>abscisse</strong> d'un point P, c'est l'endroit où tombe P quand on le projette sur l'axe horizontal. L'<strong>ordonnée</strong>, c'est pareil sur l'axe vertical. On en parle en détail dans le tutoriel sur <a class="tlink" href="le-reperage.html">le repérage</a>.</p>
+    <div class="box">
+      <svg class="fig g10 tap" id="w4" viewBox="0 0 480 300" role="img" aria-label="Un repère et un point P avec ses projetés sur les deux axes"></svg>
+      <p class="hint">Touche le quadrillage pour placer P, ou utilise les flèches.</p>
+      <div class="btns pad" role="group" aria-label="Déplacer P">
+        <button type="button" id="w4L" aria-label="P vers la gauche">←</button>
+        <button type="button" id="w4R" aria-label="P vers la droite">→</button>
+        <button type="button" id="w4U" aria-label="P vers le haut">↑</button>
+        <button type="button" id="w4D" aria-label="P vers le bas">↓</button>
+        <button type="button" id="w4Dare">Nouveau défi</button>
+      </div>
+      <div class="results" id="w4Out" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · L'ombre au soleil</span>
+    <h2>Des rayons parallèles</h2>
+    <p>Le Soleil est si loin que ses rayons arrivent sur un pré presque <strong>parallèles</strong> entre eux. L'ombre d'un sapin est donc une <strong>projection parallèle</strong> sur le sol : chaque point du sapin est « poussé » jusqu'au sol en suivant la direction des rayons.</p>
+    <p>La longueur de l'ombre dépend de la <strong>hauteur du soleil</strong>, l'angle entre les rayons et l'horizon. Vers Lausanne, à midi, le soleil monte à environ 20° fin décembre et à environ 67° fin juin.</p>
+    <div class="box">
+      <div class="btns" id="w5Pre" role="group" aria-label="Moments de la journée"></div>
+      <svg class="fig plain" id="w5" viewBox="0 0 480 280" role="img" aria-label="Un sapin de 10 m, les rayons du soleil et son ombre sur le sol"></svg>
+      <div class="param"><label for="w5h">Hauteur du soleil : <span class="mono" id="w5hOut">30°</span></label><input id="w5h" type="range" min="15" max="80" step="1" value="30"></div>
+      <div class="results" id="w5Out" aria-live="polite"></div>
+    </div>
+    <div class="note sun">
+      <span class="note-title">À 45°, l'ombre est aussi longue que l'objet</span>
+      <span>Et au même moment, toutes les ombres sont <strong>proportionnelles</strong> aux hauteurs : si un bâton de 1 m fait une ombre de 1,5 m, un sapin de 10 m fait une ombre de 15 m.</span>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · L'ombre d'une lampe</span>
+    <h2>Des rayons qui partent d'un point</h2>
+    <p>Un réverbère, une bougie ou le phare de ton vélo envoient la lumière depuis <strong>un seul point</strong>. Les rayons s'écartent : l'ombre est une <strong>projection centrale</strong>. Le point lumineux est le <strong>centre</strong> de la projection.</p>
+    <p>Différence avec le soleil : ici, <span class="hl">plus tu t'éloignes de la lampe, plus ton ombre s'allonge</span>. Le calcul vient des triangles emboîtés du tutoriel sur <a class="tlink" href="le-theoreme-de-thales.html">le théorème de Thalès</a> : ombre = 1,5 × d ÷ (H − 1,5) pour Léa, qui mesure 1,5 m.</p>
+    <div class="box">
+      <div class="btns" id="w6Pre" role="group" aria-label="Positions de Léa"></div>
+      <svg class="fig plain" id="w6" viewBox="0 0 480 290" role="img" aria-label="Un réverbère, Léa et son ombre sur le trottoir"></svg>
+      <div class="sliders">
+        <div class="param"><label for="w6d">Distance de Léa au poteau : <span class="mono" id="w6dOut">6</span> m</label><input id="w6d" type="range" min="0" max="10" step="0.5" value="6"></div>
+        <div class="param"><label for="w6H">Hauteur de la lampe : <span class="mono" id="w6HOut">4,5</span> m</label><input id="w6H" type="range" min="3" max="8" step="0.5" value="4.5"></div>
+      </div>
+      <div class="results" id="w6Out" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Les vues d'un solide</span>
+    <h2>De face, de dessus, de côté</h2>
+    <p>Un architecte qui dessine un chalet ne fait pas une photo : il dessine des <strong>vues</strong>. Chaque vue est une projection parallèle de l'objet sur une feuille, en regardant bien en face d'un côté.</p>
+    <p>Pour un solide fait de cubes : la <strong>vue de face</strong> montre la hauteur de chaque colonne ; la <strong>vue de dessus</strong> montre la place occupée au sol ; la <strong>vue de droite</strong> montre la profondeur et la hauteur. Attention : sur la vue de droite, l'avant du solide se trouve <strong>à gauche</strong> du dessin.</p>
+    <div class="box">
+      <div class="btns" id="w7Views" role="group" aria-label="Choisir la vue"></div>
+      <svg class="fig plain" id="w7" viewBox="0 0 480 260" role="img" aria-label="Un solide en cubes, dessiné en perspective, et la vue choisie"></svg>
+      <div class="btns"><button type="button" id="w7Next">Autre solide</button><span class="hint" id="w7Info"></span></div>
+    </div>
+    <div class="box">
+      <h3>Jeu : quelle vue ?</h3>
+      <div class="btns"><span class="score" id="vsScore"></span><span class="step-n" id="vsPos"></span></div>
+      <div class="card-big" id="vsCard" aria-live="polite"></div>
+      <div class="btns choice" id="vsBtns" role="group" aria-label="Choisir la vue"></div>
+      <div class="fbk" id="vsOut" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="vsPrev">← Précédent</button><button type="button" id="vsNext">Suivant →</button><button type="button" id="vsReset">Recommencer</button></div>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Le chemin inverse</span>
+    <h2>Retrouver un solide à partir de ses vues</h2>
+    <p>Une vue seule ne suffit pas : la vue de face ne dit rien de la profondeur. Avec les trois vues, on peut en général reconstruire le solide. Mais parfois, <span class="hl">deux solides différents ont les mêmes trois vues</span> !</p>
+    <div class="box">
+      <h3>Construis le solide</h3>
+      <svg class="fig plain" id="w9T" viewBox="0 0 480 165" role="img" aria-label="Les trois vues du solide à construire"></svg>
+      <p class="hint">Les trois vues à obtenir. Dessus : l'avant est en bas. Droite : l'avant est à gauche.</p>
+      <div class="builder">
+        <div class="gwrap">
+          <span class="lbl">arrière</span>
+          <div class="grid3" id="w9Grid" role="group" aria-label="Le sol vu de dessus : touche une case pour ajouter un cube"></div>
+          <span class="lbl">avant</span>
+        </div>
+        <svg class="fig plain" id="w9S" viewBox="0 0 300 200" role="img" aria-label="Ton solide dessiné en perspective"></svg>
+      </div>
+      <p class="hint">Chaque case est un emplacement au sol, vu de dessus. Touche-la pour empiler un cube (0, 1, 2, 3, puis on recommence à 0).</p>
+      <div class="btns"><button type="button" id="w9New">Autre énigme</button><button type="button" id="w9Clear">Tout effacer</button></div>
+      <div class="results" id="w9Out" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Dessiner en 3D</span>
+    <h2>La perspective cavalière</h2>
+    <p>Pour dessiner un pavé (une boîte) sur une feuille, les maths utilisent la <strong>perspective cavalière</strong>, qui est encore une projection parallèle :</p>
+    <p>• la face de devant est dessinée <strong>en vraie grandeur</strong> ;<br>• les arêtes qui partent vers l'arrière, les <strong>fuyantes</strong>, sont tracées en biais, souvent à <strong>45°</strong> ;<br>• elles sont raccourcies : on multiplie leur longueur par un <strong>coefficient</strong>, souvent <strong>0,5</strong> ;<br>• les arêtes cachées sont en <strong>pointillés</strong>.</p>
+    <div class="box">
+      <div class="btns" id="w10Mode" role="group" aria-label="Type de perspective"></div>
+      <div class="btns" id="w10Ang" role="group" aria-label="Angle des fuyantes"></div>
+      <div class="btns" id="w10Coef" role="group" aria-label="Coefficient de réduction"></div>
+      <svg class="fig" id="w10" viewBox="0 0 480 360" role="img" aria-label="Un pavé dessiné en perspective"></svg>
+      <div class="sliders three">
+        <div class="param"><label for="w10L">Longueur : <span class="mono" id="w10LOut">6</span> cm</label><input id="w10L" type="range" min="1" max="8" step="1" value="6"></div>
+        <div class="param"><label for="w10H">Hauteur : <span class="mono" id="w10HOut">3</span> cm</label><input id="w10H" type="range" min="1" max="5" step="1" value="3"></div>
+        <div class="param"><label for="w10P">Profondeur : <span class="mono" id="w10POut">4</span> cm</label><input id="w10P" type="range" min="1" max="6" step="1" value="4"></div>
+      </div>
+      <div class="results" id="w10Out" aria-live="polite"></div>
+    </div>
+    <div class="note blue">
+      <span class="note-title">Et ce que voient tes yeux ?</span>
+      <span>Ton œil, lui, fait une <strong>projection centrale</strong> : les objets lointains paraissent plus petits. Sur un quai de gare CFF, les rails parallèles semblent se rejoindre au loin, en un <strong>point de fuite</strong>. Les peintres l'utilisent depuis la Renaissance. Essaie le bouton « Perspective centrale » ci-dessus.</span>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · Les patrons du cube</span>
+    <h2>Six carrés qui se replient</h2>
+    <p>Un <strong>patron</strong>, c'est la boîte dépliée et posée à plat. Pour un cube, il faut 6 carrés reliés par leurs côtés. Mais attention : <span class="hl">sur les 35 façons de coller 6 carrés, seules 11 se replient en cube</span>. Les autres se chevauchent ou laissent un trou.</p>
+    <div class="box">
+      <h3>Jeu : est-ce un patron de cube ?</h3>
+      <div class="btns"><span class="score" id="ntScore"></span><span class="step-n" id="ntPos"></span></div>
+      <div class="card-big" id="ntCard" aria-live="polite"></div>
+      <div class="btns choice" id="ntBtns" role="group" aria-label="Est-ce un patron de cube ?"></div>
+      <div class="fbk" id="ntOut" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="ntPrev">← Précédent</button><button type="button" id="ntNext">Suivant →</button><button type="button" id="ntReset">Recommencer</button></div>
+    </div>
+    <div class="box">
+      <div class="btns"><button type="button" id="galBtn" aria-pressed="false" aria-controls="gal">Montrer les 11 patrons</button></div>
+      <div class="gal" id="gal" hidden></div>
+      <p class="hint">Les carrés de même couleur deviennent des faces opposées du cube : elles ne se touchent jamais sur le patron.</p>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · La Terre sur une carte</span>
+    <h2>Aplatir une sphère</h2>
+    <p>Essaie d'aplatir une peau d'orange sans la déchirer ni l'étirer : impossible ! Pour la Terre, c'est pareil. <span class="hl">Toute carte du monde déforme quelque chose</span> : les surfaces, les angles ou les distances.</p>
+    <p>La carte de Mercator (1569) garde les angles, très pratique pour les marins. Mais elle étire tout ce qui est loin de l'équateur. Les points y sont placés grâce à la latitude et la longitude, comme les coordonnées de l'étape 4.</p>
+    <div class="box">
+      <div class="btns" id="w12Pre" role="group" aria-label="Choisir une latitude"></div>
+      <svg class="fig plain" id="w12" viewBox="0 0 480 300" role="img" aria-label="Carte de Mercator : un même pays dessiné à l'équateur et plus au nord"></svg>
+      <div class="param"><label for="w12l">Latitude : <span class="mono" id="w12lOut">46°</span> nord</label><input id="w12l" type="range" min="0" max="75" step="1" value="46"></div>
+      <div class="results" id="w12Out" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Et les cartes suisses ?</span>
+      <span>Pour un petit pays, on choisit une projection adaptée : celle des cartes nationales de swisstopo est réglée pour que la Suisse soit très peu déformée.</span>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Attention · Idées reçues</span>
+    <h2>Ce qu'on croit souvent</h2>
+    <div class="box">
+      <ul class="errs">
+        <li><span class="bad">La distance d'un point à une droite, on peut la mesurer en biais.</span><span class="good">On la mesure perpendiculairement : c'est PH, le plus court chemin.</span><span class="soft">Tout autre segment PM est l'hypoténuse d'un triangle rectangle, donc plus long.</span></li>
+        <li><span class="bad">Le projeté d'un segment a la même longueur que le segment.</span><span class="good">Il est plus court, sauf si le segment est parallèle à la droite.</span><span class="soft">Perpendiculaire à la droite, il devient même un simple point.</span></li>
+        <li><span class="bad">Une ombre a toujours la taille de l'objet.</span><span class="good">Au soleil, elle dépend de la hauteur du soleil ; elle est égale à l'objet seulement à 45°.</span><span class="soft">Sous une lampe, elle dépend aussi de ta distance à la lampe.</span></li>
+        <li><span class="bad">En perspective cavalière, on dessine toutes les arêtes en vraie grandeur.</span><span class="good">Seule la face de devant est en vraie grandeur ; les fuyantes sont réduites (souvent × 0,5).</span><span class="soft">Un cube de 4 cm a des fuyantes de 2 cm sur le dessin.</span></li>
+        <li><span class="bad">Avec la vue de face, on connaît tout le solide.</span><span class="good">Il faut plusieurs vues, et parfois même trois vues ne suffisent pas à le déterminer.</span></li>
+        <li><span class="bad">Six carrés collés font toujours un patron de cube.</span><span class="good">Seulement 11 dispositions sur 35 se replient en cube.</span><span class="soft">Un bloc de 2 × 2 carrés, par exemple, ne marche jamais.</span></li>
+        <li><span class="bad">Une bonne carte du monde montre les vraies surfaces des pays.</span><span class="good">On ne peut pas aplatir une sphère sans la déformer : chaque carte fait un choix.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Le savais-tu ?</span>
+    <h2>Des ombres et des vues dans l'histoire</h2>
+    <div class="cards">
+      <div class="box"><span class="tag">vers 240 av. J.-C.</span><strong>La Terre mesurée avec des ombres</strong><span class="soft">Selon les récits anciens, Ératosthène a comparé les ombres à Syène et à Alexandrie, en Égypte, le même jour. Il en a déduit une estimation du tour de la Terre.</span></div>
+      <div class="box"><span class="tag">Légende</span><strong>Thalès et la pyramide</strong><span class="soft">On raconte que Thalès a mesuré une pyramide en attendant le moment où son ombre était aussi longue que lui. À cet instant, l'ombre de la pyramide donnait sa hauteur.</span></div>
+      <div class="box"><span class="tag">Fin du XVIII<sup>e</sup> siècle</span><strong>Monge et les vues</strong><span class="soft">Le Français Gaspard Monge a développé la « géométrie descriptive » : représenter un objet par plusieurs vues sur une même feuille. C'est l'ancêtre des plans d'architectes et d'ingénieurs.</span></div>
+      <div class="box"><span class="tag">Cartes</span><strong>Le Groenland géant</strong><span class="soft">Sur une carte de Mercator, le Groenland paraît presque aussi grand que l'Afrique. En vrai, l'Afrique est environ 14 fois plus grande (environ 30 millions de km² contre environ 2,2 millions).</span></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Écris un nombre (avec une virgule si besoin, par exemple 2,5), ou choisis une réponse.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Nouvelles questions</button>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À toi de jouer</span>
+    <h2>Six exercices</h2>
+    <div class="exos">
+      <details>
+        <summary>Le plus court chemin<span class="q">P est à 8 cm de la droite d, et H est son projeté. M est un point de d à 6 cm de H. Combien mesure PM ? Est-ce plus court que PH ?</span></summary>
+        <div><span>Le triangle PHM est rectangle en H : PM² = 8² + 6² = 64 + 36 = 100, donc <strong>PM = 10 cm</strong>.</span><span>10 cm > 8 cm : PM est plus long. Le plus court reste PH = 8 cm.</span></div>
+      </details>
+      <details>
+        <summary>Le segment penché<span class="q">Un segment de 10 cm fait un angle de 60° avec la droite d. Combien mesure son projeté ? Et avec un angle de 30° ?</span></summary>
+        <div><span>À 60° : 10 × cos 60° = 10 × 0,5 = <strong>5 cm</strong>.</span><span>À 30° : 10 × cos 30° ≈ 10 × 0,866 ≈ <strong>8,66 cm</strong> (avec la calculatrice).</span></div>
+      </details>
+      <details>
+        <summary>L'ombre du sapin<span class="q">Au même moment, un bâton de 2 m fait une ombre de 3 m, et un sapin fait une ombre de 12 m. Quelle est la hauteur du sapin ?</span></summary>
+        <div><span>Au soleil, les ombres sont proportionnelles aux hauteurs. L'ombre est 3 ÷ 2 = 1,5 fois plus longue que l'objet.</span><span>Hauteur du sapin : 12 ÷ 1,5 = <strong>8 m</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Sous le réverbère<span class="q">Une lampe est à 4,5 m de haut. Un enfant de 1,5 m est debout à 6 m du poteau. Quelle est la longueur de son ombre ?</span></summary>
+        <div><span>Ombre = 1,5 × 6 ÷ (4,5 − 1,5) = 9 ÷ 3 = <strong>3 m</strong>.</span><span>S'il recule à 9 m du poteau : 1,5 × 9 ÷ 3 = 4,5 m. L'ombre s'allonge.</span></div>
+      </details>
+      <details>
+        <summary>Le cube en cavalière<span class="q">Tu dessines un cube de 4 cm d'arête en perspective cavalière (45°, coefficient 0,5). Quelles longueurs traces-tu ?</span></summary>
+        <div><span>La face de devant est un vrai carré de <strong>4 cm × 4 cm</strong>.</span><span>Les fuyantes mesurent 4 × 0,5 = <strong>2 cm</strong>, tracées à 45°. Les 3 arêtes cachées sont en pointillés.</span></div>
+      </details>
+      <details>
+        <summary>Combien de cubes ?<span class="q">Vue de dessus : un carré de 2 × 2 cases. Vue de face : à gauche une colonne de 2 cubes, à droite une colonne de 1 cube. Vue de droite : à l'avant 1 cube, à l'arrière 2 cubes. Combien de cubes ?</span></summary>
+        <div><span>Les 4 cases du sol ont au moins 1 cube. La colonne de 2 doit être à gauche (vue de face) et à l'arrière (vue de droite) : c'est la case arrière gauche.</span><span>Total : 2 + 1 + 1 + 1 = <strong>5 cubes</strong>.</span></div>
+      </details>
+    </div>
+  </section>
+
+  <section data-fiche><!--tprint--><p class="tprint-h">Fiche de révision · Les projections et les vues</p><!--/tprint-->    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• <strong>Projeter</strong> un point sur une droite, c'est le faire tomber perpendiculairement : on obtient son <strong>projeté orthogonal</strong> H.</span>
+      <span>• La <strong>distance</strong> d'un point P à une droite est PH : c'est le plus court chemin (Pythagore : PM² = PH² + HM²).</span>
+      <span>• Le projeté d'un segment est plus court ou égal : <strong>A′B′ = AB × cos α</strong>. Les coordonnées d'un point sont ses projetés sur les axes.</span>
+      <span>• Ombre au soleil : <strong>projection parallèle</strong> (rayons parallèles). Ombre d'une lampe : <strong>projection centrale</strong> (rayons qui partent d'un point).</span>
+      <span>• Un solide se décrit par ses <strong>vues</strong> de face, de dessus et de côté ; une seule vue ne suffit pas.</span>
+      <span>• <strong>Perspective cavalière</strong> : face avant en vraie grandeur, fuyantes à 45° réduites (× 0,5), arêtes cachées en pointillés.</span>
+      <span>• Le cube a <strong>11 patrons</strong>. Une carte plane de la Terre déforme toujours quelque chose.</span>
+    </div>
+  <!--tprint--><p class="tprint-row"><button type="button" class="tprint" data-print><span aria-hidden="true">🖨</span> Imprimer la fiche</button><span>Seulement ce résumé, sur une page.</span></p><!--/tprint-->
+</section>
+
+  <!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"><a class="prev" href="le-cercle-et-ses-angles.html"><span>← Précédent</span><strong>Le cercle et ses angles</strong></a><a class="next" href="les-constructions-a-la-regle-et-au-compas.html"><span>Suivant →</span><strong>Les constructions à la règle et au compas</strong></a></div><div class="tnav-end"><a class="tnav-home" href="maths.html">⌂ Tous les tutoriels de maths</a><button type="button" data-share hidden>Partager</button></div></nav><!--/tnav-->
+<footer>Fiche de révision · Les projections et les vues<!--tmaj--><span class="tmaj" style="display:block;margin-top:6px;font-size:.85rem;opacity:.85">Dernière mise à jour : 24 novembre 2026 · © 2026 Nicolas Meynet</span><!--/tmaj--></footer>
+</main>
+
+<script>
+(function () {
+  /* Hooks de test : window.__proj (1 unité = 1 carreau = 30 px ; y vers le bas comme en SVG sauf mention)
+     foot(P, A, u)            -> [x, y] : projeté orthogonal de P sur la droite passant par A de direction u
+     distToLine(P, A, u)      -> number : distance de P à cette droite (= longueur PH)
+     segProj(L, deg)          -> number : longueur du projeté d'un segment de longueur L faisant l'angle deg avec la droite (L × cos)
+     shadowSun(h, deg)        -> number : ombre d'un objet de hauteur h quand le soleil est à deg° (h ÷ tan)
+     shadowLamp(H, h, d)      -> number : ombre d'un objet de hauteur h à la distance d d'une lampe de hauteur H (h × d ÷ (H − h))
+     mercator(lat)            -> { len, area } : facteurs d'agrandissement des longueurs (1 / cos) et des surfaces (1 / cos²)
+     cavalier(x, y, z, k, deg)-> [X, Y] : point (x, y) de profondeur z en perspective cavalière (y vers le haut)
+     views(hm)                -> { face, top, side } ; hm[z][x] = hauteur de la pile, z = 0 rangée de devant
+     viewSquares(hm, w)       -> [[col, ligne depuis le bas]] pour w = 'face' | 'dessus' | 'droite'
+     viewKey(hm, w), ambiguousView(hm, w), sameViews(a, b), cubeCount(hm)
+     foldNet(cells)           -> faces du dé (0–5) posées sur chaque carré ; faces opposées : 0-1, 2-3, 4-5
+     isCubeNet(cells), hasBlock(cells), hexominoes() (35), cubeNets() (11)
+     VIEW_CARDS, NET_CARDS, PUZZLES, SOLIDS : données des jeux ; checkView(k, c), checkNet(k, c), viewScore(ans), netScore(ans)
+     builder : { get(), set(hm), solved() } pour le constructeur de l'étape 8 ; quiz : les 8 questions affichées
+  */
+  var S = 30;
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function clamp(i, n) { i = Math.floor(Number(i)); if (!isFinite(i)) i = 0; return Math.max(0, Math.min(n - 1, i)); }
+  function lim(v, a, b) { return Math.max(a, Math.min(b, v)); }
+  function fmt(x, d) { var r = Math.round(x * 1e6) / 1e6; if (Object.is(r, -0)) r = 0; return r.toLocaleString('fr-FR', { maximumFractionDigits: d == null ? 2 : d }).replace('-', '−'); }
+  function num(s) { var t = String(s).replace(/\s/g, '').replace(/[−–]/g, '-').replace(',', '.'); if (t === '') return NaN; var x = Number(t); return isFinite(x) ? x : NaN; }
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  function rnd(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+  function shuffle(a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  function by(list, k) { return list.filter(function (x) { return x.k === k; })[0] || null; }
+
+  /*PURE-START*/
+  function sub(P, Q) { return [P[0] - Q[0], P[1] - Q[1]]; }
+  function add(P, Q) { return [P[0] + Q[0], P[1] + Q[1]]; }
+  function mul(P, k) { return [P[0] * k, P[1] * k]; }
+  function dot(u, v) { return u[0] * v[0] + u[1] * v[1]; }
+  function dist(P, Q) { return Math.hypot(P[0] - Q[0], P[1] - Q[1]); }
+  function unit(u) { var n = Math.hypot(u[0], u[1]); return n ? [u[0] / n, u[1] / n] : [0, 0]; }
+  function perp(u) { return [-u[1], u[0]]; }
+  var RAD = Math.PI / 180;
+  function foot(P, A, u) { var t = dot(sub(P, A), u) / dot(u, u); return add(A, mul(u, t)); }
+  function distToLine(P, A, u) { return dist(P, foot(P, A, u)); }
+  function segProj(L, deg) { var c = Math.cos(deg * RAD); if (Math.abs(c) < 1e-12) c = 0; return L * c; }
+  function shadowSun(h, deg) { return h / Math.tan(deg * RAD); }
+  function shadowLamp(H, h, d) { return H > h ? h * d / (H - h) : Infinity; }
+  function mercator(lat) { var c = Math.cos(lat * RAD); return { len: 1 / c, area: 1 / (c * c) }; }
+  function cavalier(x, y, z, k, deg) { return [x + k * z * Math.cos(deg * RAD), y + k * z * Math.sin(deg * RAD)]; }
+
+  function views(hm) {
+    var nz = hm.length, nx = hm[0].length, face = [], side = [], top = [], x, z;
+    for (x = 0; x < nx; x++) { face[x] = 0; for (z = 0; z < nz; z++) face[x] = Math.max(face[x], hm[z][x]); }
+    for (z = 0; z < nz; z++) { side[z] = Math.max.apply(null, hm[z]); top[z] = hm[z].map(function (h) { return h > 0; }); }
+    return { face: face, top: top, side: side };
+  }
+  function viewSquares(hm, w) {
+    var v = views(hm), out = [];
+    if (w === 'face') v.face.forEach(function (h, x) { for (var y = 0; y < h; y++) out.push([x, y]); });
+    else if (w === 'dessus') hm.forEach(function (row, z) { row.forEach(function (h, x) { if (h > 0) out.push([x, z]); }); });
+    else v.side.forEach(function (h, z) { for (var y = 0; y < h; y++) out.push([z, y]); });
+    return out;
+  }
+  function shapeKey(sq) {
+    if (!sq.length) return '';
+    var mx = Math.min.apply(null, sq.map(function (c) { return c[0]; })), my = Math.min.apply(null, sq.map(function (c) { return c[1]; }));
+    return sq.map(function (c) { return [c[0] - mx, c[1] - my]; }).sort(function (a, b) { return a[1] - b[1] || a[0] - b[0]; }).map(function (c) { return c[0] + ',' + c[1]; }).join(' ');
+  }
+  function viewKey(hm, w) { return shapeKey(viewSquares(hm, w)); }
+  var VIEWS = ['face', 'dessus', 'droite'];
+  function ambiguousView(hm, w) { var k = viewKey(hm, w); return VIEWS.some(function (o) { return o !== w && viewKey(hm, o) === k; }); }
+  function sameViews(a, b) { return VIEWS.every(function (w) { return viewKey(a, w) === viewKey(b, w); }); }
+  function cubeCount(hm) { return hm.reduce(function (s, row) { return s + row.reduce(function (t, h) { return t + h; }, 0); }, 0); }
+
+  /* Patron : on fait rouler un dé sur les carrés ; chaque carré reçoit la face posée dessus.
+     État du dé : [dessous, dessus, nord, sud, est, ouest]. C'est un patron si les 6 carrés reçoivent 6 faces différentes. */
+  function roll(s, d) {
+    if (d[0] === 1) return [s[4], s[5], s[2], s[3], s[1], s[0]];
+    if (d[0] === -1) return [s[5], s[4], s[2], s[3], s[0], s[1]];
+    if (d[1] === -1) return [s[2], s[3], s[1], s[0], s[4], s[5]];
+    return [s[3], s[2], s[0], s[1], s[4], s[5]];
+  }
+  function foldNet(cells) {
+    var idx = {}, lab = [], st = [], seen = [], q = [0];
+    cells.forEach(function (c, i) { idx[c[0] + ',' + c[1]] = i; });
+    st[0] = [0, 1, 2, 3, 4, 5]; lab[0] = 0; seen[0] = true;
+    while (q.length) {
+      var i = q.shift(), c = cells[i];
+      [[1, 0], [-1, 0], [0, -1], [0, 1]].forEach(function (d) {
+        var j = idx[(c[0] + d[0]) + ',' + (c[1] + d[1])];
+        if (j == null || seen[j]) return;
+        seen[j] = true; st[j] = roll(st[i], d); lab[j] = st[j][0]; q.push(j);
+      });
+    }
+    return lab;
+  }
+  function isCubeNet(cells) {
+    if (cells.length !== 6) return false;
+    var lab = foldNet(cells), used = {};
+    for (var i = 0; i < 6; i++) { if (lab[i] == null || used[lab[i]]) return false; used[lab[i]] = true; }
+    return true;
+  }
+  function hasBlock(cells) {
+    var has = {}; cells.forEach(function (c) { has[c[0] + ',' + c[1]] = true; });
+    return cells.some(function (c) { return has[(c[0] + 1) + ',' + c[1]] && has[c[0] + ',' + (c[1] + 1)] && has[(c[0] + 1) + ',' + (c[1] + 1)]; });
+  }
+  function normCells(cells) {
+    var mx = Math.min.apply(null, cells.map(function (c) { return c[0]; })), my = Math.min.apply(null, cells.map(function (c) { return c[1]; }));
+    return cells.map(function (c) { return [c[0] - mx, c[1] - my]; }).sort(function (a, b) { return a[1] - b[1] || a[0] - b[0]; });
+  }
+  function canon(cells) {
+    var best = null, bestK = null;
+    for (var t = 0; t < 8; t++) {
+      var p = normCells(cells.map(function (c) { var x = c[0], y = c[1], tmp; if (t & 1) { tmp = x; x = y; y = tmp; } if (t & 2) x = -x; if (t & 4) y = -y; return [x, y]; }));
+      var k = p.map(function (c) { return c[0] + ',' + c[1]; }).join(' ');
+      if (bestK === null || k < bestK) { bestK = k; best = p; }
+    }
+    return { k: bestK, cells: best };
+  }
+  function hexominoes() {
+    var cur = [[[0, 0]]];
+    for (var n = 2; n <= 6; n++) {
+      var next = {}, list = [];
+      cur.forEach(function (poly) {
+        var has = {}; poly.forEach(function (c) { has[c[0] + ',' + c[1]] = true; });
+        poly.forEach(function (c) {
+          [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(function (d) {
+            var nc = [c[0] + d[0], c[1] + d[1]];
+            if (has[nc[0] + ',' + nc[1]]) return;
+            var cn = canon(poly.concat([nc]));
+            if (!next[cn.k]) { next[cn.k] = true; list.push(cn.cells); }
+          });
+        });
+      });
+      cur = list;
+    }
+    return cur;
+  }
+  function cubeNets() { return hexominoes().filter(isCubeNet); }
+
+  /* ---------- Données des jeux ---------- */
+  var SOLIDS = [
+    { k: 'escalier', name: 'L’escalier', hm: [[1, 0, 2], [1, 1, 1]] },
+    { k: 'tour', name: 'La tour au fond', hm: [[1, 1], [2, 1], [3, 0]] },
+    { k: 'coin', name: 'Le coin', hm: [[1, 2], [0, 1], [0, 1]] },
+    { k: 'gradins', name: 'Les gradins', hm: [[3, 2, 1]] }
+  ];
+  var VWHY = {
+    face: 'On regarde par devant : on voit la hauteur de chaque colonne, de gauche à droite, sans la profondeur.',
+    dessus: 'On regarde d’en haut : on voit la place occupée au sol (l’avant en bas), sans les hauteurs.',
+    droite: 'On regarde par la droite : on voit la profondeur et la hauteur ; l’avant du solide est à gauche du dessin.'
+  };
+  var VIEW_CARDS = [
+    { k: 'v1', s: 'tour', w: 'dessus' }, { k: 'v2', s: 'escalier', w: 'face' }, { k: 'v3', s: 'gradins', w: 'droite' }, { k: 'v4', s: 'coin', w: 'face' },
+    { k: 'v5', s: 'tour', w: 'droite' }, { k: 'v6', s: 'escalier', w: 'dessus' }, { k: 'v7', s: 'gradins', w: 'face' }, { k: 'v8', s: 'coin', w: 'droite' }
+  ].map(function (c) { var so = by(SOLIDS, c.s); return { k: c.k, hm: so.hm, w: c.w, a: c.w, why: VWHY[c.w] }; });
+  var NET_CARDS = [
+    { k: 'n1', cells: [[1, 0], [0, 1], [1, 1], [2, 1], [3, 1], [1, 2]] },
+    { k: 'n2', cells: [[0, 0], [1, 0], [2, 0], [0, 1], [1, 1], [2, 1]] },
+    { k: 'n3', cells: [[0, 0], [1, 0], [1, 1], [2, 1], [2, 2], [3, 2]] },
+    { k: 'n4', cells: [[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [2, 1]] },
+    { k: 'n5', cells: [[0, 0], [0, 1], [1, 1], [2, 1], [3, 1], [3, 2]] },
+    { k: 'n6', cells: [[0, 0], [1, 0], [0, 1], [1, 1], [2, 1], [3, 1]] },
+    { k: 'n7', cells: [[0, 0], [1, 0], [2, 0], [2, 1], [3, 1], [4, 1]] },
+    { k: 'n8', cells: [[0, 0], [1, 0], [2, 0], [0, 1], [0, 2], [0, 3]] },
+    { k: 'n9', cells: [[0, 0], [1, 0], [1, 1], [2, 1], [3, 1], [2, 2]] },
+    { k: 'n10', cells: [[0, 0], [2, 0], [0, 1], [1, 1], [2, 1], [1, 2]] },
+    { k: 'n11', cells: [[0, 0], [0, 1], [1, 1], [2, 1], [3, 1], [0, 2]] },
+    { k: 'n12', cells: [[1, 0], [0, 1], [1, 1], [2, 1], [3, 1], [2, 2]] }
+  ].map(function (c) {
+    var ok = isCubeNet(c.cells), why;
+    if (ok) why = 'Les 6 carrés se replient sans se chevaucher. Les carrés de même couleur deviennent des faces opposées.';
+    else if (hasBlock(c.cells)) why = 'Il y a un bloc de 2 × 2 carrés : autour d’un coin du cube, il n’y a que 3 faces, pas 4. En pliant, deux carrés (en rouge) tombent sur la même face.';
+    else why = 'En pliant, deux carrés (en rouge) tombent sur la même face du cube, et une autre face reste ouverte.';
+    return { k: c.k, cells: c.cells, a: ok ? 'oui' : 'non', why: why };
+  });
+  var PUZZLES = [
+    [[1, 2, 1], [0, 1, 0], [0, 0, 0]],
+    [[2, 1, 0], [1, 2, 0], [0, 0, 0]],
+    [[2, 1, 0], [1, 0, 0], [1, 0, 0]],
+    [[0, 1, 0], [1, 2, 1], [0, 1, 0]],
+    [[1, 1, 1], [1, 0, 0], [3, 0, 0]],
+    [[1, 1, 0], [1, 2, 0], [0, 2, 1]]
+  ];
+  /*PURE-END*/
+
+  /* ---------- Dessin SVG en texte ---------- */
+  function r2(v) { return Math.round(v * 100) / 100; }
+  function u2(v) { return r2(v * S); }
+  function el(n, a, t) { var s = '<' + n; for (var k in a) s += ' ' + k + '="' + a[k] + '"'; return s + (t == null ? '/>' : '>' + esc(t) + '</' + n + '>'); }
+  function TS(col) { return 'fill:' + (col || 'var(--ink)') + ';paint-order:stroke;stroke:var(--paper);stroke-width:4px;stroke-linejoin:round'; }
+  function lnP(x1, y1, x2, y2, col, w, dash) { var a = { x1: r2(x1), y1: r2(y1), x2: r2(x2), y2: r2(y2), stroke: col, 'stroke-width': w || 2, 'stroke-linecap': 'round' }; if (dash) a['stroke-dasharray'] = dash; return el('line', a); }
+  function txP(x, y, t, col, size, bold, anchor) { return el('text', { x: r2(x), y: r2(y), 'text-anchor': anchor || 'middle', 'dominant-baseline': 'central', 'font-size': size || 18, 'font-weight': bold ? 700 : 600, style: TS(col) }, t); }
+  function pgP(pts, fill, stroke, w, extra) { var a = { points: pts.map(function (p) { return r2(p[0]) + ',' + r2(p[1]); }).join(' '), fill: fill || 'none', stroke: stroke || 'none', 'stroke-width': w || 1.5, 'stroke-linejoin': 'round' }; for (var k in extra || {}) a[k] = extra[k]; return el('polygon', a); }
+  function plP(pts, col, w, dash) { var a = { points: pts.map(function (p) { return r2(p[0]) + ',' + r2(p[1]); }).join(' '), fill: 'none', stroke: col, 'stroke-width': w || 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }; if (dash) a['stroke-dasharray'] = dash; return el('polyline', a); }
+  function dotP(x, y, col, r) { return el('circle', { cx: r2(x), cy: r2(y), r: r || 6, fill: col, stroke: 'var(--card)', 'stroke-width': 2 }); }
+  function arrowP(x1, y1, x2, y2, col, w) {
+    var d = unit([x2 - x1, y2 - y1]), n = perp(d), b = [x2 - d[0] * 12, y2 - d[1] * 12];
+    return lnP(x1, y1, b[0], b[1], col, w || 3) + pgP([[x2, y2], [b[0] + n[0] * 7, b[1] + n[1] * 7], [b[0] - n[0] * 7, b[1] - n[1] * 7]], col, 'none');
+  }
+  /* versions en unités (carreaux) */
+  function seg(P, Q, col, w, dash) { return lnP(P[0] * S, P[1] * S, Q[0] * S, Q[1] * S, col, w, dash); }
+  function infl(P, dir, col, w, dash) { var d = unit(dir); return seg(add(P, mul(d, -40)), add(P, mul(d, 40)), col, w, dash); }
+  function dotp(P, col, r) { return dotP(P[0] * S, P[1] * S, col, r); }
+  function label(P, t, col, size, bold) { return txP(P[0] * S, P[1] * S, t, col, size || 20, bold !== false); }
+  function pline(pts, col, w, dash) { return plP(pts.map(function (p) { return [p[0] * S, p[1] * S]; }), col, w, dash); }
+  function rightMark(F, u, v, col) { var s = 0.4, a = add(F, mul(u, s)), b = add(a, mul(v, s)), c = add(F, mul(v, s)); return pline([a, b, c], col, 2); }
+  function handle(P, i) { return el('circle', { cx: u2(P[0]), cy: u2(P[1]), r: 26, fill: 'transparent', 'class': 'handle', 'data-i': i }); }
+  function bigPt(P, col) { return el('circle', { cx: u2(P[0]), cy: u2(P[1]), r: 9, fill: col, stroke: 'var(--card)', 'stroke-width': 2 }); }
+  function svgPt(svg, e) { var r = svg.getBoundingClientRect(), vb = svg.viewBox.baseVal; return [(e.clientX - r.left) / r.width * vb.width / S, (e.clientY - r.top) / r.height * vb.height / S]; }
+  function draggable(svg, onMove, onTap) {
+    var drag = -1;
+    svg.addEventListener('pointerdown', function (e) {
+      var t = e.target, hit = t && t.getAttribute && t.getAttribute('data-i') !== null;
+      if (hit) drag = parseInt(t.getAttribute('data-i'), 10);
+      else if (onTap) { drag = 0; onTap(svgPt(svg, e)); }
+      else return;
+      try { svg.setPointerCapture(e.pointerId); } catch (err) {}
+      e.preventDefault();
+    });
+    svg.addEventListener('pointermove', function (e) { if (drag < 0) return; onMove(drag, svgPt(svg, e)); });
+    function end(e) { if (drag >= 0) { drag = -1; try { svg.releasePointerCapture(e.pointerId); } catch (err) {} } }
+    svg.addEventListener('pointerup', end);
+    svg.addEventListener('pointercancel', end);
+  }
+  function res(cls, name, val, calc) { return '<div class="res ' + cls + '"><span class="res-name">' + name + '</span><span class="res-val">' + val + '</span>' + (calc ? '<span class="res-calc">' + calc + '</span>' : '') + '</div>'; }
+  function cm(x) { return fmt(x, 2) + ' cm'; }
+  function presetButtons(boxId, list, onPick) {
+    var box = $(boxId);
+    list.forEach(function (p, n) {
+      var b = document.createElement('button'); b.type = 'button'; b.textContent = p.name; b.setAttribute('aria-pressed', 'false');
+      b.addEventListener('click', function () { onPick(p, n); });
+      box.appendChild(b);
+    });
+    return function (n) { Array.prototype.forEach.call(box.children, function (b, m) { b.setAttribute('aria-pressed', m === n ? 'true' : 'false'); }); };
+  }
+
+  /* ---------- 1. Projeter un point ---------- */
+  var W1 = { P: [11, 2], a: 20 }, A1 = [8, 6.5];
+  var W1LINES = [{ name: 'Horizontale', a: 0 }, { name: 'Penchée', a: 20 }, { name: 'Descendante', a: -30 }, { name: 'Raide', a: 60 }];
+  function dirOf(a) { return [Math.cos(a * RAD), -Math.sin(a * RAD)]; }
+  function inBox(Q) { return Q[0] > 0.8 && Q[0] < 15.2 && Q[1] > 0.8 && Q[1] < 9.2; }
+  function renderW1() {
+    var u = dirOf(W1.a), P = W1.P, H = foot(P, A1, u), d = dist(P, H), n = unit(perp(u)), s = '';
+    s += infl(A1, u, 'var(--ink)', 3);
+    for (var t = -20; t <= 20; t += 0.25) { var Q = add(A1, mul(u, t)); if (inBox(Q)) { var side = dot(sub(P, A1), n) > 0 ? -1 : 1; s += label(add(Q, add(mul(n, 0.6 * side), mul(u, 0.4))), 'd', 'var(--ink)', 20); break; } }
+    if (d > 1e-9) {
+      s += seg(P, H, 'var(--acc)', 3, '8 6');
+      s += rightMark(H, u[0] * (P[0] - H[0]) >= 0 ? mul(u, -1) : u, unit(sub(P, H)), 'var(--acc)');
+      s += label(add(mid2(P, H), mul(u, 0.75)), fmt(d, 1) + ' cm', 'var(--acc)', 18);
+    }
+    var off = d > 1e-9 ? unit(sub(H, P)) : n;
+    s += dotp(H, 'var(--acc)', 7) + label(add(H, add(mul(off, 0.7), mul(u, -0.5))), 'H', 'var(--acc)', 20);
+    s += bigPt(P, 'var(--ink)') + label(add(P, d > 1e-9 ? mul(unit(sub(P, H)), 0.7) : mul(n, -0.7)), 'P', 'var(--ink)', 20) + handle(P, 0);
+    $('w1').innerHTML = s;
+    var out = res('', 'Distance PH', cm(d), 'H est le projeté orthogonal de P sur d : l’angle en H mesure 90°.');
+    if (d < 1e-9) out += '<div class="verdict yes">P est déjà sur la droite d.<span>Il est son propre projeté : H = P, et la distance vaut 0.</span></div>';
+    $('w1Out').innerHTML = out;
+  }
+  function mid2(P, Q) { return [(P[0] + Q[0]) / 2, (P[1] + Q[1]) / 2]; }
+  var setW1Line = presetButtons('w1Lines', W1LINES, function (p, n) { W1.a = p.a; setW1Line(n); renderW1(); });
+  function moveW1(dx, dy) { W1.P = [lim(W1.P[0] + dx, 1, 15), lim(W1.P[1] + dy, 1, 9)]; renderW1(); }
+  $('w1L').addEventListener('click', function () { moveW1(-1, 0); });
+  $('w1R').addEventListener('click', function () { moveW1(1, 0); });
+  $('w1U').addEventListener('click', function () { moveW1(0, -1); });
+  $('w1D').addEventListener('click', function () { moveW1(0, 1); });
+  $('w1New').addEventListener('click', function () { var Q; do { Q = [rnd(2, 14), rnd(1, 9)]; } while (Q[0] === W1.P[0] && Q[1] === W1.P[1]); W1.P = Q; renderW1(); });
+  draggable($('w1'), function (i, p) { var q = [lim(Math.round(p[0] * 2) / 2, 0.5, 15.5), lim(Math.round(p[1] * 2) / 2, 0.5, 9.5)]; if (q[0] === W1.P[0] && q[1] === W1.P[1]) return; W1.P = q; renderW1(); });
+  setW1Line(1); renderW1();
+
+  /* ---------- 2. La distance, le plus court chemin ---------- */
+  var W2 = { h: 4, t: 3 }, Y2 = 8.5, X2 = 8;
+  function renderW2() {
+    var h = W2.h, t = W2.t, H = [X2, Y2], P = [X2, Y2 - h], M = [X2 + t, Y2], pm = Math.sqrt(h * h + t * t), s = '';
+    $('w2tOut').textContent = fmt(Math.abs(t)); $('w2hOut').textContent = fmt(h);
+    $('w2t').value = t; $('w2h').value = h;
+    s += el('circle', { cx: u2(P[0]), cy: u2(P[1]), r: u2(h), fill: 'none', stroke: 'var(--ink-soft)', 'stroke-width': 1.5, 'stroke-dasharray': '4 5' });
+    s += seg([0, Y2], [16, Y2], 'var(--ink)', 3) + label([15.4, Y2 + 0.6], 'd', 'var(--ink)', 20);
+    if (Math.abs(t) > 1e-9) {
+      s += seg(H, M, 'var(--ink-soft)', 5);
+      s += label([X2 + t / 2, Y2 + 0.65], fmt(Math.abs(t)) + ' cm', 'var(--ink-soft)', 18);
+      s += seg(P, M, 'var(--two)', 3.5);
+      var mpm = mid2(P, M), nn = unit(perp(sub(M, P))); if (nn[1] > 0) nn = mul(nn, -1);
+      s += label(add(mpm, mul(nn, 0.7)), fmt(pm) + ' cm', 'var(--two)', 18);
+    }
+    s += seg(P, H, 'var(--acc)', 3.5) + rightMark(H, [t > 0 ? -1 : 1, 0], [0, -1], 'var(--acc)');
+    s += label([X2 + (t > 0 ? -1.3 : 1.3), Y2 - h / 2], fmt(h) + ' cm', 'var(--acc)', 18);
+    s += dotp(H, 'var(--acc)', 7) + label([X2 + (t > 0 ? -0.55 : 0.55), Y2 + 0.6], 'H', 'var(--acc)', 20);
+    s += bigPt(P, 'var(--ink)') + label([P[0], P[1] - 0.7], 'P', 'var(--ink)', 20) + handle(P, 0);
+    if (Math.abs(t) > 1e-9) s += bigPt(M, 'var(--two)') + label([M[0] + (t > 0 ? 0.5 : -0.5), Y2 + 0.65], 'M', 'var(--two)', 20) + handle(M, 1);
+    $('w2').innerHTML = s;
+    var out = res('', 'PH (la distance de P à d)', cm(h), null);
+    if (Math.abs(t) < 1e-9) out += '<div class="verdict yes">M est en H : c’est le point de d le plus proche de P.<span>PM = PH = ' + cm(h) + '. Déplace M : PM ne pourra que grandir.</span></div>';
+    else {
+      out += res('c2', 'PM', '≈ ' + cm(pm), 'PM² = PH² + HM² = ' + fmt(h * h) + ' + ' + fmt(t * t) + ' = ' + fmt(h * h + t * t) + ', donc PM = √' + fmt(h * h + t * t) + ' ≈ ' + fmt(pm));
+      out += '<div class="verdict mid">PM > PH : M est plus loin que H.<span>La différence est de ' + cm(pm - h) + '. Le plus court chemin, c’est la perpendiculaire.</span></div>';
+    }
+    $('w2Out').innerHTML = out;
+  }
+  $('w2t').addEventListener('input', function () { W2.t = parseFloat(this.value); renderW2(); });
+  $('w2h').addEventListener('input', function () { W2.h = parseFloat(this.value); renderW2(); });
+  draggable($('w2'), function (i, p) {
+    if (i === 0) { var h = lim(Math.round(Y2 - p[1]), 1, 7); if (h === W2.h) return; W2.h = h; }
+    else { var t = lim(Math.round((p[0] - X2) * 2) / 2, -7, 7); if (t === W2.t) return; W2.t = t; }
+    renderW2();
+  });
+  renderW2();
+
+  /* ---------- 3. Projeter un segment ---------- */
+  var W3 = { L: 6, a: 40 }, A3 = [3, 10], Y3 = 11;
+  var setW3 = presetButtons('w3Pre', [{ name: '0°', a: 0 }, { name: '30°', a: 30 }, { name: '60°', a: 60 }, { name: '90°', a: 90 }], function (p, n) { W3.a = p.a; $('w3a').value = p.a; renderW3(); });
+  function renderW3() {
+    var L = W3.L, a = W3.a, B = add(A3, [L * Math.cos(a * RAD), -L * Math.sin(a * RAD)]), A_ = [A3[0], Y3], B_ = [B[0], Y3], pr = segProj(L, a), s = '';
+    $('w3aOut').textContent = a + '°'; $('w3LOut').textContent = L;
+    s += seg([0, Y3], [16, Y3], 'var(--ink)', 3) + label([15.4, Y3 - 0.55], 'd', 'var(--ink)', 20);
+    s += seg(A3, A_, 'var(--acc)', 1.8, '5 5') + seg(B, B_, 'var(--acc)', 1.8, '5 5');
+    if (a < 90) { s += rightMark(B_, [-1, 0], [0, -1], 'var(--acc)'); s += rightMark(A_, [1, 0], [0, -1], 'var(--acc)'); }
+    if (a > 0 && a < 90) {
+      s += seg(A3, [A3[0] + L, A3[1]], 'var(--ink-soft)', 1.5, '3 5');
+      var arc = []; for (var i = 0; i <= 20; i++) { var th = -a * RAD * i / 20; arc.push([A3[0] + 1.4 * Math.cos(th), A3[1] + 1.4 * Math.sin(th)]); }
+      s += pline(arc, 'var(--four)', 2.5);
+      s += label([A3[0] + 2.1 * Math.cos(-a * RAD / 2), A3[1] + 2.1 * Math.sin(-a * RAD / 2)], a + '°', 'var(--four)', 18);
+    }
+    if (pr > 1e-9) s += seg(A_, B_, 'var(--acc)', 7);
+    s += seg(A3, B, 'var(--two)', 4);
+    s += dotp(A3, 'var(--two)', 7) + dotp(B, 'var(--two)', 7) + label([A3[0] - 0.6, A3[1] - 0.3], 'A', 'var(--two)', 20) + label(add(B, [0.45, -0.45]), 'B', 'var(--two)', 20);
+    s += dotp(A_, 'var(--acc)', 6) + dotp(B_, 'var(--acc)', 6);
+    if (pr > 1e-9) s += label([A_[0] - 0.55, Y3 + 0.55], 'A′', 'var(--acc)', 20) + label([B_[0] + 0.55, Y3 + 0.55], 'B′', 'var(--acc)', 20);
+    else s += label([A_[0] + 1.1, Y3 + 0.55], 'A′ = B′', 'var(--acc)', 20);
+    $('w3').innerHTML = s;
+    var c = segProj(1, a), out = res('c2', 'AB', cm(L), null);
+    out += res('', 'A′B′, le projeté', (a % 90 === 0 || a === 60 ? '' : '≈ ') + cm(pr), 'A′B′ = AB × cos ' + a + '° ' + (a === 0 || a === 60 || a === 90 ? '= ' : '≈ ') + L + ' × ' + fmt(c, 3) + (a === 0 || a === 60 || a === 90 ? ' = ' : ' ≈ ') + fmt(pr, 2) + ' cm');
+    if (a === 0) out += '<div class="verdict yes">[AB] est parallèle à d : le projeté a la même longueur.<span>A′B′ = AB = ' + cm(L) + '.</span></div>';
+    else if (a === 90) out += '<div class="verdict no">[AB] est perpendiculaire à d : le projeté est un seul point.<span>A′ et B′ sont confondus, la longueur vaut 0.</span></div>';
+    else out += '<div class="verdict mid">Le projeté est plus court que [AB].<span>' + (a === 60 ? 'Il mesure exactement la moitié de AB, car cos 60° = 0,5.' : 'Il mesure environ ' + fmt(100 * c, 0) + ' % de AB.') + '</span></div>';
+    $('w3Out').innerHTML = out;
+    setW3([0, 30, 60, 90].indexOf(a));
+  }
+  $('w3a').addEventListener('input', function () { W3.a = parseInt(this.value, 10); renderW3(); });
+  $('w3L').addEventListener('input', function () { W3.L = parseInt(this.value, 10); renderW3(); });
+  renderW3();
+
+  /* ---------- 4. Coordonnées = projetés sur les axes ---------- */
+  var W4 = { a: 3, b: 2, goal: null }, O4 = [8, 5];
+  function sc4(a, b) { return [O4[0] + a, O4[1] - b]; }
+  function coordTxt(a, b) { return '(' + fmt(a) + ' ; ' + fmt(b) + ')'; }
+  function renderW4() {
+    var a = W4.a, b = W4.b, P = sc4(a, b), Px = sc4(a, 0), Py = sc4(0, b), s = '';
+    s += arrowP(6, O4[1] * S, 474, O4[1] * S, 'var(--ink)', 2.5) + arrowP(O4[0] * S, 294, O4[0] * S, 6, 'var(--ink)', 2.5);
+    s += label([15.5, O4[1] + 0.6], 'x', 'var(--ink)', 18) + label([O4[0] + 0.5, 0.5], 'y', 'var(--ink)', 18) + label([O4[0] - 0.45, O4[1] + 0.5], 'O', 'var(--ink-soft)', 18);
+    s += lnP((O4[0] + 1) * S, (O4[1] - 0.2) * S, (O4[0] + 1) * S, (O4[1] + 0.2) * S, 'var(--ink)', 2) + lnP((O4[0] - 0.2) * S, (O4[1] - 1) * S, (O4[0] + 0.2) * S, (O4[1] - 1) * S, 'var(--ink)', 2);
+    if (W4.goal) { var G = sc4(W4.goal[0], W4.goal[1]); s += el('circle', { cx: u2(G[0]), cy: u2(G[1]), r: 13, fill: 'none', stroke: 'var(--sun)', 'stroke-width': 3, 'stroke-dasharray': '4 4' }); }
+    if (b !== 0) s += seg(P, Px, 'var(--two)', 2.5, '7 5') + rightMark(Px, [a >= 0 ? -1 : 1, 0], [0, b > 0 ? -1 : 1], 'var(--two)');
+    if (a !== 0) s += seg(P, Py, 'var(--four)', 2.5, '7 5') + rightMark(Py, [a > 0 ? 1 : -1, 0], [0, b >= 0 ? 1 : -1], 'var(--four)');
+    s += dotp(Px, 'var(--two)', 7) + dotp(Py, 'var(--four)', 7);
+    s += label([Px[0], O4[1] + (b > 0 ? 0.7 : -0.7)], fmt(a), 'var(--two)', 20);
+    s += label([O4[0] + (a > 0 ? -0.75 : 0.75), Py[1]], fmt(b), 'var(--four)', 20);
+    s += bigPt(P, 'var(--acc)') + label([P[0] + (a >= 0 ? 0.6 : -0.6), P[1] + (b >= 0 ? -0.6 : 0.6)], 'P', 'var(--acc)', 20) + handle(P, 0);
+    $('w4').innerHTML = s;
+    var out = res('', 'Coordonnées de P', coordTxt(a, b), 'Projeté sur l’axe des abscisses : ' + coordTxt(a, 0) + ' → abscisse ' + fmt(a) + '. Projeté sur l’axe des ordonnées : ' + coordTxt(0, b) + ' → ordonnée ' + fmt(b) + '.');
+    if (W4.goal) {
+      var ok = W4.goal[0] === a && W4.goal[1] === b;
+      out += ok ? '<div class="verdict yes">Bravo, P est bien en ' + coordTxt(a, b) + ' !<span>Touche « Nouveau défi » pour continuer.</span></div>'
+        : '<div class="verdict mid">Défi : place P en ' + coordTxt(W4.goal[0], W4.goal[1]) + '.<span>Son projeté sur l’axe horizontal doit tomber sur ' + fmt(W4.goal[0]) + ', et sur l’axe vertical sur ' + fmt(W4.goal[1]) + '.</span></div>';
+    }
+    $('w4Out').innerHTML = out;
+  }
+  function setW4(a, b) { a = lim(a, -7, 7); b = lim(b, -4, 4); if (a === W4.a && b === W4.b) return; W4.a = a; W4.b = b; renderW4(); }
+  $('w4L').addEventListener('click', function () { setW4(W4.a - 1, W4.b); });
+  $('w4R').addEventListener('click', function () { setW4(W4.a + 1, W4.b); });
+  $('w4U').addEventListener('click', function () { setW4(W4.a, W4.b + 1); });
+  $('w4D').addEventListener('click', function () { setW4(W4.a, W4.b - 1); });
+  $('w4Dare').addEventListener('click', function () { var g; do { g = [rnd(-6, 6), rnd(-4, 4)]; } while ((g[0] === W4.a && g[1] === W4.b) || g[0] === 0 || g[1] === 0); W4.goal = g; renderW4(); });
+  function tapW4(p) { setW4(Math.round(p[0] - O4[0]), Math.round(O4[1] - p[1])); }
+  draggable($('w4'), function (i, p) { tapW4(p); }, tapW4);
+  renderW4();
+
+  /* ---------- 5. L'ombre au soleil (sapin de 10 m) ---------- */
+  var W5 = { h: 30 }, G5 = 240, TX = 70, K5 = 9;
+  var setW5 = presetButtons('w5Pre', [{ name: 'Hiver, midi (≈ 20°)', h: 20 }, { name: '45°', h: 45 }, { name: 'Été, midi (≈ 67°)', h: 67 }], function (p) { W5.h = p.h; $('w5h').value = p.h; renderW5(); });
+  function sapin(x, g, k, hM) {
+    var top = g - k * hM, hh = k * hM, s = '';
+    s += el('rect', { x: x - 4, y: r2(g - 0.1 * hh), width: 8, height: r2(0.1 * hh), fill: 'var(--ink-soft)' });
+    s += pgP([[x, top], [x - 0.2 * hh, top + 0.36 * hh], [x + 0.2 * hh, top + 0.36 * hh]], 'var(--tree)');
+    s += pgP([[x, top + 0.22 * hh], [x - 0.27 * hh, top + 0.61 * hh], [x + 0.27 * hh, top + 0.61 * hh]], 'var(--tree)');
+    s += pgP([[x, top + 0.46 * hh], [x - 0.33 * hh, top + 0.9 * hh], [x + 0.33 * hh, top + 0.9 * hh]], 'var(--tree)');
+    return s;
+  }
+  function renderW5() {
+    var h = W5.h, sh = shadowSun(10, h), tip = TX + K5 * sh, top = G5 - K5 * 10, c = Math.cos(h * RAD), sn = Math.sin(h * RAD), s = '';
+    $('w5hOut').textContent = h + '°';
+    [tip + 90, tip + 180].forEach(function (gx) { var x0 = gx - (G5 - 10) * c / sn; s += lnP(x0, 10, gx, G5, 'var(--sun)', 2, '6 6'); });
+    var R = Math.min(150, (TX - 22) / c, (top - 22) / sn), sx = TX - c * R, sy = top - sn * R;
+    s += lnP(sx, sy, tip, G5, 'var(--sun)', 2.5, '8 5');
+    s += el('circle', { cx: r2(sx), cy: r2(sy), r: 15, fill: 'var(--sun)' });
+    s += pgP([[TX, G5 - 3], [tip, G5 - 1], [tip, G5 + 1], [TX, G5 + 3]], 'var(--ink)', 'none', 1, { 'fill-opacity': 0.45 });
+    s += lnP(0, G5, 480, G5, 'var(--ink)', 3);
+    s += sapin(TX, G5, K5, 10);
+    s += txP(TX + 34, top + 18, '10 m', 'var(--tree)', 18, true, 'start');
+    var arc = []; for (var i = 0; i <= 16; i++) { var th = Math.PI + h * RAD * i / 16; arc.push([tip + 42 * Math.cos(th), G5 + 42 * Math.sin(th)]); }
+    s += plP(arc, 'var(--sun)', 2.5);
+    var mth = Math.PI + h * RAD / 2; s += txP(tip + 66 * Math.cos(mth), G5 + 66 * Math.sin(mth), h + '°', 'var(--sun)', 18, true);
+    s += txP(lim((TX + tip) / 2, 120, 380), G5 + 24, 'ombre ≈ ' + fmt(sh, 1) + ' m', 'var(--ink)', 18, true);
+    $('w5').innerHTML = s;
+    var tv = Math.tan(h * RAD), out = res('c3', 'Ombre du sapin', '≈ ' + fmt(sh, 2) + ' m', '10 ÷ tan(' + h + '°) ≈ 10 ÷ ' + fmt(tv, 3) + ' ≈ ' + fmt(sh, 2) + ' m');
+    if (h === 45) out += '<div class="verdict yes">À 45°, l’ombre mesure exactement la hauteur du sapin : 10 m.<span>Les rayons forment un triangle rectangle isocèle avec le sapin et l’ombre.</span></div>';
+    else out += '<div class="verdict mid">L’ombre est ' + (sh > 10 ? 'plus longue' : 'plus courte') + ' que le sapin.<span>' + (sh > 10 ? 'Le soleil est bas (moins de 45°) : les ombres s’allongent, comme en hiver ou le soir.' : 'Le soleil est haut (plus de 45°) : les ombres raccourcissent, comme à midi en été.') + '</span></div>';
+    $('w5Out').innerHTML = out;
+    setW5([20, 45, 67].indexOf(h));
+  }
+  $('w5h').addEventListener('input', function () { W5.h = parseInt(this.value, 10); renderW5(); });
+  renderW5();
+
+  /* ---------- 6. L'ombre d'une lampe (Léa, 1,5 m) ---------- */
+  var W6 = { d: 6, H: 4.5 }, G6 = 250, PX = 40, K6 = 20, LEA = 1.5;
+  var setW6 = presetButtons('w6Pre', [{ name: 'Tout près (2 m)', d: 2 }, { name: '6 m', d: 6 }, { name: 'Loin (10 m)', d: 10 }], function (p) { W6.d = p.d; $('w6d').value = p.d; renderW6(); });
+  function renderW6() {
+    var d = W6.d, H = W6.H, sh = shadowLamp(H, LEA, d), xl = PX + K6 * d, tip = xl + K6 * sh, ly = G6 - K6 * H, hy = G6 - K6 * LEA, s = '';
+    $('w6dOut').textContent = fmt(d); $('w6HOut').textContent = fmt(H);
+    s += pgP([[PX, ly], [tip, G6], [PX, G6]], 'var(--sun-soft)', 'none', 1, { 'fill-opacity': 0.8 });
+    s += pgP([[xl, G6 - 3], [tip, G6 - 1], [tip, G6 + 1], [xl, G6 + 3]], 'var(--ink)', 'none', 1, { 'fill-opacity': 0.5 });
+    s += lnP(PX, ly, tip, G6, 'var(--sun)', 2.5, '8 5');
+    s += lnP(0, G6, 480, G6, 'var(--ink)', 3);
+    s += lnP(PX, G6, PX, ly, 'var(--ink-soft)', 6);
+    s += el('circle', { cx: PX, cy: r2(ly), r: 10, fill: 'var(--sun)', stroke: 'var(--ink)', 'stroke-width': 1.5 });
+    s += txP(PX + 16, ly - 14, 'H = ' + fmt(H) + ' m', 'var(--ink)', 18, true, 'start');
+    s += el('circle', { cx: r2(xl), cy: r2(hy + 5), r: 5, fill: 'var(--two)' });
+    s += lnP(xl, hy + 10, xl, G6 - 12, 'var(--two)', 4) + lnP(xl, G6 - 12, xl - 5, G6, 'var(--two)', 3.5) + lnP(xl, G6 - 12, xl + 5, G6, 'var(--two)', 3.5) + lnP(xl - 7, hy + 15, xl + 7, hy + 15, 'var(--two)', 3.5);
+    if (K6 * d > 70) s += txP((PX + xl) / 2, G6 + 22, 'd = ' + fmt(d) + ' m', 'var(--ink-soft)', 18, true);
+    if (tip - xl > 80) s += txP((xl + tip) / 2, G6 + 22, 'ombre', 'var(--ink)', 18, true);
+    $('w6').innerHTML = s;
+    var out = res('c3', 'Ombre de Léa', (Math.abs(sh * 100 - Math.round(sh * 100)) < 1e-6 ? '' : '≈ ') + fmt(sh, 2) + ' m', '1,5 × ' + fmt(d) + ' ÷ (' + fmt(H) + ' − 1,5) = ' + fmt(LEA * d) + ' ÷ ' + fmt(H - LEA) + (Math.abs(sh * 100 - Math.round(sh * 100)) < 1e-6 ? ' = ' : ' ≈ ') + fmt(sh, 2) + ' m');
+    out += res('', 'Ombre ÷ distance', '≈ ' + fmt(LEA / (H - LEA), 2), 'Pour cette lampe, l’ombre mesure toujours ' + fmt(LEA / (H - LEA), 2) + ' fois la distance au poteau : si Léa recule deux fois plus loin, son ombre est deux fois plus longue.');
+    $('w6Out').innerHTML = out;
+    setW6([2, 6, 10].indexOf(d));
+  }
+  $('w6d').addEventListener('input', function () { W6.d = parseFloat(this.value); renderW6(); });
+  $('w6H').addEventListener('input', function () { W6.H = parseFloat(this.value); renderW6(); });
+  renderW6();
+
+  /* ---------- 7. Les vues d'un solide ---------- */
+  var CAV = 0.5 * Math.SQRT1_2;
+  function solidBox(hm) { var nz = hm.length, nx = hm[0].length, mh = Math.max.apply(null, hm.map(function (r) { return Math.max.apply(null, r); })); return { nx: nx, nz: nz, mh: Math.max(mh, 1), w: nx + CAV * nz, h: Math.max(mh, 1) + CAV * nz }; }
+  function solidSvg(hm, ox, oy, u, hl) {
+    var s = '', nz = hm.length, nx = hm[0].length, x, y, z;
+    function P(x, y, z) { return [ox + (x + CAV * z) * u, oy - (y + CAV * z) * u]; }
+    for (x = 0; x <= nx; x++) s += lnP(P(x, 0, 0)[0], P(x, 0, 0)[1], P(x, 0, nz)[0], P(x, 0, nz)[1], 'var(--line)', 1);
+    for (z = 0; z <= nz; z++) s += lnP(P(0, 0, z)[0], P(0, 0, z)[1], P(nx, 0, z)[0], P(nx, 0, z)[1], 'var(--line)', 1);
+    for (z = nz - 1; z >= 0; z--) for (y = 0; y < 4; y++) for (x = 0; x < nx; x++) {
+      if (hm[z][x] <= y) continue;
+      s += pgP([P(x + 1, y, z), P(x + 1, y, z + 1), P(x + 1, y + 1, z + 1), P(x + 1, y + 1, z)], hl === 'droite' ? 'var(--acc-mid)' : 'var(--cube-side)', 'var(--ink)', 1.6);
+      s += pgP([P(x, y + 1, z), P(x + 1, y + 1, z), P(x + 1, y + 1, z + 1), P(x, y + 1, z + 1)], hl === 'dessus' ? 'var(--acc-mid)' : 'var(--cube-top)', 'var(--ink)', 1.6);
+      s += pgP([P(x, y, z), P(x + 1, y, z), P(x + 1, y + 1, z), P(x, y + 1, z)], hl === 'face' ? 'var(--acc-mid)' : 'var(--cube-front)', 'var(--ink)', 1.6);
+    }
+    return s;
+  }
+  function eyeSvg(hm, ox, oy, u, w) {
+    var b = solidBox(hm), E, T;
+    function P(x, y, z) { return [ox + (x + CAV * z) * u, oy - (y + CAV * z) * u]; }
+    if (w === 'face') { T = P(b.nx / 2, b.mh / 2, 0); E = [T[0] - 2.2 * u, T[1] + 2.2 * u]; }
+    else if (w === 'dessus') { T = P(b.nx / 2, b.mh, b.nz / 2); E = [T[0], T[1] - 1.4 * u]; }
+    else { T = P(b.nx, b.mh / 2, b.nz / 2); E = [T[0] + 1.5 * u, T[1]]; }
+    var d = unit(sub(T, E)), A = add(E, mul(d, 16)), B = sub(T, mul(d, 0.25 * u));
+    return arrowP(A[0], A[1], B[0], B[1], 'var(--sun)', 3) +
+      el('ellipse', { cx: r2(E[0]), cy: r2(E[1]), rx: 13, ry: 8, fill: 'var(--card)', stroke: 'var(--ink)', 'stroke-width': 2 }) + el('circle', { cx: r2(E[0]), cy: r2(E[1]), r: 4, fill: 'var(--ink)' });
+  }
+  function viewSvg(hm, w, cx, by, u, col) {
+    var sq = viewSquares(hm, w), b = solidBox(hm), W = w === 'droite' ? b.nz : b.nx, x0 = cx - W * u / 2, s = '';
+    sq.forEach(function (c) { s += el('rect', { x: r2(x0 + c[0] * u), y: r2(by - (c[1] + 1) * u), width: r2(u), height: r2(u), fill: col || 'var(--acc-soft)', stroke: 'var(--ink)', 'stroke-width': 1.6 }); });
+    if (w !== 'dessus') s += lnP(x0 - 8, by, x0 + W * u + 8, by, 'var(--ink-soft)', 1.5);
+    return { s: s, x0: x0, W: W };
+  }
+  var VNAMES = { face: 'Vue de face', dessus: 'Vue de dessus', droite: 'Vue de droite' };
+  var W7 = { s: 0, w: 'face' };
+  var setW7 = presetButtons('w7Views', VIEWS.map(function (w) { return { name: VNAMES[w], w: w }; }), function (p, n) { W7.w = p.w; setW7(n); renderW7(); });
+  function renderW7() {
+    var so = SOLIDS[W7.s], hm = so.hm, w = W7.w, b = solidBox(hm), u = 34, ox = 75, oy = 205, s = '';
+    s += solidSvg(hm, ox, oy, u, w) + eyeSvg(hm, ox, oy, u, w);
+    s += lnP(240, 20, 240, 240, 'var(--line)', 1.5, '4 5');
+    var V = viewSvg(hm, w, 360, 205, 36);
+    s += txP(360, 30, VNAMES[w], 'var(--acc)', 20, true) + V.s;
+    if (w === 'droite') s += txP(V.x0, 230, 'avant', 'var(--ink-soft)', 18, false, 'start') + txP(V.x0 + V.W * 36, 230, 'arrière', 'var(--ink-soft)', 18, false, 'end');
+    if (w === 'dessus') s += txP(360, 230, 'avant', 'var(--ink-soft)', 18, false) + txP(360, 205 - b.nz * 36 - 16, 'arrière', 'var(--ink-soft)', 18, false);
+    $('w7').innerHTML = s;
+    $('w7Info').textContent = so.name + ' : ' + cubeCount(hm) + ' cubes. Les faces mises en couleur sont celles qu’on regarde.';
+  }
+  $('w7Next').addEventListener('click', function () { W7.s = (W7.s + 1) % SOLIDS.length; renderW7(); });
+  setW7(0); renderW7();
+
+  /* Trieur générique (cartes une par une), comme dans les autres tutoriels. */
+  function makeSorter(o) {
+    var idx = 0, ans = {};
+    function opts(it) { return it.o ? it.o : o.order; }
+    function name(c) { return o.names && o.names[c] ? o.names[c] : c; }
+    function render() {
+      var it = o.items[idx], a = ans[it.k];
+      if (o.cardHtml) $(o.card).innerHTML = o.cardHtml(it, !!a); else $(o.card).textContent = it.s;
+      $(o.pos).textContent = o.word + ' ' + (idx + 1) + ' / ' + o.items.length;
+      $(o.btns).innerHTML = opts(it).map(function (c) {
+        var cls = a ? (c === it.a ? 'right' : (c === a ? 'wrong' : '')) : '';
+        return '<button type="button" data-c="' + esc(c) + '"' + (cls ? ' class="' + cls + '"' : '') + (a ? ' disabled' : '') + '>' + esc(name(c)) + '</button>';
+      }).join('');
+      var out = $(o.out);
+      if (!a) { out.className = 'fbk'; out.innerHTML = ''; }
+      else {
+        var ok = a === it.a;
+        out.className = 'fbk ' + (ok ? 'ok' : 'no');
+        out.innerHTML = '<strong>' + (ok ? 'Bien vu !' : 'Pas tout à fait. Réponse : ' + esc(name(it.a)) + '.') + '</strong><span>' + esc(it.why) + '</span>';
+      }
+      var s = o.score(ans), last = idx === o.items.length - 1, left = s.total - s.answered;
+      $(o.score_).textContent = (o.word ? o.word + ' ' : '') + (idx + 1) + ' / ' + s.total;
+      $(o.pos).textContent = s.answered ? 'Bonnes réponses : ' + s.correct + ' sur ' + s.answered : '';
+      $(o.prev).disabled = idx === 0;
+      $(o.next).disabled = last;
+      $(o.next).style.display = last ? 'none' : '';
+      var end = $(o.out + 'End');
+      if (!end) { end = document.createElement('div'); end.id = o.out + 'End'; end.setAttribute('aria-live', 'polite'); $(o.out).insertAdjacentElement('afterend', end); }
+      if (!left) {
+        var r = s.correct / s.total;
+        end.className = 'fbk ok sorter-end';
+        end.innerHTML = '<strong>Terminé ! ' + s.correct + ' / ' + s.total + ' bonnes réponses</strong><span>' +
+          (r === 1 ? 'Parfait, tout est juste !' : r >= .7 ? 'Très bien !' : r >= .5 ? 'Pas mal ! Relis les explications des erreurs.' : 'Relis les explications, puis réessaie.') +
+          ' Touche « Recommencer » pour rejouer.</span>';
+      } else if (last && ans[it.k]) {
+        end.className = 'fbk warn sorter-end';
+        end.innerHTML = '<strong>C’était la dernière carte.</strong><span>Il te reste ' + left + ' réponse' + (left > 1 ? 's' : '') + ' à donner : reviens en arrière avec « ← Précédent ».</span>';
+      } else { end.className = ''; end.innerHTML = ''; }
+    }
+    $(o.btns).addEventListener('click', function (ev) {
+      var b = ev.target.closest('button'); if (!b || b.disabled) return;
+      var it = o.items[idx]; if (!ans[it.k]) ans[it.k] = b.getAttribute('data-c');
+      render();
+    });
+    $(o.prev).addEventListener('click', function () { idx = clamp(idx - 1, o.items.length); render(); });
+    $(o.next).addEventListener('click', function () { idx = clamp(idx + 1, o.items.length); render(); });
+    $(o.reset).addEventListener('click', function () { ans = {}; idx = 0; render(); });
+    render();
+  }
+  function scorer(items) {
+    return function (ans) { var correct = 0, answered = 0; items.forEach(function (x) { if (ans && ans[x.k]) { answered++; if (ans[x.k] === x.a) correct++; } }); return { correct: correct, answered: answered, total: items.length }; };
+  }
+  function checker(items, valid) {
+    return function (k, c) { var x = by(items, k); if (!x) return null; if (valid.indexOf(c) < 0) return null; return { ok: x.a === c, answer: x.a, why: x.why }; };
+  }
+
+  /* Jeu « quelle vue ? » */
+  function viewCard(it, done) {
+    var hm = it.hm, u = 30, ox = 40, oy = 182, s = solidSvg(hm, ox, oy, u, done ? it.w : null);
+    if (done) s += eyeSvg(hm, ox, oy, u, it.w);
+    s += lnP(212, 12, 212, 208, 'var(--line)', 1.5, '4 5');
+    s += viewSvg(hm, it.w, 310, 182, 32, 'var(--acc-soft)').s;
+    s += txP(310, 24, done ? VNAMES[it.w] : '?', 'var(--acc)', 18, true);
+    return '<span>Quelle vue de ce solide est dessinée à droite ?</span><svg viewBox="0 0 400 220" role="img" aria-label="Un solide en cubes à gauche, une de ses vues à droite">' + s + '</svg>';
+  }
+  var viewScore = scorer(VIEW_CARDS), checkView = checker(VIEW_CARDS, VIEWS);
+  makeSorter({ items: VIEW_CARDS, names: VNAMES, order: VIEWS, btns: 'vsBtns', card: 'vsCard', pos: 'vsPos', out: 'vsOut', score_: 'vsScore', prev: 'vsPrev', next: 'vsNext', reset: 'vsReset', word: 'Question', score: viewScore, cardHtml: viewCard });
+
+  /* ---------- 8. Construire un solide à partir de ses vues ---------- */
+  var W9 = { p: 0, hm: [[0, 0, 0], [0, 0, 0], [0, 0, 0]] };
+  function renderW9T() {
+    var T = PUZZLES[W9.p], s = '';
+    [['face', 80, 'Face'], ['dessus', 240, 'Dessus'], ['droite', 400, 'Droite']].forEach(function (q) {
+      s += txP(q[1], 22, q[2], 'var(--acc)', 18, true) + viewSvg(T, q[0], q[1], 150, 30).s;
+    });
+    $('w9T').innerHTML = s;
+  }
+  function renderW9() {
+    var grid = $('w9Grid'), T = PUZZLES[W9.p], hm = W9.hm, html = '';
+    for (var z = 2; z >= 0; z--) for (var x = 0; x < 3; x++) {
+      var h = hm[z][x];
+      html += '<button type="button" class="h' + h + '" data-x="' + x + '" data-z="' + z + '" aria-label="Case ' + (z === 2 ? 'arrière' : z === 1 ? 'milieu' : 'avant') + ' ' + (x === 0 ? 'gauche' : x === 1 ? 'centre' : 'droite') + ' : ' + h + ' cube' + (h > 1 ? 's' : '') + '">' + h + '</button>';
+    }
+    grid.innerHTML = html;
+    var n = cubeCount(hm), s = n ? solidSvg(hm, 70, 180, 40, null) : txP(150, 100, 'Touche les cases !', 'var(--ink-soft)', 18, false);
+    $('w9S').innerHTML = s;
+    var out = '', allOk = n > 0;
+    VIEWS.forEach(function (w) { var ok = n > 0 && viewKey(hm, w) === viewKey(T, w); if (!ok) allOk = false; out += res(ok ? '' : 'c3', VNAMES[w], n === 0 ? '—' : ok ? '✓ juste' : '✗ pas encore', null); });
+    if (allOk) {
+      var m = cubeCount(T);
+      out += '<div class="verdict yes">Bravo ! Ton solide a les trois bonnes vues.<span>Tu as utilisé ' + n + ' cube' + (n > 1 ? 's' : '') + '. ' + (n === m ? 'C’est aussi le nombre de cubes du solide de départ.' : 'Le solide de départ en avait ' + m + ' : deux solides différents peuvent avoir les mêmes vues !') + '</span></div>';
+    }
+    $('w9Out').innerHTML = out;
+  }
+  $('w9Grid').addEventListener('click', function (ev) {
+    var b = ev.target.closest('button'); if (!b) return;
+    var x = parseInt(b.getAttribute('data-x'), 10), z = parseInt(b.getAttribute('data-z'), 10);
+    W9.hm[z][x] = (W9.hm[z][x] + 1) % 4; renderW9();
+    var nb = $('w9Grid').querySelector('[data-x="' + x + '"][data-z="' + z + '"]'); if (nb) nb.focus();
+  });
+  function clearW9() { W9.hm = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]; }
+  $('w9Clear').addEventListener('click', function () { clearW9(); renderW9(); });
+  $('w9New').addEventListener('click', function () { W9.p = (W9.p + 1) % PUZZLES.length; clearW9(); renderW9T(); renderW9(); });
+  renderW9T(); renderW9();
+  var builder = { get: function () { return W9.hm.map(function (r) { return r.slice(); }); }, set: function (hm) { W9.hm = hm.map(function (r) { return r.slice(); }); renderW9(); }, solved: function () { return cubeCount(W9.hm) > 0 && sameViews(W9.hm, PUZZLES[W9.p]); }, puzzle: function () { return W9.p; } };
+
+  /* ---------- 9. Perspective cavalière et centrale ---------- */
+  var W10 = { L: 6, H: 3, P: 4, ang: 45, k: 0.5, mode: 'cav' }, F10 = [1, 11.5], V10 = [15, 1.2], EYE = 6;
+  var setMode = presetButtons('w10Mode', [{ name: 'Perspective cavalière', m: 'cav' }, { name: 'Perspective centrale', m: 'cen' }], function (p, n) { W10.mode = p.m; renderW10(); });
+  var setAng = presetButtons('w10Ang', [{ name: 'Fuyantes à 30°', a: 30 }, { name: '45°', a: 45 }, { name: '60°', a: 60 }], function (p) { W10.ang = p.a; renderW10(); });
+  var setCoef = presetButtons('w10Coef', [{ name: 'Coefficient 0,5', k: 0.5 }, { name: '0,7', k: 0.7 }, { name: '1', k: 1 }], function (p) { W10.k = p.k; renderW10(); });
+  function boxPts() {
+    var L = W10.L, H = W10.H, x0 = F10[0], y0 = F10[1];
+    var F = [[x0, y0], [x0 + L, y0], [x0 + L, y0 - H], [x0, y0 - H]], B;
+    if (W10.mode === 'cav') { var dv = [W10.P * W10.k * Math.cos(W10.ang * RAD), -W10.P * W10.k * Math.sin(W10.ang * RAD)]; B = F.map(function (p) { return add(p, dv); }); }
+    else { var q = EYE / (EYE + W10.P); B = F.map(function (p) { return add(V10, mul(sub(p, V10), q)); }); }
+    return { F: F, B: B };
+  }
+  function renderW10() {
+    var bp = boxPts(), F = bp.F, B = bp.B, cav = W10.mode === 'cav', s = '';
+    $('w10LOut').textContent = W10.L; $('w10HOut').textContent = W10.H; $('w10POut').textContent = W10.P;
+    setMode(cav ? 0 : 1); setAng(cav ? [30, 45, 60].indexOf(W10.ang) : -1); setCoef(cav ? [0.5, 0.7, 1].indexOf(W10.k) : -1);
+    Array.prototype.forEach.call($('w10Ang').children, function (b) { b.disabled = !cav; });
+    Array.prototype.forEach.call($('w10Coef').children, function (b) { b.disabled = !cav; });
+    if (!cav) [0, 1, 2, 3].forEach(function (i) { s += seg(B[i], V10, 'var(--sun)', 1.4, '3 5'); });
+    s += pgP([F[3], F[2], B[2], B[3]].map(function (p) { return mul(p, S); }), 'var(--cube-top)', 'none');
+    s += pgP([F[1], B[1], B[2], F[2]].map(function (p) { return mul(p, S); }), 'var(--cube-side)', 'none');
+    s += pgP(F.map(function (p) { return mul(p, S); }), 'var(--cube-front)', 'none');
+    s += seg(B[0], B[1], 'var(--ink)', 2, '6 5') + seg(B[0], B[3], 'var(--ink)', 2, '6 5') + seg(F[0], B[0], 'var(--ink)', 2, '6 5');
+    s += seg(B[1], B[2], 'var(--ink)', 3) + seg(B[2], B[3], 'var(--ink)', 3);
+    s += seg(F[1], B[1], 'var(--acc)', 3.5) + seg(F[2], B[2], 'var(--acc)', 3.5) + seg(F[3], B[3], 'var(--acc)', 3.5);
+    s += pline([F[0], F[1], F[2], F[3], F[0]], 'var(--ink)', 3.5);
+    s += label([F[0][0] + W10.L / 2, F[0][1] + 0.0 - 0.45], W10.L + ' cm', 'var(--ink)', 18);
+    s += label([F[0][0] + 0.9, F[0][1] - W10.H / 2], W10.H + ' cm', 'var(--ink)', 18);
+    if (cav) {
+      var m = mid2(F[1], B[1]); s += label([m[0] + 0.9, m[1] + 0.25], fmt(W10.P * W10.k) + ' cm', 'var(--acc)', 18);
+      var arc = []; for (var i = 0; i <= 14; i++) { var th = -W10.ang * RAD * i / 14; arc.push([F[1][0] + 1 * Math.cos(th), F[1][1] + 1 * Math.sin(th)]); }
+      s += seg(F[1], [F[1][0] + 1.6, F[1][1]], 'var(--ink-soft)', 1.5, '3 4') + pline(arc, 'var(--four)', 2.5);
+      s += label([F[1][0] + 1.55 * Math.cos(-W10.ang * RAD / 2) + 0.3, F[1][1] + 1.55 * Math.sin(-W10.ang * RAD / 2) + 0.15], W10.ang + '°', 'var(--four)', 18);
+    } else {
+      s += dotp(V10, 'var(--sun)', 7) + label([V10[0] - 0.4, V10[1] - 0.6], 'F', 'var(--sun)', 20);
+      s += txP(V10[0] * S - 16, V10[1] * S + 26, 'point de fuite', 'var(--sun)', 18, true, 'end');
+    }
+    $('w10').innerHTML = s;
+    var out = res('', 'Face de devant', W10.L + ' cm × ' + W10.H + ' cm', 'En vraie grandeur, dans les deux perspectives.');
+    if (cav) out += res('c4', 'Fuyantes', fmt(W10.P * W10.k) + ' cm', W10.P + ' cm × ' + fmt(W10.k) + ' = ' + fmt(W10.P * W10.k) + ' cm, tracées à ' + W10.ang + '°. Elles restent parallèles entre elles.');
+    else out += res('c3', 'Fuyantes', 'vers F', 'Les arêtes qui partent vers l’arrière se rejoignent au point de fuite F. La face arrière paraît plus petite : environ ' + fmt(100 * EYE / (EYE + W10.P), 0) + ' % de la face avant.');
+    out += res('', 'Arêtes cachées', '3', 'Les 3 arêtes qui partent du coin arrière en bas à gauche sont cachées : on les dessine en pointillés.');
+    $('w10Out').innerHTML = out;
+  }
+  ['L', 'H', 'P'].forEach(function (k) { $('w10' + k).addEventListener('input', function () { W10[k] = parseInt(this.value, 10); renderW10(); }); });
+  renderW10();
+
+  /* ---------- 10. Les patrons du cube ---------- */
+  var PAIR = ['var(--acc-mid)', 'var(--sun-soft)', 'var(--two-soft)'];
+  function netSvg(cells, u, color, bad) {
+    var n = normCells(cells), w = Math.max.apply(null, n.map(function (c) { return c[0]; })) + 1, h = Math.max.apply(null, n.map(function (c) { return c[1]; })) + 1;
+    var lab = foldNet(cells), cnt = {}, s = '';
+    lab.forEach(function (l) { cnt[l] = (cnt[l] || 0) + 1; });
+    var mx = Math.min.apply(null, cells.map(function (c) { return c[0]; })), my = Math.min.apply(null, cells.map(function (c) { return c[1]; }));
+    cells.forEach(function (c, i) {
+      var fill = 'var(--card)';
+      if (color) fill = PAIR[Math.floor(lab[i] / 2)];
+      if (bad && cnt[lab[i]] > 1) fill = 'var(--red-soft)';
+      s += el('rect', { x: r2((c[0] - mx) * u + 4), y: r2((c[1] - my) * u + 4), width: u, height: u, fill: fill, stroke: bad && cnt[lab[i]] > 1 ? 'var(--red)' : 'var(--ink)', 'stroke-width': 2 });
+    });
+    return { s: s, w: w * u + 8, h: h * u + 8 };
+  }
+  function netCard(it, done) {
+    var N = netSvg(it.cells, 40, done && it.a === 'oui', done && it.a === 'non');
+    return '<span>Ces 6 carrés se replient-ils en cube ?</span><svg viewBox="0 0 ' + N.w + ' ' + N.h + '" style="max-width:' + Math.round(N.w * 1.1) + 'px" role="img" aria-label="Six carrés collés par leurs côtés">' + N.s + '</svg>';
+  }
+  var NTNAMES = { oui: 'Oui, c’est un patron', non: 'Non' };
+  var netScore = scorer(NET_CARDS), checkNet = checker(NET_CARDS, ['oui', 'non']);
+  makeSorter({ items: NET_CARDS, names: NTNAMES, order: ['oui', 'non'], btns: 'ntBtns', card: 'ntCard', pos: 'ntPos', out: 'ntOut', score_: 'ntScore', prev: 'ntPrev', next: 'ntNext', reset: 'ntReset', word: 'Question', score: netScore, cardHtml: netCard });
+  var NETS = cubeNets();
+  $('gal').innerHTML = NETS.map(function (c, i) { var N = netSvg(c, 20, true, false); return '<figure><svg viewBox="0 0 ' + N.w + ' ' + N.h + '" role="img" aria-label="Patron de cube numéro ' + (i + 1) + '">' + N.s + '</svg><figcaption>n° ' + (i + 1) + '</figcaption></figure>'; }).join('');
+  $('galBtn').addEventListener('click', function () { var g = $('gal'), show = g.hidden; g.hidden = !show; this.setAttribute('aria-pressed', show ? 'true' : 'false'); this.textContent = show ? 'Cacher les 11 patrons' : 'Montrer les 11 patrons'; });
+
+  /* ---------- 11. Carte de Mercator ---------- */
+  var W12 = { lat: 46 }, CY = 150, KM = 66, R0 = 13;
+  function mercY(lat) { return CY - KM * Math.log(Math.tan(Math.PI / 4 + lat * RAD / 2)); }
+  var setW12 = presetButtons('w12Pre', [{ name: 'Équateur', l: 0 }, { name: 'Suisse (≈ 46°)', l: 46 }, { name: 'Norvège (≈ 60°)', l: 60 }, { name: 'Groenland (≈ 72°)', l: 72 }], function (p) { W12.lat = p.l; $('w12l').value = p.l; renderW12(); });
+  function renderW12() {
+    var lat = W12.lat, f = mercator(lat), y = mercY(lat), s = '';
+    $('w12lOut').textContent = lat + '°';
+    s += el('rect', { x: 70, y: 8, width: 400, height: 284, fill: 'var(--two-soft)', stroke: 'var(--ink-soft)', 'stroke-width': 1.5, rx: 6 });
+    [-40, -20, 0, 20, 40, 60, 70].forEach(function (l) {
+      var yy = mercY(l); if (yy < 10 || yy > 290) return;
+      s += lnP(70, yy, 470, yy, l === 0 ? 'var(--ink)' : 'var(--ink-soft)', l === 0 ? 2 : 1, l === 0 ? null : '4 5');
+      s += txP(62, yy, (l < 0 ? -l + '° S' : l === 0 ? '0°' : l + '° N'), 'var(--ink-soft)', 18, false, 'end');
+    });
+    for (var x = 110; x < 470; x += 60) s += lnP(x, 8, x, 292, 'var(--ink-soft)', 1, '4 5');
+    s += el('circle', { cx: 170, cy: CY, r: R0, fill: 'var(--ok-soft)', stroke: 'var(--ok)', 'stroke-width': 2.5 });
+    s += txP(170, CY + R0 + 16, 'à l’équateur', 'var(--ok)', 18, true);
+    var r = R0 * f.len;
+    s += el('circle', { cx: 340, cy: r2(y), r: r2(r), fill: 'var(--sun-soft)', stroke: 'var(--sun)', 'stroke-width': 2.5, 'fill-opacity': 0.85 });
+    s += lnP(300, y, 380, y, 'var(--sun)', 1.5);
+    s += txP(340, lim(y + r + 16, 20, 282), lat + '° N', 'var(--sun)', 18, true);
+    $('w12').innerHTML = s;
+    var out = res('c3', 'Les longueurs sont agrandies', '× ' + fmt(f.len, 2), '1 ÷ cos ' + lat + '° ≈ ' + fmt(f.len, 2) + ' (même pays, même taille en vrai : seul le dessin grandit)');
+    out += res('c3', 'Les surfaces sont agrandies', '× ' + fmt(f.area, 2), fmt(f.len, 2) + ' × ' + fmt(f.len, 2) + ' ≈ ' + fmt(f.area, 2));
+    $('w12Out').innerHTML = out;
+    setW12([0, 46, 60, 72].indexOf(lat));
+  }
+  $('w12l').addEventListener('input', function () { W12.lat = parseInt(this.value, 10); renderW12(); });
+  renderW12();
+
+  /* ---------- Quiz ---------- */
+  var GEN = [
+    function () { var t = pick([[3, 4, 5], [6, 8, 10], [5, 12, 13], [8, 6, 10], [9, 12, 15], [12, 5, 13], [8, 15, 17]]); return { q: 'P est à ' + t[0] + ' cm de la droite d, et H est son projeté. M est sur d, à ' + t[1] + ' cm de H. Combien mesure PM (en cm) ?', a: t[2], how: 'Pythagore : PM² = ' + t[0] + '² + ' + t[1] + '² = ' + (t[0] * t[0] + t[1] * t[1]) + ', donc PM = ' + t[2] + ' cm' }; },
+    function () { var L = 2 * rnd(2, 10), a = pick([0, 60, 90]), r = Math.round(segProj(L, a) * 1e9) / 1e9; return { q: 'Un segment de ' + L + ' cm fait un angle de ' + a + '° avec la droite d. Combien mesure son projeté orthogonal sur d (en cm) ?', a: r, how: a === 0 ? 'Il est parallèle à d : même longueur, ' + L + ' cm' : a === 90 ? 'Il est perpendiculaire à d : son projeté est un point, longueur 0' : L + ' × cos 60° = ' + L + ' × 0,5 = ' + fmt(r) + ' cm' }; },
+    function () { var a = pick([-6, -5, -4, -3, -2, 2, 3, 4, 5, 6]), b = pick([-4, -3, -2, -1, 1, 2, 3, 4]), x = Math.random() < 0.5; return { q: 'Le point P a pour coordonnées ' + coordTxt(a, b) + '. On le projette sur l’axe des ' + (x ? 'abscisses' : 'ordonnées') + '. Quelle ' + (x ? 'abscisse' : 'ordonnée') + ' lit-on ?', a: x ? a : b, how: 'Le projeté sur l’axe des ' + (x ? 'abscisses est ' + coordTxt(a, 0) : 'ordonnées est ' + coordTxt(0, b)) }; },
+    function () { var h = rnd(3, 30); return { q: 'Le soleil est à 45° au-dessus de l’horizon. Quelle est la longueur de l’ombre d’un mât de ' + h + ' m (en m) ?', a: h, how: 'À 45°, l’ombre est aussi longue que l’objet : ' + h + ' m' }; },
+    function () { var k = rnd(1, 4), d = 3 * k; return { q: 'Un réverbère de 6 m éclaire Léa (1,5 m), debout à ' + d + ' m du poteau. Quelle est la longueur de son ombre (en m) ?', a: k, how: '1,5 × ' + d + ' ÷ (6 − 1,5) = ' + fmt(1.5 * d) + ' ÷ 4,5 = ' + k + ' m' }; },
+    function () { var p = rnd(2, 12); return { q: 'En perspective cavalière avec un coefficient de 0,5, une arête de ' + p + ' cm qui part vers l’arrière se dessine avec quelle longueur (en cm) ?', a: p / 2, how: p + ' × 0,5 = ' + fmt(p / 2) + ' cm' }; },
+    function () { var src = pick([['le soleil', 'parallèle'], ['un réverbère', 'centrale'], ['une bougie', 'centrale'], ['le phare d’un vélo', 'centrale']]); return { q: 'L’ombre d’un objet éclairé par ' + src[0] + ' est une projection…', choices: ['parallèle', 'centrale'], a: src[1], how: src[1] === 'parallèle' ? 'Le Soleil est si loin que ses rayons sont presque parallèles.' : 'La lumière part d’un seul point : les rayons s’écartent.' }; },
+    function () { var q = pick([['Quelle vue montre la place occupée au sol par un solide ?', 'de dessus'], ['Quelle vue montre la hauteur de chaque colonne, de gauche à droite ?', 'de face'], ['Sur quelle vue l’avant du solide est-il à gauche du dessin ?', 'de droite']]); return { q: q[0], choices: ['de face', 'de dessus', 'de droite'], a: q[1], how: 'Face : largeur et hauteur. Dessus : largeur et profondeur. Droite : profondeur et hauteur, avec l’avant à gauche.' }; },
+    function () { if (Math.random() < 0.5) return { q: 'Combien de patrons différents (à rotation et retournement près) un cube possède-t-il ?', a: 11, how: 'Il y a 35 façons de coller 6 carrés, et 11 se replient en cube.' }; return { q: 'Six carrés contiennent un bloc de 2 × 2 carrés. Peuvent-ils former un patron de cube ?', choices: ['Oui', 'Non'], a: 'Non', how: 'Autour d’un coin du cube, il n’y a que 3 faces : 4 carrés autour d’un même point se chevauchent.' }; }
+  ];
+  var quiz = $('quiz'), done = [], QZ = [];
+  function updScore() { $('score').textContent = done.filter(Boolean).length + ' / 8'; }
+  function newQuiz() {
+    quiz.innerHTML = ''; done = []; QZ = [];
+    var types = shuffle([0, 1, 2, 3, 4, 5, 6, 7, 8]).slice(0, 8);
+    types.forEach(function (t, k) {
+      var Q = GEN[t](), li = document.createElement('li');
+      QZ.push(Q);
+      if (Q.choices) {
+        li.className = 'ch';
+        li.innerHTML = '<span>' + Q.q + '</span><div class="btns" role="group" aria-label="Choix pour la question ' + (k + 1) + '">' +
+          Q.choices.map(function (c, j) { return '<button type="button" id="qc' + k + '_' + j + '" aria-pressed="false">' + c + '</button>'; }).join('') +
+          '</div><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+        quiz.appendChild(li);
+        Q.choices.forEach(function (c, j) {
+          $('qc' + k + '_' + j).addEventListener('click', function () {
+            Q.choices.forEach(function (c2, j2) { $('qc' + k + '_' + j2).setAttribute('aria-pressed', j2 === j ? 'true' : 'false'); });
+            var fb = $('qf' + k);
+            if (c === Q.a) { fb.className = 'fb ok'; fb.textContent = 'Bravo, c’est juste !'; done[k] = true; }
+            else { done[k] = false; fb.className = 'fb no'; fb.innerHTML = 'Pas tout à fait : la réponse est « ' + Q.a + ' ».<span>' + Q.how + '</span>'; }
+            updScore();
+          });
+        });
+      } else {
+        li.innerHTML = '<span>' + Q.q + '</span><input type="text" id="qa' + k + '" inputmode="decimal" autocomplete="off" aria-label="Ta réponse à la question ' + (k + 1) + '"><button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+        quiz.appendChild(li);
+        var check = function () {
+          var fb = $('qf' + k), x = num($('qa' + k).value);
+          if (isNaN(x)) { fb.className = 'fb'; fb.textContent = 'Écris un nombre.'; return; }
+          if (Math.abs(x - Q.a) < 0.006) { fb.className = 'fb ok'; fb.textContent = 'Bravo, c’est juste !'; done[k] = true; }
+          else { done[k] = false; fb.className = 'fb no'; fb.innerHTML = 'Pas tout à fait : la réponse est ' + fmt(Q.a) + '.<span>' + Q.how + '</span>'; }
+          updScore();
+        };
+        $('qb' + k).addEventListener('click', check);
+        $('qa' + k).addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+      }
+    });
+    updScore();
+  }
+  $('newQuiz').addEventListener('click', newQuiz);
+  newQuiz();
+
+  window.__proj = {
+    foot: foot, distToLine: distToLine, segProj: segProj, shadowSun: shadowSun, shadowLamp: shadowLamp, mercator: mercator, cavalier: cavalier,
+    views: views, viewSquares: viewSquares, viewKey: viewKey, ambiguousView: ambiguousView, sameViews: sameViews, cubeCount: cubeCount,
+    foldNet: foldNet, isCubeNet: isCubeNet, hasBlock: hasBlock, hexominoes: hexominoes, cubeNets: cubeNets,
+    SOLIDS: SOLIDS, VIEW_CARDS: VIEW_CARDS, NET_CARDS: NET_CARDS, PUZZLES: PUZZLES,
+    checkView: checkView, checkNet: checkNet, viewScore: viewScore, netScore: netScore, builder: builder,
+    get quiz() { return QZ.slice(); }
+  };
+})();
+</script>
+</body>
+</html>

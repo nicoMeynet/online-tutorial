@@ -34,6 +34,9 @@ La page d'accueil ([index.html](index.html)) ne montre que les matières. La pag
 | [Les nombres premiers](les-nombres-premiers.html) | Multiples et diviseurs, critères de divisibilité, le crible d'Ératosthène, la décomposition, PGCD et PPCM, Goldbach, un quiz. |
 | [La vitesse](la-vitesse.html) | v = d ÷ t avec une course animée, le triangle magique, les durées, km/h et m/s, le graphique distance-temps, la vitesse moyenne, un quiz. |
 | [Les transformations](les-transformations.html) | Symétrie axiale et centrale, translation, rotation, homothétie, ce qui se conserve, rosaces et frises, un jeu et un quiz. |
+| [Les constructions à la règle et au compas](les-constructions-a-la-regle-et-au-compas.html) | Médiatrice, perpendiculaire, parallèle, bissectrice, triangles et hexagone, pas à pas, et les constructions impossibles. |
+| [Les projections et les vues](les-projections-et-les-vues.html) | Projeter un point, la distance à une droite, les ombres, les vues d'un solide, la perspective cavalière et les patrons du cube. |
+| [Le cercle et ses angles](le-cercle-et-ses-angles.html) | Corde, tangente, angle au centre et angle inscrit, le demi-cercle de Thalès, et les arcs et secteurs. |
 | [Le repérage](le-reperage.html) | Abscisse, coordonnées, chasse au trésor, distance et milieu, l'espace, latitude et longitude, distances entre villes, un quiz. |
 | [Les inéquations](les-inequations.html) | Les signes < > ≤ ≥, tester une valeur, résoudre pas à pas (changement de sens), la droite graduée, des problèmes, un quiz. |
 | [Les conversions d'unités](les-conversions.html) | Le système métrique, les tableaux de conversion (longueurs, masses, capacités, aires, volumes), les durées, un convertisseur universel, un quiz. |
