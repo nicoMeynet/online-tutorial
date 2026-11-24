@@ -1,0 +1,1437 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mettre en équation</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels de maths, marge rouge. Accent bleu (#1d4ed8, encre #1e40af pour le texte). Sur la « feuille » des problèmes : les équations en gras, la ligne qu'on vient d'écrire surlignée en jaune. Les quatre étapes (inconnue, équation, résolution, vérification) sont des pastilles. */
+:root {
+  --paper: #f6f8fc;
+  --grid: #e1e7f3;
+  --card: #ffffff;
+  --ink: #141a2e;
+  --ink-soft: #4f5872;
+  --acc: #1d4ed8;
+  --acc-ink: #1e40af;
+  --acc-soft: #e0e8fc;
+  --two: #0f766e;
+  --two-soft: #d6efeb;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --warn: #d97706;
+  --warn-soft: #fdf0d6;
+  --warn-ink: #92400e;
+  --hl: #fff0a3;
+  --line: #d6ddec;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0d111c; --grid: #172033; --card: #141b2b; --ink: #e9edf7; --ink-soft: #a3adc6;
+    --acc: #7ea6ff; --acc-ink: #a9c3ff; --acc-soft: #1b2a4d; --two: #5fd0c2; --two-soft: #10322f;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27;
+    --warn: #f5a524; --warn-soft: #3d2a0c; --warn-ink: #fbbf5a; --hl: #4b4318; --line: #27314a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0d111c; --grid: #172033; --card: #141b2b; --ink: #e9edf7; --ink-soft: #a3adc6;
+  --acc: #7ea6ff; --acc-ink: #a9c3ff; --acc-soft: #1b2a4d; --two: #5fd0c2; --two-soft: #10322f;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27;
+  --warn: #f5a524; --warn-soft: #3d2a0c; --warn-ink: #fbbf5a; --hl: #4b4318; --line: #27314a;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.x { font-family: var(--f-mono); color: var(--acc-ink); font-weight: 600; }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero-top { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+.hero-top svg { width: 170px; height: auto; flex: none; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+@media (max-width: 520px) { .box { padding: 16px 14px; } }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note.ok { border-left-color: var(--ok); background: var(--ok-soft); }
+.note.two { border-left-color: var(--two); background: var(--two-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 8px 12px; min-height: 44px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button.main { background: var(--acc); color: var(--card); }
+button[aria-pressed="true"] { background: var(--acc-ink); color: var(--paper); }
+button.ex { font-family: var(--f-mono); font-weight: 600; font-size: .92rem; }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+button:disabled { cursor: default; opacity: .5; }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+label { font-weight: 700; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
+.tag.ok { color: var(--ok); }
+.tag.no { color: var(--red); }
+.tag.acc { color: var(--acc-ink); }
+.tag.two { color: var(--two); }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc-ink); }
+.fbk { border-radius: 8px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; min-width: 0; overflow-wrap: anywhere; }
+.fbk:empty { display: none; }
+.fbk.ok { background: var(--ok-soft); }
+.fbk.no { background: var(--red-soft); }
+.fbk.info { background: var(--acc-soft); }
+.fbk.warn { background: var(--warn-soft); }
+.fbk strong { font-family: var(--f-display); }
+.fbk.ok strong { color: var(--ok); }
+.fbk.no strong { color: var(--red); }
+.fbk.info strong { color: var(--acc-ink); }
+.fbk.warn strong { color: var(--warn-ink); }
+.step-n { font-family: var(--f-mono); font-size: .85rem; color: var(--ink-soft); }
+button.right, button.right:disabled { background: var(--ok-soft); border-color: var(--ok); color: var(--ok); opacity: 1; }
+button.wrong, button.wrong:disabled { background: var(--red-soft); border-color: var(--red); color: var(--red); opacity: 1; }
+.choice button { flex: 1 1 130px; }
+.choice button:disabled:not(.right):not(.wrong) { opacity: .55; }
+.choice.long button { flex: 1 1 100%; text-align: left; font-family: var(--f-body); }
+.choice.eqs button { font-family: var(--f-mono); font-weight: 600; }
+.card-big { background: var(--paper); border: 1.5px dashed var(--line); border-radius: 10px; padding: 14px; font-family: var(--f-display); font-weight: 700; font-size: 1.15rem; overflow-wrap: anywhere; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.card-big .soft { font-family: var(--f-body); font-weight: 400; font-size: 1rem; }
+.sorter-end { margin-top: .6rem; }
+.sorter-end strong { font-size: 1.05rem; }
+
+/* Problèmes pas à pas */
+.machine { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.enonce { background: var(--paper); border: 1.5px dashed var(--line); border-radius: 10px; padding: 12px 14px; overflow-wrap: anywhere; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.enonce .soft { font-size: .92rem; }
+.stages { display: flex; flex-wrap: wrap; gap: 6px; }
+.stages span { font-family: var(--f-mono); font-size: .78rem; padding: 3px 9px; border-radius: 999px; border: 1.5px solid var(--line); color: var(--ink-soft); }
+.stages span.past { border-color: var(--ok); color: var(--ok); }
+.stages span.on { border-color: var(--acc); background: var(--acc-soft); color: var(--acc-ink); font-weight: 600; }
+.copy { background: var(--card); border: 1.5px solid var(--line); border-radius: 8px; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; font-family: var(--f-mono); font-size: .95rem; min-height: 3em; overflow-wrap: anywhere; min-width: 0; }
+.copy:empty::before { content: "(la feuille est encore vide)"; color: var(--ink-soft); }
+.copy .ln { padding: 1px 6px; border-radius: 4px; }
+.copy .ln.e { font-weight: 600; font-size: 1.08rem; color: var(--acc-ink); }
+.copy .ln.nw { background: var(--hl); color: var(--ink); }
+.figw { min-width: 0; }
+.figw:empty { display: none; }
+.fig { width: 100%; max-width: 420px; height: auto; display: block; margin: 0 auto; }
+.fig .shape { fill: var(--acc-soft); stroke: var(--ink); stroke-width: 2.5; }
+.fig .lab { font-weight: 600; fill: var(--acc-ink); }
+.fig .road { stroke: var(--line); stroke-width: 6; stroke-linecap: round; }
+.fig .gone1 { stroke: var(--acc); stroke-width: 6; stroke-linecap: round; }
+.fig .gone2 { stroke: var(--two); stroke-width: 6; stroke-linecap: round; }
+
+/* Équation à construire */
+.bline { min-height: 58px; display: flex; flex-wrap: wrap; align-items: center; font-family: var(--f-mono); font-weight: 600; font-size: clamp(1.1rem, 4.6vw, 1.35rem); padding: 10px 12px; border: 2px dashed var(--acc); border-radius: 8px; background: var(--paper); overflow-wrap: anywhere; min-width: 0; color: var(--acc-ink); }
+.bline .ph { font-family: var(--f-body); font-weight: 400; font-size: .95rem; color: var(--ink-soft); }
+.pal { display: grid; grid-template-columns: repeat(auto-fill, minmax(54px, 1fr)); gap: 8px; }
+.pal button { font-family: var(--f-mono); font-size: 1.1rem; padding: 6px 4px; min-width: 0; }
+.pal button.op { background: var(--acc-soft); }
+.pal button.xx { color: var(--acc-ink); }
+
+/* Dictionnaire, tableaux */
+.tw { overflow-x: auto; min-width: 0; }
+table.dict { border-collapse: collapse; width: 100%; }
+table.dict th, table.dict td { border-bottom: 1.5px dashed var(--line); padding: 7px 8px; text-align: left; vertical-align: top; }
+table.dict th { font-family: var(--f-display); font-size: .92rem; background: var(--acc-soft); }
+table.dict td:nth-child(2) { font-family: var(--f-mono); font-weight: 600; color: var(--acc-ink); white-space: nowrap; }
+@media (max-width: 520px) { table.dict th, table.dict td { padding: 6px 5px; font-size: .95rem; } }
+.ladder { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 6px; }
+.gl { display: flex; flex-direction: column; gap: 4px; font-family: var(--f-mono); font-size: .95rem; }
+.gl:empty { display: none; }
+.expr { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
+.expr div { background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 10px; display: flex; flex-direction: column; min-width: 0; overflow-wrap: anywhere; }
+.expr div b { font-family: var(--f-mono); color: var(--acc-ink); font-size: 1.1rem; }
+.expr div.me { border-color: var(--acc); background: var(--acc-soft); }
+.counts { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
+.counts div { background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 10px; display: flex; flex-direction: column; text-align: center; }
+.counts b { font-family: var(--f-mono); font-size: 1.4rem; color: var(--acc-ink); }
+.counts span { font-size: .85rem; color: var(--ink-soft); }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 200px auto; gap: 10px; align-items: center; }
+.quiz li > span:first-child { min-width: 0; overflow-wrap: anywhere; }
+.quiz select { font: inherit; font-size: .95rem; padding: 6px 6px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; min-height: 44px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb:empty { display: none; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; min-width: 0; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); min-width: 0; overflow-wrap: anywhere; }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+details .mono { color: var(--acc-ink); font-weight: 600; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+<!--ticons--><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Tutoriels"><script src="progress.js" defer></script><script src="share.js" defer></script><!--/ticons-->
+<style id="tnav-css">
+.tnav-top { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin: 0 0 4px; }
+.tnav-home { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font-weight: 700; font-size: .95rem; text-decoration: none; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tnav-home:hover, .tnav-home:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.tnav-bottom { margin-top: 8px; display: flex; flex-direction: column; gap: 12px; }
+.tnav-bottom h2 { margin: 0; }
+.tnav-pn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tnav-pn a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--ink, #222); border-radius: 10px;
+  background: var(--card, #fff); color: var(--ink, #222); text-decoration: none; box-shadow: 3px 3px 0 var(--ink, #222); min-width: 0; }
+.tnav-pn a span { font-size: .85rem; color: var(--ink-soft, #666); }
+.tnav-pn a strong { overflow-wrap: anywhere; }
+.tnav-pn a.next { text-align: right; grid-column: 2; }
+.tnav-bottom .tnav-home { align-self: center; }
+.tnav-top [data-share] { margin-left: auto; }
+.tnav-short { display: none; }
+.tprint-h { display: none; }
+@media (max-width: 600px) { header.hero { gap: 8px !important; } header.hero > .fig, header.hero > .box.fig, header.hero .hero-top .fig { display: none !important; }
+  header.hero p.lead { font-size: 1rem !important; line-height: 1.5 !important; } header.hero > p.soft { font-size: .88rem !important; line-height: 1.45 !important; }
+  header.hero h1 { font-size: clamp(1.7rem, 8vw, 2.2rem) !important; } }
+.tprint-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 14px 0 0; }
+.tprint-row span { font-size: .9rem; opacity: .8; }
+.tprint { display: inline-flex; align-items: center; gap: 8px; min-height: 42px; padding: 8px 16px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font: inherit; font-weight: 700; cursor: pointer; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tprint:hover, .tprint:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+@media print { [data-tp-hide] { display: none !important; } html.tp-on, html.tp-on body { background: #fff !important; color: #111 !important; padding: 0 !important; margin: 0 !important; }
+  html.tp-on [data-fiche] { color: #111; } html.tp-on [data-fiche] * { color: #111 !important; background: transparent !important; box-shadow: none !important; }
+  html.tp-on .tprint-h { display: block; font-size: 1.4rem; font-weight: 800; margin: 0 0 10px; } .tprint-row { display: none !important; } }
+@media (max-width: 520px) { .tnav-top .tnav-long { display: none; } .tnav-top .tnav-short { display: inline; } .tnav-top { flex-wrap: nowrap; } .tnav-top > * { flex: none; } }
+.tnav-end { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+@media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
+.diff { font: 700 .72rem/1.2 var(--f-mono, monospace); padding: 2px 8px; border-radius: 99px; border: 1.5px solid; white-space: nowrap; }
+.diff.d1 { color: #15803d; border-color: #15803d; background: #dcf3e3; }
+.diff.d2 { color: #a15c07; border-color: #b45309; background: #fbe7cf; }
+.diff.d3 { color: #b91c1c; border-color: #b91c1c; background: #fde2e2; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root:not([data-theme="light"]) .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root:not([data-theme="light"]) .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; } }
+:root[data-theme="dark"] .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root[data-theme="dark"] .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root[data-theme="dark"] .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; }
+</style>
+</head>
+<body>
+<main class="page">
+<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="maths.html">← <span class="tnav-long">Tous les tutoriels de maths</span><span class="tnav-short">Maths</span></a><span class="diff d2" title="Difficulté : moyen">Moyen</span><button type="button" data-share hidden>Partager</button></nav><!--/tnav-->
+
+
+  <header class="hero">
+    <div class="hero-top">
+      <svg viewBox="0 0 200 170" aria-hidden="true">
+        <rect x="4" y="4" width="192" height="162" rx="10" fill="var(--card)" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M18 16 H182 a8 8 0 0 1 8 8 V70 a8 8 0 0 1 -8 8 H62 L46 94 L48 78 H18 a8 8 0 0 1 -8 -8 V24 a8 8 0 0 1 8 -8 Z" fill="var(--acc-soft)" stroke="var(--ink)" stroke-width="2"/>
+        <text x="100" y="42" font-size="15" text-anchor="middle">« le triple, plus 7,</text>
+        <text x="100" y="64" font-size="15" text-anchor="middle">ça fait 25 »</text>
+        <path d="M100 96 V118 M92 110 L100 120 L108 110" fill="none" stroke="var(--red)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="100" y="152" font-size="25" text-anchor="middle" style="fill:var(--acc-ink);font-weight:600">3x + 7 = 25</text>
+      </svg>
+      <div style="display:flex;flex-direction:column;gap:10px;min-width:0;flex:1 1 280px">
+        <span class="eyebrow">Tutoriel de maths · niveau 9H–11H</span>
+        <h1>Des problèmes aux équations</h1>
+        <p class="lead">Un énoncé en français, une inconnue, une équation, une réponse qui a du sens. Apprends à traduire les problèmes de tous les jours (âges, prix, trajets, figures) en langage mathématique.</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · Pourquoi mettre en équation ?</span>
+    <h2>Deviner, ou calculer ?</h2>
+    <p>« Je pense à un nombre. Je le multiplie par 3, j'ajoute 7, et j'obtiens 25. Quel est ce nombre ? » Tu peux essayer de deviner. Vas-y !</p>
+    <div class="box">
+      <h3>Essaie des nombres</h3>
+      <p class="soft">Touche un nombre : la page calcule « × 3, puis + 7 » et compare avec 25.</p>
+      <div class="btns" id="gsBtns" role="group" aria-label="Essayer un nombre"></div>
+      <div class="fbk" id="gsOut" aria-live="polite"></div>
+      <div class="gl" id="gsLog"></div>
+      <div class="btns"><button type="button" id="gsReset">Recommencer</button></div>
+    </div>
+    <p>Deviner marche quand la réponse est un petit nombre entier. Mais si la réponse était 137, ou 1,25 ? Avec une <strong>équation</strong>, on trouve à coup sûr, en quelques lignes. Mettre en équation, c'est toujours <strong>quatre étapes</strong> :</p>
+    <div class="cards">
+      <div class="box"><span class="tag acc">1 · Inconnue</span><strong>Choisir l'inconnue</strong><span class="soft">On dit clairement ce que représente la lettre : « Soit x le nombre pensé. »</span></div>
+      <div class="box"><span class="tag acc">2 · Équation</span><strong>Traduire l'énoncé</strong><span class="soft">Chaque morceau de phrase devient un calcul avec x, jusqu'à obtenir une égalité.</span></div>
+      <div class="box"><span class="tag acc">3 · Résolution</span><strong>Résoudre</strong><span class="soft">On trouve la valeur de x avec les règles des équations.</span></div>
+      <div class="box"><span class="tag acc">4 · Vérification</span><strong>Vérifier et répondre</strong><span class="soft">On teste la valeur dans l'<strong>énoncé</strong>, on vérifie qu'elle a du sens, et on répond par une phrase.</span></div>
+    </div>
+    <div class="box">
+      <h3>La même devinette, avec une équation</h3>
+      <div class="machine" id="stRiddle"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Résoudre, tu sais déjà le faire</span>
+      <span>Ici, on ne réapprend pas à résoudre. Petit rappel : on fait <strong>la même chose des deux côtés</strong> du signe = (comme une balance), on rassemble les x d'un côté et les nombres de l'autre, puis on divise par le nombre devant x. Tout est expliqué dans le tutoriel sur <a class="tlink" href="les-equations.html">les équations</a>. Cette page s'occupe de ce qui vient <strong>avant</strong> (traduire) et <strong>après</strong> (vérifier et répondre).</span>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · Le dictionnaire</span>
+    <h2>Du français aux maths</h2>
+    <p>Certains mots reviennent tout le temps dans les problèmes. Voici leur traduction, avec x pour le nombre inconnu.</p>
+    <div class="box">
+      <div class="tw"><table class="dict">
+        <thead><tr><th scope="col">En français</th><th scope="col">En maths</th></tr></thead>
+        <tbody>
+          <tr><td>le double de x</td><td>2x</td></tr>
+          <tr><td>le triple de x</td><td>3x</td></tr>
+          <tr><td>la moitié de x</td><td>x/2</td></tr>
+          <tr><td>le carré de x</td><td>x²</td></tr>
+          <tr><td>5 de plus que x, x augmenté de 5</td><td>x + 5</td></tr>
+          <tr><td>3 de moins que x, x diminué de 3</td><td>x − 3</td></tr>
+          <tr><td>la somme de x et de 7</td><td>x + 7</td></tr>
+          <tr><td>la différence entre x et 4</td><td>x − 4</td></tr>
+          <tr><td>le produit de x par 6</td><td>6x</td></tr>
+          <tr><td>le quotient de x par 5</td><td>x/5</td></tr>
+          <tr><td>20 % de x</td><td>0,2x</td></tr>
+          <tr><td>deux nombres consécutifs</td><td>x et x + 1</td></tr>
+          <tr><td>l'âge de quelqu'un dans 5 ans</td><td>x + 5</td></tr>
+          <tr><td>l'âge de quelqu'un il y a 3 ans</td><td>x − 3</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+    <div class="note red">
+      <span class="note-title">Trois pièges classiques</span>
+      <span><strong>« 3 de moins que x »</strong>, c'est <span class="mono">x − 3</span> et pas <span class="mono">3 − x</span> : on part de x et on enlève 3. Avec x = 10 : 3 de moins que 10, c'est 7 = 10 − 3.</span>
+      <span><strong>« Le double de x augmenté de 4 »</strong> peut vouloir dire <span class="mono">2x + 4</span> (on double, puis on ajoute) ou <span class="mono">2(x + 4)</span> (le double de tout). Relis bien la phrase : les parenthèses changent tout.</span>
+      <span><strong>« Dans 5 ans »</strong>, <strong>tout le monde</strong> a 5 ans de plus, pas seulement une personne.</span>
+    </div>
+    <div class="box">
+      <h3>Jeu : quelle expression ?</h3>
+      <p class="soft">Lis la phrase, touche l'expression qui la traduit. Attention aux pièges !</p>
+      <div class="btns"><span class="score" id="dcScore">Phrase 1 / 15</span><span class="step-n" id="dcPos"></span></div>
+      <div class="card-big" id="dcCard" aria-live="polite"></div>
+      <div class="btns choice eqs" id="dcBtns" role="group" aria-label="Choisir l'expression"></div>
+      <div class="fbk" id="dcOut" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="dcPrev">← Précédent</button><button type="button" id="dcNext">Suivant →</button><button type="button" id="dcReset">Recommencer</button></div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Choisir l'inconnue</span>
+    <h2>Qui sera x ?</h2>
+    <p>Souvent, un problème parle de plusieurs quantités inconnues. On en choisit <strong>une</strong>, on l'appelle x, et on écrit les autres <strong>avec x</strong>. Trois conseils :</p>
+    <ol class="ladder">
+      <li><strong>Écris une phrase complète</strong>, avec l'unité : « Soit x le prix d'un croissant, en francs. » Pas seulement « x = croissant ».</li>
+      <li><strong>Choisis la plus petite quantité</strong>, ou celle dont les autres dépendent : souvent, on évite ainsi les fractions.</li>
+      <li><strong>Écris les autres quantités avec x</strong> avant de chercher l'équation.</li>
+    </ol>
+    <div class="box">
+      <h3>Essaie différents choix</h3>
+      <p class="soft">Choisis un problème, puis touche la quantité que tu veux appeler x : la page écrit les autres avec x.</p>
+      <div class="btns" id="unPick" role="group" aria-label="Choisir un problème"></div>
+      <div class="enonce" id="unText"></div>
+      <div class="btns choice long" id="unBtns" role="group" aria-label="Quelle quantité appeler x ?"></div>
+      <div class="expr" id="unExpr" aria-live="polite"></div>
+      <div class="fbk" id="unOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · Traduire l'énoncé</span>
+    <h2>L'équation à construire</h2>
+    <p>Maintenant, à toi d'écrire l'équation. Lis l'énoncé morceau par morceau, et traduis chaque morceau. L'inconnue est déjà choisie.</p>
+    <div class="note">
+      <span class="note-title">Plusieurs équations peuvent être justes</span>
+      <span>Pour le même problème, <span class="mono">x + 3x = 48</span> et <span class="mono">4x = 48</span> sont justes toutes les deux : elles ont la même solution. La page accepte toutes les équations qui ont la bonne solution. Mais essaie d'écrire l'énoncé <strong>tel quel</strong>, sans calculer de tête.</span>
+    </div>
+    <div class="box">
+      <h3>Touche les blocs pour écrire l'équation</h3>
+      <div class="btns"><span class="score" id="bdScore">Problème 1 / 6</span><span class="step-n" id="bdPos"></span></div>
+      <div class="card-big" id="bdCard" aria-live="polite"></div>
+      <div class="bline" id="bdLine" aria-live="polite" aria-label="Ton équation"></div>
+      <div class="pal" id="bdPal" role="group" aria-label="Blocs"></div>
+      <div class="btns">
+        <button type="button" id="bdBack">⌫ Effacer</button>
+        <button type="button" id="bdClear">Tout effacer</button>
+        <button type="button" id="bdCheck" class="main">Vérifier</button>
+        <button type="button" id="bdShow">Voir une solution</button>
+      </div>
+      <div class="fbk" id="bdOut" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="bdPrev">← Précédent</button><button type="button" id="bdNext">Suivant →</button><button type="button" id="bdReset">Recommencer</button></div>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Problèmes d'âge</span>
+    <h2>Aujourd'hui, dans quelques années, autrefois</h2>
+    <p>Dans les problèmes d'âge, il y a souvent deux moments : <strong>aujourd'hui</strong> et <strong>dans n ans</strong> (ou <strong>il y a n ans</strong>). La règle d'or : avec le temps, <strong>tout le monde</strong> vieillit du même nombre d'années.</p>
+    <div class="box">
+      <h3>Pas à pas : trois problèmes d'âge</h3>
+      <div class="machine" id="stAge"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Les parenthèses</span>
+      <span>« Le double de l'âge de Noé dans 4 ans », c'est <span class="mono">2(x + 4)</span> : on double <strong>tout</strong> l'âge futur. Écrire <span class="mono">2x + 4</span> serait une autre phrase.</span>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · Prix et argent</span>
+    <h2>Croissants, billets de train et tirelires</h2>
+    <p>Dans les problèmes d'argent, on cherche souvent un prix ou un nombre de semaines. Les prix peuvent avoir des centimes : une réponse comme <strong>1,20 fr.</strong> est tout à fait normale. Les prix de cette page sont <strong>inventés</strong> : en vrai, les billets de train ou les croissants coûtent d'autres montants.</p>
+    <div class="box">
+      <h3>Pas à pas : trois problèmes d'argent</h3>
+      <div class="machine" id="stMoney"></div>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Géométrie</span>
+    <h2>Périmètres et angles</h2>
+    <p>En géométrie, l'équation vient souvent d'une <strong>formule</strong> qu'on connaît déjà : le périmètre d'un rectangle (<span class="mono">2 × (longueur + largeur)</span>), ou la somme des angles d'un triangle (<strong>toujours 180°</strong>). Ces formules sont rappelées dans le tutoriel sur <a class="tlink" href="les-formes-geometriques.html">les formes géométriques</a>.</p>
+    <div class="box">
+      <h3>Pas à pas, avec la figure</h3>
+      <div class="machine" id="stGeo"></div>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Problèmes de nombres</span>
+    <h2>Consécutifs, chiffres et moyennes</h2>
+    <p>Trois classiques : des nombres qui se suivent (x, x + 1, x + 2…), les chiffres d'un nombre, et la note qu'il faut au prochain test. En Suisse, les notes vont de <strong>1 à 6</strong> : une réponse « il te faut un 7 » veut dire que c'est impossible !</p>
+    <div class="box">
+      <h3>Pas à pas : trois problèmes de nombres</h3>
+      <div class="machine" id="stNum"></div>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Mouvement</span>
+    <h2>Deux cyclistes qui se croisent</h2>
+    <p>Pour les trajets, une seule formule : <strong>distance = vitesse × temps</strong>. À 20 km/h, en 2 heures, on fait 20 × 2 = 40 km. Tout ce qui concerne la vitesse est expliqué dans le tutoriel sur <a class="tlink" href="la-vitesse.html">la vitesse</a>.</p>
+    <div class="box">
+      <h3>Pas à pas, avec le trajet</h3>
+      <div class="machine" id="stMove"></div>
+    </div>
+    <div class="note red">
+      <span class="note-title">Attention aux heures</span>
+      <span>1,5 h, c'est <strong>1 h 30 min</strong>, pas 1 h 50 min ! Une heure fait 60 minutes, donc 0,5 h = 30 min et 0,25 h = 15 min.</span>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · Vérifier et répondre</span>
+    <h2>Est-ce que la réponse a du sens ?</h2>
+    <p>Une fois x trouvé, le travail n'est pas fini. Il reste deux questions :</p>
+    <ol class="ladder">
+      <li><strong>Est-ce que ça marche dans l'énoncé ?</strong> On vérifie avec les phrases du problème, <strong>pas seulement</strong> avec l'équation : si l'équation est mal traduite, sa solution « marche » dans l'équation, mais pas dans le problème.</li>
+      <li><strong>Est-ce que c'est possible ?</strong> Un âge n'est pas négatif. Un nombre d'élèves, de billets ou de gaufres est un nombre entier. Une note suisse est entre 1 et 6. Un chiffre va de 0 à 9.</li>
+    </ol>
+    <div class="note red">
+      <span class="note-title">Exemple : vérifier dans l'énoncé</span>
+      <span>« Je pense à un nombre, j'enlève 3, j'obtiens 10. » Quelqu'un écrit (faux !) <span class="mono">3 − x = 10</span> et trouve x = −7. Dans son équation : 3 − (−7) = 10, ça marche… Mais dans l'énoncé : −7 − 3 = −10, et pas 10. L'énoncé montre l'erreur : la bonne équation était <span class="mono">x − 3 = 10</span>, donc x = 13.</span>
+    </div>
+    <p>Enfin, on <strong>répond par une phrase</strong>, avec les mots de l'énoncé et l'unité : « Noé a 4 ans. », et pas seulement « x = 4 ».</p>
+    <div class="box">
+      <h3>Jeu : cette réponse a-t-elle du sens ?</h3>
+      <div class="btns"><span class="score" id="snScore">Réponse 1 / 11</span><span class="step-n" id="snPos"></span></div>
+      <div class="card-big" id="snCard" aria-live="polite"></div>
+      <div class="btns choice" id="snBtns" role="group" aria-label="La réponse a-t-elle du sens ?"></div>
+      <div class="fbk" id="snOut" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="snPrev">← Précédent</button><button type="button" id="snNext">Suivant →</button><button type="button" id="snReset">Recommencer</button></div>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · Atelier final</span>
+    <h2>Les quatre étapes, à toi</h2>
+    <p>Choisis un problème (ou laisse le hasard choisir). Pour chaque étape, choisis la bonne proposition : l'inconnue, l'équation, la solution, puis la phrase de réponse.</p>
+    <div class="box">
+      <div class="btns" id="atPick" role="group" aria-label="Choisir un problème"></div>
+      <div class="btns"><span class="score" id="atPos"></span><span class="step-n" id="atTot"></span></div>
+      <div class="stages" id="atStages" aria-hidden="true"></div>
+      <div class="enonce" id="atText"></div>
+      <div class="card-big" id="atQ" aria-live="polite"></div>
+      <div class="btns choice long" id="atBtns" role="group" aria-label="Choisir une proposition"></div>
+      <div class="fbk" id="atOut" aria-live="polite"></div>
+      <div class="fbk" id="atEnd" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="atPrev">← Précédent</button><button type="button" id="atNext" class="main">Suivant →</button><button type="button" id="atReset">Recommencer</button></div>
+    </div>
+  </section>
+
+  <!-- 12 -->
+  <section>
+    <span class="eyebrow">Étape 12 · Pour aller plus loin</span>
+    <h2>Deux inconnues… mais une seule lettre</h2>
+    <p>Une énigme célèbre : « Dans une ferme, il y a des poules et des lapins. On compte <strong>20 têtes</strong> et <strong>56 pattes</strong>. Combien y a-t-il de poules et de lapins ? » Il y a deux inconnues. L'astuce : on les écrit avec <strong>une seule lettre</strong>.</p>
+    <div class="box">
+      <h3>D'abord, en essayant</h3>
+      <p class="soft">Change le nombre de poules. Il y a toujours 20 animaux (donc 20 têtes) : s'il y a x poules, il y a 20 − x lapins.</p>
+      <div class="counts" id="plTab" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="plMinus">− 1 poule</button><button type="button" id="plPlus">+ 1 poule</button><button type="button" id="plReset">Recommencer</button></div>
+      <div class="fbk" id="plOut" aria-live="polite"></div>
+    </div>
+    <div class="box">
+      <h3>Ensuite, avec une équation</h3>
+      <span><strong>1 · Inconnue.</strong> Soit x le nombre de poules. Comme il y a 20 animaux, il y a <span class="mono">20 − x</span> lapins.</span>
+      <span><strong>2 · Équation.</strong> Une poule a 2 pattes, un lapin 4 : <span class="mono">2x + 4(20 − x) = 56</span>.</span>
+      <span><strong>3 · Résolution.</strong> <span class="mono">2x + 80 − 4x = 56</span>, donc <span class="mono">−2x + 80 = 56</span>, donc <span class="mono">−2x = −24</span>, donc <span class="mono">x = 12</span>.</span>
+      <span><strong>4 · Vérification et réponse.</strong> 12 poules et 8 lapins : 12 + 8 = 20 têtes, et 12 × 2 + 8 × 4 = 24 + 32 = 56 pattes. Il y a 12 poules et 8 lapins.</span>
+    </div>
+    <p>On peut aussi utiliser <strong>deux lettres</strong> (x poules et y lapins) et écrire deux équations en même temps : x + y = 20 et 2x + 4y = 56. C'est un <strong>système</strong> d'équations : c'est expliqué dans le tutoriel sur <a class="tlink" href="l-equation-produit-nul-et-les-systemes.html">l'équation produit nul</a> et les systèmes.</p>
+  </section>
+
+  <section>
+    <span class="eyebrow">Les idées reçues</span>
+    <h2>Vrai ou faux ?</h2>
+    <div class="cards">
+      <div class="box"><span class="tag no">Idée reçue</span><strong>« Il faut toujours appeler l'inconnue x. »</strong><span class="soft">Non : n, t, a, p… toutes les lettres marchent. Ce qui compte, c'est de dire ce qu'elle représente : « Soit t le temps du trajet, en heures. »</span></div>
+      <div class="box"><span class="tag no">Idée reçue</span><strong>« Si l'équation est juste, la réponse est forcément juste. »</strong><span class="soft">Une équation peut être bien résolue mais mal traduite. Et la solution peut être impossible (24,5 élèves). Il faut vérifier dans l'énoncé.</span></div>
+      <div class="box"><span class="tag no">Idée reçue</span><strong>« On peut résoudre sans rien écrire. »</strong><span class="soft">Pour une devinette facile, peut-être. Mais écrire les étapes permet de retrouver une erreur, de vérifier, et de montrer son raisonnement.</span></div>
+      <div class="box"><span class="tag no">Idée reçue</span><strong>« x, c'est la réponse. »</strong><span class="soft">Pas toujours ! Si x est le chiffre des unités, on demande peut-être le nombre entier (84, et pas 4). Relis la question.</span></div>
+      <div class="box"><span class="tag no">Idée reçue</span><strong>« Un résultat à virgule est forcément faux. »</strong><span class="soft">Ça dépend de ce qu'on cherche : un prix de 1,20 fr. ou un trajet de 1,5 h, c'est normal. Pour un nombre de personnes, en revanche, il faut un entier.</span></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Le savais-tu ?</span>
+    <h2>Petites histoires d'équations</h2>
+    <div class="cards">
+      <div class="box"><span class="tag two">Mot</span><strong>« al-jabr » → algèbre</strong><span class="soft">Au IXᵉ siècle, à Bagdad, le savant al-Khwarizmi écrit un livre sur la résolution des problèmes. Son titre contient le mot arabe « al-jabr » (en gros : « remettre en place »), qui a donné le mot <strong>algèbre</strong>. Et le nom al-Khwarizmi a donné le mot <strong>algorithme</strong>.</span></div>
+      <div class="box"><span class="tag two">Énigme</span><strong>L'âge de Diophante</strong><span class="soft">Une énigme ancienne raconte la vie du mathématicien grec Diophante : enfance 1/6 de sa vie, puis 1/12 avant sa barbe, puis 1/7 avant son mariage ; 5 ans plus tard naît un fils, qui vit la moitié de la vie de son père ; Diophante meurt 4 ans après lui. Équation : x/6 + x/12 + x/7 + 5 + x/2 + 4 = x, donc <strong>x = 84</strong>. On ne sait pas si l'histoire est vraie !</span></div>
+      <div class="box"><span class="tag two">Lettres</span><strong>Des lettres pour les inconnues</strong><span class="soft">Au XVIᵉ siècle, le Français François Viète a l'idée d'utiliser des lettres : des voyelles pour les inconnues, des consonnes pour les nombres connus. Au XVIIᵉ siècle, Descartes utilise x, y, z pour les inconnues : c'est encore notre habitude.</span></div>
+      <div class="box"><span class="tag two">Signe</span><strong>Le signe =</strong><span class="soft">En 1557, le Gallois Robert Recorde invente le signe = : deux traits parallèles, parce que, selon lui, rien n'est plus égal que deux droites parallèles.</span></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Utilise une feuille si tu veux, choisis ta réponse, puis vérifie.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Recommencer</button>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À toi de jouer</span>
+    <h2>Six problèmes à mettre en équation</h2>
+    <p>Pour chaque problème, écris les quatre étapes sur une feuille, puis ouvre la correction pour comparer.</p>
+    <div class="exos">
+      <details>
+        <summary>Le nombre mystère<span class="q">Je pense à un nombre. J'en prends le triple, j'enlève 8 et j'obtiens 37. Quel est ce nombre ?</span></summary>
+        <div>
+          <span><strong>1 · Inconnue.</strong> Soit x le nombre pensé.</span>
+          <span><strong>2 · Équation.</strong> Le triple : 3x ; j'enlève 8 : <span class="mono">3x − 8 = 37</span>.</span>
+          <span><strong>3 · Résolution.</strong> On ajoute 8 des deux côtés : <span class="mono">3x = 45</span>, puis on divise par 3 : <span class="mono">x = 15</span>.</span>
+          <span><strong>4 · Vérification et réponse.</strong> 3 × 15 = 45 et 45 − 8 = 37. Le nombre pensé est <strong>15</strong>.</span>
+        </div>
+      </details>
+      <details>
+        <summary>Sami et Inès<span class="q">Inès a 5 ans de plus que Sami. Dans 3 ans, la somme de leurs âges sera 41 ans. Quel âge ont-ils aujourd'hui ?</span></summary>
+        <div>
+          <span><strong>1 · Inconnue.</strong> Soit x l'âge de Sami aujourd'hui (le plus jeune). Inès a x + 5 ans.</span>
+          <span><strong>2 · Équation.</strong> Dans 3 ans, les deux ont 3 ans de plus : Sami x + 3, Inès x + 8. <span class="mono">(x + 3) + (x + 8) = 41</span>.</span>
+          <span><strong>3 · Résolution.</strong> <span class="mono">2x + 11 = 41</span>, donc <span class="mono">2x = 30</span>, donc <span class="mono">x = 15</span>.</span>
+          <span><strong>4 · Vérification et réponse.</strong> Sami 15 ans, Inès 20 ans (5 de plus). Dans 3 ans : 18 + 23 = 41. Sami a <strong>15 ans</strong> et Inès <strong>20 ans</strong>.</span>
+        </div>
+      </details>
+      <details>
+        <summary>Glaces au bord du lac<span class="q">5 glaces et 2 boissons coûtent 18,50 fr. Une boisson coûte 0,50 fr. de plus qu'une glace. Combien coûte une glace ?</span></summary>
+        <div>
+          <span><strong>1 · Inconnue.</strong> Soit x le prix d'une glace, en francs. Une boisson coûte x + 0,5.</span>
+          <span><strong>2 · Équation.</strong> <span class="mono">5x + 2(x + 0,5) = 18,5</span>.</span>
+          <span><strong>3 · Résolution.</strong> <span class="mono">5x + 2x + 1 = 18,5</span>, donc <span class="mono">7x + 1 = 18,5</span>, donc <span class="mono">7x = 17,5</span>, donc <span class="mono">x = 2,5</span>.</span>
+          <span><strong>4 · Vérification et réponse.</strong> Glace 2,50 fr., boisson 3 fr. : 5 × 2,50 + 2 × 3 = 12,50 + 6 = 18,50. Une glace coûte <strong>2,50 fr.</strong></span>
+        </div>
+      </details>
+      <details>
+        <summary>Les angles d'un triangle<span class="q">Dans un triangle, le deuxième angle mesure 20° de plus que le premier, et le troisième le double du premier. Combien mesure chaque angle ?</span></summary>
+        <div>
+          <span><strong>1 · Inconnue.</strong> Soit x la mesure du premier angle, en degrés. Les autres : x + 20 et 2x.</span>
+          <span><strong>2 · Équation.</strong> La somme des angles d'un triangle vaut 180° : <span class="mono">x + (x + 20) + 2x = 180</span>.</span>
+          <span><strong>3 · Résolution.</strong> <span class="mono">4x + 20 = 180</span>, donc <span class="mono">4x = 160</span>, donc <span class="mono">x = 40</span>.</span>
+          <span><strong>4 · Vérification et réponse.</strong> 40 + 60 + 80 = 180. Les angles mesurent <strong>40°, 60° et 80°</strong>.</span>
+        </div>
+      </details>
+      <details>
+        <summary>Deux nombres pairs<span class="q">La somme de deux nombres pairs consécutifs vaut 98. Quels sont ces nombres ?</span></summary>
+        <div>
+          <span><strong>1 · Inconnue.</strong> Soit x le plus petit des deux. Le nombre pair suivant est x + 2 (pas x + 1 : x + 1 serait impair).</span>
+          <span><strong>2 · Équation.</strong> <span class="mono">x + (x + 2) = 98</span>.</span>
+          <span><strong>3 · Résolution.</strong> <span class="mono">2x + 2 = 98</span>, donc <span class="mono">2x = 96</span>, donc <span class="mono">x = 48</span>.</span>
+          <span><strong>4 · Vérification et réponse.</strong> 48 + 50 = 98, et ce sont bien deux nombres pairs qui se suivent. Les nombres sont <strong>48 et 50</strong>.</span>
+        </div>
+      </details>
+      <details>
+        <summary>Deux trains<span class="q">À 9 h 00, un train part de la gare A vers la gare B à 80 km/h. Au même moment, un autre part de B vers A à 100 km/h. Les gares sont à 225 km l'une de l'autre (distance inventée). À quelle heure se croisent-ils ?</span></summary>
+        <div>
+          <span><strong>1 · Inconnue.</strong> Soit x le temps, en heures, jusqu'au croisement.</span>
+          <span><strong>2 · Équation.</strong> Distance = vitesse × temps. Ensemble, les deux trains parcourent les 225 km : <span class="mono">80x + 100x = 225</span>.</span>
+          <span><strong>3 · Résolution.</strong> <span class="mono">180x = 225</span>, donc <span class="mono">x = 1,25</span>.</span>
+          <span><strong>4 · Vérification et réponse.</strong> 1,25 h = 1 h 15 min. Le premier train a fait 80 × 1,25 = 100 km, le second 100 × 1,25 = 125 km, et 100 + 125 = 225. Les trains se croisent à <strong>10 h 15</strong>, à 100 km de la gare A.</span>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section data-fiche><!--tprint--><p class="tprint-h">Fiche de révision · Des problèmes aux équations</p><!--/tprint-->    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• Mettre en équation, c'est <strong>4 étapes</strong> : 1. choisir l'inconnue ; 2. traduire l'énoncé en équation ; 3. résoudre ; 4. vérifier dans l'énoncé et répondre par une phrase.</span>
+      <span>• <strong>L'inconnue</strong> : une phrase complète avec l'unité (« Soit x le prix d'un croissant, en francs »). Souvent, on choisit la plus petite quantité, et on écrit les autres avec x.</span>
+      <span>• <strong>Le dictionnaire</strong> : le double 2x, la moitié x/2, 5 de plus x + 5, 3 de moins <strong>x − 3</strong> (pas 3 − x), deux nombres consécutifs x et x + 1.</span>
+      <span>• <strong>Les parenthèses</strong> : « le double de (l'âge dans 4 ans) », c'est 2(x + 4).</span>
+      <span>• <strong>Âges</strong> : dans n ans, tout le monde a n ans de plus. <strong>Géométrie</strong> : périmètre du rectangle 2 × (L + l), angles d'un triangle 180°. <strong>Mouvement</strong> : distance = vitesse × temps, et 0,5 h = 30 min.</span>
+      <span>• <strong>La réponse doit avoir du sens</strong> : âge positif, nombre de personnes entier, note entre 1 et 6, chiffre de 0 à 9. Sinon, cherche l'erreur.</span>
+    </div>
+  <!--tprint--><p class="tprint-row"><button type="button" class="tprint" data-print><span aria-hidden="true">🖨</span> Imprimer la fiche</button><span>Seulement ce résumé, sur une page.</span></p><!--/tprint-->
+</section>
+
+  <!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"><a class="prev" href="les-equations.html"><span>← Précédent</span><strong>Les équations</strong></a><a class="next" href="l-equation-produit-nul-et-les-systemes.html"><span>Suivant →</span><strong>L&#x27;équation produit nul et les systèmes</strong></a></div><div class="tnav-end"><a class="tnav-home" href="maths.html">⌂ Tous les tutoriels de maths</a><button type="button" data-share hidden>Partager</button></div></nav><!--/tnav-->
+<footer>Fiche de révision · Mettre en équation<!--tmaj--><span class="tmaj" style="display:block;margin-top:6px;font-size:.85rem;opacity:.85">Dernière mise à jour : 24 novembre 2026 · © 2026 Nicolas Meynet</span><!--/tmaj--></footer>
+</main>
+
+<script>
+(function () {
+  /*
+   * Hooks de test : window.__miseq
+   *   Fractions exactes [num, dén] : F(n, d), fAdd, fSub, fMul, fDiv, fNum('0,4'), fmt(f) -> '1,2', '−16', '17/3'
+   *   tokenize(s), parseEq(s) -> {L, R} (chaque côté = {a, b} pour a·x + b, en fractions)
+   *   solveEq(s)            -> {kind: 'one'|'none'|'all', x, noX}
+   *   equivalent(s1, s2)    -> true si les deux équations ont les mêmes solutions (L − R proportionnels)
+   *   tokDisp(tokens)       -> écriture d’une suite de blocs ('2', '(', 'x', ...)
+   *   checkBuild(tokens, P) -> vérification de « l’équation à construire » : {ok, k, msg, x}
+   *   guess(n)              -> devinette 3n + 7 comparé à 25
+   *   DICT, SENS            -> cartes des jeux (makeSorter) : {k, s, o?, a, why}
+   *   UNK                   -> « qui sera x ? » : problèmes et choix possibles
+   *   BUILD                 -> équations à construire : {text, let, target, nums, sol, hint}
+   *   STEP                  -> problèmes pas à pas : riddle, age, money, geo, num, move ; chaque ligne {e: équation} ou {t: texte}
+   *   ATEL                  -> atelier final : 6 problèmes à 4 étapes {q, o, a, why}, sol
+   *   poules(p)             -> {poules, lapins, tetes, pattes}
+   *   diophante()           -> solution exacte de l’énigme de Diophante
+   *   quiz                  -> les 8 questions du quiz
+   */
+  /*ALGO*/
+  /* ---------- Fractions exactes ---------- */
+  function gcd(a, b) { a = Math.abs(a); b = Math.abs(b); while (b) { var t = a % b; a = b; b = t; } return a || 1; }
+  function F(n, d) {
+    d = d == null ? 1 : d;
+    if (d === 0) throw new Error('On ne peut pas diviser par 0.');
+    if (d < 0) { n = -n; d = -d; }
+    var g = gcd(n, d); return [n / g, d / g];
+  }
+  function fAdd(p, q) { return F(p[0] * q[1] + q[0] * p[1], p[1] * q[1]); }
+  function fNeg(p) { return [-p[0], p[1]]; }
+  function fSub(p, q) { return fAdd(p, fNeg(q)); }
+  function fMul(p, q) { return F(p[0] * q[0], p[1] * q[1]); }
+  function fDiv(p, q) { if (q[0] === 0) throw new Error('On ne peut pas diviser par 0.'); return F(p[0] * q[1], p[1] * q[0]); }
+  function fEq(p, q) { return p[0] === q[0] && p[1] === q[1]; }
+  function fNum(s) {
+    s = String(s).replace(',', '.');
+    var i = s.indexOf('.');
+    if (i < 0) return F(parseInt(s, 10), 1);
+    return F(parseInt(s.replace('.', ''), 10), Math.pow(10, s.length - i - 1));
+  }
+  /* Écriture française : virgule décimale si possible, sinon fraction. */
+  function fmt(p) {
+    var n = Math.abs(p[0]), d = p[1], m = d, s;
+    while (m % 2 === 0) m /= 2;
+    while (m % 5 === 0) m /= 5;
+    if (m === 1) {
+      var pw = 1, k = 0;
+      while (pw % d !== 0) { pw *= 10; k++; }
+      var N = n * (pw / d), ip = Math.floor(N / pw), fp = String(N % pw);
+      while (fp.length < k) fp = '0' + fp;
+      fp = fp.replace(/0+$/, '');
+      s = String(ip) + (fp ? ',' + fp : '');
+    } else s = n + '/' + d;
+    return (p[0] < 0 ? '−' : '') + s;
+  }
+
+  /* ---------- Expressions du premier degré : a·x + b ---------- */
+  function lin(a, b) { return { a: a, b: b }; }
+  function lAdd(u, v) { return lin(fAdd(u.a, v.a), fAdd(u.b, v.b)); }
+  function lNeg(u) { return lin(fNeg(u.a), fNeg(u.b)); }
+  function lMul(u, v) {
+    if (u.a[0] && v.a[0]) throw new Error('Ici, on ne multiplie pas x par x : l’équation doit rester simple (sans x²).');
+    return lin(fAdd(fMul(u.a, v.b), fMul(v.a, u.b)), fMul(u.b, v.b));
+  }
+  function lDiv(u, v) {
+    if (v.a[0]) throw new Error('Ici, on ne divise pas par une expression avec x.');
+    if (!v.b[0]) throw new Error('On ne peut pas diviser par 0.');
+    return lin(fDiv(u.a, v.b), fDiv(u.b, v.b));
+  }
+  function tokenize(s) {
+    var out = [], i = 0; s = String(s);
+    while (i < s.length) {
+      var c = s.charAt(i);
+      if (c === ' ' || c === ' ' || c === ' ') { i++; continue; }
+      if (/[0-9]/.test(c)) {
+        var j = i; while (j < s.length && /[0-9,]/.test(s.charAt(j))) j++;
+        var num = s.slice(i, j);
+        if (/,$/.test(num) || (num.match(/,/g) || []).length > 1) throw new Error('Nombre mal écrit : ' + num);
+        out.push({ k: 'n', v: num }); i = j; continue;
+      }
+      if (c === 'x') { out.push({ k: 'x', v: 'x' }); i++; continue; }
+      if ('+-−×*·/:()='.indexOf(c) >= 0) {
+        out.push({ k: 'o', v: c === '-' ? '−' : (c === '*' || c === '·') ? '×' : c === ':' ? '/' : c }); i++; continue;
+      }
+      throw new Error('Signe inconnu : ' + c);
+    }
+    return out;
+  }
+  function parseLin(toks) {
+    var p = 0;
+    function isOp(t, v) { return !!t && t.k === 'o' && t.v === v; }
+    function sum() {
+      var v = prod();
+      while (isOp(toks[p], '+') || isOp(toks[p], '−')) { var o = toks[p++].v, r = prod(); v = o === '+' ? lAdd(v, r) : lAdd(v, lNeg(r)); }
+      return v;
+    }
+    function prod() {
+      var v = unary();
+      for (;;) {
+        var t = toks[p];
+        if (isOp(t, '×')) { p++; v = lMul(v, unary()); }
+        else if (isOp(t, '/')) { p++; v = lDiv(v, unary()); }
+        else if (t && (t.k === 'x' || isOp(t, '('))) v = lMul(v, prim());
+        else break;
+      }
+      return v;
+    }
+    function unary() {
+      if (isOp(toks[p], '−')) { p++; return lNeg(unary()); }
+      if (isOp(toks[p], '+')) { p++; return unary(); }
+      return prim();
+    }
+    function prim() {
+      var t = toks[p];
+      if (!t) throw new Error('Il manque quelque chose à la fin d’un côté.');
+      if (t.k === 'n') { p++; return lin(F(0), fNum(t.v)); }
+      if (t.k === 'x') { p++; return lin(F(1), F(0)); }
+      if (isOp(t, '(')) {
+        p++; var v = sum();
+        if (!isOp(toks[p], ')')) throw new Error('Il manque une parenthèse fermante « ) ».');
+        p++; return v;
+      }
+      throw new Error('Le signe « ' + t.v + ' » est mal placé.');
+    }
+    if (!toks.length) throw new Error('Un des deux côtés du signe = est vide.');
+    var v = sum();
+    if (p < toks.length) throw new Error(isOp(toks[p], ')') ? 'Il y a une parenthèse fermante « ) » en trop.' : 'Le bloc « ' + toks[p].v + ' » est mal placé : il manque peut-être un signe.');
+    return v;
+  }
+  function parseEq(s) {
+    var toks = tokenize(s), eqs = [];
+    toks.forEach(function (t, i) { if (t.k === 'o' && t.v === '=') eqs.push(i); });
+    if (!eqs.length) throw new Error('Il manque le signe = : une équation, c’est une égalité.');
+    if (eqs.length > 1) throw new Error('Il faut un seul signe =.');
+    return { L: parseLin(toks.slice(0, eqs[0])), R: parseLin(toks.slice(eqs[0] + 1)) };
+  }
+  function solveEq(s) {
+    var q = parseEq(s), A = fSub(q.L.a, q.R.a), B = fSub(q.R.b, q.L.b);
+    var noX = !q.L.a[0] && !q.R.a[0];
+    if (!A[0]) return { kind: B[0] ? 'none' : 'all', noX: noX, A: A, B: B };
+    return { kind: 'one', x: fDiv(B, A), A: A, B: B, noX: false };
+  }
+  /* Deux équations du premier degré sont équivalentes si (gauche − droite) sont proportionnels. */
+  function equivalent(s1, s2) {
+    var r1 = typeof s1 === 'string' ? solveEq(s1) : s1, r2 = typeof s2 === 'string' ? solveEq(s2) : s2;
+    if (!r1.A[0] || !r2.A[0]) return false;
+    return fEq(fMul(r1.A, r2.B), fMul(r2.A, r1.B));
+  }
+  function isNum(t) { return /^[0-9,]+$/.test(t); }
+  function tokDisp(tokens) {
+    var s = '';
+    tokens.forEach(function (t, i) {
+      var pr = tokens[i - 1];
+      var tight = i === 0 || pr === '(' || t === ')' || t === '/' || pr === '/' ||
+        (t === 'x' && (isNum(pr) || pr === ')')) || (t === '(' && (isNum(pr) || pr === 'x' || pr === ')'));
+      s += (tight ? '' : ' ') + t;
+    });
+    return s;
+  }
+
+  /* ---------- Étape 1 : la devinette ---------- */
+  function guess(n) { var r = 3 * n + 7; return { n: n, r: r, cmp: r === 25 ? 0 : r < 25 ? -1 : 1 }; }
+
+  /* ---------- Étape 2 : le dictionnaire ---------- */
+  var DICT = [
+    { k: 'd1', s: '« le double de x »', o: ['x + 2', '2x', 'x²'], a: '2x', why: 'Le double, c’est 2 fois : 2 × x = 2x. Et x² (le carré), c’est x × x.' },
+    { k: 'd2', s: '« la moitié de x »', o: ['x/2', '2x', 'x − 2'], a: 'x/2', why: 'La moitié, c’est diviser par 2 : x/2 (on peut aussi écrire 0,5x).' },
+    { k: 'd3', s: '« 3 de moins que x »', o: ['3 − x', '3x', 'x − 3'], a: 'x − 3', why: 'On part de x et on enlève 3 : x − 3. Avec x = 10 : 3 de moins que 10, c’est 7, et 10 − 3 = 7 (alors que 3 − 10 = −7).' },
+    { k: 'd4', s: '« 5 de plus que x »', o: ['x + 5', '5x', 'x − 5'], a: 'x + 5', why: '« De plus » : on ajoute. 5x, ce serait « 5 fois x ».' },
+    { k: 'd5', s: '« x diminué de 8 »', o: ['8 − x', 'x − 8', 'x/8'], a: 'x − 8', why: '« Diminué de 8 » : on enlève 8 à x. Le nombre de départ reste devant.' },
+    { k: 'd6', s: '« le triple de x, augmenté de 4 »', o: ['3x + 4', '3(x + 4)', '3 + 4x'], a: '3x + 4', why: 'On triple x (3x), puis on ajoute 4. 3(x + 4) serait « le triple de x + 4 », c’est-à-dire de tout.' },
+    { k: 'd7', s: '« le triple de la somme de x et de 4 »', o: ['3x + 4', '3(x + 4)', '3 + x + 4'], a: '3(x + 4)', why: 'On fait d’abord la somme x + 4, puis on triple le tout : il faut des parenthèses, 3(x + 4).' },
+    { k: 'd8', s: '« le carré de x »', o: ['2x', 'x + 2', 'x²'], a: 'x²', why: 'Le carré, c’est x × x = x². Le double (2x), c’est x + x : ce n’est pas pareil !' },
+    { k: 'd9', s: '« deux nombres consécutifs ; le plus petit est x »', o: ['x et 2x', 'x et x + 1', 'x et x − 1'], a: 'x et x + 1', why: 'Consécutifs : ils se suivent, comme 7 et 8. Le suivant de x est x + 1. (x − 1 serait le précédent, plus petit que x.)' },
+    { k: 'd10', s: '« le produit de x par 6 »', o: ['x + 6', 'x/6', '6x'], a: '6x', why: 'Le produit, c’est le résultat d’une multiplication : 6 × x = 6x. La somme, c’est le résultat d’une addition.' },
+    { k: 'd11', s: '« le quotient de x par 5 »', o: ['x/5', '5/x', '5x'], a: 'x/5', why: 'Le quotient, c’est le résultat d’une division : x divisé par 5, x/5.' },
+    { k: 'd12', s: '« la différence entre x et 4 »', o: ['x + 4', 'x − 4', '4x'], a: 'x − 4', why: 'La différence, c’est le résultat d’une soustraction : x − 4.' },
+    { k: 'd13', s: '« 20 % de x »', o: ['20x', 'x + 20', '0,2x'], a: '0,2x', why: '20 % = 20/100 = 0,2. Prendre 20 % de x, c’est 0,2 × x = 0,2x.' },
+    { k: 'd14', s: '« l’âge de Noé dans 5 ans » (Noé a x ans)', o: ['x + 5', '5x', 'x − 5'], a: 'x + 5', why: 'Dans 5 ans, Noé aura 5 ans de plus : x + 5. Il n’aura pas 5 fois son âge !' },
+    { k: 'd15', s: '« l’âge de Léa il y a 3 ans » (Léa a x ans)', o: ['3 − x', 'x + 3', 'x − 3'], a: 'x − 3', why: 'Il y a 3 ans, Léa avait 3 ans de moins : x − 3. Avec 3 − x, une personne de 12 ans aurait eu −9 ans…' }
+  ];
+
+  /* ---------- Étape 3 : qui sera x ? ---------- */
+  var UNK = [
+    { k: 'u1', label: 'Âges', text: 'Léa a 3 fois l’âge de son frère Noé. Leur mère a 30 ans de plus que Noé.',
+      q: [
+        { name: 'l’âge de Noé', ex: [['Noé', 'x'], ['Léa', '3x'], ['la mère', 'x + 30']], best: true, note: 'Excellent choix : Noé est le plus jeune, et tout s’écrit simplement, sans fraction.' },
+        { name: 'l’âge de Léa', ex: [['Léa', 'x'], ['Noé', 'x/3'], ['la mère', 'x/3 + 30']], best: false, note: 'Ça marche aussi, mais on obtient des fractions (x/3) : les calculs seront plus difficiles.' },
+        { name: 'l’âge de la mère', ex: [['la mère', 'x'], ['Noé', 'x − 30'], ['Léa', '3(x − 30)']], best: false, note: 'Ça marche aussi, mais il faut des parenthèses : 3(x − 30). Plus de risques d’erreur.' }
+      ] },
+    { k: 'u2', label: 'Kiosque', text: 'Au kiosque de la fête de l’école, un pain au chocolat coûte 0,50 fr. de plus qu’un croissant, et une boisson coûte le double d’un croissant.',
+      q: [
+        { name: 'le prix d’un croissant', ex: [['croissant', 'x'], ['pain au chocolat', 'x + 0,5'], ['boisson', '2x']], best: true, note: 'Excellent choix : les deux autres prix sont décrits à partir du croissant.' },
+        { name: 'le prix d’un pain au chocolat', ex: [['pain au chocolat', 'x'], ['croissant', 'x − 0,5'], ['boisson', '2(x − 0,5)']], best: false, note: 'Ça marche aussi, mais la boisson devient 2(x − 0,5) = 2x − 1 : un peu plus compliqué.' },
+        { name: 'le prix d’une boisson', ex: [['boisson', 'x'], ['croissant', 'x/2'], ['pain au chocolat', 'x/2 + 0,5']], best: false, note: 'Ça marche aussi, mais avec des moitiés (x/2) partout.' }
+      ] },
+    { k: 'u3', label: 'Consécutifs', text: 'On cherche trois nombres entiers consécutifs (qui se suivent).',
+      q: [
+        { name: 'le plus petit', ex: [['le plus petit', 'x'], ['celui du milieu', 'x + 1'], ['le plus grand', 'x + 2']], best: true, note: 'Le choix le plus courant : on ajoute 1, puis 2.' },
+        { name: 'celui du milieu', ex: [['le plus petit', 'x − 1'], ['celui du milieu', 'x'], ['le plus grand', 'x + 1']], best: true, note: 'Très bon choix aussi, et malin : la somme des trois vaut (x − 1) + x + (x + 1) = 3x. Les −1 et +1 s’annulent !' },
+        { name: 'le plus grand', ex: [['le plus petit', 'x − 2'], ['celui du milieu', 'x − 1'], ['le plus grand', 'x']], best: false, note: 'Ça marche aussi, avec des soustractions. Attention à ne pas te tromper de signe.' }
+      ] }
+  ];
+
+  /* ---------- Étape 4 : équations à construire ---------- */
+  var BUILD = [
+    { k: 'b1', text: 'Sami achète 3 cahiers au même prix et un stylo à 4 fr. Il paie 19 fr. en tout.', let: 'Soit x le prix d’un cahier, en francs.', target: '3x + 4 = 19', nums: ['2', '3', '4', '19'], sol: 5, hint: 'Combien coûtent 3 cahiers ? Ajoute le stylo : le tout fait 19.' },
+    { k: 'b2', text: 'Je pense à un nombre. Je le double, puis j’enlève 7 : j’obtiens 15.', let: 'Soit x le nombre pensé.', target: '2x − 7 = 15', nums: ['2', '3', '7', '15'], sol: 11, hint: '« Je le double » : 2x. « J’enlève 7 » : − 7. « J’obtiens 15 » : = 15.' },
+    { k: 'b3', text: 'Léa a 3 fois l’âge de son frère Noé. À eux deux, ils ont 48 ans.', let: 'Soit x l’âge de Noé, en années.', target: 'x + 3x = 48', nums: ['2', '3', '4', '48'], sol: 12, hint: 'L’âge de Léa, c’est 3x. Âge de Noé + âge de Léa = 48.' },
+    { k: 'b4', text: 'La longueur d’un rectangle vaut le double de sa largeur. Son périmètre mesure 54 cm.', let: 'Soit x la largeur, en cm.', target: '2(x + 2x) = 54', nums: ['2', '4', '54'], sol: 9, hint: 'La longueur, c’est 2x. Le périmètre (le tour), c’est 2 × (largeur + longueur) : utilise les parenthèses.' },
+    { k: 'b5', text: 'Inès a 20 fr. de plus que Noé. Ensemble, ils ont 86 fr.', let: 'Soit x la somme de Noé, en francs.', target: 'x + (x + 20) = 86', nums: ['2', '20', '86'], sol: 33, hint: 'Inès a x + 20. La somme de Noé + la somme d’Inès = 86.' },
+    { k: 'b6', text: 'La moitié d’un nombre, augmentée de 6, est égale à 14.', let: 'Soit x le nombre.', target: 'x/2 + 6 = 14', nums: ['2', '3', '6', '14'], sol: 16, hint: 'La moitié de x s’écrit x / 2 (le bloc « / » veut dire « divisé par »). Puis + 6.' }
+  ];
+  var OPS = ['+', '−', '×', '/', '(', ')', '='];
+  function palette(P) { return ['x'].concat(P.nums).concat(OPS); }
+  function checkBuild(tokens, P) {
+    if (!tokens.length) return { ok: false, k: 'empty', msg: 'Touche les blocs pour écrire ton équation.' };
+    var r;
+    try { r = solveEq(tokens.join(' ')); } catch (e) { return { ok: false, k: 'err', msg: e.message }; }
+    if (r.kind !== 'one') {
+      return { ok: false, k: 'nox', msg: r.noX ? 'Ton équation ne contient pas x : il faut traduire l’énoncé avec l’inconnue.' :
+        r.kind === 'none' ? 'Les x disparaissent et il reste une égalité fausse : aucun nombre ne marche. Relis l’énoncé.' :
+        'Les x disparaissent et il reste une égalité toujours vraie : cette équation ne permet pas de trouver x.' };
+    }
+    var x = fmt(r.x);
+    if (equivalent(r, solveEq(P.target))) {
+      var eq = tokens.indexOf('='), trivial = (eq === 1 && tokens[0] === 'x') || (eq === tokens.length - 2 && tokens[tokens.length - 1] === 'x');
+      return { ok: true, k: 'ok', x: x, msg: trivial ? 'C’est juste, mais tu as déjà fait une partie du calcul de tête. Essaie d’écrire l’énoncé tel quel, par exemple : ' + P.target + '.' : 'Ton équation a pour solution x = ' + x + '. Elle traduit bien l’énoncé.' };
+    }
+    return { ok: false, k: 'wrong', x: x, msg: 'Ton équation donne x = ' + x + '. Teste ce nombre dans l’énoncé : ça ne marche pas. Indice : ' + P.hint };
+  }
+
+  /* ---------- Problèmes pas à pas ---------- */
+  function E(s) { return { e: s }; }
+  function T(s) { return { t: s }; }
+  function S(s, say, add, extra) { var o = { s: s, say: say, add: add || [] }; for (var k in extra) o[k] = extra[k]; return o; }
+  var STAGES = ['Inconnue', 'Équation', 'Résolution', 'Vérification'];
+  var STEP = {
+    riddle: [
+      { k: 'r1', label: 'Devinette', sol: 6, text: 'Je pense à un nombre. Je le multiplie par 3, j’ajoute 7, et j’obtiens 25. Quel est ce nombre ?', steps: [
+        S(0, 'Lis l’énoncé. On cherche un seul nombre : le nombre pensé.'),
+        S(1, 'On donne un nom au nombre inconnu, en disant clairement ce qu’il représente.', [T('Soit x le nombre pensé.')]),
+        S(2, 'On traduit morceau par morceau : « je le multiplie par 3 » donne 3x ; « j’ajoute 7 » donne 3x + 7 ; « j’obtiens 25 » donne = 25.', [E('3x + 7 = 25')]),
+        S(3, 'On résout : on enlève 7 des deux côtés…', [E('3x = 18')]),
+        S(3, '… puis on divise par 3 des deux côtés.', [E('x = 6')]),
+        S(4, 'On vérifie dans l’énoncé : 6 multiplié par 3 fait 18, et 18 + 7 = 25. C’est bien 25 !', [T('Vérif. : 6 × 3 + 7 = 25 ✓')]),
+        S(4, 'On répond par une phrase, avec les mots de l’énoncé.', [T('Réponse : le nombre pensé est 6.')])
+      ] }
+    ],
+    age: [
+      { k: 'a1', label: 'Léa et Noé', sol: 4, text: 'Léa a 3 fois l’âge de son frère Noé. Dans 4 ans, Léa aura le double de l’âge de Noé. Quel âge ont-ils aujourd’hui ?', steps: [
+        S(0, 'On cherche deux âges, ceux d’aujourd’hui. « Dans 4 ans » parle du futur : ce n’est pas le même moment.'),
+        S(1, 'Noé est le plus jeune : on appelle x son âge. Léa a 3 fois son âge.', [T('Soit x l’âge de Noé aujourd’hui, en années.'), T('Âge de Léa aujourd’hui : 3x')]),
+        S(2, 'Dans 4 ans, chacun aura 4 ans de plus : les deux vieillissent !', [T('Dans 4 ans : Noé x + 4 ; Léa 3x + 4')]),
+        S(2, '« Léa aura le double de l’âge de Noé » : âge de Léa = 2 × âge de Noé. Les parenthèses sont obligatoires : c’est le double de tout x + 4.', [E('3x + 4 = 2(x + 4)')]),
+        S(3, 'On développe : 2(x + 4) = 2x + 8.', [E('3x + 4 = 2x + 8')]),
+        S(3, 'On enlève 2x et 4 des deux côtés.', [E('x = 4')]),
+        S(4, 'Noé a 4 ans, donc Léa 3 × 4 = 12 ans. Dans 4 ans : 8 ans et 16 ans. Et 16 est bien le double de 8.', [T('Vérif. : 8 et 16, et 16 = 2 × 8 ✓')]),
+        S(4, 'Des âges entiers et positifs : la réponse a du sens.', [T('Réponse : Noé a 4 ans et Léa a 12 ans.')])
+      ] },
+      { k: 'a2', label: 'Sami et Inès', sol: 18, text: 'Sami a 38 ans et sa fille Inès a 10 ans. Dans combien d’années Sami aura-t-il le double de l’âge d’Inès ?', steps: [
+        S(0, 'Ici, on ne cherche pas un âge, mais un nombre d’années à attendre.'),
+        S(1, 'L’inconnue est le temps à attendre.', [T('Soit x le nombre d’années à attendre.')]),
+        S(2, 'Dans x années, chacun aura x ans de plus.', [T('Dans x ans : Sami 38 + x ; Inès 10 + x')]),
+        S(2, '« Sami aura le double de l’âge d’Inès ».', [E('38 + x = 2(10 + x)')]),
+        S(3, 'On développe : 2(10 + x) = 20 + 2x.', [E('38 + x = 20 + 2x')]),
+        S(3, 'On enlève x et 20 des deux côtés.', [E('18 = x')]),
+        S(4, 'Dans 18 ans, Sami aura 38 + 18 = 56 ans et Inès 10 + 18 = 28 ans. Et 56 = 2 × 28.', [T('Vérif. : 56 = 2 × 28 ✓')]),
+        S(4, 'Un nombre d’années positif : ça a du sens.', [T('Réponse : dans 18 ans, Sami aura le double de l’âge d’Inès.')])
+      ] },
+      { k: 'a3', label: 'Grand-maman', sol: 3, text: 'Grand-maman a 66 ans et son petit-fils Noé a 12 ans. Il y a combien d’années avait-elle 7 fois l’âge de Noé ?', steps: [
+        S(0, '« Il y a » : on regarde dans le passé. Chacun avait alors le même nombre d’années en moins.'),
+        S(1, 'L’inconnue est le nombre d’années en arrière.', [T('Soit x le nombre d’années en arrière.')]),
+        S(2, 'Il y a x ans, chacun avait x ans de moins.', [T('Il y a x ans : grand-maman 66 − x ; Noé 12 − x')]),
+        S(2, '« Elle avait 7 fois l’âge de Noé ».', [E('66 − x = 7(12 − x)')]),
+        S(3, 'On développe : 7(12 − x) = 84 − 7x.', [E('66 − x = 84 − 7x')]),
+        S(3, 'On ajoute 7x des deux côtés.', [E('66 + 6x = 84')]),
+        S(3, 'On enlève 66 des deux côtés, puis on divise par 6.', [E('6x = 18'), E('x = 3')]),
+        S(4, 'Il y a 3 ans : grand-maman avait 63 ans et Noé 9 ans. Et 63 = 7 × 9.', [T('Vérif. : 63 = 7 × 9 ✓')]),
+        S(4, 'Et x doit être plus petit que 12 : il y a 3 ans, Noé était déjà né. C’est le cas.', [T('Réponse : c’était il y a 3 ans.')])
+      ] }
+    ],
+    money: [
+      { k: 'm1', label: 'Croissants', sol: 1.2, text: 'À la boulangerie, Noé achète 4 croissants et 3 pains au chocolat pour 9,60 fr. Un pain au chocolat coûte 0,40 fr. de plus qu’un croissant. Combien coûte un croissant ?', steps: [
+        S(0, 'Deux prix inconnus, mais l’un dépend de l’autre : on n’a besoin que d’une lettre.'),
+        S(1, 'Le pain au chocolat est décrit à partir du croissant : on choisit le croissant.', [T('Soit x le prix d’un croissant, en francs.'), T('Prix d’un pain au chocolat : x + 0,4')]),
+        S(2, '4 croissants coûtent 4x ; 3 pains au chocolat coûtent 3(x + 0,4). Le tout fait 9,60 fr.', [E('4x + 3(x + 0,4) = 9,6')]),
+        S(3, 'On développe : 3(x + 0,4) = 3x + 1,2.', [E('4x + 3x + 1,2 = 9,6')]),
+        S(3, 'On regroupe les x, puis on enlève 1,2 des deux côtés.', [E('7x + 1,2 = 9,6'), E('7x = 8,4')]),
+        S(3, 'On divise par 7.', [E('x = 1,2')]),
+        S(4, 'Un croissant coûte 1,20 fr., un pain au chocolat 1,60 fr. : 4 × 1,20 + 3 × 1,60 = 4,80 + 4,80 = 9,60.', [T('Vérif. : 4,80 + 4,80 = 9,60 ✓')]),
+        S(4, 'Un prix avec des centimes, c’est normal.', [T('Réponse : un croissant coûte 1,20 fr. (et un pain au chocolat 1,60 fr.).')])
+      ] },
+      { k: 'm2', label: 'Billets de train', sol: 15, text: 'Pour une excursion, un billet demi-tarif coûte la moitié du plein tarif. La famille de Léa achète 2 billets plein tarif et 3 billets demi-tarif. Elle paie 52,50 fr. Combien coûte un billet plein tarif ? (Prix inventés.)', steps: [
+        S(0, 'Les prix sont inventés pour l’exercice : en vrai, les billets coûtent d’autres montants.'),
+        S(1, 'Le demi-tarif dépend du plein tarif : on choisit le plein tarif.', [T('Soit x le prix d’un billet plein tarif, en francs.'), T('Prix d’un billet demi-tarif : x/2')]),
+        S(2, '2 billets à x, et 3 billets à x/2. Le tout fait 52,50 fr.', [E('2x + 3 × x/2 = 52,5')]),
+        S(3, '3 fois la moitié de x, c’est 1,5x. Et 2x + 1,5x = 3,5x.', [E('3,5x = 52,5')]),
+        S(3, 'On divise par 3,5 des deux côtés.', [E('x = 15')]),
+        S(4, 'Plein tarif 15 fr., demi-tarif 7,50 fr. : 2 × 15 + 3 × 7,50 = 30 + 22,50 = 52,50.', [T('Vérif. : 30 + 22,50 = 52,50 ✓')]),
+        S(4, 'On répond à la question posée.', [T('Réponse : un billet plein tarif coûte 15 fr. (demi-tarif : 7,50 fr.).')])
+      ] },
+      { k: 'm3', label: 'Tirelires', sol: 5, text: 'Sami a 45 fr. dans sa tirelire et y ajoute 6 fr. chaque semaine. Inès a 90 fr. et en dépense 3 chaque semaine. Dans combien de semaines auront-ils la même somme ?', steps: [
+        S(0, 'Une somme augmente, l’autre diminue. On cherche le moment où elles sont égales.'),
+        S(1, 'L’inconnue est un nombre de semaines.', [T('Soit x le nombre de semaines.')]),
+        S(2, 'Après x semaines, Sami a ajouté 6x fr. et Inès a dépensé 3x fr.', [T('Sami : 45 + 6x ; Inès : 90 − 3x')]),
+        S(2, '« La même somme » : on écrit l’égalité.', [E('45 + 6x = 90 − 3x')]),
+        S(3, 'On ajoute 3x des deux côtés.', [E('45 + 9x = 90')]),
+        S(3, 'On enlève 45, puis on divise par 9.', [E('9x = 45'), E('x = 5')]),
+        S(4, 'Dans 5 semaines : Sami a 45 + 30 = 75 fr., Inès a 90 − 15 = 75 fr.', [T('Vérif. : 75 fr. = 75 fr. ✓')]),
+        S(4, 'Un nombre entier de semaines : ça a du sens.', [T('Réponse : dans 5 semaines, ils auront chacun 75 fr.')])
+      ] }
+    ],
+    geo: [
+      { k: 'g1', label: 'Rectangle', sol: 9, fig: 'shape', text: 'La longueur d’un rectangle vaut le double de sa largeur. Son périmètre mesure 54 cm. Quelles sont ses dimensions ?',
+        shape: { vb: '0 0 320 180', pts: [[70, 40], [270, 40], [270, 140], [70, 140]], labs: [[170, 28, '2x', '18 cm', 'middle'], [58, 96, 'x', '9 cm', 'end'], [170, 164, '2x', '18 cm', 'middle'], [282, 96, 'x', '9 cm', 'start']] },
+        steps: [
+        S(0, 'Le périmètre, c’est le tour de la figure : on additionne les quatre côtés.'),
+        S(1, 'La longueur est décrite à partir de la largeur : on choisit la largeur.', [T('Soit x la largeur, en cm.'), T('Longueur : 2x')]),
+        S(2, 'Périmètre = 2 × (largeur + longueur).', [E('2(x + 2x) = 54')]),
+        S(3, 'Dans la parenthèse, x + 2x = 3x. Et 2 × 3x = 6x.', [E('6x = 54')]),
+        S(3, 'On divise par 6.', [E('x = 9')]),
+        S(4, 'Largeur 9 cm, longueur 18 cm. Le tour : 9 + 18 + 9 + 18 = 54.', [T('Vérif. : 9 + 18 + 9 + 18 = 54 ✓')], { show: true }),
+        S(4, 'On donne les deux dimensions, avec l’unité.', [T('Réponse : le rectangle mesure 9 cm sur 18 cm.')], { show: true })
+      ] },
+      { k: 'g2', label: 'Triangle x, 2x, 3x', sol: 30, fig: 'shape', text: 'Les trois angles d’un triangle mesurent x, 2x et 3x degrés. Combien mesure chaque angle ?',
+        shape: { vb: '0 0 320 190', pts: [[30, 165], [290, 165], [225, 52.4]], labs: [[78, 157, 'x', '30°', 'middle'], [262, 154, '2x', '60°', 'end'], [222, 82, '3x', '90°', 'middle']] },
+        steps: [
+        S(0, 'Ce qu’il faut savoir : dans tout triangle, la somme des trois angles vaut 180°.'),
+        S(1, 'Ici, l’inconnue est déjà choisie par l’énoncé.', [T('x : la mesure du plus petit angle, en degrés.')]),
+        S(2, 'Les trois angles ensemble font 180°.', [E('x + 2x + 3x = 180')]),
+        S(3, 'On regroupe : x + 2x + 3x = 6x.', [E('6x = 180')]),
+        S(3, 'On divise par 6.', [E('x = 30')]),
+        S(4, 'Les angles : 30°, 2 × 30 = 60° et 3 × 30 = 90°. Et 30 + 60 + 90 = 180. C’est un triangle rectangle !', [T('Vérif. : 30 + 60 + 90 = 180 ✓')], { show: true }),
+        S(4, 'x n’est pas toute la réponse : on donne les trois angles.', [T('Réponse : les angles mesurent 30°, 60° et 90°.')], { show: true })
+      ] },
+      { k: 'g3', label: 'Triangle isocèle', sol: 44, fig: 'shape', text: 'Dans un triangle isocèle, chaque angle de la base mesure 24° de plus que l’angle au sommet. Combien mesurent les angles ?',
+        shape: { vb: '0 0 320 210', pts: [[90, 190], [230, 190], [160, 17]], labs: [[160, 82, 'x', '44°', 'middle'], [102, 181, 'x + 24', '68°', 'start'], [218, 181, 'x + 24', '68°', 'end']] },
+        steps: [
+        S(0, 'Isocèle : les deux angles de la base sont égaux. Et la somme des angles vaut toujours 180°.'),
+        S(1, 'Les angles de la base sont décrits à partir de l’angle au sommet : on choisit celui-là.', [T('Soit x l’angle au sommet, en degrés.'), T('Chaque angle de la base : x + 24')]),
+        S(2, 'Un angle au sommet et deux angles de base : 180° en tout.', [E('x + 2(x + 24) = 180')]),
+        S(3, 'On développe, puis on regroupe.', [E('x + 2x + 48 = 180'), E('3x + 48 = 180')]),
+        S(3, 'On enlève 48, puis on divise par 3.', [E('3x = 132'), E('x = 44')]),
+        S(4, 'Sommet 44°, chaque angle de la base 44 + 24 = 68°. Et 44 + 68 + 68 = 180.', [T('Vérif. : 44 + 68 + 68 = 180 ✓')], { show: true }),
+        S(4, 'On donne les trois angles.', [T('Réponse : 44° au sommet, 68° et 68° à la base.')], { show: true })
+      ] }
+    ],
+    num: [
+      { k: 'n1', label: 'Consécutifs', sol: 28, text: 'La somme de trois nombres entiers consécutifs vaut 87. Quels sont ces nombres ?', steps: [
+        S(0, 'Consécutifs : ils se suivent, comme 4, 5 et 6.'),
+        S(1, 'On choisit le plus petit, et on écrit les suivants.', [T('Soit x le plus petit des trois nombres.'), T('Les suivants : x + 1 et x + 2')]),
+        S(2, 'Leur somme vaut 87.', [E('x + (x + 1) + (x + 2) = 87')]),
+        S(3, 'On regroupe les x et les nombres.', [E('3x + 3 = 87')]),
+        S(3, 'On enlève 3, puis on divise par 3.', [E('3x = 84'), E('x = 28')]),
+        S(4, '28 + 29 + 30 = 87, et ce sont bien trois entiers qui se suivent.', [T('Vérif. : 28 + 29 + 30 = 87 ✓')]),
+        S(4, 'On donne les trois nombres.', [T('Réponse : les nombres sont 28, 29 et 30.')])
+      ] },
+      { k: 'n2', label: 'Moyenne', sol: 6, text: 'Léa a eu 4,5 ; 5 et 4,5 à ses trois premiers tests de maths. Quelle note lui faut-il au quatrième test pour avoir exactement 5 de moyenne ?', steps: [
+        S(0, 'La moyenne, c’est la somme des notes divisée par le nombre de notes. En Suisse, les notes vont de 1 à 6.'),
+        S(1, 'On cherche la quatrième note.', [T('Soit x la note du quatrième test.')]),
+        S(2, 'Somme des 4 notes, divisée par 4, égale 5.', [E('(4,5 + 5 + 4,5 + x)/4 = 5')]),
+        S(3, 'On multiplie par 4 des deux côtés.', [E('4,5 + 5 + 4,5 + x = 20')]),
+        S(3, '4,5 + 5 + 4,5 = 14. On enlève 14 des deux côtés.', [E('14 + x = 20'), E('x = 6')]),
+        S(4, '(4,5 + 5 + 4,5 + 6) : 4 = 20 : 4 = 5. Et 6 est possible : c’est la meilleure note. Si Léa voulait 5,5 de moyenne, il lui faudrait 8 : impossible !', [T('Vérif. : 20 : 4 = 5 ✓ et 6 ≤ 6 ✓')]),
+        S(4, 'On répond à la question.', [T('Réponse : il faut un 6 au quatrième test.')])
+      ] },
+      { k: 'n3', label: 'Les chiffres', sol: 4, text: 'Un nombre a deux chiffres. Son chiffre des dizaines est le double de son chiffre des unités, et la somme de ses deux chiffres vaut 12. Quel est ce nombre ?', steps: [
+        S(0, 'Attention : on parle de chiffres (de 0 à 9), pas de nombres.'),
+        S(1, 'Le chiffre des dizaines dépend de celui des unités.', [T('Soit x le chiffre des unités.'), T('Chiffre des dizaines : 2x')]),
+        S(2, 'La somme des deux chiffres vaut 12.', [E('x + 2x = 12')]),
+        S(3, 'On regroupe, puis on divise par 3.', [E('3x = 12'), E('x = 4')]),
+        S(4, 'Unités 4, dizaines 2 × 4 = 8. Et 8 + 4 = 12. Ce sont bien des chiffres (de 0 à 9).', [T('Vérif. : 8 = 2 × 4 et 8 + 4 = 12 ✓')]),
+        S(4, 'Piège : x n’est pas la réponse ! On demandait le nombre, pas le chiffre des unités.', [T('Réponse : le nombre est 84.')])
+      ] }
+    ],
+    move: [
+      { k: 'v1', label: 'Deux cyclistes', sol: 1.5, fig: 'move', text: 'Deux villages au bord d’un lac sont à 63 km l’un de l’autre (distance inventée). À 14 h, Léa part du village A à vélo, à 20 km/h. Au même moment, Noé part du village B vers A, à 22 km/h. À quelle heure se croisent-ils ?', steps: [
+        S(0, 'Distance = vitesse × temps. À 20 km/h, en 1 heure on fait 20 km ; en 2 heures, 40 km.', [], { t: 0 }),
+        S(1, 'Ils partent en même temps : ils roulent pendant le même temps jusqu’au croisement.', [T('Soit x le temps jusqu’au croisement, en heures.')], { t: 0 }),
+        S(2, 'Après x heures, Léa a fait 20x km et Noé 22x km. (Sur le dessin : après une demi-heure.)', [T('Léa : 20x km ; Noé : 22x km')], { t: 0.5 }),
+        S(2, 'Quand ils se croisent, à eux deux, ils ont parcouru les 63 km. (Sur le dessin : après une heure, il reste encore 21 km.)', [E('20x + 22x = 63')], { t: 1 }),
+        S(3, 'On regroupe, puis on divise par 42.', [E('42x = 63'), E('x = 1,5')], { t: 1 }),
+        S(4, '1,5 h = 1 h 30 min. Léa a fait 20 × 1,5 = 30 km, Noé 22 × 1,5 = 33 km. Et 30 + 33 = 63.', [T('Vérif. : 30 + 33 = 63 ✓')], { t: 1.5 }),
+        S(4, 'On répond à la question « à quelle heure ? » : 14 h + 1 h 30 min.', [T('Réponse : ils se croisent à 15 h 30, à 30 km du village A.')], { t: 1.5 })
+      ] }
+    ]
+  };
+
+  /* ---------- Étape 10 : la réponse a-t-elle du sens ? ---------- */
+  var SENSN = { oui: 'Ça a du sens', non: 'Impossible' };
+  var SENS = [
+    { k: 's1', s: 'Nombre d’élèves dans la classe : x = 23,5', a: 'non', why: 'Un nombre d’élèves est un nombre entier. Il y a une erreur dans l’équation ou dans le calcul.' },
+    { k: 's2', s: 'Âge de Noé : x = −4 ans', a: 'non', why: 'Un âge ne peut pas être négatif. Relis l’énoncé et ton équation.' },
+    { k: 's3', s: 'Prix d’un croissant : x = 1,20 fr.', a: 'oui', why: 'Un prix peut avoir des centimes : 1,20 fr., c’est tout à fait possible.' },
+    { k: 's4', s: 'Note nécessaire au prochain test : x = 6,5', a: 'non', why: 'En Suisse, les notes vont de 1 à 6. Une note de 6,5 n’existe pas : l’objectif est impossible à atteindre.' },
+    { k: 's5', s: 'Température au sommet d’une montagne : x = −8 °C', a: 'oui', why: 'Une température peut être négative ! Une solution négative n’est pas toujours fausse : tout dépend de ce qu’on cherche.' },
+    { k: 's6', s: 'Longueur d’un côté d’un rectangle : x = −3 cm', a: 'non', why: 'Une longueur est toujours positive.' },
+    { k: 's7', s: 'Durée d’un trajet à vélo : x = 1,5 h', a: 'oui', why: '1,5 h, c’est 1 h 30 min : une durée normale.' },
+    { k: 's8', s: 'Nombre de billets de train achetés : x = 3,2', a: 'non', why: 'On achète un nombre entier de billets.' },
+    { k: 's9', s: 'Chiffre des unités d’un nombre : x = 12', a: 'non', why: 'Un chiffre va de 0 à 9. 12 n’est pas un chiffre.' },
+    { k: 's10', s: 'Un des angles d’un triangle : x = 200°', a: 'non', why: 'Les trois angles d’un triangle font 180° en tout : un seul angle ne peut pas mesurer 200°.' },
+    { k: 's11', s: 'Somme dans la tirelire de Sami après 5 semaines : x = 75 fr.', a: 'oui', why: 'Une somme positive, en francs : ça a du sens. Reste à vérifier dans l’énoncé !' }
+  ];
+
+  /* ---------- Étape 11 : atelier final ---------- */
+  var ATEL = [
+    { k: 'w1', label: 'Gaufres', sol: 25, text: 'À la fête de l’école, Léa vend des gaufres à 3 fr. pièce. Au début, il y a déjà 12 fr. dans sa caisse. À la fin, il y a 87 fr. Combien de gaufres a-t-elle vendues ?', st: [
+      { q: 'Quelle inconnue choisir ?', o: ['Soit x le nombre de gaufres vendues.', 'Soit x l’argent dans la caisse à la fin.', 'Soit x le prix d’une gaufre.'], a: 0, why: 'On cherche le nombre de gaufres : c’est lui qu’on appelle x. Le prix (3 fr.) et la caisse finale (87 fr.) sont déjà connus.' },
+      { q: 'Quelle équation traduit l’énoncé ?', o: ['3(x + 12) = 87', '3x + 12 = 87', '12x + 3 = 87'], a: 1, eq: true, why: 'x gaufres à 3 fr. rapportent 3x. On ajoute les 12 fr. du début : 3x + 12 = 87.' },
+      { q: 'Quelle est la solution ?', o: ['25', '33', '17'], a: 0, why: '3x + 12 = 87, donc 3x = 75, donc x = 25.' },
+      { q: 'Quelle est la bonne phrase de réponse ?', o: ['Léa a gagné 25 fr.', 'x = 25.', 'Léa a vendu 25 gaufres.'], a: 2, why: 'On répond avec les mots de l’énoncé : des gaufres, pas des francs. Vérif. : 25 × 3 + 12 = 75 + 12 = 87.' }
+    ] },
+    { k: 'w2', label: 'Camp de ski', sol: 13, text: 'Au camp de ski, il y a 3 fois plus d’élèves que d’accompagnants. En tout, 52 personnes partent. Combien y a-t-il d’accompagnants ?', st: [
+      { q: 'Quelle inconnue choisir ?', o: ['Soit x le nombre de personnes.', 'Soit x les élèves.', 'Soit x le nombre d’accompagnants.'], a: 2, why: 'Les accompagnants sont les moins nombreux : on les appelle x, et les élèves sont 3x. « Soit x les élèves » n’est pas assez précis : x est un nombre.' },
+      { q: 'Quelle équation traduit l’énoncé ?', o: ['x + 3x = 52', '3x = 52', 'x + 3 = 52'], a: 0, eq: true, why: 'Accompagnants (x) + élèves (3x) = 52 personnes. 3x = 52 oublierait les accompagnants.' },
+      { q: 'Quelle est la solution ?', o: ['39', '13', '17,33…'], a: 1, why: 'x + 3x = 4x = 52, donc x = 13. (39, c’est le nombre d’élèves.)' },
+      { q: 'Quelle est la bonne phrase de réponse ?', o: ['Il y a 13 accompagnants (et 39 élèves).', 'Il y a 13 élèves.', 'Il y a environ 17 accompagnants.'], a: 0, why: 'x est le nombre d’accompagnants. Vérif. : 13 + 39 = 52, et 39 = 3 × 13.' }
+    ] },
+    { k: 'w3', label: 'Tour à vélo', sol: 35, text: 'Inès fait un tour à vélo en 3 jours. Le 2ᵉ jour, elle roule 10 km de plus que le 1ᵉʳ. Le 3ᵉ jour, elle roule le double du 1ᵉʳ. En tout, elle fait 150 km. Combien de km roule-t-elle chaque jour ?', st: [
+      { q: 'Quelle inconnue choisir ?', o: ['Soit x le nombre de jours.', 'Soit x le nombre de km du 1ᵉʳ jour.', 'Soit x le nombre de km du 3ᵉ jour.'], a: 1, why: 'Les autres jours sont décrits à partir du 1ᵉʳ : c’est le choix le plus simple. Le nombre de jours (3) est déjà connu.' },
+      { q: 'Quelle équation traduit l’énoncé ?', o: ['x + 10 + 2x = 150', 'x + 10x + 2x = 150', 'x + (x + 10) + 2x = 150'], a: 2, eq: true, why: '1ᵉʳ jour x, 2ᵉ jour x + 10, 3ᵉ jour 2x. La première proposition a oublié le x du 2ᵉ jour.' },
+      { q: 'Quelle est la solution ?', o: ['35', '45', '70'], a: 0, why: '4x + 10 = 150, donc 4x = 140, donc x = 35.' },
+      { q: 'Quelle est la bonne phrase de réponse ?', o: ['Elle a roulé 35 km.', 'Elle roule 35 km le 1ᵉʳ jour, 45 km le 2ᵉ et 70 km le 3ᵉ.', 'x = 35 km.'], a: 1, why: 'On demandait les trois jours. Vérif. : 35 + 45 + 70 = 150.' }
+    ] },
+    { k: 'w4', label: 'Billets', sol: 9, text: 'Un billet aller-retour coûte le double d’un aller simple (prix inventés). Sami achète 3 allers simples et 2 allers-retours pour 63 fr. Combien coûte un aller simple ?', st: [
+      { q: 'Quelle inconnue choisir ?', o: ['Soit x le prix d’un aller simple, en francs.', 'Soit x le nombre de billets.', 'Soit x le prix total.'], a: 0, why: 'On cherche le prix d’un aller simple. L’aller-retour coûte alors 2x.' },
+      { q: 'Quelle équation traduit l’énoncé ?', o: ['3x + 2x = 63', '3x + 2 × 2x = 63', '5x × 2 = 63'], a: 1, eq: true, why: '3 allers simples : 3x. 2 allers-retours à 2x chacun : 2 × 2x = 4x. 3x + 2x oublierait que l’aller-retour coûte le double.' },
+      { q: 'Quelle est la solution ?', o: ['12,6', '6,3', '9'], a: 2, why: '3x + 4x = 7x = 63, donc x = 9.' },
+      { q: 'Quelle est la bonne phrase de réponse ?', o: ['Sami a payé 9 fr.', 'Un aller simple coûte 9 fr. (et un aller-retour 18 fr.).', 'Un aller-retour coûte 9 fr.'], a: 1, why: 'x est le prix d’un aller simple. Vérif. : 3 × 9 + 2 × 18 = 27 + 36 = 63.' }
+    ] },
+    { k: 'w5', label: 'Jardin', sol: 9, text: 'Le jardin de l’école est un rectangle. Sa longueur mesure 7 m de plus que sa largeur, et son périmètre fait 50 m. Quelles sont ses dimensions ?', st: [
+      { q: 'Quelle inconnue choisir ?', o: ['Soit x le périmètre.', 'Soit x l’aire du jardin.', 'Soit x la largeur, en m.'], a: 2, why: 'Le périmètre (50 m) est connu. La longueur est décrite à partir de la largeur : on choisit la largeur.' },
+      { q: 'Quelle équation traduit l’énoncé ?', o: ['2(x + x + 7) = 50', 'x + (x + 7) = 50', '4x + 7 = 50'], a: 0, eq: true, why: 'Périmètre = 2 × (largeur + longueur) = 2(x + x + 7). x + (x + 7) ne compte que la moitié du tour.' },
+      { q: 'Quelle est la solution ?', o: ['21,5', '9', '16'], a: 1, why: '2(2x + 7) = 4x + 14 = 50, donc 4x = 36, donc x = 9.' },
+      { q: 'Quelle est la bonne phrase de réponse ?', o: ['Le jardin mesure 9 m.', 'Le jardin mesure 9 m sur 7 m.', 'Le jardin mesure 9 m sur 16 m.'], a: 2, why: 'Largeur 9 m, longueur 9 + 7 = 16 m. Vérif. : 9 + 16 + 9 + 16 = 50.' }
+    ] },
+    { k: 'w6', label: 'Mère et fils', sol: 16, text: 'Mme Rochat a 40 ans et son fils Sami a 12 ans. Dans combien d’années aura-t-elle le double de l’âge de Sami ?', st: [
+      { q: 'Quelle inconnue choisir ?', o: ['Soit x l’âge de Sami.', 'Soit x le nombre d’années à attendre.', 'Soit x l’âge de Mme Rochat.'], a: 1, why: 'Les âges d’aujourd’hui sont connus : on cherche combien d’années il faut attendre.' },
+      { q: 'Quelle équation traduit l’énoncé ?', o: ['40 + x = 2(12 + x)', '40 + x = 2 × 12', '2(40 + x) = 12 + x'], a: 0, eq: true, why: 'Dans x ans, les deux vieillissent : 40 + x et 12 + x. L’âge de la mère = le double de celui du fils.' },
+      { q: 'Quelle est la solution ?', o: ['−16', '16', '28'], a: 1, why: '40 + x = 24 + 2x, donc 16 = x.' },
+      { q: 'Quelle est la bonne phrase de réponse ?', o: ['Mme Rochat aura 16 ans.', 'C’était il y a 16 ans.', 'Dans 16 ans, elle aura 56 ans et Sami 28 ans : le double.'], a: 2, why: 'x est un nombre d’années à attendre. Vérif. : 56 = 2 × 28.' }
+    ] }
+  ];
+  var ATST = ['L’inconnue', 'L’équation', 'La solution', 'La réponse'];
+
+  /* ---------- Étape 12 : poules et lapins ---------- */
+  function poules(p) { return { poules: p, lapins: 20 - p, tetes: 20, pattes: 2 * p + 4 * (20 - p) }; }
+  function diophante() { return solveEq('x/6 + x/12 + x/7 + 5 + x/2 + 4 = x'); }
+
+  /* ---------- Quiz ---------- */
+  var QZ = [
+    { q: '« 4 de moins que x » s’écrit…', o: [['a', '4 − x'], ['b', 'x − 4'], ['c', '4x']], a: 'b', how: 'On part de x et on enlève 4. Avec x = 10 : 10 − 4 = 6.' },
+    { q: '« Le triple de x, augmenté de 2 » s’écrit…', o: [['a', '3(x + 2)'], ['b', '3 + 2x'], ['c', '3x + 2']], a: 'c', how: 'On triple x (3x), puis on ajoute 2. 3(x + 2) serait « le triple de la somme de x et de 2 ».' },
+    { q: 'Un rectangle a pour largeur x et pour longueur 3x. Son périmètre fait 48 cm. Quelle équation ?', o: [['a', '2(x + 3x) = 48'], ['b', 'x + 3x = 48'], ['c', 'x × 3x = 48']], a: 'a', how: 'Périmètre = 2 × (largeur + longueur). 2 × 4x = 8x = 48, donc x = 6 : 6 cm sur 18 cm.' },
+    { q: 'Les angles d’un triangle mesurent x, x et 2x degrés. Combien vaut x ?', o: [['a', '60'], ['b', '45'], ['c', '90']], a: 'b', how: 'x + x + 2x = 4x = 180, donc x = 45. Les angles : 45°, 45° et 90°.' },
+    { q: 'Léa a 4 fois l’âge de Noé. Ensemble, ils ont 35 ans. Quel âge a Noé ?', o: [['a', '7 ans'], ['b', '28 ans'], ['c', '8,75 ans']], a: 'a', how: 'x + 4x = 5x = 35, donc x = 7. Noé a 7 ans et Léa 28 ans.' },
+    { q: 'Ton équation donne « nombre d’élèves : x = 24,5 ». Que fais-tu ?', o: [['a', 'J’arrondis à 25'], ['b', 'Je cherche l’erreur'], ['c', 'J’écris 24,5 élèves']], a: 'b', how: 'Un nombre d’élèves est entier : la réponse n’a pas de sens, il y a une erreur dans l’équation ou dans le calcul.' },
+    { q: 'Deux cyclistes à 60 km l’un de l’autre roulent l’un vers l’autre, à 15 km/h et à 25 km/h. Après combien de temps se croisent-ils ?', o: [['a', '2,4 h'], ['b', '4 h'], ['c', '1,5 h']], a: 'c', how: '15x + 25x = 40x = 60, donc x = 1,5 : ils se croisent après 1 h 30 min.' },
+    { q: 'Tu as trouvé x. Que reste-t-il à faire ?', o: [['a', 'Rien, x est la réponse'], ['b', 'Vérifier et faire une phrase'], ['c', 'Arrondir x']], a: 'b', how: 'Dernière étape : vérifier dans l’énoncé que la valeur marche et a du sens, puis répondre par une phrase.' }
+  ];
+  /*END-ALGO*/
+
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function clamp(i, n) { i = Math.floor(Number(i)); if (!isFinite(i)) i = 0; return Math.max(0, Math.min(n - 1, i)); }
+  function rint(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+
+  /* Trieur générique (cartes une par une), comme dans les autres tutoriels.
+     Si un item a sa propre liste o (options), elle remplace les boutons communs.
+     o.cardHtml(it, answered) renvoie le contenu HTML de la carte. */
+  function makeSorter(o) {
+    var idx = 0, ans = {};
+    function opts(it) { return it.o ? it.o : o.order; }
+    function name(c) { return o.names && o.names[c] ? o.names[c] : c; }
+    function render() {
+      var it = o.items[idx], a = ans[it.k];
+      if (o.cardHtml) $(o.card).innerHTML = o.cardHtml(it, !!a); else $(o.card).textContent = it.s;
+      $(o.pos).textContent = o.word + ' ' + (idx + 1) + ' / ' + o.items.length;
+      $(o.btns).innerHTML = opts(it).map(function (c) {
+        var cls = a ? (c === it.a ? 'right' : (c === a ? 'wrong' : '')) : '';
+        return '<button type="button" data-c="' + esc(c) + '"' + (cls ? ' class="' + cls + '"' : '') + (a ? ' disabled' : '') + '>' + esc(name(c)) + '</button>';
+      }).join('');
+      var out = $(o.out);
+      if (!a) { out.className = 'fbk'; out.innerHTML = ''; }
+      else {
+        var ok = a === it.a;
+        out.className = 'fbk ' + (ok ? 'ok' : 'no');
+        out.innerHTML = '<strong>' + (ok ? 'Bien vu !' : 'Pas tout à fait. Réponse : ' + esc(name(it.a)) + '.') + '</strong><span>' + esc(it.why) + '</span>';
+      }
+      var s = o.score(ans), last = idx === o.items.length - 1, left = s.total - s.answered;
+      $(o.score_).textContent = (o.word ? o.word + ' ' : '') + (idx + 1) + ' / ' + s.total;
+      $(o.pos).textContent = s.answered ? 'Bonnes réponses : ' + s.correct + ' sur ' + s.answered : '';
+      $(o.prev).disabled = idx === 0;
+      $(o.next).disabled = last;
+      $(o.next).style.display = last ? 'none' : '';
+      var end = $(o.out + 'End');
+      if (!end) { end = document.createElement('div'); end.id = o.out + 'End'; end.setAttribute('aria-live', 'polite'); $(o.out).insertAdjacentElement('afterend', end); }
+      if (!left) {
+        var r = s.correct / s.total;
+        end.className = 'fbk ok sorter-end';
+        end.innerHTML = '<strong>Terminé ! ' + s.correct + ' / ' + s.total + ' bonnes réponses</strong><span>' +
+          (r === 1 ? 'Parfait, tout est juste !' : r >= .7 ? 'Très bien !' : r >= .5 ? 'Pas mal ! Relis les explications des erreurs.' : 'Relis les explications, puis réessaie.') +
+          ' Touche « Recommencer » pour rejouer.</span>';
+      } else if (last && ans[it.k]) {
+        end.className = 'fbk warn sorter-end';
+        end.innerHTML = '<strong>C’était la dernière carte.</strong><span>Il te reste ' + left + ' réponse' + (left > 1 ? 's' : '') + ' à donner : reviens en arrière avec « ← Précédent ».</span>';
+      } else { end.className = ''; end.innerHTML = ''; }
+    }
+    $(o.btns).addEventListener('click', function (ev) {
+      var b = ev.target.closest('button'); if (!b || b.disabled) return;
+      var it = o.items[idx]; if (!ans[it.k]) ans[it.k] = b.getAttribute('data-c');
+      render();
+    });
+    $(o.prev).addEventListener('click', function () { idx = clamp(idx - 1, o.items.length); render(); });
+    $(o.next).addEventListener('click', function () { idx = clamp(idx + 1, o.items.length); render(); });
+    $(o.reset).addEventListener('click', function () { ans = {}; idx = 0; render(); });
+    render();
+  }
+  function scorer(items) {
+    return function (ans) { var correct = 0, answered = 0; items.forEach(function (x) { if (ans && ans[x.k]) { answered++; if (ans[x.k] === x.a) correct++; } }); return { correct: correct, answered: answered, total: items.length }; };
+  }
+
+  /* ---------- Figures des problèmes pas à pas ---------- */
+  var FIGS = {
+    shape: function (P, st) {
+      var sh = P.shape, show = !!st.show;
+      var s = '<svg class="fig" viewBox="' + sh.vb + '" role="img" aria-label="Figure du problème">';
+      s += '<polygon class="shape" points="' + sh.pts.map(function (p) { return p.join(','); }).join(' ') + '"/>';
+      sh.labs.forEach(function (l) { s += '<text class="lab" x="' + l[0] + '" y="' + l[1] + '" font-size="16" text-anchor="' + l[4] + '">' + esc(show ? l[3] : l[2]) + '</text>'; });
+      return s + '</svg>';
+    },
+    move: function (P, st) {
+      var t = st.t || 0, D = 63, x0 = 30, x1 = 330, w = x1 - x0;
+      var dl = Math.min(20 * t, D), dn = Math.min(22 * t, D);
+      var xl = x0 + w * dl / D, xn = x1 - w * dn / D;
+      var min = 14 * 60 + Math.round(t * 60), hh = Math.floor(min / 60), mm = min % 60;
+      var clock = hh + ' h ' + (mm < 10 ? '0' : '') + mm;
+      var title = t ? 'Après ' + String(t).replace('.', ',') + ' h : ' + clock : 'Départ : ' + clock;
+      var s = '<svg class="fig" viewBox="0 0 360 150" role="img" aria-label="Trajet des deux cyclistes : ' + esc(title) + '">';
+      s += '<text x="180" y="22" font-size="15" text-anchor="middle" style="font-weight:600">' + esc(title) + '</text>';
+      s += '<line class="road" x1="' + x0 + '" y1="84" x2="' + x1 + '" y2="84"/>';
+      if (dl) s += '<line class="gone1" x1="' + x0 + '" y1="84" x2="' + xl.toFixed(1) + '" y2="84"/>';
+      if (dn) s += '<line class="gone2" x1="' + x1 + '" y1="84" x2="' + xn.toFixed(1) + '" y2="84"/>';
+      s += '<rect x="' + (x0 - 7) + '" y="96" width="14" height="14" fill="var(--ink)"/><text x="' + x0 + '" y="132" font-size="15" text-anchor="middle">A</text>';
+      s += '<rect x="' + (x1 - 7) + '" y="96" width="14" height="14" fill="var(--ink)"/><text x="' + x1 + '" y="132" font-size="15" text-anchor="middle">B</text>';
+      s += '<circle cx="' + xl.toFixed(1) + '" cy="84" r="8" fill="var(--acc)" stroke="var(--ink)" stroke-width="1.5"/>';
+      s += '<circle cx="' + xn.toFixed(1) + '" cy="84" r="8" fill="var(--two)" stroke="var(--ink)" stroke-width="1.5"/>';
+      s += '<text x="' + Math.max(4, Math.min(xl - 8, 266)).toFixed(1) + '" y="66" font-size="14" text-anchor="start" style="fill:var(--acc-ink);font-weight:600">Léa ' + String(dl).replace('.', ',') + ' km</text>';
+      s += '<text x="' + Math.min(356, Math.max(xn + 8, 94)).toFixed(1) + '" y="46" font-size="14" text-anchor="end" style="fill:var(--two);font-weight:600">Noé ' + String(dn).replace('.', ',') + ' km</text>';
+      if (t && t < 1.5) s += '<text x="180" y="132" font-size="14" text-anchor="middle" class="soft" style="fill:var(--ink-soft)">écart : ' + String(D - dl - dn).replace('.', ',') + ' km</text>';
+      else if (t >= 1.5) s += '<text x="180" y="132" font-size="14" text-anchor="middle" style="fill:var(--ok);font-weight:600">ils se croisent !</text>';
+      return s + '</svg>';
+    }
+  };
+
+  /* ---------- Problèmes pas à pas : choix, feuille, Précédent / Suivant / Recommencer ---------- */
+  function makeStepper(id, probs) {
+    var root = $(id), pi = 0, idx = 0, h = '';
+    if (probs.length > 1) h += '<div class="btns" role="group" aria-label="Choisir un problème">' + probs.map(function (P, i) { return '<button type="button" class="ex pb" data-i="' + i + '" aria-pressed="' + (i === 0) + '">' + esc(P.label) + '</button>'; }).join('') + '</div>';
+    h += '<div class="enonce stx"></div>';
+    h += '<div class="btns"><span class="score spos"></span></div>';
+    h += '<div class="stages sst" aria-hidden="true"></div>';
+    h += '<div class="figw sfig"></div>';
+    h += '<div class="copy scopy" aria-label="La feuille"></div>';
+    h += '<div class="fbk info ssay" aria-live="polite"></div>';
+    h += '<div class="btns"><button type="button" class="sprev">← Précédent</button><button type="button" class="snext main">Suivant →</button><button type="button" class="sreset">Recommencer</button></div>';
+    root.innerHTML = h;
+    function q(s) { return root.querySelector(s); }
+    function render() {
+      var P = probs[pi], st = P.steps[idx], last = idx === P.steps.length - 1;
+      q('.stx').innerHTML = '<span>' + esc(P.text) + '</span>';
+      q('.spos').textContent = 'Étape ' + (idx + 1) + ' / ' + P.steps.length;
+      q('.sst').innerHTML = STAGES.map(function (n, k) { var c = st.s === k + 1 ? 'on' : (st.s > k + 1 || last) ? 'past' : ''; return '<span' + (c ? ' class="' + c + '"' : '') + '>' + (k + 1) + ' · ' + n + '</span>'; }).join('');
+      q('.sfig').innerHTML = P.fig ? FIGS[P.fig](P, st) : '';
+      var lines = '';
+      P.steps.slice(0, idx + 1).forEach(function (S2, j) {
+        S2.add.forEach(function (l) { lines += '<div class="ln' + (l.e ? ' e' : '') + (j === idx ? ' nw' : '') + '">' + esc(l.e || l.t) + '</div>'; });
+      });
+      q('.scopy').innerHTML = lines;
+      var say = q('.ssay');
+      if (last) { say.className = 'fbk ok ssay'; say.innerHTML = '<strong>Problème résolu</strong><span>' + esc(st.say) + '</span>'; }
+      else { say.className = 'fbk info ssay'; say.innerHTML = '<span>' + esc(st.say) + '</span>'; }
+      q('.sprev').disabled = idx === 0;
+      q('.snext').disabled = last;
+      q('.snext').style.display = last ? 'none' : '';
+      root.querySelectorAll('.pb').forEach(function (b) { b.setAttribute('aria-pressed', +b.getAttribute('data-i') === pi ? 'true' : 'false'); });
+    }
+    root.addEventListener('click', function (ev) {
+      var b = ev.target.closest('button'); if (!b) return;
+      var n = probs[pi].steps.length;
+      if (b.classList.contains('pb')) { pi = clamp(b.getAttribute('data-i'), probs.length); idx = 0; }
+      else if (b.classList.contains('sprev')) idx = clamp(idx - 1, n);
+      else if (b.classList.contains('snext')) idx = clamp(idx + 1, n);
+      else if (b.classList.contains('sreset')) idx = 0;
+      else return;
+      render();
+    });
+    render();
+  }
+  makeStepper('stRiddle', STEP.riddle);
+  makeStepper('stAge', STEP.age);
+  makeStepper('stMoney', STEP.money);
+  makeStepper('stGeo', STEP.geo);
+  makeStepper('stNum', STEP.num);
+  makeStepper('stMove', STEP.move);
+
+  /* ---------- Étape 1 : deviner ---------- */
+  (function () {
+    var tries = [];
+    $('gsBtns').innerHTML = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(function (n) { return '<button type="button" class="ex" data-n="' + n + '">' + n + '</button>'; }).join('');
+    function render() {
+      var out = $('gsOut');
+      if (!tries.length) { out.className = 'fbk'; out.innerHTML = ''; $('gsLog').innerHTML = ''; return; }
+      var g = tries[tries.length - 1], found = tries.some(function (t) { return t.cmp === 0; });
+      out.className = 'fbk ' + (g.cmp === 0 ? 'ok' : 'info');
+      out.innerHTML = g.cmp === 0 ? '<strong>Trouvé en ' + tries.length + ' essai' + (tries.length > 1 ? 's' : '') + ' !</strong><span>' + g.n + ' × 3 + 7 = 25. Le nombre pensé est ' + g.n + '.</span>'
+        : '<strong>' + g.n + ' × 3 + 7 = ' + g.r + '</strong><span>' + (g.cmp < 0 ? 'Trop petit : essaie un nombre plus grand.' : 'Trop grand : essaie un nombre plus petit.') + (found ? ' (Tu avais déjà trouvé, plus haut !)' : '') + '</span>';
+      $('gsLog').innerHTML = tries.map(function (t, i) { return '<span>Essai ' + (i + 1) + ' : ' + t.n + ' → ' + t.r + (t.cmp === 0 ? ' ✓' : t.cmp < 0 ? ' (trop petit)' : ' (trop grand)') + '</span>'; }).join('');
+    }
+    $('gsBtns').addEventListener('click', function (ev) {
+      var b = ev.target.closest('button'); if (!b) return;
+      tries.push(guess(+b.getAttribute('data-n'))); render();
+    });
+    $('gsReset').addEventListener('click', function () { tries = []; render(); });
+    render();
+  })();
+
+  /* ---------- Étape 2 et 10 : jeux une carte à la fois ---------- */
+  makeSorter({ items: DICT, names: null, order: [], btns: 'dcBtns', card: 'dcCard', pos: 'dcPos', out: 'dcOut', score_: 'dcScore', prev: 'dcPrev', next: 'dcNext', reset: 'dcReset', word: 'Phrase', score: scorer(DICT),
+    cardHtml: function (it) { return '<span>' + esc(it.s) + '</span><span class="soft">Quelle expression la traduit ?</span>'; } });
+  makeSorter({ items: SENS, names: SENSN, order: ['oui', 'non'], btns: 'snBtns', card: 'snCard', pos: 'snPos', out: 'snOut', score_: 'snScore', prev: 'snPrev', next: 'snNext', reset: 'snReset', word: 'Réponse', score: scorer(SENS),
+    cardHtml: function (it) { return '<span>' + esc(it.s) + '</span><span class="soft">Cette réponse a-t-elle du sens ?</span>'; } });
+
+  /* ---------- Étape 3 : qui sera x ? ---------- */
+  (function () {
+    var ui = 0, ch = -1;
+    $('unPick').innerHTML = UNK.map(function (U, i) { return '<button type="button" class="ex" data-i="' + i + '">' + esc(U.label) + '</button>'; }).join('');
+    function render() {
+      var U = UNK[ui];
+      $('unPick').querySelectorAll('button').forEach(function (b) { b.setAttribute('aria-pressed', +b.getAttribute('data-i') === ui ? 'true' : 'false'); });
+      $('unText').innerHTML = '<span>' + esc(U.text) + '</span><span class="soft">Quelle quantité appelles-tu x ?</span>';
+      $('unBtns').innerHTML = U.q.map(function (c, i) { return '<button type="button" data-c="' + i + '" aria-pressed="' + (i === ch) + '">x = ' + esc(c.name) + '</button>'; }).join('');
+      if (ch < 0) { $('unExpr').innerHTML = ''; $('unOut').className = 'fbk'; $('unOut').innerHTML = ''; return; }
+      var c = U.q[ch];
+      $('unExpr').innerHTML = c.ex.map(function (e, i) { return '<div' + (i === 0 ? ' class="me"' : '') + '><span>' + esc(e[0]) + '</span><b>' + esc(e[1]) + '</b></div>'; }).join('');
+      $('unOut').className = 'fbk ' + (c.best ? 'ok' : 'info');
+      $('unOut').innerHTML = '<strong>' + (c.best ? 'Très bon choix' : 'Possible aussi') + '</strong><span>Soit x ' + esc(c.name) + '. ' + esc(c.note) + '</span>';
+    }
+    $('unPick').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b) return; ui = clamp(b.getAttribute('data-i'), UNK.length); ch = -1; render(); });
+    $('unBtns').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b) return; ch = clamp(b.getAttribute('data-c'), UNK[ui].q.length); render(); });
+    render();
+  })();
+
+  /* ---------- Étape 4 : l'équation à construire ---------- */
+  (function () {
+    var n = BUILD.length, idx = 0, toks, st, res;
+    function init() { toks = BUILD.map(function () { return []; }); st = BUILD.map(function () { return null; }); res = BUILD.map(function () { return null; }); idx = 0; }
+    init();
+    function render() {
+      var P = BUILD[idx], locked = !!st[idx], last = idx === n - 1;
+      var okN = st.filter(function (v) { return v === 'ok'; }).length, doneN = st.filter(Boolean).length;
+      $('bdScore').textContent = 'Problème ' + (idx + 1) + ' / ' + n;
+      $('bdPos').textContent = doneN ? 'Équations réussies : ' + okN + ' sur ' + doneN : '';
+      $('bdCard').innerHTML = '<span>' + esc(P.text) + '</span><span class="soft">' + esc(P.let) + '</span>';
+      $('bdLine').innerHTML = toks[idx].length ? esc(tokDisp(toks[idx])) : '<span class="ph">Touche les blocs ci-dessous…</span>';
+      $('bdPal').innerHTML = palette(P).map(function (t) { var c = t === 'x' ? 'xx' : OPS.indexOf(t) >= 0 ? 'op' : ''; return '<button type="button" data-t="' + esc(t) + '"' + (c ? ' class="' + c + '"' : '') + (locked ? ' disabled' : '') + ' aria-label="Bloc ' + esc(t) + '">' + esc(t) + '</button>'; }).join('');
+      ['bdBack', 'bdClear', 'bdCheck', 'bdShow'].forEach(function (b) { $(b).disabled = locked; });
+      var out = $('bdOut'), r = res[idx];
+      if (st[idx] === 'seen') { out.className = 'fbk info'; out.innerHTML = '<strong>Une solution : ' + esc(P.target) + '</strong><span>Elle donne x = ' + esc(fmt(F(P.sol * 100, 100))) + '. Relis l’énoncé avec cette équation sous les yeux : chaque morceau de phrase y est traduit.</span>'; }
+      else if (!r) { out.className = 'fbk'; out.innerHTML = ''; }
+      else if (r.ok) { out.className = 'fbk ok'; out.innerHTML = '<strong>Juste ! x = ' + esc(r.x) + '</strong><span>' + esc(r.msg) + '</span>'; }
+      else { out.className = 'fbk no'; out.innerHTML = '<strong>' + (r.k === 'wrong' ? 'Pas encore' : 'Attention') + '</strong><span>' + esc(r.msg) + '</span>'; }
+      $('bdPrev').disabled = idx === 0;
+      $('bdNext').disabled = last;
+      $('bdNext').style.display = last ? 'none' : '';
+      var end = $('bdOutEnd');
+      if (!end) { end = document.createElement('div'); end.id = 'bdOutEnd'; end.setAttribute('aria-live', 'polite'); out.insertAdjacentElement('afterend', end); }
+      if (doneN === n) { end.className = 'fbk ok sorter-end'; end.innerHTML = '<strong>Terminé ! ' + okN + ' / ' + n + ' équations construites</strong><span>' + (okN === n ? 'Parfait, tu sais traduire un énoncé !' : 'Reprends celles dont tu as vu la solution : touche « Recommencer » pour rejouer.') + '</span>'; }
+      else if (last && st[idx]) { end.className = 'fbk warn sorter-end'; end.innerHTML = '<strong>C’était le dernier problème.</strong><span>Il te reste ' + (n - doneN) + ' équation' + (n - doneN > 1 ? 's' : '') + ' à construire : reviens en arrière avec « ← Précédent ».</span>'; }
+      else { end.className = ''; end.innerHTML = ''; }
+    }
+    $('bdPal').addEventListener('click', function (ev) {
+      var b = ev.target.closest('button'); if (!b || b.disabled || st[idx]) return;
+      if (toks[idx].length >= 24) return;
+      toks[idx].push(b.getAttribute('data-t')); res[idx] = null; render();
+    });
+    $('bdBack').addEventListener('click', function () { if (st[idx]) return; toks[idx].pop(); res[idx] = null; render(); });
+    $('bdClear').addEventListener('click', function () { if (st[idx]) return; toks[idx] = []; res[idx] = null; render(); });
+    $('bdCheck').addEventListener('click', function () { if (st[idx]) return; var r = checkBuild(toks[idx], BUILD[idx]); res[idx] = r; if (r.ok) st[idx] = 'ok'; render(); });
+    $('bdShow').addEventListener('click', function () { if (st[idx]) return; st[idx] = 'seen'; render(); });
+    $('bdPrev').addEventListener('click', function () { idx = clamp(idx - 1, n); render(); });
+    $('bdNext').addEventListener('click', function () { idx = clamp(idx + 1, n); render(); });
+    $('bdReset').addEventListener('click', function () { init(); render(); });
+    render();
+  })();
+
+  /* ---------- Étape 11 : atelier final ---------- */
+  (function () {
+    var n = ATEL.length, pi = 0, ans, cur;
+    function init() { ans = ATEL.map(function () { return [null, null, null, null]; }); cur = ATEL.map(function () { return 0; }); }
+    init();
+    function isDone(p) { return ans[p].every(function (v) { return v !== null; }); }
+    function pts(p) { var c = 0; ans[p].forEach(function (v, i) { if (v === ATEL[p].st[i].a) c++; }); return c; }
+    $('atPick').innerHTML = ATEL.map(function (W, i) { return '<button type="button" class="ex" data-i="' + i + '">' + (i + 1) + ' · ' + esc(W.label) + '</button>'; }).join('') + '<button type="button" data-r="1">Au hasard</button>';
+    function render() {
+      var W = ATEL[pi], k = cur[pi], S2 = W.st[k], a = ans[pi][k], last = k === 3;
+      $('atPick').querySelectorAll('button[data-i]').forEach(function (b) { b.setAttribute('aria-pressed', +b.getAttribute('data-i') === pi ? 'true' : 'false'); });
+      $('atPos').textContent = 'Étape ' + (k + 1) + ' / 4 · ' + ATST[k];
+      var doneList = ATEL.map(function (x, i) { return i; }).filter(isDone), tot = 0, got = 0;
+      ATEL.forEach(function (x, i) { ans[i].forEach(function (v, j) { if (v !== null) { tot++; if (v === x.st[j].a) got++; } }); });
+      $('atTot').textContent = tot ? 'Problèmes terminés : ' + doneList.length + ' sur ' + n + ' · bonnes réponses : ' + got + ' sur ' + tot : '';
+      $('atStages').innerHTML = STAGES.map(function (nm, j) { var c = j === k ? 'on' : ans[pi][j] !== null ? 'past' : ''; return '<span' + (c ? ' class="' + c + '"' : '') + '>' + (j + 1) + ' · ' + nm + '</span>'; }).join('');
+      $('atText').innerHTML = '<span>' + esc(W.text) + '</span>';
+      $('atQ').innerHTML = '<span>' + esc(S2.q) + '</span>';
+      $('atBtns').className = 'btns choice long' + (S2.eq || k === 2 ? ' eqs' : '');
+      $('atBtns').innerHTML = S2.o.map(function (t, i) {
+        var cls = a !== null ? (i === S2.a ? 'right' : (i === a ? 'wrong' : '')) : '';
+        return '<button type="button" data-c="' + i + '"' + (cls ? ' class="' + cls + '"' : '') + (a !== null ? ' disabled' : '') + '>' + esc(t) + '</button>';
+      }).join('');
+      var out = $('atOut');
+      if (a === null) { out.className = 'fbk'; out.innerHTML = ''; }
+      else { var ok = a === S2.a; out.className = 'fbk ' + (ok ? 'ok' : 'no'); out.innerHTML = '<strong>' + (ok ? 'Bien vu !' : 'Pas tout à fait. Réponse : ' + esc(S2.o[S2.a])) + '</strong><span>' + esc(S2.why) + '</span>'; }
+      var end = $('atEnd');
+      if (isDone(pi)) {
+        var p = pts(pi), all = doneList.length === n;
+        end.className = 'fbk ok sorter-end';
+        end.innerHTML = '<strong>Problème terminé : ' + p + ' / 4</strong><span>' + (p === 4 ? 'Les quatre étapes sont justes, bravo ! ' : 'Relis les explications des étapes manquées. ') + (all ? 'Atelier terminé : ' + got + ' / ' + tot + ' bonnes réponses. Touche « Recommencer » pour refaire ce problème.' : 'Choisis un autre problème ci-dessus (il en reste ' + (n - doneList.length) + ').') + '</span>';
+      } else if (last && a !== null) {
+        end.className = 'fbk warn sorter-end'; end.innerHTML = '<strong>Il manque une étape.</strong><span>Reviens en arrière avec « ← Précédent » pour répondre aux étapes oubliées.</span>';
+      } else { end.className = 'fbk'; end.innerHTML = ''; }
+      $('atPrev').disabled = k === 0;
+      $('atNext').disabled = last || a === null;
+      $('atNext').style.display = last ? 'none' : '';
+    }
+    $('atPick').addEventListener('click', function (ev) {
+      var b = ev.target.closest('button'); if (!b) return;
+      if (b.getAttribute('data-r')) {
+        var free = ATEL.map(function (x, i) { return i; }).filter(function (i) { return !isDone(i) && i !== pi; });
+        if (!free.length) free = ATEL.map(function (x, i) { return i; }).filter(function (i) { return i !== pi; });
+        pi = free[rint(0, free.length - 1)];
+      } else pi = clamp(b.getAttribute('data-i'), n);
+      render();
+    });
+    $('atBtns').addEventListener('click', function (ev) {
+      var b = ev.target.closest('button'); if (!b || b.disabled) return;
+      if (ans[pi][cur[pi]] === null) ans[pi][cur[pi]] = clamp(b.getAttribute('data-c'), 3);
+      render();
+    });
+    $('atPrev').addEventListener('click', function () { cur[pi] = clamp(cur[pi] - 1, 4); render(); });
+    $('atNext').addEventListener('click', function () { if (ans[pi][cur[pi]] === null) return; cur[pi] = clamp(cur[pi] + 1, 4); render(); });
+    $('atReset').addEventListener('click', function () { ans[pi] = [null, null, null, null]; cur[pi] = 0; render(); });
+    render();
+  })();
+
+  /* ---------- Étape 12 : poules et lapins ---------- */
+  (function () {
+    var p = 10;
+    function render() {
+      var r = poules(p);
+      $('plTab').innerHTML = '<div><b>' + r.poules + '</b><span>poules</span></div><div><b>' + r.lapins + '</b><span>lapins</span></div><div><b>' + r.tetes + '</b><span>têtes</span></div><div><b>' + r.pattes + '</b><span>pattes (il en faut 56)</span></div>';
+      var out = $('plOut');
+      if (r.pattes === 56) { out.className = 'fbk ok'; out.innerHTML = '<strong>Trouvé : 12 poules et 8 lapins</strong><span>' + r.poules + ' × 2 + ' + r.lapins + ' × 4 = ' + (2 * r.poules) + ' + ' + (4 * r.lapins) + ' = 56 pattes. L’équation ci-dessous trouve la même chose, sans essayer.</span>'; }
+      else { out.className = 'fbk info'; out.innerHTML = '<strong>' + r.poules + ' × 2 + ' + r.lapins + ' × 4 = ' + r.pattes + ' pattes</strong><span>' + (r.pattes > 56 ? 'Trop de pattes : il faut plus de poules (elles ont moins de pattes que les lapins).' : 'Pas assez de pattes : il faut moins de poules, donc plus de lapins.') + ' Chaque poule en plus (et lapin en moins) enlève 2 pattes.</span>'; }
+      $('plMinus').disabled = p <= 0; $('plPlus').disabled = p >= 20;
+    }
+    $('plMinus').addEventListener('click', function () { p = Math.max(0, p - 1); render(); });
+    $('plPlus').addEventListener('click', function () { p = Math.min(20, p + 1); render(); });
+    $('plReset').addEventListener('click', function () { p = 10; render(); });
+    render();
+  })();
+
+  /* ---------- Quiz ---------- */
+  var quiz = $('quiz'), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ''; done = [];
+    QZ.forEach(function (Q, k) {
+      var li = document.createElement('li');
+      li.innerHTML = '<span>' + esc(Q.q) + '</span><select id="qa' + k + '" aria-label="Ta réponse à la question ' + (k + 1) + '"><option value="">…</option>' + Q.o.map(function (o) { return '<option value="' + o[0] + '">' + esc(o[1]) + '</option>'; }).join('') + '</select><button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+      quiz.appendChild(li);
+      function check() {
+        var fb = $('qf' + k), v = $('qa' + k).value;
+        if (!v) { fb.className = 'fb'; fb.textContent = 'Choisis une réponse.'; return; }
+        if (v === Q.a) { fb.className = 'fb ok'; fb.innerHTML = 'Bravo, c’est juste !<span>' + esc(Q.how) + '</span>'; done[k] = true; }
+        else {
+          done[k] = false;
+          var good = Q.o.filter(function (o) { return o[0] === Q.a; })[0][1];
+          fb.className = 'fb no'; fb.innerHTML = 'Pas tout à fait : la bonne réponse est « ' + esc(good) + ' ».<span>' + esc(Q.how) + '</span>';
+        }
+        $('score').textContent = done.filter(Boolean).length + ' / 8';
+      }
+      $('qb' + k).addEventListener('click', check);
+      $('qa' + k).addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+    });
+    $('score').textContent = '0 / 8';
+  }
+  $('newQuiz').addEventListener('click', newQuiz);
+  newQuiz();
+
+  window.__miseq = {
+    F: F, fAdd: fAdd, fSub: fSub, fMul: fMul, fDiv: fDiv, fNum: fNum, fmt: fmt,
+    tokenize: tokenize, parseEq: parseEq, solveEq: solveEq, equivalent: equivalent, tokDisp: tokDisp,
+    checkBuild: checkBuild, palette: palette, guess: guess,
+    DICT: DICT, SENS: SENS, UNK: UNK, BUILD: BUILD, STEP: STEP, ATEL: ATEL,
+    poules: poules, diophante: diophante, quiz: QZ
+  };
+})();
+</script>
+</body>
+</html>

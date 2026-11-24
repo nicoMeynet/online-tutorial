@@ -22,6 +22,8 @@ DATES = maj.Dates()
 ROOT = Path(__file__).resolve().parent.parent
 
 TOPICS = [
+    ("mettre en équation", "mettre-en-equation.html"),
+    ("la mise en équation", "mettre-en-equation.html"),
     ("les fractions, décimaux et pourcentages", "fractions-decimaux-et-pourcentages.html"),
     ("fractions, décimaux et pourcentages", "fractions-decimaux-et-pourcentages.html"),
     ("les nombres décimaux", "les-nombres-decimaux.html"),
