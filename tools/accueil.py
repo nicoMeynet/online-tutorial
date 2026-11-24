@@ -384,6 +384,11 @@ def main():
     subj_json, data, blocks, light, dark = [], [], [], [], []
     for fname, sid, name, col, dcol, desc in SUBJECTS:
         cats, cards = read_landing(fname)
+        lp = ROOT / fname
+        lt = lp.read_text(encoding="utf-8")
+        lt2 = re.sub(r'(<p class="sub">)\d+( tutoriels)', lambda m: m.group(1) + str(len(cards)) + m.group(2), lt)
+        if lt2 != lt:
+            lp.write_text(lt2, encoding="utf-8", newline="\n")
         for c in cards:
             c["s"] = sid
         data += cards
