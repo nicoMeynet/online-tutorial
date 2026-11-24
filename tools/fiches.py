@@ -103,6 +103,7 @@ def summary(path):
     if not path.exists():
         return None
     s = path.read_text(encoding="utf-8")
+    s = re.sub(r"<!--tprint-->.*?<!--/tprint-->", "", s, flags=re.S)
     m = re.search(r'<section[^>]*>\s*<span class="eyebrow">À retenir[^<]*</span>(.*?)</section>', s, re.S)
     if not m:
         return None

@@ -115,6 +115,33 @@
       b.addEventListener('click', function () { open(b); });
     });
   }
+  /* « Imprimer la fiche » : on cache tout sauf la section [data-fiche] (et ses ancêtres), on imprime, puis on remet. */
+  function printFiche() {
+    var f = document.querySelector('[data-fiche]');
+    if (!f) { window.print(); return; }
+    var hidden = [];
+    for (var n = f; n && n !== document.body; n = n.parentElement) {
+      Array.prototype.forEach.call(n.parentElement.children, function (s) {
+        if (s !== n && !s.hasAttribute('data-tp-hide')) { s.setAttribute('data-tp-hide', ''); hidden.push(s); }
+      });
+    }
+    document.documentElement.classList.add('tp-on');
+    var done = false;
+    function restore() {
+      if (done) return; done = true;
+      hidden.forEach(function (s) { s.removeAttribute('data-tp-hide'); });
+      document.documentElement.classList.remove('tp-on');
+      window.removeEventListener('afterprint', restore);
+    }
+    window.addEventListener('afterprint', restore);
+    window.print();
+    setTimeout(restore, 1000);
+  }
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('[data-print]');
+    if (b) printFiche();
+  });
+
   window.__share = { url: pageUrl, message: message, open: function () { open(document.querySelector('button[data-share]')); }, close: close };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 })();

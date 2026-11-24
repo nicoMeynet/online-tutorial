@@ -199,6 +199,15 @@ a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-dec
 .tnav-bottom .tnav-home { align-self: center; }
 .tnav-top [data-share] { margin-left: auto; }
 .tnav-short { display: none; }
+.tprint-h { display: none; }
+.tprint-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 14px 0 0; }
+.tprint-row span { font-size: .9rem; opacity: .8; }
+.tprint { display: inline-flex; align-items: center; gap: 8px; min-height: 42px; padding: 8px 16px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font: inherit; font-weight: 700; cursor: pointer; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tprint:hover, .tprint:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+@media print { [data-tp-hide] { display: none !important; } html.tp-on, html.tp-on body { background: #fff !important; color: #111 !important; padding: 0 !important; margin: 0 !important; }
+  html.tp-on [data-fiche] { color: #111; } html.tp-on [data-fiche] * { color: #111 !important; background: transparent !important; box-shadow: none !important; }
+  html.tp-on .tprint-h { display: block; font-size: 1.4rem; font-weight: 800; margin: 0 0 10px; } .tprint-row { display: none !important; } }
 @media (max-width: 520px) { .tnav-top .tnav-long { display: none; } .tnav-top .tnav-short { display: inline; } .tnav-top { flex-wrap: nowrap; } .tnav-top > * { flex: none; } }
 .tnav-end { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
 @media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
@@ -241,6 +250,27 @@ def linkify(text, self_name):
         return out
 
     return MENTION.sub(rep, text)
+
+
+FICHE = re.compile(r"<!--tprint-->.*?<!--/tprint-->\n?", re.S)
+
+
+def fiche(src):
+    """Bouton « Imprimer la fiche » à la fin de la section « À retenir » (inverse exact : FICHE.sub)."""
+    src = FICHE.sub("", src).replace(" data-fiche>", ">")
+    m = re.search(r'<section([^>]*)>(\s*<span class="eyebrow">À retenir)', src)
+    if not m:
+        return src
+    end = src.index("</section>", m.end())
+    h1 = re.search(r"<h1[^>]*>(.*?)</h1>", src, re.S)
+    title = re.sub(r"<[^>]+>", "", h1.group(1)).strip() if h1 else ""
+    head = (f'<!--tprint--><p class="tprint-h">Fiche de révision · {title}</p><!--/tprint-->')
+    btn = ('<!--tprint--><p class="tprint-row"><button type="button" class="tprint" data-print>'
+           '<span aria-hidden="true">🖨</span> Imprimer la fiche</button>'
+           '<span>Seulement ce résumé, sur une page.</span></p><!--/tprint-->\n')
+    src = src[:end] + btn + src[end:]
+    src = src[:m.start()] + f"<section{m.group(1)} data-fiche>" + head + m.group(2) + src[m.end():]
+    return src
 
 
 def process(path, order):
@@ -287,6 +317,7 @@ def process(path, order):
     at = foot if foot > src.index('<main class="page">') else end
     src = src[:at] + bottom + src[at:]
     src = src.replace("</head>", ICONS + CSS + "</head>", 1)
+    src = fiche(src)
     src = maj.put(src, DATES.page(path.name, src))
     path.write_text(src, encoding="utf-8", newline="\n")
 
@@ -294,7 +325,7 @@ def process(path, order):
 def main():
     difficulte.apply_landings(ROOT)
     order = landing_order()
-    files = [ROOT / a for a in sys.argv[1:]] or sorted(p for p in ROOT.glob("*.html") if p.name not in dict(LANDINGS) and p.name != "index.html")
+    files = [ROOT / a for a in sys.argv[1:]] or sorted(p for p in ROOT.glob("*.html") if p.name not in dict(LANDINGS) and p.name not in ("index.html", "a-propos.html"))
     for p in files:
         process(p, order)
         print("ok", p.name)
@@ -306,10 +337,11 @@ def main():
         ds = [DATES.page(landing, src)] + [DATES.data[h]["d"] for h, _ in cards if h in DATES.data]
         alld += ds
         f.write_text(maj.put(src, max(ds)), encoding="utf-8", newline="\n")
-    idx = ROOT / "index.html"
-    if idx.exists():
-        src = idx.read_text(encoding="utf-8")
-        idx.write_text(maj.put(src, max(alld + [DATES.page("index.html", src)])), encoding="utf-8", newline="\n")
+    for name in ("index.html", "a-propos.html"):
+        idx = ROOT / name
+        if idx.exists():
+            src = idx.read_text(encoding="utf-8")
+            idx.write_text(maj.put(src, max(alld + [DATES.page(name, src)])), encoding="utf-8", newline="\n")
     DATES.save()
 
 

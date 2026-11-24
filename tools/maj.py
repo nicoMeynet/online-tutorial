@@ -24,6 +24,7 @@ def norm(src):
     s = re.sub(r"<!--ticons-->.*?<!--/ticons-->", "", s, flags=re.S)
     s = re.sub(r'<style id="tnav-css">.*?</style>', "", s, flags=re.S)
     s = STAMP.sub("", s)
+    s = re.sub(r"<!--tprint-->.*?<!--/tprint-->", "", s, flags=re.S).replace(" data-fiche>", ">")
     s = re.sub(r'<a class="tlink" href="[^"]*">(.*?)</a>', r"\1", s, flags=re.S)
     s = re.sub(r'<span class="diff d\d"[^>]*>[^<]*</span>', "", s)
     s = re.sub(r"/\*diff2?\*/.*?/\*/diff2?\*/", "", s, flags=re.S)
