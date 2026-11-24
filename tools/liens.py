@@ -22,6 +22,7 @@ DATES = maj.Dates()
 ROOT = Path(__file__).resolve().parent.parent
 
 TOPICS = [
+    ("les nombres décimaux", "les-nombres-decimaux.html"),
     ("les triangles isométriques et semblables", "les-triangles-isometriques-et-semblables.html"),
     ("les triangles semblables", "les-triangles-isometriques-et-semblables.html"),
     ("les opérations posées", "les-operations-posees.html"),

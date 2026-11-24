@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parent.parent
 
 TRACKS = [
     ("bases", "maths", "Les bases du calcul", "8H–9H", "Calculer sans se tromper, les fractions, la proportionnalité et les premières figures.", [
-        "les-priorites-de-calcul", "les-operations-posees", "les-nombres-relatifs", "les-fractions", "les-arrondis-et-ordres-de-grandeur",
+        "les-priorites-de-calcul", "les-operations-posees", "les-nombres-decimaux", "les-nombres-relatifs", "les-fractions", "les-arrondis-et-ordres-de-grandeur",
         "la-proportionnalite", "les-conversions", "les-angles-et-triangles", "les-formes-geometriques"]),
     ("quatrieme", "maths", "Cap sur la 10H", "9H–10H", "Les lettres entrent en scène : puissances, calcul littéral, équations, Pythagore.", [
         "les-puissances", "le-calcul-litteral", "les-equations", "les-pourcentages", "la-vitesse",
