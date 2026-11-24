@@ -70,6 +70,7 @@ Accueil : [francais.html](francais.html).
 | [La langue française](la-langue-francaise.html) | Du latin au français d'aujourd'hui, les mots venus d'ailleurs, la francophonie, le français de Suisse romande et les pièges d'orthographe. |
 | [La grammaire de la phrase](la-grammaire.html) | Sujet, prédicat et complément de phrase, les manipulations, les groupes, les compléments du verbe, les accords et la phrase complexe. |
 | [L'orthographe](l-orthographe.html) | Un son et plusieurs écritures, les accents, les lettres muettes, le pluriel et le féminin, de nouveaux homophones et l'art de se relire. |
+| [La ponctuation](la-ponctuation.html) | Les points, la virgule et ses deux règles d'or, le point-virgule et le deux-points, le dialogue, les espaces, et la ponctuation des messages. |
 | [La conjugaison](la-conjugaison.html) | Radical et terminaison, les trois groupes, présent, imparfait, futur, passé composé, conditionnel, subjonctif, et une machine à conjuguer. |
 
 ## Physique-chimie

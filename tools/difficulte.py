@@ -34,7 +34,7 @@ DIFF = {
     "les-signaux-et-la-communication": 2, "le-ciel-bleu-et-l-arc-en-ciel": 2, "la-physique-du-sport": 2,
     "le-climat-et-l-effet-de-serre": 2, "revisions-brevet-physique": 3,
     # Géographie et citoyenneté
-    "la-langue-francaise": 1, "la-grammaire": 2, "l-orthographe": 1, "la-conjugaison": 2, "la-geographie-de-la-suisse": 1, "l-histoire-de-la-suisse": 2, "la-geographie-du-monde": 1, "la-politique-suisse": 2,
+    "la-langue-francaise": 1, "la-grammaire": 2, "l-orthographe": 1, "la-ponctuation": 1, "la-conjugaison": 2, "la-geographie-de-la-suisse": 1, "l-histoire-de-la-suisse": 2, "la-geographie-du-monde": 1, "la-politique-suisse": 2,
     # Religions
     "les-religions-du-monde": 1, "l-hindouisme": 2, "le-bouddhisme": 2, "le-judaisme": 1, "le-christianisme": 1, "l-islam": 1, "les-sagesses-de-chine-et-du-japon": 2, "les-mythologies-antiques": 1, "les-fetes-et-calendriers": 2, "le-sikhisme": 1, "les-religions-traditionnelles": 1,
     # Numérique

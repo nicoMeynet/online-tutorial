@@ -22,6 +22,7 @@ DATES = maj.Dates()
 ROOT = Path(__file__).resolve().parent.parent
 
 TOPICS = [
+    ("la ponctuation", "la-ponctuation.html"),
     ("l'orthographe", "l-orthographe.html"),
     ("l’orthographe", "l-orthographe.html"),
     ("la grammaire", "la-grammaire.html"),
