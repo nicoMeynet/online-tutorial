@@ -205,6 +205,9 @@ summary::marker { color: var(--red); }
 details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); }
 details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
 footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+/*sorter-end*/
+.sorter-end { margin-top: .6rem; }
+.sorter-end strong { font-size: 1.05rem; }
 </style>
 
 <!--ticons--><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Tutoriels"><script src="progress.js" defer></script><script src="share.js" defer></script><!--/ticons-->
@@ -334,7 +337,8 @@ a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-dec
         <span class="fbk" id="sortFb" aria-live="polite"></span>
         <div class="btns">
           <button type="button" id="sortNext">Suivant</button>
-          <span class="score" id="sortScore">0 / 10</span>
+          <button type="button" id="sortReset">Recommencer</button>
+          <span class="score" id="sortScore">1 / 10</span>
           <span class="soft" id="sortProg"></span>
         </div>
       </div>
@@ -583,7 +587,7 @@ a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-dec
 </section>
 
   <!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"><a class="prev" href="la-gravitation.html"><span>← Précédent</span><strong>La gravitation</strong></a><a class="next" href="l-energie-cinetique-et-la-securite-routiere.html"><span>Suivant →</span><strong>L&#x27;énergie cinétique et la sécurité routière</strong></a></div><div class="tnav-end"><a class="tnav-home" href="physique.html">⌂ Tous les tutoriels de physique</a><button type="button" data-share hidden>Partager</button></div></nav><!--/tnav-->
-<footer>Fiche de révision · Les formes d'énergie<!--tmaj--><span class="tmaj" style="display:block;margin-top:6px;font-size:.85rem;opacity:.85">Dernière mise à jour : 20 novembre 2026 · © 2026 Nicolas Meynet</span><!--/tmaj--></footer>
+<footer>Fiche de révision · Les formes d'énergie<!--tmaj--><span class="tmaj" style="display:block;margin-top:6px;font-size:.85rem;opacity:.85">Dernière mise à jour : 24 novembre 2026 · © 2026 Nicolas Meynet</span><!--/tmaj--></footer>
 </main>
 
 <script>
@@ -605,6 +609,16 @@ a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-dec
   */
   var NS = 'http://www.w3.org/2000/svg', G = 9.8;
   function $(id) { return document.getElementById(id); }
+  /* Encadré de fin, placé après le retour d'un jeu « une carte à la fois » (comme makeSorter). */
+  function endBox(outId, cls, title, text) {
+    var end = $(outId + 'End');
+    if (!end) { end = document.createElement('div'); end.id = outId + 'End'; end.setAttribute('aria-live', 'polite'); $(outId).insertAdjacentElement('afterend', end); }
+    if (!cls) { end.className = ''; end.innerHTML = ''; return; }
+    end.className = 'fbk ' + cls + ' sorter-end';
+    end.innerHTML = '<strong>' + title + '</strong><span>' + text + '</span>';
+  }
+  function endMsg(r) { return (r === 1 ? 'Parfait, tout est juste !' : r >= .7 ? 'Très bien !' : r >= .5 ? 'Pas mal ! Relis les explications des erreurs.' : 'Relis les explications, puis réessaie.') + ' Touche « Recommencer » pour rejouer.'; }
+  function leftMsg(left) { return 'Il te reste ' + left + ' réponse' + (left > 1 ? 's' : '') + ' à donner : reviens en arrière avec « ← Précédent ».'; }
   function mk(p, name, attrs, text) { var e = document.createElementNS(NS, name); for (var a in attrs) if (attrs[a] != null) e.setAttribute(a, attrs[a]); if (text != null) e.textContent = text; p.appendChild(e); return e; }
   function clear(e) { while (e.firstChild) e.removeChild(e.firstChild); }
   function fmt(x, d) { var r = Math.round(x * 1e6) / 1e6; if (Object.is(r, -0)) r = 0; return r.toLocaleString('fr-FR', { maximumFractionDigits: d == null ? 3 : d }).replace('-', '−'); }
@@ -774,17 +788,23 @@ a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-dec
     b.addEventListener('click', function () { sortAnswer(f[0]); });
     $('sortBtns').appendChild(b);
   });
-  function sortNew() { deck = shuffle(POOL.slice()).slice(0, 10); si = 0; sScore = 0; $('sortScore').textContent = '0 / 10'; sortShow(); }
+  function sortNew() { deck = shuffle(POOL.slice()).slice(0, 10); si = 0; sScore = 0; sortShow(); }
+  /* Le grand compteur donne la situation affichée ; le score reste dans la ligne discrète.
+     Pas de « Suivant » sur la dernière situation : l'encadré de fin donne le score. */
+  function sortStatus() {
+    var n = si + (sDone ? 1 : 0), last = si === deck.length - 1;
+    $('sortScore').textContent = (si + 1) + ' / ' + deck.length;
+    $('sortProg').textContent = n ? 'Bonnes réponses : ' + sScore + ' sur ' + n : '';
+    $('sortNext').disabled = !sDone;
+    $('sortNext').style.display = last ? 'none' : '';
+    if (last && sDone) endBox('sortFb', 'ok', 'Terminé ! ' + sScore + ' / ' + deck.length + ' bonnes réponses', endMsg(sScore / deck.length));
+    else endBox('sortFb', '');
+  }
   function sortShow() {
     sDone = false; $('sortFb').className = 'fbk'; $('sortFb').innerHTML = '';
     FORMS.forEach(function (f) { sBtns[f[0]].className = ''; sBtns[f[0]].disabled = false; });
-    if (si >= deck.length) {
-      $('sortQ').textContent = 'Terminé : ' + sScore + ' / 10 !';
-      FORMS.forEach(function (f) { sBtns[f[0]].disabled = true; });
-      $('sortNext').textContent = 'Rejouer'; $('sortProg').textContent = ''; return;
-    }
-    $('sortQ').textContent = deck[si].t; $('sortNext').textContent = 'Suivant'; $('sortNext').disabled = true;
-    $('sortProg').textContent = 'Situation ' + (si + 1) + ' sur 10';
+    $('sortQ').textContent = deck[si].t;
+    sortStatus();
   }
   function sortAnswer(f) {
     if (sDone || si >= deck.length) return;
@@ -793,9 +813,10 @@ a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-dec
     sBtns[it.f].className = 'good'; if (!good) sBtns[f].className = 'bad';
     $('sortFb').className = 'fbk ' + (good ? 'ok' : 'no');
     $('sortFb').innerHTML = (good ? 'Bien vu !' : 'Eh non : énergie ' + FN[it.f] + '.') + '<span>' + it.why + '</span>';
-    $('sortScore').textContent = sScore + ' / 10'; $('sortNext').disabled = false;
+    sortStatus();
   }
-  $('sortNext').addEventListener('click', function () { if (si >= deck.length) { $('sortNext').disabled = false; sortNew(); return; } si++; sortShow(); if (si >= deck.length) $('sortNext').disabled = false; });
+  $('sortNext').addEventListener('click', function () { if (!sDone || si >= deck.length - 1) return; si++; sortShow(); });
+  $('sortReset').addEventListener('click', sortNew);
   sortNew();
 
   /* ---------- Étape 3 : balle ---------- */
@@ -833,6 +854,7 @@ a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-dec
       '<span class="mono">Énergie de la balle en haut : ' + fmt(BM) + ' × 9,8 × ' + fmt(h, 2) + ' ≈ ' + fmt(Eb, 2) + ' J</span>' +
       '<span>' + (bn === 0 ? "Toute son énergie (" + fmt(E0, 2) + " J) est de l'énergie de position." : fmt(Et, 2) + " J sont devenus de l'énergie thermique et du son. Total : " + fmt(E0, 2) + " J, toujours : rien n'a disparu.") + '</span>';
     $('bNext').disabled = bn >= BMAX;
+    $('bNext').style.display = bn >= BMAX ? 'none' : '';
   }
   $('bR').addEventListener('input', ball);
   $('bNext').addEventListener('click', function () { if (bn < BMAX) bn++; ball(); });

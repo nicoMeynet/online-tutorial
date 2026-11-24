@@ -190,6 +190,10 @@ details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8p
 details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
 details ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; }
 footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+/*sorter-end*/
+.sorter-end { margin-top: .6rem; }
+.sorter-end strong { font-size: 1.05rem; }
+.so-end.verdict { font-family: var(--f-body); }
 </style>
 
 <!--ticons--><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Tutoriels"><script src="progress.js" defer></script><script src="share.js" defer></script><!--/ticons-->
@@ -532,7 +536,7 @@ a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-dec
 </section>
 
   <!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"><a class="next" href="l-hindouisme.html"><span>Suivant →</span><strong>L&#x27;hindouisme</strong></a></div><div class="tnav-end"><a class="tnav-home" href="religions.html">⌂ Tous les tutoriels de religions</a><button type="button" data-share hidden>Partager</button></div></nav><!--/tnav-->
-<footer>Fiche de révision · Les religions du monde<!--tmaj--><span class="tmaj" style="display:block;margin-top:6px;font-size:.85rem;opacity:.85">Dernière mise à jour : 23 novembre 2026 · © 2026 Nicolas Meynet</span><!--/tmaj--></footer>
+<footer>Fiche de révision · Les religions du monde<!--tmaj--><span class="tmaj" style="display:block;margin-top:6px;font-size:.85rem;opacity:.85">Dernière mise à jour : 24 novembre 2026 · © 2026 Nicolas Meynet</span><!--/tmaj--></footer>
 </main>
 
 <script>
@@ -555,6 +559,9 @@ a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-dec
    */
   var NS = 'http://www.w3.org/2000/svg';
   function $(id) { return document.getElementById(id); }
+  /* Textes de l'encadré de fin des jeux de tri (comme makeSorter). */
+  function endMsg(r) { return (r === 1 ? 'Parfait, tout est juste !' : r >= .7 ? 'Très bien !' : r >= .5 ? 'Pas mal ! Relis les explications des erreurs.' : 'Relis les explications, puis réessaie.') + ' Touche « Recommencer » pour rejouer.'; }
+  function leftMsg(left) { return 'Il te reste ' + left + ' réponse' + (left > 1 ? 's' : '') + ' à donner : reviens en arrière avec « ← Précédent ».'; }
   function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   function mk(parent, name, attrs, text) { var e = document.createElementNS(NS, name); for (var a in attrs) e.setAttribute(a, attrs[a]); if (text != null) e.textContent = text; parent.appendChild(e); return e; }
 
@@ -704,9 +711,17 @@ a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-dec
     cats.innerHTML = S.cats.map(function (c) { return '<button type="button" data-k="' + c[0] + '">' + esc(c[1]) + '</button>'; }).join('');
     function upd() {
       var s = scoreOf(name, first);
-      el('.score').textContent = s.correct + ' / ' + s.total;
-      el('.so-prog').textContent = noun + ' ' + (cur + 1) + ' sur ' + S.items.length + ' · ' + s.answered + ' répondu' + (s.answered > 1 ? 's' : '');
-      el('.so-end').textContent = s.answered === s.total ? 'Terminé : ' + s.correct + ' bonne' + (s.correct > 1 ? 's' : '') + ' réponse' + (s.correct > 1 ? 's' : '') + ' du premier coup sur ' + s.total + '.' : '';
+      /* Le grand compteur donne la carte affichée ; le score reste dans la ligne discrète. */
+      var end = el('.so-end'), lastCard = cur === S.items.length - 1, left = s.total - s.answered;
+      el('.score').textContent = noun + ' ' + (cur + 1) + ' / ' + S.items.length;
+      el('.so-prog').textContent = s.answered ? 'Bonnes réponses du premier coup : ' + s.correct + ' sur ' + s.answered : '';
+      if (!left) {
+        end.className = 'verdict yes so-end sorter-end';
+        end.innerHTML = '<strong>Terminé ! ' + s.correct + ' / ' + s.total + ' bonnes réponses du premier coup</strong><span>' + endMsg(s.correct / s.total) + '</span>';
+      } else if (lastCard && Object.prototype.hasOwnProperty.call(first, cur)) {
+        end.className = 'verdict mid so-end sorter-end';
+        end.innerHTML = '<strong>C’était la dernière carte.</strong><span>' + leftMsg(left) + '</span>';
+      } else { end.className = 'so-end'; end.innerHTML = ''; }
     }
     function paint() {
       var it = S.items[cur], k = last[cur], r = k ? check(name, cur, k) : null;
@@ -725,6 +740,7 @@ a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-dec
       el('.so-item').innerHTML = (it.sym ? symSvg(it.sym) : '') + '<span>' + esc(it.t) + '</span>';
       el('.so-prev').disabled = cur === 0;
       el('.so-next').disabled = cur === S.items.length - 1;
+      el('.so-next').style.display = cur === S.items.length - 1 ? 'none' : '';
       paint(); upd();
     }
     cats.addEventListener('click', function (e) {
@@ -807,6 +823,7 @@ a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-dec
     Array.prototype.forEach.call($('tlChips').querySelectorAll('button'), function (b, i) { b.setAttribute('aria-pressed', i === tlCur ? 'true' : 'false'); });
     $('tlInfo').innerHTML = '<strong>' + esc(t.name) + '</strong><span class="mono soft" style="font-size:.88rem">' + esc(t.when) + '</span><span class="tag acc">' + (tlMode === 'hist' ? 'Selon les historiens' : 'Selon la tradition') + '</span><span>' + esc(t.text) + '</span>';
     $('tlPrev').disabled = tlCur === 0; $('tlNext').disabled = tlCur === TL.length - 1;
+    $('tlNext').style.display = tlCur === TL.length - 1 ? 'none' : '';
     $('tlHist').setAttribute('aria-pressed', tlMode === 'hist' ? 'true' : 'false');
     $('tlTrad').setAttribute('aria-pressed', tlMode === 'trad' ? 'true' : 'false');
   }

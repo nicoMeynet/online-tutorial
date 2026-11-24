@@ -262,6 +262,9 @@ details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8p
 details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
 details ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; }
 footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+/*sorter-end*/
+.sorter-end { margin-top: .6rem; }
+.sorter-end strong { font-size: 1.05rem; }
 </style>
 
 <!--ticons--><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Tutoriels"><script src="progress.js" defer></script><script src="share.js" defer></script><!--/ticons-->
@@ -619,7 +622,7 @@ a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-dec
     <div class="box">
       <h3>Qui suis-je ?</h3>
       <p class="soft">Lis les indices un par un. Plus tu trouves vite, plus tu gagnes de points : 3 points avec un indice, 2 avec deux, 1 avec trois.</p>
-      <div class="btns"><span class="score" id="whoScore">0 / 24</span><span class="step-n" id="whoPos"></span></div>
+      <div class="btns"><span class="score" id="whoScore">1 / 8</span><span class="step-n" id="whoPos"></span></div>
       <ol class="clues" id="whoClues" aria-live="polite"></ol>
       <div class="btns"><button type="button" id="whoMore">Indice suivant</button></div>
       <div class="btns who" id="whoBtns" role="group" aria-label="Choisir le personnage"></div>
@@ -764,7 +767,7 @@ a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-dec
 </section>
 
   <!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"><a class="prev" href="la-geographie-de-la-suisse.html"><span>← Précédent</span><strong>La géographie de la Suisse</strong></a><a class="next" href="la-geographie-du-monde.html"><span>Suivant →</span><strong>La géographie du monde</strong></a></div><div class="tnav-end"><a class="tnav-home" href="geographie.html">⌂ Tous les tutoriels d'histoire-géo</a><button type="button" data-share hidden>Partager</button></div></nav><!--/tnav-->
-<footer>Fiche de révision · L'histoire de la Suisse<!--tmaj--><span class="tmaj" style="display:block;margin-top:6px;font-size:.85rem;opacity:.85">Dernière mise à jour : 23 novembre 2026 · © 2026 Nicolas Meynet</span><!--/tmaj--></footer>
+<footer>Fiche de révision · L'histoire de la Suisse<!--tmaj--><span class="tmaj" style="display:block;margin-top:6px;font-size:.85rem;opacity:.85">Dernière mise à jour : 24 novembre 2026 · © 2026 Nicolas Meynet</span><!--/tmaj--></footer>
 </main>
 
 <script>
@@ -791,6 +794,16 @@ a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-dec
    */
   var NS = 'http://www.w3.org/2000/svg';
   function $(id) { return document.getElementById(id); }
+  /* Encadré de fin, placé après le retour d'un jeu « une carte à la fois » (comme makeSorter). */
+  function endBox(outId, cls, title, text) {
+    var end = $(outId + 'End');
+    if (!end) { end = document.createElement('div'); end.id = outId + 'End'; end.setAttribute('aria-live', 'polite'); $(outId).insertAdjacentElement('afterend', end); }
+    if (!cls) { end.className = ''; end.innerHTML = ''; return; }
+    end.className = 'fbk ' + cls + ' sorter-end';
+    end.innerHTML = '<strong>' + title + '</strong><span>' + text + '</span>';
+  }
+  function endMsg(r) { return (r === 1 ? 'Parfait, tout est juste !' : r >= .7 ? 'Très bien !' : r >= .5 ? 'Pas mal ! Relis les explications des erreurs.' : 'Relis les explications, puis réessaie.') + ' Touche « Recommencer » pour rejouer.'; }
+  function leftMsg(left) { return 'Il te reste ' + left + ' réponse' + (left > 1 ? 's' : '') + ' à donner : reviens en arrière avec « ← Précédent ».'; }
   function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   function mk(svg, name, attrs, text) { var e = document.createElementNS(NS, name); for (var a in attrs) e.setAttribute(a, attrs[a]); if (text != null) e.textContent = text; svg.appendChild(e); return e; }
   function clear(el) { while (el.firstChild) el.removeChild(el.firstChild); }
@@ -822,11 +835,24 @@ a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-dec
         out.className = 'fbk ' + (ok ? 'ok' : 'no');
         out.innerHTML = '<strong>' + (ok ? 'Bien vu !' : 'Pas tout à fait. Réponse : ' + esc(o.names[it.a]) + '.') + '</strong><span>' + esc(it.why) + '</span>';
       }
-      var s = o.score(ans);
-      $(o.score_).textContent = s.correct + ' / ' + s.total;
-      if (s.answered === s.total) $(o.pos).textContent = 'Terminé : ' + s.correct + ' bonnes réponses sur ' + s.total + '.';
+      var s = o.score(ans), last = idx === o.items.length - 1, left = s.total - s.answered;
+      $(o.score_).textContent = (o.word ? o.word + ' ' : '') + (idx + 1) + ' / ' + s.total;
+      $(o.pos).textContent = s.answered ? 'Bonnes réponses : ' + s.correct + ' sur ' + s.answered : '';
       $(o.prev).disabled = idx === 0;
-      $(o.next).disabled = idx === o.items.length - 1;
+      $(o.next).disabled = last;
+      $(o.next).style.display = last ? 'none' : '';
+      var end = $(o.out + 'End');
+      if (!end) { end = document.createElement('div'); end.id = o.out + 'End'; end.setAttribute('aria-live', 'polite'); $(o.out).insertAdjacentElement('afterend', end); }
+      if (!left) {
+        var r = s.correct / s.total;
+        end.className = 'fbk ok sorter-end';
+        end.innerHTML = '<strong>Terminé ! ' + s.correct + ' / ' + s.total + ' bonnes réponses</strong><span>' +
+          (r === 1 ? 'Parfait, tout est juste !' : r >= .7 ? 'Très bien !' : r >= .5 ? 'Pas mal ! Relis les explications des erreurs.' : 'Relis les explications, puis réessaie.') +
+          ' Touche « Recommencer » pour rejouer.</span>';
+      } else if (last && ans[it.k]) {
+        end.className = 'fbk warn sorter-end';
+        end.innerHTML = '<strong>C’était la dernière carte.</strong><span>Il te reste ' + left + ' réponse' + (left > 1 ? 's' : '') + ' à donner : reviens en arrière avec « ← Précédent ».</span>';
+      } else { end.className = ''; end.innerHTML = ''; }
     }
     $(o.btns).addEventListener('click', function (ev) {
       var b = ev.target.closest('button'); if (!b || b.disabled) return;
@@ -947,6 +973,7 @@ a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-dec
     });
     $('grPrev').disabled = gr === 0;
     $('grNext').disabled = gr === STOPS.length - 1;
+    $('grNext').style.display = gr === STOPS.length - 1 ? 'none' : '';
   }
   function grStop() { if (grTimer) { clearInterval(grTimer); grTimer = null; } $('grPlay').setAttribute('aria-pressed', 'false'); $('grPlay').textContent = '▶ Pas à pas'; }
   $('grSlider').addEventListener('input', function () { grStop(); grShow(this.value); });
@@ -1080,10 +1107,15 @@ a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-dec
       out.innerHTML = '<div class="reveal"><svg class="ico" viewBox="0 0 56 56" aria-hidden="true">' + ICONS[f.icon] + '</svg><div><strong>' + (ok ? 'Bravo ! +' + p + ' point' + (p > 1 ? 's' : '') : 'Non : c’était ' + esc(f.name) + '.') + '</strong><br><span>' + esc(f.name) + ' · ' + esc(f.why) + '</span></div></div>';
     }
     var tot = 0, done = 0; FIG.forEach(function (x) { tot += who.pts[x.k] || 0; if (who.ans[x.k]) done++; });
-    $('whoScore').textContent = tot + ' / ' + (FIG.length * 3);
-    $('whoPos').textContent = done === FIG.length ? 'Terminé : ' + tot + ' points sur ' + (FIG.length * 3) + '.' : 'Personnage ' + (who.idx + 1) + ' / ' + FIG.length;
+    var max = FIG.length * 3, last = who.idx === FIG.length - 1, left = FIG.length - done;
+    $('whoScore').textContent = (who.idx + 1) + ' / ' + FIG.length;
+    $('whoPos').textContent = done ? 'Points : ' + tot + ' sur ' + (done * 3) : '';
     $('whoPrev').disabled = who.idx === 0;
-    $('whoNext').disabled = who.idx === FIG.length - 1;
+    $('whoNext').disabled = last;
+    $('whoNext').style.display = last ? 'none' : '';
+    if (!left) endBox('whoOut', 'ok', 'Terminé ! ' + tot + ' / ' + max + ' points', endMsg(tot / max));
+    else if (last && a) endBox('whoOut', 'warn', 'C’était le dernier personnage.', leftMsg(left));
+    else endBox('whoOut', '');
   }
   $('whoMore').addEventListener('click', function () { var f = FIG[who.idx]; if (who.ans[f.k]) return; who.shown[f.k] = Math.min(3, (who.shown[f.k] || 1) + 1); whoRender(); });
   $('whoBtns').addEventListener('click', function (ev) {
@@ -1145,6 +1177,7 @@ a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-dec
     $('tlBar').style.width = Math.round((tlIdx + 1) / TL.length * 100) + '%';
     $('tlPrev').disabled = tlIdx === 0;
     $('tlNext').disabled = tlIdx === TL.length - 1;
+    $('tlNext').style.display = tlIdx === TL.length - 1 ? 'none' : '';
   }
   function tlStop() { if (tlTimer) { clearInterval(tlTimer); tlTimer = null; } $('tlPlay').setAttribute('aria-pressed', 'false'); $('tlPlay').textContent = '▶ Pas à pas automatique'; }
   $('tlBtns').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (b) { tlStop(); tlShow(b.getAttribute('data-i')); } });

@@ -256,6 +256,9 @@ details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8p
 details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
 details ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; }
 footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+/*sorter-end*/
+.sorter-end { margin-top: .6rem; }
+.sorter-end strong { font-size: 1.05rem; }
 </style>
 
 <!--ticons--><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Tutoriels"><script src="progress.js" defer></script><script src="share.js" defer></script><!--/ticons-->
@@ -788,7 +791,7 @@ a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-dec
 </section>
 
   <!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"><a class="prev" href="la-geographie-du-monde.html"><span>← Précédent</span><strong>La géographie du monde</strong></a></div><div class="tnav-end"><a class="tnav-home" href="geographie.html">⌂ Tous les tutoriels d'histoire-géo</a><button type="button" data-share hidden>Partager</button></div></nav><!--/tnav-->
-<footer>Fiche de révision · La politique suisse<!--tmaj--><span class="tmaj" style="display:block;margin-top:6px;font-size:.85rem;opacity:.85">Dernière mise à jour : 23 novembre 2026 · © 2026 Nicolas Meynet</span><!--/tmaj--></footer>
+<footer>Fiche de révision · La politique suisse<!--tmaj--><span class="tmaj" style="display:block;margin-top:6px;font-size:.85rem;opacity:.85">Dernière mise à jour : 24 novembre 2026 · © 2026 Nicolas Meynet</span><!--/tmaj--></footer>
 </main>
 
 <script>
@@ -900,11 +903,24 @@ a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-dec
         out.className = 'fbk ' + (ok ? 'ok' : 'no');
         out.innerHTML = '<strong>' + (ok ? 'Bien vu !' : 'Pas tout à fait. Réponse : ' + esc(o.names[o.main(it)]) + '.') + '</strong><span>' + esc(it.why) + '</span>';
       }
-      var s = o.score(ans);
-      $(o.score_).textContent = s.correct + ' / ' + s.total;
-      if (s.answered === s.total) $(o.pos).textContent = 'Terminé : ' + s.correct + ' bonnes réponses sur ' + s.total + '.';
+      var s = o.score(ans), last = idx === o.items.length - 1, left = s.total - s.answered;
+      $(o.score_).textContent = (o.word ? o.word + ' ' : '') + (idx + 1) + ' / ' + s.total;
+      $(o.pos).textContent = s.answered ? 'Bonnes réponses : ' + s.correct + ' sur ' + s.answered : '';
       $(o.prev).disabled = idx === 0;
-      $(o.next).disabled = idx === o.items.length - 1;
+      $(o.next).disabled = last;
+      $(o.next).style.display = last ? 'none' : '';
+      var end = $(o.out + 'End');
+      if (!end) { end = document.createElement('div'); end.id = o.out + 'End'; end.setAttribute('aria-live', 'polite'); $(o.out).insertAdjacentElement('afterend', end); }
+      if (!left) {
+        var r = s.correct / s.total;
+        end.className = 'fbk ok sorter-end';
+        end.innerHTML = '<strong>Terminé ! ' + s.correct + ' / ' + s.total + ' bonnes réponses</strong><span>' +
+          (r === 1 ? 'Parfait, tout est juste !' : r >= .7 ? 'Très bien !' : r >= .5 ? 'Pas mal ! Relis les explications des erreurs.' : 'Relis les explications, puis réessaie.') +
+          ' Touche « Recommencer » pour rejouer.</span>';
+      } else if (last && ans[it.k]) {
+        end.className = 'fbk warn sorter-end';
+        end.innerHTML = '<strong>C’était la dernière carte.</strong><span>Il te reste ' + left + ' réponse' + (left > 1 ? 's' : '') + ' à donner : reviens en arrière avec « ← Précédent ».</span>';
+      } else { end.className = ''; end.innerHTML = ''; }
     }
     $(o.btns).addEventListener('click', function (ev) {
       var b = ev.target.closest('button'); if (!b || b.disabled) return;
@@ -1143,6 +1159,7 @@ a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-dec
     $('pathBar').style.width = Math.round((pIdx + 1) / L.length * 100) + '%';
     $('pathPrev').disabled = pIdx === 0;
     $('pathNext').disabled = pIdx === L.length - 1;
+    $('pathNext').style.display = pIdx === L.length - 1 ? 'none' : '';
   }
   $('pathIni').addEventListener('click', function () { path = 'ini'; pathShow(0); });
   $('pathRef').addEventListener('click', function () { path = 'ref'; pathShow(0); });
@@ -1259,6 +1276,7 @@ a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-dec
     $('tlBar').style.width = Math.round((tlIdx + 1) / TL.length * 100) + '%';
     $('tlPrev').disabled = tlIdx === 0;
     $('tlNext').disabled = tlIdx === TL.length - 1;
+    $('tlNext').style.display = tlIdx === TL.length - 1 ? 'none' : '';
   }
   $('tlBtns').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (b) tlShow(b.getAttribute('data-i')); });
   $('tlPrev').addEventListener('click', function () { tlShow(tlIdx - 1); });

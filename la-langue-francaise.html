@@ -249,6 +249,9 @@ details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8p
 details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
 details ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; }
 footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+/*sorter-end*/
+.sorter-end { margin-top: .6rem; }
+.sorter-end strong { font-size: 1.05rem; }
 </style>
 
 <!--ticons--><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Tutoriels"><script src="progress.js" defer></script><script src="share.js" defer></script><!--/ticons-->
@@ -501,7 +504,7 @@ a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-dec
     <div class="box">
       <h3>Classe les mots</h3>
       <p class="soft">Le mot encadré est à classer. Choisis sa classe. Tu peux aussi toucher un mot de la phrase pour y aller.</p>
-      <div class="btns"><span class="score" id="clScore">0 / 31</span><span class="step-n" id="clPos"></span></div>
+      <div class="btns"><span class="score" id="clScore">Phrase 1 / 5</span><span class="step-n" id="clPos"></span></div>
       <div class="sent" id="clSent" aria-live="polite"></div>
       <div class="btns cls" id="clBtns" role="group" aria-label="Classe du mot"></div>
       <div class="fbk" id="clOut" aria-live="polite"></div>
@@ -689,6 +692,16 @@ a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-dec
    *   quiz                        -> les 8 questions
    */
   function $(id) { return document.getElementById(id); }
+  /* Encadré de fin, placé après le retour d'un jeu « une carte à la fois » (comme makeSorter). */
+  function endBox(outId, cls, title, text) {
+    var end = $(outId + 'End');
+    if (!end) { end = document.createElement('div'); end.id = outId + 'End'; end.setAttribute('aria-live', 'polite'); $(outId).insertAdjacentElement('afterend', end); }
+    if (!cls) { end.className = ''; end.innerHTML = ''; return; }
+    end.className = 'fbk ' + cls + ' sorter-end';
+    end.innerHTML = '<strong>' + title + '</strong><span>' + text + '</span>';
+  }
+  function endMsg(r) { return (r === 1 ? 'Parfait, tout est juste !' : r >= .7 ? 'Très bien !' : r >= .5 ? 'Pas mal ! Relis les explications des erreurs.' : 'Relis les explications, puis réessaie.') + ' Touche « Recommencer » pour rejouer.'; }
+  function leftMsg(left) { return 'Il te reste ' + left + ' réponse' + (left > 1 ? 's' : '') + ' à donner : reviens en arrière avec « ← Précédent ».'; }
   function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   function clamp(i, n) { i = Math.floor(Number(i)); if (!isFinite(i)) i = 0; return Math.max(0, Math.min(n - 1, i)); }
   function each(list, fn) { Array.prototype.forEach.call(list, fn); }
@@ -716,11 +729,24 @@ a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-dec
         out.className = 'fbk ' + (ok ? 'ok' : 'no');
         out.innerHTML = '<strong>' + (ok ? 'Bien vu !' : 'Pas tout à fait. Réponse : ' + esc(name(it.a)) + '.') + '</strong><span>' + esc(it.why) + '</span>';
       }
-      var s = o.score(ans);
-      $(o.score_).textContent = s.correct + ' / ' + s.total;
-      if (s.answered === s.total) $(o.pos).textContent = 'Terminé : ' + s.correct + ' bonnes réponses sur ' + s.total + '.';
+      var s = o.score(ans), last = idx === o.items.length - 1, left = s.total - s.answered;
+      $(o.score_).textContent = (o.word ? o.word + ' ' : '') + (idx + 1) + ' / ' + s.total;
+      $(o.pos).textContent = s.answered ? 'Bonnes réponses : ' + s.correct + ' sur ' + s.answered : '';
       $(o.prev).disabled = idx === 0;
-      $(o.next).disabled = idx === o.items.length - 1;
+      $(o.next).disabled = last;
+      $(o.next).style.display = last ? 'none' : '';
+      var end = $(o.out + 'End');
+      if (!end) { end = document.createElement('div'); end.id = o.out + 'End'; end.setAttribute('aria-live', 'polite'); $(o.out).insertAdjacentElement('afterend', end); }
+      if (!left) {
+        var r = s.correct / s.total;
+        end.className = 'fbk ok sorter-end';
+        end.innerHTML = '<strong>Terminé ! ' + s.correct + ' / ' + s.total + ' bonnes réponses</strong><span>' +
+          (r === 1 ? 'Parfait, tout est juste !' : r >= .7 ? 'Très bien !' : r >= .5 ? 'Pas mal ! Relis les explications des erreurs.' : 'Relis les explications, puis réessaie.') +
+          ' Touche « Recommencer » pour rejouer.</span>';
+      } else if (last && ans[it.k]) {
+        end.className = 'fbk warn sorter-end';
+        end.innerHTML = '<strong>C’était la dernière carte.</strong><span>Il te reste ' + left + ' réponse' + (left > 1 ? 's' : '') + ' à donner : reviens en arrière avec « ← Précédent ».</span>';
+      } else { end.className = ''; end.innerHTML = ''; }
     }
     $(o.btns).addEventListener('click', function (ev) {
       var b = ev.target.closest('button'); if (!b || b.disabled) return;
@@ -787,6 +813,7 @@ a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-dec
     }).join('');
     var full = ev.n >= E.stages.length;
     $('evNext').disabled = full;
+    $('evNext').style.display = full ? 'none' : '';
     $('evAll').disabled = full;
     $('evOut').innerHTML = full ? '<strong>Des cousins savants</strong><span>' + esc(E.cousins) + '</span>' : '';
     $('evOut').className = 'fbk' + (full ? ' info' : '');
@@ -1042,10 +1069,16 @@ a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-dec
     else { var ok = a === W[1]; out.className = 'fbk ' + (ok ? 'ok' : 'no'); out.innerHTML = '<strong>« ' + esc(W[0]) + ' » : ' + esc(CLNAMES[W[1]].toLowerCase()) + (ok ? '. Bravo !' : '.') + '</strong><span>' + esc(W[2]) + '</span>'; }
     var correct = 0, answered = 0;
     SENT.forEach(function (s, si) { s.words.forEach(function (w, wi) { var x = cl.ans[clKey(si, wi)]; if (x) { answered++; if (x === w[1]) correct++; } }); });
-    $('clScore').textContent = correct + ' / ' + CLTOTAL;
-    $('clPos').textContent = answered === CLTOTAL ? 'Terminé : ' + correct + ' sur ' + CLTOTAL + '.' : 'Phrase ' + (cl.s + 1) + ' / ' + SENT.length;
+    var last = cl.s === SENT.length - 1, left = CLTOTAL - answered;
+    var hereDone = S.words.every(function (w, i) { return !!cl.ans[clKey(cl.s, i)]; });
+    $('clScore').textContent = 'Phrase ' + (cl.s + 1) + ' / ' + SENT.length;
+    $('clPos').textContent = answered ? 'Bonnes réponses : ' + correct + ' sur ' + answered : '';
     $('clPrev').disabled = cl.s === 0;
-    $('clNext').disabled = cl.s === SENT.length - 1;
+    $('clNext').disabled = last;
+    $('clNext').style.display = last ? 'none' : '';
+    if (!left) endBox('clOut', 'ok', 'Terminé ! ' + correct + ' / ' + CLTOTAL + ' bonnes réponses', endMsg(correct / CLTOTAL));
+    else if (last && hereDone) endBox('clOut', 'warn', 'C’était la dernière phrase.', 'Il te reste ' + left + ' mot' + (left > 1 ? 's' : '') + ' à classer : reviens en arrière avec « ← Phrase précédente ».');
+    else endBox('clOut', '');
   }
   $('clSent').addEventListener('click', function (e) { var b = e.target.closest('button'); if (!b) return; cl.w = clamp(b.getAttribute('data-w'), SENT[cl.s].words.length); clRender(); });
   $('clBtns').addEventListener('click', function (e) {

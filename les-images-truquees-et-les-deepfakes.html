@@ -225,6 +225,9 @@ details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8p
 details .msg { display: block; margin-top: 8px; font-weight: 400; font-family: var(--f-mono); font-size: .9rem; background: var(--paper); border: 1.5px dashed var(--line); border-radius: 8px; padding: 8px 10px; overflow-wrap: anywhere; color: var(--ink); }
 details ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; }
 footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+/*sorter-end*/
+.sorter-end { margin-top: .6rem; }
+.sorter-end strong { font-size: 1.05rem; }
 </style>
 
 <!--ticons--><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Tutoriels"><script src="progress.js" defer></script><script src="share.js" defer></script><!--/ticons-->
@@ -324,8 +327,9 @@ a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-dec
     <div class="box">
       <div class="top-row">
         <h3>Le jeu des mots</h3>
-        <span class="score" id="mScore">0 / 10</span>
+        <span class="score" id="mScore">1 / 10</span>
       </div>
+      <p class="soft" id="mPos"></p>
       <p class="soft">Lis l'exemple et choisis le bon mot. Tu peux changer d'avis : seule ta dernière réponse compte.</p>
       <div class="dots" id="mDots" role="group" aria-label="Choisir un exemple"></div>
       <p class="example" id="mText" aria-live="polite"></p>
@@ -641,7 +645,7 @@ a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-dec
 </section>
 
   <!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"><a class="prev" href="vraie-ou-fausse-info.html"><span>← Précédent</span><strong>Vraie ou fausse info ?</strong></a><a class="next" href="les-reseaux-sociaux-et-les-algorithmes.html"><span>Suivant →</span><strong>Les réseaux sociaux et les algorithmes</strong></a></div><div class="tnav-end"><a class="tnav-home" href="numerique.html">⌂ Tous les tutoriels numériques</a><button type="button" data-share hidden>Partager</button></div></nav><!--/tnav-->
-<footer>Fiche de révision · Les images truquées et les deepfakes<!--tmaj--><span class="tmaj" style="display:block;margin-top:6px;font-size:.85rem;opacity:.85">Dernière mise à jour : 20 novembre 2026 · © 2026 Nicolas Meynet</span><!--/tmaj--></footer>
+<footer>Fiche de révision · Les images truquées et les deepfakes<!--tmaj--><span class="tmaj" style="display:block;margin-top:6px;font-size:.85rem;opacity:.85">Dernière mise à jour : 24 novembre 2026 · © 2026 Nicolas Meynet</span><!--/tmaj--></footer>
 </main>
 
 <script>
@@ -671,6 +675,16 @@ a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-dec
    */
   var NS = 'http://www.w3.org/2000/svg';
   function $(id) { return document.getElementById(id); }
+  /* Encadré de fin, placé après le retour d'un jeu « une carte à la fois » (comme makeSorter). */
+  function endBox(outId, cls, title, text) {
+    var end = $(outId + 'End');
+    if (!end) { end = document.createElement('div'); end.id = outId + 'End'; end.setAttribute('aria-live', 'polite'); $(outId).insertAdjacentElement('afterend', end); }
+    if (!cls) { end.className = ''; end.innerHTML = ''; return; }
+    end.className = 'verdict ' + (cls === 'ok' ? 'yes' : 'mid') + ' sorter-end';
+    end.innerHTML = '<strong>' + title + '</strong><span>' + text + '</span>';
+  }
+  function endMsg(r) { return (r === 1 ? 'Parfait, tout est juste !' : r >= .7 ? 'Très bien !' : r >= .5 ? 'Pas mal ! Relis les explications des erreurs.' : 'Relis les explications, puis réessaie.') + ' Touche « Recommencer » pour rejouer.'; }
+  function leftMsg(left) { return 'Il te reste ' + left + ' réponse' + (left > 1 ? 's' : '') + ' à donner : reviens en arrière avec « ← Précédent ».'; }
   function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   function btn(label, cls) { var b = document.createElement('button'); b.type = 'button'; b.textContent = label; if (cls) b.className = cls; return b; }
   function shuffle(a, rnd) { var r = a.slice(), i, j, t; for (i = r.length - 1; i > 0; i--) { j = Math.floor(rnd() * (i + 1)); t = r[i]; r[i] = r[j]; r[j] = t; } return r; }
@@ -724,7 +738,7 @@ a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-dec
   });
   function mShow(i) {
     mCur = i; var it = MATCH[i];
-    $('mText').textContent = (i + 1) + ' / ' + MATCH.length + ' — ' + it.text;
+    $('mText').textContent = it.text;
     $('mOut').innerHTML = '';
     MATCH.forEach(function (m, j) {
       var d = $('mD' + j); d.className = mAns[m.id] ? (mAns[m.id] === m.a ? 'good' : 'bad') : '';
@@ -736,8 +750,14 @@ a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-dec
       b.setAttribute('aria-pressed', mine ? 'true' : 'false');
     });
     var s = matchScore();
-    $('mScore').textContent = s.correct + ' / ' + s.total;
-    $('mPrev').disabled = i === 0; $('mNext').disabled = i === MATCH.length - 1;
+    var last = i === MATCH.length - 1, left = s.total - s.answered;
+    $('mScore').textContent = (i + 1) + ' / ' + MATCH.length;
+    $('mPos').textContent = s.answered ? 'Bonnes réponses : ' + s.correct + ' sur ' + s.answered : '';
+    $('mPrev').disabled = i === 0; $('mNext').disabled = last;
+    $('mNext').style.display = last ? 'none' : '';
+    if (!left) endBox('mOut', 'ok', 'Terminé ! ' + s.correct + ' / ' + s.total + ' bonnes réponses', endMsg(s.correct / s.total));
+    else if (last && mAns[it.id]) endBox('mOut', 'warn', 'C’était le dernier exemple.', leftMsg(left));
+    else endBox('mOut', '');
   }
   $('mPrev').addEventListener('click', function () { if (mCur > 0) mShow(mCur - 1); });
   $('mNext').addEventListener('click', function () { if (mCur < MATCH.length - 1) mShow(mCur + 1); });
@@ -900,6 +920,7 @@ a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-dec
     $('genText').innerHTML = GEN_TXT[genStep];
     $('genStep').textContent = genStep + ' / 5';
     $('genNext').disabled = genStep >= 5;
+    $('genNext').style.display = genStep >= 5 ? 'none' : '';
   }
   $('genNext').addEventListener('click', function () { if (genStep < 5) { genStep++; genRender(); } });
   $('genReset').addEventListener('click', function () { genStep = 0; genRender(); });
