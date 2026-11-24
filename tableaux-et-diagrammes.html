@@ -1,0 +1,1310 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tableaux et diagrammes</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels de maths, marge rouge. Accent bleu canard (#0e7490, encre #155e75 pour le texte). Sur les diagrammes : 5 couleurs de séries (--s1 à --s5), la barre ou la part touchée entourée en rouge, les rangs des quartiles surlignés en jaune. Toutes les données sont inventées. */
+:root {
+  --paper: #f6f9fa;
+  --grid: #dfeaee;
+  --card: #ffffff;
+  --ink: #12232b;
+  --ink-soft: #4d626b;
+  --acc: #0e7490;
+  --acc-ink: #155e75;
+  --acc-soft: #d7eff4;
+  --two: #c2410c;
+  --two-soft: #fde5d6;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --warn: #d97706;
+  --warn-soft: #fdf0d6;
+  --warn-ink: #92400e;
+  --hl: #fff0a3;
+  --line: #d3e1e6;
+  --s1: #0e7490; --s2: #ea7a3a; --s3: #7c5cd6; --s4: #d4a72c; --s5: #d0467f;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0b1518; --grid: #142429; --card: #11201f; --ink: #e6f1f3; --ink-soft: #a2b8bf;
+    --acc: #3fc1d9; --acc-ink: #8ee0ee; --acc-soft: #12323a; --two: #ff9a5c; --two-soft: #3a2112;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27;
+    --warn: #f5a524; --warn-soft: #3d2a0c; --warn-ink: #fbbf5a; --hl: #4b4318; --line: #24393f;
+    --s1: #3fc1d9; --s2: #ff9a5c; --s3: #b39cff; --s4: #f0cc5a; --s5: #f27aac;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0b1518; --grid: #142429; --card: #11201f; --ink: #e6f1f3; --ink-soft: #a2b8bf;
+  --acc: #3fc1d9; --acc-ink: #8ee0ee; --acc-soft: #12323a; --two: #ff9a5c; --two-soft: #3a2112;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27;
+  --warn: #f5a524; --warn-soft: #3d2a0c; --warn-ink: #fbbf5a; --hl: #4b4318; --line: #24393f;
+  --s1: #3fc1d9; --s2: #ff9a5c; --s3: #b39cff; --s4: #f0cc5a; --s5: #f27aac;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+@media (max-width: 520px) { .page { padding-block: 28px 64px; gap: 44px; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero-top { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+.hero-top svg { width: 170px; height: auto; flex: none; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+@media (max-width: 520px) { .box { padding: 16px 14px; } }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note.ok { border-left-color: var(--ok); background: var(--ok-soft); }
+.note.two { border-left-color: var(--two); background: var(--two-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+svg text.cl { font-family: var(--f-body); font-weight: 700; }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 8px 12px; min-height: 44px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button.main { background: var(--acc); color: var(--card); }
+button[aria-pressed="true"] { background: var(--acc-ink); color: var(--paper); }
+button.ex { font-family: var(--f-mono); font-weight: 600; font-size: .92rem; }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+button:disabled { cursor: default; opacity: .5; }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+label { font-weight: 700; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
+.tag.ok { color: var(--ok); }
+.tag.no { color: var(--red); }
+.tag.acc { color: var(--acc-ink); }
+.tag.two { color: var(--two); }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc-ink); }
+.fbk { border-radius: 8px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; min-width: 0; overflow-wrap: anywhere; }
+.fbk:empty { display: none; }
+.fbk.ok { background: var(--ok-soft); }
+.fbk.no { background: var(--red-soft); }
+.fbk.info { background: var(--acc-soft); }
+.fbk.warn { background: var(--warn-soft); }
+.fbk strong { font-family: var(--f-display); }
+.fbk.ok strong { color: var(--ok); }
+.fbk.no strong { color: var(--red); }
+.fbk.info strong { color: var(--acc-ink); }
+.fbk.warn strong { color: var(--warn-ink); }
+.say { min-height: 4.2em; }
+.step-n { font-family: var(--f-mono); font-size: .85rem; color: var(--ink-soft); }
+button.right, button.right:disabled { background: var(--ok-soft); border-color: var(--ok); color: var(--ok); opacity: 1; }
+button.wrong, button.wrong:disabled { background: var(--red-soft); border-color: var(--red); color: var(--red); opacity: 1; }
+.choice button { flex: 1 1 130px; }
+.choice button:disabled:not(.right):not(.wrong) { opacity: .55; }
+.card-big { background: var(--paper); border: 1.5px dashed var(--line); border-radius: 10px; padding: 14px; font-family: var(--f-display); font-weight: 700; font-size: 1.15rem; overflow-wrap: anywhere; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.card-big .ask { font-family: var(--f-body); font-weight: 400; font-size: 1rem; color: var(--ink-soft); }
+.card-big .graph svg { background: var(--card); }
+.sorter-end { margin-top: .6rem; }
+.sorter-end strong { font-size: 1.05rem; }
+
+/* Diagrammes dessinés par le script */
+.graph { min-width: 0; }
+.graph svg { width: 100%; height: auto; display: block; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; max-width: 560px; margin: 0 auto; }
+.graph.pie svg { max-width: 340px; }
+.minis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.minis div { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 0; }
+.minis svg { width: 100%; max-width: 130px; height: auto; display: block; }
+.tp { cursor: pointer; }
+.tp:focus { outline: none; }
+.tp:focus-visible .vis { stroke: var(--red); stroke-width: 4; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: .92rem; color: var(--ink-soft); }
+.sw { display: inline-block; width: 13px; height: 13px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; border: 1px solid var(--ink); }
+.scroll { overflow-x: auto; max-width: 100%; }
+table.tb { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+table.tb th, table.tb td { border: 1.5px solid var(--line); padding: 6px 8px; text-align: center; font-family: var(--f-mono); font-size: .95rem; }
+table.tb thead th { font-family: var(--f-display); background: var(--acc-soft); }
+table.tb tbody th, table.tb tfoot th { font-family: var(--f-body); background: var(--paper); text-align: left; }
+table.tb tfoot th, table.tb tfoot td { border-top: 2.5px solid var(--ink); font-weight: 700; }
+table.tb tr.on th, table.tb tr.on td, table.tb td.on { background: var(--hl); }
+table.tb td.bad { color: var(--warn-ink); background: var(--warn-soft); }
+table.tb td.al { text-align: left; }
+@media (max-width: 520px) { table.tb th, table.tb td { padding: 5px 3px; font-size: .84rem; } }
+.tally svg { height: 22px; vertical-align: middle; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chips button { font-family: var(--f-body); font-weight: 700; font-size: .92rem; padding: 6px 10px; box-shadow: 2px 2px 0 var(--ink); }
+.chips button.used, .chips button.used:disabled { text-decoration: line-through; opacity: .4; box-shadow: none; }
+.chips button.on { background: var(--hl); color: var(--ink); }
+.rawlist { display: flex; flex-wrap: wrap; gap: 6px; }
+.rawlist span { border: 1.5px solid var(--line); background: var(--paper); border-radius: 6px; padding: 2px 8px; font-size: .92rem; }
+.ctrls { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+.ctrl { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; align-items: center; gap: 6px; border: 1.5px dashed var(--line); border-radius: 8px; padding: 6px 8px; background: var(--paper); min-width: 0; }
+.ctrl .n { grid-column: 1 / -1; font-weight: 700; font-size: .92rem; overflow-wrap: anywhere; }
+.ctrl button { padding: 0; min-width: 44px; font-size: 1.3rem; line-height: 1; }
+.ctrl .v { text-align: center; font-family: var(--f-mono); font-weight: 600; font-size: 1.15rem; }
+.ctrl.ok { border-color: var(--ok); border-style: solid; background: var(--ok-soft); }
+.ctrl.no { border-color: var(--red); border-style: solid; background: var(--red-soft); }
+.sorted { display: grid; grid-template-columns: repeat(auto-fill, minmax(54px, 1fr)); gap: 6px; }
+.sorted span { border: 1.5px solid var(--line); border-radius: 6px; padding: 2px 4px; text-align: center; font-family: var(--f-mono); font-size: .9rem; background: var(--paper); line-height: 1.3; }
+.sorted span small { display: block; font-size: .7rem; color: var(--ink-soft); }
+.sorted span.k { background: var(--hl); border-color: var(--ink); font-weight: 600; }
+.sorted span.e { background: var(--acc-soft); border-color: var(--acc); }
+.fiveN { display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); gap: 8px; }
+.fiveN div { border: 1.5px solid var(--line); border-radius: 8px; padding: 6px 8px; background: var(--paper); display: flex; flex-direction: column; min-width: 0; }
+.fiveN small { color: var(--ink-soft); font-size: .78rem; }
+.fiveN b { font-family: var(--f-mono); font-size: 1.05rem; color: var(--acc-ink); }
+.formula { font-family: var(--f-mono); font-weight: 600; font-size: clamp(1.05rem, 4.2vw, 1.3rem); color: var(--acc-ink); overflow-wrap: anywhere; }
+.readout { font-family: var(--f-mono); font-size: .98rem; display: flex; flex-direction: column; gap: 6px; overflow-wrap: anywhere; min-width: 0; }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 200px auto; gap: 10px; align-items: center; }
+.quiz li > span:first-child { min-width: 0; overflow-wrap: anywhere; }
+.quiz select { font: inherit; font-size: .95rem; padding: 6px 6px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; min-height: 44px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb:empty { display: none; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; min-width: 0; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); min-width: 0; overflow-wrap: anywhere; }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+<!--ticons--><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Tutoriels"><script src="progress.js" defer></script><script src="share.js" defer></script><!--/ticons-->
+<style id="tnav-css">
+.tnav-top { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin: 0 0 4px; }
+.tnav-home { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font-weight: 700; font-size: .95rem; text-decoration: none; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tnav-home:hover, .tnav-home:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.tnav-bottom { margin-top: 8px; display: flex; flex-direction: column; gap: 12px; }
+.tnav-bottom h2 { margin: 0; }
+.tnav-pn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tnav-pn a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--ink, #222); border-radius: 10px;
+  background: var(--card, #fff); color: var(--ink, #222); text-decoration: none; box-shadow: 3px 3px 0 var(--ink, #222); min-width: 0; }
+.tnav-pn a span { font-size: .85rem; color: var(--ink-soft, #666); }
+.tnav-pn a strong { overflow-wrap: anywhere; }
+.tnav-pn a.next { text-align: right; grid-column: 2; }
+.tnav-bottom .tnav-home { align-self: center; }
+.tnav-top [data-share] { margin-left: auto; }
+.tnav-short { display: none; }
+.tprint-h { display: none; }
+@media (max-width: 600px) { header.hero { gap: 8px !important; } header.hero > .fig, header.hero > .box.fig, header.hero .hero-top .fig { display: none !important; }
+  header.hero p.lead { font-size: 1rem !important; line-height: 1.5 !important; } header.hero > p.soft { font-size: .88rem !important; line-height: 1.45 !important; }
+  header.hero h1 { font-size: clamp(1.7rem, 8vw, 2.2rem) !important; } }
+.tprint-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 14px 0 0; }
+.tprint-row span { font-size: .9rem; opacity: .8; }
+.tprint { display: inline-flex; align-items: center; gap: 8px; min-height: 42px; padding: 8px 16px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font: inherit; font-weight: 700; cursor: pointer; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tprint:hover, .tprint:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+@media print { [data-tp-hide] { display: none !important; } html.tp-on, html.tp-on body { background: #fff !important; color: #111 !important; padding: 0 !important; margin: 0 !important; }
+  html.tp-on [data-fiche] { color: #111; } html.tp-on [data-fiche] * { color: #111 !important; background: transparent !important; box-shadow: none !important; }
+  html.tp-on .tprint-h { display: block; font-size: 1.4rem; font-weight: 800; margin: 0 0 10px; } .tprint-row { display: none !important; } }
+@media (max-width: 520px) { .tnav-top .tnav-long { display: none; } .tnav-top .tnav-short { display: inline; } .tnav-top { flex-wrap: nowrap; } .tnav-top > * { flex: none; } }
+.tnav-end { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+@media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
+.diff { font: 700 .72rem/1.2 var(--f-mono, monospace); padding: 2px 8px; border-radius: 99px; border: 1.5px solid; white-space: nowrap; }
+.diff.d1 { color: #15803d; border-color: #15803d; background: #dcf3e3; }
+.diff.d2 { color: #a15c07; border-color: #b45309; background: #fbe7cf; }
+.diff.d3 { color: #b91c1c; border-color: #b91c1c; background: #fde2e2; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root:not([data-theme="light"]) .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root:not([data-theme="light"]) .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; } }
+:root[data-theme="dark"] .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root[data-theme="dark"] .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root[data-theme="dark"] .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; }
+</style>
+</head>
+<body>
+<main class="page">
+<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="maths.html">← <span class="tnav-long">Tous les tutoriels de maths</span><span class="tnav-short">Maths</span></a><span class="diff d1" title="Difficulté : facile">Facile</span><button type="button" data-share hidden>Partager</button></nav><!--/tnav-->
+
+
+  <header class="hero">
+    <div class="hero-top">
+      <svg class="fig" viewBox="0 0 200 170" aria-hidden="true">
+        <rect x="4" y="4" width="192" height="162" rx="10" fill="var(--card)" stroke="var(--ink)" stroke-width="2"/>
+        <line x1="22" y1="140" x2="112" y2="140" stroke="var(--ink)" stroke-width="2.5"/>
+        <line x1="22" y1="30" x2="22" y2="140" stroke="var(--ink)" stroke-width="2.5"/>
+        <rect x="30" y="62" width="18" height="78" fill="var(--s1)" stroke="var(--ink)" stroke-width="1.5"/>
+        <rect x="56" y="88" width="18" height="52" fill="var(--s2)" stroke="var(--ink)" stroke-width="1.5"/>
+        <rect x="82" y="108" width="18" height="32" fill="var(--s3)" stroke="var(--ink)" stroke-width="1.5"/>
+        <polyline points="30,52 52,40 74,58 100,30" fill="none" stroke="var(--red)" stroke-width="3" stroke-linejoin="round"/>
+        <circle cx="152" cy="92" r="34" fill="var(--s4)" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M152 92 L152 58 A34 34 0 0 1 186 92 Z" fill="var(--s1)" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M152 92 L186 92 A34 34 0 0 1 128 116 Z" fill="var(--s2)" stroke="var(--ink)" stroke-width="2"/>
+        <text x="152" y="150" font-size="14" text-anchor="middle" style="font-weight:600">%</text>
+      </svg>
+      <div style="display:flex;flex-direction:column;gap:10px;min-width:0;flex:1 1 280px">
+        <span class="eyebrow">Tutoriel de maths · niveau 9H–11H</span>
+        <h1>Faire parler les données</h1>
+        <p class="lead">Une liste de réponses en vrac ne dit pas grand-chose. Rangée dans un tableau, puis dessinée dans le bon diagramme, elle raconte une histoire. Tu vas apprendre à compter, à calculer des parts et à choisir le dessin qui convient.</p>
+      </div>
+    </div>
+    <p class="soft">Toutes les données de cette page sont <strong>inventées</strong> : une classe imaginaire de 24 élèves, une semaine de températures à Sion, les entrées d'une piscine.</p>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · Les données brutes</span>
+    <h2>Qui, quoi, quelles réponses ?</h2>
+    <p>Une classe de 24 élèves a rempli un petit questionnaire. Chaque ligne du tableau, c'est un élève ; chaque colonne, une question. Voici les 4 premières lignes : ce sont des <strong>données brutes</strong>, pas encore rangées.</p>
+    <div class="scroll">
+      <table class="tb" aria-label="Quatre premières réponses du questionnaire (données inventées)">
+        <thead><tr><th>Élève</th><th>Sport préféré</th><th>Transport</th><th>Trajet (min)</th><th>Taille (cm)</th><th>Frères et sœurs</th><th>Écran (h/jour)</th></tr></thead>
+        <tbody>
+          <tr><th>Léa</th><td>Natation</td><td>Bus</td><td>12</td><td>157</td><td>1</td><td>2,5</td></tr>
+          <tr><th>Noah</th><td>Football</td><td>À pied</td><td>8</td><td>163</td><td>0</td><td>3</td></tr>
+          <tr><th>Inès</th><td>Danse</td><td>Vélo</td><td>15</td><td>150</td><td>2</td><td>1,5</td></tr>
+          <tr><th>Elias</th><td>Ski</td><td>Bus</td><td>25</td><td>169</td><td>1</td><td>2</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="cards">
+      <div class="box"><span class="tag acc">Population</span><strong>Le groupe qu'on étudie</strong><span class="soft">Ici : les 24 élèves de la classe. Ça pourrait être les habitants d'une ville ou les jours d'un mois.</span></div>
+      <div class="box"><span class="tag acc">Individu</span><strong>Un membre du groupe</strong><span class="soft">Ici : un élève (Léa, Noah…). Pour les températures, un individu serait un jour.</span></div>
+      <div class="box"><span class="tag acc">Caractère</span><strong>Ce qu'on observe</strong><span class="soft">Le sport préféré, la taille, le temps de trajet… On dit aussi une « variable ».</span></div>
+    </div>
+    <div class="cards">
+      <div class="box"><span class="tag two">Qualitatif</span><strong>La réponse est un mot</strong><span class="soft">Une catégorie : football, bus, bleu… On peut compter, mais pas calculer une moyenne.</span></div>
+      <div class="box"><span class="tag ok">Quantitatif discret</span><strong>Un nombre qu'on compte</strong><span class="soft">Des valeurs « isolées », souvent entières : 0, 1, 2 frères et sœurs. Pas de 1,7 frère !</span></div>
+      <div class="box"><span class="tag ok">Quantitatif continu</span><strong>Un nombre qu'on mesure</strong><span class="soft">Toutes les valeurs d'un intervalle sont possibles : 157 cm, 157,4 cm, 157,43 cm… seule la précision de la mesure limite.</span></div>
+    </div>
+    <div class="box">
+      <h3>Trie les caractères</h3>
+      <p class="soft">Pour chaque caractère, choisis son type. Astuce : « Est-ce que la réponse est un nombre avec lequel calculer a un sens ? »</p>
+      <div class="btns"><span class="score" id="c1Score">Question 1 / 12</span><span class="step-n" id="c1Pos"></span></div>
+      <div class="card-big" id="c1Card" aria-live="polite"></div>
+      <div class="btns choice" id="c1Btns" role="group" aria-label="Type de caractère"></div>
+      <div class="fbk" id="c1Out" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="c1Prev">← Précédent</button><button type="button" id="c1Next">Suivant →</button><button type="button" id="c1Reset">Recommencer</button></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Déjà vu ailleurs</span>
+      <span>Moyenne, médiane, étendue, moyenne pondérée et graphiques trompeurs sont expliqués dans le tutoriel sur <a class="tlink" href="les-statistiques.html">les statistiques</a>. Ici, on s'occupe d'autre chose : <strong>ranger</strong> les données dans des tableaux et les <strong>dessiner</strong> dans le bon diagramme.</span>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · Le tableau d'effectifs</span>
+    <h2>Dépouiller : compter chaque réponse</h2>
+    <p><strong>Dépouiller</strong> une liste, c'est la lire réponse par réponse et faire un trait (un <strong>bâton</strong>) dans la bonne ligne du tableau. Pour compter vite, on groupe les bâtons par 5 : quatre traits droits, et le cinquième qui les barre. L'<strong>effectif</strong> d'une valeur, c'est le nombre de fois où elle apparaît.</p>
+    <div class="box">
+      <h3>À toi de dépouiller</h3>
+      <p class="soft">Question posée : « Comment viens-tu à l'école ? ». Touche chaque réponse, une à une : elle se barre et un bâton s'ajoute dans le tableau.</p>
+      <div class="chips" id="tlChips" role="group" aria-label="Réponses à dépouiller"></div>
+      <div class="scroll"><table class="tb" id="tlTable" aria-live="polite"></table></div>
+      <div class="fbk" id="tlOut" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="tlAll">Tout dépouiller d'un coup</button><button type="button" id="tlReset">Recommencer</button><button type="button" id="tlNew">Autres données</button></div>
+    </div>
+    <div class="note ok">
+      <span class="note-title">Le contrôle indispensable</span>
+      <span>À la fin, on additionne les effectifs. L'<strong>effectif total</strong> doit être égal au <strong>nombre d'individus</strong> (ici 24 élèves). Sinon, on a oublié une réponse ou on l'a comptée deux fois.</span>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Les fréquences</span>
+    <h2>Quelle part du total ?</h2>
+    <p>Dire « 8 élèves aiment le football », c'est bien. Mais 8 sur combien ? La <strong>fréquence</strong> répond : c'est la part de la valeur dans le total.</p>
+    <div class="box"><p class="formula">fréquence = effectif ÷ effectif total</p><p class="soft">On peut l'écrire en fraction (8/24 = 1/3), en nombre décimal (≈ 0,333) ou en pourcentage (≈ 33,3&nbsp;%). Pour passer d'une écriture à l'autre, il y a le tutoriel sur <a class="tlink" href="fractions-decimaux-et-pourcentages.html">fractions, décimaux et pourcentages</a>.</p></div>
+    <div class="box">
+      <h3>Le tableau qui calcule tout seul</h3>
+      <p class="soft">Sport préféré des 24 élèves. Change les effectifs avec − et + : la colonne des fréquences se met à jour. Regarde bien la ligne du total.</p>
+      <div class="btns" role="group" aria-label="Arrondi des pourcentages">
+        <button type="button" id="frU" aria-pressed="true">% à l'unité</button>
+        <button type="button" id="frT" aria-pressed="false">% au dixième</button>
+        <button type="button" id="frR">Revenir au départ</button>
+        <button type="button" id="frN">Autres données</button>
+      </div>
+      <div class="scroll"><table class="tb" id="frTable" aria-live="polite"></table></div>
+      <div class="ctrls" id="frCtrls"></div>
+      <div class="fbk" id="frOut" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">99 % ou 101 % : pas une erreur</span>
+      <span>Les vraies fréquences font toujours exactement <strong>1 = 100&nbsp;%</strong>. Mais chaque pourcentage arrondi est un peu trop grand ou un peu trop petit. En additionnant les arrondis, les petits écarts peuvent donner 99&nbsp;% ou 101&nbsp;%. On l'écrit honnêtement, sans « tricher » sur une ligne.</span>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · Les effectifs cumulés</span>
+    <h2>Combien « au plus » ?</h2>
+    <p>Pour un caractère quantitatif, on range les valeurs dans l'ordre croissant. L'<strong>effectif cumulé croissant</strong> d'une valeur, c'est le nombre d'individus qui ont <strong>cette valeur ou moins</strong>. On l'obtient en ajoutant les effectifs, ligne après ligne, du haut vers le bas.</p>
+    <div class="box">
+      <h3>Frères et sœurs : on cumule pas à pas</h3>
+      <div class="btns"><span class="score" id="cuPos"></span></div>
+      <div class="scroll"><table class="tb" id="cuTable"></table></div>
+      <div class="fbk info say" id="cuSay" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="cuPrev">← Précédent</button><button type="button" id="cuNext" class="main">Suivant →</button><button type="button" id="cuReset">Recommencer</button></div>
+    </div>
+    <div class="box">
+      <h3>Lire le tableau</h3>
+      <p class="soft">Touche une question : la réponse se lit dans la colonne des effectifs cumulés.</p>
+      <div class="btns" id="cuQs" role="group" aria-label="Questions"></div>
+      <div class="scroll"><table class="tb" id="cuTable2"></table></div>
+      <div class="fbk" id="cuOut" aria-live="polite"></div>
+    </div>
+    <div class="note two">
+      <span class="note-title">« Au moins », c'est le reste</span>
+      <span>« Au moins 2 », c'est le contraire de « au plus 1 ». Donc : au moins 2 = total − (au plus 1).</span>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Regrouper en classes</span>
+    <h2>Ranger des nombres dans des boîtes</h2>
+    <p>Les temps de trajet des 24 élèves sont presque tous différents : un tableau avec une ligne par valeur serait long et ne montrerait rien. On les <strong>regroupe en classes</strong>, des intervalles de même largeur.</p>
+    <div class="cards">
+      <div class="box"><span class="tag acc">Notation</span><strong class="mono">[10 ; 20[</strong><span class="soft">Les nombres de 10 (compris) jusqu'à 20 (non compris). Le crochet tourné vers le nombre l'inclut, le crochet tourné vers l'extérieur l'exclut.</span></div>
+      <div class="box"><span class="tag acc">Exemple</span><strong>Où va 20 minutes ?</strong><span class="soft">Pas dans [10 ; 20[, car 20 en est exclu : il va dans [20 ; 30[. Ainsi, chaque valeur va dans <strong>une seule</strong> classe.</span></div>
+      <div class="box"><span class="tag acc">Largeur</span><strong>20 − 10 = 10</strong><span class="soft">La largeur (ou amplitude) d'une classe, c'est la borne de droite moins la borne de gauche.</span></div>
+    </div>
+    <div class="box">
+      <h3>Choisis la largeur des classes</h3>
+      <p class="soft">Temps de trajet en minutes (données inventées). Touche une valeur pour voir dans quelle classe elle va.</p>
+      <div class="chips" id="clVals" role="group" aria-label="Temps de trajet"></div>
+      <div class="btns" id="clW" role="group" aria-label="Largeur des classes"></div>
+      <div class="graph" id="clGraph"></div>
+      <div class="scroll"><table class="tb" id="clTable" aria-live="polite"></table></div>
+      <div class="fbk info" id="clOut" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Ni trop, ni trop peu</span>
+      <span>Trop de classes : beaucoup de petites barres, des trous, une forme en dents de scie. Trop peu : presque tout tombe dans une ou deux classes, on ne voit plus rien. Avec 20 à 30 valeurs, on vise souvent <strong>5 à 8 classes</strong>.</span>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · Le diagramme en barres</span>
+    <h2>Une barre par valeur</h2>
+    <p>Le <strong>diagramme en barres</strong> (ou en bâtons) convient à un caractère <strong>qualitatif</strong> ou <strong>quantitatif discret</strong>. Chaque valeur a sa barre ; la <strong>hauteur</strong> de la barre est l'effectif (ou la fréquence).</p>
+    <div class="cards">
+      <div class="box"><span class="tag ok">1</span><strong>Un titre et des axes nommés</strong><span class="soft">Sous l'axe horizontal : les valeurs. Sur l'axe vertical : « effectif » ou « nombre d'élèves ».</span></div>
+      <div class="box"><span class="tag ok">2</span><strong>L'axe part de 0</strong><span class="soft">Avec des graduations régulières (1, 2, 3… ou 2, 4, 6…).</span></div>
+      <div class="box"><span class="tag ok">3</span><strong>Même largeur, des espaces</strong><span class="soft">Toutes les barres ont la même largeur, et on laisse un espace entre elles : les valeurs sont séparées.</span></div>
+    </div>
+    <div class="box">
+      <h3>Construis le diagramme</h3>
+      <p class="soft">Voici le tableau des transports (étape 2). Règle la hauteur de chaque barre avec − et +, puis vérifie.</p>
+      <div class="scroll"><table class="tb" id="buTable"></table></div>
+      <div class="graph" id="buGraph"></div>
+      <div class="ctrls" id="buCtrls"></div>
+      <div class="fbk" id="buOut" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="buCheck" class="main">Vérifier</button><button type="button" id="buReset">Recommencer</button></div>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Le diagramme circulaire</span>
+    <h2>Le camembert : des parts d'un tout</h2>
+    <p>Dans un <strong>diagramme circulaire</strong>, le disque entier représente tout le groupe (100&nbsp;%). Chaque part a un <strong>angle proportionnel</strong> à la fréquence. Un tour complet fait 360°, d'où la formule. Pour mesurer et tracer les angles au rapporteur, il y a le tutoriel sur <a class="tlink" href="les-angles-et-triangles.html">les angles et les triangles</a>.</p>
+    <div class="box"><p class="formula">angle = fréquence × 360°</p><p class="soft">Raccourci : avec 24 élèves, chaque élève « vaut » 360° ÷ 24 = 15°.</p></div>
+    <div class="box">
+      <h3>Calcule les angles, part par part</h3>
+      <div class="btns" role="group" aria-label="Choisir les données">
+        <button type="button" id="piS" aria-pressed="true">Sports préférés</button>
+        <button type="button" id="piT" aria-pressed="false">Moyens de transport</button>
+      </div>
+      <div class="btns"><span class="score" id="piPos"></span></div>
+      <div class="graph pie" id="piGraph"></div>
+      <div class="legend" id="piLeg"></div>
+      <div class="fbk info say" id="piSay" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="piPrev">← Précédent</button><button type="button" id="piNext" class="main">Suivant →</button><button type="button" id="piReset">Recommencer</button></div>
+    </div>
+    <div class="cards">
+      <div class="box"><span class="tag ok">Oui</span><strong>Pour montrer des parts d'un tout</strong><span class="soft">Quand ce qui compte, c'est « quelle part du groupe ? », et qu'il y a peu de catégories (2 à 6 environ).</span></div>
+      <div class="box"><span class="tag no">Non</span><strong>Trop de catégories</strong><span class="soft">Avec 12 parts minuscules, on ne compare plus rien. Un diagramme en barres est plus lisible.</span></div>
+      <div class="box"><span class="tag no">Non</span><strong>Pas de « tout »</strong><span class="soft">Des températures jour après jour ne sont pas des parts d'un total : un camembert n'a aucun sens.</span></div>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · L'histogramme</span>
+    <h2>Des barres collées pour des classes</h2>
+    <p>Pour un caractère <strong>quantitatif continu</strong> regroupé en classes (étape 5), on dessine un <strong>histogramme</strong>. L'axe horizontal est une vraie droite graduée ; chaque classe occupe sa largeur, et les rectangles <strong>se touchent</strong>, parce qu'il n'y a pas de « trou » entre 154,9 cm et 155 cm.</p>
+    <div class="cards">
+      <div class="box"><span class="tag acc">Barres</span><strong>Valeurs séparées</strong><span class="soft">Qualitatif ou discret. Des espaces entre les barres. L'ordre des barres peut être libre (pour un qualitatif).</span></div>
+      <div class="box"><span class="tag acc">Histogramme</span><strong>Classes qui se suivent</strong><span class="soft">Continu, en classes. Rectangles collés, axe horizontal gradué avec les bornes des classes, dans l'ordre.</span></div>
+    </div>
+    <div class="box">
+      <h3>Les tailles de la classe</h3>
+      <p class="soft">Tailles en cm des 24 élèves, en classes de largeur 5. Touche un rectangle pour le lire, et compare les deux dessins.</p>
+      <div class="btns" role="group" aria-label="Type de dessin">
+        <button type="button" id="hiH" aria-pressed="true">Histogramme</button>
+        <button type="button" id="hiB" aria-pressed="false">Barres séparées</button>
+      </div>
+      <div class="graph" id="hiGraph"></div>
+      <div class="fbk info" id="hiOut" aria-live="polite"></div>
+    </div>
+    <p class="soft">Ici, toutes les classes ont la même largeur : la hauteur suffit. Si les classes avaient des largeurs différentes, c'est l'<strong>aire</strong> des rectangles qui devrait être proportionnelle à l'effectif ; c'est pour plus tard.</p>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Le graphique en ligne</span>
+    <h2>Suivre une évolution dans le temps</h2>
+    <p>Quand les données changent <strong>au fil du temps</strong> (jours, mois, années), on place un point par moment et on les relie : c'est un <strong>graphique en ligne</strong> (ou courbe). Le temps va sur l'axe horizontal, de gauche à droite. On y lit le maximum, le minimum, les hausses et les baisses.</p>
+    <div class="box">
+      <h3>Touche un point pour le lire</h3>
+      <div class="btns" role="group" aria-label="Choisir les données">
+        <button type="button" id="liS" aria-pressed="true">Températures à Sion</button>
+        <button type="button" id="liP" aria-pressed="false">Entrées à la piscine</button>
+      </div>
+      <p class="soft" id="liIntro"></p>
+      <div class="graph" id="liGraph"></div>
+      <div class="fbk info" id="liOut" aria-live="polite"></div>
+      <div class="btns" role="group" aria-label="Lire le graphique">
+        <button type="button" id="liL">◀ Point précédent</button>
+        <button type="button" id="liR">Point suivant ▶</button>
+        <button type="button" id="liMax">Maximum</button>
+        <button type="button" id="liMin">Minimum</button>
+        <button type="button" id="liUp">Plus forte hausse</button>
+        <button type="button" id="liDown">Plus forte baisse</button>
+      </div>
+    </div>
+    <div class="note">
+      <span class="note-title">Pente raide = gros changement</span>
+      <span>Plus le segment entre deux points est penché, plus la valeur a changé. Un segment qui monte : hausse ; qui descend : baisse ; horizontal : pas de changement.</span>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · Choisir le bon diagramme</span>
+    <h2>Quel diagramme pour quelles données ?</h2>
+    <div class="cards">
+      <div class="box"><span class="tag acc">Barres</span><span class="soft">Comparer des effectifs : qualitatif ou discret, même avec beaucoup de catégories.</span></div>
+      <div class="box"><span class="tag acc">Circulaire</span><span class="soft">Montrer des parts d'un tout, avec peu de catégories.</span></div>
+      <div class="box"><span class="tag acc">Histogramme</span><span class="soft">Quantitatif continu regroupé en classes.</span></div>
+      <div class="box"><span class="tag acc">Ligne</span><span class="soft">Une évolution dans le temps.</span></div>
+    </div>
+    <div class="box">
+      <h3>À toi de choisir</h3>
+      <p class="soft">Pour chaque situation, quel diagramme est le plus adapté ? Parfois, deux réponses sont acceptées : l'explication le dit.</p>
+      <div class="btns"><span class="score" id="chScore">Question 1 / 10</span><span class="step-n" id="chPos"></span></div>
+      <div class="card-big" id="chCard" aria-live="polite"></div>
+      <div class="btns choice" id="chBtns" role="group" aria-label="Quel diagramme ?"></div>
+      <div class="fbk" id="chOut" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="chPrev">← Précédent</button><button type="button" id="chNext">Suivant →</button><button type="button" id="chReset">Recommencer</button></div>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · Pour aller plus loin (11H)</span>
+    <h2>Quartiles et boîte à moustaches</h2>
+    <p>La médiane coupe une série triée en deux moitiés. Les <strong>quartiles</strong> la coupent en quatre parts d'environ un quart chacune. Avec le minimum, Q1, la médiane, Q3 et le maximum, on dessine une <strong>boîte à moustaches</strong>.</p>
+    <div class="box">
+      <h3>La règle utilisée ici</h3>
+      <p>On trie les n valeurs dans l'ordre croissant. Puis :</p>
+      <p><strong>Q1</strong> = la valeur de rang <span class="mono">n ÷ 4</span>, arrondi à l'entier <strong>supérieur</strong> si ce n'est pas un entier.<br><strong>Q3</strong> = la valeur de rang <span class="mono">3n ÷ 4</span>, arrondi de la même façon.<br><strong>Médiane</strong> : la valeur du milieu (ou la moyenne des deux valeurs du milieu si n est pair).</p>
+      <p class="soft">C'est la convention habituelle à l'école en Suisse romande et en France. Avec cette règle, Q1 et Q3 sont toujours des valeurs de la série. Les calculatrices et les tableurs utilisent parfois d'autres méthodes : ils peuvent donner des valeurs un peu différentes. Ce n'est pas une erreur, seulement une autre règle.</p>
+      <p><strong>Écart interquartile</strong> = Q3 − Q1. Environ la moitié des valeurs se trouvent entre Q1 et Q3 : plus l'écart est petit, plus les valeurs du milieu sont serrées.</p>
+    </div>
+    <div class="box">
+      <h3>Construis la boîte, pas à pas</h3>
+      <div class="btns" role="group" aria-label="Choisir la classe">
+        <button type="button" id="bxA" aria-pressed="true">Classe A</button>
+        <button type="button" id="bxB" aria-pressed="false">Classe B</button>
+        <button type="button" id="bxNew">Autres données</button>
+      </div>
+      <div class="btns"><span class="score" id="bxPos"></span><span class="step-n" id="bxInfo"></span></div>
+      <div class="sorted" id="bxList" aria-label="Tailles triées, avec leur rang"></div>
+      <div class="graph" id="bxGraph"></div>
+      <div class="fbk info say" id="bxSay" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="bxPrev">← Précédent</button><button type="button" id="bxNext" class="main">Suivant →</button><button type="button" id="bxReset">Recommencer</button></div>
+    </div>
+    <div class="box">
+      <h3>Comparer deux classes</h3>
+      <p class="soft">Les deux boîtes sur le même axe : on compare d'un coup d'œil le milieu (la médiane) et la dispersion (la longueur de la boîte).</p>
+      <div class="graph" id="bxCmp"></div>
+      <div class="fbk info" id="bxCmpOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 12 -->
+  <section>
+    <span class="eyebrow">Étape 12 · Atelier final</span>
+    <h2>De la liste brute à la conclusion</h2>
+    <p>Tout le chemin, d'un coup. Question posée aux 24 élèves : « Quelle est ta boisson préférée au goûter ? ». Voici les réponses, en vrac :</p>
+    <div class="rawlist" id="atRaw" aria-label="Les 24 réponses"></div>
+    <div class="box">
+      <h3>Huit étapes, huit choix</h3>
+      <div class="btns"><span class="score" id="atScore">Étape 1 / 8</span><span class="step-n" id="atPos"></span></div>
+      <div class="card-big" id="atCard" aria-live="polite"></div>
+      <div class="btns choice" id="atBtns" role="group" aria-label="Ta réponse"></div>
+      <div class="fbk" id="atOut" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="atPrev">← Précédent</button><button type="button" id="atNext">Suivant →</button><button type="button" id="atReset">Recommencer</button></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Les idées reçues</span>
+    <h2>Vrai ou faux ?</h2>
+    <div class="cards">
+      <div class="box"><span class="tag no">Idée reçue</span><strong>« Un camembert convient à toutes les données. »</strong><span class="soft">Seulement pour des parts d'un tout, avec peu de catégories. Pour une évolution dans le temps, c'est un graphique en ligne ; pour des classes, un histogramme.</span></div>
+      <div class="box"><span class="tag no">Idée reçue</span><strong>« Dans un histogramme, on peut laisser des espaces. »</strong><span class="soft">Non : les classes se suivent sans trou, donc les rectangles se touchent. Une classe vide reste visible comme un « creux » de hauteur 0.</span></div>
+      <div class="box"><span class="tag no">Idée reçue</span><strong>« Les pourcentages font toujours exactement 100. »</strong><span class="soft">Les vraies fréquences, oui. Les pourcentages arrondis peuvent faire 99&nbsp;% ou 101&nbsp;%.</span></div>
+      <div class="box"><span class="tag no">Idée reçue</span><strong>« Un nombre, c'est forcément quantitatif. »</strong><span class="soft">Un numéro postal ou un numéro de maillot est un code : calculer leur moyenne n'a aucun sens. C'est qualitatif.</span></div>
+      <div class="box"><span class="tag no">Idée reçue</span><strong>« La valeur 20 va dans [10 ; 20[. »</strong><span class="soft">Non, 20 est exclu de cette classe (crochet tourné vers l'extérieur) : il va dans [20 ; 30[.</span></div>
+      <div class="box"><span class="tag no">Idée reçue</span><strong>« L'angle d'une part, c'est son pourcentage en degrés. »</strong><span class="soft">25&nbsp;% ne fait pas 25°, mais 0,25 × 360° = 90°. Sinon, le disque ne serait rempli qu'à 100° !</span></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Le savais-tu ?</span>
+    <h2>Les inventeurs des diagrammes</h2>
+    <div class="cards">
+      <div class="box"><span class="tag two">1786 et 1801</span><strong>William Playfair</strong><span class="soft">Cet Écossais a publié en 1786 des graphiques en ligne et le premier diagramme en barres connu, pour montrer le commerce de l'Angleterre. En 1801, il a dessiné l'un des premiers diagrammes circulaires.</span></div>
+      <div class="box"><span class="tag two">1858</span><strong>Florence Nightingale</strong><span class="soft">Cette infirmière anglaise a publié en 1858 un diagramme « en aires polaires », en forme de rose, pour montrer que beaucoup de soldats mouraient de maladies évitables, et convaincre d'améliorer l'hygiène des hôpitaux.</span></div>
+      <div class="box"><span class="tag two">Années 1970</span><strong>John Tukey</strong><span class="soft">Ce statisticien américain a fait connaître la boîte à moustaches dans les années 1970, pour résumer une série en cinq nombres et repérer d'un coup d'œil les valeurs inhabituelles.</span></div>
+      <div class="box"><span class="tag two">Le mot</span><strong>« Histogramme »</strong><span class="soft">Le mot a été employé par le mathématicien anglais Karl Pearson à la fin du XIXᵉ siècle.</span></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Choisis ta réponse, puis vérifie.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Recommencer</button>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À toi de jouer</span>
+    <h2>Six exercices</h2>
+    <p>Fais chaque exercice sur une feuille, puis ouvre la correction pour comparer.</p>
+    <div class="exos">
+      <details>
+        <summary>Dépouiller une liste<span class="q">Fruit préféré de 20 élèves : pomme, banane, pomme, orange, pomme, kiwi, banane, pomme, orange, banane, pomme, kiwi, pomme, banane, orange, pomme, banane, pomme, orange, banane. Fais le tableau d'effectifs et contrôle le total.</span></summary>
+        <div>
+          <span>Pomme : <strong>8</strong> · Banane : <strong>6</strong> · Orange : <strong>4</strong> · Kiwi : <strong>2</strong>.</span>
+          <span>Contrôle : 8 + 6 + 4 + 2 = 20, le nombre d'élèves. Le caractère « fruit préféré » est qualitatif.</span>
+        </div>
+      </details>
+      <details>
+        <summary>Des fréquences<span class="q">Dans un club de 30 membres : 12 font du foot, 9 du tennis, 6 du judo, 3 de l'escalade. Calcule les fréquences en pourcentage.</span></summary>
+        <div>
+          <span>Foot : 12/30 = 2/5 = 0,4 = <strong>40&nbsp;%</strong>. Tennis : 9/30 = 3/10 = <strong>30&nbsp;%</strong>. Judo : 6/30 = 1/5 = <strong>20&nbsp;%</strong>. Escalade : 3/30 = 1/10 = <strong>10&nbsp;%</strong>.</span>
+          <span>Total : 40 + 30 + 20 + 10 = 100&nbsp;%. Ici, pas d'arrondi, donc le total est exact.</span>
+        </div>
+      </details>
+      <details>
+        <summary>Effectifs cumulés<span class="q">Nombre d'animaux à la maison pour 20 élèves : 0 → 7 élèves, 1 → 8, 2 → 4, 3 → 1. Calcule les effectifs cumulés. Combien ont au plus 1 animal ? Au moins 2 ?</span></summary>
+        <div>
+          <span>Cumulés : 7 ; 7 + 8 = 15 ; 15 + 4 = 19 ; 19 + 1 = 20 (le total, c'est le contrôle).</span>
+          <span>Au plus 1 animal : <strong>15</strong> élèves. Au moins 2 : 20 − 15 = <strong>5</strong> élèves (4 + 1).</span>
+        </div>
+      </details>
+      <details>
+        <summary>Les angles du camembert<span class="q">Reprends le club de l'exercice 2 (40 %, 30 %, 20 %, 10 %). Calcule l'angle de chaque part.</span></summary>
+        <div>
+          <span>Foot : 0,4 × 360° = <strong>144°</strong>. Tennis : 0,3 × 360° = <strong>108°</strong>. Judo : 0,2 × 360° = <strong>72°</strong>. Escalade : 0,1 × 360° = <strong>36°</strong>.</span>
+          <span>Contrôle : 144 + 108 + 72 + 36 = 360°. Autre façon : 360° ÷ 30 = 12° par membre, et 12 × 12° = 144°.</span>
+        </div>
+      </details>
+      <details>
+        <summary>Regrouper en classes<span class="q">Temps de trajet (min) de 12 élèves : 4, 9, 12, 15, 18, 20, 21, 25, 29, 33, 37, 41. Fais un tableau avec les classes [0 ; 10[, [10 ; 20[, … Quel diagramme dessiner ?</span></summary>
+        <div>
+          <span>[0 ; 10[ : <strong>2</strong> (4 et 9) · [10 ; 20[ : <strong>3</strong> (12, 15, 18) · [20 ; 30[ : <strong>4</strong> (20, 21, 25, 29) · [30 ; 40[ : <strong>2</strong> · [40 ; 50[ : <strong>1</strong>. Total : 12.</span>
+          <span>Attention : 20 va dans [20 ; 30[. Le temps est continu et regroupé en classes : on dessine un <strong>histogramme</strong>, rectangles collés.</span>
+        </div>
+      </details>
+      <details>
+        <summary>Quartiles (11H)<span class="q">Série triée de 10 valeurs : 3, 5, 6, 8, 9, 10, 12, 13, 15, 20. Trouve Q1, la médiane, Q3 et l'écart interquartile (règle de l'étape 11).</span></summary>
+        <div>
+          <span>n = 10. Q1 : 10 ÷ 4 = 2,5 → rang 3 → <strong>Q1 = 6</strong>. Q3 : 3 × 10 ÷ 4 = 7,5 → rang 8 → <strong>Q3 = 13</strong>.</span>
+          <span>Médiane : moyenne des 5ᵉ et 6ᵉ valeurs, (9 + 10) ÷ 2 = <strong>9,5</strong>. Écart interquartile : 13 − 6 = <strong>7</strong>.</span>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section data-fiche><!--tprint--><p class="tprint-h">Fiche de révision · Faire parler les données</p><!--/tprint-->    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• <strong>Population</strong> = le groupe étudié, <strong>individu</strong> = un membre, <strong>caractère</strong> = ce qu'on observe : qualitatif (un mot), quantitatif discret (on compte) ou continu (on mesure).</span>
+      <span>• <strong>Effectif</strong> = combien de fois une valeur apparaît. L'effectif total doit être égal au nombre d'individus.</span>
+      <span>• <strong>Fréquence</strong> = effectif ÷ effectif total, en fraction, décimal ou %. La somme vaut 1 = 100&nbsp;% (les arrondis peuvent donner 99&nbsp;% ou 101&nbsp;%).</span>
+      <span>• <strong>Effectif cumulé croissant</strong> = combien d'individus ont cette valeur <strong>ou moins</strong>.</span>
+      <span>• <strong>Classes</strong> : [a ; b[ contient a mais pas b. Ni trop de classes, ni trop peu.</span>
+      <span>• <strong>Barres</strong> pour comparer (qualitatif, discret) ; <strong>circulaire</strong> pour des parts d'un tout (angle = fréquence × 360°) ; <strong>histogramme</strong> pour des classes (rectangles collés) ; <strong>ligne</strong> pour une évolution dans le temps.</span>
+      <span>• <strong>Quartiles</strong> (11H) : Q1 au rang n ÷ 4, Q3 au rang 3n ÷ 4 (arrondis à l'entier supérieur) ; écart interquartile = Q3 − Q1.</span>
+    </div>
+  <!--tprint--><p class="tprint-row"><button type="button" class="tprint" data-print><span aria-hidden="true">🖨</span> Imprimer la fiche</button><span>Seulement ce résumé, sur une page.</span></p><!--/tprint-->
+</section>
+
+  <!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"><a class="prev" href="les-statistiques.html"><span>← Précédent</span><strong>Les statistiques</strong></a><a class="next" href="les-probabilites.html"><span>Suivant →</span><strong>Les probabilités</strong></a></div><div class="tnav-end"><a class="tnav-home" href="maths.html">⌂ Tous les tutoriels de maths</a><button type="button" data-share hidden>Partager</button></div></nav><!--/tnav-->
+<footer>Fiche de révision · Tableaux et diagrammes<!--tmaj--><span class="tmaj" style="display:block;margin-top:6px;font-size:.85rem;opacity:.85">Dernière mise à jour : 24 novembre 2026 · © 2026 Nicolas Meynet</span><!--/tmaj--></footer>
+</main>
+
+<script>
+(function () {
+  /*
+   * Hooks de test : window.__diag
+   *   Données (toutes inventées) : SPORTS, TRANS, TRANS_RAW, SIB, TRAJET, TAILLES_A, TAILLES_B, SION, PISC, DRINKS, DRINK_RAW
+   *   Calcul exact (entiers) :
+   *     gcd(a, b), roundRat(n, d, p)  -> arrondi de n/d à p décimales, renvoyé en entier (× 10^p), arrondi « au plus proche, 0,5 vers le haut »
+   *     fixStr(v, p), decStr(n, d, p), pctStr(n, d, p), fracStr(n, d), angleStr(c, T)
+   *     countBy(list, keys)            -> effectifs d’une liste brute
+   *     freqTable(counts, p)           -> {T, rows:[{c, frac, dec, pct, pctR}], sumR}  (sumR = somme des % arrondis, × 10^p)
+   *     cumul(counts)                  -> effectifs cumulés croissants
+   *     classes(values, w, start)      -> [{a, b, c}] classes [a ; b[ de largeur w
+   *     classOf(v, w, start)           -> indice de la classe de v
+   *     pieSteps(items)                -> étapes du calcul des angles (texte + angles)
+   *     quartiles(values)              -> {s, n, min, max, r1, r3, q1, q3, med2, medRanks, eiq}  (médiane = med2 / 2)
+   *     lineStats(vals)                -> {max, min, up, down} (indices, avec égalités)
+   *   Jeux : charCards (étape 1), chartCards (étape 10), atelierCards (étape 12), scorer(items), isOk(item, c)
+   *   quiz : les 8 questions du quiz
+   */
+  var NB = ' ', NBS = ' ', MI = '−';
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function clamp(i, n) { i = Math.floor(Number(i)); if (!isFinite(i)) i = 0; return Math.max(0, Math.min(n - 1, i)); }
+  function rint(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+  function num(a, b) { return a - b; }
+
+  /* ---------- Arithmétique exacte et écriture à la française ---------- */
+  function gcd(a, b) { a = Math.abs(a); b = Math.abs(b); while (b) { var t = a % b; a = b; b = t; } return a || 1; }
+  function grp(n) { var s = String(Math.abs(n)).replace(/\B(?=(\d{3})+(?!\d))/g, NB); return (n < 0 ? MI : '') + s; }
+  function roundRat(n, d, p) { var m = Math.pow(10, p || 0); return Math.floor((2 * n * m + d) / (2 * d)); }
+  function fixStr(v, p) {
+    p = p || 0; var neg = v < 0; v = Math.abs(v);
+    var s = String(v);
+    if (p) { while (s.length < p + 1) s = '0' + s; s = grp(+s.slice(0, s.length - p)) + ',' + s.slice(s.length - p); }
+    else s = grp(v);
+    return (neg ? MI : '') + s;
+  }
+  function trimZ(s) { if (s.indexOf(',') < 0) return s; return s.replace(/0+$/, '').replace(/,$/, ''); }
+  function isExact(n, d, p) { return (n * Math.pow(10, p)) % d === 0; }
+  function decStr(n, d, p) { p = p == null ? 3 : p; if (!d) return '—'; var r = trimZ(fixStr(roundRat(n, d, p), p)); return isExact(n, d, p) ? r : '≈' + NBS + r; }
+  function pctStr(n, d, p) { p = p == null ? 1 : p; if (!d) return '—'; var r = trimZ(fixStr(roundRat(100 * n, d, p), p)); return (isExact(100 * n, d, p) ? '' : '≈' + NBS) + r + NBS + '%'; }
+  function fracStr(n, d) { var g = gcd(n, d); return n + '/' + d + (g > 1 && n ? ' = ' + (n / g) + '/' + (d / g) : ''); }
+  function angleStr(c, T) { return decStr(360 * c, T, 1) + '°'; }
+  function half(m2) { return m2 % 2 ? grp((m2 - 1) / 2) + ',5' : grp(m2 / 2); }
+
+  /* ---------- Données inventées ---------- */
+  var SPORTS = [{ k: 'foot', name: 'Football', c: 8 }, { k: 'nat', name: 'Natation', c: 6 }, { k: 'ski', name: 'Ski', c: 4 }, { k: 'bas', name: 'Basket', c: 3 }, { k: 'dan', name: 'Danse', c: 3 }];
+  var TRANS = [{ k: 'bus', name: 'Bus', c: 9 }, { k: 'pied', name: 'À pied', c: 7 }, { k: 'velo', name: 'Vélo', c: 5 }, { k: 'auto', name: 'Voiture', c: 3 }];
+  var TRANS_RAW = ['bus', 'pied', 'bus', 'velo', 'auto', 'bus', 'pied', 'pied', 'bus', 'velo', 'bus', 'pied', 'auto', 'bus', 'velo', 'pied', 'bus', 'bus', 'velo', 'pied', 'auto', 'bus', 'velo', 'pied'];
+  var SIB = [{ v: 0, c: 5 }, { v: 1, c: 9 }, { v: 2, c: 6 }, { v: 3, c: 3 }, { v: 4, c: 1 }];
+  var TRAJET = [12, 25, 8, 15, 3, 18, 31, 10, 22, 14, 7, 45, 16, 12, 38, 19, 5, 27, 13, 8, 35, 15, 24, 18];
+  var TAILLES_A = [146, 149, 150, 152, 153, 154, 155, 156, 157, 157, 158, 159, 159, 160, 161, 162, 163, 163, 164, 165, 167, 169, 170, 172];
+  var TAILLES_B = [151, 153, 156, 158, 159, 160, 161, 162, 162, 164, 165, 166, 167, 168, 168, 170, 171, 173, 175, 176, 179, 182];
+  var SION = { key: 'sion', intro: 'Températures maximales à Sion pendant une semaine d’avril, en °C (données inventées).', labels: ['lun', 'mar', 'mer', 'jeu', 'ven', 'sam', 'dim'], long: ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'], vals: [14, 16, 19, 21, 18, 12, 16], y1: 25, sy: 5, unit: '°C', yl: '°C', prevWord: 'à la veille' };
+  var PISC = { key: 'pisc', intro: 'Nombre d’entrées par mois dans une piscine couverte et en plein air, sur une année (données inventées).', labels: ['jan', 'fév', 'mar', 'avr', 'mai', 'jun', 'jul', 'aoû', 'sep', 'oct', 'nov', 'déc'], long: ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'], vals: [2100, 2300, 1900, 1700, 2400, 3800, 5100, 4900, 2600, 2200, 2000, 1500], y1: 6000, sy: 1000, unit: 'entrées', yl: 'entrées', prevWord: 'au mois d’avant' };
+  var DRINKS = [{ k: 'eau', name: 'Eau', c: 10 }, { k: 'jus', name: 'Jus de pomme', c: 6 }, { k: 'lait', name: 'Lait', c: 5 }, { k: 'the', name: 'Thé froid', c: 3 }];
+  var DRINK_RAW = ['eau', 'jus', 'eau', 'lait', 'eau', 'the', 'jus', 'eau', 'lait', 'eau', 'jus', 'eau', 'the', 'lait', 'eau', 'jus', 'eau', 'lait', 'jus', 'eau', 'the', 'eau', 'lait', 'jus'];
+  var SCOL = ['var(--s1)', 'var(--s2)', 'var(--s3)', 'var(--s4)', 'var(--s5)'];
+
+  /* ---------- Calculs statistiques ---------- */
+  function countBy(list, keys) { var o = {}; keys.forEach(function (k) { o[k] = 0; }); list.forEach(function (x) { if (o[x] != null) o[x]++; }); return o; }
+  function sum(a) { return a.reduce(function (s, x) { return s + x; }, 0); }
+  function freqTable(counts, p) {
+    var T = sum(counts);
+    var rows = counts.map(function (c) { return { c: c, frac: T ? fracStr(c, T) : '—', dec: decStr(c, T, 3), pct: pctStr(c, T, p), pctR: T ? roundRat(100 * c, T, p) : 0 }; });
+    return { T: T, rows: rows, sumR: sum(rows.map(function (r) { return r.pctR; })) };
+  }
+  function cumul(counts) { var s = 0; return counts.map(function (c) { s += c; return s; }); }
+  function classOf(v, w, start) { return Math.floor((v - start) / w); }
+  function classes(values, w, start) {
+    var mx = Math.max.apply(null, values), n = classOf(mx, w, start) + 1, out = [];
+    for (var i = 0; i < n; i++) out.push({ a: start + i * w, b: start + (i + 1) * w, c: 0 });
+    values.forEach(function (v) { out[classOf(v, w, start)].c++; });
+    return out;
+  }
+  function quartiles(values) {
+    var s = values.slice().sort(num), n = s.length;
+    var r1 = Math.ceil(n / 4), r3 = Math.ceil(3 * n / 4), med2, medRanks;
+    if (n % 2) { medRanks = [(n + 1) / 2]; med2 = 2 * s[(n - 1) / 2]; }
+    else { medRanks = [n / 2, n / 2 + 1]; med2 = s[n / 2 - 1] + s[n / 2]; }
+    return { s: s, n: n, min: s[0], max: s[n - 1], r1: r1, r3: r3, q1: s[r1 - 1], q3: s[r3 - 1], med2: med2, medRanks: medRanks, eiq: s[r3 - 1] - s[r1 - 1] };
+  }
+  function lineStats(vals) {
+    var mx = Math.max.apply(null, vals), mn = Math.min.apply(null, vals), d = [], i;
+    for (i = 1; i < vals.length; i++) d.push(vals[i] - vals[i - 1]);
+    var up = Math.max.apply(null, d), dn = Math.min.apply(null, d);
+    function idx(arr, v, off) { var r = []; arr.forEach(function (x, j) { if (x === v) r.push(j + off); }); return r; }
+    return { max: idx(vals, mx, 0), min: idx(vals, mn, 0), up: up > 0 ? idx(d, up, 1) : [], down: dn < 0 ? idx(d, dn, 1) : [], upV: up, downV: dn };
+  }
+  function pieSteps(items) {
+    var T = sum(items.map(function (x) { return x.c; })), st = [], degs = [];
+    st.push({ k: 0, text: 'Total : ' + T + ' élèves. Le disque entier, c’est les ' + T + ' élèves, soit 360°. Un élève vaut 360° ÷ ' + T + ' = ' + decStr(360, T, 2) + '°.' });
+    items.forEach(function (x, i) {
+      var g = gcd(x.c, T), f = x.c / g + '/' + T / g;
+      degs.push(roundRat(360 * x.c, T, 1));
+      st.push({ k: i + 1, text: x.name + ' : ' + x.c + ' élève' + (x.c > 1 ? 's' : '') + '. Fréquence : ' + x.c + '/' + T + (g > 1 ? ' = ' + f : '') + '. Angle : ' + f + ' × 360° = ' + angleStr(x.c, T) + ' (ou ' + x.c + ' × ' + decStr(360, T, 2) + '°).' });
+    });
+    var allExact = items.every(function (x) { return (360 * x.c) % T === 0; });
+    st.push({ k: items.length, done: true, text: 'Contrôle : ' + items.map(function (x) { return angleStr(x.c, T).replace('≈' + NBS, ''); }).join(' + ') + (allExact ? ' = 360°' : ' ≈ 360°') + '. Le tour est complet ! Chaque part est proportionnelle à son effectif.' });
+    return { T: T, steps: st };
+  }
+
+  /* ---------- Dessins SVG ---------- */
+  function r1(x) { return String(Math.round(x * 10) / 10); }
+  function Ln(x1, y1, x2, y2, col, w, extra) { return '<line x1="' + r1(x1) + '" y1="' + r1(y1) + '" x2="' + r1(x2) + '" y2="' + r1(y2) + '" style="stroke:' + col + ';stroke-width:' + w + '"' + (extra || '') + '/>'; }
+  function Tx(x, y, s, o) { o = o || {}; return '<text x="' + r1(x) + '" y="' + r1(y) + '" font-size="' + (o.fs || 14) + '"' + (o.a ? ' text-anchor="' + o.a + '"' : '') + (o.cls ? ' class="' + o.cls + '"' : '') + (o.st ? ' style="' + o.st + '"' : '') + '>' + esc(s) + '</text>'; }
+  function halo(col) { return 'fill:' + col + ';stroke:var(--card);stroke-width:4px;paint-order:stroke;font-weight:600'; }
+  function niceStep(m) { return m <= 8 ? 1 : m <= 16 ? 2 : m <= 40 ? 5 : 10; }
+  /* Diagramme en barres ou histogramme. c.cats = [{name, v, col}], c.hist (rectangles collés + bornes c.edges), c.hl, c.tap, c.marks */
+  function barSvg(c) {
+    var W = 340, H = c.h || 250, L = 38, R = 10, T = 26, B = c.hist ? 42 : 34;
+    var pw = W - L - R, ph = H - T - B, n = c.cats.length, i;
+    var mx = Math.max(1, Math.max.apply(null, c.cats.map(function (x) { return x.v; })));
+    if (c.yMin) mx = Math.max(mx, c.yMin);
+    var st = niceStep(mx), yMax = (Math.floor(mx / st) + 1) * st;
+    function Y(v) { return T + ph - v / yMax * ph; }
+    var s = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + esc(c.label) + '">';
+    s += '<rect x="' + L + '" y="' + T + '" width="' + pw + '" height="' + ph + '" style="fill:var(--card)"/>';
+    for (i = 0; i <= yMax; i += st) { s += Ln(L, Y(i), L + pw, Y(i), 'var(--line)', 1); s += Tx(L - 6, Y(i) + 5, String(i), { fs: 13, a: 'end' }); }
+    s += Tx(4, 15, c.yl || 'effectif', { fs: 13, st: 'fill:var(--ink-soft)' });
+    var slot = pw / n;
+    c.cats.forEach(function (x, k) {
+      var bx = c.hist ? L + k * slot : L + k * slot + slot * .2, bw = c.hist ? slot : slot * .6, by = Y(x.v), hl = c.hl === k;
+      var rect = '<rect class="vis" x="' + r1(bx) + '" y="' + r1(by) + '" width="' + r1(bw) + '" height="' + r1(Math.max(0, T + ph - by)) + '" style="fill:' + x.col + ';stroke:' + (hl ? 'var(--red)' : 'var(--ink)') + ';stroke-width:' + (hl ? 3.5 : 1.5) + '"/>';
+      var lab = x.v > 0 || c.showZero ? Tx(bx + bw / 2, by - 6, String(x.v), { fs: 14, a: 'middle', st: halo('var(--ink)') }) : '';
+      if (c.marks && c.marks[k]) lab += Tx(bx + bw / 2, T - 8, c.marks[k], { fs: 14, a: 'middle', st: halo(c.marks[k] === '✓' ? 'var(--ok)' : 'var(--red)') });
+      if (c.tap) s += '<g class="tp" data-i="' + k + '" tabindex="0" role="button" aria-label="' + esc(x.aria || (x.name + ' : ' + x.v)) + '">' + '<rect x="' + r1(bx) + '" y="' + T + '" width="' + r1(bw) + '" height="' + ph + '" style="fill:transparent"/>' + rect + lab + '</g>';
+      else s += rect + lab;
+      if (!c.hist) s += Tx(L + k * slot + slot / 2, T + ph + 20, x.name, { fs: 13, a: 'middle', cls: 'cl' });
+    });
+    if (c.hist) {
+      var every = n > 8 ? 2 : 1;
+      c.edges.forEach(function (e, k) { s += Ln(L + k * slot, T + ph, L + k * slot, T + ph + 5, 'var(--ink)', 1.5); if (k % every === 0 || k === c.edges.length - 1) s += Tx(L + k * slot, T + ph + 19, String(e), { fs: 13, a: 'middle' }); });
+      if (c.xl) s += Tx(L + pw, H - 4, c.xl, { fs: 13, a: 'end', st: 'fill:var(--ink-soft)' });
+    }
+    s += Ln(L, T + ph, L + pw, T + ph, 'var(--ink)', 2) + Ln(L, T - 4, L, T + ph, 'var(--ink)', 2);
+    return s + '</svg>';
+  }
+  function polar(cx, cy, R, deg) { var a = deg * Math.PI / 180; return [cx + R * Math.sin(a), cy - R * Math.cos(a)]; }
+  /* Diagramme circulaire. slices = [{deg, col, label}] ; o.k = nombre de parts dessinées ; o.small = sans étiquettes */
+  function pieSvg(slices, o) {
+    o = o || {};
+    var small = !!o.small, W = small ? 120 : 300, H = small ? 120 : 260, cx = W / 2, cy = H / 2, R = small ? 52 : 108;
+    var k = o.k == null ? slices.length : o.k, a0 = 0, s = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + esc(o.label || 'Diagramme circulaire') + '">';
+    s += '<circle cx="' + cx + '" cy="' + cy + '" r="' + R + '" style="fill:var(--card);stroke:var(--ink-soft);stroke-width:1.5;stroke-dasharray:5 4"/>';
+    var labels = '';
+    for (var i = 0; i < k && i < slices.length; i++) {
+      var d = slices[i].deg, a1 = a0 + d, hl = o.hl === i, sty = 'fill:' + slices[i].col + ';stroke:' + (hl ? 'var(--red)' : 'var(--ink)') + ';stroke-width:' + (hl ? 3.5 : 1.5);
+      if (d >= 359.999) s += '<circle cx="' + cx + '" cy="' + cy + '" r="' + R + '" style="' + sty + '"/>';
+      else if (d > 0) {
+        var p0 = polar(cx, cy, R, a0), p1 = polar(cx, cy, R, a1);
+        s += '<path d="M' + r1(cx) + ' ' + r1(cy) + ' L' + r1(p0[0]) + ' ' + r1(p0[1]) + ' A' + R + ' ' + R + ' 0 ' + (d > 180 ? 1 : 0) + ' 1 ' + r1(p1[0]) + ' ' + r1(p1[1]) + ' Z" style="' + sty + '"/>';
+      }
+      if (!small && slices[i].label && d > 0) { var pm = polar(cx, cy, d < 30 ? R + 18 : R * .62, a0 + d / 2); labels += Tx(pm[0], pm[1] + 5, slices[i].label, { fs: 14, a: 'middle', st: halo('var(--ink)') }); }
+      a0 = a1;
+    }
+    return s + labels + '</svg>';
+  }
+  /* Graphique en ligne. d = SION ou PISC ; sel = indice du point choisi */
+  function lineSvg(d, sel) {
+    var W = 340, H = 250, L = d.y1 >= 1000 ? 50 : 34, R = 10, T = 26, B = 34, n = d.vals.length, i;
+    var pw = W - L - R, ph = H - T - B;
+    function X(k) { return L + (k + .5) * pw / n; }
+    function Y(v) { return T + ph - v / d.y1 * ph; }
+    var s = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Graphique en ligne : ' + esc(d.intro) + '">';
+    s += '<rect x="' + L + '" y="' + T + '" width="' + pw + '" height="' + ph + '" style="fill:var(--card)"/>';
+    for (i = 0; i <= d.y1; i += d.sy) { s += Ln(L, Y(i), L + pw, Y(i), 'var(--line)', 1); s += Tx(L - 6, Y(i) + 5, grp(i), { fs: 13, a: 'end' }); }
+    s += Tx(4, 15, d.yl, { fs: 13, st: 'fill:var(--ink-soft)' });
+    for (i = 0; i < n; i++) s += Tx(X(i), T + ph + 20, d.labels[i], { fs: 13, a: 'middle', cls: 'cl' });
+    if (sel != null) { s += Ln(X(sel), Y(d.vals[sel]), X(sel), T + ph, 'var(--red)', 1.8, ' stroke-dasharray="5 4"'); s += Ln(L, Y(d.vals[sel]), X(sel), Y(d.vals[sel]), 'var(--red)', 1.8, ' stroke-dasharray="5 4"'); }
+    s += '<polyline points="' + d.vals.map(function (v, k) { return r1(X(k)) + ',' + r1(Y(v)); }).join(' ') + '" style="fill:none;stroke:var(--acc);stroke-width:3;stroke-linejoin:round"/>';
+    s += Ln(L, T + ph, L + pw, T + ph, 'var(--ink)', 2) + Ln(L, T - 4, L, T + ph, 'var(--ink)', 2);
+    d.vals.forEach(function (v, k) {
+      var on = k === sel;
+      s += '<g class="tp" data-i="' + k + '" tabindex="0" role="button" aria-label="' + esc(d.long[k] + ' : ' + grp(v) + ' ' + d.unit) + '"><circle cx="' + r1(X(k)) + '" cy="' + r1(Y(v)) + '" r="16" style="fill:transparent"/><circle class="vis" cx="' + r1(X(k)) + '" cy="' + r1(Y(v)) + '" r="' + (on ? 8 : 6) + '" style="fill:' + (on ? 'var(--red)' : 'var(--acc)') + ';stroke:var(--card);stroke-width:2"/></g>';
+    });
+    if (sel != null) { var tx = Math.min(Math.max(X(sel), L + 30), L + pw - 30); s += Tx(tx, Y(d.vals[sel]) - 14, grp(d.vals[sel]), { fs: 14, a: 'middle', st: halo('var(--red)') }); }
+    return s + '</svg>';
+  }
+  /* Boîtes à moustaches sur un axe commun. rows = [{name, Q, col, dots, upto}] */
+  var BX0 = 140, BX1 = 185;
+  function boxSvg(rows, o) {
+    o = o || {};
+    var W = 340, L = 18, R = 14, rowH = o.dots ? 130 : 62, T = 10, H = T + rows.length * rowH + 34, pw = W - L - R;
+    function X(v) { return L + (v - BX0) / (BX1 - BX0) * pw; }
+    var s = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + esc(o.label || 'Boîte à moustaches') + '">';
+    for (var t = BX0; t <= BX1; t += 5) { s += Ln(X(t), T, X(t), T + rows.length * rowH, 'var(--line)', 1); s += Tx(X(t), H - 12, String(t), { fs: 13, a: 'middle' }); }
+    s += Ln(L, T + rows.length * rowH, L + pw, T + rows.length * rowH, 'var(--ink)', 2);
+    s += Tx(L + pw, H - 0.5, 'cm', { fs: 13, a: 'end', st: 'fill:var(--ink-soft)' });
+    rows.forEach(function (r, ri) {
+      var Q = r.Q, y0 = T + ri * rowH, up = r.upto == null ? 9 : r.upto, by = y0 + (o.dots ? 34 : 30), bh = 22, col = r.col || 'var(--acc)';
+      if (!o.dots || r.name) s += Tx(L, y0 + 14, r.name || '', { fs: 13, cls: 'cl', st: 'fill:' + col });
+      if (o.dots) {
+        var seen = {};
+        Q.s.forEach(function (v, k) {
+          var h = seen[v] = (seen[v] || 0) + 1, key = (k + 1 === Q.r1 && up >= 3) || (k + 1 === Q.r3 && up >= 4) || (Q.medRanks.indexOf(k + 1) >= 0 && up >= 2) || ((k === 0 || k === Q.n - 1) && up >= 1);
+          s += '<circle cx="' + r1(X(v)) + '" cy="' + r1(y0 + rowH - 8 - (h - 1) * 9) + '" r="4" style="fill:' + (key ? 'var(--red)' : col) + ';stroke:var(--card);stroke-width:1"/>';
+        });
+      }
+      function vline(v, lab, show, below) { if (!show) return ''; return Ln(X(v), by - 4, X(v), by + bh + 4, 'var(--ink)', 2.5) + (lab ? Tx(X(v), below ? by + bh + 18 : by - 8, lab, { fs: 13, a: 'middle', st: halo('var(--ink)') }) : ''); }
+      if (up >= 5) {
+        s += Ln(X(Q.min), by + bh / 2, X(Q.q1), by + bh / 2, 'var(--ink)', 2) + Ln(X(Q.q3), by + bh / 2, X(Q.max), by + bh / 2, 'var(--ink)', 2);
+        s += '<rect x="' + r1(X(Q.q1)) + '" y="' + by + '" width="' + r1(X(Q.q3) - X(Q.q1)) + '" height="' + bh + '" style="fill:' + col + ';fill-opacity:.35;stroke:var(--ink);stroke-width:2"/>';
+      }
+      var lb = o.labels !== false;
+      s += vline(Q.min, lb ? 'min' : '', up >= 1) + vline(Q.max, lb ? 'max' : '', up >= 1);
+      s += vline(Q.q1, lb ? 'Q1' : '', up >= 3, X(Q.q1) - X(Q.min) < 28) + vline(Q.q3, lb ? 'Q3' : '', up >= 4, X(Q.max) - X(Q.q3) < 28);
+      if (up >= 2) s += Ln(X(Q.med2 / 2), by - 4, X(Q.med2 / 2), by + bh + 4, 'var(--red)', 3) + (lb ? Tx(X(Q.med2 / 2), by + bh + 18, 'méd.', { fs: 13, a: 'middle', st: halo('var(--red)') }) : '');
+    });
+    return s + '</svg>';
+  }
+  function tallySvg(c) {
+    if (!c) return '<span class="soft">—</span>';
+    var g = Math.floor(c / 5), r = c % 5, s = '', x = 4, i, j;
+    for (i = 0; i < g; i++) { for (j = 0; j < 4; j++) s += Ln(x + j * 6, 3, x + j * 6, 21, 'var(--ink)', 2); s += Ln(x - 3, 17, x + 21, 7, 'var(--red)', 2); x += 32; }
+    for (j = 0; j < r; j++) s += Ln(x + j * 6, 3, x + j * 6, 21, 'var(--ink)', 2);
+    x += r * 6 + 2;
+    return '<svg viewBox="0 0 ' + x + ' 24" style="width:' + x + 'px" aria-hidden="true">' + s + '</svg>';
+  }
+  function legendHtml(items) { return items.map(function (x, i) { return '<span><i class="sw" style="background:' + SCOL[i % 5] + '"></i>' + esc(x.name) + '</span>'; }).join(''); }
+
+  /* ---------- Trieur générique (cartes une par une), comme dans les autres tutoriels.
+     Si un item a sa propre liste o (options), elle remplace les boutons communs.
+     Si un item a une liste alt, ces réponses sont aussi acceptées.
+     o.cardHtml(it, answered) renvoie le contenu HTML de la carte. ---------- */
+  function isOk(it, c) { return c === it.a || !!(it.alt && it.alt.indexOf(c) >= 0); }
+  function makeSorter(o) {
+    var idx = 0, ans = {};
+    function opts(it) { return it.o ? it.o : o.order; }
+    function name(c) { return o.names && o.names[c] ? o.names[c] : c; }
+    function render() {
+      var it = o.items[idx], a = ans[it.k];
+      if (o.cardHtml) $(o.card).innerHTML = o.cardHtml(it, !!a); else $(o.card).textContent = it.s;
+      $(o.pos).textContent = o.word + ' ' + (idx + 1) + ' / ' + o.items.length;
+      $(o.btns).innerHTML = opts(it).map(function (c) {
+        var cls = a ? (c === it.a || (c === a && isOk(it, a)) ? 'right' : (c === a ? 'wrong' : '')) : '';
+        return '<button type="button" data-c="' + esc(c) + '"' + (cls ? ' class="' + cls + '"' : '') + (a ? ' disabled' : '') + '>' + esc(name(c)) + '</button>';
+      }).join('');
+      var out = $(o.out);
+      if (!a) { out.className = 'fbk'; out.innerHTML = ''; }
+      else {
+        var ok = isOk(it, a);
+        out.className = 'fbk ' + (ok ? 'ok' : 'no');
+        out.innerHTML = '<strong>' + (ok ? 'Bien vu !' : 'Pas tout à fait. Réponse : ' + esc(name(it.a)) + '.') + '</strong><span>' + esc(it.why) + '</span>';
+      }
+      var s = o.score(ans), last = idx === o.items.length - 1, left = s.total - s.answered;
+      $(o.score_).textContent = (o.word ? o.word + ' ' : '') + (idx + 1) + ' / ' + s.total;
+      $(o.pos).textContent = s.answered ? 'Bonnes réponses : ' + s.correct + ' sur ' + s.answered : '';
+      $(o.prev).disabled = idx === 0;
+      $(o.next).disabled = last;
+      $(o.next).style.display = last ? 'none' : '';
+      var end = $(o.out + 'End');
+      if (!end) { end = document.createElement('div'); end.id = o.out + 'End'; end.setAttribute('aria-live', 'polite'); $(o.out).insertAdjacentElement('afterend', end); }
+      if (!left) {
+        var r = s.correct / s.total;
+        end.className = 'fbk ok sorter-end';
+        end.innerHTML = '<strong>Terminé ! ' + s.correct + ' / ' + s.total + ' bonnes réponses</strong><span>' +
+          (r === 1 ? 'Parfait, tout est juste !' : r >= .7 ? 'Très bien !' : r >= .5 ? 'Pas mal ! Relis les explications des erreurs.' : 'Relis les explications, puis réessaie.') +
+          ' Touche « Recommencer » pour rejouer.</span>';
+      } else if (last && ans[it.k]) {
+        end.className = 'fbk warn sorter-end';
+        end.innerHTML = '<strong>C’était la dernière carte.</strong><span>Il te reste ' + left + ' réponse' + (left > 1 ? 's' : '') + ' à donner : reviens en arrière avec « ← Précédent ».</span>';
+      } else { end.className = ''; end.innerHTML = ''; }
+    }
+    $(o.btns).addEventListener('click', function (ev) {
+      var b = ev.target.closest('button'); if (!b || b.disabled) return;
+      var it = o.items[idx]; if (!ans[it.k]) ans[it.k] = b.getAttribute('data-c');
+      render();
+    });
+    $(o.prev).addEventListener('click', function () { idx = clamp(idx - 1, o.items.length); render(); });
+    $(o.next).addEventListener('click', function () { idx = clamp(idx + 1, o.items.length); render(); });
+    $(o.reset).addEventListener('click', function () { ans = {}; idx = 0; render(); });
+    render();
+  }
+  function scorer(items) {
+    return function (ans) { var correct = 0, answered = 0; items.forEach(function (x) { if (ans && ans[x.k]) { answered++; if (isOk(x, ans[x.k])) correct++; } }); return { correct: correct, answered: answered, total: items.length }; };
+  }
+  function tapKeys(el, fn) {
+    el.addEventListener('click', function (ev) { var g = ev.target.closest('[data-i]'); if (g && el.contains(g)) fn(+g.getAttribute('data-i')); });
+    el.addEventListener('keydown', function (ev) { if (ev.key !== 'Enter' && ev.key !== ' ') return; var g = ev.target.closest('[data-i]'); if (g) { ev.preventDefault(); fn(+g.getAttribute('data-i')); } });
+  }
+
+  /* ---------- Étape 1 : types de caractères ---------- */
+  var CHAR_NAMES = { qual: 'Qualitatif', disc: 'Quantitatif discret', cont: 'Quantitatif continu' };
+  var charCards = [
+    { k: 'q1', s: 'Le sport préféré', a: 'qual', why: 'La réponse est un mot (football, ski…) : une catégorie, pas un nombre.' },
+    { k: 'q2', s: 'Le nombre de frères et sœurs', a: 'disc', why: 'On compte : 0, 1, 2, 3… Il n’y a rien entre 1 et 2.' },
+    { k: 'q3', s: 'La taille en cm', a: 'cont', why: 'On mesure : 157 cm, 157,4 cm… Toutes les valeurs entre deux tailles sont possibles.' },
+    { k: 'q4', s: 'Le moyen de transport pour venir à l’école', a: 'qual', why: 'Bus, vélo, à pied : ce sont des catégories.' },
+    { k: 'q5', s: 'Le temps de trajet en minutes', a: 'cont', why: 'Un temps se mesure : 12 min, 12,5 min, 12 min 20 s… On l’arrondit souvent, mais il est continu.' },
+    { k: 'q6', s: 'Le numéro postal (NPA) du domicile', a: 'qual', why: 'C’est un nombre, mais c’est un code ! La moyenne de 1950 et de 1003 ne veut rien dire. On le traite comme une catégorie.' },
+    { k: 'q7', s: 'Le nombre d’animaux à la maison', a: 'disc', why: 'On compte les animaux : 0, 1, 2… des valeurs entières séparées.' },
+    { k: 'q8', s: 'La masse du sac d’école en kg', a: 'cont', why: 'Une masse se mesure avec une balance : 4,2 kg, 4,25 kg… Elle est continue.' },
+    { k: 'q9', s: 'La couleur des yeux', a: 'qual', why: 'Bleu, brun, vert : des catégories.' },
+    { k: 'q10', s: 'Le nombre de messages reçus hier', a: 'disc', why: 'On compte les messages : 0, 1, 2… Pas de demi-message.' },
+    { k: 'q11', s: 'La température à midi dans la cour', a: 'cont', why: 'Une température se mesure : 18 °C, 18,3 °C… Elle peut prendre toutes les valeurs.' },
+    { k: 'q12', s: 'L’instrument de musique joué', a: 'qual', why: 'Piano, guitare, aucun : des catégories.' }
+  ];
+  makeSorter({ items: charCards, names: CHAR_NAMES, order: ['qual', 'disc', 'cont'], btns: 'c1Btns', card: 'c1Card', pos: 'c1Pos', out: 'c1Out', score_: 'c1Score', prev: 'c1Prev', next: 'c1Next', reset: 'c1Reset', word: 'Question', score: scorer(charCards),
+    cardHtml: function (it) { return '<span>' + esc(it.s) + '</span><span class="ask">Quel type de caractère ?</span>'; } });
+
+  /* ---------- Étape 2 : dépouillement ---------- */
+  var tlRaw = TRANS_RAW.slice(), tlUsed = [];
+  var TKEYS = TRANS.map(function (x) { return x.k; }), TNAME = {};
+  TRANS.forEach(function (x) { TNAME[x.k] = x.name; });
+  function tlRender() {
+    $('tlChips').innerHTML = tlRaw.map(function (k, i) { var u = !!tlUsed[i]; return '<button type="button" data-i="' + i + '"' + (u ? ' class="used" disabled' : '') + ' aria-label="Réponse ' + (i + 1) + ' : ' + esc(TNAME[k]) + (u ? ', déjà comptée' : '') + '">' + esc(TNAME[k]) + '</button>'; }).join('');
+    var done = tlRaw.filter(function (k, i) { return tlUsed[i]; }), cnt = countBy(done, TKEYS), n = done.length;
+    var h = '<thead><tr><th>Transport</th><th>Bâtons</th><th>Effectif</th></tr></thead><tbody>';
+    TRANS.forEach(function (x) { h += '<tr><th>' + esc(x.name) + '</th><td class="al tally">' + tallySvg(cnt[x.k]) + '</td><td>' + cnt[x.k] + '</td></tr>'; });
+    h += '</tbody><tfoot><tr><th>Total</th><td class="al">' + n + ' réponse' + (n > 1 ? 's' : '') + ' dépouillée' + (n > 1 ? 's' : '') + ' sur ' + tlRaw.length + '</td><td>' + n + '</td></tr></tfoot>';
+    $('tlTable').innerHTML = h;
+    var out = $('tlOut');
+    if (n === tlRaw.length) { out.className = 'fbk ok'; out.innerHTML = '<strong>Dépouillement terminé</strong><span>Effectif total : ' + TRANS.map(function (x) { return cnt[x.k]; }).join(' + ') + ' = ' + n + ', c’est bien le nombre d’élèves (' + tlRaw.length + '). Aucune réponse oubliée, aucune comptée deux fois.</span>'; }
+    else if (n) { out.className = 'fbk info'; out.innerHTML = '<span>Encore ' + (tlRaw.length - n) + ' réponse' + (tlRaw.length - n > 1 ? 's' : '') + ' à compter.</span>'; }
+    else { out.className = 'fbk'; out.innerHTML = ''; }
+  }
+  $('tlChips').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b || b.disabled) return; tlUsed[+b.getAttribute('data-i')] = true; tlRender(); });
+  $('tlAll').addEventListener('click', function () { tlRaw.forEach(function (k, i) { tlUsed[i] = true; }); tlRender(); });
+  $('tlReset').addEventListener('click', function () { tlUsed = []; tlRender(); });
+  $('tlNew').addEventListener('click', function () { var w = ['bus', 'bus', 'bus', 'pied', 'pied', 'pied', 'velo', 'velo', 'auto']; tlRaw = []; for (var i = 0; i < 24; i++) tlRaw.push(w[rint(0, w.length - 1)]); tlUsed = []; tlRender(); });
+  tlRender();
+
+  /* ---------- Étape 3 : fréquences ---------- */
+  var frC = SPORTS.map(function (x) { return x.c; }), frP = 0;
+  function frRender() {
+    var F = freqTable(frC, frP), h = '<thead><tr><th>Sport</th><th>Effectif</th><th>Fraction</th><th>Décimal</th><th>%</th></tr></thead><tbody>';
+    SPORTS.forEach(function (x, i) { var r = F.rows[i]; h += '<tr><th><i class="sw" style="background:' + SCOL[i] + '"></i>' + esc(x.name) + '</th><td>' + r.c + '</td><td>' + esc(r.frac) + '</td><td>' + esc(r.dec) + '</td><td>' + esc(F.T ? trimZ(fixStr(r.pctR, frP)) + NBS + '%' : '—') + '</td></tr>'; });
+    var off = F.T && F.sumR !== 100 * Math.pow(10, frP);
+    h += '</tbody><tfoot><tr><th>Total</th><td>' + F.T + '</td><td>' + (F.T ? F.T + '/' + F.T + ' = 1' : '—') + '</td><td>' + (F.T ? '1' : '—') + '</td><td' + (off ? ' class="bad"' : '') + '>' + (F.T ? esc(trimZ(fixStr(F.sumR, frP)) + NBS + '%') : '—') + '</td></tr></tfoot>';
+    $('frTable').innerHTML = h;
+    $('frCtrls').innerHTML = SPORTS.map(function (x, i) { return '<div class="ctrl"><span class="n">' + esc(x.name) + '</span><button type="button" data-i="' + i + '" data-d="-1" aria-label="Un élève de moins pour ' + esc(x.name) + '"' + (frC[i] ? '' : ' disabled') + '>' + MI + '</button><span class="v">' + frC[i] + '</span><button type="button" data-i="' + i + '" data-d="1" aria-label="Un élève de plus pour ' + esc(x.name) + '"' + (frC[i] < 30 ? '' : ' disabled') + '>+</button></div>'; }).join('');
+    var out = $('frOut');
+    if (!F.T) { out.className = 'fbk warn'; out.innerHTML = '<strong>Il n’y a personne !</strong><span>Avec un total de 0, on ne peut pas diviser : ajoute au moins un élève.</span>'; }
+    else if (off) { out.className = 'fbk warn'; out.innerHTML = '<strong>Les % arrondis font ' + esc(trimZ(fixStr(F.sumR, frP))) + NBS + '%</strong><span>Ce n’est pas une erreur : chaque pourcentage a été arrondi' + (frP ? ' au dixième' : ' à l’unité') + '. Les vraies fréquences font exactement 1 = 100' + NBS + '%. ' + (frP ? '' : 'Essaie « % au dixième » : l’écart devient plus petit.') + '</span>'; }
+    else { out.className = 'fbk ok'; out.innerHTML = '<strong>Les % arrondis font 100' + NBS + '%</strong><span>Ici, les arrondis se compensent' + (F.rows.every(function (r) { return isExact(100 * r.c, F.T, frP); }) ? ' (et même, aucun arrondi n’a été nécessaire)' : '') + '. La somme des vraies fréquences, elle, vaut toujours exactement 1.</span>'; }
+    $('frU').setAttribute('aria-pressed', frP ? 'false' : 'true'); $('frT').setAttribute('aria-pressed', frP ? 'true' : 'false');
+  }
+  $('frCtrls').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b || b.disabled) return; var i = +b.getAttribute('data-i'); frC[i] = Math.max(0, Math.min(30, frC[i] + +b.getAttribute('data-d'))); frRender(); });
+  $('frU').addEventListener('click', function () { frP = 0; frRender(); });
+  $('frT').addEventListener('click', function () { frP = 1; frRender(); });
+  $('frR').addEventListener('click', function () { frC = SPORTS.map(function (x) { return x.c; }); frRender(); });
+  $('frN').addEventListener('click', function () { frC = SPORTS.map(function () { return rint(1, 10); }); frRender(); });
+  frRender();
+
+  /* ---------- Étape 4 : effectifs cumulés ---------- */
+  var SIBC = SIB.map(function (x) { return x.c; }), SIBCU = cumul(SIBC), SIBT = sum(SIBC);
+  function sibName(v) { return v + ' frère' + (v > 1 ? 's' : '') + ' ou sœur' + (v > 1 ? 's' : ''); }
+  var cuSteps = [{ n: 0, text: 'On a rangé les valeurs dans l’ordre croissant : 0, 1, 2, 3, 4. On va remplir la colonne des effectifs cumulés de haut en bas.' }];
+  SIB.forEach(function (x, i) {
+    cuSteps.push({ n: i + 1, done: i === SIB.length - 1, text: (i === 0 ? 'Première ligne : personne n’a moins de 0, donc le cumul est l’effectif lui-même : ' + SIBCU[0] + '.' : 'On ajoute l’effectif au cumul d’avant : ' + SIBCU[i - 1] + ' + ' + x.c + ' = ' + SIBCU[i] + '.') + ' ' + SIBCU[i] + ' élèves ont au plus ' + sibName(x.v) + '.' + (i === SIB.length - 1 ? ' Le dernier cumul est l’effectif total, ' + SIBT + ' : c’est le contrôle.' : '') });
+  });
+  var cuIdx = 0;
+  function cuTable(upto, hlRows, el) {
+    var h = '<thead><tr><th>Frères et sœurs</th><th>Effectif</th><th>Effectif cumulé</th></tr></thead><tbody>';
+    SIB.forEach(function (x, i) { var on = hlRows && hlRows.indexOf(i) >= 0; h += '<tr' + (on ? ' class="on"' : '') + '><th>' + x.v + '</th><td>' + x.c + '</td><td' + (i === upto - 1 && !hlRows ? ' class="on"' : '') + '>' + (i < upto ? SIBCU[i] : '') + '</td></tr>'; });
+    $(el).innerHTML = h + '</tbody><tfoot><tr><th>Total</th><td>' + SIBT + '</td><td></td></tr></tfoot>';
+  }
+  function cuRender() {
+    var st = cuSteps[cuIdx], last = cuIdx === cuSteps.length - 1;
+    $('cuPos').textContent = 'Étape ' + (cuIdx + 1) + ' / ' + cuSteps.length;
+    cuTable(st.n, null, 'cuTable');
+    $('cuSay').className = 'fbk say ' + (st.done ? 'ok' : 'info');
+    $('cuSay').innerHTML = st.done ? '<strong>Tableau terminé</strong><span>' + esc(st.text) + '</span>' : '<span>' + esc(st.text) + '</span>';
+    $('cuPrev').disabled = cuIdx === 0; $('cuNext').disabled = last; $('cuNext').style.display = last ? 'none' : '';
+  }
+  $('cuPrev').addEventListener('click', function () { cuIdx = clamp(cuIdx - 1, cuSteps.length); cuRender(); });
+  $('cuNext').addEventListener('click', function () { cuIdx = clamp(cuIdx + 1, cuSteps.length); cuRender(); });
+  $('cuReset').addEventListener('click', function () { cuIdx = 0; cuRender(); });
+  cuRender();
+  var CUQ = [
+    { t: 'au plus 1', f: function () { return { rows: [0, 1], v: SIBCU[1], why: 'Au plus 1 = 0 ou 1. On lit le cumul de la ligne 1 : ' + SIBCU[1] + ' (= ' + SIBC[0] + ' + ' + SIBC[1] + ').' }; } },
+    { t: 'au plus 2', f: function () { return { rows: [0, 1, 2], v: SIBCU[2], why: 'Au plus 2 = 0, 1 ou 2. On lit le cumul de la ligne 2 : ' + SIBCU[2] + '.' }; } },
+    { t: 'au plus 3', f: function () { return { rows: [0, 1, 2, 3], v: SIBCU[3], why: 'On lit le cumul de la ligne 3 : ' + SIBCU[3] + '.' }; } },
+    { t: 'au moins 2', f: function () { return { rows: [2, 3, 4], v: SIBT - SIBCU[1], why: 'Au moins 2, c’est tous sauf « au plus 1 » : ' + SIBT + ' − ' + SIBCU[1] + ' = ' + (SIBT - SIBCU[1]) + '. Vérification : ' + SIBC[2] + ' + ' + SIBC[3] + ' + ' + SIBC[4] + ' = ' + (SIBC[2] + SIBC[3] + SIBC[4]) + '.' }; } },
+    { t: 'au moins 1', f: function () { return { rows: [1, 2, 3, 4], v: SIBT - SIBCU[0], why: 'Tous sauf ceux qui n’en ont aucun : ' + SIBT + ' − ' + SIBCU[0] + ' = ' + (SIBT - SIBCU[0]) + '.' }; } }
+  ];
+  $('cuQs').innerHTML = CUQ.map(function (q, i) { return '<button type="button" data-i="' + i + '" aria-pressed="false">Combien en ont ' + esc(q.t) + ' ?</button>'; }).join('');
+  function cuAsk(i) {
+    var q = CUQ[i], r = q.f();
+    $('cuQs').querySelectorAll('button').forEach(function (b, k) { b.setAttribute('aria-pressed', k === i ? 'true' : 'false'); });
+    cuTable(SIB.length, r.rows, 'cuTable2');
+    $('cuOut').className = 'fbk ok'; $('cuOut').innerHTML = '<strong>' + r.v + ' élèves en ont ' + esc(q.t) + '</strong><span>' + esc(r.why) + ' Soit ' + esc(pctStr(r.v, SIBT, 1)) + ' de la classe.</span>';
+  }
+  $('cuQs').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (b) cuAsk(+b.getAttribute('data-i')); });
+  cuTable(SIB.length, [], 'cuTable2');
+
+  /* ---------- Étape 5 : classes ---------- */
+  var clWv = 10, clSel = null, CLW = [5, 10, 20];
+  var CLTXT = {
+    5: 'Classes de largeur 5 : beaucoup de petites classes, certaines presque vides ou vides. La forme est en dents de scie : trop de classes.',
+    10: 'Classes de largeur 10 : la forme se voit bien. La plupart des élèves mettent entre 10 et 20 minutes, et peu mettent plus de 30 minutes.',
+    20: 'Classes de largeur 20 : seulement 3 classes, et presque tout le monde est dans la première. On ne voit plus la forme : trop peu de classes.'
+  };
+  $('clW').innerHTML = CLW.map(function (w) { return '<button type="button" data-w="' + w + '">Largeur ' + w + '</button>'; }).join('');
+  function clLab(c) { return '[' + c.a + ' ;' + NBS + c.b + '['; }
+  function clRender() {
+    var C = classes(TRAJET, clWv, 0), hl = clSel == null ? -1 : classOf(TRAJET[clSel], clWv, 0), empty = C.filter(function (c) { return !c.c; }).length;
+    $('clW').querySelectorAll('button').forEach(function (b) { b.setAttribute('aria-pressed', +b.getAttribute('data-w') === clWv ? 'true' : 'false'); });
+    $('clVals').innerHTML = TRAJET.map(function (v, i) { return '<button type="button" data-i="' + i + '" class="ex' + (i === clSel ? ' on' : '') + '" aria-label="' + v + ' minutes">' + v + '</button>'; }).join('');
+    $('clGraph').innerHTML = barSvg({ cats: C.map(function (c) { return { name: clLab(c), v: c.c, col: 'var(--s1)' }; }), hist: true, edges: C.map(function (c) { return c.a; }).concat([C[C.length - 1].b]), hl: hl, xl: 'minutes', label: 'Histogramme des temps de trajet, classes de largeur ' + clWv });
+    var h = '<thead><tr><th>Classe (min)</th><th>Effectif</th></tr></thead><tbody>';
+    C.forEach(function (c, i) { h += '<tr' + (i === hl ? ' class="on"' : '') + '><th class="mono">' + esc(clLab(c)) + '</th><td>' + c.c + '</td></tr>'; });
+    $('clTable').innerHTML = h + '</tbody><tfoot><tr><th>Total</th><td>' + sum(C.map(function (c) { return c.c; })) + '</td></tr></tfoot>';
+    var t = '<strong>' + C.length + ' classes' + (empty ? ', dont ' + empty + ' vide' + (empty > 1 ? 's' : '') : '') + '</strong><span>' + esc(CLTXT[clWv]) + '</span>';
+    if (clSel != null) { var v = TRAJET[clSel], c = C[hl]; t += '<span><strong>' + v + ' min</strong> va dans <span class="mono">' + esc(clLab(c)) + '</span>, car ' + c.a + ' ≤ ' + v + ' &lt; ' + c.b + '.</span>'; }
+    $('clOut').innerHTML = t;
+  }
+  $('clW').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b) return; clWv = +b.getAttribute('data-w'); clRender(); });
+  $('clVals').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b) return; var i = +b.getAttribute('data-i'); clSel = clSel === i ? null : i; clRender(); });
+  clRender();
+
+  /* ---------- Étape 6 : construire le diagramme en barres ---------- */
+  var buV = TRANS.map(function () { return 0; }), buMarks = null;
+  $('buTable').innerHTML = '<thead><tr><th>Transport</th>' + TRANS.map(function (x) { return '<th>' + esc(x.name) + '</th>'; }).join('') + '<th>Total</th></tr></thead><tbody><tr><th>Effectif</th>' + TRANS.map(function (x) { return '<td>' + x.c + '</td>'; }).join('') + '<td>' + sum(TRANS.map(function (x) { return x.c; })) + '</td></tr></tbody>';
+  function buRender() {
+    $('buGraph').innerHTML = barSvg({ cats: TRANS.map(function (x, i) { return { name: x.name, v: buV[i], col: SCOL[i] }; }), yMin: 9, marks: buMarks, yl: 'nombre d’élèves', label: 'Ton diagramme en barres des moyens de transport' });
+    $('buCtrls').innerHTML = TRANS.map(function (x, i) { var m = buMarks ? (buV[i] === x.c ? ' ok' : ' no') : ''; return '<div class="ctrl' + m + '"><span class="n"><i class="sw" style="background:' + SCOL[i] + '"></i>' + esc(x.name) + '</span><button type="button" data-i="' + i + '" data-d="-1" aria-label="Baisser la barre ' + esc(x.name) + '"' + (buV[i] ? '' : ' disabled') + '>' + MI + '</button><span class="v">' + buV[i] + '</span><button type="button" data-i="' + i + '" data-d="1" aria-label="Monter la barre ' + esc(x.name) + '"' + (buV[i] < 12 ? '' : ' disabled') + '>+</button></div>'; }).join('');
+  }
+  $('buCtrls').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b || b.disabled) return; var i = +b.getAttribute('data-i'); buV[i] = Math.max(0, Math.min(12, buV[i] + +b.getAttribute('data-d'))); buMarks = null; $('buOut').className = 'fbk'; $('buOut').innerHTML = ''; buRender(); });
+  $('buCheck').addEventListener('click', function () {
+    buMarks = TRANS.map(function (x, i) { return buV[i] === x.c ? '✓' : '✗'; });
+    var bad = TRANS.filter(function (x, i) { return buV[i] !== x.c; });
+    var out = $('buOut');
+    if (!bad.length) { out.className = 'fbk ok'; out.innerHTML = '<strong>Diagramme juste !</strong><span>Chaque barre a la hauteur de son effectif. Les barres ont la même largeur et sont séparées : c’est un caractère qualitatif.</span>'; }
+    else { out.className = 'fbk no'; out.innerHTML = '<strong>Encore ' + bad.length + ' barre' + (bad.length > 1 ? 's' : '') + ' à corriger</strong><span>' + esc(bad.map(function (x) { var i = TRANS.indexOf(x); return x.name + ' : ' + buV[i] + ' au lieu de ' + x.c + (buV[i] < x.c ? ' (trop basse)' : ' (trop haute)'); }).join(' ; ')) + '.</span>'; }
+    buRender();
+  });
+  $('buReset').addEventListener('click', function () { buV = TRANS.map(function () { return 0; }); buMarks = null; $('buOut').className = 'fbk'; $('buOut').innerHTML = ''; buRender(); });
+  buRender();
+
+  /* ---------- Étape 7 : angles du diagramme circulaire ---------- */
+  var piData = SPORTS, piIdx = 0;
+  function piSlices(items) { var T = sum(items.map(function (x) { return x.c; })); return items.map(function (x, i) { return { deg: 360 * x.c / T, col: SCOL[i % 5], label: angleStr(x.c, T).replace('≈' + NBS, '') }; }); }
+  function piRender() {
+    var P = pieSteps(piData), st = P.steps[piIdx], last = piIdx === P.steps.length - 1;
+    $('piPos').textContent = 'Étape ' + (piIdx + 1) + ' / ' + P.steps.length;
+    $('piGraph').innerHTML = pieSvg(piSlices(piData), { k: st.k, hl: st.done || !st.k ? -1 : st.k - 1, label: 'Diagramme circulaire en construction' });
+    $('piLeg').innerHTML = legendHtml(piData);
+    $('piSay').className = 'fbk say ' + (st.done ? 'ok' : 'info');
+    $('piSay').innerHTML = st.done ? '<strong>Diagramme terminé</strong><span>' + esc(st.text) + '</span>' : '<span>' + esc(st.text) + '</span>';
+    $('piPrev').disabled = piIdx === 0; $('piNext').disabled = last; $('piNext').style.display = last ? 'none' : '';
+    $('piS').setAttribute('aria-pressed', piData === SPORTS ? 'true' : 'false'); $('piT').setAttribute('aria-pressed', piData === TRANS ? 'true' : 'false');
+  }
+  $('piS').addEventListener('click', function () { piData = SPORTS; piIdx = 0; piRender(); });
+  $('piT').addEventListener('click', function () { piData = TRANS; piIdx = 0; piRender(); });
+  $('piPrev').addEventListener('click', function () { piIdx = clamp(piIdx - 1, piData.length + 2); piRender(); });
+  $('piNext').addEventListener('click', function () { piIdx = clamp(piIdx + 1, piData.length + 2); piRender(); });
+  $('piReset').addEventListener('click', function () { piIdx = 0; piRender(); });
+  piRender();
+
+  /* ---------- Étape 8 : histogramme des tailles ---------- */
+  var hiHist = true, hiSel = null, HIC = classes(TAILLES_A, 5, 145);
+  function hiRender() {
+    var cats = HIC.map(function (c) { return { name: c.a + '–' + c.b, v: c.c, col: 'var(--s3)', aria: 'Classe de ' + c.a + ' à ' + c.b + ' cm : ' + c.c + ' élèves' }; });
+    $('hiGraph').innerHTML = barSvg({ cats: cats, hist: hiHist, edges: HIC.map(function (c) { return c.a; }).concat([HIC[HIC.length - 1].b]), hl: hiSel, tap: true, xl: 'taille (cm)', label: (hiHist ? 'Histogramme' : 'Diagramme en barres séparées') + ' des tailles' });
+    $('hiH').setAttribute('aria-pressed', hiHist ? 'true' : 'false'); $('hiB').setAttribute('aria-pressed', hiHist ? 'false' : 'true');
+    var out = $('hiOut'), t = '';
+    if (hiSel != null) { var c = HIC[hiSel]; t += '<strong>[' + c.a + ' ;' + NBS + c.b + '[ : ' + c.c + ' élève' + (c.c > 1 ? 's' : '') + '</strong><span>Des élèves qui mesurent au moins ' + c.a + ' cm et moins de ' + c.b + ' cm. Fréquence : ' + c.c + '/' + TAILLES_A.length + ' ' + esc(pctStr(c.c, TAILLES_A.length, 1)) + '.</span>'; }
+    t += hiHist ? '<span>Les rectangles se touchent : la classe suivante commence exactement où la précédente s’arrête.</span>' : '<span>Avec des espaces, on a l’impression qu’il manque des tailles entre les barres (entre 149,9 et 150 cm ?). Pour des classes d’un caractère continu, c’est l’histogramme qui convient.</span>';
+    out.innerHTML = t;
+  }
+  tapKeys($('hiGraph'), function (i) { hiSel = hiSel === i ? null : clamp(i, HIC.length); hiRender(); });
+  $('hiH').addEventListener('click', function () { hiHist = true; hiRender(); });
+  $('hiB').addEventListener('click', function () { hiHist = false; hiRender(); });
+  hiRender();
+
+  /* ---------- Étape 9 : graphique en ligne ---------- */
+  var liD = SION, liSel = null;
+  function liText(i) {
+    var d = liD, v = d.vals[i], t = '<strong>' + esc(d.long[i].charAt(0).toUpperCase() + d.long[i].slice(1)) + ' : ' + grp(v) + ' ' + esc(d.unit) + '</strong>';
+    if (i === 0) t += '<span>C’est le premier point : pas de comparaison possible.</span>';
+    else { var df = v - d.vals[i - 1]; t += '<span>Par rapport ' + esc(d.prevWord) + ' (' + esc(d.long[i - 1]) + ') : ' + (df > 0 ? '+' + grp(df) + ' ' + esc(d.unit) + ', une hausse.' : df < 0 ? grp(df) + ' ' + esc(d.unit) + ', une baisse.' : 'pas de changement.') + '</span>'; }
+    return t;
+  }
+  function liRender(msg) {
+    $('liIntro').textContent = liD.intro;
+    $('liGraph').innerHTML = lineSvg(liD, liSel);
+    $('liS').setAttribute('aria-pressed', liD === SION ? 'true' : 'false'); $('liP').setAttribute('aria-pressed', liD === PISC ? 'true' : 'false');
+    $('liOut').innerHTML = msg || (liSel == null ? '<span>Touche un point du graphique, ou un des boutons.</span>' : liText(liSel));
+  }
+  function deA(w) { return (/^[aeiouéèh]/i.test(w) ? 'D’' : 'De ') + w; }
+  function names(ids) { return ids.map(function (i) { return liD.long[i]; }).join(' et '); }
+  tapKeys($('liGraph'), function (i) { liSel = clamp(i, liD.vals.length); liRender(); });
+  $('liS').addEventListener('click', function () { liD = SION; liSel = null; liRender(); });
+  $('liP').addEventListener('click', function () { liD = PISC; liSel = null; liRender(); });
+  $('liL').addEventListener('click', function () { liSel = liSel == null ? 0 : clamp(liSel - 1, liD.vals.length); liRender(); });
+  $('liR').addEventListener('click', function () { liSel = liSel == null ? 0 : clamp(liSel + 1, liD.vals.length); liRender(); });
+  $('liMax').addEventListener('click', function () { var S = lineStats(liD.vals); liSel = S.max[0]; liRender('<strong>Maximum : ' + grp(liD.vals[liSel]) + ' ' + esc(liD.unit) + ', ' + esc(names(S.max)) + '</strong><span>C’est le point le plus haut du graphique.</span>'); });
+  $('liMin').addEventListener('click', function () { var S = lineStats(liD.vals); liSel = S.min[0]; liRender('<strong>Minimum : ' + grp(liD.vals[liSel]) + ' ' + esc(liD.unit) + ', ' + esc(names(S.min)) + '</strong><span>C’est le point le plus bas du graphique.</span>'); });
+  $('liUp').addEventListener('click', function () { var S = lineStats(liD.vals); if (!S.up.length) { liSel = null; liRender('<span>Aucune hausse ici.</span>'); return; } liSel = S.up[0]; liRender('<strong>Plus forte hausse : +' + grp(S.upV) + ' ' + esc(liD.unit) + '</strong><span>' + esc(deA(liD.long[liSel - 1])) + ' à ' + esc(liD.long[liSel]) + ' (' + grp(liD.vals[liSel - 1]) + ' → ' + grp(liD.vals[liSel]) + '). C’est le segment qui monte le plus raide.</span>'); });
+  $('liDown').addEventListener('click', function () { var S = lineStats(liD.vals); if (!S.down.length) { liSel = null; liRender('<span>Aucune baisse ici.</span>'); return; } liSel = S.down[0]; liRender('<strong>Plus forte baisse : ' + grp(S.downV) + ' ' + esc(liD.unit) + '</strong><span>' + esc(deA(liD.long[liSel - 1])) + ' à ' + esc(liD.long[liSel]) + ' (' + grp(liD.vals[liSel - 1]) + ' → ' + grp(liD.vals[liSel]) + '). C’est le segment qui descend le plus raide.</span>'); });
+  liRender();
+
+  /* ---------- Étape 10 : choisir le diagramme ---------- */
+  var CH_NAMES = { bar: 'Barres', pie: 'Circulaire', hist: 'Histogramme', line: 'Ligne' };
+  var chartCards = [
+    { k: 'g1', s: 'Les tailles en cm des 24 élèves, regroupées en classes [145 ; 150[, [150 ; 155[…', a: 'hist', why: 'Caractère continu, regroupé en classes qui se suivent : histogramme, rectangles collés.' },
+    { k: 'g2', s: 'Le nombre d’entrées à la piscine chaque mois de l’année', a: 'line', why: 'Une évolution dans le temps (mois après mois) : graphique en ligne.' },
+    { k: 'g3', s: 'La couleur préférée des élèves, avec 9 couleurs différentes', a: 'bar', why: 'Qualitatif, mais 9 catégories : un camembert aurait trop de petites parts. Les barres se comparent mieux.' },
+    { k: 'g4', s: 'Le vote de la classe pour la sortie (3 choix) : quelle part de la classe a choisi chaque sortie ?', a: 'pie', alt: ['bar'], why: 'On veut des parts d’un tout, avec seulement 3 catégories : le diagramme circulaire est parfait. Des barres seraient aussi acceptables pour comparer les votes.' },
+    { k: 'g5', s: 'Ta taille mesurée à chaque anniversaire, de 6 à 14 ans', a: 'line', why: 'C’est une évolution dans le temps : un point par année, reliés par une ligne.' },
+    { k: 'g6', s: 'Le nombre de frères et sœurs (0, 1, 2, 3, 4) des 24 élèves', a: 'bar', why: 'Quantitatif discret, avec peu de valeurs isolées : une barre par valeur, séparées par des espaces.' },
+    { k: 'g7', s: 'Le temps du 60 m (en secondes) des 24 élèves, en classes [8 ; 9[, [9 ; 10[…', a: 'hist', why: 'Un temps est continu, et il est regroupé en classes : histogramme.' },
+    { k: 'g8', s: 'Comment ton argent de poche du mois est partagé : sorties, épargne, habits, cadeaux', a: 'pie', alt: ['bar'], why: 'Des parts d’un tout (tout ton argent de poche), avec 4 catégories : circulaire. Des barres seraient aussi acceptables.' },
+    { k: 'g9', s: 'Le nombre de buts marqués par chacune des 12 équipes d’un tournoi', a: 'bar', why: 'On veut comparer 12 équipes, pas montrer des parts d’un tout, et 12 parts de camembert seraient illisibles : barres.' },
+    { k: 'g10', s: 'La température de l’eau du lac, mesurée chaque jour pendant un mois', a: 'line', why: 'Une évolution jour après jour : graphique en ligne. Un camembert n’aurait aucun sens.' }
+  ];
+  makeSorter({ items: chartCards, names: CH_NAMES, order: ['bar', 'pie', 'hist', 'line'], btns: 'chBtns', card: 'chCard', pos: 'chPos', out: 'chOut', score_: 'chScore', prev: 'chPrev', next: 'chNext', reset: 'chReset', word: 'Question', score: scorer(chartCards),
+    cardHtml: function (it) { return '<span>' + esc(it.s) + '</span><span class="ask">Quel diagramme ?</span>'; } });
+
+  /* ---------- Étape 11 : quartiles et boîtes ---------- */
+  var bxSets = { A: TAILLES_A.slice(), B: TAILLES_B.slice() }, bxCls = 'A', bxIdx = 0;
+  function randHeights(n, base) { var a = []; for (var i = 0; i < n; i++) a.push(Math.max(BX0 + 1, Math.min(BX1 - 1, base + rint(0, 8) + rint(0, 8) + rint(0, 8) + rint(0, 8) - 16))); return a.sort(num); }
+  function rankTxt(n, k) {
+    var r = Math.ceil(k * n / 4), ex = (k * n) % 4 === 0, q = trimZ(fixStr(roundRat(k * n, 4, 2), 2));
+    return (k === 3 ? '3 × ' + n + ' ÷ 4' : n + ' ÷ 4') + ' = ' + q + (ex ? ' : c’est un entier, rang ' + r : ' : pas un entier, on prend l’entier juste au-dessus, rang ' + r);
+  }
+  function bxSteps(Q) {
+    var n = Q.n, med = half(Q.med2);
+    return [
+      { up: 0, text: 'Les ' + n + ' tailles de la classe ' + bxCls + ', triées de la plus petite à la plus grande. Chaque case montre le rang (en petit) et la valeur. Sur le dessin, un point par élève.' },
+      { up: 1, text: 'Les extrêmes : minimum = ' + Q.min + ' cm (rang 1) et maximum = ' + Q.max + ' cm (rang ' + n + '). L’étendue vaut ' + Q.max + ' − ' + Q.min + ' = ' + (Q.max - Q.min) + ' cm.' },
+      { up: 2, text: 'La médiane : ' + (n % 2 ? 'n = ' + n + ' est impair, c’est la valeur du milieu, de rang ' + Q.medRanks[0] + ' : ' + med + ' cm.' : 'n = ' + n + ' est pair, c’est la moyenne des valeurs de rangs ' + Q.medRanks[0] + ' et ' + Q.medRanks[1] + ' : (' + Q.s[Q.medRanks[0] - 1] + ' + ' + Q.s[Q.medRanks[1] - 1] + ') ÷ 2 = ' + med + ' cm.') },
+      { up: 3, text: 'Q1 : ' + rankTxt(n, 1) + '. Q1 = ' + Q.q1 + ' cm. Au moins un quart des élèves mesurent ' + Q.q1 + ' cm ou moins.' },
+      { up: 4, text: 'Q3 : ' + rankTxt(n, 3) + '. Q3 = ' + Q.q3 + ' cm. Au moins trois quarts des élèves mesurent ' + Q.q3 + ' cm ou moins.' },
+      { up: 5, text: 'On dessine la boîte de Q1 à Q3, avec un trait à la médiane, puis les « moustaches » jusqu’au minimum et au maximum.' },
+      { up: 5, done: true, text: 'Écart interquartile : Q3 − Q1 = ' + Q.q3 + ' − ' + Q.q1 + ' = ' + Q.eiq + ' cm. Environ la moitié des élèves de la classe ' + bxCls + ' ont une taille dans la boîte, entre ' + Q.q1 + ' et ' + Q.q3 + ' cm.' }
+    ];
+  }
+  function bxRender() {
+    var Q = quartiles(bxSets[bxCls]), S = bxSteps(Q), st = S[bxIdx], last = bxIdx === S.length - 1, up = st.up;
+    $('bxPos').textContent = 'Étape ' + (bxIdx + 1) + ' / ' + S.length;
+    $('bxInfo').textContent = 'Classe ' + bxCls + ' · n = ' + Q.n;
+    $('bxList').innerHTML = Q.s.map(function (v, k) {
+      var r = k + 1, key = ((r === 1 || r === Q.n) && up >= 1) || (Q.medRanks.indexOf(r) >= 0 && up >= 2) || (r === Q.r1 && up >= 3) || (r === Q.r3 && up >= 4);
+      var inBox = up >= 5 && r >= Q.r1 && r <= Q.r3;
+      return '<span class="' + (key ? 'k' : inBox ? 'e' : '') + '"><small>' + r + '</small>' + v + '</span>';
+    }).join('');
+    $('bxGraph').innerHTML = boxSvg([{ name: '', Q: Q, col: bxCls === 'A' ? 'var(--s1)' : 'var(--s2)', upto: up }], { dots: true, label: 'Tailles de la classe ' + bxCls + ' : points et boîte à moustaches' });
+    $('bxSay').className = 'fbk say ' + (st.done ? 'ok' : 'info');
+    $('bxSay').innerHTML = st.done ? '<strong>Boîte terminée</strong><span>' + esc(st.text) + '</span>' : '<span>' + esc(st.text) + '</span>';
+    $('bxPrev').disabled = bxIdx === 0; $('bxNext').disabled = last; $('bxNext').style.display = last ? 'none' : '';
+    $('bxA').setAttribute('aria-pressed', bxCls === 'A' ? 'true' : 'false'); $('bxB').setAttribute('aria-pressed', bxCls === 'B' ? 'true' : 'false');
+  }
+  function bxCmpRender() {
+    var A = quartiles(bxSets.A), B = quartiles(bxSets.B);
+    $('bxCmp').innerHTML = boxSvg([{ name: 'Classe A (n = ' + A.n + ')', Q: A, col: 'var(--s1)', upto: 5 }, { name: 'Classe B (n = ' + B.n + ')', Q: B, col: 'var(--s2)', upto: 5 }], { label: 'Comparaison des boîtes à moustaches des classes A et B', labels: false });
+    function line(n, Q) { return n + ' : min ' + Q.min + ', Q1 ' + Q.q1 + ', médiane ' + half(Q.med2) + ', Q3 ' + Q.q3 + ', max ' + Q.max + ' (écart interquartile ' + Q.eiq + ').'; }
+    var dm = A.med2 - B.med2, de = A.eiq - B.eiq;
+    var t = dm === 0 ? 'Les deux classes ont la même médiane.' : 'La médiane de la classe ' + (dm > 0 ? 'A' : 'B') + ' est plus grande, de ' + half(Math.abs(dm)) + ' cm : ses élèves sont plutôt plus grands.';
+    t += ' ' + (de === 0 ? 'Les deux boîtes ont la même longueur.' : 'La boîte de la classe ' + (de > 0 ? 'A' : 'B') + ' est plus longue (écart interquartile ' + Math.max(A.eiq, B.eiq) + ' contre ' + Math.min(A.eiq, B.eiq) + ') : les tailles du milieu y sont plus dispersées.');
+    $('bxCmpOut').innerHTML = '<span class="mono">' + esc(line('A', A)) + '</span><span class="mono">' + esc(line('B', B)) + '</span><span>' + esc(t) + '</span>';
+  }
+  $('bxA').addEventListener('click', function () { bxCls = 'A'; bxIdx = 0; bxRender(); });
+  $('bxB').addEventListener('click', function () { bxCls = 'B'; bxIdx = 0; bxRender(); });
+  $('bxNew').addEventListener('click', function () { bxSets = { A: randHeights(rint(11, 24), 160), B: randHeights(rint(11, 24), 165) }; bxIdx = 0; bxRender(); bxCmpRender(); });
+  $('bxPrev').addEventListener('click', function () { bxIdx = clamp(bxIdx - 1, 7); bxRender(); });
+  $('bxNext').addEventListener('click', function () { bxIdx = clamp(bxIdx + 1, 7); bxRender(); });
+  $('bxReset').addEventListener('click', function () { bxIdx = 0; bxRender(); });
+  bxRender(); bxCmpRender();
+
+  /* ---------- Étape 12 : atelier ---------- */
+  var DNAME = {}; DRINKS.forEach(function (x) { DNAME[x.k] = x.name; });
+  $('atRaw').innerHTML = DRINK_RAW.map(function (k) { return '<span>' + esc(DNAME[k]) + '</span>'; }).join('');
+  var DC = countBy(DRINK_RAW, DRINKS.map(function (x) { return x.k; })), DT = DRINK_RAW.length, EAU = DC.eau;
+  var eauPct = pctStr(EAU, DT, 1), eauDeg = angleStr(EAU, DT);
+  var pieGood = DRINKS.map(function (x, i) { return { deg: 360 * DC[x.k] / DT, col: SCOL[i] }; });
+  var pieEqual = DRINKS.map(function (x, i) { return { deg: 90, col: SCOL[i] }; });
+  var piePct = DRINKS.map(function (x, i) { return { deg: 100 * DC[x.k] / DT, col: SCOL[i] }; });
+  function minis() { return '<div class="minis"><div>' + pieSvg(pieEqual, { small: true, label: 'Camembert A' }) + '<strong>A</strong></div><div>' + pieSvg(pieGood, { small: true, label: 'Camembert B' }) + '<strong>B</strong></div><div>' + pieSvg(piePct, { small: true, label: 'Camembert C' }) + '<strong>C</strong></div></div><div class="legend">' + legendHtml(DRINKS) + '</div>'; }
+  var atelierCards = [
+    { k: 'a1', s: 'Le caractère « boisson préférée » est…', o: ['Qualitatif', 'Quantitatif discret', 'Quantitatif continu'], a: 'Qualitatif', why: 'Les réponses sont des mots (eau, lait…) : des catégories.' },
+    { k: 'a2', s: 'Dépouille la liste : combien d’élèves ont choisi l’eau ?', o: [String(EAU - 2), String(EAU), String(EAU + 2)], a: String(EAU), why: 'On compte ' + EAU + ' fois « Eau ». Le tableau complet : ' + DRINKS.map(function (x) { return x.name + ' ' + DC[x.k]; }).join(', ') + '.' },
+    { k: 'a3', s: 'Le tableau est fait : ' + DRINKS.map(function (x) { return x.name + ' ' + DC[x.k]; }).join(', ') + '. Que dois-tu vérifier ?', o: ['Que le total fait ' + DT, 'Que le total fait 100', 'Qu’aucun effectif ne dépasse 10'], a: 'Que le total fait ' + DT, why: DRINKS.map(function (x) { return DC[x.k]; }).join(' + ') + ' = ' + DT + ' : c’est le nombre d’élèves. Aucune réponse oubliée.' },
+    { k: 'a4', s: 'Quelle est la fréquence de l’eau, en pourcentage ?', o: [eauPct, EAU + NBS + '%', DT + NBS + '%'], a: eauPct, why: EAU + ' ÷ ' + DT + ' ' + decStr(EAU, DT, 3) + ', soit ' + eauPct + '.' },
+    { k: 'a5', s: 'On veut montrer la part de chaque boisson dans toute la classe. Quel diagramme ?', o: ['Circulaire', 'Histogramme', 'Ligne'], a: 'Circulaire', why: 'Des parts d’un tout, avec 4 catégories : diagramme circulaire. Pas d’histogramme (pas de classes) ni de ligne (pas d’évolution dans le temps).' },
+    { k: 'a6', s: 'Quel est l’angle de la part « Eau » ?', o: [eauDeg, '100°', trimZ(fixStr(roundRat(100 * EAU, DT, 1), 1)) + '°'], a: eauDeg, why: EAU + '/' + DT + ' × 360° = ' + eauDeg + '. Ou : un élève vaut 360° ÷ ' + DT + ' = ' + decStr(360, DT, 2) + '°, et ' + EAU + ' × ' + decStr(360, DT, 2) + '° = ' + eauDeg + '.' },
+    { k: 'a7', s: 'Lequel de ces camemberts est juste ?', html: true, o: ['A', 'B', 'C'], a: 'B', why: 'B : ' + DRINKS.map(function (x) { return x.name + ' ' + angleStr(DC[x.k], DT); }).join(', ') + '. A donne la même part à tout le monde ; C a pris les pourcentages pour des degrés, le disque n’est rempli qu’à 100°.' },
+    { k: 'a8', s: 'Quelle phrase de conclusion est juste ?', o: ['L’eau est la boisson la plus choisie, par environ 42' + NBS + '% de la classe.', 'Plus de la moitié de la classe préfère l’eau.', 'Le thé froid est choisi par 3' + NBS + '% des élèves.'], a: 'L’eau est la boisson la plus choisie, par environ 42' + NBS + '% de la classe.', why: EAU + ' élèves sur ' + DT + ', c’est ' + eauPct + ' : moins de la moitié (50' + NBS + '%). Le thé froid : 3 élèves sur ' + DT + ', soit ' + pctStr(DC.the, DT, 1) + ', pas 3' + NBS + '%.' }
+  ];
+  makeSorter({ items: atelierCards, names: null, order: [], btns: 'atBtns', card: 'atCard', pos: 'atPos', out: 'atOut', score_: 'atScore', prev: 'atPrev', next: 'atNext', reset: 'atReset', word: 'Étape', score: scorer(atelierCards),
+    cardHtml: function (it) { return '<span>' + esc(it.s) + '</span>' + (it.html ? minis() : ''); } });
+
+  /* ---------- Quiz ---------- */
+  var QZ = [
+    { q: 'Le nombre de frères et sœurs est un caractère…', o: [['a', 'qualitatif'], ['b', 'quantitatif discret'], ['c', 'quantitatif continu']], a: 'b', how: 'On compte : 0, 1, 2… des valeurs entières séparées.' },
+    { q: '6 élèves sur 24 aiment le basket. Quelle est la fréquence ?', o: [['a', '6 %'], ['b', '24 %'], ['c', '25 %']], a: 'c', how: '6/24 = 1/4 = 0,25 = 25 %.' },
+    { q: 'Effectifs : 0 → 5, 1 → 9, 2 → 6. Effectif cumulé de la valeur 2 ?', o: [['a', '6'], ['b', '15'], ['c', '20']], a: 'c', how: '5 + 9 + 6 = 20 élèves ont au plus 2 frères et sœurs.' },
+    { q: 'Dans quelle classe va la valeur 20 ?', o: [['a', '[10 ; 20['], ['b', '[20 ; 30['], ['c', 'dans les deux']], a: 'b', how: '[10 ; 20[ exclut 20. Chaque valeur va dans une seule classe : [20 ; 30[.' },
+    { q: 'Une part a une fréquence de 1/8. Quel est son angle ?', o: [['a', '8°'], ['b', '45°'], ['c', '12,5°']], a: 'b', how: '1/8 × 360° = 45°. (12,5 % n’est pas 12,5° !)' },
+    { q: 'Pour montrer la température chaque jour d’un mois, on choisit…', o: [['a', 'un diagramme circulaire'], ['b', 'un graphique en ligne'], ['c', 'un histogramme']], a: 'b', how: 'C’est une évolution dans le temps : graphique en ligne.' },
+    { q: 'Dans un histogramme, les rectangles…', o: [['a', 'se touchent'], ['b', 'sont séparés par des espaces'], ['c', 'forment un disque']], a: 'a', how: 'Les classes se suivent sans trou : les rectangles se touchent.' },
+    { q: 'Série triée de 12 valeurs. Q1 est la valeur de rang…', o: [['a', '3'], ['b', '4'], ['c', '6']], a: 'a', how: '12 ÷ 4 = 3 : c’est un entier, donc Q1 est la 3ᵉ valeur.' }
+  ];
+  var quiz = $('quiz'), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ''; done = [];
+    QZ.forEach(function (Q, k) {
+      var li = document.createElement('li');
+      li.innerHTML = '<span>' + esc(Q.q) + '</span><select id="qa' + k + '" aria-label="Ta réponse à la question ' + (k + 1) + '"><option value="">…</option>' + Q.o.map(function (o) { return '<option value="' + o[0] + '">' + esc(o[1]) + '</option>'; }).join('') + '</select><button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+      quiz.appendChild(li);
+      function check() {
+        var fb = $('qf' + k), v = $('qa' + k).value;
+        if (!v) { fb.className = 'fb'; fb.textContent = 'Choisis une réponse.'; return; }
+        if (v === Q.a) { fb.className = 'fb ok'; fb.innerHTML = 'Bravo, c’est juste !<span>' + esc(Q.how) + '</span>'; done[k] = true; }
+        else {
+          done[k] = false;
+          var good = Q.o.filter(function (o) { return o[0] === Q.a; })[0][1];
+          fb.className = 'fb no'; fb.innerHTML = 'Pas tout à fait : la bonne réponse est « ' + esc(good) + ' ».<span>' + esc(Q.how) + '</span>';
+        }
+        $('score').textContent = done.filter(Boolean).length + ' / 8';
+      }
+      $('qb' + k).addEventListener('click', check);
+      $('qa' + k).addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+    });
+    $('score').textContent = '0 / 8';
+  }
+  $('newQuiz').addEventListener('click', newQuiz);
+  newQuiz();
+
+  window.__diag = {
+    SPORTS: SPORTS, TRANS: TRANS, TRANS_RAW: TRANS_RAW, SIB: SIB, TRAJET: TRAJET, TAILLES_A: TAILLES_A, TAILLES_B: TAILLES_B, SION: SION, PISC: PISC, DRINKS: DRINKS, DRINK_RAW: DRINK_RAW,
+    gcd: gcd, roundRat: roundRat, fixStr: fixStr, decStr: decStr, pctStr: pctStr, fracStr: fracStr, angleStr: angleStr,
+    countBy: countBy, freqTable: freqTable, cumul: cumul, classes: classes, classOf: classOf, pieSteps: pieSteps, quartiles: quartiles, lineStats: lineStats,
+    charCards: charCards, chartCards: chartCards, atelierCards: atelierCards, scorer: scorer, isOk: isOk, quiz: QZ
+  };
+})();
+</script>
+</body>
+</html>

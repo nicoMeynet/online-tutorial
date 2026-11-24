@@ -32,6 +32,7 @@ La page d'accueil ([index.html](index.html)) ne montre que les matières. La pag
 | [Les identités remarquables](les-identites-remarquables.html) | (a + b)², (a − b)² et (a + b)(a − b) : la preuve avec des carrés, le piège a² + b², développer pas à pas, le calcul mental (99², 102 × 98), factoriser, (a + b)³ et le triangle de Pascal, un quiz. |
 | [Les fonctions](les-fonctions.html) | La machine à nombres, image et antécédent, tableau de valeurs et courbe, fonctions linéaires et affines, comparer deux forfaits, un quiz. |
 | [Les statistiques](les-statistiques.html) | Effectifs et fréquences, moyenne, médiane, étendue, moyenne pondérée, valeurs extrêmes, graphiques et graphiques trompeurs, un quiz. |
+| [Tableaux et diagrammes](tableaux-et-diagrammes.html) | Effectifs et fréquences, regrouper en classes, barres, camembert, histogramme et courbe, choisir le bon diagramme et la boîte à moustaches. |
 | [Les probabilités](les-probabilites.html) | Vocabulaire, l'urne, la loi des grands nombres simulée, deux épreuves (arbre, somme de deux dés), les pièges, le Loto, un quiz. |
 | [Les angles et les triangles](les-angles-et-triangles.html) | Le rapporteur virtuel, la somme des angles d'un triangle, les triangles particuliers, l'inégalité triangulaire, les parallèles, les polygones, un quiz. |
 | [La trigonométrie](la-trigonometrie.html) | Adjacent, opposé, hypoténuse, cos/sin/tan (SOH CAH TOA), calculer une longueur ou un angle, la hauteur d'un arbre, les pentes, un quiz. |

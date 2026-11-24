@@ -22,6 +22,8 @@ DATES = maj.Dates()
 ROOT = Path(__file__).resolve().parent.parent
 
 TOPICS = [
+    ("les tableaux et diagrammes", "tableaux-et-diagrammes.html"),
+    ("tableaux et diagrammes", "tableaux-et-diagrammes.html"),
     ("les fonctions affines", "les-fonctions-affines.html"),
     ("mettre en équation", "mettre-en-equation.html"),
     ("la mise en équation", "mettre-en-equation.html"),
