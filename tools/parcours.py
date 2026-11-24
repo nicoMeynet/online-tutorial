@@ -30,7 +30,7 @@ TRACKS = [
         "les-echelles", "la-sphere-et-la-boule", "les-grandeurs-composees", "les-conversions-avancees", "les-probabilites",
         "l-algorithmique", "la-demonstration", "revisions-brevet"]),
     ("lycee", "maths", "Avant-goût du secondaire II", "11H → secondaire II", "Pour les curieux qui veulent prendre de l'avance.", [
-        "les-ensembles-de-nombres", "le-second-degre", "les-vecteurs", "les-suites", "la-derivee", "les-nombres-complexes"]),
+        "les-ensembles-de-nombres", "le-second-degre", "les-vecteurs", "les-suites", "la-derivee", "l-integrale", "les-nombres-complexes"]),
     ("curiosites", "maths", "Maths et curiosités", "tous niveaux", "Les nombres célèbres, les codes secrets, les jeux et la musique.", [
         "le-nombre-pi", "le-nombre-d-or", "le-nombre-e", "les-grands-nombres-et-l-infini", "le-binaire-et-les-bases",
         "la-cryptographie", "les-paradoxes-de-probabilite", "les-fractales", "les-jeux-de-strategie", "les-maths-et-la-musique"]),
@@ -64,6 +64,7 @@ TRACKS = [
 
 # Ce qu'il vaut mieux connaître avant (seulement les liens importants).
 PRE = {
+    "l-integrale": ["la-derivee"],
     "la-conjugaison": ["la-grammaire"],
     "la-politique-suisse": ["la-geographie-de-la-suisse"],
     "le-bouddhisme": ["l-hindouisme"],

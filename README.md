@@ -53,6 +53,7 @@ La page d'accueil ([index.html](index.html)) ne montre que les matières. La pag
 | [Les vecteurs](les-vecteurs.html) | Avant-goût du secondaire II : déplacement, égalité, coordonnées, relation de Chasles, multiplication par un nombre, norme, l'avion dans le vent, un quiz. |
 | [Les suites](les-suites.html) | Avant-goût du secondaire II : suites arithmétiques et géométriques, croissance linéaire contre exponentielle, limites, la conjecture de Syracuse, un quiz. |
 | [La dérivée](la-derivee.html) | Avant-goût du secondaire II : de la vitesse moyenne à la vitesse instantanée, de la sécante à la tangente, le sens de variation, un quiz. |
+| [L'intégrale](l-integrale.html) | Avant-goût du secondaire II : l'aire sous une courbe : accumuler une vitesse, des rectangles de plus en plus fins, le symbole ∫ et le lien avec la dérivée. |
 | [Les nombres complexes](les-nombres-complexes.html) | Avant-goût du secondaire II : i² = −1, le plan complexe, addition et rotation, module, résoudre x² + 1 = 0, Mandelbrot, un quiz. |
 | [La cryptographie](la-cryptographie.html) | Code de César et sa roue, casser un code par force brute et par les fréquences, Vigenère, l'arithmétique de l'horloge, l'idée du RSA avec de petits nombres premiers, un quiz. |
 | [Le binaire et les bases](le-binaire-et-les-bases.html) | Base 10, 60, 12 et 20, le binaire avec des ampoules, les conversions pas à pas, l'hexadécimal et les couleurs, les octets, le code ASCII, un tour de magie, un quiz. |

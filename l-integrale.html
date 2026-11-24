@@ -1,0 +1,962 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>L'intégrale</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux et même encre bordeaux que la page sur la dérivée. Ici, ce sont les aires sous les courbes qui sont au centre. */
+:root {
+  --paper: #faf6f7;
+  --grid: #eee2e5;
+  --card: #ffffff;
+  --ink: #2a1219;
+  --ink-soft: #6e4a55;
+  --acc: #9f1239;
+  --acc-soft: #fde4ea;
+  --two: #1c64c8;
+  --two-soft: #dbe8fa;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --warn: #b7791f;
+  --warn-soft: #fdf0d5;
+  --warn-ink: #8a5a00;
+  --hl: #fff0a3;
+  --line: #e6d3d8;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #150b0e; --grid: #23141a; --card: #1c1014; --ink: #f6eaee; --ink-soft: #c4a5b0;
+    --acc: #f68aa5; --acc-soft: #45111f; --two: #7fb0ff; --two-soft: #1a2a45;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27;
+    --warn: #f0b955; --warn-soft: #3a2e14; --warn-ink: #f0c36b; --hl: #4b4318; --line: #3a2229;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #150b0e; --grid: #23141a; --card: #1c1014; --ink: #f6eaee; --ink-soft: #c4a5b0;
+  --acc: #f68aa5; --acc-soft: #45111f; --two: #7fb0ff; --two-soft: #1a2a45;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27;
+  --warn: #f0b955; --warn-soft: #3a2e14; --warn-ink: #f0c36b; --hl: #4b4318; --line: #3a2229;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+@media (max-width: 520px) { .page { padding-block: 28px 64px; gap: 44px; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+@media (max-width: 420px) { .box { padding: 14px; } }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note.two { border-left-color: var(--two); background: var(--two-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 8px 12px; min-height: 44px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button[aria-pressed="true"] { background: var(--acc); color: var(--card); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+button:disabled { cursor: default; }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+input[type="text"] { font: inherit; font-family: var(--f-mono); font-size: 1.05rem; padding: 8px 10px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; min-height: 44px; }
+
+/* Curseurs faciles à prendre au pouce, avec des boutons − et + */
+input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; min-width: 0; height: 44px; margin: 0; background: transparent; accent-color: var(--acc); cursor: pointer; }
+input[type="range"]::-webkit-slider-runnable-track { height: 8px; border-radius: 4px; background: var(--line); }
+input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 30px; height: 30px; margin-top: -11px; border-radius: 50%; background: var(--acc); border: 3px solid var(--card); box-shadow: 0 0 0 2px var(--ink); }
+input[type="range"]::-moz-range-track { height: 8px; border-radius: 4px; background: var(--line); }
+input[type="range"]::-moz-range-thumb { width: 26px; height: 26px; border-radius: 50%; background: var(--acc); border: 3px solid var(--card); box-shadow: 0 0 0 2px var(--ink); }
+.param { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.param label { font-weight: 700; }
+.params { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px 18px; }
+.srow { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; gap: 10px; align-items: center; }
+.srow button { padding: 0; min-width: 44px; font-size: 1.3rem; line-height: 1; }
+
+.graph svg { width: 100%; height: auto; display: block; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; }
+svg.drag { touch-action: none; cursor: grab; }
+.readout { font-family: var(--f-mono); font-size: .98rem; display: flex; flex-direction: column; gap: 4px; overflow-wrap: anywhere; }
+.readout b { color: var(--acc); }
+.c-acc { color: var(--acc); font-weight: 700; }
+.c-two { color: var(--two); font-weight: 700; }
+.c-ok { color: var(--ok); font-weight: 700; }
+.c-red { color: var(--red); font-weight: 700; }
+.verdict { border-radius: 8px; padding: 12px 14px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; background: var(--paper); }
+.verdict.yes { background: var(--ok-soft); color: var(--ok); }
+.verdict.no { background: var(--red-soft); color: var(--red); }
+.verdict.flat { background: var(--two-soft); color: var(--two); }
+.verdict span { font-weight: 400; color: var(--ink); }
+
+.ptable { border-collapse: separate; border-spacing: 0; width: 100%; font-variant-numeric: tabular-nums; }
+.ptable th, .ptable td { border: 1.5px solid var(--ink); padding: 6px 8px; text-align: center; font-family: var(--f-mono); font-size: .98rem; }
+.ptable th { font-family: var(--f-display); background: var(--paper); }
+.ptable tr.cur td { background: var(--acc-soft); font-weight: 600; color: var(--acc); }
+@media (max-width: 420px) { .ptable th, .ptable td { padding: 5px 4px; font-size: .88rem; } }
+.scroll { overflow-x: auto; max-width: 100%; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.rule { font-family: var(--f-mono); font-size: 1.1rem; font-weight: 600; color: var(--acc); }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
+.tag.ok { color: var(--ok); }
+.tag.two { color: var(--two); }
+.tag.no { color: var(--red); }
+
+/* Retours et jeux « une carte à la fois » */
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc); }
+.fbk { border-radius: 8px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; min-width: 0; overflow-wrap: anywhere; }
+.fbk:empty { display: none; }
+.fbk.ok { background: var(--ok-soft); }
+.fbk.no { background: var(--red-soft); }
+.fbk.info { background: var(--two-soft); }
+.fbk.warn { background: var(--warn-soft); }
+.fbk strong { font-family: var(--f-display); }
+.fbk.ok strong { color: var(--ok); }
+.fbk.no strong { color: var(--red); }
+.fbk.info strong { color: var(--two); }
+.fbk.warn strong { color: var(--warn-ink); }
+.step-n { font-family: var(--f-mono); font-size: .85rem; color: var(--ink-soft); }
+button.right, button.right:disabled { background: var(--ok-soft); border-color: var(--ok); color: var(--ok); }
+button.wrong, button.wrong:disabled { background: var(--red-soft); border-color: var(--red); color: var(--red); }
+.choice button { flex: 1 1 130px; }
+.choice button:disabled:not(.right):not(.wrong) { opacity: .55; }
+.card-big { background: var(--paper); border: 1.5px dashed var(--line); border-radius: 10px; padding: 14px; font-family: var(--f-display); font-weight: 700; font-size: 1.15rem; overflow-wrap: anywhere; display: flex; flex-direction: column; gap: 6px; }
+.card-big .ax { font-family: var(--f-mono); font-weight: 400; font-size: .95rem; color: var(--ink-soft); }
+.card-big .ax b { color: var(--acc); }
+.card-big .res { color: var(--ok); font-size: 1rem; }
+.sorter-end { margin-top: .6rem; }
+.sorter-end strong { font-size: 1.05rem; }
+
+/* Le symbole */
+.notation { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; padding: 10px 0; }
+.notation button { font-family: var(--f-mono); font-weight: 600; font-size: 1.6rem; min-width: 52px; min-height: 52px; box-shadow: none; border-width: 1.5px; border-style: dashed; }
+.notation button:hover { box-shadow: none; }
+.notation .big { font-size: 3.2rem; min-height: 120px; line-height: 1; padding: 0 14px; font-family: var(--f-body); font-weight: 400; }
+.notation .bounds { display: flex; flex-direction: column; justify-content: space-between; gap: 16px; }
+.notation .bounds button { font-size: 1.2rem; min-width: 48px; min-height: 48px; }
+.notation button.seen { border-style: solid; border-color: var(--ok); }
+.notation button[aria-pressed="true"] { border-style: solid; }
+
+.errs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.errs li { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--paper); }
+.errs .bad { font-family: var(--f-mono); color: var(--red); text-decoration: line-through; overflow-wrap: anywhere; }
+.errs .good { font-family: var(--f-mono); color: var(--ok); font-weight: 600; overflow-wrap: anywhere; }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 110px auto; gap: 10px; align-items: center; }
+.quiz li > span:first-child { overflow-wrap: anywhere; min-width: 0; }
+.quiz input[type="text"] { font-size: 1rem; padding: 6px 8px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb:empty { display: none; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.timeline li { display: grid; grid-template-columns: 120px 1fr; gap: 16px; padding-block: 14px; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .when { font-family: var(--f-mono); font-weight: 600; color: var(--red); font-size: .95rem; }
+.timeline .what { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+@media (max-width: 520px) { .timeline li { grid-template-columns: 1fr; gap: 4px; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); overflow-wrap: anywhere; }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+details .fig svg { width: 100%; max-width: 300px; height: auto; display: block; margin-top: 8px; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+<!--ticons--><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Tutoriels"><script src="progress.js" defer></script><script src="share.js" defer></script><!--/ticons-->
+<style id="tnav-css">
+.tnav-top { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin: 0 0 4px; }
+.tnav-home { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font-weight: 700; font-size: .95rem; text-decoration: none; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tnav-home:hover, .tnav-home:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.tnav-bottom { margin-top: 8px; display: flex; flex-direction: column; gap: 12px; }
+.tnav-bottom h2 { margin: 0; }
+.tnav-pn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tnav-pn a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--ink, #222); border-radius: 10px;
+  background: var(--card, #fff); color: var(--ink, #222); text-decoration: none; box-shadow: 3px 3px 0 var(--ink, #222); min-width: 0; }
+.tnav-pn a span { font-size: .85rem; color: var(--ink-soft, #666); }
+.tnav-pn a strong { overflow-wrap: anywhere; }
+.tnav-pn a.next { text-align: right; grid-column: 2; }
+.tnav-bottom .tnav-home { align-self: center; }
+.tnav-top [data-share] { margin-left: auto; }
+.tnav-short { display: none; }
+.tprint-h { display: none; }
+@media (max-width: 600px) { header.hero { gap: 8px !important; } header.hero > .fig, header.hero > .box.fig, header.hero .hero-top .fig { display: none !important; }
+  header.hero p.lead { font-size: 1rem !important; line-height: 1.5 !important; } header.hero > p.soft { font-size: .88rem !important; line-height: 1.45 !important; }
+  header.hero h1 { font-size: clamp(1.7rem, 8vw, 2.2rem) !important; } }
+.tprint-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 14px 0 0; }
+.tprint-row span { font-size: .9rem; opacity: .8; }
+.tprint { display: inline-flex; align-items: center; gap: 8px; min-height: 42px; padding: 8px 16px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font: inherit; font-weight: 700; cursor: pointer; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tprint:hover, .tprint:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+@media print { [data-tp-hide] { display: none !important; } html.tp-on, html.tp-on body { background: #fff !important; color: #111 !important; padding: 0 !important; margin: 0 !important; }
+  html.tp-on [data-fiche] { color: #111; } html.tp-on [data-fiche] * { color: #111 !important; background: transparent !important; box-shadow: none !important; }
+  html.tp-on .tprint-h { display: block; font-size: 1.4rem; font-weight: 800; margin: 0 0 10px; } .tprint-row { display: none !important; } }
+@media (max-width: 520px) { .tnav-top .tnav-long { display: none; } .tnav-top .tnav-short { display: inline; } .tnav-top { flex-wrap: nowrap; } .tnav-top > * { flex: none; } }
+.tnav-end { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+@media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
+.diff { font: 700 .72rem/1.2 var(--f-mono, monospace); padding: 2px 8px; border-radius: 99px; border: 1.5px solid; white-space: nowrap; }
+.diff.d1 { color: #15803d; border-color: #15803d; background: #dcf3e3; }
+.diff.d2 { color: #a15c07; border-color: #b45309; background: #fbe7cf; }
+.diff.d3 { color: #b91c1c; border-color: #b91c1c; background: #fde2e2; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root:not([data-theme="light"]) .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root:not([data-theme="light"]) .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; } }
+:root[data-theme="dark"] .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root[data-theme="dark"] .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root[data-theme="dark"] .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; }
+</style>
+</head>
+<body>
+<main class="page">
+<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="maths.html">← <span class="tnav-long">Tous les tutoriels de maths</span><span class="tnav-short">Maths</span></a><span class="diff d3" title="Difficulté : difficile">Difficile</span><button type="button" data-share hidden>Partager</button></nav><!--/tnav-->
+
+
+  <header class="hero">
+    <span class="eyebrow">Tutoriel de maths · avant-goût du secondaire II</span>
+    <h1>L'intégrale expliquée simplement</h1>
+    <p class="lead">Dans le tutoriel sur <a class="tlink" href="la-derivee.html">la dérivée</a>, on partait d'une distance pour trouver une vitesse. Ici, on fait le chemin inverse : tu connais la vitesse à chaque instant, et tu veux savoir quelle distance tu as parcourue. La réponse se cache dans une <strong>aire sous une courbe</strong>. C'est ça, l'intégrale.</p>
+    <div class="box">
+      <div class="graph">
+        <svg viewBox="0 0 400 220" role="img" aria-label="Une courbe qui monte, avec l'aire en dessous remplie par des rectangles">
+          <rect x="60" y="180" width="50" height="10" fill="var(--acc)" fill-opacity=".22" stroke="var(--acc)" stroke-width="1.5"/>
+          <rect x="110" y="172" width="50" height="18" fill="var(--acc)" fill-opacity=".22" stroke="var(--acc)" stroke-width="1.5"/>
+          <rect x="160" y="155" width="50" height="35" fill="var(--acc)" fill-opacity=".22" stroke="var(--acc)" stroke-width="1.5"/>
+          <rect x="210" y="130" width="50" height="60" fill="var(--acc)" fill-opacity=".22" stroke="var(--acc)" stroke-width="1.5"/>
+          <rect x="260" y="96" width="50" height="94" fill="var(--acc)" fill-opacity=".22" stroke="var(--acc)" stroke-width="1.5"/>
+          <path d="M40 182 Q 200 175 340 22" fill="none" stroke="var(--ink)" stroke-width="3"/>
+          <line x1="30" y1="190" x2="380" y2="190" stroke="var(--ink)" stroke-width="2"/>
+          <line x1="40" y1="200" x2="40" y2="14" stroke="var(--ink)" stroke-width="2"/>
+          <text x="345" y="210" font-size="15">x</text>
+          <text x="260" y="172" font-size="16" font-weight="600" text-anchor="middle" style="fill:var(--acc)">aire</text>
+          <text x="350" y="40" font-size="15">f</text>
+        </svg>
+      </div>
+      <span class="soft">On remplit l'aire sous la courbe avec des rectangles. Plus ils sont fins, plus la somme de leurs aires est proche de la vraie aire : l'<strong>intégrale</strong>.</span>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · L'idée : accumuler</span>
+    <h2>Combien en tout ?</h2>
+    <p>Beaucoup de questions de la vie se ressemblent. Je connais ma vitesse à chaque instant : quelle <strong>distance</strong> ai-je parcourue ? Je connais le débit du robinet : combien d'<strong>eau</strong> y a-t-il dans la baignoire ? On <strong>accumule</strong> petit à petit.</p>
+    <p>Commençons simple. Dans le tutoriel sur <a class="tlink" href="la-vitesse.html">la vitesse</a>, tu as vu que distance = vitesse × durée. Une voiture roule à 80 km/h pendant 2 h : elle fait 80 × 2 = 160 km. Sur le graphique vitesse-temps, ce calcul est l'<strong>aire d'un rectangle</strong> !</p>
+    <div class="box">
+      <div class="graph"><svg id="rectSvg" viewBox="0 0 400 300" role="img" aria-label="Graphique vitesse en fonction du temps avec le rectangle de la distance"></svg></div>
+      <div class="params">
+        <div class="param">
+          <label for="vSl">Vitesse : <span class="mono" id="vOut">80</span> km/h</label>
+          <div class="srow"><button type="button" class="pm" data-for="vSl" data-d="-10" aria-label="Moins vite">−</button><input id="vSl" type="range" min="0" max="130" step="10" value="80"><button type="button" class="pm" data-for="vSl" data-d="10" aria-label="Plus vite">+</button></div>
+        </div>
+        <div class="param">
+          <label for="tSl">Durée : <span class="mono" id="tOut">2</span> h</label>
+          <div class="srow"><button type="button" class="pm" data-for="tSl" data-d="-0.25" aria-label="Moins longtemps">−</button><input id="tSl" type="range" min="0" max="4" step="0.25" value="2"><button type="button" class="pm" data-for="tSl" data-d="0.25" aria-label="Plus longtemps">+</button></div>
+        </div>
+      </div>
+      <div class="readout" id="rectOut" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Les unités se multiplient aussi</span>
+      <span>Hauteur en km/h, largeur en h : l'aire est en km/h × h = <strong>km</strong>. C'est bien une distance.</span>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · Quand la vitesse change</span>
+    <h2>Le train qui démarre, roule et freine</h2>
+    <p>Un train régional CFF quitte une gare. Pendant 60 s, il <strong>accélère</strong> régulièrement jusqu'à 25 m/s (90 km/h). Il <strong>roule</strong> ensuite à cette vitesse pendant 120 s. Puis il <strong>freine</strong> pendant 50 s et s'arrête à la gare suivante.</p>
+    <p>La distance, c'est encore l'aire sous la courbe. Mais cette fois, elle est faite d'un triangle, d'un rectangle et d'un trapèze. Fais glisser le doigt sur le graphique (ou utilise le curseur).</p>
+    <div class="box">
+      <div class="graph"><svg id="trainSvg" class="drag" viewBox="0 0 400 300" role="img" aria-label="Vitesse du train en fonction du temps, aire accumulée depuis le départ"></svg></div>
+      <div class="param">
+        <label for="trT">Temps : <span class="mono" id="trTOut">90</span> s</label>
+        <div class="srow"><button type="button" class="pm" data-for="trT" data-d="-5" aria-label="Reculer de 5 secondes">−</button><input id="trT" type="range" min="0" max="230" step="1" value="90"><button type="button" class="pm" data-for="trT" data-d="5" aria-label="Avancer de 5 secondes">+</button></div>
+      </div>
+      <div class="readout" id="trainOut" aria-live="polite"></div>
+    </div>
+    <p>Unités : m/s × s = <strong>m</strong>. Entre les deux gares, le train a parcouru 750 + 3 000 + 625 = <strong>4 375 m</strong>, soit environ 4,4 km.</p>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Sous une vraie courbe</span>
+    <h2>Les rectangles de plus en plus fins</h2>
+    <p>Prenons maintenant la courbe de f(x) = x², entre x = 0 et x = 2. Quelle est l'aire en dessous ? Le problème, c'est le <strong>toit courbé</strong> : ce n'est ni un rectangle, ni un triangle, ni un trapèze. Aucune formule de géométrie ne marche directement.</p>
+    <p>L'idée géniale : découper l'aire en <strong>n rectangles</strong> très fins et additionner leurs aires. Ce sont les <strong>sommes de Riemann</strong>. La hauteur de chaque rectangle se lit sur la courbe : à gauche, à droite ou au milieu de sa base.</p>
+    <div class="box">
+      <div class="btns" role="group" aria-label="Où prendre la hauteur">
+        <button type="button" id="mL" data-m="left">À gauche</button>
+        <button type="button" id="mR" data-m="right">À droite</button>
+        <button type="button" id="mM" data-m="mid">Au milieu</button>
+      </div>
+      <div class="graph"><svg id="riemSvg" viewBox="0 0 400 300" role="img" aria-label="Courbe y = x² entre 0 et 2 et les rectangles en dessous"></svg></div>
+      <div class="param">
+        <label for="rn">Nombre de rectangles : n = <span class="mono" id="rnOut">4</span></label>
+        <div class="srow"><button type="button" class="pm" data-for="rn" data-d="-1" aria-label="Un rectangle de moins">−</button><input id="rn" type="range" min="1" max="100" step="1" value="4"><button type="button" class="pm" data-for="rn" data-d="1" aria-label="Un rectangle de plus">+</button></div>
+      </div>
+      <div class="btns" role="group" aria-label="Nombres de rectangles tout prêts">
+        <button type="button" class="rnp" data-n="4">4</button>
+        <button type="button" class="rnp" data-n="10">10</button>
+        <button type="button" class="rnp" data-n="50">50</button>
+        <button type="button" class="rnp" data-n="100">100</button>
+      </div>
+      <div class="readout" id="riemOut" aria-live="polite"></div>
+      <div class="scroll"><table class="ptable" id="riemTable" aria-label="Somme des rectangles et écart avec la valeur exacte"></table></div>
+    </div>
+    <div class="note">
+      <span class="note-title">La valeur exacte</span>
+      <span>Plus n est grand, plus la somme se rapproche d'un seul nombre : <strong>8/3 ≈ 2,667</strong>. C'est l'aire exacte sous x² entre 0 et 2. À l'étape 6, tu verras d'où vient ce 8/3.</span>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · Le symbole</span>
+    <h2>Un S tout en longueur</h2>
+    <p>Une somme de rectangles, c'est « hauteur × largeur + hauteur × largeur + … ». Quand les rectangles deviennent infiniment fins, Leibniz a écrit cette somme avec un nouveau symbole. Touche chaque morceau pour savoir ce qu'il veut dire.</p>
+    <div class="box">
+      <div class="notation" id="notation" role="group" aria-label="L'intégrale de 0 à 2 de x carré dx">
+        <button type="button" class="big" data-k="int" aria-label="Le symbole intégrale">∫</button>
+        <span class="bounds"><button type="button" data-k="hi" aria-label="La borne du haut, 2">2</button><button type="button" data-k="lo" aria-label="La borne du bas, 0">0</button></span>
+        <button type="button" data-k="f" aria-label="La fonction x carré">x²</button>
+        <button type="button" data-k="dx" aria-label="dx">dx</button>
+      </div>
+      <div class="btns"><span class="step-n" id="ntSeen">Morceaux découverts : 0 / 5</span><button type="button" id="ntRead">Comment ça se lit ?</button></div>
+      <div class="fbk info" id="ntOut" aria-live="polite"><strong>Touche un morceau du symbole.</strong></div>
+    </div>
+    <p>Pour résumer : <span class="mono">∫₀² x² dx = 8/3</span> veut dire « en additionnant des rectangles de hauteur x² et de largeur minuscule dx, de x = 0 à x = 2, on trouve 8/3 ».</p>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Aires négatives</span>
+    <h2>Sous l'axe, ça compte en moins</h2>
+    <p>Un petit robot roule sur un rail. Sa vitesse est v(t) = t − 1 (en m/s). Pendant la première seconde, la vitesse est <strong>négative</strong> : il recule ! Ensuite, il avance de plus en plus vite.</p>
+    <p>L'intégrale compte l'aire <strong>au-dessus</strong> de l'axe en plus, et l'aire <strong>en dessous</strong> en moins. Elle donne la distance « nette » : où est le robot par rapport à son départ.</p>
+    <div class="box">
+      <div class="graph"><svg id="negSvg" viewBox="0 0 400 300" role="img" aria-label="Droite v = t − 1, aire négative en rouge et aire positive en vert"></svg></div>
+      <div class="param">
+        <label for="negB">Jusqu'à t = <span class="mono" id="negBOut">3</span> s</label>
+        <div class="srow"><button type="button" class="pm" data-for="negB" data-d="-0.1" aria-label="Moins loin">−</button><input id="negB" type="range" min="0" max="3" step="0.1" value="3"><button type="button" class="pm" data-for="negB" data-d="0.1" aria-label="Plus loin">+</button></div>
+      </div>
+      <div class="btns"><button type="button" id="negTwo">Essayer t = 2</button></div>
+      <div class="readout" id="negOut" aria-live="polite"></div>
+      <div class="verdict" id="negVerdict" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · Le lien avec la dérivée</span>
+    <h2>Intégrer et dériver : deux opérations inverses</h2>
+    <p>Appelons <strong>A(x)</strong> l'aire accumulée sous la courbe de f, depuis 0 jusqu'à x. Quand x avance un tout petit peu, l'aire grandit d'une bande très fine, de hauteur f(x). Donc A grandit <strong>vite</strong> là où f est <strong>haut</strong>, et lentement là où f est bas.</p>
+    <p>Dans le tutoriel sur <a class="tlink" href="la-derivee.html">la dérivée</a>, la pente de la tangente mesurait la vitesse de changement. Ici, la pente de A est exactement f(x) ! Déplace le point et compare les deux graphiques.</p>
+    <div class="box">
+      <div class="btns" id="accBtns" role="group" aria-label="Choix de la fonction f"></div>
+      <div class="graph"><svg id="accTop" class="drag" viewBox="0 0 400 230" role="img" aria-label="En haut : la courbe de f et l'aire accumulée depuis 0"></svg></div>
+      <div class="graph"><svg id="accBot" class="drag" viewBox="0 0 400 230" role="img" aria-label="En bas : la courbe de l'aire A(x) et sa tangente"></svg></div>
+      <div class="param">
+        <label for="accX">x = <span class="mono" id="accXOut">1,5</span></label>
+        <div class="srow"><button type="button" class="pm" data-for="accX" data-d="-0.1" aria-label="Reculer">−</button><input id="accX" type="range" min="0" max="2" step="0.01" value="1.5"><button type="button" class="pm" data-for="accX" data-d="0.1" aria-label="Avancer">+</button></div>
+      </div>
+      <div class="readout" id="accOut" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Le théorème fondamental (en version intuitive)</span>
+      <span>La dérivée de l'aire accumulée, c'est la fonction de départ : <strong>A′(x) = f(x)</strong>. Dériver « défait » ce qu'intégrer a fait, comme la soustraction défait l'addition. Newton et Leibniz ont compris ce lien au XVII<sup>e</sup> siècle, et il a tout changé.</span>
+    </div>
+    <div class="box">
+      <span class="tag two">Pour aller plus loin</span>
+      <h3>Une première primitive</h3>
+      <span>Pour f(x) = x, l'aire de 0 à t est un <strong>triangle</strong> de base t et de hauteur t : A(t) = t × t ÷ 2 = <strong>t²/2</strong>. Vérifie avec le tutoriel sur <a class="tlink" href="la-derivee.html">la dérivée</a> : la dérivée de t² est 2t, donc celle de t²/2 est 2t ÷ 2 = <strong>t</strong>. On retrouve bien f !</span>
+      <span>Pour f(x) = x², l'aire de 0 à t vaut <strong>t³/3</strong>. Sa dérivée : 3t² ÷ 3 = t². Et pour t = 2 : 2³/3 = <strong>8/3 ≈ 2,667</strong>, exactement le nombre vers lequel allaient les rectangles de l'étape 3.</span>
+      <span class="soft">Une fonction dont la dérivée est f s'appelle une <strong>primitive</strong> de f. Au secondaire II, tu apprendras à en trouver beaucoup d'autres.</span>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Dans la vraie vie</span>
+    <h2>Que représente l'aire ?</h2>
+    <p>Ta montre de sport, le GPS d'une voiture ou le compteur d'un panneau solaire font des intégrales sans arrêt. Pour savoir ce que veut dire l'aire, multiplie les unités des deux axes. Pour chaque graphique, choisis ce que représente l'aire sous la courbe.</p>
+    <div class="box">
+      <div class="btns"><span class="score" id="rwScore">Question 1 / 8</span><span class="step-n" id="rwPos"></span></div>
+      <div class="card-big" id="rwCard" aria-live="polite"></div>
+      <div class="btns choice" id="rwBtns" role="group" aria-label="Ce que représente l'aire"></div>
+      <div class="fbk" id="rwOut" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="rwPrev">← Précédent</button><button type="button" id="rwNext">Suivant →</button><button type="button" id="rwReset">Recommencer</button></div>
+    </div>
+    <div class="note">
+      <span class="note-title">L'astuce des unités</span>
+      <span>kW × h = kWh (une énergie) ; L/min × min = L (un volume) ; m/s × s = m (une distance). L'unité de l'aire, c'est toujours (unité de l'axe vertical) × (unité de l'axe horizontal).</span>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Un peu d'histoire</span>
+    <h2>2 000 ans pour calculer une aire</h2>
+    <ol class="timeline">
+      <li><span class="when">IV<sup>e</sup> s. av. J.-C.</span><div class="what"><strong>La méthode d'exhaustion</strong><span>On l'attribue au Grec Eudoxe de Cnide : on remplit une figure avec des formes simples, de plus en plus nombreuses, jusqu'à « épuiser » la place qui reste.</span></div></li>
+      <li><span class="when">III<sup>e</sup> s. av. J.-C.</span><div class="what"><strong>Archimède et la parabole</strong><span>Archimède, à Syracuse, montre qu'un segment de parabole a une aire égale aux <strong>4/3</strong> de celle du triangle qui a la même base et le même sommet. Il remplit la figure avec des triangles de plus en plus petits.</span></div></li>
+      <li><span class="when">1635</span><div class="what"><strong>Les indivisibles</strong><span>L'Italien Bonaventura Cavalieri imagine les figures comme faites d'une infinité de tranches très fines.</span></div></li>
+      <li><span class="when">XVII<sup>e</sup> siècle</span><div class="what"><strong>Newton et Leibniz</strong><span>Isaac Newton (en Angleterre) et Gottfried Leibniz (en Allemagne) découvrent que tangentes et aires sont liées : dériver et intégrer sont des opérations inverses. Leibniz invente les notations ∫ et dx. Une longue querelle éclate pour savoir qui a été le premier ; aujourd'hui, on pense en général qu'ils ont trouvé chacun de leur côté.</span></div></li>
+      <li><span class="when">XIX<sup>e</sup> siècle</span><div class="what"><strong>Riemann</strong><span>L'Allemand Bernhard Riemann donne, vers 1854, une définition précise de l'intégrale avec des rectangles : ce sont les sommes de l'étape 3, qui portent son nom.</span></div></li>
+    </ol>
+    <p class="soft">Vérifie Archimède avec nos outils : sous la droite y = 1, entre x = −1 et x = 1, le segment de la parabole y = x² a une aire de 2 − 2 × 1/3 = 4/3. Le triangle de même base et de sommet (0 ; 0) a une aire de 2 × 1 ÷ 2 = 1. Le rapport vaut bien 4/3.</p>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Attention</span>
+    <h2>Les pièges et les idées reçues</h2>
+    <div class="box">
+      <ul class="errs">
+        <li><span class="bad">l'intégrale est toujours une aire positive</span><span class="good">sous l'axe, l'aire compte en moins</span><span class="soft">∫₀² (x − 1) dx = −0,5 + 0,5 = 0, alors qu'on voit bien deux petits triangles.</span></li>
+        <li><span class="bad">avec 100 rectangles, c'est exact</span><span class="good">c'est très proche, mais pas exact</span><span class="soft">Avec un nombre fini de rectangles sous x², il reste toujours une petite erreur. Sauf cas particuliers : sous une droite horizontale, un seul rectangle donne déjà l'aire exacte.</span></li>
+        <li><span class="bad">80 × 2 = 160 (sans unité)</span><span class="good">80 km/h × 2 h = 160 km</span><span class="soft">L'aire a l'unité (axe vertical) × (axe horizontal). Sans unité, impossible de savoir si c'est une distance, une énergie ou un volume.</span></li>
+        <li><span class="bad">plus f est grand, plus A(x) est grand</span><span class="good">plus f est grand, plus A(x) grandit vite</span><span class="soft">f donne la pente de A, pas sa hauteur.</span></li>
+      </ul>
+    </div>
+    <h3>Vrai ou idée reçue ?</h3>
+    <div class="box">
+      <div class="btns"><span class="score" id="myScore">Question 1 / 8</span><span class="step-n" id="myPos"></span></div>
+      <div class="card-big" id="myCard" aria-live="polite"></div>
+      <div class="btns choice" id="myBtns" role="group" aria-label="Vrai ou idée reçue"></div>
+      <div class="fbk" id="myOut" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="myPrev">← Précédent</button><button type="button" id="myNext">Suivant →</button><button type="button" id="myReset">Recommencer</button></div>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · Le savais-tu ?</span>
+    <h2>Des aires partout</h2>
+    <div class="cards">
+      <div class="box"><span class="tag ok">∫</span><span>Le symbole de l'intégrale est un « s » long, comme on l'écrivait autrefois. Leibniz l'a choisi pour le mot latin <em>summa</em>, la somme.</span></div>
+      <div class="box"><span class="tag ok">Les tonneaux</span><span>En 1615, l'astronome Johannes Kepler publie un livre sur le volume des tonneaux de vin. Son idée : les découper en tranches très fines et additionner.</span></div>
+      <div class="box"><span class="tag two">Une machine suisse</span><span>Vers 1854, Jakob Amsler, à Schaffhouse, invente un planimètre : un instrument qui mesure l'aire d'une figure sur une carte quand on suit son contour avec une pointe.</span></div>
+      <div class="box"><span class="tag two">Les ordinateurs</span><span>Les calculatrices et les ordinateurs calculent souvent les intégrales comme à l'étape 3 : avec des milliers de petits morceaux, rectangles ou trapèzes.</span></div>
+      <div class="box"><span class="tag no">Archimède</span><span>Il a aussi trouvé que le volume d'une boule vaut les 2/3 de celui du cylindre qui l'entoure. Selon Cicéron, une sphère et un cylindre étaient gravés sur sa tombe.</span></div>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Écris un nombre (tu peux utiliser une virgule). Arrondis au centième si besoin.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Nouvelles questions</button>
+    </div>
+  </section>
+
+  <!-- 12 -->
+  <section>
+    <span class="eyebrow">Étape 12 · À toi de jouer</span>
+    <h2>Six exercices</h2>
+    <div class="exos">
+      <details>
+        <summary>Vitesse constante<span class="q">Un car postal roule à 75 km/h pendant 1 h 30 min. Quelle distance parcourt-il ? Dessine le rectangle.</span></summary>
+        <div><span>1 h 30 min = 1,5 h. Aire du rectangle : 75 × 1,5 = <strong>112,5 km</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Le vélo qui démarre<span class="q">Un vélo passe régulièrement de 0 à 6 m/s en 10 s. Quelle distance fait-il pendant ce démarrage ?</span></summary>
+        <div><span>Sous la courbe, c'est un triangle de base 10 s et de hauteur 6 m/s.</span><span>Aire : 10 × 6 ÷ 2 = <strong>30 m</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Compter les carreaux<span class="q">Sur ce quadrillage (1 carreau = 1 unité d'aire), compte l'aire sous la droite y = x + 1, entre x = 0 et x = 3.</span>
+          <span class="q fig"><svg viewBox="0 0 220 210" role="img" aria-label="Quadrillage avec la droite y = x + 1 et l'aire en dessous entre 0 et 3">
+            <polygon points="30,180 30,140 150,20 150,180" fill="var(--acc)" fill-opacity=".22"/>
+            <g stroke="var(--line)" stroke-width="1.5">
+              <line x1="70" y1="20" x2="70" y2="180"/><line x1="110" y1="20" x2="110" y2="180"/><line x1="150" y1="20" x2="150" y2="180"/><line x1="190" y1="20" x2="190" y2="180"/>
+              <line x1="30" y1="20" x2="190" y2="20"/><line x1="30" y1="60" x2="190" y2="60"/><line x1="30" y1="100" x2="190" y2="100"/><line x1="30" y1="140" x2="190" y2="140"/>
+            </g>
+            <line x1="30" y1="180" x2="200" y2="180" stroke="var(--ink)" stroke-width="2"/>
+            <line x1="30" y1="10" x2="30" y2="180" stroke="var(--ink)" stroke-width="2"/>
+            <line x1="30" y1="140" x2="160" y2="10" stroke="var(--acc)" stroke-width="3"/>
+            <text x="30" y="200" font-size="15" text-anchor="middle">0</text><text x="70" y="200" font-size="15" text-anchor="middle">1</text><text x="110" y="200" font-size="15" text-anchor="middle">2</text><text x="150" y="200" font-size="15" text-anchor="middle">3</text>
+            <text x="22" y="145" font-size="15" text-anchor="end">1</text><text x="22" y="105" font-size="15" text-anchor="end">2</text><text x="22" y="65" font-size="15" text-anchor="end">3</text><text x="22" y="25" font-size="15" text-anchor="end">4</text>
+          </svg></span>
+        </summary>
+        <div><span>Colonne de 0 à 1 : 1 carreau entier + 1 demi. Colonne de 1 à 2 : 2 entiers + 1 demi. Colonne de 2 à 3 : 3 entiers + 1 demi.</span><span>Total : 6 carreaux entiers + 3 demis = <strong>7,5</strong>.</span><span>Vérification avec le trapèze : (1 + 4) ÷ 2 × 3 = 7,5.</span></div>
+      </details>
+      <details>
+        <summary>Le signe de l'aire<span class="q">Un robot roule à −2 m/s (il recule) pendant 3 s. Que vaut ∫₀³ (−2) dt ? Que veut dire le signe ?</span></summary>
+        <div><span>Le rectangle est sous l'axe : l'intégrale vaut −2 × 3 = <strong>−6</strong>.</span><span>Le signe moins veut dire que le robot a <strong>reculé</strong> de 6 m. Il a quand même parcouru 6 m de chemin.</span></div>
+      </details>
+      <details>
+        <summary>Le panneau solaire<span class="q">Un jour d'été, la puissance d'un panneau monte régulièrement de 0 kW à 6 h jusqu'à 3 kW à 12 h, puis redescend régulièrement à 0 kW à 18 h. Quelle énergie a-t-il produite ?</span></summary>
+        <div><span>Sous la courbe, un triangle de base 18 − 6 = 12 h et de hauteur 3 kW.</span><span>Aire : 12 × 3 ÷ 2 = <strong>18 kWh</strong> (kW × h = kWh).</span></div>
+      </details>
+      <details>
+        <summary>Deux rectangles<span class="q">Pour f(x) = x entre 0 et 2, calcule la somme de 2 rectangles de largeur 1, hauteur prise à droite. Compare avec l'aire exacte.</span></summary>
+        <div><span>Hauteurs f(1) = 1 et f(2) = 2. Somme : 1 × 1 + 2 × 1 = <strong>3</strong>.</span><span>L'aire exacte est un triangle : 2 × 2 ÷ 2 = <strong>2</strong>. Les rectangles « à droite » dépassent de la courbe quand elle monte : la somme est trop grande.</span></div>
+      </details>
+    </div>
+  </section>
+
+  <section data-fiche><!--tprint--><p class="tprint-h">Fiche de révision · L'intégrale expliquée simplement</p><!--/tprint-->    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• Intégrer, c'est <strong>accumuler</strong> : additionner des petits morceaux (distance, eau, énergie…).</span>
+      <span>• L'intégrale de f entre a et b est l'<strong>aire sous la courbe</strong>, comptée en moins sous l'axe.</span>
+      <span>• Vitesse constante : distance = vitesse × durée = aire d'un rectangle. Unité de l'aire = (unité verticale) × (unité horizontale).</span>
+      <span>• Sous une courbe, on approche l'aire avec des <strong>rectangles</strong> de plus en plus fins (sommes de Riemann). Exemple : ∫₀² x² dx = 8/3 ≈ 2,667.</span>
+      <span>• On écrit <strong>∫ₐᵇ f(x) dx</strong> : un S allongé pour « somme », des bornes a et b, une hauteur f(x), une largeur minuscule dx.</span>
+      <span>• L'aire accumulée A(x) a pour dérivée f(x) : <strong>intégrer et dériver sont des opérations inverses</strong>. Exemples : ∫₀ᵗ x dx = t²/2 et ∫₀ᵗ x² dx = t³/3.</span>
+    </div>
+  <!--tprint--><p class="tprint-row"><button type="button" class="tprint" data-print><span aria-hidden="true">🖨</span> Imprimer la fiche</button><span>Seulement ce résumé, sur une page.</span></p><!--/tprint-->
+</section>
+
+  <!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"><a class="prev" href="la-derivee.html"><span>← Précédent</span><strong>La dérivée</strong></a><a class="next" href="les-nombres-complexes.html"><span>Suivant →</span><strong>Les nombres complexes</strong></a></div><div class="tnav-end"><a class="tnav-home" href="maths.html">⌂ Tous les tutoriels de maths</a><button type="button" data-share hidden>Partager</button></div></nav><!--/tnav-->
+<footer>Fiche de révision · L'intégrale<!--tmaj--><span class="tmaj" style="display:block;margin-top:6px;font-size:.85rem;opacity:.85">Dernière mise à jour : 24 novembre 2026 · © 2026 Nicolas Meynet</span><!--/tmaj--></footer>
+</main>
+
+<script>
+(function () {
+  /* Test hooks (window.__integ) :
+     rectDist(v, T)          -> km : distance à vitesse constante v (km/h) pendant T (h) = aire du rectangle, ex. rectDist(80, 2) = 160
+     trainV(t)               -> m/s : vitesse du train au temps t (s) ; 0→25 m/s de 0 à 60 s, 25 m/s jusqu’à 180 s, 25→0 de 180 à 230 s
+     trainParts(t)           -> { p1, p2, p3, total } en m : triangle, rectangle, trapèze ; trainParts(230).total = 4375
+     riemann(n, mode, fn?, a?, b?) -> somme de n rectangles (mode 'left' | 'right' | 'mid'), par défaut fn = x² sur [0 ; 2]
+     EXACT                   -> 8/3, aire exacte sous x² sur [0 ; 2]
+     notation                -> explications des 5 morceaux du symbole (clés int, lo, hi, f, dx)
+     negParts(b)             -> { neg, pos, net, total } pour v(t) = t − 1 de 0 à b ; negParts(3) = { −0,5 ; 2 ; 1,5 ; 2,5 }, negParts(2).net = 0
+     ACC                     -> fonctions de l’étape 6 : { one, lin, sq } avec f(x) et A(x) (A = x, x²/2, x³/3)
+     accSlope(key, x)        -> pente numérique de A en x (≈ f(x))
+     real, realScore(ans)    -> étape 7 : cartes graphique → sens de l’aire ('dist' | 'ener' | 'vol')
+     myths, mythScore(ans)   -> étape 9 : vrai ou idée reçue ('vrai' | 'mythe')
+     makeQ(k)                -> question k du quiz (0 à 7) : { q, a, how }
+     fmt(x, d?)              -> string : format français (virgule décimale, signe −)
+  */
+  var NS = 'http://www.w3.org/2000/svg';
+  function $(id) { return document.getElementById(id); }
+  function fmt(x, d) { var r = Math.round(x * 1e6) / 1e6; var p = Math.pow(10, d == null ? 3 : d); r = Math.round(r * p) / p; if (Object.is(r, -0)) r = 0; return r.toLocaleString('fr-FR', { maximumFractionDigits: d == null ? 3 : d }).replace('-', '−'); }
+  function num(s) { var t = String(s).replace(/\s/g, '').replace(/[−–]/g, '-').replace(',', '.'); if (t === '') return NaN; var x = Number(t); return isFinite(x) ? x : NaN; }
+  function mk(parent, name, attrs, text) { var e = document.createElementNS(NS, name); for (var a in attrs) e.setAttribute(a, attrs[a]); if (text != null) e.textContent = text; parent.appendChild(e); return e; }
+  function clear(svg) { while (svg.firstChild) svg.removeChild(svg.firstChild); }
+  function clamp(x, lo, hi) { return Math.max(lo, Math.min(hi, x)); }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  var FS = 15;
+
+  /* ---------- Repère (même style que la page sur la dérivée) ---------- */
+  function frame(svg, v) {
+    clear(svg);
+    var vb = svg.viewBox.baseVal, W = vb.width, H = vb.height;
+    var L = v.L != null ? v.L : 40, R = 12, T = v.yl ? 30 : 10, B = v.xl ? 50 : 30;
+    var pw = W - L - R, ph = H - T - B;
+    function X(x) { return L + (x - v.x0) / (v.x1 - v.x0) * pw; }
+    function Y(y) { return T + (v.y1 - y) / (v.y1 - v.y0) * ph; }
+    function ix(px) { return v.x0 + (px - L) / pw * (v.x1 - v.x0); }
+    var cid = svg.id + '-clip';
+    var defs = mk(svg, 'defs', {}), cp = mk(defs, 'clipPath', { id: cid });
+    mk(cp, 'rect', { x: L, y: T, width: pw, height: ph });
+    mk(svg, 'rect', { x: L, y: T, width: pw, height: ph, fill: 'var(--card)', stroke: 'var(--line)' });
+    var i, sx = v.sx || 1, sy = v.sy || 1, lx = v.lx || sx;
+    for (i = Math.ceil(v.x0 / sx - 1e-9); i * sx <= v.x1 + 1e-9; i++) {
+      var gx = i * sx;
+      mk(svg, 'line', { x1: X(gx), y1: T, x2: X(gx), y2: T + ph, stroke: 'var(--line)', 'stroke-width': 1 });
+      if (Math.abs(gx / lx - Math.round(gx / lx)) < 1e-9) mk(svg, 'text', { x: X(gx), y: T + ph + 20, 'text-anchor': 'middle', 'font-size': FS }, fmt(gx));
+    }
+    for (i = Math.ceil(v.y0 / sy - 1e-9); i * sy <= v.y1 + 1e-9; i++) {
+      var gy = i * sy;
+      mk(svg, 'line', { x1: L, y1: Y(gy), x2: L + pw, y2: Y(gy), stroke: 'var(--line)', 'stroke-width': 1 });
+      mk(svg, 'text', { x: L - 5, y: Y(gy) + 5, 'text-anchor': 'end', 'font-size': FS }, fmt(gy));
+    }
+    if (v.y0 <= 0 && v.y1 >= 0) mk(svg, 'line', { x1: L, y1: Y(0), x2: L + pw, y2: Y(0), stroke: 'var(--ink)', 'stroke-width': 1.5 });
+    if (v.x0 <= 0 && v.x1 >= 0) mk(svg, 'line', { x1: X(0), y1: T, x2: X(0), y2: T + ph, stroke: 'var(--ink)', 'stroke-width': 1.5 });
+    if (v.xl) mk(svg, 'text', { x: L + pw, y: H - 6, 'text-anchor': 'end', 'font-size': FS }, v.xl);
+    if (v.yl) mk(svg, 'text', { x: 4, y: 19, 'font-size': FS }, v.yl);
+    var g = mk(svg, 'g', { 'clip-path': 'url(#' + cid + ')' });
+    return { X: X, Y: Y, ix: ix, g: g, v: v, L: L, T: T, pw: pw, ph: ph };
+  }
+  function curvePath(fn, lo, hi, P) {
+    var d = '', n = 200;
+    for (var i = 0; i <= n; i++) { var x = lo + (hi - lo) * i / n; d += (i ? 'L' : 'M') + P.X(x).toFixed(2) + ' ' + P.Y(fn(x)).toFixed(2) + ' '; }
+    return d;
+  }
+  /* Polygone de l’aire entre la courbe et l’axe, de lo à hi */
+  function areaPath(fn, lo, hi, P) {
+    if (hi <= lo) return '';
+    var d = 'M' + P.X(lo).toFixed(2) + ' ' + P.Y(0).toFixed(2) + ' ', n = 120;
+    for (var i = 0; i <= n; i++) { var x = lo + (hi - lo) * i / n; d += 'L' + P.X(x).toFixed(2) + ' ' + P.Y(fn(x)).toFixed(2) + ' '; }
+    return d + 'L' + P.X(hi).toFixed(2) + ' ' + P.Y(0).toFixed(2) + ' Z';
+  }
+  function dot(P, x, y, color, r) { return mk(P.g, 'circle', { cx: P.X(x), cy: P.Y(y), r: r || 7, fill: color, stroke: 'var(--card)', 'stroke-width': 2 }); }
+  function draggable(svg, getP, onX) {
+    var on = false;
+    function at(e) { var r = svg.getBoundingClientRect(), vb = svg.viewBox.baseVal; if (!r.width || !getP()) return; onX(getP().ix((e.clientX - r.left) / r.width * vb.width)); }
+    svg.addEventListener('pointerdown', function (e) { on = true; try { svg.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ } at(e); e.preventDefault(); });
+    svg.addEventListener('pointermove', function (e) { if (on) at(e); });
+    svg.addEventListener('pointerup', function () { on = false; });
+    svg.addEventListener('pointercancel', function () { on = false; });
+  }
+  function setRange(inp, x) {
+    var lo = Number(inp.min), hi = Number(inp.max), st = Number(inp.step) || 1;
+    x = clamp(Math.round((x - lo) / st) * st + lo, lo, hi);
+    inp.value = String(Math.round(x * 1e6) / 1e6);
+    inp.dispatchEvent(new Event('input'));
+  }
+  /* Boutons − et + à côté des curseurs */
+  Array.prototype.forEach.call(document.querySelectorAll('.pm'), function (b) {
+    b.addEventListener('click', function () { var inp = $(b.getAttribute('data-for')); setRange(inp, Number(inp.value) + Number(b.getAttribute('data-d'))); });
+  });
+
+  /* ---------- Étape 1 : le rectangle ---------- */
+  function rectDist(v, T) { return v * T; }
+  function hm(T) { var h = Math.floor(T + 1e-9), m = Math.round((T - h) * 60); return h + ' h' + (m ? ' ' + m + ' min' : ''); }
+  var vSl = $('vSl'), tSl = $('tSl');
+  function drawRect() {
+    var v = Number(vSl.value), T = Number(tSl.value), d = rectDist(v, T);
+    $('vOut').textContent = fmt(v); $('tOut').textContent = fmt(T, 2);
+    var P = frame($('rectSvg'), { x0: 0, x1: 4, y0: 0, y1: 140, sx: 0.5, lx: 1, sy: 20, L: 46, xl: 'temps (h)', yl: 'vitesse (km/h)' });
+    if (T > 0 && v > 0) mk(P.g, 'rect', { x: P.X(0), y: P.Y(v), width: P.X(T) - P.X(0), height: P.Y(0) - P.Y(v), fill: 'var(--acc)', 'fill-opacity': 0.22, stroke: 'var(--acc)', 'stroke-width': 2 });
+    mk(P.g, 'line', { x1: P.X(0), y1: P.Y(v), x2: P.X(4), y2: P.Y(v), stroke: 'var(--ink)', 'stroke-width': 3 });
+    if (T >= 1 && v >= 30) mk(P.g, 'text', { x: (P.X(0) + P.X(T)) / 2, y: (P.Y(v) + P.Y(0)) / 2 + 6, 'text-anchor': 'middle', 'font-size': 17, 'font-weight': 600, style: 'fill:var(--acc)' }, fmt(d, 1) + ' km');
+    $('rectOut').innerHTML = '<span>Durée : ' + hm(T) + '</span>' +
+      '<span>Distance = vitesse × durée = ' + fmt(v) + ' km/h × ' + fmt(T, 2) + ' h = <b>' + fmt(d, 1) + ' km</b></span>' +
+      '<span class="c-acc">Aire du rectangle = hauteur × largeur = ' + fmt(v) + ' × ' + fmt(T, 2) + ' = ' + fmt(d, 1) + '</span>' +
+      '<span class="soft">' + (d === 0 ? 'Rectangle aplati : aire 0, distance 0.' : 'Les deux calculs donnent le même nombre : la distance est l’aire sous la courbe.') + '</span>';
+  }
+  vSl.addEventListener('input', drawRect); tSl.addEventListener('input', drawRect); drawRect();
+
+  /* ---------- Étape 2 : le train ---------- */
+  function trainV(t) { t = clamp(t, 0, 230); if (t <= 60) return 25 * t / 60; if (t <= 180) return 25; return 25 * (230 - t) / 50; }
+  function trainParts(t) {
+    t = clamp(t, 0, 230);
+    var a = Math.min(t, 60), p1 = a * trainV(a) / 2;
+    var p2 = t > 60 ? 25 * (Math.min(t, 180) - 60) : 0;
+    var p3 = t > 180 ? (25 + trainV(t)) / 2 * (t - 180) : 0;
+    return { p1: p1, p2: p2, p3: p3, total: p1 + p2 + p3 };
+  }
+  var trT = $('trT'), trP = null, trSvg = $('trainSvg');
+  function drawTrain() {
+    var t = Number(trT.value), v = trainV(t), S = trainParts(t);
+    $('trTOut').textContent = fmt(t);
+    var P = trP = frame(trSvg, { x0: 0, x1: 240, y0: 0, y1: 30, sx: 30, lx: 60, sy: 5, L: 40, xl: 'temps (s)', yl: 'vitesse (m/s)' });
+    if (t > 0) mk(P.g, 'path', { d: areaPath(trainV, 0, t, P), fill: 'var(--acc)', 'fill-opacity': 0.22, stroke: 'none' });
+    [60, 180].forEach(function (b) { mk(P.g, 'line', { x1: P.X(b), y1: P.Y(0), x2: P.X(b), y2: P.Y(25), stroke: 'var(--ink-soft)', 'stroke-width': 1.5, 'stroke-dasharray': '5 4' }); });
+    mk(P.g, 'path', { d: 'M' + P.X(0) + ' ' + P.Y(0) + ' L' + P.X(60) + ' ' + P.Y(25) + ' L' + P.X(180) + ' ' + P.Y(25) + ' L' + P.X(230) + ' ' + P.Y(0), fill: 'none', stroke: 'var(--ink)', 'stroke-width': 3, 'stroke-linejoin': 'round' });
+    mk(P.g, 'line', { x1: P.X(t), y1: P.Y(0), x2: P.X(t), y2: P.Y(30), stroke: 'var(--acc)', 'stroke-width': 2 });
+    dot(P, t, v, 'var(--acc)', 8);
+    var phase = t === 0 ? 'à l’arrêt en gare' : t < 60 ? 'il accélère' : t <= 180 ? 'il roule à vitesse constante' : t < 230 ? 'il freine' : 'arrivé à la gare suivante';
+    var lines = ['<span>t = ' + fmt(t) + ' s : ' + phase + ', vitesse ' + fmt(v, 1) + ' m/s (≈ ' + fmt(v * 3.6, 0) + ' km/h)</span>'];
+    var a = Math.min(t, 60);
+    lines.push('<span>Démarrage (triangle) : ' + fmt(a) + ' × ' + fmt(trainV(a), 1) + ' ÷ 2 ≈ ' + fmt(S.p1, 1) + ' m</span>');
+    if (t > 60) lines.push('<span>Croisière (rectangle) : ' + fmt(Math.min(t, 180) - 60) + ' × 25 = ' + fmt(S.p2, 1) + ' m</span>');
+    if (t > 180) lines.push('<span>Freinage (trapèze) : (25 + ' + fmt(v, 1) + ') ÷ 2 × ' + fmt(t - 180) + ' ≈ ' + fmt(S.p3, 1) + ' m</span>');
+    lines.push('<span><b>Distance depuis le départ ≈ ' + fmt(S.total, 1) + ' m</b></span>');
+    $('trainOut').innerHTML = lines.join('');
+  }
+  trT.addEventListener('input', drawTrain);
+  draggable(trSvg, function () { return trP; }, function (x) { setRange(trT, x); });
+  drawTrain();
+
+  /* ---------- Étape 3 : sommes de Riemann ---------- */
+  function sq(x) { return x * x; }
+  function riemann(n, mode, fn, a, b) {
+    fn = fn || sq; a = a == null ? 0 : a; b = b == null ? 2 : b; n = Math.max(1, Math.round(n));
+    var h = (b - a) / n, s = 0;
+    for (var i = 0; i < n; i++) { var x = a + (mode === 'left' ? i : mode === 'right' ? i + 1 : i + 0.5) * h; s += fn(x) * h; }
+    return s;
+  }
+  var EXACT = 8 / 3, rMode = 'left', rn = $('rn');
+  var MODES = { left: 'à gauche', right: 'à droite', mid: 'au milieu' };
+  function errTxt(e) { return e < 0.00005 ? 'moins de 0,0001' : fmt(e, 4); }
+  function drawRiem() {
+    var n = Number(rn.value), S = riemann(n, rMode), h = 2 / n, e = Math.abs(S - EXACT);
+    $('rnOut').textContent = n;
+    ['mL', 'mR', 'mM'].forEach(function (id) { $(id).setAttribute('aria-pressed', $(id).getAttribute('data-m') === rMode ? 'true' : 'false'); });
+    Array.prototype.forEach.call(document.querySelectorAll('.rnp'), function (b) { b.setAttribute('aria-pressed', Number(b.getAttribute('data-n')) === n ? 'true' : 'false'); });
+    var P = frame($('riemSvg'), { x0: 0, x1: 2, y0: 0, y1: 4.4, sx: 0.5, sy: 1, L: 34, xl: 'x', yl: 'y = x²' });
+    for (var i = 0; i < n; i++) {
+      var xs = (rMode === 'left' ? i : rMode === 'right' ? i + 1 : i + 0.5) * h, y = sq(xs);
+      mk(P.g, 'rect', { x: P.X(i * h), y: P.Y(y), width: P.X(h) - P.X(0), height: P.Y(0) - P.Y(y), fill: 'var(--acc)', 'fill-opacity': 0.22, stroke: 'var(--acc)', 'stroke-width': n > 40 ? 0.5 : 1.2 });
+      if (n <= 20) dot(P, xs, y, 'var(--acc)', 4);
+    }
+    mk(P.g, 'path', { d: curvePath(sq, 0, 2, P), fill: 'none', stroke: 'var(--ink)', 'stroke-width': 3 });
+    var tip = rMode === 'left' ? 'Hauteur à gauche : les rectangles restent sous la courbe, la somme est trop petite.' : rMode === 'right' ? 'Hauteur à droite : les rectangles dépassent de la courbe, la somme est trop grande.' : 'Hauteur au milieu : les petits morceaux en trop et en moins se compensent presque.';
+    $('riemOut').innerHTML = '<span>' + n + ' rectangle' + (n > 1 ? 's' : '') + ' de largeur 2 ÷ ' + n + ' = ' + fmt(h, 4) + ', hauteur prise ' + MODES[rMode] + '</span>' +
+      '<span><b>Somme des aires ≈ ' + fmt(S, 4) + '</b></span>' +
+      '<span class="c-two">Valeur exacte : 8/3 ≈ 2,6667</span>' +
+      '<span>Écart : ' + errTxt(e) + '</span>' +
+      '<span class="soft">' + tip + '</span>';
+    var ns = [1, 4, 10, 50, 100];
+    $('riemTable').innerHTML = '<tr><th>n</th><th>somme (' + MODES[rMode] + ')</th><th>écart avec 8/3</th></tr>' +
+      ns.map(function (k) { var s = riemann(k, rMode); return '<tr' + (k === n ? ' class="cur"' : '') + '><td>' + k + '</td><td>' + fmt(s, 4) + '</td><td>' + errTxt(Math.abs(s - EXACT)) + '</td></tr>'; }).join('');
+  }
+  rn.addEventListener('input', drawRiem);
+  ['mL', 'mR', 'mM'].forEach(function (id) { $(id).addEventListener('click', function () { rMode = this.getAttribute('data-m'); drawRiem(); }); });
+  Array.prototype.forEach.call(document.querySelectorAll('.rnp'), function (b) { b.addEventListener('click', function () { setRange(rn, Number(b.getAttribute('data-n'))); }); });
+  drawRiem();
+
+  /* ---------- Étape 4 : le symbole ---------- */
+  var NOTA = {
+    int: { t: '∫ : un S allongé', s: 'C’est l’initiale du mot « somme ». Leibniz l’a choisi parce qu’une intégrale est une somme d’une infinité de rectangles très fins.' },
+    lo: { t: '0 : la borne du bas', s: 'On commence à additionner à partir de x = 0. C’est le bord gauche de l’aire.' },
+    hi: { t: '2 : la borne du haut', s: 'On s’arrête à x = 2. C’est le bord droit de l’aire.' },
+    f: { t: 'x² : la hauteur', s: 'C’est la fonction dont on cherche l’aire. À chaque x, elle donne la hauteur du petit rectangle.' },
+    dx: { t: 'dx : une largeur minuscule', s: 'C’est la largeur de chaque rectangle, si petite qu’on ne peut pas l’écrire avec un nombre. « hauteur × largeur » devient x² × dx.' }
+  };
+  var ntSeen = {};
+  $('notation').addEventListener('click', function (ev) {
+    var b = ev.target.closest('button'); if (!b) return;
+    var k = b.getAttribute('data-k'); if (!NOTA[k]) return;
+    ntSeen[k] = true;
+    Array.prototype.forEach.call(this.querySelectorAll('button'), function (x) { var kk = x.getAttribute('data-k'); x.setAttribute('aria-pressed', kk === k ? 'true' : 'false'); if (ntSeen[kk]) x.classList.add('seen'); });
+    var o = $('ntOut'); o.className = 'fbk info'; o.innerHTML = '<strong>' + NOTA[k].t + '</strong><span>' + NOTA[k].s + '</span>';
+    var c = Object.keys(ntSeen).length;
+    $('ntSeen').textContent = 'Morceaux découverts : ' + c + ' / 5' + (c === 5 ? ' : bravo !' : '');
+  });
+  $('ntRead').addEventListener('click', function () {
+    var o = $('ntOut'); o.className = 'fbk ok';
+    o.innerHTML = '<strong>« L’intégrale de 0 à 2 de x carré dx »</strong><span>Ça veut dire : l’aire sous la courbe de x², entre x = 0 et x = 2. Elle vaut 8/3 ≈ 2,667.</span>';
+  });
+
+  /* ---------- Étape 5 : aires négatives ---------- */
+  function negParts(b) {
+    b = clamp(b, 0, 3);
+    var neg = b <= 1 ? b * b / 2 - b : -0.5;
+    var pos = b > 1 ? (b - 1) * (b - 1) / 2 : 0;
+    return { neg: neg, pos: pos, net: neg + pos, total: pos - neg };
+  }
+  var negB = $('negB');
+  function vRobot(t) { return t - 1; }
+  function drawNeg() {
+    var b = Math.round(Number(negB.value) * 10) / 10, N = negParts(b);
+    $('negBOut').textContent = fmt(b, 1);
+    var P = frame($('negSvg'), { x0: 0, x1: 3, y0: -1.5, y1: 2.5, sx: 0.5, lx: 1, sy: 0.5, L: 44, xl: 'temps t (s)', yl: 'vitesse (m/s)' });
+    var m = Math.min(b, 1);
+    if (m > 0) mk(P.g, 'path', { d: areaPath(vRobot, 0, m, P), fill: 'var(--red)', 'fill-opacity': 0.3, stroke: 'var(--red)', 'stroke-width': 1.5 });
+    if (b > 1) mk(P.g, 'path', { d: areaPath(vRobot, 1, b, P), fill: 'var(--ok)', 'fill-opacity': 0.3, stroke: 'var(--ok)', 'stroke-width': 1.5 });
+    mk(P.g, 'path', { d: curvePath(vRobot, 0, 3, P), fill: 'none', stroke: 'var(--ink)', 'stroke-width': 3 });
+    if (m >= 0.6) mk(P.g, 'text', { x: P.X(m / 2), y: P.Y(-0.3), 'text-anchor': 'middle', 'font-size': 22, 'font-weight': 700, style: 'fill:var(--red)' }, '−');
+    if (b >= 1.6) mk(P.g, 'text', { x: P.X(1 + (b - 1) * 0.66), y: P.Y((b - 1) * 0.3) + 6, 'text-anchor': 'middle', 'font-size': 22, 'font-weight': 700, style: 'fill:var(--ok)' }, '+');
+    mk(P.g, 'line', { x1: P.X(b), y1: P.Y(-1.5), x2: P.X(b), y2: P.Y(2.5), stroke: 'var(--acc)', 'stroke-width': 2, 'stroke-dasharray': '6 4' });
+    $('negOut').innerHTML = '<span class="c-red">Sous l’axe (le robot recule) : ' + fmt(N.neg, 3) + ' m</span>' +
+      '<span class="c-ok">Au-dessus (il avance) : +' + fmt(N.pos, 3) + ' m</span>' +
+      '<span><b>Intégrale = ' + fmt(N.neg, 3) + ' + ' + fmt(N.pos, 3) + ' = ' + fmt(N.net, 3) + '</b></span>' +
+      '<span class="soft">Chemin vraiment parcouru (sans les signes) : ' + fmt(-N.neg, 3) + ' + ' + fmt(N.pos, 3) + ' = ' + fmt(N.total, 3) + ' m</span>';
+    var vd = $('negVerdict');
+    if (b === 0) { vd.className = 'verdict'; vd.innerHTML = 't = 0 : rien n’a encore été accumulé.<span>Avance le curseur.</span>'; }
+    else if (Math.abs(N.net) < 1e-9) { vd.className = 'verdict flat'; vd.innerHTML = 'L’intégrale vaut 0 !<span>Les deux triangles ont la même aire et se compensent : le robot est revenu exactement à son point de départ, alors qu’il a roulé ' + fmt(N.total, 3) + ' m.</span>'; }
+    else if (N.net < 0) { vd.className = 'verdict no'; vd.innerHTML = 'Intégrale négative : ' + fmt(N.net, 3) + '<span>Pour l’instant, le robot est derrière son point de départ, à ' + fmt(-N.net, 3) + ' m.</span>'; }
+    else { vd.className = 'verdict yes'; vd.innerHTML = 'Intégrale positive : +' + fmt(N.net, 3) + '<span>Le robot est devant son point de départ, à ' + fmt(N.net, 3) + ' m.</span>'; }
+  }
+  negB.addEventListener('input', drawNeg);
+  $('negTwo').addEventListener('click', function () { setRange(negB, 2); });
+  drawNeg();
+
+  /* ---------- Étape 6 : f et l’aire accumulée A ---------- */
+  var ACC = {
+    one: { label: 'f(x) = 1', fl: '1', Al: 'x', f: function () { return 1; }, A: function (x) { return x; } },
+    lin: { label: 'f(x) = x', fl: 'x', Al: 'x²/2', f: function (x) { return x; }, A: function (x) { return x * x / 2; } },
+    sq: { label: 'f(x) = x²', fl: 'x²', Al: 'x³/3', f: function (x) { return x * x; }, A: function (x) { return x * x * x / 3; } }
+  };
+  function accSlope(key, x) { var h = 0.001; return (ACC[key].A(x + h) - ACC[key].A(x - h)) / (2 * h); }
+  var accKey = 'lin', accX = $('accX'), accPT = null, accPB = null;
+  Object.keys(ACC).forEach(function (k) {
+    var b = document.createElement('button'); b.type = 'button'; b.id = 'acc-' + k; b.textContent = ACC[k].label;
+    b.addEventListener('click', function () { accKey = k; drawAcc(); });
+    $('accBtns').appendChild(b);
+  });
+  function drawAcc() {
+    var F = ACC[accKey], x = clamp(Number(accX.value), 0, 2), fx = F.f(x), Ax = F.A(x);
+    Object.keys(ACC).forEach(function (k) { $('acc-' + k).setAttribute('aria-pressed', k === accKey ? 'true' : 'false'); });
+    $('accXOut').textContent = fmt(x, 2);
+    var P = accPT = frame($('accTop'), { x0: 0, x1: 2, y0: 0, y1: 4.4, sx: 0.5, sy: 1, L: 34, yl: 'en haut : f, l’aire jusqu’à x' });
+    if (x > 0) mk(P.g, 'path', { d: areaPath(F.f, 0, x, P), fill: 'var(--acc)', 'fill-opacity': 0.25, stroke: 'none' });
+    mk(P.g, 'path', { d: curvePath(F.f, 0, 2, P), fill: 'none', stroke: 'var(--ink)', 'stroke-width': 3 });
+    mk(P.g, 'line', { x1: P.X(x), y1: P.Y(0), x2: P.X(x), y2: P.Y(fx), stroke: 'var(--two)', 'stroke-width': 4 });
+    dot(P, x, fx, 'var(--two)', 7);
+    var Q = accPB = frame($('accBot'), { x0: 0, x1: 2, y0: 0, y1: 3, sx: 0.5, sy: 1, L: 34, yl: 'en bas : A(x), l’aire accumulée' });
+    mk(Q.g, 'path', { d: curvePath(F.A, 0, 2, Q), fill: 'none', stroke: 'var(--ink)', 'stroke-width': 3 });
+    mk(Q.g, 'line', { x1: Q.X(x - 0.6), y1: Q.Y(Ax - 0.6 * fx), x2: Q.X(x + 0.6), y2: Q.Y(Ax + 0.6 * fx), stroke: 'var(--two)', 'stroke-width': 3 });
+    dot(Q, x, Ax, 'var(--acc)', 7);
+    var s = accSlope(accKey, x);
+    var why = accKey === 'one' ? 'f est constante : A grandit toujours à la même vitesse, c’est une droite.' : 'Plus x avance, plus f est haut : A grandit de plus en plus vite, sa courbe se redresse.';
+    $('accOut').innerHTML = '<span class="c-two">Hauteur en haut : f(' + fmt(x, 2) + ') = ' + fmt(fx, 3) + '</span>' +
+      '<span class="c-acc">Aire accumulée : A(' + fmt(x, 2) + ') = ' + F.Al.replace(/x/g, fmt(x, 2)) + ' ≈ ' + fmt(Ax, 3) + '</span>' +
+      '<span>Pente de la tangente en bas : (A(x + 0,001) − A(x − 0,001)) ÷ 0,002 ≈ ' + fmt(s, 3) + '</span>' +
+      '<span><b>La pente de A vaut f(x) = ' + fmt(fx, 3) + ' !</b></span>' +
+      '<span class="soft">' + why + '</span>';
+  }
+  accX.addEventListener('input', drawAcc);
+  draggable($('accTop'), function () { return accPT; }, function (x) { setRange(accX, x); });
+  draggable($('accBot'), function () { return accPB; }, function (x) { setRange(accX, x); });
+  drawAcc();
+
+  /* ---------- Jeux « une carte à la fois » : moteur makeSorter (repris de la page d’orthographe) ---------- */
+  var makeSorter = (function () {
+    function clamp(i, n) { i = Math.floor(Number(i)); if (!isFinite(i)) i = 0; return Math.max(0, Math.min(n - 1, i)); }
+    function makeSorter(o) {
+      var idx = 0, ans = {};
+      function opts(it) { return it.o ? it.o : o.order; }
+      function name(c) { return o.names && o.names[c] ? o.names[c] : c; }
+      function render() {
+        var it = o.items[idx], a = ans[it.k];
+        if (o.cardHtml) $(o.card).innerHTML = o.cardHtml(it, !!a); else $(o.card).textContent = it.s;
+        $(o.pos).textContent = o.word + ' ' + (idx + 1) + ' / ' + o.items.length;
+        $(o.btns).innerHTML = opts(it).map(function (c) {
+          var cls = a ? (c === it.a ? 'right' : (c === a ? 'wrong' : '')) : '';
+          return '<button type="button" data-c="' + esc(c) + '"' + (cls ? ' class="' + cls + '"' : '') + (a ? ' disabled' : '') + '>' + esc(name(c)) + '</button>';
+        }).join('');
+        var out = $(o.out);
+        if (!a) { out.className = 'fbk'; out.innerHTML = ''; }
+        else {
+          var ok = a === it.a;
+          out.className = 'fbk ' + (ok ? 'ok' : 'no');
+          out.innerHTML = '<strong>' + (ok ? 'Bien vu !' : 'Pas tout à fait. Réponse : ' + esc(name(it.a)) + '.') + '</strong><span>' + esc(it.why) + '</span>';
+        }
+        var s = o.score(ans), last = idx === o.items.length - 1, left = s.total - s.answered;
+        $(o.score_).textContent = (o.word ? o.word + ' ' : '') + (idx + 1) + ' / ' + s.total;
+        $(o.pos).textContent = s.answered ? 'Bonnes réponses : ' + s.correct + ' sur ' + s.answered : '';
+        $(o.prev).disabled = idx === 0;
+        $(o.next).disabled = last;
+        $(o.next).style.display = last ? 'none' : '';
+        var end = $(o.out + 'End');
+        if (!end) { end = document.createElement('div'); end.id = o.out + 'End'; end.setAttribute('aria-live', 'polite'); $(o.out).insertAdjacentElement('afterend', end); }
+        if (!left) {
+          var r = s.correct / s.total;
+          end.className = 'fbk ok sorter-end';
+          end.innerHTML = '<strong>Terminé ! ' + s.correct + ' / ' + s.total + ' bonnes réponses</strong><span>' +
+            (r === 1 ? 'Parfait, tout est juste !' : r >= .7 ? 'Très bien !' : r >= .5 ? 'Pas mal ! Relis les explications des erreurs.' : 'Relis les explications, puis réessaie.') +
+            ' Touche « Recommencer » pour rejouer.</span>';
+        } else if (last && ans[it.k]) {
+          end.className = 'fbk warn sorter-end';
+          end.innerHTML = '<strong>C’était la dernière carte.</strong><span>Il te reste ' + left + ' réponse' + (left > 1 ? 's' : '') + ' à donner : reviens en arrière avec « ← Précédent ».</span>';
+        } else { end.className = ''; end.innerHTML = ''; }
+      }
+      $(o.btns).addEventListener('click', function (ev) {
+        var b = ev.target.closest('button'); if (!b || b.disabled) return;
+        var it = o.items[idx]; if (!ans[it.k]) ans[it.k] = b.getAttribute('data-c');
+        render();
+      });
+      $(o.prev).addEventListener('click', function () { idx = clamp(idx - 1, o.items.length); render(); });
+      $(o.next).addEventListener('click', function () { idx = clamp(idx + 1, o.items.length); render(); });
+      $(o.reset).addEventListener('click', function () { ans = {}; idx = 0; render(); });
+      render();
+    }
+    return makeSorter;
+  })();
+  function scorer(items) {
+    return function (ans) { var correct = 0, answered = 0; items.forEach(function (x) { if (ans && ans[x.k]) { answered++; if (ans[x.k] === x.a) correct++; } }); return { correct: correct, answered: answered, total: items.length }; };
+  }
+
+  /* ---------- Étape 7 : que représente l’aire ? ---------- */
+  var RWNAMES = { dist: 'Une distance', ener: 'Une énergie', vol: 'Un volume' };
+  var REAL = [
+    { k: 'montre', s: 'Ta montre de sport enregistre ta vitesse pendant un footing.', y: 'vitesse (m/s)', x: 'temps (s)', u: 'des mètres : m/s × s = m', a: 'dist', why: 'Vitesse × temps = distance. L’aire donne les mètres courus, même si ta vitesse a changé tout le temps.' },
+    { k: 'solaire', s: 'La puissance d’un panneau solaire au fil d’une journée.', y: 'puissance (kW)', x: 'heure (h)', u: 'des kilowattheures : kW × h = kWh', a: 'ener', why: 'Puissance × temps = énergie. C’est l’énergie produite dans la journée, en kWh, comme sur la facture d’électricité.' },
+    { k: 'robinet', s: 'Le débit du robinet pendant que tu remplis la baignoire.', y: 'débit (L/min)', x: 'temps (min)', u: 'des litres : L/min × min = L', a: 'vol', why: 'Débit × temps = volume. L’aire donne le nombre de litres dans la baignoire.' },
+    { k: 'gps', s: 'Le GPS d’une voiture note sa vitesse pendant un trajet.', y: 'vitesse (km/h)', x: 'temps (h)', u: 'des kilomètres : km/h × h = km', a: 'dist', why: 'Comme à l’étape 2 avec le train : l’aire sous la vitesse, c’est la distance.' },
+    { k: 'piscine', s: 'Une piscine à fond en pente : à chaque endroit de la longueur, on mesure l’aire de la « tranche » d’eau.', y: 'aire de la tranche (m²)', x: 'position dans la longueur (m)', u: 'des mètres cubes : m² × m = m³', a: 'vol', why: 'On additionne des tranches très fines : aire × épaisseur = volume. C’est l’idée de Kepler avec ses tonneaux.' },
+    { k: 'maison', s: 'La puissance électrique utilisée par une maison pendant une journée.', y: 'puissance (kW)', x: 'temps (h)', u: 'des kilowattheures : kW × h = kWh', a: 'ener', why: 'C’est l’énergie consommée dans la journée. Le compteur électrique fait exactement cette intégrale.' },
+    { k: 'velo', s: 'La puissance du moteur d’un vélo électrique pendant une balade.', y: 'puissance (W)', x: 'temps (h)', u: 'des wattheures : W × h = Wh', a: 'ener', why: 'Puissance × temps = énergie, ici en Wh. Elle dit combien de la batterie a été utilisé.' },
+    { k: 'riviere', s: 'Le débit d’une rivière qui se jette dans un lac.', y: 'débit (m³/s)', x: 'temps (s)', u: 'des mètres cubes : m³/s × s = m³', a: 'vol', why: 'Débit × temps = volume : c’est la quantité d’eau arrivée dans le lac.' }
+  ];
+  function realCard(it, done) {
+    return '<span>' + esc(it.s) + '</span><span class="ax">Axe vertical : <b>' + esc(it.y) + '</b></span><span class="ax">Axe horizontal : <b>' + esc(it.x) + '</b></span>' + (done ? '<span class="res">Unité de l’aire : ' + esc(it.u) + '</span>' : '');
+  }
+  var realScore = scorer(REAL);
+  makeSorter({ items: REAL, names: RWNAMES, order: ['dist', 'ener', 'vol'], btns: 'rwBtns', card: 'rwCard', pos: 'rwPos', out: 'rwOut', score_: 'rwScore', prev: 'rwPrev', next: 'rwNext', reset: 'rwReset', word: 'Question', score: realScore, cardHtml: realCard });
+
+  /* ---------- Étape 9 : vrai ou idée reçue ? ---------- */
+  var MYNAMES = { vrai: 'Vrai', mythe: 'Idée reçue' };
+  var MYTHS = [
+    { k: 'positive', s: '« Une intégrale, c’est toujours une aire positive. »', a: 'mythe', why: 'Sous l’axe, l’aire compte en moins. Une intégrale peut être négative, ou même nulle.' },
+    { k: 'plus', s: '« Avec plus de rectangles, l’approximation est en général meilleure. »', a: 'vrai', why: 'C’est ce que montre le tableau de l’étape 3 : l’écart diminue quand n augmente.' },
+    { k: 'mille', s: '« Avec 1 000 rectangles, on obtient exactement l’aire sous x². »', a: 'mythe', why: 'On est très proche, mais il reste une toute petite erreur. La valeur exacte 8/3 est la limite quand les rectangles deviennent infiniment fins.' },
+    { k: 'vitesse', s: '« L’aire sous un graphique vitesse-temps est une distance. »', a: 'vrai', why: 'Vitesse × temps = distance : c’est l’idée de départ de l’intégrale.' },
+    { k: 'rapport', s: '« Intégrer et dériver n’ont aucun rapport. »', a: 'mythe', why: 'Ce sont des opérations inverses : la dérivée de l’aire accumulée A(x) est f(x).' },
+    { k: 'zero', s: '« Si une intégrale vaut 0, la courbe est collée à l’axe. »', a: 'mythe', why: 'Pas forcément ! Pour t − 1 entre 0 et 2, une partie négative et une partie positive de même aire se compensent.' },
+    { k: 'symbole', s: '« Le symbole ∫ vient de la lettre S, pour “somme”. »', a: 'vrai', why: 'Leibniz a choisi un S allongé, pour le mot latin summa.' },
+    { k: 'unite', s: '« L’aire sous une courbe n’a jamais d’unité. »', a: 'mythe', why: 'Son unité est (unité de l’axe vertical) × (unité de l’axe horizontal) : km, kWh, litres…' }
+  ];
+  var mythScore = scorer(MYTHS);
+  makeSorter({ items: MYTHS, names: MYNAMES, order: ['vrai', 'mythe'], btns: 'myBtns', card: 'myCard', pos: 'myPos', out: 'myOut', score_: 'myScore', prev: 'myPrev', next: 'myNext', reset: 'myReset', word: 'Question', score: mythScore });
+
+  /* ---------- Quiz ---------- */
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  function makeQ(t) {
+    var v, T, q, m, p, h, b, s;
+    if (t === 0) { v = pick([40, 60, 80, 90, 100, 120]); T = pick([0.5, 1.5, 2, 2.5, 3]); return { q: 'Une voiture roule à ' + v + ' km/h pendant ' + fmt(T) + ' h. Quelle distance parcourt-elle (en km) ?', a: v * T, how: 'Aire du rectangle : ' + v + ' × ' + fmt(T) + ' = ' + fmt(v * T) + ' km' }; }
+    if (t === 1) { v = pick([10, 20, 30]); T = pick([20, 30, 40, 60]); return { q: 'Un train accélère régulièrement de 0 à ' + v + ' m/s en ' + T + ' s. Quelle distance fait-il pendant ce démarrage (en m) ?', a: v * T / 2, how: 'Aire du triangle : ' + T + ' × ' + v + ' ÷ 2 = ' + fmt(v * T / 2) + ' m' }; }
+    if (t === 2) { q = pick([6, 8, 10, 12]); m = pick([5, 10, 15]); return { q: 'Un robinet coule à ' + q + ' L/min pendant ' + m + ' min. Combien de litres a-t-il versés ?', a: q * m, how: 'Débit × temps : ' + q + ' × ' + m + ' = ' + (q * m) + ' L' }; }
+    if (t === 3) { p = pick([2, 3, 4]); h = pick([3, 5, 6]); return { q: 'Un panneau solaire fournit ' + p + ' kW pendant ' + h + ' h, sans changer. Quelle énergie produit-il (en kWh) ?', a: p * h, how: 'Puissance × temps : ' + p + ' × ' + h + ' = ' + (p * h) + ' kWh' }; }
+    if (t === 4) { T = pick([2, 4, 6, 8, 10]); return { q: 'Combien vaut l’intégrale de 0 à ' + T + ' de x dx ? (l’aire sous y = x)', a: T * T / 2, how: 'C’est un triangle de base ' + T + ' et de hauteur ' + T + ' : ' + T + ' × ' + T + ' ÷ 2 = ' + (T * T / 2) }; }
+    if (t === 5) { s = pick(['left', 'right']); return { q: 'Pour f(x) = x² entre 0 et 2, on prend 2 rectangles de largeur 1, hauteur prise ' + (s === 'left' ? 'à gauche' : 'à droite') + '. Quelle est la somme de leurs aires ?', a: riemann(2, s), how: s === 'left' ? 'Hauteurs f(0) = 0 et f(1) = 1 : 0 × 1 + 1 × 1 = 1' : 'Hauteurs f(1) = 1 et f(2) = 4 : 1 × 1 + 4 × 1 = 5' }; }
+    if (t === 6) { b = pick([2, 3, 4]); return { q: 'Combien vaut l’intégrale de 0 à ' + b + ' de (x − 1) dx ? Attention à la partie sous l’axe.', a: b * b / 2 - b, how: 'Sous l’axe : −0,5. Au-dessus : triangle ' + (b - 1) + ' × ' + (b - 1) + ' ÷ 2 = ' + fmt((b - 1) * (b - 1) / 2) + '. Total : ' + fmt(b * b / 2 - b) }; }
+    T = pick([1, 2, 3]);
+    return { q: 'Combien vaut l’intégrale de 0 à ' + T + ' de x² dx ? (arrondis au centième)', a: T * T * T / 3, how: 'L’aire de 0 à t sous x² vaut t³/3 : ' + T + '³ ÷ 3 = ' + (T * T * T) + '/3 ' + (T === 3 ? '= 9' : '≈ ' + fmt(T * T * T / 3, 2)) };
+  }
+  var quiz = $('quiz'), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ''; done = [];
+    for (var k = 0; k < 8; k++) {
+      var Q = makeQ(k), li = document.createElement('li');
+      li.innerHTML = '<span>' + Q.q + '</span><input type="text" id="qa' + k + '" inputmode="decimal" autocomplete="off" aria-label="Ta réponse à la question ' + (k + 1) + '"><button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+      quiz.appendChild(li);
+      (function (k, Q) {
+        function check() {
+          var fb = $('qf' + k), x = num($('qa' + k).value);
+          if (isNaN(x)) { fb.className = 'fb'; fb.textContent = 'Écris un nombre.'; return; }
+          if (Math.abs(x - Q.a) < 0.006) { fb.className = 'fb ok'; fb.textContent = 'Bravo, c’est juste !'; done[k] = true; }
+          else { done[k] = false; fb.className = 'fb no'; fb.innerHTML = 'Pas tout à fait : la réponse est ' + fmt(Q.a, 2) + '.<span>' + Q.how + '</span>'; }
+          $('score').textContent = done.filter(Boolean).length + ' / 8';
+        }
+        $('qb' + k).addEventListener('click', check);
+        $('qa' + k).addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+      })(k, Q);
+    }
+    $('score').textContent = '0 / 8';
+  }
+  $('newQuiz').addEventListener('click', newQuiz);
+  newQuiz();
+
+  window.__integ = { rectDist: rectDist, trainV: trainV, trainParts: trainParts, riemann: riemann, EXACT: EXACT, notation: NOTA, negParts: negParts, ACC: ACC, accSlope: accSlope, real: REAL, realScore: realScore, myths: MYTHS, mythScore: mythScore, makeQ: makeQ, fmt: fmt };
+})();
+</script>
+</body>
+</html>

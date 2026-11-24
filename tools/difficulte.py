@@ -21,7 +21,7 @@ DIFF = {
     "les-angles-et-triangles": 1, "les-droites-remarquables": 2, "les-quadrilateres": 1,
     "le-theoreme-de-pythagore": 2, "le-theoreme-de-thales": 3, "la-trigonometrie": 3, "les-transformations": 1,
     "le-reperage": 1, "les-statistiques": 1, "les-probabilites": 2, "l-algorithmique": 1, "la-demonstration": 3,
-    "le-second-degre": 3, "les-vecteurs": 3, "les-suites": 3, "la-derivee": 3, "les-nombres-complexes": 3,
+    "le-second-degre": 3, "les-vecteurs": 3, "les-suites": 3, "la-derivee": 3, "l-integrale": 3, "les-nombres-complexes": 3,
     "la-cryptographie": 2, "le-binaire-et-les-bases": 2, "les-paradoxes-de-probabilite": 3, "les-fractales": 2,
     "les-jeux-de-strategie": 1, "les-maths-et-la-musique": 2, "le-nombre-pi": 1, "le-nombre-e": 2,
     "le-nombre-d-or": 1, "revisions-brevet": 3,
