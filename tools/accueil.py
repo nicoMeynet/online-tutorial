@@ -140,6 +140,14 @@ a.subj svg { grid-row: 1 / span 2; width: 56px; height: 56px; color: var(--c); }
 a.subj h2 { color: var(--c); font-size: 1.35rem; }
 a.subj .n { font: 700 .8rem var(--f-mono); color: var(--soft); margin-left: 6px; white-space: nowrap; }
 a.subj p { color: var(--soft); font-size: .95rem; line-height: 1.45; }
+/* Progression (localStorage) : une fine barre en bas de chaque matière + « Reprendre » */
+a.subj { position: relative; overflow: hidden; }
+a.subj .bar { position: absolute; left: 0; right: 0; bottom: 0; height: 6px; background: var(--line); }
+a.subj .bar i { display: block; height: 100%; width: 0; background: var(--c); }
+.resume { display: flex; align-items: center; gap: 6px 12px; flex-wrap: wrap; }
+.resume a.pill { max-width: 100%; min-width: 0; }
+.resume a.pill span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.resume .soft { font-size: .9rem; }
 @media (max-width: 600px) {
   main { gap: 18px; }
   .lead { font-size: 1rem; }
@@ -161,6 +169,10 @@ INDEX_BODY = """  <div class="top">
     <h1>Tutoriels interactifs</h1>
     <p class="lead">Choisis une matière. Sur chaque page, tu bouges, tu testes et la page t'explique, étape par étape.</p>
   </header>
+  <div class="resume" id="resume" hidden>
+    <a class="pill" href="#" data-last>▶ <span>Reprendre</span></a>
+    <span class="soft" data-sum></span>
+  </div>
   <nav class="subjects" aria-label="Matières">
 __SUBJECTS__
   </nav>
@@ -168,6 +180,37 @@ __SUBJECTS__
     <span>Secondaire I (8H–11H), Suisse romande · <a href="a-propos.html">À propos du site</a></span>
   </footer>
 </main>
+<script>
+(function () {
+  /* Progression simple : lue dans ce navigateur (même clé que progress.js), rien n'est envoyé. */
+  var PAGES = __PAGES_JSON__;
+  var d = {};
+  try { d = JSON.parse(localStorage.getItem('tutoriels-progression-v1')) || {}; } catch (e) {}
+  var seen = 0, total = 0, last = null;
+  Object.keys(PAGES).forEach(function (sid) {
+    var list = PAGES[sid], n = 0;
+    list.forEach(function (x) {
+      var p = d[x[0]];
+      if (!p) return;
+      n++;
+      if (p.seen && (!last || p.seen > last.when)) last = { h: x[0], t: x[1], when: p.seen };
+    });
+    seen += n; total += list.length;
+    var a = document.querySelector('a.subj[data-s="' + sid + '"]');
+    if (!a || !n) return;
+    a.querySelector('.n').textContent = n + '/' + list.length;
+    a.querySelector('.bar').hidden = false;
+    a.querySelector('.bar i').style.width = Math.round(100 * n / list.length) + '%';
+  });
+  if (last) {
+    var r = document.getElementById('resume'), l = r.querySelector('[data-last]');
+    l.href = last.h; l.querySelector('span').textContent = 'Reprendre : ' + last.t;
+    r.querySelector('[data-sum]').textContent = seen + ' tutoriels ouverts sur ' + total;
+    r.hidden = false;
+  }
+  window.__index = { seen: seen, total: total, last: last };
+})();
+</script>
 </body>
 </html>
 """
@@ -348,15 +391,18 @@ def main():
         light.append(f"  --s-{sid}: {col};")
         dark.append(f"    --s-{sid}: {dcol};")
         blocks.append(
-            f'    <a class="subj" href="{fname}" style="--c:var(--s-{sid})">'
+            f'    <a class="subj" href="{fname}" data-s="{sid}" style="--c:var(--s-{sid})">'
             f'<svg viewBox="0 0 64 64" aria-hidden="true">{ICONS[sid]}</svg>'
-            f'<h2>{html.escape(name)}<span class="n">{len(cards)}</span></h2><p>{html.escape(desc)}</p></a>')
+            f'<h2>{html.escape(name)}<span class="n">{len(cards)}</span></h2><p>{html.escape(desc)}</p>'
+            f'<span class="bar" hidden aria-hidden="true"><i></i></span></a>')
 
     def head(title, css):
         return (HEAD.replace("__TITLE__", title).replace("__CSS__", css)
                 .replace("__LIGHT__", "\n".join(light)).replace("__DARK__", "\n".join(dark)))
 
-    index = head("Tutoriels interactifs", INDEX_CSS) + INDEX_BODY.replace("__SUBJECTS__", "\n".join(blocks))
+    pages = {sid: [[c["h"], c["t"]] for c in data if c["s"] == sid] for _, sid, *_ in SUBJECTS}
+    index = head("Tutoriels interactifs", INDEX_CSS) + (INDEX_BODY.replace("__SUBJECTS__", "\n".join(blocks))
+             .replace("__PAGES_JSON__", json.dumps(pages, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")))
     (ROOT / "index.html").write_text(index, encoding="utf-8", newline="\n")
     about = head("À propos · Tutoriels interactifs", ABOUT_CSS) + (
         ABOUT_BODY.replace("__TOTAL__", str(len(data))).replace("__NSUBJ__", str(len(SUBJECTS)))
