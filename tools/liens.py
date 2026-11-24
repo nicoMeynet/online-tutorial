@@ -22,6 +22,7 @@ DATES = maj.Dates()
 ROOT = Path(__file__).resolve().parent.parent
 
 TOPICS = [
+    ("les opérations posées", "les-operations-posees.html"),
     ("les constructions à la règle et au compas", "les-constructions-a-la-regle-et-au-compas.html"),
     ("les constructions", "les-constructions-a-la-regle-et-au-compas.html"),
     ("les projections et les vues", "les-projections-et-les-vues.html"),

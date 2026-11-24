@@ -1,0 +1,1635 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Les opérations posées</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels de maths, marge rouge. Accent violet (#6d28d9, encre #5b21b6 pour le texte). Dans les calculs posés : retenues en petit et en rouge, colonne en cours surlignée en jaune, chiffre qu'on vient d'écrire en violet, 0 ajoutés (décalage, zéros après la virgule) en vert d'eau. */
+:root {
+  --paper: #f8f7fc;
+  --grid: #e6e2f3;
+  --card: #ffffff;
+  --ink: #1f1a33;
+  --ink-soft: #5a5373;
+  --acc: #6d28d9;
+  --acc-ink: #5b21b6;
+  --acc-soft: #ede5fc;
+  --two: #0f766e;
+  --two-soft: #d6efeb;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --warn: #d97706;
+  --warn-soft: #fdf0d6;
+  --warn-ink: #92400e;
+  --hl: #fff0a3;
+  --line: #ddd8ec;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #110e1c; --grid: #1c1830; --card: #18142a; --ink: #eeeaf8; --ink-soft: #aea6c8;
+    --acc: #a78bfa; --acc-ink: #c4b5fd; --acc-soft: #2a2148; --two: #5fd0c2; --two-soft: #10322f;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27;
+    --warn: #f5a524; --warn-soft: #3d2a0c; --warn-ink: #fbbf5a; --hl: #4b4318; --line: #2d2745;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #110e1c; --grid: #1c1830; --card: #18142a; --ink: #eeeaf8; --ink-soft: #aea6c8;
+  --acc: #a78bfa; --acc-ink: #c4b5fd; --acc-soft: #2a2148; --two: #5fd0c2; --two-soft: #10322f;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27;
+  --warn: #f5a524; --warn-soft: #3d2a0c; --warn-ink: #fbbf5a; --hl: #4b4318; --line: #2d2745;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero-top { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+.hero-top svg { width: 170px; height: auto; flex: none; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+@media (max-width: 520px) { .box { padding: 16px 14px; } }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note.ok { border-left-color: var(--ok); background: var(--ok-soft); }
+.note.two { border-left-color: var(--two); background: var(--two-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 8px 12px; min-height: 44px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button.main { background: var(--acc); color: var(--card); }
+button[aria-pressed="true"] { background: var(--acc-ink); color: var(--paper); }
+button.ex { font-family: var(--f-mono); font-weight: 600; font-size: .92rem; }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+button:disabled { cursor: default; opacity: .5; }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+input[type="text"] { font: inherit; font-family: var(--f-mono); font-size: 1.05rem; padding: 8px 10px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; min-height: 44px; }
+label { font-weight: 700; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
+.tag.ok { color: var(--ok); }
+.tag.no { color: var(--red); }
+.tag.acc { color: var(--acc-ink); }
+.tag.two { color: var(--two); }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc-ink); }
+.fbk { border-radius: 8px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; min-width: 0; overflow-wrap: anywhere; }
+.fbk:empty { display: none; }
+.fbk.ok { background: var(--ok-soft); }
+.fbk.no { background: var(--red-soft); }
+.fbk.info { background: var(--acc-soft); }
+.fbk.warn { background: var(--warn-soft); }
+.fbk strong { font-family: var(--f-display); }
+.fbk.ok strong { color: var(--ok); }
+.fbk.no strong { color: var(--red); }
+.fbk.info strong { color: var(--acc-ink); }
+.fbk.warn strong { color: var(--warn-ink); }
+.step-n { font-family: var(--f-mono); font-size: .85rem; color: var(--ink-soft); }
+button.right, button.right:disabled { background: var(--ok-soft); border-color: var(--ok); color: var(--ok); opacity: 1; }
+button.wrong, button.wrong:disabled { background: var(--red-soft); border-color: var(--red); color: var(--red); opacity: 1; }
+.choice button { flex: 1 1 130px; }
+.choice button:disabled:not(.right):not(.wrong) { opacity: .55; }
+.card-big { background: var(--paper); border: 1.5px dashed var(--line); border-radius: 10px; padding: 14px; font-family: var(--f-display); font-weight: 700; font-size: 1.15rem; overflow-wrap: anywhere; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.card-big .sheet { background: var(--card); }
+.sorter-end { margin-top: .6rem; }
+.sorter-end strong { font-size: 1.05rem; }
+
+/* Calculs posés en colonnes */
+.sheet { overflow-x: auto; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; padding: 14px 10px; min-width: 0; max-width: 100%; }
+.cols { border-collapse: collapse; margin: 0 auto; font-family: var(--f-mono); font-variant-numeric: tabular-nums; font-size: clamp(1.15rem, 4.6vw, 1.5rem); line-height: 1; }
+.cols td { width: 1.3em; min-width: 1.3em; height: 1.6em; padding: 0; text-align: center; vertical-align: middle; position: relative; font-weight: 600; white-space: nowrap; }
+.cols td.k { color: var(--red); font-size: .62em; vertical-align: bottom; padding-bottom: .15em; }
+.cols td.op { color: var(--ink-soft); }
+.cols td.z { color: var(--two); }
+.cols td.x { color: var(--ink-soft); text-decoration: line-through; text-decoration-color: var(--red); text-decoration-thickness: 2px; }
+.cols td.bad { color: var(--red); }
+.cols td.bt { border-top: 2.5px solid var(--ink); }
+.cols td.bl { border-left: 2.5px solid var(--ink); }
+.cols td.sp { width: .5em; min-width: .5em; }
+.cols td.cur { background: var(--hl); }
+.cols td.nw { color: var(--acc-ink); }
+.cols td.nw.k { color: var(--red); background: var(--hl); }
+.cols .mk { position: absolute; font-style: normal; line-height: 1; pointer-events: none; }
+.cols .mk.tl { top: 1px; left: -2px; font-size: .5em; color: var(--red); }
+.cols .mk.cm { bottom: .12em; right: -.22em; font-size: 1em; color: var(--ink); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: .88rem; color: var(--ink-soft); }
+.legend i { font-style: normal; font-family: var(--f-mono); font-weight: 600; padding: 0 4px; border-radius: 4px; }
+.legend .lk { color: var(--red); }
+.legend .lc { background: var(--hl); color: var(--ink); }
+.legend .ln { color: var(--acc-ink); }
+.legend .lz { color: var(--two); }
+.machine { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.machine .say { min-height: 4.2em; }
+.own { border: 1.5px dashed var(--line); background: var(--paper); padding: 8px 12px; }
+.own summary { font-family: var(--f-display); }
+.pick { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; align-items: end; margin-top: 8px; }
+.pick label { display: flex; flex-direction: column; gap: 4px; font-size: .92rem; }
+.pick .soft { grid-column: 1 / -1; font-size: .88rem; }
+
+/* Tableau des positions */
+table.pos { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+table.pos th, table.pos td { border: 1.5px solid var(--line); padding: 6px 4px; text-align: center; }
+table.pos th { font-family: var(--f-display); background: var(--acc-soft); font-size: .92rem; }
+table.pos td { font-family: var(--f-mono); font-weight: 600; font-size: 1.4rem; height: 2.2em; }
+table.pos th small { display: block; font-family: var(--f-body); font-weight: 400; font-size: .72rem; color: var(--ink-soft); }
+.vals { display: flex; flex-direction: column; gap: 4px; font-family: var(--f-mono); font-size: .95rem; }
+.ladder { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 6px; }
+
+/* Jalousie et méthode égyptienne */
+.lat { width: 100%; max-width: 320px; height: auto; display: block; margin: 0 auto; }
+.lat .cell { fill: var(--card); stroke: var(--ink); stroke-width: 2; }
+.lat .cell.on { fill: var(--hl); }
+.lat .dg { stroke: var(--ink-soft); stroke-width: 1.5; }
+.lat .ext { stroke: var(--ink-soft); stroke-width: 1.2; stroke-dasharray: 4 4; }
+.lat .lab { font-weight: 600; fill: var(--acc-ink); }
+.lat .hot { fill: var(--red); font-weight: 600; }
+.lat .res { fill: var(--acc-ink); font-weight: 600; }
+table.egy { border-collapse: collapse; margin: 0 auto; font-family: var(--f-mono); font-variant-numeric: tabular-nums; font-size: 1.15rem; }
+table.egy th, table.egy td { padding: 6px 14px; border-bottom: 1.5px dashed var(--line); text-align: right; }
+table.egy th { font-family: var(--f-display); font-size: .9rem; color: var(--ink-soft); }
+table.egy tr.pk td { background: var(--hl); font-weight: 600; }
+table.egy td.ck { color: var(--ok); text-align: center; width: 2em; }
+table.egy tr.sum td { border-top: 2.5px solid var(--ink); border-bottom: 0; color: var(--acc-ink); font-weight: 600; }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 200px auto; gap: 10px; align-items: center; }
+.quiz li > span:first-child { min-width: 0; overflow-wrap: anywhere; }
+.quiz select { font: inherit; font-size: .95rem; padding: 6px 6px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; min-height: 44px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb:empty { display: none; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; min-width: 0; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); min-width: 0; overflow-wrap: anywhere; }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+<!--ticons--><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Tutoriels"><script src="progress.js" defer></script><script src="share.js" defer></script><!--/ticons-->
+<style id="tnav-css">
+.tnav-top { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin: 0 0 4px; }
+.tnav-home { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font-weight: 700; font-size: .95rem; text-decoration: none; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tnav-home:hover, .tnav-home:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.tnav-bottom { margin-top: 8px; display: flex; flex-direction: column; gap: 12px; }
+.tnav-bottom h2 { margin: 0; }
+.tnav-pn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tnav-pn a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--ink, #222); border-radius: 10px;
+  background: var(--card, #fff); color: var(--ink, #222); text-decoration: none; box-shadow: 3px 3px 0 var(--ink, #222); min-width: 0; }
+.tnav-pn a span { font-size: .85rem; color: var(--ink-soft, #666); }
+.tnav-pn a strong { overflow-wrap: anywhere; }
+.tnav-pn a.next { text-align: right; grid-column: 2; }
+.tnav-bottom .tnav-home { align-self: center; }
+.tnav-top [data-share] { margin-left: auto; }
+.tnav-short { display: none; }
+.tprint-h { display: none; }
+@media (max-width: 600px) { header.hero { gap: 8px !important; } header.hero > .fig, header.hero > .box.fig, header.hero .hero-top .fig { display: none !important; }
+  header.hero p.lead { font-size: 1rem !important; line-height: 1.5 !important; } header.hero > p.soft { font-size: .88rem !important; line-height: 1.45 !important; }
+  header.hero h1 { font-size: clamp(1.7rem, 8vw, 2.2rem) !important; } }
+.tprint-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 14px 0 0; }
+.tprint-row span { font-size: .9rem; opacity: .8; }
+.tprint { display: inline-flex; align-items: center; gap: 8px; min-height: 42px; padding: 8px 16px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font: inherit; font-weight: 700; cursor: pointer; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tprint:hover, .tprint:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+@media print { [data-tp-hide] { display: none !important; } html.tp-on, html.tp-on body { background: #fff !important; color: #111 !important; padding: 0 !important; margin: 0 !important; }
+  html.tp-on [data-fiche] { color: #111; } html.tp-on [data-fiche] * { color: #111 !important; background: transparent !important; box-shadow: none !important; }
+  html.tp-on .tprint-h { display: block; font-size: 1.4rem; font-weight: 800; margin: 0 0 10px; } .tprint-row { display: none !important; } }
+@media (max-width: 520px) { .tnav-top .tnav-long { display: none; } .tnav-top .tnav-short { display: inline; } .tnav-top { flex-wrap: nowrap; } .tnav-top > * { flex: none; } }
+.tnav-end { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+@media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
+.diff { font: 700 .72rem/1.2 var(--f-mono, monospace); padding: 2px 8px; border-radius: 99px; border: 1.5px solid; white-space: nowrap; }
+.diff.d1 { color: #15803d; border-color: #15803d; background: #dcf3e3; }
+.diff.d2 { color: #a15c07; border-color: #b45309; background: #fbe7cf; }
+.diff.d3 { color: #b91c1c; border-color: #b91c1c; background: #fde2e2; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root:not([data-theme="light"]) .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root:not([data-theme="light"]) .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; } }
+:root[data-theme="dark"] .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root[data-theme="dark"] .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root[data-theme="dark"] .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; }
+</style>
+</head>
+<body>
+<main class="page">
+<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="maths.html">← <span class="tnav-long">Tous les tutoriels de maths</span><span class="tnav-short">Maths</span></a><span class="diff d1" title="Difficulté : facile">Facile</span><button type="button" data-share hidden>Partager</button></nav><!--/tnav-->
+
+
+  <header class="hero">
+    <div class="hero-top">
+      <svg class="fig" viewBox="0 0 200 170" aria-hidden="true">
+        <rect x="4" y="4" width="192" height="162" rx="10" fill="var(--card)" stroke="var(--ink)" stroke-width="2"/>
+        <text x="100" y="40" font-size="15" text-anchor="middle" style="fill:var(--red);font-weight:600">1</text>
+        <text x="70" y="40" font-size="15" text-anchor="middle" style="fill:var(--red);font-weight:600">1</text>
+        <text x="70" y="74" font-size="26" text-anchor="middle">4</text><text x="100" y="74" font-size="26" text-anchor="middle">7</text><text x="130" y="74" font-size="26" text-anchor="middle">8</text>
+        <text x="40" y="108" font-size="26" text-anchor="middle" style="fill:var(--ink-soft)">+</text>
+        <text x="70" y="108" font-size="26" text-anchor="middle">3</text><text x="100" y="108" font-size="26" text-anchor="middle">5</text><text x="130" y="108" font-size="26" text-anchor="middle">6</text>
+        <line x1="28" y1="120" x2="150" y2="120" stroke="var(--ink)" stroke-width="3"/>
+        <text x="70" y="152" font-size="26" text-anchor="middle" style="fill:var(--acc-ink);font-weight:600">8</text><text x="100" y="152" font-size="26" text-anchor="middle" style="fill:var(--acc-ink);font-weight:600">3</text><text x="130" y="152" font-size="26" text-anchor="middle" style="fill:var(--acc-ink);font-weight:600">4</text>
+      </svg>
+      <div style="display:flex;flex-direction:column;gap:10px;min-width:0;flex:1 1 280px">
+        <span class="eyebrow">Tutoriel de maths · niveau 8H–9H</span>
+        <h1>Calculer par écrit, en colonnes</h1>
+        <p class="lead">Additions, soustractions, multiplications et divisions « posées » : chaque chiffre à sa place, les retenues en petit, et une machine qui te montre chaque étape, pour les nombres que tu veux.</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · Pourquoi à la main ?</span>
+    <h2>Pourquoi encore calculer à la main ?</h2>
+    <p>Tu as une calculatrice dans ton téléphone. Alors pourquoi apprendre à poser une opération ? Parce que ça sert bien plus souvent qu'on ne le croit.</p>
+    <div class="cards">
+      <div class="box"><span class="tag acc">Comprendre</span><strong>Savoir ce qu'on fait</strong><span class="soft">Poser un calcul, c'est voir comment marchent les nombres : les unités, les dizaines, les centaines. Ça aide ensuite pour les décimaux, les fractions, l'algèbre.</span></div>
+      <div class="box"><span class="tag acc">Estimer</span><strong>Avoir une idée du résultat</strong><span class="soft">Quelqu'un qui sait calculer sent tout de suite qu'un résultat est « trop grand » ou « trop petit ».</span></div>
+      <div class="box"><span class="tag acc">Vérifier</span><strong>La calculatrice ne se trompe pas… toi, si</strong><span class="soft">Une touche ratée, une virgule oubliée, et la calculatrice affiche un résultat faux. Savoir calculer, c'est savoir repérer l'erreur.</span></div>
+      <div class="box"><span class="tag acc">Sans machine</span><strong>Les tests sans calculatrice</strong><span class="soft">À l'école, beaucoup de travaux écrits et d'épreuves se font, au moins en partie, sans calculatrice.</span></div>
+    </div>
+
+    <h3 style="font-size:1.4rem;margin-top:8px">La règle d'or : unités sous unités</h3>
+    <p>Dans un nombre, chaque chiffre a une valeur qui dépend de sa <strong>position</strong>. Dans 352, le 3 vaut 300 (3 centaines), le 5 vaut 50 (5 dizaines) et le 2 vaut 2 (2 unités). Quand on pose une opération, on écrit les nombres <strong>alignés à droite</strong> : les unités sous les unités, les dizaines sous les dizaines, et ainsi de suite.</p>
+    <div class="box">
+      <h3>Le tableau des positions</h3>
+      <p class="soft">Choisis un nombre : regarde où va chaque chiffre et ce qu'il vaut.</p>
+      <div class="btns" id="posBtns" role="group" aria-label="Choisir un nombre"></div>
+      <div style="overflow-x:auto"><table class="pos" id="posTable" aria-live="polite"></table></div>
+      <div class="vals" id="posVals"></div>
+    </div>
+    <div class="box">
+      <h3>Bien aligné, ou pas ?</h3>
+      <p class="soft">On veut calculer 352 + 47. Compare les deux façons de poser.</p>
+      <div class="btns" role="group" aria-label="Façon de poser">
+        <button type="button" id="alGood" aria-pressed="true">Aligné à droite</button>
+        <button type="button" id="alBad" aria-pressed="false">Aligné à gauche</button>
+      </div>
+      <div class="sheet" id="alSheet"></div>
+      <div class="fbk" id="alOut" aria-live="polite"></div>
+    </div>
+    <p class="soft">Ici, on pose une opération à la fois. Pour enchaîner plusieurs opérations dans une même ligne (comme 2 + 3 × 4), il y a des règles : c'est le tutoriel sur <a class="tlink" href="les-priorites-de-calcul.html">les priorités de calcul</a>.</p>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · L'addition</span>
+    <h2>L'addition posée et ses retenues</h2>
+    <p>On additionne <strong>colonne par colonne</strong>, en commençant <strong>par la droite</strong> (les unités). Quand une colonne fait 10 ou plus, on écrit seulement le chiffre des unités, et on <strong>retient</strong> le reste : on l'écrit en petit en haut de la colonne suivante.</p>
+    <div class="note">
+      <span class="note-title">Pourquoi on retient ?</span>
+      <span>Parce que <strong>10 unités font 1 dizaine</strong>. Si la colonne des unités donne 14, ça fait 1 dizaine et 4 unités : on écrit 4, et la dizaine part dans la colonne des dizaines. Même chose plus loin : 10 dizaines font 1 centaine.</span>
+    </div>
+    <div class="box">
+      <h3>La machine à additionner</h3>
+      <p class="soft">Choisis un exemple ou touche « Autre calcul », puis avance avec « Suivant ». Tu peux aussi écrire tes nombres (jusqu'à 3 nombres de 6 chiffres).</p>
+      <div class="machine" id="mAdd"></div>
+      <div class="legend"><span><i class="lk">1</i> retenue</span><span><i class="lc">7</i> colonne en cours</span><span><i class="ln">4</i> chiffre qu'on vient d'écrire</span></div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · La soustraction</span>
+    <h2>La soustraction posée : deux méthodes</h2>
+    <p>On pose le <strong>plus grand nombre en haut</strong>, unités sous unités, et on commence par la droite. Le problème arrive quand le chiffre du haut est plus petit que celui du bas, par exemple dans 52 − 27 : on ne peut pas faire 2 − 7. Il existe <strong>deux méthodes</strong>, toutes les deux justes.</p>
+    <div class="cards">
+      <div class="box">
+        <span class="tag acc">Méthode 1</span><strong>L'emprunt : on « casse » une dizaine</strong>
+        <span class="soft">On prend 1 dizaine dans la colonne voisine et on la transforme en 10 unités. Dans 52 − 27 : le 5 devient 4, et le 2 devient 12. 12 − 7 = 5, puis 4 − 2 = 2. Résultat : <strong>25</strong>.</span>
+      </div>
+      <div class="box">
+        <span class="tag two">Méthode 2</span><strong>La compensation : + 10 en haut, + 1 en bas</strong>
+        <span class="soft">On ajoute 10 unités en haut (2 devient 12) et, pour compenser, 1 dizaine en bas (le 2 de 27 devient 3). 12 − 7 = 5, puis 5 − 3 = 2. Résultat : <strong>25</strong> aussi.</span>
+      </div>
+    </div>
+    <div class="note two">
+      <span class="note-title">Pourquoi la compensation marche</span>
+      <span>Si on ajoute la même quantité aux deux nombres, l'écart entre eux ne change pas. C'est comme l'âge : dans 10 ans, la différence d'âge entre toi et ton frère sera toujours la même. Ici, on ajoute 10 aux deux nombres (10 unités en haut, 1 dizaine en bas).</span>
+    </div>
+    <div class="note">
+      <span class="note-title">Laquelle choisir ?</span>
+      <span>En Suisse romande, selon l'école et l'enseignant ou l'enseignante, on apprend l'une ou l'autre. Les deux donnent le même résultat : <strong>utilise celle de ta classe</strong>. La machine sait faire les deux.</span>
+    </div>
+    <div class="box">
+      <h3>La machine à soustraire</h3>
+      <div class="machine" id="mSub"></div>
+      <div class="legend"><span><i class="lk">4</i> nouveau chiffre (emprunt) ou ajout (compensation)</span><span><i class="lc">2</i> colonne en cours</span></div>
+    </div>
+    <div class="note ok">
+      <span class="note-title">Vérifier avec une addition</span>
+      <span>Si 523 − 187 = 336, alors 336 + 187 doit redonner 523. La soustraction et l'addition sont des opérations « inverses » : l'une défait ce que fait l'autre.</span>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · Multiplier par un chiffre</span>
+    <h2>Les tables, puis la multiplication posée</h2>
+    <p>Pour multiplier en colonnes, il faut connaître ses <strong>tables de multiplication</strong> jusqu'à 9 × 9. Bonne nouvelle : il y en a moins à apprendre qu'on ne croit.</p>
+    <div class="cards">
+      <div class="box"><strong>L'ordre ne compte pas</strong><span class="soft">7 × 8 = 8 × 7 = 56. Si tu connais l'un, tu connais l'autre : ça fait presque deux fois moins de calculs à retenir.</span></div>
+      <div class="box"><strong>Les faciles</strong><span class="soft">× 1 ne change rien, × 2 c'est le double, × 5 finit par 0 ou 5, × 10 ajoute un 0.</span></div>
+      <div class="box"><strong>L'astuce du 9</strong><span class="soft">Dans la table de 9, les chiffres du résultat font 9 : 9 × 7 = 63 et 6 + 3 = 9. Et le chiffre des dizaines est 7 − 1 = 6.</span></div>
+      <div class="box"><strong>Les plus difficiles</strong><span class="soft">6 × 7 = 42, 6 × 8 = 48, 7 × 7 = 49, 7 × 8 = 56, 8 × 8 = 64, 7 × 9 = 63, 8 × 9 = 72. À répéter souvent !</span></div>
+    </div>
+    <p>Ensuite, on multiplie <strong>chaque chiffre du haut</strong> par le chiffre du bas, de droite à gauche. Comme pour l'addition, si on dépasse 9, on écrit les unités et on <strong>retient</strong> les dizaines, qu'on ajoute au produit suivant.</p>
+    <div class="box">
+      <h3>La machine à multiplier (par un chiffre)</h3>
+      <div class="machine" id="mMul1"></div>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Multiplier par un grand nombre</span>
+    <h2>Les lignes intermédiaires et le décalage</h2>
+    <p>Pour 345 × 26, on fait une ligne par chiffre de 26 : d'abord 345 × 6, puis 345 × 20. Enfin, on <strong>additionne</strong> les lignes.</p>
+    <div class="note">
+      <span class="note-title">Pourquoi on décale (ou on écrit un 0)</span>
+      <span>Le 2 de 26 n'est pas un 2 : c'est 2 dizaines, donc <strong>20</strong>. Or <strong>× 20 = × 2 × 10</strong>, et multiplier par 10 ajoute un 0 à droite. Sur la deuxième ligne, on écrit donc d'abord un <strong>0 dans la colonne des unités</strong>, puis on multiplie par 2. Pour le chiffre des centaines, on écrit deux 0 (× 300 = × 3 × 100). Certains laissent la case vide ou mettent un point au lieu du 0 : c'est la même idée, on décale d'un rang.</span>
+    </div>
+    <div class="box">
+      <h3>La machine à multiplier (jusqu'à 4 chiffres × 3 chiffres)</h3>
+      <div class="machine" id="mMulN"></div>
+      <div class="legend"><span><i class="lz">0</i> 0 du décalage</span><span><i class="lk">1</i> retenue</span><span><i class="lc">5</i> en cours</span></div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · La division</span>
+    <h2>La division posée, dans la « potence »</h2>
+    <p>Diviser, c'est chercher <strong>combien de fois</strong> un nombre entre dans un autre. Quatre mots à connaître, avec l'exemple 745 : 3 :</p>
+    <div class="cards">
+      <div class="box"><span class="tag acc">745</span><strong>Le dividende</strong><span class="soft">le nombre qu'on partage.</span></div>
+      <div class="box"><span class="tag acc">3</span><strong>Le diviseur</strong><span class="soft">en combien de parts on partage (ou la taille d'une part).</span></div>
+      <div class="box"><span class="tag acc">248</span><strong>Le quotient</strong><span class="soft">le résultat : combien de fois 3 entre dans 745.</span></div>
+      <div class="box"><span class="tag acc">1</span><strong>Le reste</strong><span class="soft">ce qui reste à la fin. Il est toujours <strong>plus petit que le diviseur</strong>.</span></div>
+    </div>
+    <p>En Suisse romande (comme en France), on pose la division dans une <strong>« potence »</strong> : le dividende à gauche, le diviseur à droite en haut, le quotient sous le diviseur, et les soustractions successives sous le dividende. Puis on répète toujours les mêmes gestes :</p>
+    <ol class="ladder">
+      <li><strong>Combien de fois ?</strong> Combien de fois le diviseur entre-t-il dans le nombre qu'on regarde ? On écrit ce chiffre au quotient.</li>
+      <li><strong>Je multiplie</strong> ce chiffre par le diviseur, et j'écris le résultat sous le nombre.</li>
+      <li><strong>Je soustrais</strong> : le reste doit être plus petit que le diviseur.</li>
+      <li><strong>J'abaisse</strong> le chiffre suivant du dividende, et je recommence.</li>
+    </ol>
+    <div class="box">
+      <h3>La machine à diviser</h3>
+      <p class="soft">Diviseur de 1 ou 2 chiffres, dividende jusqu'à 5 chiffres. Avec « Continuer après la virgule », la machine va jusqu'à 3 chiffres après la virgule.</p>
+      <div class="machine" id="mDiv"></div>
+    </div>
+    <div class="note ok">
+      <span class="note-title">La vérification de la division</span>
+      <span><strong>dividende = diviseur × quotient + reste</strong>, et le reste est plus petit que le diviseur. Pour 745 : 3 : 3 × 248 + 1 = 744 + 1 = 745. C'est juste !</span>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Estimer le quotient</span>
+    <h2>Combien de fois ? Les astuces</h2>
+    <p>Avec un diviseur à 2 chiffres, trouver « combien de fois » est la partie la plus difficile. Personne ne connaît la table de 23 ! Voici comment faire :</p>
+    <ol class="ladder">
+      <li><strong>Arrondis le diviseur</strong> : 23, c'est environ 20.</li>
+      <li><strong>Calcule avec le nombre arrondi</strong> : dans 150, combien de fois 20 ? Environ 7 (car 7 × 20 = 140).</li>
+      <li><strong>Essaie</strong> avec le vrai diviseur : 7 × 23 = 161. C'est plus que 150 : trop grand !</li>
+      <li><strong>Ajuste</strong> : 6 × 23 = 138. Ça rentre, et il reste 150 − 138 = 12, plus petit que 23. C'est <strong>6</strong>.</li>
+    </ol>
+    <div class="box">
+      <h3>À toi d'estimer</h3>
+      <div class="btns"><span class="score" id="esScore">Calcul 1 / 8</span><span class="step-n" id="esPos"></span></div>
+      <div class="card-big" id="esCard" aria-live="polite"></div>
+      <div class="btns choice" id="esBtns" role="group" aria-label="Combien de fois ?"></div>
+      <div class="fbk" id="esOut" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="esPrev">← Précédent</button><button type="button" id="esNext">Suivant →</button><button type="button" id="esReset">Recommencer</button></div>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Avec des virgules</span>
+    <h2>Les opérations avec des nombres décimaux</h2>
+    <div class="cards">
+      <div class="box"><span class="tag acc">+ et −</span><strong>Virgule sous virgule</strong><span class="soft">On aligne les <strong>virgules</strong>, et on complète par des 0 pour avoir autant de chiffres après la virgule : 12,5 + 3,75 devient 12,50 + 3,75. Ces 0 ne changent pas le nombre.</span></div>
+      <div class="box"><span class="tag acc">×</span><strong>On compte les chiffres après la virgule</strong><span class="soft">On multiplie <strong>sans les virgules</strong> (2,4 × 1,5 → 24 × 15 = 360). Puis on compte : 1 chiffre après la virgule dans 2,4, 1 dans 1,5, donc 2 en tout : 3,60 = 3,6.</span></div>
+      <div class="box"><span class="tag acc">:</span><strong>On continue après la virgule</strong><span class="soft">Quand il reste quelque chose, on met une virgule au quotient et on ajoute des 0 au dividende (7 = 7,00) : 7 : 4 = 1,75. Parfois, ça ne s'arrête jamais : 10 : 3 = 3,333…</span></div>
+    </div>
+    <div class="box">
+      <h3>La machine à virgules</h3>
+      <div class="machine" id="mDec"></div>
+      <div class="legend"><span><i class="lz">0</i> 0 ajouté</span><span><i class="lk">1</i> retenue</span></div>
+    </div>
+    <p class="soft">Une division, c'est aussi une fraction : 7 : 4 = 7/4 = 1,75. Le lien entre les deux écritures est expliqué dans le tutoriel sur <a class="tlink" href="les-fractions.html">les fractions</a>.</p>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Vérifier</span>
+    <h2>Trois façons de vérifier son résultat</h2>
+    <div class="cards">
+      <div class="box"><span class="tag acc">1</span><strong>L'ordre de grandeur</strong><span class="soft">On arrondit les nombres et on calcule de tête : 387 × 24 ≈ 400 × 20 = 8&#8239;000. Si on trouve 2&#8239;322, c'est beaucoup trop petit ! Les arrondis sont expliqués dans le tutoriel sur <a class="tlink" href="les-arrondis-et-ordres-de-grandeur.html">les arrondis</a> et ordres de grandeur.</span></div>
+      <div class="box"><span class="tag acc">2</span><strong>L'opération inverse</strong><span class="soft">On « défait » le calcul : pour une soustraction, on additionne ; pour une multiplication, on divise ; pour une division, on multiplie.</span></div>
+      <div class="box"><span class="tag two">Pour aller plus loin</span><strong>La preuve par 9</strong><span class="soft">On remplace chaque nombre par le reste de sa division par 9 (en additionnant ses chiffres jusqu'à n'en avoir plus qu'un ; 9 compte comme 0), et on refait l'opération avec ces restes. Si ça ne colle pas, il y a une erreur. Si ça colle, c'est <strong>probablement</strong> juste : elle laisse passer certaines erreurs.</span></div>
+    </div>
+    <div class="box">
+      <h3>Le vérificateur</h3>
+      <p class="soft">Choisis un calcul « déjà fait » (juste ou faux), puis essaie les trois vérifications.</p>
+      <div class="btns" id="vfBtns" role="group" aria-label="Choisir un calcul"></div>
+      <div class="card-big" id="vfCalc" aria-live="polite"></div>
+      <div class="btns" role="group" aria-label="Choisir une vérification">
+        <button type="button" id="vfOg">Ordre de grandeur</button>
+        <button type="button" id="vfInv">Opération inverse</button>
+        <button type="button" id="vfNine">Preuve par 9</button>
+        <button type="button" id="vfShow">Voir la réponse</button>
+      </div>
+      <div class="fbk" id="vfOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · Les erreurs fréquentes</span>
+    <h2>Cinq erreurs à éviter</h2>
+    <div class="cards">
+      <div class="box"><span class="tag no">1</span><strong>Oublier la retenue</strong><span class="soft">On l'a calculée… mais on oublie de l'ajouter à la colonne suivante. Écris-la toujours en petit, en haut.</span></div>
+      <div class="box"><span class="tag no">2</span><strong>Mal aligner</strong><span class="soft">Les nombres doivent être alignés <strong>à droite</strong> (ou sur la virgule), pas à gauche.</span></div>
+      <div class="box"><span class="tag no">3</span><strong>Oublier le décalage</strong><span class="soft">Dans une multiplication, la 2ᵉ ligne commence par un 0 (ou une case vide), la 3ᵉ par deux 0.</span></div>
+      <div class="box"><span class="tag no">4</span><strong>Oublier un 0 au quotient</strong><span class="soft">Quand le diviseur n'entre « 0 fois », il faut écrire 0 au quotient : 618 : 6 = 103, pas 13.</span></div>
+      <div class="box"><span class="tag no">5</span><strong>Soustraire à l'envers</strong><span class="soft">Pour 3 − 7, on n'a pas le droit de faire 7 − 3 ! Il faut emprunter (ou compenser).</span></div>
+    </div>
+    <div class="box">
+      <h3>Trouve l'erreur</h3>
+      <p class="soft">Chaque calcul contient une erreur. Laquelle ?</p>
+      <div class="btns"><span class="score" id="erScore">Calcul 1 / 10</span><span class="step-n" id="erPos"></span></div>
+      <div class="card-big" id="erCard" aria-live="polite"></div>
+      <div class="btns choice" id="erBtns" role="group" aria-label="Quelle erreur ?"></div>
+      <div class="fbk" id="erOut" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="erPrev">← Précédent</button><button type="button" id="erNext">Suivant →</button><button type="button" id="erReset">Recommencer</button></div>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · D'autres façons de faire</span>
+    <h2>Deux méthodes anciennes, pour le plaisir</h2>
+    <p>La méthode en colonnes n'est pas la seule ! Voici deux curiosités. Tu n'as pas besoin de les apprendre, mais elles montrent que les mêmes idées (les positions, les retenues) peuvent s'écrire autrement.</p>
+    <div class="box">
+      <div class="btns" role="group" aria-label="Choisir la méthode">
+        <button type="button" id="oGel" aria-pressed="true">Par jalousie</button>
+        <button type="button" id="oEgy" aria-pressed="false">À l'égyptienne</button>
+      </div>
+      <p class="soft" id="oIntro"></p>
+      <div class="btns"><span class="score" id="oPos"></span></div>
+      <div class="sheet" id="oView"></div>
+      <div class="fbk info" id="oSay" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="oPrev">← Précédent</button><button type="button" id="oNext" class="main">Suivant →</button><button type="button" id="oReset">Recommencer</button></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Les idées reçues</span>
+    <h2>Vrai ou faux ?</h2>
+    <div class="cards">
+      <div class="box"><span class="tag no">Idée reçue</span><strong>« Avec la calculatrice, plus besoin de savoir poser. »</strong><span class="soft">La calculatrice ne sait pas si tu as tapé le bon calcul. Pour repérer une erreur, il faut savoir estimer et calculer. Et beaucoup de tests se font sans elle.</span></div>
+      <div class="box"><span class="tag no">Idée reçue</span><strong>« Il n'y a qu'une bonne façon de soustraire. »</strong><span class="soft">L'emprunt et la compensation sont toutes les deux justes. Il existe aussi d'autres méthodes dans d'autres pays.</span></div>
+      <div class="box"><span class="tag no">Idée reçue</span><strong>« Le reste peut être plus grand que le diviseur. »</strong><span class="soft">Non : si le reste est plus grand (ou égal), c'est que le diviseur entrait encore une fois de plus. Le quotient est trop petit.</span></div>
+      <div class="box"><span class="tag no">Idée reçue</span><strong>« Pour multiplier des décimaux, on aligne les virgules. »</strong><span class="soft">Aligner les virgules, c'est pour l'addition et la soustraction. Pour la multiplication, on multiplie sans virgule, puis on compte les chiffres après la virgule.</span></div>
+      <div class="box"><span class="tag no">Idée reçue</span><strong>« Multiplier rend toujours plus grand. »</strong><span class="soft">Pas avec les décimaux : 8 × 0,5 = 4, c'est plus petit que 8. Multiplier par 0,5, c'est prendre la moitié.</span></div>
+      <div class="box"><span class="tag no">Idée reçue</span><strong>« La preuve par 9 prouve que c'est juste. »</strong><span class="soft">Elle peut seulement montrer qu'il y a une erreur. Deux chiffres inversés ou un décalage oublié passent sans qu'elle les voie.</span></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Le savais-tu ?</span>
+    <h2>Petites histoires de calcul</h2>
+    <div class="cards">
+      <div class="box"><span class="tag two">Mot</span><strong>Des petits cailloux</strong><span class="soft">Le mot « calcul » vient du latin <em>calculus</em>, qui veut dire « petit caillou » : on comptait autrefois avec des cailloux.</span></div>
+      <div class="box"><span class="tag two">Égypte</span><strong>Doubler, encore doubler</strong><span class="soft">Un papyrus égyptien célèbre, le papyrus Rhind (vers 1650 avant notre ère), montre des multiplications faites en doublant, comme dans l'étape 11.</span></div>
+      <div class="box"><span class="tag two">Italie</span><strong>Les volets « jalousies »</strong><span class="soft">La multiplication par jalousie était utilisée en Italie à la fin du Moyen Âge. Sa grille rappelle les volets à lattes qu'on appelle des jalousies.</span></div>
+      <div class="box"><span class="tag two">Monde</span><strong>Chaque pays sa potence</strong><span class="soft">Aux États-Unis ou au Royaume-Uni, on écrit la division autrement : le quotient au-dessus du dividende. Le calcul est le même, seule la disposition change.</span></div>
+      <div class="box"><span class="tag two">Signe</span><strong>Deux points ou ÷ ?</strong><span class="soft">En Suisse romande, on écrit souvent la division avec deux points (745 : 3). Sur les calculatrices, on trouve plutôt le signe ÷ ou la barre /.</span></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Pose les calculs sur une feuille si tu veux, choisis ta réponse, puis vérifie.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Recommencer</button>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À toi de jouer</span>
+    <h2>Six calculs à poser</h2>
+    <p>Pose chaque calcul sur une feuille, puis ouvre la correction pour comparer, colonne par colonne.</p>
+    <div class="exos">
+      <details>
+        <summary>Trois nombres<span class="q">3&#8239;847 + 2&#8239;956 + 708 = ?</span></summary>
+        <div>
+          <div class="sheet" data-w="add:3847,2956,708"></div>
+          <span>Unités : 7 + 6 + 8 = 21, j'écris 1, je retiens 2. Dizaines : 2 + 4 + 5 + 0 = 11, j'écris 1, je retiens 1. Centaines : 1 + 8 + 9 + 7 = 25, j'écris 5, je retiens 2. Milliers : 2 + 3 + 2 = 7.</span>
+          <span>Résultat : <strong>7&#8239;511</strong>.</span>
+        </div>
+      </details>
+      <details>
+        <summary>Des zéros en haut<span class="q">5&#8239;002 − 1&#8239;637 = ?</span></summary>
+        <div>
+          <div class="sheet" data-w="sub:5002,1637"></div>
+          <span>Avec l'emprunt : 2 − 7 est impossible, et il y a des 0 juste à gauche. Je casse 1 millier : le 5 devient 4, les deux 0 deviennent des 9, et j'ai 12 unités. 12 − 7 = 5, 9 − 3 = 6, 9 − 6 = 3, 4 − 1 = 3.</span>
+          <span>Résultat : <strong>3&#8239;365</strong>. Vérification : 3&#8239;365 + 1&#8239;637 = 5&#8239;002.</span>
+        </div>
+      </details>
+      <details>
+        <summary>Par un chiffre<span class="q">487 × 6 = ?</span></summary>
+        <div>
+          <div class="sheet" data-w="mul:487,6"></div>
+          <span>7 × 6 = 42 : j'écris 2, je retiens 4. 8 × 6 = 48, + 4 = 52 : j'écris 2, je retiens 5. 4 × 6 = 24, + 5 = 29 : j'écris 29.</span>
+          <span>Résultat : <strong>2&#8239;922</strong>.</span>
+        </div>
+      </details>
+      <details>
+        <summary>Avec décalage<span class="q">236 × 47 = ?</span></summary>
+        <div>
+          <div class="sheet" data-w="mul:236,47"></div>
+          <span>Première ligne : 236 × 7 = 1&#8239;652. Deuxième ligne : un 0 de décalage, puis 236 × 4 = 944, donc 9&#8239;440. Addition : 1&#8239;652 + 9&#8239;440 = 11&#8239;092.</span>
+          <span>Résultat : <strong>11&#8239;092</strong>. Ordre de grandeur : 200 × 50 = 10&#8239;000, ça colle.</span>
+        </div>
+      </details>
+      <details>
+        <summary>Un 0 caché au quotient<span class="q">9&#8239;156 : 7 = ?</span></summary>
+        <div>
+          <div class="sheet" data-w="div:9156,7"></div>
+          <span>9 : 7 → 1 fois, reste 2. J'abaisse 1 : 21 : 7 → 3 fois, reste 0. J'abaisse 5 : 5 : 7 → <strong>0 fois</strong>, j'écris 0. J'abaisse 6 : 56 : 7 → 8 fois, reste 0.</span>
+          <span>Résultat : <strong>1&#8239;308</strong>, reste 0. Vérification : 7 × 1&#8239;308 = 9&#8239;156.</span>
+        </div>
+      </details>
+      <details>
+        <summary>Les croissants<span class="q">4 croissants coûtent 13 CHF. Combien coûte un croissant ? (13 : 4, en continuant après la virgule)</span></summary>
+        <div>
+          <div class="sheet" data-w="divd:13,4"></div>
+          <span>13 : 4 → 3 fois, reste 1. Je mets une virgule au quotient et j'écris un 0 : 10 : 4 → 2 fois, reste 2. Encore un 0 : 20 : 4 → 5 fois, reste 0.</span>
+          <span>Un croissant coûte <strong>3,25 CHF</strong>. Vérification : 4 × 3,25 = 13.</span>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section data-fiche><!--tprint--><p class="tprint-h">Fiche de révision · Calculer par écrit, en colonnes</p><!--/tprint-->    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• On pose les nombres <strong>alignés à droite</strong> : unités sous unités (ou virgule sous virgule pour les décimaux).</span>
+      <span>• On commence toujours par la <strong>colonne de droite</strong>, sauf pour la division, qui commence par la gauche.</span>
+      <span>• <strong>Addition</strong> : si une colonne fait 10 ou plus, j'écris les unités et je <strong>retiens</strong> les dizaines.</span>
+      <span>• <strong>Soustraction</strong> : emprunt (on casse une dizaine) ou compensation (+ 10 en haut, + 1 en bas). On vérifie avec une addition.</span>
+      <span>• <strong>Multiplication</strong> : une ligne par chiffre du bas, avec le <strong>décalage</strong> (× 20 = × 2 × 10), puis on additionne les lignes.</span>
+      <span>• <strong>Division</strong> : combien de fois ? je multiplie, je soustrais, j'abaisse. Ne pas oublier les 0 au quotient. <strong>Dividende = diviseur × quotient + reste</strong>, avec reste &lt; diviseur.</span>
+      <span>• <strong>Décimaux</strong> : + et − virgule sous virgule ; × sans virgule, puis on compte les chiffres après la virgule.</span>
+      <span>• Toujours <strong>vérifier</strong> : ordre de grandeur, opération inverse.</span>
+    </div>
+  <!--tprint--><p class="tprint-row"><button type="button" class="tprint" data-print><span aria-hidden="true">🖨</span> Imprimer la fiche</button><span>Seulement ce résumé, sur une page.</span></p><!--/tprint-->
+</section>
+
+  <!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"><a class="prev" href="les-priorites-de-calcul.html"><span>← Précédent</span><strong>Les priorités de calcul</strong></a><a class="next" href="les-nombres-relatifs.html"><span>Suivant →</span><strong>Les nombres relatifs</strong></a></div><div class="tnav-end"><a class="tnav-home" href="maths.html">⌂ Tous les tutoriels de maths</a><button type="button" data-share hidden>Partager</button></div></nav><!--/tnav-->
+<footer>Fiche de révision · Les opérations posées<!--tmaj--><span class="tmaj" style="display:block;margin-top:6px;font-size:.85rem;opacity:.85">Dernière mise à jour : 24 novembre 2026 · © 2026 Nicolas Meynet</span><!--/tmaj--></footer>
+</main>
+
+<script>
+(function () {
+  /*
+   * Hooks de test : window.__posees
+   *   Constructeurs de calculs posés (purs, sans DOM). Chacun renvoie
+   *   G = {steps:[{L, R, text, hl, nw, done}], rows, lc, rc, bar, title, ...}
+   *   où L et R sont les cases (gauche, et droite pour la potence) : {"ligne,colonne": {t, k, m}}.
+   *   addBuild(nums, D, zp)          -> addition de 2 ou 3 chaînes de chiffres (D chiffres après la virgule, zp = 0 ajoutés) ; G.result
+   *   subBuild(a, b, method, D, zp)  -> soustraction, method 'emp' (emprunt) ou 'comp' (compensation) ; G.result
+   *   mulBuild(a, b, decA, decB)     -> multiplication avec lignes intermédiaires et décalage ; G.result (avec virgule)
+   *   divBuild(S, dd, d, maxDec)     -> division dans la potence : dividende S (dd décimales), diviseur d, maxDec chiffres après la virgule ;
+   *                                     G.q (chiffres du quotient), G.qDec, G.rem (reste à la dernière étape), G.quotient (texte)
+   *   readRow(G, st, r, right)       -> lit un nombre écrit dans une ligne du dessin (pour les tests)
+   *   gridHtml(G, st, label)         -> le tableau HTML d’une étape
+   *   decBuild(expr)                 -> machine à virgules : '12,5 + 3,75', '2,4 × 1,5', '12,6 : 4'…
+   *   estCards, estCard(d, n)        -> jeu « combien de fois ? » : {k, d, n, a, o, why}
+   *   errCards                       -> jeu « trouve l’erreur » : {k, a, wrong, right, why}
+   *   noCarryAdd, noCarryMul, leftAlignAdd, noShiftMul, reverseSub, dropZero -> les erreurs simulées
+   *   nineRest(n), proof9(op, a, b, r), roughly(n), inverseCheck(op, a, b, r), vfPresets
+   *   gelosia(a, b), egypt(a, b)     -> méthodes par jalousie et égyptienne
+   *   positions(n)                   -> tableau des positions [{name, digit, value}]
+   *   quiz                           -> les 8 questions du quiz
+   */
+  /*ALGO*/
+  var NB = ' ';
+  var COLP = ['unités', 'dizaines', 'centaines', 'milliers', 'dizaines de milliers', 'centaines de milliers', 'millions', 'dizaines de millions'];
+  var COLS1 = ['unité', 'dizaine', 'centaine', 'millier', 'dizaine de milliers', 'centaine de milliers', 'million', 'dizaine de millions'];
+  var DECP = ['dixièmes', 'centièmes', 'millièmes'];
+  var DECS1 = ['dixième', 'centième', 'millième'];
+  var ORD = ['Première', 'Deuxième', 'Troisième'];
+  function colP(p) { return p >= 0 ? COLP[p] : DECP[-p - 1]; }
+  function colS(p) { return p >= 0 ? COLS1[p] : DECS1[-p - 1]; }
+  function rep(ch, n) { var s = ''; for (var i = 0; i < n; i++) s += ch; return s; }
+  function pow10(n) { return Math.pow(10, n); }
+  function escH(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function grpInt(s) { s = String(s).replace(/^0+(?=\d)/, ''); return s.replace(/\B(?=(\d{3})+(?!\d))/g, NB); }
+  /* Nombre écrit à la française : chaîne de chiffres + nombre de chiffres après la virgule. */
+  function nb(d, dec) {
+    d = String(d); dec = dec || 0;
+    while (d.length < dec + 1) d = '0' + d;
+    var ip = d.slice(0, d.length - dec), fp = d.slice(d.length - dec);
+    return grpInt(ip) + (dec ? ',' + fp : '');
+  }
+  function trimDec(d, dec) { d = String(d); while (dec > 0 && d.charAt(d.length - 1) === '0') { d = d.slice(0, -1); dec--; } return [d, dec]; }
+  function nbT(d, dec) { var t = trimDec(d, dec); return nb(t[0], t[1]); }
+
+  /* Une feuille de calcul : des cases (gauche L, droite R) et une liste d’étapes (photos des cases). */
+  function Grid() {
+    var L = {}, R = {}, steps = [];
+    function cell(m, r, c) { var k = r + ',' + c; return m[k] || (m[k] = { t: '', k: '', m: {} }); }
+    var g = {
+      put: function (r, c, t, k, right) {
+        var o = cell(right ? R : L, r, c);
+        var keep = o.k.split(' ').filter(function (x) { return x === 'bt' || x === 'bl'; });
+        o.t = String(t); o.k = [k || 'd'].concat(keep).join(' ');
+        return g;
+      },
+      cls: function (r, c, k, right) { var o = cell(right ? R : L, r, c); if ((' ' + o.k + ' ').indexOf(' ' + k + ' ') < 0) o.k = (o.k ? o.k + ' ' : '') + k; return g; },
+      mark: function (r, c, pos, t, right) { cell(right ? R : L, r, c).m[pos] = String(t); return g; },
+      get: function (r, c, right) { return (right ? R : L)[r + ',' + c] || null; },
+      del: function (r, c, right) { delete (right ? R : L)[r + ',' + c]; },
+      clearRow: function (r) { Object.keys(L).forEach(function (key) { if (+key.split(',')[0] === r) delete L[key]; }); },
+      rule: function (r, c0, c1, right) { for (var c = c0; c <= c1; c++) g.cls(r, c, 'bt', right); return g; },
+      step: function (text, hl, nw, done) { steps.push({ L: JSON.parse(JSON.stringify(L)), R: JSON.parse(JSON.stringify(R)), text: text, hl: hl || [], nw: nw || [], done: !!done }); },
+      finish: function (extra) {
+        var rows = 0, lc = 0, rc = 0;
+        steps.forEach(function (st) {
+          Object.keys(st.L).forEach(function (key) { var a = key.split(','); rows = Math.max(rows, +a[0] + 1); lc = Math.max(lc, +a[1] + 1); });
+          Object.keys(st.R).forEach(function (key) { var a = key.split(','); rows = Math.max(rows, +a[0] + 1); rc = Math.max(rc, +a[1] + 1); });
+        });
+        var G = { steps: steps, rows: rows, lc: lc, rc: rc };
+        for (var x in extra) G[x] = extra[x];
+        return G;
+      }
+    };
+    return g;
+  }
+  function kL(r, c) { return 'L' + r + ',' + c; }
+  function kR(r, c) { return 'R' + r + ',' + c; }
+  function rowKeys(st, r, right) { var m = right ? st.R : st.L, a = []; Object.keys(m).forEach(function (key) { if (+key.split(',')[0] === r && m[key].t !== '') a.push((right ? 'R' : 'L') + key); }); return a; }
+  /* Lit le nombre écrit dans la ligne r (chiffres, et virgule si elle est marquée). */
+  function readRow(G, st, r, right) {
+    var m = right ? st.R : st.L, n = right ? G.rc : G.lc, s = '', dec = -1;
+    for (var c = 0; c < n; c++) {
+      var o = m[r + ',' + c];
+      if (!o || !/^\d$/.test(o.t)) continue;
+      s += o.t;
+      if (dec >= 0) dec++;
+      if (o.m.cm) dec = 0;
+    }
+    return dec > 0 ? s.slice(0, s.length - dec) + ',' + s.slice(s.length - dec) : s;
+  }
+  function tdHtml(o, st, key, extra) {
+    var k = (o ? o.k : '') + (extra || '');
+    if (st.hl.indexOf(key) >= 0) k += ' cur';
+    if (st.nw.indexOf(key) >= 0) k += ' nw';
+    var inner = o ? escH(o.t) : '';
+    if (o) for (var p in o.m) inner += '<i class="mk ' + p + '">' + escH(o.m[p]) + '</i>';
+    k = k.replace(/\s+/g, ' ').trim();
+    return '<td' + (k ? ' class="' + k + '"' : '') + '>' + inner + '</td>';
+  }
+  function gridHtml(G, st, label) {
+    var h = '<table class="cols" role="img" aria-label="' + escH(label || '') + '"><tbody>';
+    for (var r = 0; r < G.rows; r++) {
+      h += '<tr>';
+      for (var c = 0; c < G.lc; c++) h += tdHtml(st.L[r + ',' + c], st, kL(r, c));
+      if (G.rc) {
+        h += '<td class="sp"></td>';
+        for (var x = 0; x < G.rc; x++) h += tdHtml(st.R[r + ',' + x], st, kR(r, x), G.bar ? ((x === 0 && r <= 1 ? ' bl' : '') + (r === 1 ? ' bt' : '')) : '');
+      }
+      h += '</tr>';
+    }
+    return h + '</tbody></table>';
+  }
+  function simplifyNote(d, dec) { var t = trimDec(d, dec); return t[1] < dec ? ' Les 0 à la fin, après la virgule, ne servent à rien : on peut écrire ' + nb(t[0], t[1]) + '.' : ''; }
+
+  /* ---------- Addition ---------- */
+  function addBuild(nums, D, zp) {
+    D = D || 0; zp = zp || [];
+    var n = nums.length, total = 0;
+    nums.forEach(function (s) { total += Number(s); });
+    var res = String(total); while (res.length < D + 1) res = '0' + res;
+    var w = Math.max.apply(null, nums.map(function (s) { return s.length; }).concat([res.length])) + 1;
+    function col(p) { return w - 1 - p; }
+    var g = Grid(), rr = n + 1;
+    nums.forEach(function (s, i) {
+      for (var j = 0; j < s.length; j++) { var p = s.length - 1 - j; g.put(i + 1, col(p), s[j], p < (zp[i] || 0) ? 'd z' : 'd'); }
+      if (D) g.mark(i + 1, col(D), 'cm', ',');
+    });
+    g.put(n, 0, '+', 'op');
+    g.rule(rr, 0, w - 1);
+    if (D) g.mark(rr, col(D), 'cm', ',');
+    var shown = nums.map(function (s, i) { return nb(s.slice(0, s.length - (zp[i] || 0)), D - (zp[i] || 0)); });
+    var title = shown.join(' + ');
+    g.step(D ? 'On pose l’addition virgule sous virgule' + (zp.some(Boolean) ? ', et on complète par des 0 (en vert) pour avoir partout ' + D + ' chiffre' + (D > 1 ? 's' : '') + ' après la virgule : ces 0 ne changent pas les nombres' : '') + '. La virgule du résultat se place sous les autres. On commence par la colonne de droite.'
+      : 'On pose l’addition : unités sous unités, dizaines sous dizaines, et ainsi de suite. On commence par la colonne de droite, celle des unités.', [], []);
+    var carry = 0;
+    for (var p = 0; p < res.length; p++) {
+      var digs = [], hl = [];
+      nums.forEach(function (s, i) { if (p < s.length) { digs.push(+s[s.length - 1 - p]); hl.push(kL(i + 1, col(p))); } });
+      if (carry) hl.push(kL(0, col(p)));
+      var sum = carry, terms = carry ? [carry + ' (retenue)'] : [];
+      digs.forEach(function (x) { sum += x; terms.push(String(x)); });
+      var name = colP(p - D), digit = sum % 10, nc = Math.floor(sum / 10), txt;
+      if (!digs.length) txt = 'Il reste la retenue ' + carry + ' : je l’écris dans la colonne des ' + name + '.';
+      else if (terms.length === 1) txt = 'Colonne des ' + name + ' : il n’y a que ' + terms[0] + ', je l’écris.';
+      else txt = 'Colonne des ' + name + ' : ' + terms.join(' + ') + ' = ' + sum + ' : ' + (nc ? 'j’écris ' + digit + ' et je retiens ' + nc + '.' : 'j’écris ' + digit + '.');
+      g.put(rr, col(p), digit, 'd');
+      var nw = [kL(rr, col(p))];
+      if (nc && p + 1 < res.length) { g.put(0, col(p + 1), nc, 'k'); nw.push(kL(0, col(p + 1))); }
+      hl.push(kL(rr, col(p)));
+      g.step(txt, hl, nw);
+      carry = nc;
+    }
+    g.step('Calcul terminé : ' + title + ' = ' + nb(res, D) + '.' + simplifyNote(res, D), [], [], true);
+    var G = g.finish({ title: title, value: res, D: D });
+    G.result = readRow(G, G.steps[G.steps.length - 1], rr);
+    return G;
+  }
+
+  /* ---------- Soustraction ---------- */
+  function subBuild(a, b, method, D, zp) {
+    D = D || 0; zp = zp || [];
+    var A = Number(a), B = Number(b), res = String(A - B);
+    while (res.length < D + 1) res = '0' + res;
+    var w = Math.max(a.length, b.length) + 1;
+    function col(p) { return w - 1 - p; }
+    var g = Grid();
+    for (var j = 0; j < a.length; j++) { var pa = a.length - 1 - j; g.put(1, col(pa), a[j], pa < (zp[0] || 0) ? 'd z' : 'd'); }
+    for (j = 0; j < b.length; j++) { var pb = b.length - 1 - j; g.put(2, col(pb), b[j], pb < (zp[1] || 0) ? 'd z' : 'd'); }
+    g.put(2, 0, '−', 'op');
+    g.rule(3, 0, w - 1);
+    if (D) { g.mark(1, col(D), 'cm', ','); g.mark(2, col(D), 'cm', ','); g.mark(3, col(D), 'cm', ','); }
+    var aS = nb(a.slice(0, a.length - (zp[0] || 0)), D - (zp[0] || 0)), bS = nb(b.slice(0, b.length - (zp[1] || 0)), D - (zp[1] || 0));
+    var title = aS + ' − ' + bS;
+    g.step('On pose la soustraction : le plus grand nombre en haut, ' + (D ? 'virgule sous virgule' + (zp.some(Boolean) ? ' (avec des 0 en vert pour compléter)' : '') : 'unités sous unités') + '. On commence par la colonne de droite. Méthode : ' + (method === 'comp' ? 'la compensation' : 'l’emprunt') + '.', [], []);
+    var t = [], bb = [], hasB = [];
+    for (var p = 0; p < a.length; p++) { t[p] = +a[a.length - 1 - p]; hasB[p] = p < b.length; bb[p] = hasB[p] ? +b[b.length - 1 - p] : 0; }
+    var c = 0;
+    for (p = 0; p < a.length; p++) {
+      var name = colP(p - D), hl = [kL(1, col(p)), kL(2, col(p))], nw = [], head, tail = '', d;
+      if (g.get(0, col(p))) hl.push(kL(0, col(p)));
+      if (method === 'comp') {
+        var beff = bb[p] + c, top = t[p];
+        var pre = c ? (hasB[p] ? 'en bas, ' + bb[p] + ' + 1 (ajouté) = ' + beff + ' ; ' : 'en bas, il n’y a que le 1 ajouté ; ') : '';
+        if (top >= beff) {
+          d = top - beff;
+          head = 'Colonne des ' + name + ' : ' + pre + (hasB[p] || c ? top + ' − ' + beff + ' = ' + d : 'rien à enlever en bas, il reste ' + top);
+          c = 0;
+        } else {
+          d = top + 10 - beff;
+          head = 'Colonne des ' + name + ' : ' + pre + top + ' − ' + beff + ', c’est impossible. J’ajoute 10 en haut : ' + (top + 10) + ' − ' + beff + ' = ' + d;
+          g.mark(1, col(p), 'tl', '1'); g.mark(2, col(p + 1), 'tl', '+1');
+          nw.push(kL(1, col(p)), kL(2, col(p + 1)));
+          tail = ' Pour compenser, j’ajoute aussi 1 en bas, dans la colonne des ' + colP(p + 1 - D) + '.';
+          c = 1;
+        }
+      } else {
+        var topE = t[p];
+        if (topE < bb[p]) {
+          var jj = p + 1; while (t[jj] === 0) jj++;
+          var oldJ = t[jj]; t[jj]--;
+          for (var m = p + 1; m < jj; m++) t[m] = 9;
+          t[p] += 10;
+          for (m = p; m <= jj; m++) { g.put(0, col(m), t[m], 'k'); g.cls(1, col(m), 'x'); nw.push(kL(0, col(m))); hl.push(kL(1, col(m))); }
+          d = t[p] - bb[p];
+          if (jj === p + 1) head = 'Colonne des ' + name + ' : ' + topE + ' − ' + bb[p] + ', c’est impossible. Je casse 1 ' + colS(p + 1 - D) + ' en 10 ' + name + ' : à côté, ' + oldJ + ' devient ' + t[jj] + ', et ici j’ai ' + t[p] + '. ' + t[p] + ' − ' + bb[p] + ' = ' + d;
+          else head = 'Colonne des ' + name + ' : ' + topE + ' − ' + bb[p] + ', c’est impossible, et juste à côté il y a 0 : rien à casser. Je vais plus loin : je casse 1 ' + colS(jj - D) + ' (' + oldJ + ' devient ' + t[jj] + '), ' + (jj - p - 1 > 1 ? 'les 0 deviennent des 9' : 'le 0 devient 9') + ', et ici j’ai ' + t[p] + '. ' + t[p] + ' − ' + bb[p] + ' = ' + d;
+        } else {
+          d = topE - bb[p];
+          head = 'Colonne des ' + name + ' : ' + (hasB[p] ? topE + ' − ' + bb[p] + ' = ' + d : 'rien à enlever en bas, il reste ' + topE);
+        }
+      }
+      var lead = p >= res.length;
+      if (lead) head += '. C’est un 0 tout à gauche : on ne l’écrit pas.';
+      else { g.put(3, col(p), d, 'd'); nw.push(kL(3, col(p))); hl.push(kL(3, col(p))); head += ' : j’écris ' + d + '.'; }
+      g.step(head + tail, hl, nw);
+    }
+    var rS = nb(res, D);
+    g.step('Calcul terminé : ' + title + ' = ' + rS + '.' + simplifyNote(res, D) + ' Pour vérifier, on fait l’addition : ' + rS + ' + ' + nb(b, D) + ' = ' + nb(a, D) + '.', [], [], true);
+    var G = g.finish({ title: title, value: res, D: D });
+    G.result = readRow(G, G.steps[G.steps.length - 1], 3);
+    return G;
+  }
+
+  /* ---------- Multiplication ---------- */
+  function mulBuild(a, b, decA, decB) {
+    decA = decA || 0; decB = decB || 0;
+    var K = decA + decB, A = Number(a), B = Number(b), P = A * B;
+    var la = a.length, lb = b.length, res = String(P), resFull = res;
+    while (resFull.length < K + 1) resFull = '0' + resFull;
+    var parts = [];
+    for (var j = 0; j < lb; j++) { var bj0 = +b[lb - 1 - j]; parts.push(bj0 ? String(A * bj0) + rep('0', j) : rep('0', la + j)); }
+    var zero = A === 0 || B === 0;
+    var w = Math.max(la, lb, resFull.length, zero ? 1 : Math.max.apply(null, parts.map(function (s) { return s.length; }))) + 1;
+    function col(p) { return w - 1 - p; }
+    var g = Grid(), multi = lb > 1 && !zero, rr = multi ? 3 + lb : 3;
+    for (j = 0; j < la; j++) g.put(1, col(la - 1 - j), a[j], 'd');
+    for (j = 0; j < lb; j++) g.put(2, col(lb - 1 - j), b[j], 'd');
+    g.put(2, 0, '×', 'op');
+    if (decA) g.mark(1, col(decA), 'cm', ',');
+    if (decB) g.mark(2, col(decB), 'cm', ',');
+    g.rule(3, 0, w - 1);
+    if (multi) { g.rule(rr, 0, w - 1); g.put(3 + lb - 1, 0, '+', 'op'); }
+    var aD = nb(a, decA), bD = nb(b, decB), title = aD + ' × ' + bD;
+    var intro = K ? 'On multiplie d’abord sans s’occuper des virgules : ' + nb(a) + ' × ' + nb(b) + '. La virgule viendra à la fin. ' : 'On pose la multiplication, unités sous unités. ';
+    if (zero) {
+      g.step(intro, [], []);
+      g.put(3, col(0), '0', 'd');
+      g.step('Un nombre multiplié par 0 donne toujours 0.', [kL(3, col(0))], [kL(3, col(0))]);
+      g.step('Calcul terminé : ' + title + ' = 0.', [], [], true);
+      var Gz = g.finish({ title: title, value: '0', K: K });
+      Gz.result = readRow(Gz, Gz.steps[Gz.steps.length - 1], 3);
+      return Gz;
+    }
+    g.step(intro + (lb === 1 ? 'On multiplie chaque chiffre de ' + nb(a) + ' par ' + b + ', en commençant par les unités.' : 'On va multiplier ' + nb(a) + ' par chaque chiffre de ' + nb(b) + ', une ligne par chiffre, en commençant par les unités.'), [], []);
+    var hadCarry = false;
+    for (j = 0; j < lb; j++) {
+      var row = 3 + j, bj = +b[lb - 1 - j], bkey = kL(2, col(j)), nwz = [];
+      if (j > 0) g.clearRow(0);
+      if (bj === 0) {
+        for (var z = 0; z < la + j; z++) { g.put(row, col(z), '0', 'd z'); nwz.push(kL(row, col(z))); }
+        g.step((lb > 1 ? ORD[j] + ' ligne : le' : 'Le') + ' chiffre des ' + colP(j) + ' de ' + nb(b) + ' est 0. ' + nb(a) + ' × 0 = 0 : toute la ligne est faite de 0. (On peut aussi la sauter, mais alors il faut décaler la ligne suivante d’un rang de plus.)' + (hadCarry ? ' J’efface les anciennes retenues.' : ''), [bkey], nwz);
+        hadCarry = false;
+        continue;
+      }
+      if (j > 0) {
+        for (z = 0; z < j; z++) { g.put(row, col(z), '0', 'd z'); nwz.push(kL(row, col(z))); }
+        var real = bj * pow10(j);
+        g.step(ORD[j] + ' ligne : je multiplie par le chiffre des ' + colP(j) + ', ' + bj + '. En réalité, il vaut ' + nb(String(real)) + ', et × ' + nb(String(real)) + ' = × ' + bj + ' × ' + nb(String(pow10(j))) + '. Je commence donc par écrire ' + (j === 1 ? 'un 0 dans la colonne des unités : on décale d’un rang.' : 'deux 0 : on décale de deux rangs.') + (hadCarry ? ' J’efface aussi les anciennes retenues.' : ''), [bkey], nwz);
+      } else if (lb > 1) g.step('Première ligne : je multiplie ' + nb(a) + ' par le chiffre des unités, ' + bj + '.', [bkey], []);
+      hadCarry = false;
+      var c = 0;
+      for (var i = 0; i < la; i++) {
+        var ai = +a[la - 1 - i], pr = ai * bj, s = pr + c, hl = [kL(1, col(i)), bkey], nw = [], txt;
+        if (c) hl.push(kL(0, col(i)));
+        var head = ai + ' × ' + bj + ' = ' + pr + (c ? ', plus la retenue ' + c + ' : ' + pr + ' + ' + c + ' = ' + s : '');
+        if (i < la - 1) {
+          var dg = s % 10, nc = Math.floor(s / 10);
+          g.put(row, col(i + j), dg, 'd'); nw.push(kL(row, col(i + j)));
+          if (nc) { g.put(0, col(i + 1), nc, 'k'); nw.push(kL(0, col(i + 1))); hadCarry = true; }
+          txt = head + ' : j’écris ' + dg + (nc ? ' et je retiens ' + nc : '') + '.';
+          c = nc;
+        } else {
+          var ss = String(s);
+          for (var q = 0; q < ss.length; q++) { g.put(row, col(i + j + ss.length - 1 - q), ss[q], 'd'); nw.push(kL(row, col(i + j + ss.length - 1 - q))); }
+          txt = head + (s >= 10 ? ' : c’est le dernier chiffre, j’écris ' + s + ' en entier.' : ' : j’écris ' + s + '.');
+        }
+        g.step(txt, hl.concat(nw), nw);
+      }
+    }
+    if (multi) {
+      g.clearRow(0);
+      g.step('J’additionne maintenant les ' + lb + ' lignes, colonne par colonne, en commençant par la droite. (J’efface les retenues de la multiplication.)', [], []);
+      var carry = 0;
+      for (var pp = 0; pp < res.length; pp++) {
+        var digs = [], hla = [];
+        parts.forEach(function (s, jx) { if (pp < s.length) { digs.push(+s[s.length - 1 - pp]); hla.push(kL(3 + jx, col(pp))); } });
+        var sum = carry, terms = carry ? [carry + ' (retenue)'] : [];
+        digs.forEach(function (x) { sum += x; terms.push(String(x)); });
+        var name = colP(pp), digit = sum % 10, ncc = Math.floor(sum / 10), ta;
+        if (!digs.length) ta = 'Addition : il reste la retenue ' + carry + ', je l’écris dans la colonne des ' + name + '.';
+        else if (terms.length === 1) ta = 'Addition, colonne des ' + name + ' : il n’y a que ' + terms[0] + ', je l’écris.';
+        else ta = 'Addition, colonne des ' + name + ' : ' + terms.join(' + ') + ' = ' + sum + ' : ' + (ncc ? 'j’écris ' + digit + ' et je retiens ' + ncc + '.' : 'j’écris ' + digit + '.');
+        g.put(rr, col(pp), digit, 'd');
+        var nwa = [kL(rr, col(pp))];
+        if (ncc && pp + 1 < res.length) { g.mark(3, col(pp + 1), 'tl', ncc); nwa.push(kL(3, col(pp + 1))); }
+        g.step(ta, hla.concat([kL(rr, col(pp))]), nwa);
+        carry = ncc;
+      }
+    }
+    if (K) {
+      var nwk = [];
+      for (var e = res.length; e <= K; e++) { g.put(rr, col(e), '0', 'd z'); nwk.push(kL(rr, col(e))); }
+      g.mark(rr, col(K), 'cm', ',');
+      var who = [];
+      if (decA) who.push(decA + ' chiffre' + (decA > 1 ? 's' : '') + ' après la virgule dans ' + aD);
+      if (decB) who.push(decB + ' dans ' + bD);
+      g.step('Je place la virgule : il y a ' + who.join(' et ') + (who.length > 1 ? ', donc ' + K + ' en tout' : '') + '. Je compte ' + K + ' chiffre' + (K > 1 ? 's' : '') + ' depuis la droite : ' + nb(resFull, K) + '.' + (nwk.length ? ' Il manquait des chiffres : je complète par des 0 devant.' : '') + simplifyNote(resFull, K), [], nwk.concat([kL(rr, col(K))]));
+    }
+    g.step('Calcul terminé : ' + title + ' = ' + nbT(resFull, K) + '.', [], [], true);
+    var G = g.finish({ title: title, value: resFull, K: K });
+    G.result = readRow(G, G.steps[G.steps.length - 1], rr);
+    return G;
+  }
+
+  /* ---------- Division (potence) ---------- */
+  function divBuild(S, dd, d, maxDec) {
+    dd = dd || 0; maxDec = Math.max(maxDec || 0, dd);
+    var digs = S.split('').map(Number), u = digs.length - dd - 1, g = Grid();
+    var Nd = nb(S, dd), dS = String(d), title = Nd + ' : ' + d;
+    digs.forEach(function (x, i) { g.put(0, i + 1, x, 'd'); });
+    if (dd) g.mark(0, u + 1, 'cm', ',');
+    dS.split('').forEach(function (x, i) { g.put(0, i, x, 'd', true); });
+    g.step('On pose la division dans la « potence » : le dividende ' + Nd + ' à gauche, le diviseur ' + d + ' à droite. Le quotient s’écrira sous le diviseur, sous le trait.', [], []);
+    var k = 0, cur = digs[0];
+    while (cur < d && k < u) { k++; cur = cur * 10 + digs[k]; }
+    var k0 = k, hl0 = [];
+    for (var i = 0; i <= k; i++) hl0.push(kL(0, i + 1));
+    var t0;
+    if (cur < d) t0 = 'La partie entière du dividende, ' + nb(String(cur)) + ', est plus petite que ' + d + ' : elle contient 0 fois ' + d + '.';
+    else if (k === 0) t0 = 'Je regarde le début du dividende : ' + cur + ' contient au moins une fois ' + d + ', ça suffit pour commencer.';
+    else t0 = 'Je regarde le début du dividende : ' + digs[0] + ' est plus petit que ' + d + ', c’est trop peu. Je prends ' + (k + 1) + ' chiffres : ' + nb(String(cur)) + '.';
+    g.step(t0, hl0, []);
+    var q = [], curRow = 0, rows = 1, guard = 0;
+    function numKeys(r, end) { var a = []; for (var c = 1; c <= end; c++) { var o = g.get(r, c); if (o && /^\d$/.test(o.t)) a.push(kL(r, c)); } return a; }
+    function curKeys() { return curRow === 0 ? hl0.length && k === k0 ? hl0 : numKeys(0, k + 1) : numKeys(curRow, k + 1); }
+    while (guard++ < 60) {
+      var qd = Math.floor(cur / d), x = q.length;
+      q.push(qd);
+      g.put(1, x, qd, 'd', true);
+      var cs = nb(String(cur)), txt;
+      if (qd === 0) txt = 'Combien de fois ' + d + ' dans ' + cs + ' ? 0 fois, car ' + cs + ' est plus petit que ' + d + '. J’écris 0 au quotient' + (x > 0 ? ' : surtout, ne l’oublie pas !' : '.');
+      else txt = 'Combien de fois ' + d + ' dans ' + cs + ' ? ' + qd + ' fois, car ' + qd + ' × ' + d + ' = ' + nb(String(qd * d)) + (qd < 9 ? ', et ' + (qd + 1) + ' × ' + d + ' = ' + nb(String((qd + 1) * d)) + ', c’est trop' : '') + '. J’écris ' + qd + ' au quotient.';
+      g.step(txt, curKeys().concat([kR(1, x)]), [kR(1, x)]);
+      if (qd > 0) {
+        var pS = String(qd * d), pr = rows++, end = k + 1, nwp = [];
+        for (var j = 0; j < pS.length; j++) { g.put(pr, end - pS.length + 1 + j, pS[j], 'd'); nwp.push(kL(pr, end - pS.length + 1 + j)); }
+        g.put(pr, end - pS.length, '−', 'op');
+        var before = curKeys();
+        g.step('Je multiplie : ' + qd + ' × ' + d + ' = ' + nb(pS) + '. Je l’écris sous ' + cs + ', aligné à droite.', [kR(1, x)].concat(nwp), nwp);
+        var r = cur - qd * d, rS = String(r), rr = rows++, nwr = [];
+        g.rule(rr, end - pS.length + 1, end);
+        for (j = 0; j < rS.length; j++) { g.put(rr, end - rS.length + 1 + j, rS[j], 'd'); nwr.push(kL(rr, end - rS.length + 1 + j)); }
+        g.step('Je soustrais : ' + cs + ' − ' + nb(pS) + ' = ' + nb(rS) + '. Le reste, ' + nb(rS) + ', est bien plus petit que ' + d + '.', before.concat(nwp, nwr), nwr);
+        cur = r; curRow = rr;
+      }
+      var hasNext = k + 1 < digs.length;
+      if (hasNext || (cur !== 0 && digs.length - 1 - u < maxDec)) {
+        var added = !hasNext, firstDec = k === u, nwa = [];
+        if (added) { digs.push(0); g.put(0, digs.length, '0', 'd z'); nwa.push(kL(0, digs.length)); }
+        if (firstDec) { if (!dd) g.mark(0, u + 1, 'cm', ','); g.mark(1, q.length - 1, 'cm', ',', true); nwa.push(kR(1, q.length - 1)); }
+        var nx = digs[k + 1], ncur = cur * 10 + nx, tx = '';
+        if (firstDec && !added) tx = 'Je passe la virgule du dividende : je mets aussi une virgule au quotient. ';
+        if (added) tx = firstDec ? 'Il n’y a plus de chiffre à abaisser, mais il reste ' + nb(String(cur)) + '. Pour continuer, je mets une virgule au quotient et j’écris un 0 après la virgule du dividende (' + Nd + ' = ' + Nd + ',0). ' : 'Il reste encore ' + nb(String(cur)) + ' : j’écris un autre 0 au dividende. ';
+        if (curRow === 0) tx += 'Je prends aussi le chiffre suivant, ' + nx + ' : j’ai ' + nb(String(ncur)) + '.';
+        else { g.put(curRow, k + 2, nx, 'd'); nwa.push(kL(curRow, k + 2)); tx += 'J’abaisse le ' + nx + ' : j’ai ' + nb(String(ncur)) + '.'; }
+        k++; cur = ncur;
+        g.step(tx, [kL(0, k + 1)].concat(curKeys()), nwa);
+        continue;
+      }
+      break;
+    }
+    var qS = q.join(''), qDec = q.length - 1 - (u - k0), qT = nb(qS, qDec), fin;
+    if (qDec === 0) {
+      fin = cur === 0 ? 'Calcul terminé : ' + title + ' = ' + qT + '. Le reste est 0 : la division « tombe juste ». Vérification : ' + d + ' × ' + qT + ' = ' + Nd + '.'
+        : 'Calcul terminé : ' + title + ' = ' + qT + ', reste ' + nb(String(cur)) + '. Vérification : ' + d + ' × ' + qT + ' + ' + nb(String(cur)) + ' = ' + Nd + ', et le reste ' + nb(String(cur)) + ' est bien plus petit que ' + d + '.';
+    } else if (cur === 0) fin = 'Calcul terminé : ' + title + ' = ' + qT + '. Le reste est 0 : la division s’arrête. Vérification : ' + d + ' × ' + qT + ' = ' + Nd + '.';
+    else {
+      var rounded = String(Number(qS) + (2 * cur >= d ? 1 : 0));
+      fin = 'Calcul terminé : je m’arrête à ' + qDec + ' chiffre' + (qDec > 1 ? 's' : '') + ' après la virgule. ' + title + ' ≈ ' + qT + '… Le reste n’est pas 0 : on pourrait continuer encore. Arrondi au ' + DECS1[qDec - 1] + ' : ' + title + ' ≈ ' + nb(rounded, qDec) + '.';
+    }
+    g.step(fin, [], [], true);
+    return g.finish({ title: title, bar: true, q: qS, qDec: qDec, rem: cur, quotient: qT, S: S, dd: dd, d: d, digsLen: digs.length });
+  }
+
+  /* ---------- Machine à virgules ---------- */
+  function parseDec(s) {
+    s = String(s).replace(/\s/g, '');
+    if (!/^\d+(,\d+)?$/.test(s)) throw new Error('« ' + s + ' » n’est pas un nombre que je comprends.');
+    var p = s.split(','), ip = p[0].replace(/^0+(?=\d)/, ''), fp = p[1] || '';
+    return { ip: ip, fp: fp, dec: fp.length };
+  }
+  function decBuild(expr) {
+    var m = String(expr).replace(/\s/g, '').match(/^([\d,]+)([+−\-×x*:\/])([\d,]+)$/);
+    if (!m) throw new Error('Je ne comprends pas ce calcul.');
+    var op = m[2] === '-' ? '−' : (m[2] === 'x' || m[2] === '*') ? '×' : m[2] === '/' ? ':' : m[2];
+    var A = parseDec(m[1]), B = parseDec(m[3]);
+    if (op === '+' || op === '−') {
+      var D = Math.max(A.dec, B.dec);
+      var sa = A.ip + A.fp + rep('0', D - A.dec), sb = B.ip + B.fp + rep('0', D - B.dec);
+      if (op === '+') return addBuild([sa, sb], D, [D - A.dec, D - B.dec]);
+      if (Number(sb) > Number(sa)) throw new Error('Le premier nombre doit être le plus grand.');
+      return subBuild(sa, sb, 'emp', D, [D - A.dec, D - B.dec]);
+    }
+    if (op === '×') {
+      var da = (A.ip + A.fp).replace(/^0+(?=\d)/, ''), db = (B.ip + B.fp).replace(/^0+(?=\d)/, '');
+      return mulBuild(da, db, A.dec, B.dec);
+    }
+    if (B.dec) throw new Error('Ici, on divise seulement par un nombre entier.');
+    var dv = Number(B.ip);
+    if (!dv) throw new Error('On ne peut pas diviser par 0 !');
+    return divBuild(A.ip + A.fp, A.dec, dv, 3);
+  }
+
+  /* ---------- Estimer le quotient ---------- */
+  function estCard(d, n) {
+    var a = Math.floor(n / d), dr = Math.max(10, Math.round(d / 10) * 10), guess = Math.floor(n / dr), why = 'J’arrondis : ' + d + ' ≈ ' + dr + '. Dans ' + n + ', ' + dr + ' entre environ ' + guess + ' fois. ';
+    var tries = [], gss = guess;
+    if (gss * d > n) { while (gss * d > n) { tries.push(gss + ' × ' + d + ' = ' + gss * d + ', c’est trop'); gss--; } }
+    else if ((gss + 1) * d <= n) { while ((gss + 1) * d <= n) { tries.push(gss + ' × ' + d + ' = ' + gss * d + ', on peut encore en mettre'); gss++; } }
+    why += (tries.length ? 'J’essaie : ' + tries.join(' ; ') + '. ' : '') + 'Donc ' + a + ' fois : ' + a + ' × ' + d + ' = ' + a * d + ', et il reste ' + (n - a * d) + ', plus petit que ' + d + '.';
+    var o = [a - 1, a, a + 1].filter(function (x) { return x >= 0; }).map(String);
+    return { k: d + '-' + n, d: d, n: n, a: String(a), o: o, s: 'Combien de fois ' + d + ' dans ' + n + ' ?', why: why };
+  }
+  var EST_PAIRS = [[23, 150], [19, 100], [32, 200], [48, 300], [67, 420], [14, 95], [41, 370], [28, 250]];
+  var estCards = EST_PAIRS.map(function (p) { return estCard(p[0], p[1]); });
+
+  /* ---------- Erreurs simulées ---------- */
+  function noCarryAdd(a, b) {
+    var w = Math.max(a.length, b.length), A = rep('0', w - a.length) + a, B = rep('0', w - b.length) + b, s = '';
+    for (var i = w - 1; i >= 0; i--) { var x = +A[i] + +B[i]; s = (i === 0 ? String(x) : String(x % 10)) + s; }
+    return s.replace(/^0+(?=\d)/, '');
+  }
+  function noCarryMul(a, d) { var s = ''; for (var i = a.length - 1; i >= 0; i--) { var x = +a[i] * d; s = (i === 0 ? String(x) : String(x % 10)) + s; } return s; }
+  function leftAlignAdd(a, b) { return String(Number(a) + Number(b) * pow10(a.length - b.length)); }
+  function noShiftMul(a, b) { var s = 0; for (var i = 0; i < b.length; i++) s += Number(a) * +b[i]; return String(s); }
+  function reverseSub(a, b) {
+    var w = a.length, B = rep('0', w - b.length) + b, s = '';
+    for (var i = w - 1; i >= 0; i--) s = String(Math.abs(+a[i] - +B[i])) + s;
+    return s.replace(/^0+(?=\d)/, '');
+  }
+  function dropZero(q) { return q.replace(/0/g, ''); }
+  /* Disposition fixe : lignes {s, off (décalage vers la gauche), sign, rule, k}. */
+  function staticCols(spec, label) {
+    var w = 0;
+    spec.forEach(function (x) { w = Math.max(w, x.s.length + (x.off || 0)); });
+    w += 1;
+    var g = Grid();
+    spec.forEach(function (x, i) {
+      if (x.rule) g.rule(i, 0, w - 1);
+      for (var j = 0; j < x.s.length; j++) g.put(i, w - 1 - (x.off || 0) - (x.s.length - 1 - j), x.s[j], 'd' + (x.k ? ' ' + x.k : ''));
+      if (x.sign) g.put(i, 0, x.sign, 'op');
+    });
+    g.step('', [], []);
+    var G = g.finish({});
+    return gridHtml(G, G.steps[0], label);
+  }
+  function divWrongHtml(S, d, wrongQ, label) {
+    var G = divBuild(S, 0, d, 0), st = JSON.parse(JSON.stringify(G.steps[G.steps.length - 1]));
+    Object.keys(st.R).forEach(function (key) { if (key.split(',')[0] === '1') delete st.R[key]; });
+    wrongQ.split('').forEach(function (x, i) { st.R['1,' + i] = { t: x, k: 'd bad', m: {} }; });
+    st.hl = []; st.nw = [];
+    return gridHtml(G, st, label);
+  }
+  var ERRNAMES = { ret: 'Oubli de la retenue', ali: 'Chiffres mal alignés', dec: 'Décalage oublié', zer: '0 oublié au quotient', env: 'Soustraction à l’envers' };
+  function errCard(k, kind, a, b) {
+    var c = { k: k, a: kind }, f;
+    if (kind === 'ret' && b.length > 1) {
+      c.wrong = noCarryAdd(a, b); c.right = String(Number(a) + Number(b)); c.calc = nb(a) + ' + ' + nb(b);
+      c.html = staticCols([{ s: a }, { s: b, sign: '+' }, { s: c.wrong, rule: true, k: 'bad' }], c.calc + ' = ' + nb(c.wrong));
+      c.why = 'Les retenues ont été oubliées : il fallait les écrire en haut et les ajouter à la colonne suivante. ' + c.calc + ' = ' + nb(c.right) + '.';
+    } else if (kind === 'ret') {
+      c.wrong = noCarryMul(a, +b); c.right = String(Number(a) * +b); c.calc = nb(a) + ' × ' + b;
+      c.html = staticCols([{ s: a }, { s: b, sign: '×' }, { s: c.wrong, rule: true, k: 'bad' }], c.calc + ' = ' + nb(c.wrong));
+      c.why = 'La retenue a été oubliée : ' + a[a.length - 1] + ' × ' + b + ' = ' + (+a[a.length - 1] * +b) + ', il fallait retenir ' + Math.floor(+a[a.length - 1] * +b / 10) + ' et l’ajouter au produit suivant. ' + c.calc + ' = ' + nb(c.right) + '.';
+    } else if (kind === 'ali') {
+      c.wrong = leftAlignAdd(a, b); c.right = String(Number(a) + Number(b)); c.calc = nb(a) + ' + ' + nb(b);
+      c.html = staticCols([{ s: a }, { s: b, sign: '+', off: a.length - b.length }, { s: c.wrong, rule: true, k: 'bad' }], c.calc + ' = ' + nb(c.wrong));
+      c.why = b + ' a été aligné à gauche : ses chiffres sont tombés dans les mauvaises colonnes, comme si c’était ' + nb(String(Number(b) * pow10(a.length - b.length))) + '. Unités sous unités : ' + c.calc + ' = ' + nb(c.right) + '.';
+    } else if (kind === 'dec') {
+      c.wrong = noShiftMul(a, b); c.right = String(Number(a) * Number(b)); c.calc = nb(a) + ' × ' + b;
+      f = [{ s: a }, { s: b, sign: '×' }];
+      for (var i = b.length - 1; i >= 0; i--) f.push({ s: String(Number(a) * +b[i]), rule: i === b.length - 1, sign: i === 0 ? '+' : '' });
+      f.push({ s: c.wrong, rule: true, k: 'bad' });
+      c.html = staticCols(f, c.calc + ' = ' + nb(c.wrong));
+      c.why = 'La deuxième ligne n’a pas été décalée. Elle vaut ' + nb(a) + ' × ' + (+b[0] * 10) + ' = ' + nb(String(Number(a) * +b[0] * 10)) + ' : il fallait commencer par un 0. ' + c.calc + ' = ' + nb(c.right) + '.';
+    } else if (kind === 'zer') {
+      var Gd = divBuild(a, 0, +b, 0);
+      c.right = Gd.q; c.wrong = dropZero(Gd.q); c.calc = nb(a) + ' : ' + b;
+      c.html = divWrongHtml(a, +b, c.wrong, c.calc + ' = ' + c.wrong);
+      c.why = 'À une étape, ' + b + ' entrait 0 fois : il fallait écrire ce 0 au quotient. ' + c.calc + ' = ' + nb(c.right) + '. Vérification : ' + b + ' × ' + nb(c.right) + ' = ' + nb(a) + '.';
+    } else {
+      c.wrong = reverseSub(a, b); c.right = String(Number(a) - Number(b)); c.calc = nb(a) + ' − ' + nb(b);
+      c.html = staticCols([{ s: a }, { s: b, sign: '−' }, { s: c.wrong, rule: true, k: 'bad' }], c.calc + ' = ' + nb(c.wrong));
+      c.why = 'Quand le chiffre du haut était plus petit, on a fait « le grand moins le petit » (par exemple ' + b[b.length - 1] + ' − ' + a[a.length - 1] + ' au lieu de ' + a[a.length - 1] + ' − ' + b[b.length - 1] + '). Il fallait emprunter ou compenser. ' + c.calc + ' = ' + nb(c.right) + '.';
+    }
+    c.s = c.calc + ' = ' + nb(c.wrong);
+    return c;
+  }
+  var errCards = [
+    errCard('e1', 'ret', '478', '356'), errCard('e2', 'env', '523', '187'), errCard('e3', 'ali', '352', '47'),
+    errCard('e4', 'dec', '243', '15'), errCard('e5', 'zer', '618', '6'), errCard('e6', 'ret', '47', '6'),
+    errCard('e7', 'env', '702', '458'), errCard('e8', 'ali', '1205', '38'), errCard('e9', 'dec', '312', '23'),
+    errCard('e10', 'zer', '824', '4')
+  ];
+
+  /* ---------- Vérifier ---------- */
+  function nineRest(n) {
+    var s = String(n), parts = [];
+    while (s.length > 1) { var ds = s.split(''), sum = ds.reduce(function (x, y) { return x + +y; }, 0); parts.push(ds.join(' + ') + ' = ' + sum); s = String(sum); }
+    var r = +s % 9;
+    return { r: r, txt: nb(String(n)) + ' → ' + (parts.length ? parts.join(', ') : s) + (s === '9' ? ' (9 compte comme 0)' : '') + ' → reste ' + r };
+  }
+  function proof9(op, a, b, r) {
+    var ra = nineRest(a), rb = nineRest(b), rr = nineRest(r), left, ok, how;
+    if (op === '+') { left = (ra.r + rb.r) % 9; ok = left === rr.r; how = 'Pour +, j’additionne les restes : ' + ra.r + ' + ' + rb.r + ' → reste ' + left + '.'; }
+    else if (op === '×') { left = (ra.r * rb.r) % 9; ok = left === rr.r; how = 'Pour ×, je multiplie les restes : ' + ra.r + ' × ' + rb.r + ' = ' + ra.r * rb.r + ' → reste ' + left + '.'; }
+    else { left = (rr.r + rb.r) % 9; ok = left === ra.r; how = 'Pour −, je vérifie que reste du résultat + reste de ' + nb(String(b)) + ' redonne le reste de ' + nb(String(a)) + ' : ' + rr.r + ' + ' + rb.r + ' → reste ' + left + ', à comparer avec ' + ra.r + '.'; }
+    var text = ra.txt + ' ; ' + rb.txt + ' ; ' + rr.txt + '. ' + how + ' ' + (op === '−' ? '' : 'Le résultat proposé a pour reste ' + rr.r + '. ') + (ok ? 'Ça correspond : la preuve par 9 ne voit pas d’erreur. Attention, ça ne prouve pas que c’est juste !' : 'Ça ne correspond pas : il y a sûrement une erreur.');
+    return { ok: ok, text: text };
+  }
+  function roughly(n) { if (n < 10) return n; var p = pow10(String(n).length - 1); return Math.round(n / p) * p; }
+  function ogCheck(op, a, b, r) {
+    var ea = roughly(a), eb = roughly(b), e = op === '+' ? ea + eb : op === '−' ? ea - eb : ea * eb;
+    var head = 'J’arrondis : ' + nb(String(a)) + ' ≈ ' + nb(String(ea)) + ' et ' + nb(String(b)) + ' ≈ ' + nb(String(eb)) + '. ' + nb(String(ea)) + ' ' + op + ' ' + nb(String(eb)) + ' = ' + nb(String(e)) + '. ';
+    if (e <= 0) return { ok: true, text: head + 'Ici, l’estimation ne permet pas de conclure.' };
+    var ratio = r / e, ok = ratio >= 0.5 && ratio <= 2;
+    return { ok: ok, text: head + (ok ? 'Le résultat proposé, ' + nb(String(r)) + ', est du même ordre de grandeur : ça paraît possible (mais ça ne prouve pas que c’est juste).' : 'Le résultat proposé, ' + nb(String(r)) + ', est bien trop loin de ' + nb(String(e)) + ' : il y a une erreur !') };
+  }
+  function inverseCheck(op, a, b, r) {
+    var A = nb(String(a)), B = nb(String(b)), Rr = nb(String(r));
+    if (op === '+') { var x = r - b; return { ok: x === a, text: 'Si ' + A + ' + ' + B + ' = ' + Rr + ', alors ' + Rr + ' − ' + B + ' doit redonner ' + A + '. ' + (x < 0 ? Rr + ' est plus petit que ' + B + ' : impossible, il y a une erreur.' : Rr + ' − ' + B + ' = ' + nb(String(x)) + (x === a ? ' : c’est juste !' : ' : ce n’est pas ' + A + ', il y a une erreur.')) }; }
+    if (op === '−') { var y = r + b; return { ok: y === a, text: 'Si ' + A + ' − ' + B + ' = ' + Rr + ', alors ' + Rr + ' + ' + B + ' doit redonner ' + A + '. ' + Rr + ' + ' + B + ' = ' + nb(String(y)) + (y === a ? ' : c’est juste !' : ' : ce n’est pas ' + A + ', il y a une erreur.') }; }
+    var qq = Math.floor(r / b), rem = r - qq * b, ok = qq === a && rem === 0;
+    return { ok: ok, text: 'Si ' + A + ' × ' + B + ' = ' + Rr + ', alors ' + Rr + ' : ' + B + ' doit redonner ' + A + '. ' + Rr + ' : ' + B + ' = ' + nb(String(qq)) + (rem ? ', reste ' + rem : '') + (ok ? ' : c’est juste !' : ' : ce n’est pas ' + A + ', il y a une erreur.') };
+  }
+  function realResult(op, a, b) { return op === '+' ? a + b : op === '−' ? a - b : a * b; }
+  var vfPresets = [
+    { op: '×', a: 387, b: 24, r: 9288 }, { op: '×', a: 387, b: 24, r: 2322 }, { op: '×', a: 387, b: 24, r: 9828 },
+    { op: '−', a: 4506, b: 1789, r: 2717 }, { op: '−', a: 4506, b: 1789, r: 3283 }, { op: '+', a: 1254, b: 3867, r: 5121 }
+  ];
+
+  /* ---------- Méthodes anciennes ---------- */
+  function gelosia(a, b) {
+    var n = a.length, m = b.length, cells = [], diag = [];
+    for (var i = 0; i < m; i++) { cells.push([]); for (var j = 0; j < n; j++) { var v = +a[j] * +b[i]; cells[i].push({ v: v, t: Math.floor(v / 10), u: v % 10, p: (n - 1 - j) + (m - 1 - i) }); } }
+    var carry = 0, digits = [];
+    for (var p = 0; p < n + m; p++) {
+      var items = [];
+      for (i = m - 1; i >= 0; i--) for (j = n - 1; j >= 0; j--) { var c = cells[i][j]; if (c.p === p) items.push({ i: i, j: j, part: 'u', d: c.u }); if (c.p + 1 === p) items.push({ i: i, j: j, part: 't', d: c.t }); }
+      var s = carry + items.reduce(function (x, y) { return x + y.d; }, 0);
+      diag.push({ p: p, items: items, carry: carry, sum: s, digit: s % 10, nc: Math.floor(s / 10) });
+      digits.unshift(s % 10); carry = Math.floor(s / 10);
+    }
+    var res = digits.join('').replace(/^0+(?=\d)/, '');
+    return { a: a, b: b, n: n, m: m, cells: cells, diag: diag, res: res };
+  }
+  function egypt(a, b) {
+    var rows = [], p = 1, v = b;
+    while (p <= a) { rows.push([p, v]); p *= 2; v *= 2; }
+    var left = a, pick = rows.map(function () { return false; });
+    for (var i = rows.length - 1; i >= 0; i--) if (rows[i][0] <= left) { pick[i] = true; left -= rows[i][0]; }
+    var sum = 0; rows.forEach(function (r, k) { if (pick[k]) sum += r[1]; });
+    return { a: a, b: b, rows: rows, pick: pick, sum: sum };
+  }
+  var POSN = [['CM', 'centaines de mille'], ['DM', 'dizaines de mille'], ['UM', 'unités de mille'], ['C', 'centaines'], ['D', 'dizaines'], ['U', 'unités']];
+  var POSV = [100000, 10000, 1000, 100, 10, 1];
+  function positions(n) {
+    var s = String(n), out = [];
+    for (var i = 0; i < s.length; i++) { var p = s.length - 1 - i; out.push({ name: POSN[5 - p][1], short: POSN[5 - p][0], digit: +s[i], value: +s[i] * POSV[5 - p] }); }
+    return out;
+  }
+  /*END-ALGO*/
+
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function clamp(i, n) { i = Math.floor(Number(i)); if (!isFinite(i)) i = 0; return Math.max(0, Math.min(n - 1, i)); }
+  function rint(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+  function rnd(len) { var s = String(rint(1, 9)); for (var i = 1; i < len; i++) s += rint(0, 9); return s; }
+
+  /* Trieur générique (cartes une par une), comme dans les autres tutoriels.
+     Si un item a sa propre liste o (options), elle remplace les boutons communs.
+     o.cardHtml(it, answered) renvoie le contenu HTML de la carte. */
+  function makeSorter(o) {
+    var idx = 0, ans = {};
+    function opts(it) { return it.o ? it.o : o.order; }
+    function name(c) { return o.names && o.names[c] ? o.names[c] : c; }
+    function render() {
+      var it = o.items[idx], a = ans[it.k];
+      if (o.cardHtml) $(o.card).innerHTML = o.cardHtml(it, !!a); else $(o.card).textContent = it.s;
+      $(o.pos).textContent = o.word + ' ' + (idx + 1) + ' / ' + o.items.length;
+      $(o.btns).innerHTML = opts(it).map(function (c) {
+        var cls = a ? (c === it.a ? 'right' : (c === a ? 'wrong' : '')) : '';
+        return '<button type="button" data-c="' + esc(c) + '"' + (cls ? ' class="' + cls + '"' : '') + (a ? ' disabled' : '') + '>' + esc(name(c)) + '</button>';
+      }).join('');
+      var out = $(o.out);
+      if (!a) { out.className = 'fbk'; out.innerHTML = ''; }
+      else {
+        var ok = a === it.a;
+        out.className = 'fbk ' + (ok ? 'ok' : 'no');
+        out.innerHTML = '<strong>' + (ok ? 'Bien vu !' : 'Pas tout à fait. Réponse : ' + esc(name(it.a)) + '.') + '</strong><span>' + esc(it.why) + '</span>';
+      }
+      var s = o.score(ans), last = idx === o.items.length - 1, left = s.total - s.answered;
+      $(o.score_).textContent = (o.word ? o.word + ' ' : '') + (idx + 1) + ' / ' + s.total;
+      $(o.pos).textContent = s.answered ? 'Bonnes réponses : ' + s.correct + ' sur ' + s.answered : '';
+      $(o.prev).disabled = idx === 0;
+      $(o.next).disabled = last;
+      $(o.next).style.display = last ? 'none' : '';
+      var end = $(o.out + 'End');
+      if (!end) { end = document.createElement('div'); end.id = o.out + 'End'; end.setAttribute('aria-live', 'polite'); $(o.out).insertAdjacentElement('afterend', end); }
+      if (!left) {
+        var r = s.correct / s.total;
+        end.className = 'fbk ok sorter-end';
+        end.innerHTML = '<strong>Terminé ! ' + s.correct + ' / ' + s.total + ' bonnes réponses</strong><span>' +
+          (r === 1 ? 'Parfait, tout est juste !' : r >= .7 ? 'Très bien !' : r >= .5 ? 'Pas mal ! Relis les explications des erreurs.' : 'Relis les explications, puis réessaie.') +
+          ' Touche « Recommencer » pour rejouer.</span>';
+      } else if (last && ans[it.k]) {
+        end.className = 'fbk warn sorter-end';
+        end.innerHTML = '<strong>C’était la dernière carte.</strong><span>Il te reste ' + left + ' réponse' + (left > 1 ? 's' : '') + ' à donner : reviens en arrière avec « ← Précédent ».</span>';
+      } else { end.className = ''; end.innerHTML = ''; }
+    }
+    $(o.btns).addEventListener('click', function (ev) {
+      var b = ev.target.closest('button'); if (!b || b.disabled) return;
+      var it = o.items[idx]; if (!ans[it.k]) ans[it.k] = b.getAttribute('data-c');
+      render();
+    });
+    $(o.prev).addEventListener('click', function () { idx = clamp(idx - 1, o.items.length); render(); });
+    $(o.next).addEventListener('click', function () { idx = clamp(idx + 1, o.items.length); render(); });
+    $(o.reset).addEventListener('click', function () { ans = {}; idx = 0; render(); });
+    render();
+  }
+  function scorer(items) {
+    return function (ans) { var correct = 0, answered = 0; items.forEach(function (x) { if (ans && ans[x.k]) { answered++; if (ans[x.k] === x.a) correct++; } }); return { correct: correct, answered: answered, total: items.length }; };
+  }
+
+  /* ---------- Machine générique : exemples, « Autre calcul », mes nombres, pas à pas ---------- */
+  function makeMachine(o) {
+    var root = $(o.id), tog = o.toggle ? o.toggle.value : null, G = null, idx = 0;
+    var h = '';
+    if (o.toggle) h += '<div class="btns" role="group" aria-label="' + esc(o.toggle.label) + '">' + o.toggle.opts.map(function (t) { return '<button type="button" class="tg" data-v="' + t[0] + '" aria-pressed="' + (t[0] === tog) + '">' + esc(t[1]) + '</button>'; }).join('') + '</div>';
+    h += '<div class="btns" role="group" aria-label="Exemples">' + o.presets.map(function (p, i) { return '<button type="button" class="ex" data-i="' + i + '">' + esc(o.label(p)) + '</button>'; }).join('') + '<button type="button" class="rnd">Autre calcul</button></div>';
+    if (o.fields) h += '<details class="own"><summary>Choisir mes nombres</summary><div class="pick">' + o.fields.map(function (f, i) { return '<label>' + esc(f.label) + '<input type="text" inputmode="numeric" autocomplete="off" maxlength="' + f.max + '" data-f="' + i + '"></label>'; }).join('') + '<button type="button" class="go main">Poser</button>' + (o.hint ? '<span class="soft">' + esc(o.hint) + '</span>' : '') + '</div></details>';
+    h += '<div class="btns"><span class="score mpos"></span><span class="step-n mexpr"></span></div>';
+    h += '<div class="sheet msheet"></div>';
+    h += '<div class="fbk info say msay" aria-live="polite"></div>';
+    h += '<div class="btns"><button type="button" class="mprev">← Précédent</button><button type="button" class="mnext main">Suivant →</button><button type="button" class="mreset">Recommencer</button></div>';
+    root.innerHTML = h;
+    function q(s) { return root.querySelector(s); }
+    var vals = o.presets[0];
+    function fill() { if (!o.fields) return; root.querySelectorAll('[data-f]').forEach(function (inp) { var i = +inp.getAttribute('data-f'); inp.value = vals[i] != null ? vals[i] : ''; }); }
+    function build(v) {
+      try { G = o.build(v, tog); vals = v; idx = 0; fill(); render(); }
+      catch (e) { var say = q('.msay'); say.className = 'fbk no say msay'; say.innerHTML = '<strong>Oups</strong><span>' + esc(e.message) + '</span>'; }
+    }
+    function render() {
+      var st = G.steps[idx], last = idx === G.steps.length - 1;
+      q('.mpos').textContent = 'Étape ' + (idx + 1) + ' / ' + G.steps.length;
+      q('.mexpr').textContent = G.title;
+      q('.msheet').innerHTML = gridHtml(G, st, G.title + ', posé en colonnes, étape ' + (idx + 1));
+      var say = q('.msay');
+      if (st.done) { say.className = 'fbk ok say msay'; say.innerHTML = '<strong>Calcul terminé</strong><span>' + esc(st.text.replace(/^Calcul terminé : /, '')) + '</span>'; }
+      else { say.className = 'fbk info say msay'; say.innerHTML = '<span>' + esc(st.text) + '</span>'; }
+      q('.mprev').disabled = idx === 0;
+      q('.mnext').disabled = last;
+      q('.mnext').style.display = last ? 'none' : '';
+    }
+    root.addEventListener('click', function (ev) {
+      var b = ev.target.closest('button'); if (!b) return;
+      if (b.classList.contains('ex')) build(o.presets[+b.getAttribute('data-i')]);
+      else if (b.classList.contains('rnd')) build(o.random(tog));
+      else if (b.classList.contains('go')) {
+        var v = []; root.querySelectorAll('[data-f]').forEach(function (inp) { v.push(inp.value.replace(/[\s\x27’]/g, '')); });
+        build(v);
+      } else if (b.classList.contains('tg')) {
+        tog = b.getAttribute('data-v');
+        root.querySelectorAll('.tg').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+        build(vals);
+      } else if (b.classList.contains('mprev')) { idx = clamp(idx - 1, G.steps.length); render(); }
+      else if (b.classList.contains('mnext')) { idx = clamp(idx + 1, G.steps.length); render(); }
+      else if (b.classList.contains('mreset')) { idx = 0; render(); }
+    });
+    build(vals);
+    return { get: function () { return G; } };
+  }
+  function intField(v, label, max, min) {
+    if (v == null || v === '') throw new Error('Écris ' + label + '.');
+    if (!/^\d+$/.test(v)) throw new Error(label.charAt(0).toUpperCase() + label.slice(1) + ' : écris seulement des chiffres, sans virgule.');
+    var s = v.replace(/^0+(?=\d)/, '');
+    if (s.length > max) throw new Error(label.charAt(0).toUpperCase() + label.slice(1) + ' : ' + max + ' chiffres au maximum.');
+    if (min != null && Number(s) < min) throw new Error(label.charAt(0).toUpperCase() + label.slice(1) + ' : au moins ' + min + '.');
+    return s;
+  }
+
+  makeMachine({
+    id: 'mAdd',
+    presets: [['478', '356'], ['4567', '891'], ['2708', '1395', '846'], ['99999', '1']],
+    label: function (p) { return p.filter(Boolean).map(function (x) { return nb(x); }).join(' + '); },
+    fields: [{ label: 'Nombre 1', max: 6 }, { label: 'Nombre 2', max: 6 }, { label: 'Nombre 3 (facultatif)', max: 6 }],
+    hint: 'Laisse le nombre 3 vide pour additionner seulement deux nombres.',
+    random: function () { var n = Math.random() < .35 ? 3 : 2, l = rint(3, 6), v = [rnd(l)]; for (var i = 1; i < n; i++) v.push(rnd(rint(2, l))); return v; },
+    build: function (v) {
+      var nums = [intField(v[0], 'le nombre 1', 6), intField(v[1], 'le nombre 2', 6)];
+      if (v[2]) nums.push(intField(v[2], 'le nombre 3', 6));
+      return addBuild(nums, 0);
+    }
+  });
+  makeMachine({
+    id: 'mSub',
+    toggle: { label: 'Méthode', value: 'emp', opts: [['emp', 'Emprunt'], ['comp', 'Compensation']] },
+    presets: [['523', '187'], ['702', '458'], ['4000', '1267'], ['85', '29']],
+    label: function (p) { return nb(p[0]) + ' − ' + nb(p[1]); },
+    fields: [{ label: 'Nombre du haut', max: 6 }, { label: 'Nombre du bas', max: 6 }],
+    random: function () {
+      var l = rint(3, 6), a = rnd(l).split('');
+      for (var i = 1; i < l - 1; i++) if (Math.random() < .25) a[i] = '0';
+      a = a.join(''); var b = rnd(rint(2, l));
+      if (Number(b) > Number(a)) { var t = a; a = b; b = t; }
+      return [a, b];
+    },
+    build: function (v, m) {
+      var a = intField(v[0], 'le nombre du haut', 6), b = intField(v[1], 'le nombre du bas', 6);
+      if (Number(b) > Number(a)) throw new Error('Le nombre du haut doit être le plus grand. Sinon, le résultat est négatif : c’est le tutoriel sur les nombres relatifs.');
+      return subBuild(a, b, m, 0);
+    }
+  });
+  makeMachine({
+    id: 'mMul1',
+    presets: [['47', '8'], ['357', '6'], ['1209', '7'], ['8463', '9']],
+    label: function (p) { return nb(p[0]) + ' × ' + p[1]; },
+    fields: [{ label: 'Nombre du haut', max: 6 }, { label: 'Chiffre (1 à 9)', max: 1 }],
+    random: function () { return [rnd(rint(2, 5)), String(rint(2, 9))]; },
+    build: function (v) { var a = intField(v[0], 'le nombre du haut', 6), b = intField(v[1], 'le chiffre du bas', 1, 1); return mulBuild(a, b); }
+  });
+  makeMachine({
+    id: 'mMulN',
+    presets: [['345', '26'], ['243', '15'], ['1207', '305'], ['4096', '128']],
+    label: function (p) { return nb(p[0]) + ' × ' + nb(p[1]); },
+    fields: [{ label: 'Nombre du haut (4 chiffres max.)', max: 4 }, { label: 'Nombre du bas (3 chiffres max.)', max: 3 }],
+    random: function () { return [rnd(rint(2, 4)), rnd(rint(2, 3))]; },
+    build: function (v) { var a = intField(v[0], 'le nombre du haut', 4), b = intField(v[1], 'le nombre du bas', 3); return mulBuild(a, b); }
+  });
+  makeMachine({
+    id: 'mDiv',
+    toggle: { label: 'Quand il reste quelque chose', value: 'stop', opts: [['stop', 'S’arrêter avec un reste'], ['dec', 'Continuer après la virgule']] },
+    presets: [['745', '3'], ['618', '6'], ['9156', '7'], ['150', '23'], ['86425', '37'], ['7', '4'], ['10', '3']],
+    label: function (p) { return nb(p[0]) + ' : ' + p[1]; },
+    fields: [{ label: 'Dividende (5 chiffres max.)', max: 5 }, { label: 'Diviseur (1 à 99)', max: 2 }],
+    random: function () {
+      var d = Math.random() < .5 ? rint(2, 9) : rint(11, 49), n;
+      do { n = Number(rnd(rint(3, 5))); } while (n < d);
+      return [String(n), String(d)];
+    },
+    build: function (v, m) {
+      var S = intField(v[0], 'le dividende', 5, 1), d = intField(v[1], 'le diviseur', 2, 1);
+      return divBuild(S, 0, Number(d), m === 'dec' ? 3 : 0);
+    }
+  });
+  function rdec(ipMax, decs) { return String(rint(0, ipMax)) + ',' + rnd(decs).split('').reverse().join(''); }
+  makeMachine({
+    id: 'mDec',
+    presets: [['12,5 + 3,75'], ['8 − 2,35'], ['2,4 × 1,5'], ['0,25 × 0,4'], ['12,6 : 4'], ['7 : 4'], ['10 : 3']],
+    label: function (p) { return p[0]; },
+    random: function () {
+      var k = rint(0, 3);
+      if (k === 0) return [rdec(99, rint(1, 2)) + ' + ' + rdec(99, rint(1, 2))];
+      if (k === 1) { var a = rint(10, 99), b = rdec(a - 1, rint(1, 2)); return [a + (Math.random() < .5 ? ',' + rint(1, 9) : '') + ' − ' + b]; }
+      if (k === 2) return [rint(1, 9) + ',' + rint(1, 9) + ' × ' + (Math.random() < .5 ? rint(2, 9) : rint(0, 9) + ',' + rint(1, 9))];
+      return [rint(2, 99) + ',' + rint(1, 9) + ' : ' + rint(2, 9)];
+    },
+    build: function (v) { return decBuild(v[0]); }
+  });
+
+  /* ---------- Étape 1 : positions ---------- */
+  var posNow = 352;
+  function posRender() {
+    var ps = positions(posNow), cols = 6 - ps.length;
+    var head = '<tr>' + POSN.map(function (p) { return '<th scope="col">' + p[0] + '<small>' + p[1] + '</small></th>'; }).join('') + '</tr>';
+    var row = '<tr>';
+    for (var i = 0; i < 6; i++) row += '<td>' + (i < cols ? '' : ps[i - cols].digit) + '</td>';
+    $('posTable').innerHTML = '<thead>' + head + '</thead><tbody>' + row + '</tbody>';
+    $('posVals').innerHTML = ps.map(function (p) { return '<span>' + p.digit + ' ' + p.name + ' = ' + nb(String(p.value)) + '</span>'; }).join('') + '<span><strong>' + ps.map(function (p) { return nb(String(p.value)); }).join(' + ') + ' = ' + nb(String(posNow)) + '</strong></span>';
+    $('posBtns').querySelectorAll('button[data-n]').forEach(function (b) { b.setAttribute('aria-pressed', +b.getAttribute('data-n') === posNow ? 'true' : 'false'); });
+  }
+  $('posBtns').innerHTML = [7, 45, 352, 1205, 30408].map(function (n) { return '<button type="button" class="ex" data-n="' + n + '">' + nb(String(n)) + '</button>'; }).join('') + '<button type="button" data-r="1">Autre nombre</button>';
+  $('posBtns').addEventListener('click', function (ev) {
+    var b = ev.target.closest('button'); if (!b) return;
+    posNow = b.getAttribute('data-r') ? Number(rnd(rint(2, 6))) : +b.getAttribute('data-n');
+    posRender();
+  });
+  posRender();
+  function alRender(good) {
+    $('alGood').setAttribute('aria-pressed', good ? 'true' : 'false'); $('alBad').setAttribute('aria-pressed', good ? 'false' : 'true');
+    var wrong = leftAlignAdd('352', '47');
+    $('alSheet').innerHTML = good ? staticCols([{ s: '352' }, { s: '47', sign: '+' }, { s: '399', rule: true }], '352 + 47 = 399, bien aligné') : staticCols([{ s: '352' }, { s: '47', sign: '+', off: 1 }, { s: wrong, rule: true, k: 'bad' }], '352 + 47 aligné à gauche : ' + wrong);
+    $('alOut').className = 'fbk ' + (good ? 'ok' : 'no');
+    $('alOut').innerHTML = good ? '<strong>Juste : 399</strong><span>Le 7 est sous le 2 (unités sous unités) et le 4 sous le 5 (dizaines sous dizaines).</span>' : '<strong>Faux : ' + wrong + '</strong><span>Le 4 est tombé sous le 3, dans les centaines : on a calculé 352 + 470 au lieu de 352 + 47 !</span>';
+  }
+  $('alGood').addEventListener('click', function () { alRender(true); });
+  $('alBad').addEventListener('click', function () { alRender(false); });
+  alRender(true);
+
+  /* ---------- Jeux une carte à la fois ---------- */
+  makeSorter({ items: estCards, names: null, order: [], btns: 'esBtns', card: 'esCard', pos: 'esPos', out: 'esOut', score_: 'esScore', prev: 'esPrev', next: 'esNext', reset: 'esReset', word: 'Calcul', score: scorer(estCards),
+    cardHtml: function (it) { return '<span>Combien de fois <strong>' + it.d + '</strong> dans <strong>' + it.n + '</strong> ?</span>'; } });
+  makeSorter({ items: errCards, names: ERRNAMES, order: ['ret', 'ali', 'dec', 'zer', 'env'], btns: 'erBtns', card: 'erCard', pos: 'erPos', out: 'erOut', score_: 'erScore', prev: 'erPrev', next: 'erNext', reset: 'erReset', word: 'Calcul', score: scorer(errCards),
+    cardHtml: function (it) { return '<span>' + esc(it.s) + ' : où est l’erreur ?</span><div class="sheet">' + it.html + '</div>'; } });
+
+  /* ---------- Étape 9 : vérificateur ---------- */
+  var vfNow = vfPresets[0];
+  function vfLabel(p) { return nb(String(p.a)) + ' ' + p.op + ' ' + nb(String(p.b)) + ' = ' + nb(String(p.r)); }
+  function vfDraw() {
+    $('vfBtns').innerHTML = vfPresets.map(function (p, i) { return '<button type="button" class="ex" data-i="' + i + '" aria-pressed="' + (p === vfNow) + '">' + esc(vfLabel(p)) + '</button>'; }).join('') + '<button type="button" data-r="1">Autre calcul</button>';
+    $('vfCalc').innerHTML = '<span>' + esc(vfLabel(vfNow)) + ' ?</span>';
+    $('vfOut').className = 'fbk'; $('vfOut').innerHTML = '';
+  }
+  function vfRandom() {
+    var op = ['+', '−', '×'][rint(0, 2)], a, b, r;
+    if (op === '×') { a = Number(rnd(3)); b = Number(rnd(2)); } else { a = Number(rnd(4)); b = Number(rnd(rint(3, 4))); if (op === '−' && b > a) { var t = a; a = b; b = t; } }
+    r = realResult(op, a, b);
+    if (Math.random() < .6) {
+      var w;
+      if (op === '+') w = Number(noCarryAdd(String(a), String(b)));
+      else if (op === '−') w = Number(reverseSub(String(a), String(b)));
+      else w = Math.random() < .5 ? Number(noShiftMul(String(a), String(b))) : Number(String(r).replace(/^(\d)(\d)/, '$2$1'));
+      if (w === r) w = r + 10;
+      r = w;
+    }
+    return { op: op, a: a, b: b, r: r };
+  }
+  $('vfBtns').addEventListener('click', function (ev) {
+    var b = ev.target.closest('button'); if (!b) return;
+    vfNow = b.getAttribute('data-r') ? vfRandom() : vfPresets[+b.getAttribute('data-i')];
+    vfDraw();
+  });
+  function vfShow(res, title) { $('vfOut').className = 'fbk ' + (res.ok ? 'ok' : 'no'); $('vfOut').innerHTML = '<strong>' + esc(title) + '</strong><span>' + esc(res.text) + '</span>'; }
+  $('vfOg').addEventListener('click', function () { vfShow(ogCheck(vfNow.op, vfNow.a, vfNow.b, vfNow.r), 'Ordre de grandeur'); });
+  $('vfInv').addEventListener('click', function () { vfShow(inverseCheck(vfNow.op, vfNow.a, vfNow.b, vfNow.r), 'Opération inverse'); });
+  $('vfNine').addEventListener('click', function () { vfShow(proof9(vfNow.op, vfNow.a, vfNow.b, vfNow.r), 'Preuve par 9'); });
+  $('vfShow').addEventListener('click', function () {
+    var real = realResult(vfNow.op, vfNow.a, vfNow.b), ok = real === vfNow.r;
+    $('vfOut').className = 'fbk ' + (ok ? 'ok' : 'no');
+    $('vfOut').innerHTML = '<strong>' + (ok ? 'Le calcul était juste' : 'Le calcul était faux') + '</strong><span>' + esc(nb(String(vfNow.a)) + ' ' + vfNow.op + ' ' + nb(String(vfNow.b)) + ' = ' + nb(String(real)) + '.' + (ok ? '' : ' Quelle vérification a trouvé l’erreur ?')) + '</span>';
+  });
+  vfDraw();
+
+  /* ---------- Étape 11 : jalousie et méthode égyptienne ---------- */
+  var GEL = gelosia('47', '36'), EGY = egypt(13, 24);
+  var gelSteps = [{ c: 0, dg: 0, hc: null, hd: -1, text: 'On dessine une grille de ' + GEL.m + ' × ' + GEL.n + ' cases, chacune coupée par une diagonale. On écrit ' + GEL.a + ' en haut et ' + GEL.b + ' à droite, de haut en bas.' }];
+  var order = [];
+  for (var gi = 0; gi < GEL.m; gi++) for (var gj = 0; gj < GEL.n; gj++) order.push([gi, gj]);
+  order.forEach(function (ij, n) {
+    var c = GEL.cells[ij[0]][ij[1]];
+    gelSteps.push({ c: n + 1, dg: 0, hc: ij, hd: -1, text: 'Case ' + GEL.a[ij[1]] + ' × ' + GEL.b[ij[0]] + ' = ' + c.v + ' : j’écris ' + c.t + ' en haut à gauche (les dizaines) et ' + c.u + ' en bas à droite (les unités).' });
+  });
+  GEL.diag.forEach(function (dgl, p) {
+    var terms = dgl.items.map(function (x) { return String(x.d); }); if (dgl.carry) terms.push(dgl.carry + ' (retenue)');
+    var last = p === GEL.diag.length - 1;
+    var t = 'Diagonale ' + (p + 1) + ' (en partant d’en bas à droite) : ' + (terms.length > 1 ? terms.join(' + ') + ' = ' + dgl.sum : 'il n’y a que ' + terms[0]) + (last && dgl.sum === 0 ? ' : un 0 tout devant ne s’écrit pas.' : ' : j’écris ' + dgl.digit + (dgl.nc ? ' et je retiens ' + dgl.nc + ' pour la diagonale suivante.' : '.'));
+    gelSteps.push({ c: order.length, dg: p + 1, hc: null, hd: p, text: t });
+  });
+  gelSteps.push({ c: order.length, dg: GEL.diag.length, hc: null, hd: -1, done: true, text: 'On lit le résultat en tournant autour de la grille, de haut en bas à gauche, puis de gauche à droite en bas : ' + GEL.a + ' × ' + GEL.b + ' = ' + nb(GEL.res) + '.' });
+  function gelSvg(st) {
+    var cs = 70, x0 = 50, y0 = 44, n = GEL.n, m = GEL.m, s = '<svg class="lat" viewBox="0 0 ' + (x0 + n * cs + 46) + ' ' + (y0 + m * cs + 50) + '" role="img" aria-label="Multiplication par jalousie de ' + GEL.a + ' par ' + GEL.b + '">';
+    var hotSet = {};
+    if (st.hd >= 0) GEL.diag[st.hd].items.forEach(function (x) { hotSet[x.i + ',' + x.j + x.part] = 1; });
+    for (var i = 0; i < m; i++) for (var j = 0; j < n; j++) {
+      var on = st.hc && st.hc[0] === i && st.hc[1] === j;
+      s += '<rect class="cell' + (on ? ' on' : '') + '" x="' + (x0 + j * cs) + '" y="' + (y0 + i * cs) + '" width="' + cs + '" height="' + cs + '"/>';
+      s += '<line class="dg" x1="' + (x0 + (j + 1) * cs) + '" y1="' + (y0 + i * cs) + '" x2="' + (x0 + j * cs) + '" y2="' + (y0 + (i + 1) * cs) + '"/>';
+    }
+    for (j = 0; j < n; j++) s += '<line class="ext" x1="' + (x0 + j * cs) + '" y1="' + (y0 + m * cs) + '" x2="' + (x0 + j * cs - 24) + '" y2="' + (y0 + m * cs + 24) + '"/>';
+    for (i = 0; i < m; i++) s += '<line class="ext" x1="' + x0 + '" y1="' + (y0 + i * cs) + '" x2="' + (x0 - 24) + '" y2="' + (y0 + i * cs + 24) + '"/>';
+    for (j = 0; j < n; j++) s += '<text class="lab" x="' + (x0 + j * cs + cs / 2) + '" y="' + (y0 - 14) + '" font-size="24" text-anchor="middle">' + GEL.a[j] + '</text>';
+    for (i = 0; i < m; i++) s += '<text class="lab" x="' + (x0 + n * cs + 22) + '" y="' + (y0 + i * cs + cs / 2 + 8) + '" font-size="24" text-anchor="middle">' + GEL.b[i] + '</text>';
+    order.slice(0, st.c).forEach(function (ij) {
+      var c = GEL.cells[ij[0]][ij[1]], cx = x0 + ij[1] * cs, cy = y0 + ij[0] * cs;
+      s += '<text' + (hotSet[ij[0] + ',' + ij[1] + 't'] ? ' class="hot"' : '') + ' x="' + (cx + 20) + '" y="' + (cy + 30) + '" font-size="20" text-anchor="middle">' + c.t + '</text>';
+      s += '<text' + (hotSet[ij[0] + ',' + ij[1] + 'u'] ? ' class="hot"' : '') + ' x="' + (cx + 50) + '" y="' + (cy + 58) + '" font-size="20" text-anchor="middle">' + c.u + '</text>';
+    });
+    for (var p = 0; p < st.dg; p++) {
+      var dgl = GEL.diag[p], tx, ty;
+      if (p === GEL.diag.length - 1 && dgl.sum === 0) continue;
+      if (p < n) { tx = x0 + (n - 1 - p) * cs + 12; ty = y0 + m * cs + 38; }
+      else { tx = x0 - 30; ty = y0 + (m - 1 - (p - n)) * cs + 52; }
+      s += '<text class="res" x="' + tx + '" y="' + ty + '" font-size="22" text-anchor="middle">' + dgl.digit + '</text>';
+    }
+    return s + '</svg>';
+  }
+  var egySteps = [];
+  (function () {
+    var rows = EGY.rows;
+    egySteps.push({ r: 1, pk: false, sum: false, text: 'On écrit deux colonnes : 1 à gauche, et ' + EGY.b + ' à droite (1 fois ' + EGY.b + ').' });
+    for (var i = 1; i < rows.length; i++) egySteps.push({ r: i + 1, pk: false, sum: false, text: 'On double les deux nombres : ' + rows[i][0] + ' et ' + rows[i][1] + '.' + (i === rows.length - 1 ? ' Le double suivant serait ' + rows[i][0] * 2 + ', plus grand que ' + EGY.a + ' : on s’arrête.' : '') });
+    var parts = []; for (i = rows.length - 1; i >= 0; i--) if (EGY.pick[i]) parts.push(rows[i][0]);
+    egySteps.push({ r: rows.length, pk: true, sum: false, text: 'On cherche quels nombres de gauche font ' + EGY.a + ' : ' + parts.join(' + ') + ' = ' + EGY.a + '. On coche ces lignes.' });
+    var vals = []; for (i = rows.length - 1; i >= 0; i--) if (EGY.pick[i]) vals.push(nb(String(rows[i][1])));
+    egySteps.push({ r: rows.length, pk: true, sum: true, text: 'On additionne les nombres de droite des lignes cochées : ' + vals.join(' + ') + ' = ' + nb(String(EGY.sum)) + '.' });
+    egySteps.push({ r: rows.length, pk: true, sum: true, done: true, text: EGY.a + ' × ' + EGY.b + ' = ' + nb(String(EGY.sum)) + '. Pas besoin des tables : il suffit de savoir doubler et additionner !' });
+  })();
+  function egyHtml(st) {
+    var h = '<table class="egy" aria-label="Multiplication égyptienne de ' + EGY.a + ' par ' + EGY.b + '"><thead><tr><th></th><th>Fois</th><th>' + EGY.b + ' × …</th></tr></thead><tbody>';
+    EGY.rows.slice(0, st.r).forEach(function (r, k) { var p = st.pk && EGY.pick[k]; h += '<tr' + (p ? ' class="pk"' : '') + '><td class="ck">' + (p ? '✓' : '') + '</td><td>' + r[0] + '</td><td>' + nb(String(r[1])) + '</td></tr>'; });
+    if (st.sum) h += '<tr class="sum"><td></td><td>' + EGY.a + '</td><td>' + nb(String(EGY.sum)) + '</td></tr>';
+    return h + '</tbody></table>';
+  }
+  var oMode = 'gel', oIdx = 0;
+  var oIntros = {
+    gel: 'Par jalousie (ou « per gelosia ») : on remplit une grille avec les produits des chiffres, puis on additionne en suivant les diagonales. Exemple : ' + GEL.a + ' × ' + GEL.b + '.',
+    egy: 'À l’égyptienne : on double, on double encore, puis on additionne les bonnes lignes. Exemple : ' + EGY.a + ' × ' + EGY.b + '.'
+  };
+  function oRender() {
+    var steps = oMode === 'gel' ? gelSteps : egySteps, st = steps[oIdx], last = oIdx === steps.length - 1;
+    $('oIntro').textContent = oIntros[oMode];
+    $('oPos').textContent = 'Étape ' + (oIdx + 1) + ' / ' + steps.length;
+    $('oView').innerHTML = oMode === 'gel' ? gelSvg(st) : egyHtml(st);
+    $('oSay').className = 'fbk ' + (st.done ? 'ok' : 'info');
+    $('oSay').innerHTML = st.done ? '<strong>Calcul terminé</strong><span>' + esc(st.text) + '</span>' : '<span>' + esc(st.text) + '</span>';
+    $('oPrev').disabled = oIdx === 0;
+    $('oNext').disabled = last; $('oNext').style.display = last ? 'none' : '';
+    $('oGel').setAttribute('aria-pressed', oMode === 'gel' ? 'true' : 'false'); $('oEgy').setAttribute('aria-pressed', oMode === 'egy' ? 'true' : 'false');
+  }
+  $('oGel').addEventListener('click', function () { oMode = 'gel'; oIdx = 0; oRender(); });
+  $('oEgy').addEventListener('click', function () { oMode = 'egy'; oIdx = 0; oRender(); });
+  $('oPrev').addEventListener('click', function () { oIdx = clamp(oIdx - 1, (oMode === 'gel' ? gelSteps : egySteps).length); oRender(); });
+  $('oNext').addEventListener('click', function () { oIdx = clamp(oIdx + 1, (oMode === 'gel' ? gelSteps : egySteps).length); oRender(); });
+  $('oReset').addEventListener('click', function () { oIdx = 0; oRender(); });
+  oRender();
+
+  /* ---------- Corrections « À toi de jouer » ---------- */
+  function workedG(spec) {
+    var p = spec.split(':'), v = p[1].split(',');
+    if (p[0] === 'add') return addBuild(v, 0);
+    if (p[0] === 'sub') return subBuild(v[0], v[1], 'emp', 0);
+    if (p[0] === 'mul') return mulBuild(v[0], v[1]);
+    return divBuild(v[0], 0, Number(v[1]), p[0] === 'divd' ? 3 : 0);
+  }
+  document.querySelectorAll('[data-w]').forEach(function (el) {
+    var G = workedG(el.getAttribute('data-w')), st = G.steps[G.steps.length - 1];
+    el.innerHTML = gridHtml(G, st, G.title + ', posé en colonnes');
+  });
+
+  /* ---------- Quiz ---------- */
+  var QZ = [
+    { q: '4 708 + 2 395 = ?', o: [['a', '6 093'], ['b', '7 103'], ['c', '7 003']], a: 'b', how: 'Unités 8 + 5 = 13 (je retiens 1), dizaines 1 + 0 + 9 = 10 (je retiens 1), centaines 1 + 7 + 3 = 11 (je retiens 1), milliers 1 + 4 + 2 = 7.' },
+    { q: '803 − 467 = ?', o: [['a', '336'], ['b', '446'], ['c', '464']], a: 'a', how: 'Vérification : 336 + 467 = 803. 464 est l’erreur « à l’envers » (7 − 3 au lieu de 13 − 7).' },
+    { q: 'Dans 345 × 26, que vaut vraiment la deuxième ligne ?', o: [['a', '690'], ['b', '2 070'], ['c', '6 900']], a: 'c', how: 'C’est 345 × 20 = 345 × 2 × 10 = 6 900 : d’où le 0 du décalage.' },
+    { q: '618 : 6 = ?', o: [['a', '13'], ['b', '103'], ['c', '130']], a: 'b', how: '6 : 6 = 1 ; puis 1 : 6 = 0 fois (on écrit 0 !) ; puis 18 : 6 = 3. Vérification : 6 × 103 = 618.' },
+    { q: 'Dans 745 : 3 = 248 reste 1, comment s’appelle le 3 ?', o: [['a', 'le dividende'], ['b', 'le diviseur'], ['c', 'le quotient']], a: 'b', how: '745 est le dividende, 3 le diviseur, 248 le quotient et 1 le reste.' },
+    { q: '2,4 × 1,5 = ?', o: [['a', '36'], ['b', '0,36'], ['c', '3,6']], a: 'c', how: '24 × 15 = 360, puis 1 + 1 = 2 chiffres après la virgule : 3,60 = 3,6.' },
+    { q: '7 : 4 = ?', o: [['a', '1,3'], ['b', '1,75'], ['c', '1,57']], a: 'b', how: '7 : 4 = 1 reste 3 ; 30 : 4 = 7 reste 2 ; 20 : 4 = 5. Donc 1,75. (1,3 mélange quotient et reste.)' },
+    { q: 'Dans une division par 7, le reste peut être…', o: [['a', '6'], ['b', '7'], ['c', '9']], a: 'a', how: 'Le reste est toujours plus petit que le diviseur : de 0 à 6 pour une division par 7.' }
+  ];
+  var quiz = $('quiz'), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ''; done = [];
+    QZ.forEach(function (Q, k) {
+      var li = document.createElement('li');
+      li.innerHTML = '<span>' + esc(Q.q) + '</span><select id="qa' + k + '" aria-label="Ta réponse à la question ' + (k + 1) + '"><option value="">…</option>' + Q.o.map(function (o) { return '<option value="' + o[0] + '">' + esc(o[1]) + '</option>'; }).join('') + '</select><button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+      quiz.appendChild(li);
+      function check() {
+        var fb = $('qf' + k), v = $('qa' + k).value;
+        if (!v) { fb.className = 'fb'; fb.textContent = 'Choisis une réponse.'; return; }
+        if (v === Q.a) { fb.className = 'fb ok'; fb.innerHTML = 'Bravo, c’est juste !<span>' + esc(Q.how) + '</span>'; done[k] = true; }
+        else {
+          done[k] = false;
+          var good = Q.o.filter(function (o) { return o[0] === Q.a; })[0][1];
+          fb.className = 'fb no'; fb.innerHTML = 'Pas tout à fait : la bonne réponse est « ' + esc(good) + ' ».<span>' + esc(Q.how) + '</span>';
+        }
+        $('score').textContent = done.filter(Boolean).length + ' / 8';
+      }
+      $('qb' + k).addEventListener('click', check);
+      $('qa' + k).addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+    });
+    $('score').textContent = '0 / 8';
+  }
+  $('newQuiz').addEventListener('click', newQuiz);
+  newQuiz();
+
+  window.__posees = {
+    addBuild: addBuild, subBuild: subBuild, mulBuild: mulBuild, divBuild: divBuild, decBuild: decBuild,
+    readRow: readRow, gridHtml: gridHtml, nb: nb,
+    estCards: estCards, estCard: estCard, errCards: errCards, errNames: ERRNAMES,
+    noCarryAdd: noCarryAdd, noCarryMul: noCarryMul, leftAlignAdd: leftAlignAdd, noShiftMul: noShiftMul, reverseSub: reverseSub, dropZero: dropZero,
+    nineRest: nineRest, proof9: proof9, roughly: roughly, ogCheck: ogCheck, inverseCheck: inverseCheck, vfPresets: vfPresets,
+    gelosia: gelosia, egypt: egypt, gelSteps: gelSteps, egySteps: egySteps, positions: positions, quiz: QZ
+  };
+})();
+</script>
+</body>
+</html>
