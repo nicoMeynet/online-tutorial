@@ -25,7 +25,7 @@ TRACKS = [
         "le-reperage", "le-theoreme-de-pythagore", "les-transformations", "les-droites-remarquables", "les-constructions-a-la-regle-et-au-compas", "les-projections-et-les-vues",
         "les-quadrilateres", "les-statistiques"]),
     ("brevet", "maths", "Objectif 11H", "11H", "Tout le programme de 11H, jusqu'au grand quiz de révision.", [
-        "les-identites-remarquables", "l-equation-produit-nul-et-les-systemes", "les-inequations", "les-fonctions",
+        "les-identites-remarquables", "l-equation-produit-nul-et-les-systemes", "les-inequations", "les-fonctions", "les-fonctions-affines",
         "les-racines-carrees", "les-nombres-premiers", "le-theoreme-de-thales", "les-triangles-isometriques-et-semblables", "le-cercle-et-ses-angles", "la-trigonometrie",
         "les-echelles", "la-sphere-et-la-boule", "les-grandeurs-composees", "les-conversions-avancees", "les-probabilites",
         "l-algorithmique", "la-demonstration", "revisions-brevet"]),
@@ -64,6 +64,7 @@ TRACKS = [
 
 # Ce qu'il vaut mieux connaître avant (seulement les liens importants).
 PRE = {
+    "les-fonctions-affines": ["les-fonctions"],
     "mettre-en-equation": ["les-equations"],
     "fractions-decimaux-et-pourcentages": ["les-fractions", "les-pourcentages"],
     "les-triangles-isometriques-et-semblables": ["le-theoreme-de-thales"],

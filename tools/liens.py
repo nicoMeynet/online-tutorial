@@ -22,6 +22,7 @@ DATES = maj.Dates()
 ROOT = Path(__file__).resolve().parent.parent
 
 TOPICS = [
+    ("les fonctions affines", "les-fonctions-affines.html"),
     ("mettre en équation", "mettre-en-equation.html"),
     ("la mise en équation", "mettre-en-equation.html"),
     ("les fractions, décimaux et pourcentages", "fractions-decimaux-et-pourcentages.html"),

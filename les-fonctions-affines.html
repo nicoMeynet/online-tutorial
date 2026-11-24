@@ -1,0 +1,1470 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Les fonctions affines</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels de maths, marge rouge. Accent bleu (#1d4ed8, encre #1e40af pour le texte). Sur les graphiques : 1re droite en bleu, 2e en orange, 3e en vert ; les « escaliers » de pente en pointillés. Les deux axes ont la même échelle, pour que les pentes se voient bien. */
+:root {
+  --paper: #f7f8fc;
+  --grid: #e1e6f3;
+  --card: #ffffff;
+  --ink: #141a2e;
+  --ink-soft: #4f5873;
+  --acc: #1d4ed8;
+  --acc-ink: #1e40af;
+  --acc-soft: #dde7fd;
+  --two: #c2410c;
+  --two-soft: #fde5d6;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --warn: #d97706;
+  --warn-soft: #fdf0d6;
+  --warn-ink: #92400e;
+  --hl: #fff0a3;
+  --line: #d6dcec;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0d1120; --grid: #171d33; --card: #141a2c; --ink: #e9edf8; --ink-soft: #a4adc8;
+    --acc: #7aa2ff; --acc-ink: #a9c1ff; --acc-soft: #1a2547; --two: #ff9a5c; --two-soft: #3a2112;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27;
+    --warn: #f5a524; --warn-soft: #3d2a0c; --warn-ink: #fbbf5a; --hl: #4b4318; --line: #283150;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0d1120; --grid: #171d33; --card: #141a2c; --ink: #e9edf8; --ink-soft: #a4adc8;
+  --acc: #7aa2ff; --acc-ink: #a9c1ff; --acc-soft: #1a2547; --two: #ff9a5c; --two-soft: #3a2112;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27;
+  --warn: #f5a524; --warn-soft: #3d2a0c; --warn-ink: #fbbf5a; --hl: #4b4318; --line: #283150;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+@media (max-width: 520px) { .page { padding-block: 28px 64px; gap: 44px; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero-top { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+.hero-top svg { width: 170px; height: auto; flex: none; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+@media (max-width: 520px) { .box { padding: 16px 14px; } }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note.ok { border-left-color: var(--ok); background: var(--ok-soft); }
+.note.two { border-left-color: var(--two); background: var(--two-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 8px 12px; min-height: 44px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button.main { background: var(--acc); color: var(--card); }
+button[aria-pressed="true"] { background: var(--acc-ink); color: var(--paper); }
+button.ex { font-family: var(--f-mono); font-weight: 600; font-size: .92rem; }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+button:disabled { cursor: default; opacity: .5; }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+label { font-weight: 700; }
+
+/* Curseurs faciles à prendre au pouce, avec des boutons − et + */
+input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; min-width: 0; height: 44px; margin: 0; background: transparent; accent-color: var(--acc); cursor: pointer; }
+input[type="range"]::-webkit-slider-runnable-track { height: 8px; border-radius: 4px; background: var(--line); }
+input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 30px; height: 30px; margin-top: -11px; border-radius: 50%; background: var(--acc); border: 3px solid var(--card); box-shadow: 0 0 0 2px var(--ink); }
+input[type="range"]::-moz-range-track { height: 8px; border-radius: 4px; background: var(--line); }
+input[type="range"]::-moz-range-thumb { width: 26px; height: 26px; border-radius: 50%; background: var(--acc); border: 3px solid var(--card); box-shadow: 0 0 0 2px var(--ink); }
+.param { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.params { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px 18px; }
+.srow { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; gap: 10px; align-items: center; }
+.srow button { padding: 0; min-width: 44px; font-size: 1.3rem; line-height: 1; }
+.offer { border: 1.5px dashed var(--line); border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+
+/* Graphiques dessinés par le script */
+.graph { min-width: 0; }
+.graph svg { width: 100%; height: auto; display: block; background: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; }
+.graph.sq svg { max-width: 460px; margin: 0 auto; }
+.graph.mini svg { max-width: 320px; margin: 0 auto; }
+.graph.wide svg { max-width: 560px; margin: 0 auto; }
+.lp { cursor: pointer; }
+.lp:focus { outline: none; }
+.lp:focus-visible .vis { stroke: var(--red); stroke-width: 4; }
+.eqline { font-family: var(--f-mono); font-weight: 600; font-size: clamp(1.15rem, 4.5vw, 1.45rem); color: var(--acc-ink); overflow-wrap: anywhere; }
+.readout { font-family: var(--f-mono); font-size: .98rem; display: flex; flex-direction: column; gap: 6px; overflow-wrap: anywhere; min-width: 0; }
+.readout b { color: var(--acc-ink); }
+.c-acc { color: var(--acc-ink); font-weight: 700; }
+.c-two { color: var(--two); font-weight: 700; }
+.c-ok { color: var(--ok); font-weight: 700; }
+.c-red { color: var(--red); font-weight: 700; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: .9rem; color: var(--ink-soft); }
+.legend i { display: inline-block; width: 22px; height: 4px; border-radius: 2px; vertical-align: middle; margin-right: 6px; }
+.ptable { border-collapse: separate; border-spacing: 0; width: 100%; font-variant-numeric: tabular-nums; }
+.ptable th, .ptable td { border: 1.5px solid var(--ink); padding: 6px 8px; text-align: center; font-family: var(--f-mono); font-size: .98rem; }
+.ptable th { font-family: var(--f-display); background: var(--paper); }
+.ptable td.new { background: var(--hl); }
+@media (max-width: 420px) { .ptable th, .ptable td { padding: 5px 3px; font-size: .86rem; } }
+.scroll { overflow-x: auto; max-width: 100%; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.rule { font-family: var(--f-mono); font-size: 1.1rem; font-weight: 600; color: var(--acc-ink); overflow-wrap: anywhere; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
+.tag.ok { color: var(--ok); }
+.tag.no { color: var(--red); }
+.tag.acc { color: var(--acc-ink); }
+.tag.two { color: var(--two); }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc-ink); }
+.fbk { border-radius: 8px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; min-width: 0; overflow-wrap: anywhere; }
+.fbk:empty { display: none; }
+.fbk.ok { background: var(--ok-soft); }
+.fbk.no { background: var(--red-soft); }
+.fbk.info { background: var(--acc-soft); }
+.fbk.warn { background: var(--warn-soft); }
+.fbk strong { font-family: var(--f-display); }
+.fbk.ok strong { color: var(--ok); }
+.fbk.no strong { color: var(--red); }
+.fbk.info strong { color: var(--acc-ink); }
+.fbk.warn strong { color: var(--warn-ink); }
+.say { min-height: 4.2em; }
+.step-n { font-family: var(--f-mono); font-size: .85rem; color: var(--ink-soft); }
+button.right, button.right:disabled { background: var(--ok-soft); border-color: var(--ok); color: var(--ok); opacity: 1; }
+button.wrong, button.wrong:disabled { background: var(--red-soft); border-color: var(--red); color: var(--red); opacity: 1; }
+.choice button { flex: 1 1 130px; }
+.choice.eqs button { font-family: var(--f-mono); font-weight: 600; font-size: .95rem; }
+.choice button:disabled:not(.right):not(.wrong) { opacity: .55; }
+.card-big { background: var(--paper); border: 1.5px dashed var(--line); border-radius: 10px; padding: 14px; font-family: var(--f-display); font-weight: 700; font-size: 1.15rem; overflow-wrap: anywhere; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.card-big .graph svg { background: var(--card); }
+.card-big .formula { font-family: var(--f-mono); font-size: clamp(1.3rem, 5.5vw, 1.7rem); color: var(--acc-ink); text-align: center; padding: 8px 0; }
+.card-big .ask { font-family: var(--f-body); font-weight: 400; font-size: 1rem; color: var(--ink-soft); }
+.sorter-end { margin-top: .6rem; }
+.sorter-end strong { font-size: 1.05rem; }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 200px auto; gap: 10px; align-items: center; }
+.quiz li > span:first-child { min-width: 0; overflow-wrap: anywhere; }
+.quiz select { font: inherit; font-size: .95rem; padding: 6px 6px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; min-height: 44px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb:empty { display: none; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; min-width: 0; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); min-width: 0; overflow-wrap: anywhere; }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+<!--ticons--><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Tutoriels"><script src="progress.js" defer></script><script src="share.js" defer></script><!--/ticons-->
+<style id="tnav-css">
+.tnav-top { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin: 0 0 4px; }
+.tnav-home { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font-weight: 700; font-size: .95rem; text-decoration: none; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tnav-home:hover, .tnav-home:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.tnav-bottom { margin-top: 8px; display: flex; flex-direction: column; gap: 12px; }
+.tnav-bottom h2 { margin: 0; }
+.tnav-pn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tnav-pn a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--ink, #222); border-radius: 10px;
+  background: var(--card, #fff); color: var(--ink, #222); text-decoration: none; box-shadow: 3px 3px 0 var(--ink, #222); min-width: 0; }
+.tnav-pn a span { font-size: .85rem; color: var(--ink-soft, #666); }
+.tnav-pn a strong { overflow-wrap: anywhere; }
+.tnav-pn a.next { text-align: right; grid-column: 2; }
+.tnav-bottom .tnav-home { align-self: center; }
+.tnav-top [data-share] { margin-left: auto; }
+.tnav-short { display: none; }
+.tprint-h { display: none; }
+@media (max-width: 600px) { header.hero { gap: 8px !important; } header.hero > .fig, header.hero > .box.fig, header.hero .hero-top .fig { display: none !important; }
+  header.hero p.lead { font-size: 1rem !important; line-height: 1.5 !important; } header.hero > p.soft { font-size: .88rem !important; line-height: 1.45 !important; }
+  header.hero h1 { font-size: clamp(1.7rem, 8vw, 2.2rem) !important; } }
+.tprint-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 14px 0 0; }
+.tprint-row span { font-size: .9rem; opacity: .8; }
+.tprint { display: inline-flex; align-items: center; gap: 8px; min-height: 42px; padding: 8px 16px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font: inherit; font-weight: 700; cursor: pointer; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tprint:hover, .tprint:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+@media print { [data-tp-hide] { display: none !important; } html.tp-on, html.tp-on body { background: #fff !important; color: #111 !important; padding: 0 !important; margin: 0 !important; }
+  html.tp-on [data-fiche] { color: #111; } html.tp-on [data-fiche] * { color: #111 !important; background: transparent !important; box-shadow: none !important; }
+  html.tp-on .tprint-h { display: block; font-size: 1.4rem; font-weight: 800; margin: 0 0 10px; } .tprint-row { display: none !important; } }
+@media (max-width: 520px) { .tnav-top .tnav-long { display: none; } .tnav-top .tnav-short { display: inline; } .tnav-top { flex-wrap: nowrap; } .tnav-top > * { flex: none; } }
+.tnav-end { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+@media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
+.diff { font: 700 .72rem/1.2 var(--f-mono, monospace); padding: 2px 8px; border-radius: 99px; border: 1.5px solid; white-space: nowrap; }
+.diff.d1 { color: #15803d; border-color: #15803d; background: #dcf3e3; }
+.diff.d2 { color: #a15c07; border-color: #b45309; background: #fbe7cf; }
+.diff.d3 { color: #b91c1c; border-color: #b91c1c; background: #fde2e2; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root:not([data-theme="light"]) .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root:not([data-theme="light"]) .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; } }
+:root[data-theme="dark"] .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root[data-theme="dark"] .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root[data-theme="dark"] .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; }
+</style>
+</head>
+<body>
+<main class="page">
+<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="maths.html">← <span class="tnav-long">Tous les tutoriels de maths</span><span class="tnav-short">Maths</span></a><span class="diff d2" title="Difficulté : moyen">Moyen</span><button type="button" data-share hidden>Partager</button></nav><!--/tnav-->
+
+
+  <header class="hero">
+    <div class="hero-top">
+      <svg class="fig" viewBox="0 0 200 170" aria-hidden="true">
+        <rect x="4" y="4" width="192" height="162" rx="10" fill="var(--card)" stroke="var(--ink)" stroke-width="2"/>
+        <g stroke="var(--line)" stroke-width="1">
+          <line x1="50" y1="20" x2="50" y2="140"/><line x1="80" y1="20" x2="80" y2="140"/><line x1="110" y1="20" x2="110" y2="140"/><line x1="140" y1="20" x2="140" y2="140"/><line x1="170" y1="20" x2="170" y2="140"/>
+          <line x1="20" y1="110" x2="180" y2="110"/><line x1="20" y1="80" x2="180" y2="80"/><line x1="20" y1="50" x2="180" y2="50"/><line x1="20" y1="20" x2="180" y2="20"/>
+        </g>
+        <line x1="20" y1="140" x2="182" y2="140" stroke="var(--ink)" stroke-width="2"/>
+        <line x1="20" y1="140" x2="20" y2="16" stroke="var(--ink)" stroke-width="2"/>
+        <line x1="20" y1="140" x2="170" y2="20" stroke="var(--acc)" stroke-width="4" stroke-linecap="round"/>
+        <line x1="20" y1="104" x2="180" y2="56" stroke="var(--two)" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="92" cy="82" r="7" fill="var(--red)" stroke="var(--card)" stroke-width="2"/>
+        <text x="150" y="30" font-size="16" style="fill:var(--acc);font-weight:600">A</text>
+        <text x="160" y="80" font-size="16" style="fill:var(--two);font-weight:600">B</text>
+        <text x="172" y="158" font-size="13">h</text>
+        <text x="26" y="30" font-size="13">fr.</text>
+      </svg>
+      <div style="display:flex;flex-direction:column;gap:10px;min-width:0;flex:1 1 280px">
+        <span class="eyebrow">Tutoriel de maths · niveau 10H–11H</span>
+        <h1>Des droites et des tarifs</h1>
+        <p class="lead">Les fonctions affines dessinent des droites. Avec deux nombres, la pente et l'ordonnée à l'origine, tu sauras lire, tracer et comparer des droites… et choisir le tarif le moins cher.</p>
+      </div>
+    </div>
+  </header>
+
+  <section>
+    <span class="eyebrow">Ce que tu sais déjà</span>
+    <div class="note">
+      <span class="note-title">Petit rappel</span>
+      <span>Une fonction est une « machine » : un nombre x entre, un seul nombre <span class="mono">f(x)</span> sort, c'est l'<strong>image</strong> de x (et x est un <strong>antécédent</strong> de f(x)). On peut ranger des images dans un tableau de valeurs et dessiner la courbe. Tout cela est expliqué dans le tutoriel sur <a class="tlink" href="les-fonctions.html">les fonctions</a>. Ici, on va plus loin avec une famille très utile : les fonctions dont la courbe est une <strong>droite</strong>.</span>
+    </div>
+    <div class="box">
+      <h3>La notation de ce tutoriel</h3>
+      <p>En Suisse romande, on écrit souvent une fonction affine <span class="rule">f(x) = mx + h</span></p>
+      <p><strong>m</strong> s'appelle la <strong>pente</strong> (on dit aussi le coefficient directeur) et <strong>h</strong> l'<strong>ordonnée à l'origine</strong>. On écrit aussi <span class="mono">f : x ↦ mx + h</span>, qui se lit « f est la fonction qui à x associe mx + h ».</p>
+      <p class="soft">Dans certains livres (et dans le tutoriel sur <a class="tlink" href="les-fonctions.html">les fonctions</a>), on écrit <span class="mono">f(x) = ax + b</span> : c'est exactement la même chose, a joue le rôle de m et b celui de h.</p>
+    </div>
+  </section>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · Trois familles</span>
+    <h2>Linéaire, affine, constante</h2>
+    <p>Toutes les fonctions de la forme <span class="mono">mx + h</span> ont une droite pour graphique. Selon les valeurs de m et h, on leur donne un nom plus précis.</p>
+    <div class="cards">
+      <div class="box"><span class="tag acc">h = 0</span><strong>Linéaire : f(x) = mx</strong><span class="soft">Exemple : <span class="mono">f(x) = 3x</span>. C'est la <strong>proportionnalité</strong> : si x double, f(x) double. La droite passe par l'<strong>origine</strong> (0 ; 0). Le lien est expliqué dans le tutoriel sur <a class="tlink" href="la-proportionnalite.html">la proportionnalité</a>.</span></div>
+      <div class="box"><span class="tag acc">m ≠ 0, h ≠ 0</span><strong>Affine : f(x) = mx + h</strong><span class="soft">Exemple : <span class="mono">f(x) = 3x + 2</span>. La droite est penchée et coupe l'axe vertical en h, pas en 0. Ce n'est plus de la proportionnalité.</span></div>
+      <div class="box"><span class="tag acc">m = 0</span><strong>Constante : f(x) = h</strong><span class="soft">Exemple : <span class="mono">f(x) = 5</span>. Quel que soit x, le résultat est 5. La droite est <strong>horizontale</strong>.</span></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Une famille dans l'autre</span>
+      <span>Au sens large, les fonctions linéaires et constantes sont <strong>aussi</strong> des fonctions affines (avec h = 0 ou avec m = 0). Dans le jeu ci-dessous, « affine » veut dire « ni linéaire, ni constante ». Attention aux formules déguisées : on développe et on range d'abord !</span>
+    </div>
+    <div class="box">
+      <h3>Reconnais la famille</h3>
+      <p class="soft">Formule ou graphique : choisis la bonne famille.</p>
+      <div class="btns"><span class="score" id="kdScore">Carte 1 / 12</span><span class="step-n" id="kdPos"></span></div>
+      <div class="card-big" id="kdCard" aria-live="polite"></div>
+      <div class="btns choice" id="kdBtns" role="group" aria-label="Quelle famille ?"></div>
+      <div class="fbk" id="kdOut" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="kdPrev">← Précédent</button><button type="button" id="kdNext">Suivant →</button><button type="button" id="kdReset">Recommencer</button></div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · Le laboratoire</span>
+    <h2>Que font m et h ?</h2>
+    <p>Bouge les deux curseurs et regarde la droite, son équation et son tableau de valeurs changer en même temps. Le point orange est le point où la droite coupe l'axe vertical, les pointillés orange montrent la pente.</p>
+    <div class="box">
+      <div class="btns" id="labBtns" role="group" aria-label="Exemples de droites"></div>
+      <div class="eqline" id="labEq" aria-live="polite"></div>
+      <div class="graph sq" id="labG"></div>
+      <div class="params" id="labParams"></div>
+      <div class="scroll"><table class="ptable" id="labTable" aria-label="Tableau de valeurs de la fonction"></table></div>
+      <div class="readout" id="labOut" aria-live="polite"></div>
+    </div>
+    <div class="cards">
+      <div class="box"><span class="tag two">h</span><strong>Le point de départ</strong><span class="soft">f(0) = m × 0 + h = h. La droite coupe l'<strong>axe vertical</strong> au point (0 ; h). Changer h fait monter ou descendre la droite, sans la pencher.</span></div>
+      <div class="box"><span class="tag acc">m &gt; 0</span><strong>La droite monte</strong><span class="soft">De gauche à droite, elle grimpe. Plus m est grand, plus elle est raide.</span></div>
+      <div class="box"><span class="tag acc">m &lt; 0</span><strong>La droite descend</strong><span class="soft">De gauche à droite, elle descend. m = −3 descend plus vite que m = −1/2.</span></div>
+      <div class="box"><span class="tag acc">m = 0</span><strong>La droite est plate</strong><span class="soft">Horizontale : la fonction est constante.</span></div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Lire la pente</span>
+    <h2>L'escalier de la pente</h2>
+    <p>La pente m dit de combien y change quand x augmente de 1 : <strong>quand x augmente de 1, y augmente de m</strong> (ou diminue, si m est négatif). Avec f(x) = 2x + 1 : f(0) = 1, f(1) = 3, f(2) = 5… à chaque pas de 1, on monte de 2.</p>
+    <p>Entre deux points de la droite, on dessine un « escalier » : une marche horizontale <strong>Δx</strong> (on lit « delta x », l'écart des x) et une contremarche verticale <strong>Δy</strong> (l'écart des y). Pour n'importe quels deux points de la même droite, on trouve toujours le même quotient :</p>
+    <p class="rule">m = Δy / Δx = (y₂ − y₁) / (x₂ − x₁)</p>
+    <div class="box">
+      <h3>Mesure la pente toi-même</h3>
+      <p class="soft">Touche deux points ronds de la droite : l'escalier apparaît et la pente est calculée. Essaie avec des points proches, puis éloignés : la pente ne change pas.</p>
+      <div class="eqline" id="slEq"></div>
+      <div class="graph sq" id="slG"></div>
+      <div class="btns"><button type="button" id="slOther" class="main">Autre droite</button><button type="button" id="slClear">Effacer les points</button></div>
+      <div class="fbk info" id="slOut" aria-live="polite"></div>
+    </div>
+    <div class="note two">
+      <span class="note-title">Une pente en fraction</span>
+      <span>Si m = 2/3, l'escalier le plus simple fait <strong>3 pas à droite et 2 pas vers le haut</strong> : le dénominateur pour Δx, le numérateur pour Δy. Si m = −3/4 : 4 pas à droite et 3 pas vers le bas.</span>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · Lire une équation sur un graphe</span>
+    <h2>Trouve l'équation de cette droite</h2>
+    <p>Pour lire l'équation d'une droite, deux questions dans l'ordre :</p>
+    <div class="cards">
+      <div class="box"><span class="tag two">1</span><strong>Où coupe-t-elle l'axe vertical ?</strong><span class="soft">Ce nombre, c'est <strong>h</strong>.</span></div>
+      <div class="box"><span class="tag acc">2</span><strong>Quel escalier ?</strong><span class="soft">Depuis un point du quadrillage, compte les pas vers la droite (Δx) et vers le haut ou le bas (Δy). <strong>m = Δy/Δx</strong>, négatif si ça descend.</span></div>
+    </div>
+    <div class="box">
+      <h3>Le jeu des équations</h3>
+      <p class="soft">Les mauvaises réponses sont des erreurs classiques : signe de m oublié, m et h échangés, escalier lu à l'envers (Δx/Δy).</p>
+      <div class="btns"><span class="score" id="eqScore">Droite 1 / 9</span><span class="step-n" id="eqPos"></span></div>
+      <div class="card-big" id="eqCard" aria-live="polite"></div>
+      <div class="btns choice eqs" id="eqBtns" role="group" aria-label="Quelle équation ?"></div>
+      <div class="fbk" id="eqOut" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="eqPrev">← Précédent</button><button type="button" id="eqNext">Suivant →</button><button type="button" id="eqReset">Recommencer</button></div>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Tracer une droite</span>
+    <h2>De l'équation à la droite</h2>
+    <p>Pour tracer une droite, il suffit de <strong>deux points</strong> (un troisième sert à vérifier). Deux méthodes : l'escalier, rapide, et le tableau de valeurs, sûr.</p>
+    <div class="box">
+      <div class="btns" role="group" aria-label="Méthode">
+        <button type="button" id="trEsc" aria-pressed="true">Avec h et l'escalier</button>
+        <button type="button" id="trTab" aria-pressed="false">Avec un tableau</button>
+      </div>
+      <div class="btns" id="trBtns" role="group" aria-label="Choisir une droite"></div>
+      <div class="btns"><span class="score" id="trPos"></span></div>
+      <div class="graph sq" id="trG"></div>
+      <div class="scroll" id="trTable"></div>
+      <div class="fbk info say" id="trSay" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="trPrev">← Précédent</button><button type="button" id="trNext" class="main">Suivant →</button><button type="button" id="trReset">Recommencer</button></div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · Deux points, une équation</span>
+    <h2>Trouver l'équation à partir de deux points</h2>
+    <p>Une droite est connue dès qu'on connaît deux de ses points A(x₁ ; y₁) et B(x₂ ; y₂). On calcule d'abord la pente, puis h :</p>
+    <div class="cards">
+      <div class="box"><span class="tag acc">1</span><strong>La pente</strong><span class="rule">m = (y₂ − y₁) / (x₂ − x₁)</span></div>
+      <div class="box"><span class="tag two">2</span><strong>L'ordonnée à l'origine</strong><span class="rule">h = y₁ − m × x₁</span><span class="soft">car A est sur la droite : y₁ = m × x₁ + h.</span></div>
+    </div>
+    <div class="box">
+      <div class="btns"><span class="score" id="tpPos"></span><span class="step-n" id="tpLabel"></span></div>
+      <div class="graph sq" id="tpG"></div>
+      <div class="fbk info say" id="tpSay" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="tpPrev">← Précédent</button><button type="button" id="tpNext" class="main">Suivant →</button><button type="button" id="tpReset">Recommencer</button><button type="button" id="tpOther">Autre paire de points</button></div>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Deux droites</span>
+    <h2>Parallèles ou sécantes ?</h2>
+    <p>Deux droites qui ont la <strong>même pente</strong> montent (ou descendent) exactement de la même façon : elles sont <strong>parallèles</strong> et ne se rencontrent jamais (sauf si elles ont aussi le même h : c'est alors la même droite, on dit « confondues »). Si les pentes sont <strong>différentes</strong>, elles finissent toujours par se croiser en un seul point : elles sont <strong>sécantes</strong>.</p>
+    <div class="box">
+      <div class="btns" id="paBtns" role="group" aria-label="Exemples de paires de droites"></div>
+      <div class="legend"><span><i style="background:var(--acc)"></i><span id="paE1"></span></span><span><i style="background:var(--two)"></i><span id="paE2"></span></span></div>
+      <div class="graph sq" id="paG"></div>
+      <div class="params" id="paParams"></div>
+      <div class="fbk" id="paOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Le point d'intersection</span>
+    <h2>Où se croisent deux droites ?</h2>
+    <p>Au point où deux droites se croisent, elles ont le même x <strong>et</strong> le même y. On cherche donc le x pour lequel f(x) = g(x) : c'est une équation du premier degré, comme dans le tutoriel sur <a class="tlink" href="les-equations.html">les équations</a>. Chercher un point commun à deux droites, c'est aussi résoudre un <strong>système</strong> de deux équations à deux inconnues.</p>
+    <div class="box">
+      <div class="btns"><span class="score" id="inPos"></span><span class="step-n" id="inLabel"></span></div>
+      <div class="legend"><span><i style="background:var(--acc)"></i><span id="inE1"></span></span><span><i style="background:var(--two)"></i><span id="inE2"></span></span></div>
+      <div class="graph sq" id="inG"></div>
+      <div class="fbk info say" id="inSay" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="inPrev">← Précédent</button><button type="button" id="inNext" class="main">Suivant →</button><button type="button" id="inReset">Recommencer</button><button type="button" id="inOther">Autre paire de droites</button></div>
+    </div>
+    <div class="note">
+      <span class="note-title">La recette</span>
+      <span>mx + h = m'x + h' ⟹ (m − m')x = h' − h ⟹ x = (h' − h) / (m − m'). Ensuite, y = f(x). Si m = m', on ne peut pas diviser : les droites sont parallèles (ou confondues).</span>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Comparer des tarifs</span>
+    <h2>Quelle offre est la moins chère ?</h2>
+    <p>Beaucoup de prix sont des fonctions affines : un <strong>montant fixe</strong> (frais, carte, prise en charge) plus un <strong>prix par unité</strong> (par heure, par entrée, par kilomètre). Le montant fixe, c'est h ; le prix par unité, c'est la pente m.</p>
+    <p>Exemple : location de vélos A « 2 fr. par heure » : A(x) = 2x. Location B « 5 fr. + 1 fr. par heure » : B(x) = x + 5. Pour quelques heures, A est moins cher ; pour une longue balade, B gagne. Les deux coûtent pareil quand 2x = x + 5, donc après <strong>5 heures</strong> (10 fr. chacun).</p>
+    <div class="box">
+      <h3>Le comparateur de tarifs</h3>
+      <p class="soft">Tous les prix et noms d'entreprises sont <strong>inventés</strong>. Change les montants, ajoute une 3ᵉ offre, et lis où les droites se croisent.</p>
+      <div class="btns" id="taBtns" role="group" aria-label="Choisir une situation"></div>
+      <div class="params" id="taParams"></div>
+      <div class="btns"><button type="button" id="taC" aria-pressed="false">Ajouter l'offre C</button></div>
+      <div class="legend" id="taLeg"></div>
+      <div class="graph wide" id="taG"></div>
+      <div class="params" id="taXp"></div>
+      <div class="readout" id="taOut" aria-live="polite"></div>
+    </div>
+    <div class="note ok">
+      <span class="note-title">La méthode, sans graphique</span>
+      <span>1) J'écris chaque tarif sous la forme mx + h. 2) Je résous A(x) = B(x) pour trouver le « point d'équilibre ». 3) Avant ce point, l'offre avec le plus petit montant fixe est la moins chère ; après, c'est celle avec le plus petit prix par unité.</span>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · Dans la vraie vie</span>
+    <h2>Des droites partout</h2>
+    <p>Chaque fois qu'une grandeur part d'une <strong>valeur de départ</strong> (h) et change <strong>toujours de la même quantité</strong> par unité (m), on a une fonction affine. Quelques exemples :</p>
+    <div class="cards">
+      <div class="box"><span class="tag acc">Taxi</span><strong>Prise en charge + prix au km</strong><span class="soft">h = la prise en charge, m = le prix par kilomètre.</span></div>
+      <div class="box"><span class="tag acc">Température</span><strong>F = 1,8C + 32</strong><span class="soft">Pour passer des degrés Celsius aux degrés Fahrenheit : 0 °C = 32 °F, 100 °C = 212 °F.</span></div>
+      <div class="box"><span class="tag acc">Bougie, réservoir</span><strong>Une pente négative</strong><span class="soft">Une bougie qui raccourcit ou un réservoir qui se vide : la quantité diminue chaque heure, donc m &lt; 0.</span></div>
+      <div class="box"><span class="tag acc">Vitesse constante</span><strong>d = v · t + d₀</strong><span class="soft">La distance d₀ au départ, plus la vitesse v fois le temps t. Plus de détails dans le tutoriel sur <a class="tlink" href="la-vitesse.html">la vitesse</a>.</span></div>
+    </div>
+    <div class="box">
+      <h3>Associe la situation à sa fonction</h3>
+      <div class="btns"><span class="score" id="lfScore">Situation 1 / 9</span><span class="step-n" id="lfPos"></span></div>
+      <div class="card-big" id="lfCard" aria-live="polite"></div>
+      <div class="btns choice" id="lfBtns" role="group" aria-label="Quelle fonction ?"></div>
+      <div class="fbk" id="lfOut" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="lfPrev">← Précédent</button><button type="button" id="lfNext">Suivant →</button><button type="button" id="lfReset">Recommencer</button></div>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · Sens de variation et zéro</span>
+    <h2>Monte, descend, et coupe l'axe horizontal</h2>
+    <p>Une fonction affine est <strong>croissante</strong> si m &gt; 0 (quand x augmente, f(x) augmente), <strong>décroissante</strong> si m &lt; 0, et constante si m = 0.</p>
+    <p>Son <strong>zéro</strong> est le x pour lequel f(x) = 0 : c'est là où la droite coupe l'<strong>axe horizontal</strong>. On résout mx + h = 0, donc <span class="rule">x = −h / m</span> (si m ≠ 0). Pour la bougie, le zéro est le moment où elle est entièrement brûlée.</p>
+    <div class="box">
+      <div class="btns" id="zeBtns" role="group" aria-label="Exemples"></div>
+      <div class="eqline" id="zeEq" aria-live="polite"></div>
+      <div class="graph sq" id="zeG"></div>
+      <div class="params" id="zeParams"></div>
+      <div class="readout" id="zeOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 12 -->
+  <section>
+    <span class="eyebrow">Étape 12 · Pour aller plus loin</span>
+    <h2>Des morceaux de droites</h2>
+    <p>Certains tarifs changent en cours de route : par exemple, un parking (inventé) qui coûte 3 fr. par heure pendant les 3 premières heures, puis seulement 1 fr. par heure. Le graphique est fait de <strong>deux morceaux de droites</strong> de pentes différentes : c'est une fonction <strong>affine par morceaux</strong>. Autre cas : « chaque heure commencée est due » donne un graphique en <strong>escalier</strong> (des morceaux de droites horizontales). Certains impôts, calculés par tranches, ressemblent aussi à des morceaux de droites.</p>
+    <div class="box">
+      <div class="btns" role="group" aria-label="Type de tarif">
+        <button type="button" id="pcMorc" aria-pressed="true">Par morceaux</button>
+        <button type="button" id="pcEsc" aria-pressed="false">En escalier</button>
+      </div>
+      <div class="graph wide" id="pcG"></div>
+      <div class="params" id="pcParams"></div>
+      <div class="readout" id="pcOut" aria-live="polite"></div>
+    </div>
+    <div class="note two">
+      <span class="note-title">Et les courbes ?</span>
+      <span>Quand le graphique n'est plus fait de droites mais d'une belle courbe en U, comme f(x) = x², on entre dans un autre monde : c'est le tutoriel sur <a class="tlink" href="le-second-degre.html">le second degré</a>.</span>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Les idées reçues</span>
+    <h2>Vrai ou faux ?</h2>
+    <div class="cards">
+      <div class="box"><span class="tag no">Idée reçue</span><strong>« Une fonction affine passe toujours par 0. »</strong><span class="soft">Seules les fonctions linéaires (h = 0) passent par l'origine. f(x) = 2x + 3 coupe l'axe vertical en 3.</span></div>
+      <div class="box"><span class="tag no">Idée reçue</span><strong>« Plus la droite est longue, plus la pente est grande. »</strong><span class="soft">Une droite n'a pas de longueur : elle continue sans fin. La pente dépend seulement de son inclinaison, Δy/Δx.</span></div>
+      <div class="box"><span class="tag no">Idée reçue</span><strong>« m négatif, ça veut dire que la droite est sous l'axe. »</strong><span class="soft">Non : m &lt; 0 veut dire que la droite <strong>descend</strong>. f(x) = −x + 5 a une pente négative, mais elle est au-dessus de l'axe pour tous les x plus petits que 5.</span></div>
+      <div class="box"><span class="tag no">Idée reçue</span><strong>« Dans 3 − 2x, la pente est 3. »</strong><span class="soft">La pente est le nombre qui multiplie x : ici −2. L'ordre d'écriture ne compte pas : 3 − 2x = −2x + 3.</span></div>
+      <div class="box"><span class="tag no">Idée reçue</span><strong>« La pente, c'est Δx/Δy. »</strong><span class="soft">C'est l'inverse : on divise ce qui monte (Δy) par ce qui avance (Δx). Une pente de 2 monte de 2 pour 1 pas à droite.</span></div>
+      <div class="box"><span class="tag no">Idée reçue</span><strong>« Toute droite est le graphique d'une fonction. »</strong><span class="soft">Une droite verticale, comme x = 2, n'en est pas une : pour x = 2, il y aurait une infinité d'images.</span></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Le savais-tu ?</span>
+    <h2>Petites histoires de droites</h2>
+    <div class="cards">
+      <div class="box"><span class="tag two">XVIIᵉ siècle</span><strong>Descartes et le repère</strong><span class="soft">En 1637, le philosophe et mathématicien René Descartes publie <em>La Géométrie</em>, où il relie les équations et les figures. Pierre de Fermat a eu des idées semblables à la même époque. C'est grâce à eux qu'on parle de « coordonnées cartésiennes ».</span></div>
+      <div class="box"><span class="tag two">Thermomètre</span><strong>−40, le point de rencontre</strong><span class="soft">L'échelle Fahrenheit date du début du XVIIIᵉ siècle. Les droites F = C et F = 1,8C + 32 se coupent en C = −40 : à −40 degrés, Celsius et Fahrenheit affichent le même nombre !</span></div>
+      <div class="box"><span class="tag two">Route</span><strong>Les pentes en pour cent</strong><span class="soft">Un panneau « 10 % » au bord de la route veut dire : la route monte (ou descend) de 10 m pour 100 m à l'horizontale. C'est une pente m = 10/100 = 0,1.</span></div>
+      <div class="box"><span class="tag two">Suisse</span><strong>Plus raide que 100 %</strong><span class="soft">Le funiculaire du Stoos, dans le canton de Schwytz, ouvert en 2017, est présenté comme le plus raide du monde : sa pente atteint environ 110 %, donc plus de 45°.</span></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Fais tes calculs sur une feuille si tu veux, choisis ta réponse, puis vérifie.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Recommencer</button>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À toi de jouer</span>
+    <h2>Six problèmes</h2>
+    <p>Cherche sur une feuille, avec un petit graphique si ça t'aide, puis ouvre la correction.</p>
+    <div class="exos">
+      <details>
+        <summary>Lire une droite<span class="q">Une droite coupe l'axe vertical en −2. Quand on avance de 2 vers la droite, elle monte de 3. Quelle est son équation ?</span></summary>
+        <div>
+          <span>h = −2 (là où elle coupe l'axe vertical). m = Δy/Δx = 3/2.</span>
+          <span>Équation : <strong>f(x) = (3/2)x − 2</strong>. Vérification : f(2) = 3 − 2 = 1, et on a bien monté de 3 depuis −2.</span>
+        </div>
+      </details>
+      <details>
+        <summary>Deux points<span class="q">Trouve l'équation de la droite qui passe par A(−1 ; 7) et B(2 ; 1).</span></summary>
+        <div>
+          <span>m = (1 − 7) / (2 − (−1)) = −6 / 3 = −2.</span>
+          <span>h = y₁ − m × x₁ = 7 − (−2) × (−1) = 7 − 2 = 5.</span>
+          <span>Équation : <strong>f(x) = −2x + 5</strong>. Vérification avec B : f(2) = −4 + 5 = 1 ✓</span>
+        </div>
+      </details>
+      <details>
+        <summary>Le point d'intersection<span class="q">Où se coupent les droites de f(x) = 3x − 2 et g(x) = x + 4 ?</span></summary>
+        <div>
+          <span>3x − 2 = x + 4, donc 3x − x = 4 + 2, donc 2x = 6, donc x = 3.</span>
+          <span>y = f(3) = 9 − 2 = 7, et g(3) = 3 + 4 = 7 ✓. Point d'intersection : <strong>I(3 ; 7)</strong>.</span>
+        </div>
+      </details>
+      <details>
+        <summary>Deux forfaits de téléphone<span class="q">Forfait Bleu : 10 fr. par mois + 2 fr. par Go de données. Forfait Vert : 18 fr. par mois + 1 fr. par Go (prix inventés). À partir de combien de Go le Vert est-il moins cher ?</span></summary>
+        <div>
+          <span>Bleu : B(x) = 2x + 10. Vert : V(x) = x + 18, avec x le nombre de Go.</span>
+          <span>2x + 10 = x + 18, donc x = 8. À 8 Go, les deux coûtent 26 fr.</span>
+          <span><strong>Jusqu'à 8 Go, Bleu est moins cher ; au-delà de 8 Go, c'est Vert.</strong> Exemple : pour 5 Go, Bleu coûte 20 fr. et Vert 23 fr.</span>
+        </div>
+      </details>
+      <details>
+        <summary>Celsius et Fahrenheit<span class="q">Avec F = 1,8C + 32 : combien font 25 °C en °F ? Et 212 °F en °C ?</span></summary>
+        <div>
+          <span>F = 1,8 × 25 + 32 = 45 + 32 = <strong>77 °F</strong>.</span>
+          <span>212 = 1,8C + 32, donc 1,8C = 180, donc C = 180 : 1,8 = <strong>100 °C</strong> (l'eau qui bout).</span>
+        </div>
+      </details>
+      <details>
+        <summary>La bougie<span class="q">Une bougie mesure 15 cm et raccourcit de 1,5 cm par heure. Écris sa longueur L(t) après t heures. Est-ce croissant ou décroissant ? Quand est-elle entièrement brûlée ?</span></summary>
+        <div>
+          <span>L(t) = −1,5t + 15 : m = −1,5 &lt; 0, donc <strong>décroissante</strong>.</span>
+          <span>Le zéro : −1,5t + 15 = 0, donc t = 15 : 1,5 = <strong>10 heures</strong>.</span>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section data-fiche><!--tprint--><p class="tprint-h">Fiche de révision · Des droites et des tarifs</p><!--/tprint-->    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• Une fonction affine s'écrit <strong>f(x) = mx + h</strong> (ou ax + b dans certains livres). Son graphique est une <strong>droite</strong>.</span>
+      <span>• <strong>Linéaire</strong> : h = 0, f(x) = mx, proportionnalité, la droite passe par l'origine. <strong>Constante</strong> : m = 0, droite horizontale.</span>
+      <span>• <strong>h</strong> = ordonnée à l'origine : la droite coupe l'axe vertical en (0 ; h).</span>
+      <span>• <strong>m</strong> = pente : quand x augmente de 1, y change de m. m &gt; 0 : la droite monte ; m &lt; 0 : elle descend.</span>
+      <span>• Avec deux points : <strong>m = (y₂ − y₁) / (x₂ − x₁)</strong>, puis <strong>h = y₁ − m × x₁</strong>. Si x₁ = x₂, la droite est verticale : ce n'est pas une fonction.</span>
+      <span>• Même pente : droites <strong>parallèles</strong>. Pentes différentes : droites <strong>sécantes</strong>, intersection en résolvant f(x) = g(x).</span>
+      <span>• Zéro : <strong>x = −h/m</strong>, là où la droite coupe l'axe horizontal.</span>
+      <span>• Tarifs : montant fixe = h, prix par unité = m. Le point d'équilibre se trouve avec A(x) = B(x).</span>
+    </div>
+  <!--tprint--><p class="tprint-row"><button type="button" class="tprint" data-print><span aria-hidden="true">🖨</span> Imprimer la fiche</button><span>Seulement ce résumé, sur une page.</span></p><!--/tprint-->
+</section>
+
+  <!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"><a class="prev" href="les-fonctions.html"><span>← Précédent</span><strong>Les fonctions</strong></a><a class="next" href="la-proportionnalite.html"><span>Suivant →</span><strong>La proportionnalité</strong></a></div><div class="tnav-end"><a class="tnav-home" href="maths.html">⌂ Tous les tutoriels de maths</a><button type="button" data-share hidden>Partager</button></div></nav><!--/tnav-->
+<footer>Fiche de révision · Les fonctions affines<!--tmaj--><span class="tmaj" style="display:block;margin-top:6px;font-size:.85rem;opacity:.85">Dernière mise à jour : 24 novembre 2026 · © 2026 Nicolas Meynet</span><!--/tmaj--></footer>
+</main>
+
+<script>
+(function () {
+  /*
+   * Hooks de test : window.__aff
+   *   Fractions exactes (entiers, d > 0, toujours simplifiées) : F(n, d), add, sub, mul, div, neg, cmp, eq, val, isInt
+   *   fs(q)                    -> texte « −3/4 », « 2 » ; dec(x, d) -> « 2,5 » (virgule, signe −)
+   *   eqStr(m, h, nom, var)    -> « f(x) = (2/3)x − 1 » ; rhs(m, h) ; evalStr(m, h, x) -> « 2 × 3 − 1 = 5 »
+   *   M_LIST                   -> les 17 pentes du laboratoire (−3 … 3, pas de 1/2, et ±1/3, ±1/4)
+   *   slope(A, B), lineFrom2(A, B), intersect(m1, h1, m2, h2), zeroOf(m, h), latticePts(m, h, r), fval(m, h, x)
+   *   kindCards, KIND_NAMES    -> étape 1 : {k, s | g, a ('lin' | 'aff' | 'cst' | 'non'), why}
+   *   eqCards                  -> étape 4 : {k, m, h, a (bonne équation), o (options), why}
+   *   lifeCards                -> étape 10 : {k, a, o, why}
+   *   SLOPE_LINES, TRACE_LINES, TWO_PAIRS, INTER_PAIRS
+   *   traceSteps(m, h, 'esc' | 'tab') -> {steps, A, B, C, rows}
+   *   twoPtSteps(A, B)         -> pas à pas ; dernier pas : res = {m, h} ou {vertical, x}
+   *   interSteps(f, g)         -> pas à pas ; dernier pas : res = {kind: 'one', x, y} | {kind: 'none'} | {kind: 'same'}
+   *   TARIFS, breakEven(a, b), cheapest(offres, xMax), pairText(a, b, U, xMax), segText(segs, U), uStr(t, U), mon(centimes)
+   *                            -> comparateur (montants en centimes, fractions exactes)
+   *   parkCost(t), stairCost(t) -> étape 12 (fr.)
+   *   plot(cfg, draw, after)   -> SVG (texte) d’un repère
+   *   quiz                     -> les 8 questions
+   */
+  /*ALGO*/
+  var MI = '−';
+  function gcd(a, b) { a = Math.abs(a); b = Math.abs(b); while (b) { var t = a % b; a = b; b = t; } return a || 1; }
+  function F(n, d) {
+    if (typeof n === 'object') return n;
+    if (d === undefined) d = 1;
+    if (!isFinite(n) || !isFinite(d) || d === 0 || Math.round(n) !== n || Math.round(d) !== d) throw new Error('fraction invalide');
+    if (d < 0) { n = -n; d = -d; }
+    var g = gcd(n, d);
+    return { n: n / g + 0, d: d / g };
+  }
+  function Q(x) { return typeof x === 'object' ? x : F(x, 1); }
+  function add(a, b) { a = Q(a); b = Q(b); return F(a.n * b.d + b.n * a.d, a.d * b.d); }
+  function neg(a) { a = Q(a); return F(-a.n, a.d); }
+  function sub(a, b) { return add(a, neg(b)); }
+  function mul(a, b) { a = Q(a); b = Q(b); return F(a.n * b.n, a.d * b.d); }
+  function div(a, b) { a = Q(a); b = Q(b); if (b.n === 0) throw new Error('division par 0'); return F(a.n * b.d, a.d * b.n); }
+  function cmp(a, b) { a = Q(a); b = Q(b); var s = a.n * b.d - b.n * a.d; return s > 0 ? 1 : s < 0 ? -1 : 0; }
+  function eq(a, b) { return cmp(a, b) === 0; }
+  function val(a) { a = Q(a); return a.n / a.d; }
+  function isInt(a) { return Q(a).d === 1; }
+  function sg(a) { var n = Q(a).n; return n > 0 ? 1 : n < 0 ? -1 : 0; }
+  function absQ(a) { a = Q(a); return F(Math.abs(a.n), a.d); }
+  function ns(n) { return (n < 0 ? MI : '') + Math.abs(n); }
+  function fs(a) { a = Q(a); return a.d === 1 ? ns(a.n) : ns(a.n) + '/' + a.d; }
+  function fp(a) { return sg(a) < 0 ? '(' + fs(a) + ')' : fs(a); }
+  function dec(x, d) {
+    d = d == null ? 2 : d;
+    var p = Math.pow(10, d), s = (Math.round(x * p) / p).toFixed(d);
+    if (s.indexOf('.') >= 0) s = s.replace(/\.?0+$/, '');
+    if (s === '-0') s = '0';
+    return s.replace('.', ',').replace('-', MI);
+  }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+
+  /* Écriture des équations */
+  function termX(m, v) {
+    m = Q(m); v = v || 'x';
+    if (m.n === 0) return '';
+    if (m.d === 1) return m.n === 1 ? v : m.n === -1 ? MI + v : ns(m.n) + v;
+    return (m.n < 0 ? MI : '') + '(' + Math.abs(m.n) + '/' + m.d + ')' + v;
+  }
+  function rhs(m, h, v) {
+    var t = termX(m, v); h = Q(h);
+    if (!t) return fs(h);
+    if (h.n === 0) return t;
+    return t + (h.n < 0 ? ' ' + MI + ' ' : ' + ') + fs(absQ(h));
+  }
+  function eqStr(m, h, nm, v) { v = v || 'x'; return (nm || 'f') + '(' + v + ') = ' + rhs(m, h, v); }
+  function fval(m, h, x) { return add(mul(m, x), h); }
+  function evalStr(m, h, x) {
+    m = Q(m); h = Q(h); x = Q(x);
+    var y = fval(m, h, x);
+    if (m.n === 0) return fs(h);
+    var s = fp(m) + ' × ' + fp(x);
+    if (h.n !== 0) s += (h.n < 0 ? ' ' + MI + ' ' : ' + ') + fs(absQ(h));
+    return s + ' = ' + fs(y);
+  }
+
+  /* Droites */
+  function slope(A, B) { var dx = B[0] - A[0], dy = B[1] - A[1]; return dx === 0 ? null : F(dy, dx); }
+  function lineFrom2(A, B) { var m = slope(A, B); if (!m) return { vertical: true, x: A[0] }; return { m: m, h: sub(A[1], mul(m, A[0])) }; }
+  function intersect(m1, h1, m2, h2) {
+    if (eq(m1, m2)) return eq(h1, h2) ? { kind: 'same' } : { kind: 'none' };
+    var x = div(sub(h2, h1), sub(m1, m2));
+    return { kind: 'one', x: x, y: fval(m1, h1, x) };
+  }
+  function zeroOf(m, h) {
+    if (Q(m).n === 0) return Q(h).n === 0 ? { kind: 'all' } : { kind: 'none' };
+    return { kind: 'one', x: div(neg(h), m) };
+  }
+  function latticePts(m, h, r) {
+    r = r || 6; var out = [];
+    for (var x = -r; x <= r; x++) { var y = fval(m, h, x); if (isInt(y) && Math.abs(y.n) <= r) out.push([x, y.n]); }
+    return out;
+  }
+  var M_LIST = [[-3, 1], [-5, 2], [-2, 1], [-3, 2], [-1, 1], [-1, 2], [-1, 3], [-1, 4], [0, 1], [1, 4], [1, 3], [1, 2], [1, 1], [3, 2], [2, 1], [5, 2], [3, 1]].map(function (p) { return F(p[0], p[1]); });
+  function mIdx(m) { for (var i = 0; i < M_LIST.length; i++) if (eq(M_LIST[i], m)) return i; return 8; }
+
+  /* ---------- Repère en SVG (texte), même style que les autres pages de maths ---------- */
+  var CLIP = 0;
+  function r1(x) { return String(Math.round(x * 10) / 10); }
+  function Ln(x1, y1, x2, y2, col, w, extra) { return '<line x1="' + r1(x1) + '" y1="' + r1(y1) + '" x2="' + r1(x2) + '" y2="' + r1(y2) + '" style="stroke:' + col + ';stroke-width:' + w + '"' + (extra || '') + '/>'; }
+  function Tx(x, y, s, o) { o = o || {}; return '<text x="' + r1(x) + '" y="' + r1(y) + '" font-size="' + (o.fs || 15) + '"' + (o.a ? ' text-anchor="' + o.a + '"' : '') + (o.st ? ' style="' + o.st + '"' : '') + '>' + esc(s) + '</text>'; }
+  function halo(col) { return 'fill:' + col + ';stroke:var(--card);stroke-width:4px;paint-order:stroke;font-weight:600'; }
+  function Dot(P, x, y, col, r, extra) { return '<circle cx="' + r1(P.X(x)) + '" cy="' + r1(P.Y(y)) + '" r="' + (r || 7) + '" style="fill:' + col + ';stroke:var(--card);stroke-width:2"' + (extra || '') + '/>'; }
+  function plot(c, draw, after) {
+    var W = c.w || 360, H = c.h || 360, L = c.L != null ? c.L : 32, R = c.R != null ? c.R : 8, T = c.T != null ? c.T : 8, B = c.B != null ? c.B : 32;
+    var pw = W - L - R, ph = H - T - B, fz = c.fs || 15;
+    function X(x) { return L + (x - c.x0) / (c.x1 - c.x0) * pw; }
+    function Y(y) { return T + (c.y1 - y) / (c.y1 - c.y0) * ph; }
+    var P = { X: X, Y: Y, c: c, fs: fz };
+    var id = 'aff-clip-' + (++CLIP), s = '', i, g;
+    var sx = c.sx || 1, sy = c.sy || 1, lx = c.lx || 2 * sx, ly = c.ly || 2 * sy;
+    s += '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + esc(c.label || 'Graphique') + '">';
+    s += '<defs><clipPath id="' + id + '"><rect x="' + L + '" y="' + T + '" width="' + pw + '" height="' + ph + '"/></clipPath></defs>';
+    s += '<rect x="' + L + '" y="' + T + '" width="' + pw + '" height="' + ph + '" style="fill:var(--card);stroke:var(--line)"/>';
+    for (i = Math.ceil(c.x0 / sx - 1e-9); i * sx <= c.x1 + 1e-9; i++) {
+      g = i * sx; s += Ln(X(g), T, X(g), T + ph, 'var(--line)', 1);
+      if (Math.abs(g / lx - Math.round(g / lx)) < 1e-9) s += Tx(X(g), T + ph + fz + 4, dec(g, 2), { fs: fz, a: 'middle' });
+    }
+    for (i = Math.ceil(c.y0 / sy - 1e-9); i * sy <= c.y1 + 1e-9; i++) {
+      g = i * sy; s += Ln(L, Y(g), L + pw, Y(g), 'var(--line)', 1);
+      if (Math.abs(g / ly - Math.round(g / ly)) < 1e-9) s += Tx(L - 5, Y(g) + fz * 0.35, dec(g, 2), { fs: fz, a: 'end' });
+    }
+    if (c.y0 <= 0 && c.y1 >= 0) s += Ln(L, Y(0), L + pw, Y(0), 'var(--ink)', 1.6);
+    if (c.x0 <= 0 && c.x1 >= 0) s += Ln(X(0), T, X(0), T + ph, 'var(--ink)', 1.6);
+    if (c.names) { s += Tx(L + pw - 6, Y(0) - 7, 'x', { fs: fz, a: 'end', st: 'font-style:italic' }); s += Tx(X(0) + 7, T + fz + 2, 'y', { fs: fz, st: 'font-style:italic' }); }
+    if (c.xl) s += Tx(L + pw, H - 6, c.xl, { fs: fz, a: 'end' });
+    if (c.yl) s += Tx(4, fz + 2, c.yl, { fs: fz });
+    s += '<g clip-path="url(#' + id + ')">' + (draw ? draw(P) : '') + '</g>';
+    if (after) s += after(P);
+    return s + '</svg>';
+  }
+  function SQ(label, r) { r = r || 6; return { w: 360, h: 360, L: 32, R: 8, T: 8, B: 32, x0: -r, x1: r, y0: -r, y1: r, sx: 1, sy: 1, lx: 2, ly: 2, names: true, label: label }; }
+  function MINI(label) { return { w: 260, h: 260, L: 28, R: 6, T: 6, B: 28, x0: -5, x1: 5, y0: -5, y1: 5, sx: 1, sy: 1, lx: 2, ly: 2, fs: 14, names: true, label: label }; }
+  function lineM(P, m, h, col, w, extra) { var a = P.c.x0, b = P.c.x1, mm = val(m), hh = val(h); return Ln(P.X(a), P.Y(mm * a + hh), P.X(b), P.Y(mm * b + hh), col, w || 3, ' stroke-linecap="round"' + (extra || '')); }
+  function vLine(P, x, col, w) { return Ln(P.X(x), P.Y(P.c.y0), P.X(x), P.Y(P.c.y1), col, w || 3); }
+  function curve(P, fn, col, w) { var d = '', n = 120, a = P.c.x0, b = P.c.x1; for (var i = 0; i <= n; i++) { var x = a + (b - a) * i / n; d += (i ? 'L' : 'M') + r1(P.X(x)) + ' ' + r1(P.Y(fn(x))) + ' '; } return '<path d="' + d + '" style="fill:none;stroke:' + col + ';stroke-width:' + (w || 3.5) + '"/>'; }
+  function stair(P, x, y, dx, dy, col) { return '<path d="M' + r1(P.X(x)) + ' ' + r1(P.Y(y)) + ' H' + r1(P.X(x + dx)) + ' V' + r1(P.Y(y + dy)) + '" style="fill:none;stroke:' + col + ';stroke-width:2.5;stroke-dasharray:6 4"/>'; }
+  function stairLabels(P, x, y, dx, dy, col) {
+    var s = '';
+    s += Tx((P.X(x) + P.X(x + dx)) / 2, P.Y(y) + (dy > 0 ? P.fs + 6 : -8), (dx > 0 ? '+' : MI) + Math.abs(dx), { fs: P.fs, a: 'middle', st: halo(col) });
+    if (dy !== 0) s += Tx(P.X(x + dx) + (dx > 0 ? 7 : -7), (P.Y(y) + P.Y(y + dy)) / 2 + 5, (dy > 0 ? '+' : MI) + Math.abs(dy), { fs: P.fs, a: dx > 0 ? 'start' : 'end', st: halo(col) });
+    return s;
+  }
+  function inView(p, r) { r = r || 6; return Math.abs(p[0]) <= r && Math.abs(p[1]) <= r; }
+
+  /* ---------- Étape 1 : reconnaître la famille ---------- */
+  var KIND_NAMES = { lin: 'Linéaire (mx)', aff: 'Affine (mx + h)', cst: 'Constante (h)', non: 'Pas affine' };
+  var kindCards = [
+    { k: 'k1', s: 'f(x) = 4x', a: 'lin', why: 'C’est mx avec m = 4 et h = 0 : de la proportionnalité. La droite passe par l’origine.' },
+    { k: 'k2', s: 'f(x) = 3 − 2x', a: 'aff', why: 'On range : f(x) = −2x + 3. Donc m = −2 et h = 3. L’ordre des termes ne change rien.' },
+    { k: 'k3', g: { m: F(2, 3), h: F(0) }, a: 'lin', why: 'La droite passe par l’origine (0 ; 0) et elle est penchée : fonction linéaire. Ici m = 2/3 : 3 pas à droite, 2 pas vers le haut.' },
+    { k: 'k4', s: 'f(x) = x²', a: 'non', why: 'x est au carré : le graphique est une courbe (une parabole), pas une droite.' },
+    { k: 'k5', s: 'f(x) = 5', a: 'cst', why: 'm = 0 et h = 5 : f(x) vaut toujours 5. La droite est horizontale.' },
+    { k: 'k6', g: { m: F(-1), h: F(3) }, a: 'aff', why: 'La droite est penchée et ne passe pas par l’origine : elle coupe l’axe vertical en 3. C’est f(x) = −x + 3.' },
+    { k: 'k7', s: 'f(x) = (x + 2)/2', a: 'aff', why: 'On partage : (x + 2)/2 = x/2 + 2/2 = (1/2)x + 1. Donc m = 1/2 et h = 1.' },
+    { k: 'k8', s: 'f(x) = −x/3', a: 'lin', why: '−x/3 = (−1/3)x : m = −1/3 et h = 0. Linéaire, même avec une fraction et un signe moins.' },
+    { k: 'k9', g: { m: F(0), h: F(-2) }, a: 'cst', why: 'Droite horizontale : m = 0. La fonction vaut −2 pour tous les x : f(x) = −2.' },
+    { k: 'k10', s: 'f(x) = 2/x', a: 'non', why: 'x est au dénominateur : on ne peut pas l’écrire mx + h. Le graphique est une courbe (une hyperbole).' },
+    { k: 'k11', s: 'f(x) = 2(x − 1) + 2', a: 'lin', why: 'On développe : 2x − 2 + 2 = 2x. Il reste seulement 2x : c’est linéaire, déguisé !' },
+    { k: 'k12', g: { curve: true }, a: 'non', why: 'Le graphique est courbé : ce n’est pas une droite, donc pas une fonction affine. (Ici, c’est f(x) = x²/2 − 3.)' }
+  ];
+  function parab(x) { return x * x / 2 - 3; }
+
+  /* ---------- Étape 3 : droites pour mesurer la pente ---------- */
+  var SLOPE_LINES = [[2, 3, -1], [-2, 1, 3], [1, 2, 1], [-3, 4, 2], [3, 1, -4], [-1, 3, 0]].map(function (t) { return { m: F(t[0], t[1]), h: F(t[2]) }; });
+
+  /* ---------- Étape 4 : trouver l’équation ---------- */
+  var EQ_LINES = [[2, 1, 1], [-1, 1, 3], [1, 2, -2], [-3, 1, 0], [2, 3, 1], [0, 1, -2], [-1, 2, 4], [3, 2, -3], [-2, 1, -1]];
+  function readWhy(m, h) {
+    m = Q(m); h = Q(h);
+    var s = 'La droite coupe l’axe vertical en ' + fs(h) + ' : h = ' + fs(h) + '. ';
+    if (m.n === 0) s += 'Elle est horizontale : m = 0.';
+    else s += 'Quand x augmente de ' + m.d + ', y ' + (m.n > 0 ? 'monte' : 'descend') + ' de ' + Math.abs(m.n) + ' : m = ' + fs(m) + '.';
+    return s + ' Donc ' + eqStr(m, h) + '.';
+  }
+  function eqOptions(m, h, i) {
+    var good = eqStr(m, h), cand = [eqStr(neg(m), h), eqStr(h, m)];
+    if (Q(m).n !== 0) cand.push(eqStr(div(1, m), h));
+    cand.push(eqStr(m, neg(h)));
+    var seen = {}, out = [];
+    seen[good] = 1;
+    cand.forEach(function (c) { if (!seen[c] && out.length < 3) { seen[c] = 1; out.push(c); } });
+    var pos = i % (out.length + 1);
+    out.splice(pos, 0, good);
+    return out;
+  }
+  var eqCards = EQ_LINES.map(function (t, i) {
+    var m = F(t[0], t[1]), h = F(t[2]);
+    return { k: 'e' + (i + 1), m: m, h: h, a: eqStr(m, h), o: eqOptions(m, h, i), why: readWhy(m, h) };
+  });
+
+  /* ---------- Étape 5 : tracer ---------- */
+  var TRACE_LINES = [[2, 3, -1], [-2, 1, 3], [1, 2, 2], [-3, 4, 2]].map(function (t) { return { m: F(t[0], t[1]), h: F(t[2]) }; });
+  var RND_SLOPES = [[1, 1], [2, 1], [3, 1], [-1, 1], [-2, 1], [-3, 1], [1, 2], [-1, 2], [3, 2], [-3, 2], [2, 3], [-2, 3], [1, 3], [-1, 3], [3, 4], [-3, 4]];
+  function traceable(m, h) {
+    m = Q(m); h = Q(h); if (!isInt(h) || m.n === 0) return false;
+    var d = m.d, n = m.n, hv = h.n;
+    if (!inView([0, hv]) || !inView([d, hv + n])) return false;
+    return inView([2 * d, hv + 2 * n]) || inView([-d, hv - n]);
+  }
+  function traceSteps(m, h, meth) {
+    m = Q(m); h = Q(h);
+    var d = m.d, n = m.n, hv = h.n, eqs = eqStr(m, h);
+    var A = [0, hv], B = [d, hv + n], fwd = inView([2 * d, hv + 2 * n]);
+    var C = fwd ? [2 * d, hv + 2 * n] : [-d, hv - n];
+    var xs = fwd ? [0, d, 2 * d] : [-d, 0, d];
+    var rows = xs.map(function (x) { return { x: x, y: fval(m, h, x), calc: evalStr(m, h, x) }; });
+    var steps;
+    if (meth === 'tab') {
+      steps = [
+        { text: 'On veut tracer <strong>' + eqs + '</strong>. Je choisis trois valeurs de x faciles : ' + xs.map(ns).join(', ') + (d > 1 ? ' (des multiples de ' + d + ', pour que f(x) tombe juste sur le quadrillage)' : '') + '.', show: { tab: 1 } },
+        { text: 'Je calcule l’image de chaque x : ' + rows.map(function (r) { return 'f(' + ns(r.x) + ') = ' + r.calc; }).join(' ; ') + '.', show: { tab: 2 } },
+        { text: 'Je place les trois points (x ; f(x)) dans le repère : ' + rows.map(function (r) { return '(' + ns(r.x) + ' ; ' + fs(r.y) + ')'; }).join(', ') + '.', show: { tab: 2, pts: 1 } },
+        { text: 'Je trace à la règle la droite qui passe par les points. Deux points suffisent ; le troisième sert de vérification : s’il n’est pas aligné avec les autres, il y a une erreur de calcul.', show: { tab: 2, pts: 1, line: 1 } }
+      ];
+    } else {
+      steps = [
+        { text: 'On veut tracer <strong>' + eqs + '</strong>. On lit les deux nombres : h = ' + fs(h) + ' (le point de départ) et m = ' + fs(m) + (d === 1 ? ' (on peut l’écrire ' + fs(m) + '/1 : 1 pas à droite)' : ' (' + d + ' pas à droite, ' + Math.abs(n) + ' pas ' + (n > 0 ? 'vers le haut' : 'vers le bas') + ')') + '.', show: {} },
+        { text: 'Je place le point A(0 ; ' + fs(h) + ') sur l’axe vertical : c’est l’ordonnée à l’origine.', show: { A: 1 } },
+        { text: 'Depuis A, je fais un escalier : j’avance de ' + d + ' vers la droite, puis je ' + (n > 0 ? 'monte' : 'descends') + ' de ' + Math.abs(n) + '. J’arrive au point B(' + ns(B[0]) + ' ; ' + ns(B[1]) + ').', show: { A: 1, s1: 1, B: 1 } },
+        { text: (fwd ? 'Je refais le même escalier depuis B' : 'Je fais l’escalier à l’envers depuis A : je recule de ' + d + ' et je ' + (n > 0 ? 'descends' : 'monte') + ' de ' + Math.abs(n)) + '. J’obtiens C(' + ns(C[0]) + ' ; ' + ns(C[1]) + ') : un 3ᵉ point pour vérifier.', show: { A: 1, s1: 1, B: 1, s2: 1, C: 1 } },
+        { text: 'Je trace la droite à la règle : elle passe par A, B et C. La droite de ' + eqs + ' est tracée.', show: { A: 1, s1: 1, B: 1, s2: 1, C: 1, line: 1 } }
+      ];
+    }
+    return { steps: steps, A: A, B: B, C: C, fwd: fwd, rows: rows };
+  }
+
+  /* ---------- Étape 6 : deux points ---------- */
+  var TWO_PAIRS = [[[1, 3], [4, 9]], [[-2, 5], [2, -3]], [[0, -1], [3, 1]], [[-3, 0], [1, 2]], [[2, 4], [2, -1]], [[-1, 2], [3, 2]], [[-4, -2], [2, 1]], [[1, -1], [3, -4]]];
+  function pt(nm, p) { return nm + '(' + ns(p[0]) + ' ; ' + ns(p[1]) + ')'; }
+  function twoPtSteps(A, B) {
+    var dx = B[0] - A[0], dy = B[1] - A[1];
+    var st = [{ text: 'On connaît deux points de la droite : ' + pt('A', A) + ' et ' + pt('B', B) + '. On cherche d’abord m, puis h.', show: { pts: 1 } }];
+    var dxT = 'Δx = x₂ − x₁ = ' + ns(B[0]) + ' − ' + fp(A[0]) + ' = ' + ns(dx), dyT = 'Δy = y₂ − y₁ = ' + ns(B[1]) + ' − ' + fp(A[1]) + ' = ' + ns(dy);
+    if (dx === 0) {
+      st.push({ text: dxT + ' : les deux points ont le même x !', show: { pts: 1 } });
+      st.push({ text: 'On ne peut pas diviser par Δx = 0 : il n’y a pas de pente. La droite est <strong>verticale</strong>, d’équation x = ' + ns(A[0]) + '. Ce n’est <strong>pas une fonction</strong> : pour x = ' + ns(A[0]) + ', il y aurait une infinité de valeurs de y, alors qu’une fonction donne une seule image.', show: { pts: 1, vert: 1 }, res: { vertical: true, x: A[0] } });
+      return st;
+    }
+    var m = F(dy, dx), h = sub(A[1], mul(m, A[0])), raw = ns(dy) + '/' + ns(dx);
+    st.push({ text: 'L’escalier de A à B : ' + dxT + ' et ' + dyT + '.', show: { pts: 1, tri: 1 } });
+    st.push({ text: 'La pente : m = Δy / Δx = ' + (fs(m) !== raw ? raw + ' = <strong>' + fs(m) + '</strong> (on simplifie)' : '<strong>' + raw + '</strong>') + '.', show: { pts: 1, tri: 1 } });
+    st.push({ text: 'Pour h, j’utilise A : il est sur la droite, donc ' + ns(A[1]) + ' = ' + fp(m) + ' × ' + fp(A[0]) + ' + h. Donc h = ' + ns(A[1]) + ' − ' + fp(m) + ' × ' + fp(A[0]) + ' = ' + ns(A[1]) + ' − ' + fp(mul(m, A[0])) + ' = <strong>' + fs(h) + '</strong>.', show: { pts: 1, tri: 1, H: 1 } });
+    st.push({ text: 'L’équation est <strong>' + eqStr(m, h) + '</strong>. Vérification avec B : f(' + ns(B[0]) + ') = ' + evalStr(m, h, B[0]) + ' ✓' + (Q(h).n === 0 && Q(m).n !== 0 ? ' Ici h = 0 : c’est une fonction linéaire.' : '') + (Q(m).n === 0 ? ' Ici m = 0 : la droite est horizontale, la fonction est constante.' : ''), show: { pts: 1, tri: 1, H: 1, line: 1 }, res: { m: m, h: h } });
+    return st;
+  }
+
+  /* ---------- Étape 8 : intersection ---------- */
+  function L2(m, h) { return { m: Q(m), h: Q(h) }; }
+  var INTER_PAIRS = [
+    [L2(2, -1), L2(-1, 5)], [L2(F(1, 2), 1), L2(-1, 4)], [L2(1, 3), L2(F(-1, 2), 0)], [L2(3, -4), L2(1, 2)],
+    [L2(-2, 1), L2(1, -5)], [L2(2, 1), L2(2, -3)], [L2(1, 0), L2(-2, 5)]
+  ];
+  function interSteps(f, g) {
+    var ef = eqStr(f.m, f.h, 'f'), eg = eqStr(g.m, g.h, 'g'), a = sub(f.m, g.m), b = sub(g.h, f.h);
+    var st = [{ text: 'Voici les droites de ' + ef + ' (en bleu) et de ' + eg + ' (en orange). On cherche le point où elles se croisent.', show: {} }];
+    st.push({ text: 'Au point d’intersection, f et g donnent le même y pour le même x. On écrit donc f(x) = g(x) : <strong>' + rhs(f.m, f.h) + ' = ' + rhs(g.m, g.h) + '</strong>.', show: {} });
+    st.push({ text: 'On met les x à gauche et les nombres à droite : (' + fs(f.m) + ' − ' + fp(g.m) + ')x = ' + fs(g.h) + ' − ' + fp(f.h) + ', donc <strong>' + (a.n === 0 ? '0x' : termX(a)) + ' = ' + fs(b) + '</strong>.', show: {} });
+    if (a.n === 0) {
+      st.push({ text: b.n === 0 ? '0x = 0 est vrai pour tous les x : les deux droites sont confondues, c’est la même droite.' : '0x = ' + fs(b) + ' est impossible : aucun x ne convient. Les deux droites ont la même pente m = ' + fs(f.m) + ' : elles sont <strong>parallèles</strong> et ne se coupent jamais.', show: {}, res: { kind: b.n === 0 ? 'same' : 'none' } });
+      return st;
+    }
+    var x = div(b, a), y = fval(f.m, f.h, x);
+    st.push({ text: 'On divise par ' + fp(a) + ' : x = ' + fs(b) + ' : ' + fp(a) + ' = <strong>' + fs(x) + '</strong>.', show: { vx: 1 } });
+    st.push({ text: 'On calcule y avec f : f(' + fs(x) + ') = ' + evalStr(f.m, f.h, x) + '. On vérifie avec g : g(' + fs(x) + ') = ' + evalStr(g.m, g.h, x) + '. Les deux donnent ' + fs(y) + ' ✓', show: { vx: 1, I: 1 } });
+    st.push({ text: 'Les droites se coupent au point <strong>I(' + fs(x) + ' ; ' + fs(y) + ')</strong>.' + (isInt(x) && isInt(y) ? '' : ' Les coordonnées ne sont pas entières : sur le graphique, on peut seulement les estimer ; le calcul donne la valeur exacte.'), show: { vx: 1, I: 1 }, res: { kind: 'one', x: x, y: y } });
+    return st;
+  }
+
+  /* ---------- Étape 9 : comparer des tarifs (montants en centimes) ---------- */
+  var TARIFS = {
+    velo: { name: 'Vélos', unit: { one: 'heure', many: 'heures', time: true }, xMax: 12, xl: 'durée (h)', o: [
+      { name: 'A', label: 'Location à l’heure', fee: 0, price: 2 }, { name: 'B', label: 'Carte membre', fee: 5, price: 1 }, { name: 'C', label: 'Forfait journée', fee: 15, price: 0 }] },
+    piscine: { name: 'Piscine', unit: { one: 'entrée', many: 'entrées', count: true }, xMax: 20, xl: 'nombre d’entrées', o: [
+      { name: 'A', label: 'Entrée simple', fee: 0, price: 8 }, { name: 'B', label: 'Carte de réduction', fee: 30, price: 3 }, { name: 'C', label: 'Abonnement de saison', fee: 80, price: 0 }] },
+    taxi: { name: 'Taxi', unit: { one: 'km', many: 'km' }, xMax: 15, xl: 'distance (km)', o: [
+      { name: 'A', label: 'Taxi Lac', fee: 6, price: 3.5 }, { name: 'B', label: 'Taxi Mont', fee: 12, price: 2.5 }, { name: 'C', label: 'Navette Alpes', fee: 25, price: 1.5 }] }
+  };
+  function cents(v) { return Math.round(v * 100); }
+  function costF(o, t) { return add(F(cents(o.fee)), mul(F(cents(o.price)), t)); }
+  function mon(c) {
+    c = Q(c);
+    if (!isInt(c)) return 'environ ' + (val(c) / 100).toFixed(2).replace('.', ',') + ' fr.';
+    return c.n % 100 === 0 ? ns(c.n / 100) + ' fr.' : (c.n / 100).toFixed(2).replace('.', ',') + ' fr.';
+  }
+  function uStr(t, U) {
+    t = Q(t);
+    if (isInt(t)) return ns(t.n) + ' ' + (Math.abs(t.n) <= 1 ? U.one : U.many);
+    if (U.time) {
+      var mn = mul(t, 60);
+      if (isInt(mn)) { var hh = Math.floor(val(t)); return hh + ' h ' + (mn.n - 60 * hh) + ' min'; }
+      return 'environ ' + dec(val(t), 2) + ' h';
+    }
+    return (isInt(mul(t, 100)) ? '' : 'environ ') + dec(val(t), 2) + ' ' + U.many;
+  }
+  function breakEven(a, b) {
+    var pa = cents(a.price), pb = cents(b.price), fa = cents(a.fee), fb = cents(b.fee);
+    if (pa === pb) return fa === fb ? { kind: 'same' } : { kind: 'never', cheaper: fa < fb ? a.name : b.name, samePrice: true };
+    var t = F(fb - fa, pa - pb);
+    if (t.n <= 0) return { kind: 'never', cheaper: pa < pb ? a.name : b.name, t: t };
+    return { kind: 'cross', t: t, cost: costF(a, t), before: fa < fb ? a.name : b.name, after: fa < fb ? b.name : a.name };
+  }
+  function andList(a) { return a.length <= 1 ? a.join('') : a.slice(0, -1).join(', ') + ' et ' + a[a.length - 1]; }
+  function cheapest(offers, xMax) {
+    var cuts = [F(0), F(xMax)], i, j;
+    for (i = 0; i < offers.length; i++) for (j = i + 1; j < offers.length; j++) {
+      var be = breakEven(offers[i], offers[j]);
+      if (be.kind === 'cross' && val(be.t) < xMax) cuts.push(be.t);
+    }
+    cuts.sort(cmp);
+    var u = [];
+    cuts.forEach(function (c) { if (!u.length || !eq(u[u.length - 1], c)) u.push(c); });
+    var segs = [];
+    for (i = 0; i + 1 < u.length; i++) {
+      var mid = div(add(u[i], u[i + 1]), 2), costs = offers.map(function (o) { return costF(o, mid); }), min = costs[0];
+      costs.forEach(function (c) { if (cmp(c, min) < 0) min = c; });
+      var win = offers.filter(function (o, k) { return eq(costs[k], min); }).map(function (o) { return o.name; });
+      var last = segs[segs.length - 1];
+      if (last && last.win.join() === win.join()) last.to = u[i + 1];
+      else segs.push({ from: u[i], to: u[i + 1], win: win });
+    }
+    return segs;
+  }
+  function pairText(a, b, U, xMax) {
+    var be = breakEven(a, b);
+    if (be.kind === 'same') return a.name + ' et ' + b.name + ' coûtent toujours la même chose.';
+    if (be.kind === 'never') {
+      var other = be.cheaper === a.name ? b.name : a.name;
+      return be.cheaper + ' est toujours moins cher que ' + other + (be.samePrice ? ' : même prix par ' + U.one + ', mais un montant fixe plus petit (droites parallèles).' : ' : il ne coûte pas plus au départ et moins par ' + U.one + '.');
+    }
+    if (U.count && !isInt(Q(be.t))) {
+      var lo = Math.floor(val(be.t));
+      return 'Le point d’équilibre tombe entre ' + lo + ' et ' + (lo + 1) + ' ' + U.many + ' (environ ' + dec(val(be.t), 2) + ') : on ne peut pas payer une entrée en morceaux. Jusqu’à ' + lo + ' ' + U.many + ', ' + be.before + ' est moins cher que ' + be.after + ' ; dès ' + (lo + 1) + ' ' + U.many + ', c’est ' + be.after + '.' + (val(be.t) > xMax ? ' (Ce point est en dehors du graphique.)' : '');
+    }
+    return 'Jusqu’à ' + uStr(be.t, U) + ', ' + be.before + ' est moins cher que ' + be.after + ' ; au-delà, c’est ' + be.after + '. À ' + uStr(be.t, U) + ', les deux coûtent ' + mon(be.cost) + (/\.$/.test(mon(be.cost)) ? '' : '.') + (val(be.t) > xMax ? ' (Ce point est en dehors du graphique.)' : '');
+  }
+  function segText(segs, U) {
+    return segs.map(function (s, i) {
+      var who = s.win.length === 1 ? s.win[0] + ' est le moins cher' : andList(s.win) + ' coûtent pareil';
+      if (segs.length === 1) return 'De 0 à ' + uStr(s.to, U) + ' : ' + who + '.';
+      if (i === 0) return 'Jusqu’à ' + uStr(s.to, U) + ' : ' + who + '.';
+      if (i === segs.length - 1) { var u0 = uStr(s.from, U); return (/^environ/.test(u0) ? 'Au-delà d’' : 'Au-delà de ') + u0 + ' : ' + who + '.'; }
+      return 'De ' + uStr(s.from, U) + ' à ' + uStr(s.to, U) + ' : ' + who + '.';
+    });
+  }
+  function tarifEq(o, U) {
+    var p = dec(o.price), f = dec(o.fee), t;
+    if (cents(o.price) === 0) t = f;
+    else { t = (p === '1' ? '' : p) + 'x'; if (cents(o.fee) !== 0) t += ' + ' + f; }
+    return o.name + '(x) = ' + t;
+  }
+
+  /* ---------- Étape 10 : situations ---------- */
+  var lifeCards = [
+    { k: 'r1', s: 'Taxi (prix inventés) : prise en charge 6 fr., puis 3 fr. par km. Prix P pour x km ?', o: ['P(x) = 3x + 6', 'P(x) = 6x + 3', 'P(x) = 9x'], a: 'P(x) = 3x + 6', why: 'Le prix par km (3 fr.) est la pente m ; la prise en charge (6 fr.), payée même pour 0 km, est h. Pour 10 km : 30 + 6 = 36 fr.' },
+    { k: 'r2', s: 'Convertir une température C (en °C) en degrés Fahrenheit F. On sait que 0 °C = 32 °F et 100 °C = 212 °F.', o: ['F = 32C + 1,8', 'F = 1,8C − 32', 'F = 1,8C + 32'], a: 'F = 1,8C + 32', why: 'Pour C = 0, F = 32 : h = 32. Entre 0 °C et 100 °C, F augmente de 180 : m = 180/100 = 1,8. Vérification : 1,8 × 100 + 32 = 212.' },
+    { k: 'r3', s: 'Une bougie de 20 cm raccourcit de 2 cm par heure. Longueur L après t heures ?', o: ['L(t) = 2t + 20', 'L(t) = −2t + 20', 'L(t) = 20t − 2'], a: 'L(t) = −2t + 20', why: 'Au départ, 20 cm : h = 20. Elle perd 2 cm par heure : m = −2 (pente négative). Elle est finie quand −2t + 20 = 0, donc après 10 h.' },
+    { k: 'r4', s: 'Un tonneau d’eau de pluie contient 120 L. Un robinet le vide de 8 L par minute. Volume V après t minutes ?', o: ['V(t) = 8t + 120', 'V(t) = 120t − 8', 'V(t) = 120 − 8t'], a: 'V(t) = 120 − 8t', why: 'Départ : 120 L (h = 120). Le volume baisse de 8 L chaque minute : m = −8. Le tonneau est vide après 120 : 8 = 15 minutes.' },
+    { k: 'r5', s: 'Une voiture est à 30 km de Lausanne et s’en éloigne à 80 km/h, à vitesse constante. Distance d à Lausanne après t heures ?', o: ['d(t) = 80t + 30', 'd(t) = 30t + 80', 'd(t) = 110t'], a: 'd(t) = 80t + 30', why: 'd = v · t + d₀ avec v = 80 km/h (la pente) et d₀ = 30 km (le départ). Après 2 h : 160 + 30 = 190 km.' },
+    { k: 'r6', s: 'Recharge d’une voiture électrique (prix inventé) : 0,50 fr. par kWh, sans frais fixes. Prix C pour x kWh ?', o: ['C(x) = 0,5x + 1', 'C(x) = 0,5x', 'C(x) = x + 0,5'], a: 'C(x) = 0,5x', why: 'Pas de frais fixes : h = 0. C’est une fonction linéaire, donc de la proportionnalité : 40 kWh coûtent 20 fr.' },
+    { k: 'r7', g: { c: { w: 300, h: 250, L: 38, R: 8, T: 26, B: 44, x0: 0, x1: 10, y0: 0, y1: 24, sx: 1, sy: 4, lx: 2, ly: 4, fs: 14, xl: 'temps (h)', yl: 'cm', label: 'Droite qui part de 20 et descend jusqu’à 0 en 10 heures' }, m: F(-2), h: F(20) }, o: ['Une bougie de 20 cm qui brûle', 'Un taxi : 6 fr. + 3 fr. par km', 'Une recharge à 0,50 fr. par kWh'], a: 'Une bougie de 20 cm qui brûle', why: 'La droite descend (m < 0) : quelque chose diminue avec le temps. Elle part de 20 et atteint 0 après 10 h : la bougie.' },
+    { k: 'r8', g: { c: { w: 300, h: 250, L: 38, R: 8, T: 26, B: 44, x0: 0, x1: 40, y0: 0, y1: 24, sx: 5, sy: 4, lx: 10, ly: 4, fs: 14, xl: 'énergie (kWh)', yl: 'fr.', label: 'Droite qui part de l’origine et monte jusqu’à 20 fr. pour 40 kWh' }, m: F(1, 2), h: F(0) }, o: ['Un taxi : 6 fr. + 3 fr. par km', 'Une recharge à 0,50 fr. par kWh', 'Une bougie de 20 cm qui brûle'], a: 'Une recharge à 0,50 fr. par kWh', why: 'La droite passe par l’origine : 0 kWh, 0 fr. C’est de la proportionnalité. 40 kWh pour 20 fr., donc 0,50 fr. par kWh.' },
+    { k: 'r9', s: 'Piscine (prix inventés) : une carte à 30 fr., puis 3 fr. par entrée. Prix P pour n entrées ?', o: ['P(n) = 30n + 3', 'P(n) = 3n + 30', 'P(n) = 33n'], a: 'P(n) = 3n + 30', why: 'La carte (30 fr.) est payée une fois : h = 30. Chaque entrée ajoute 3 fr. : m = 3. Pour 10 entrées : 30 + 30 = 60 fr.' }
+  ];
+
+  /* ---------- Étape 12 : morceaux ---------- */
+  function parkCost(t) { return t <= 3 ? 3 * t : 9 + (t - 3); }
+  function stairCost(t) { return t <= 0 ? 0 : 3 * Math.ceil(t - 1e-9); }
+
+  /* ---------- Quiz ---------- */
+  var QZ = [
+    { q: 'Quelle est la pente de f(x) = 5 − 3x ?', o: [['a', '5'], ['b', '−3'], ['c', '3']], a: 'b', how: 'La pente est le nombre qui multiplie x : f(x) = −3x + 5, donc m = −3 (et h = 5).' },
+    { q: 'La droite de f(x) = −2x + 4 coupe l’axe vertical au point…', o: [['a', '(0 ; 4)'], ['b', '(0 ; −2)'], ['c', '(2 ; 0)']], a: 'a', how: 'f(0) = −2 × 0 + 4 = 4 : c’est h. (2 ; 0) est le point où elle coupe l’axe horizontal (le zéro).' },
+    { q: 'Une droite passe par (1 ; 2) et (3 ; 8). Sa pente vaut…', o: [['a', '1/3'], ['b', '6'], ['c', '3']], a: 'c', how: 'm = (8 − 2) / (3 − 1) = 6 / 2 = 3. 1/3, c’est l’escalier lu à l’envers.' },
+    { q: 'Laquelle de ces fonctions est linéaire ?', o: [['a', 'f(x) = 3x + 1'], ['b', 'f(x) = −x/4'], ['c', 'f(x) = 4']], a: 'b', how: '−x/4 = (−1/4)x : h = 0, la droite passe par l’origine. 3x + 1 est affine, 4 est constante.' },
+    { q: 'Les droites de y = 2x + 1 et y = 2x − 5 sont…', o: [['a', 'parallèles'], ['b', 'sécantes'], ['c', 'confondues']], a: 'a', how: 'Même pente (2) et h différents (1 et −5) : parallèles, elles ne se coupent jamais.' },
+    { q: 'Où se coupent f(x) = x + 1 et g(x) = −x + 5 ?', o: [['a', 'en (3 ; 2)'], ['b', 'en (2 ; 3)'], ['c', 'en (4 ; 5)']], a: 'b', how: 'x + 1 = −x + 5, donc 2x = 4 et x = 2. y = f(2) = 3, et g(2) = 3 ✓.' },
+    { q: 'Vélo A : 3 fr. par heure. Vélo B : 6 fr. + 1 fr. par heure (prix inventés). B est moins cher pour…', o: [['a', 'plus de 2 heures'], ['b', 'plus de 3 heures'], ['c', 'plus de 6 heures']], a: 'b', how: '3x = x + 6, donc 2x = 6 et x = 3 : à 3 h, les deux coûtent 9 fr. Au-delà, B est moins cher (pente plus petite).' },
+    { q: 'Le zéro de f(x) = 2x − 6 est…', o: [['a', 'x = 3'], ['b', 'x = −6'], ['c', 'x = −3']], a: 'a', how: '2x − 6 = 0, donc 2x = 6 et x = 3. Avec la formule : x = −h/m = 6/2 = 3. (−6 est h.)' }
+  ];
+  /*END-ALGO*/
+
+  function $(id) { return document.getElementById(id); }
+  function rint(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  function clampN(x, lo, hi) { return Math.max(lo, Math.min(hi, x)); }
+  function clampI(i, n) { i = Math.floor(Number(i)); if (!isFinite(i)) i = 0; return Math.max(0, Math.min(n - 1, i)); }
+
+  /* ---------- Curseurs avec boutons − et + ---------- */
+  function sliderHtml(id, label, min, max, step, value, d) {
+    return '<div class="param"><label for="' + id + '">' + esc(label) + ' : <span class="mono" id="' + id + 'Out"></span></label><div class="srow"><button type="button" class="pm" data-for="' + id + '" data-d="-' + d + '" aria-label="' + esc(label) + ' : diminuer">−</button><input id="' + id + '" type="range" min="' + min + '" max="' + max + '" step="' + step + '" value="' + value + '"><button type="button" class="pm" data-for="' + id + '" data-d="' + d + '" aria-label="' + esc(label) + ' : augmenter">+</button></div></div>';
+  }
+  function setRange(inp, x, silent) {
+    var lo = Number(inp.min), hi = Number(inp.max), st = Number(inp.step) || 1;
+    if (!isFinite(x)) x = lo;
+    x = clampN(Math.round((x - lo) / st) * st + lo, lo, hi);
+    inp.value = String(Math.round(x * 1e6) / 1e6);
+    if (!silent) inp.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+  document.addEventListener('click', function (ev) {
+    var b = ev.target.closest ? ev.target.closest('.pm') : null; if (!b) return;
+    var inp = $(b.getAttribute('data-for')); if (!inp) return;
+    setRange(inp, Number(inp.value) + Number(b.getAttribute('data-d')));
+  });
+  function rv(id) { var x = Number($(id).value); return isFinite(x) ? x : 0; }
+  function presetBtns(list, label, other) {
+    return list.map(function (p, i) { return '<button type="button" class="ex" data-i="' + i + '">' + esc(label(p)) + '</button>'; }).join('') + (other ? '<button type="button" data-r="1">' + esc(other) + '</button>' : '');
+  }
+
+  /* Trieur générique (cartes une par une), le même que dans les autres tutoriels.
+     Si un item a sa propre liste o (options), elle remplace les boutons communs.
+     o.cardHtml(it, answered) renvoie le contenu HTML de la carte. */
+  var makeSorter = (function () {
+    function clamp(i, n) { i = Math.floor(Number(i)); if (!isFinite(i)) i = 0; return Math.max(0, Math.min(n - 1, i)); }
+    function makeSorter(o) {
+      var idx = 0, ans = {};
+      function opts(it) { return it.o ? it.o : o.order; }
+      function name(c) { return o.names && o.names[c] ? o.names[c] : c; }
+      function render() {
+        var it = o.items[idx], a = ans[it.k];
+        if (o.cardHtml) $(o.card).innerHTML = o.cardHtml(it, !!a); else $(o.card).textContent = it.s;
+        $(o.pos).textContent = o.word + ' ' + (idx + 1) + ' / ' + o.items.length;
+        $(o.btns).innerHTML = opts(it).map(function (c) {
+          var cls = a ? (c === it.a ? 'right' : (c === a ? 'wrong' : '')) : '';
+          return '<button type="button" data-c="' + esc(c) + '"' + (cls ? ' class="' + cls + '"' : '') + (a ? ' disabled' : '') + '>' + esc(name(c)) + '</button>';
+        }).join('');
+        var out = $(o.out);
+        if (!a) { out.className = 'fbk'; out.innerHTML = ''; }
+        else {
+          var ok = a === it.a;
+          out.className = 'fbk ' + (ok ? 'ok' : 'no');
+          out.innerHTML = '<strong>' + (ok ? 'Bien vu !' : 'Pas tout à fait. Réponse : ' + esc(name(it.a)) + '.') + '</strong><span>' + esc(it.why) + '</span>';
+        }
+        var s = o.score(ans), last = idx === o.items.length - 1, left = s.total - s.answered;
+        $(o.score_).textContent = (o.word ? o.word + ' ' : '') + (idx + 1) + ' / ' + s.total;
+        $(o.pos).textContent = s.answered ? 'Bonnes réponses : ' + s.correct + ' sur ' + s.answered : '';
+        $(o.prev).disabled = idx === 0;
+        $(o.next).disabled = last;
+        $(o.next).style.display = last ? 'none' : '';
+        var end = $(o.out + 'End');
+        if (!end) { end = document.createElement('div'); end.id = o.out + 'End'; end.setAttribute('aria-live', 'polite'); $(o.out).insertAdjacentElement('afterend', end); }
+        if (!left) {
+          var r = s.correct / s.total;
+          end.className = 'fbk ok sorter-end';
+          end.innerHTML = '<strong>Terminé ! ' + s.correct + ' / ' + s.total + ' bonnes réponses</strong><span>' +
+            (r === 1 ? 'Parfait, tout est juste !' : r >= .7 ? 'Très bien !' : r >= .5 ? 'Pas mal ! Relis les explications des erreurs.' : 'Relis les explications, puis réessaie.') +
+            ' Touche « Recommencer » pour rejouer.</span>';
+        } else if (last && ans[it.k]) {
+          end.className = 'fbk warn sorter-end';
+          end.innerHTML = '<strong>C’était la dernière carte.</strong><span>Il te reste ' + left + ' réponse' + (left > 1 ? 's' : '') + ' à donner : reviens en arrière avec « ← Précédent ».</span>';
+        } else { end.className = ''; end.innerHTML = ''; }
+      }
+      $(o.btns).addEventListener('click', function (ev) {
+        var b = ev.target.closest('button'); if (!b || b.disabled) return;
+        var it = o.items[idx]; if (!ans[it.k]) ans[it.k] = b.getAttribute('data-c');
+        render();
+      });
+      $(o.prev).addEventListener('click', function () { idx = clamp(idx - 1, o.items.length); render(); });
+      $(o.next).addEventListener('click', function () { idx = clamp(idx + 1, o.items.length); render(); });
+      $(o.reset).addEventListener('click', function () { ans = {}; idx = 0; render(); });
+      render();
+    }
+    return makeSorter;
+  })();
+  function scorer(items) {
+    return function (ans) { var correct = 0, answered = 0; items.forEach(function (x) { if (ans && ans[x.k]) { answered++; if (ans[x.k] === x.a) correct++; } }); return { correct: correct, answered: answered, total: items.length }; };
+  }
+
+  /* Pas à pas générique : Précédent / Suivant / Recommencer, « Suivant » caché à la fin */
+  function makeSteps(o) {
+    var S = { steps: [], idx: 0 };
+    function render() {
+      var st = S.steps[S.idx], last = S.idx === S.steps.length - 1;
+      $(o.pos).textContent = 'Étape ' + (S.idx + 1) + ' / ' + S.steps.length;
+      o.draw(st, S.idx);
+      var say = $(o.say);
+      if (last) { say.className = 'fbk ok say'; say.innerHTML = '<strong>' + esc(o.doneTitle || 'Terminé') + '</strong><span>' + st.text + '</span>'; }
+      else { say.className = 'fbk info say'; say.innerHTML = '<span>' + st.text + '</span>'; }
+      $(o.prev).disabled = S.idx === 0;
+      $(o.next).disabled = last;
+      $(o.next).style.display = last ? 'none' : '';
+    }
+    $(o.prev).addEventListener('click', function () { S.idx = clampI(S.idx - 1, S.steps.length); render(); });
+    $(o.next).addEventListener('click', function () { S.idx = clampI(S.idx + 1, S.steps.length); render(); });
+    $(o.reset).addEventListener('click', function () { S.idx = 0; render(); });
+    S.load = function (steps) { S.steps = steps; S.idx = 0; render(); };
+    return S;
+  }
+
+  /* ---------- Étape 1 ---------- */
+  function miniLine(m, h, label) { return plot(MINI(label), function (P) { return lineM(P, m, h, 'var(--acc)', 3.5); }); }
+  makeSorter({ items: kindCards, names: KIND_NAMES, order: ['lin', 'aff', 'cst', 'non'], btns: 'kdBtns', card: 'kdCard', pos: 'kdPos', out: 'kdOut', score_: 'kdScore', prev: 'kdPrev', next: 'kdNext', reset: 'kdReset', word: 'Carte', score: scorer(kindCards),
+    cardHtml: function (it) {
+      if (it.s) return '<span class="ask">Quelle famille ?</span><span class="formula">' + esc(it.s) + '</span>';
+      var svg = it.g.curve ? plot(MINI('Une courbe en forme de U'), function (P) { return curve(P, parab, 'var(--acc)'); }) : miniLine(it.g.m, it.g.h, 'Une droite dans un repère');
+      return '<span class="ask">Quelle famille pour ce graphique ?</span><div class="graph mini">' + svg + '</div>';
+    } });
+
+  /* ---------- Étape 2 : laboratoire ---------- */
+  var LAB_PRESETS = [[F(2), F(0)], [F(-1), F(3)], [F(1, 2), F(-2)], [F(0), F(4)]];
+  $('labParams').innerHTML = sliderHtml('labM', 'Pente m', 0, 16, 1, 14, 1) + sliderHtml('labH', 'Ordonnée à l’origine h', -5, 5, 1, 0, 1);
+  $('labBtns').innerHTML = presetBtns(LAB_PRESETS, function (p) { return eqStr(p[0], p[1]); }, 'Autre droite');
+  function labRender() {
+    var m = M_LIST[clampI(rv('labM'), M_LIST.length)], h = F(Math.round(rv('labH')));
+    $('labMOut').textContent = fs(m); $('labHOut').textContent = fs(h);
+    $('labEq').textContent = eqStr(m, h);
+    var stairOk = m.n !== 0 && inView([m.d, h.n + m.n]);
+    $('labG').innerHTML = plot(SQ('Droite de ' + eqStr(m, h)), function (P) {
+      var s = lineM(P, m, h, 'var(--acc)', 3.5);
+      if (stairOk) s += stair(P, 0, h.n, m.d, m.n, 'var(--two)');
+      return s + Dot(P, 0, h.n, 'var(--two)', 7);
+    }, function (P) { return stairOk ? stairLabels(P, 0, h.n, m.d, m.n, 'var(--two)') : ''; });
+    var xs = [-2, -1, 0, 1, 2, 3];
+    $('labTable').innerHTML = '<tr><th scope="row">x</th>' + xs.map(function (x) { return '<td>' + ns(x) + '</td>'; }).join('') + '</tr><tr><th scope="row">f(x)</th>' + xs.map(function (x) { return '<td' + (x === 0 ? ' class="new"' : '') + '>' + fs(fval(m, h, x)) + '</td>'; }).join('') + '</tr>';
+    var kind = m.n === 0 && h.n === 0 ? 'Fonction nulle (f(x) = 0) : à la fois linéaire et constante.' : m.n === 0 ? 'Fonction constante : m = 0.' : h.n === 0 ? 'Fonction linéaire : h = 0, la droite passe par l’origine (proportionnalité).' : 'Fonction affine : m ≠ 0 et h ≠ 0.';
+    var mt = m.n > 0 ? 'm = ' + fs(m) + ' > 0 : la droite monte. Quand x augmente de 1, y augmente de ' + fs(m) + '.' : m.n < 0 ? 'm = ' + fs(m) + ' < 0 : la droite descend. Quand x augmente de 1, y diminue de ' + fs(absQ(m)) + '.' : 'm = 0 : la droite est horizontale, y ne change pas.';
+    if (m.d > 1) mt += ' Escalier entier : ' + m.d + ' pas à droite, ' + Math.abs(m.n) + ' ' + (m.n > 0 ? 'vers le haut' : 'vers le bas') + '.';
+    $('labOut').innerHTML = '<span><b>' + esc(kind) + '</b></span><span class="c-two">h = ' + esc(fs(h)) + ' : la droite coupe l’axe vertical au point (0 ; ' + esc(fs(h)) + ').</span><span>' + esc(mt) + '</span>';
+    Array.prototype.forEach.call($('labBtns').querySelectorAll('[data-i]'), function (b) { var p = LAB_PRESETS[+b.getAttribute('data-i')]; b.setAttribute('aria-pressed', eq(p[0], m) && eq(p[1], h) ? 'true' : 'false'); });
+  }
+  $('labParams').addEventListener('input', labRender);
+  $('labBtns').addEventListener('click', function (ev) {
+    var b = ev.target.closest('button'); if (!b) return;
+    var p;
+    if (b.hasAttribute('data-r')) { var cur = [rv('labM'), rv('labH')], nm, nh; do { nm = rint(0, 16); nh = rint(-5, 5); } while (nm === cur[0] && nh === cur[1]); setRange($('labM'), nm, true); setRange($('labH'), nh, true); }
+    else { p = LAB_PRESETS[+b.getAttribute('data-i')]; setRange($('labM'), mIdx(p[0]), true); setRange($('labH'), p[1].n, true); }
+    labRender();
+  });
+  labRender();
+
+  /* ---------- Étape 3 : taper deux points ---------- */
+  var slK = 0, slLine = SLOPE_LINES[0], slSel = [];
+  function slRender() {
+    var m = slLine.m, h = slLine.h, pts = latticePts(m, h, 6);
+    $('slEq').textContent = eqStr(m, h);
+    var A = slSel[0], B = slSel[1];
+    $('slG').innerHTML = plot(SQ('Droite de ' + eqStr(m, h) + ' avec ses points du quadrillage'), function (P) {
+      var s = lineM(P, m, h, 'var(--acc)', 3.5);
+      if (A && B) s += stair(P, A[0], A[1], B[0] - A[0], B[1] - A[1], 'var(--two)');
+      return s;
+    }, function (P) {
+      var s = '';
+      if (A && B) s += stairLabels(P, A[0], A[1], B[0] - A[0], B[1] - A[1], 'var(--two)');
+      pts.forEach(function (p) {
+        var on = (A && A[0] === p[0]) || (B && B[0] === p[0]);
+        s += '<g class="lp" data-x="' + p[0] + '" data-y="' + p[1] + '" tabindex="0" role="button" aria-label="Point (' + ns(p[0]) + ' ; ' + ns(p[1]) + ')' + (on ? ', choisi' : '') + '"><circle cx="' + r1(P.X(p[0])) + '" cy="' + r1(P.Y(p[1])) + '" r="18" style="fill:transparent"/><circle class="vis" cx="' + r1(P.X(p[0])) + '" cy="' + r1(P.Y(p[1])) + '" r="8" style="fill:' + (on ? 'var(--red)' : 'var(--card)') + ';stroke:var(--acc);stroke-width:3"/></g>';
+      });
+      if (A) s += Tx(P.X(A[0]) - 10, P.Y(A[1]) - 12, 'A', { fs: P.fs, a: 'end', st: halo('var(--red)') });
+      if (B) s += Tx(P.X(B[0]) + 10, P.Y(B[1]) - 12, 'B', { fs: P.fs, st: halo('var(--red)') });
+      return s;
+    });
+    var out = $('slOut');
+    if (!A) { out.className = 'fbk info'; out.innerHTML = '<span>Touche un premier point rond de la droite.</span>'; }
+    else if (!B) { out.className = 'fbk info'; out.innerHTML = '<span>Premier point : ' + pt('A', A) + '. Touche un deuxième point.</span>'; }
+    else {
+      var dx = B[0] - A[0], dy = B[1] - A[1], q = F(dy, dx), raw = ns(dy) + '/' + ns(dx);
+      out.className = 'fbk ok';
+      out.innerHTML = '<strong>m = ' + esc(fs(q)) + '</strong><span>' + pt('A', A) + ' et ' + pt('B', B) + '. Δx = ' + ns(B[0]) + ' − ' + fp(A[0]) + ' = ' + ns(dx) + ' ; Δy = ' + ns(B[1]) + ' − ' + fp(A[1]) + ' = ' + ns(dy) + '.</span><span>m = Δy / Δx = ' + raw + (raw !== fs(q) ? ' = ' + fs(q) + ' (simplifié)' : '') + '.' + (dx < 0 ? ' Tu es allé vers la gauche : Δx et Δy changent tous les deux de signe, le quotient reste le même.' : '') + ' C’est bien la pente de ' + eqStr(m, h) + '. Touche un autre point pour recommencer.</span>';
+    }
+  }
+  function slTap(g) {
+    var p = [+g.getAttribute('data-x'), +g.getAttribute('data-y')];
+    if (slSel.length >= 2) slSel = [p];
+    else if (slSel.length === 1 && slSel[0][0] === p[0]) return;
+    else slSel.push(p);
+    slRender();
+    var again = $('slG').querySelector('.lp[data-x="' + p[0] + '"]'); if (again) again.focus();
+  }
+  $('slG').addEventListener('click', function (ev) { var g = ev.target.closest('.lp'); if (g) slTap(g); });
+  $('slG').addEventListener('keydown', function (ev) { var g = ev.target.closest('.lp'); if (g && (ev.key === 'Enter' || ev.key === ' ')) { ev.preventDefault(); slTap(g); } });
+  $('slOther').addEventListener('click', function () { slK = (slK + 1) % SLOPE_LINES.length; slLine = SLOPE_LINES[slK]; slSel = []; slRender(); });
+  $('slClear').addEventListener('click', function () { slSel = []; slRender(); });
+  slRender();
+
+  /* ---------- Étape 4 ---------- */
+  makeSorter({ items: eqCards, names: null, order: [], btns: 'eqBtns', card: 'eqCard', pos: 'eqPos', out: 'eqOut', score_: 'eqScore', prev: 'eqPrev', next: 'eqNext', reset: 'eqReset', word: 'Droite', score: scorer(eqCards),
+    cardHtml: function (it) { return '<span class="ask">Quelle est l’équation de cette droite ?</span><div class="graph mini">' + miniLine(it.m, it.h, 'Une droite à identifier') + '</div>'; } });
+
+  /* ---------- Étape 5 : tracer ---------- */
+  var trMeth = 'esc', trLine = TRACE_LINES[0], trData = null;
+  function rndTrace() { var m, h, c = 0; do { var t = pick(RND_SLOPES); m = F(t[0], t[1]); h = F(rint(-4, 4)); c++; } while ((!traceable(m, h) || (eq(m, trLine.m) && eq(h, trLine.h))) && c < 500); return { m: m, h: h }; }
+  $('trBtns').innerHTML = presetBtns(TRACE_LINES, function (p) { return eqStr(p.m, p.h); }, 'Autre droite');
+  function trDraw(st) {
+    var s = st.show, m = trLine.m, h = trLine.h, D = trData;
+    $('trG').innerHTML = plot(SQ('Tracé de ' + eqStr(m, h)), function (P) {
+      var o = '';
+      if (s.line) o += lineM(P, m, h, 'var(--acc)', 3.5);
+      if (s.s1) o += stair(P, D.A[0], D.A[1], D.B[0] - D.A[0], D.B[1] - D.A[1], 'var(--two)');
+      if (s.s2) { var F0 = D.fwd ? D.B : D.A, T0 = D.C; o += stair(P, F0[0], F0[1], T0[0] - F0[0], T0[1] - F0[1], 'var(--two)'); }
+      return o;
+    }, function (P) {
+      var o = '';
+      if (s.s1) o += stairLabels(P, D.A[0], D.A[1], D.B[0] - D.A[0], D.B[1] - D.A[1], 'var(--two)');
+      if (s.s2) { var F0 = D.fwd ? D.B : D.A; o += stairLabels(P, F0[0], F0[1], D.C[0] - F0[0], D.C[1] - F0[1], 'var(--two)'); }
+      [['A', D.A], ['B', D.B], ['C', D.C]].forEach(function (q) { if (s[q[0]]) o += Dot(P, q[1][0], q[1][1], 'var(--red)', 7) + Tx(P.X(q[1][0]) - 10, P.Y(q[1][1]) - 10, q[0], { fs: P.fs, a: 'end', st: halo('var(--red)') }); });
+      if (s.pts) D.rows.forEach(function (r) { o += Dot(P, r.x, val(r.y), 'var(--red)', 7); });
+      return o;
+    });
+    if (trMeth === 'tab') {
+      $('trTable').innerHTML = '<table class="ptable" aria-label="Tableau de valeurs"><tr><th scope="row">x</th>' + D.rows.map(function (r) { return '<td>' + ns(r.x) + '</td>'; }).join('') + '</tr><tr><th scope="row">f(x)</th>' + D.rows.map(function (r) { return '<td' + (s.tab === 2 ? ' class="new"' : '') + '>' + (s.tab === 2 ? fs(r.y) : '?') + '</td>'; }).join('') + '</tr></table>';
+    } else $('trTable').innerHTML = '';
+  }
+  var trS = makeSteps({ pos: 'trPos', say: 'trSay', prev: 'trPrev', next: 'trNext', reset: 'trReset', draw: trDraw, doneTitle: 'Droite tracée' });
+  function trLoad() {
+    trData = traceSteps(trLine.m, trLine.h, trMeth);
+    $('trEsc').setAttribute('aria-pressed', trMeth === 'esc' ? 'true' : 'false'); $('trTab').setAttribute('aria-pressed', trMeth === 'tab' ? 'true' : 'false');
+    Array.prototype.forEach.call($('trBtns').querySelectorAll('[data-i]'), function (b) { var p = TRACE_LINES[+b.getAttribute('data-i')]; b.setAttribute('aria-pressed', eq(p.m, trLine.m) && eq(p.h, trLine.h) ? 'true' : 'false'); });
+    trS.load(trData.steps);
+  }
+  $('trEsc').addEventListener('click', function () { trMeth = 'esc'; trLoad(); });
+  $('trTab').addEventListener('click', function () { trMeth = 'tab'; trLoad(); });
+  $('trBtns').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b) return; trLine = b.hasAttribute('data-r') ? rndTrace() : TRACE_LINES[+b.getAttribute('data-i')]; trLoad(); });
+  trLoad();
+
+  /* ---------- Étape 6 : deux points ---------- */
+  var tpK = 0;
+  function tpDraw(st) {
+    var A = TWO_PAIRS[tpK][0], B = TWO_PAIRS[tpK][1], s = st.show, L = lineFrom2(A, B);
+    $('tpG').innerHTML = plot(SQ('Points ' + pt('A', A) + ' et ' + pt('B', B)), function (P) {
+      var o = '';
+      if (s.vert) o += vLine(P, A[0], 'var(--red)', 3.5);
+      if (s.line && !L.vertical) o += lineM(P, L.m, L.h, 'var(--acc)', 3.5);
+      if (s.tri) o += stair(P, A[0], A[1], B[0] - A[0], B[1] - A[1], 'var(--two)');
+      return o;
+    }, function (P) {
+      var o = '';
+      if (s.tri) o += stairLabels(P, A[0], A[1], B[0] - A[0], B[1] - A[1], 'var(--two)');
+      if (s.H && !L.vertical) o += Dot(P, 0, val(L.h), 'var(--two)', 7) + Tx(P.X(0) + 10, P.Y(val(L.h)) + 18, 'h', { fs: P.fs, st: halo('var(--two)') });
+      o += Dot(P, A[0], A[1], 'var(--red)', 7) + Tx(P.X(A[0]) - 10, P.Y(A[1]) - 10, 'A', { fs: P.fs, a: 'end', st: halo('var(--red)') });
+      o += Dot(P, B[0], B[1], 'var(--red)', 7) + Tx(P.X(B[0]) + 10, P.Y(B[1]) - 10, 'B', { fs: P.fs, st: halo('var(--red)') });
+      return o;
+    });
+  }
+  var tpS = makeSteps({ pos: 'tpPos', say: 'tpSay', prev: 'tpPrev', next: 'tpNext', reset: 'tpReset', draw: tpDraw, doneTitle: 'Équation trouvée' });
+  function tpLoad() { var A = TWO_PAIRS[tpK][0], B = TWO_PAIRS[tpK][1]; $('tpLabel').textContent = 'Paire ' + (tpK + 1) + ' / ' + TWO_PAIRS.length + ' : ' + pt('A', A) + ', ' + pt('B', B); tpS.load(twoPtSteps(A, B)); }
+  $('tpOther').addEventListener('click', function () { tpK = (tpK + 1) % TWO_PAIRS.length; tpLoad(); });
+  tpLoad();
+
+  /* ---------- Étape 7 : parallèles ou sécantes ---------- */
+  var PA_PRESETS = [
+    { name: 'Parallèles', a: [F(2), F(1)], b: [F(2), F(-3)] }, { name: 'Sécantes', a: [F(2), F(-1)], b: [F(-1), F(5)] },
+    { name: 'Confondues', a: [F(1, 2), F(1)], b: [F(1, 2), F(1)] }, { name: 'Perpendiculaires', a: [F(2), F(-1)], b: [F(-1, 2), F(4)] }
+  ];
+  $('paParams').innerHTML = sliderHtml('paM1', 'Pente m₁ (bleue)', 0, 16, 1, 14, 1) + sliderHtml('paH1', 'h₁ (bleue)', -5, 5, 1, 1, 1) + sliderHtml('paM2', 'Pente m₂ (orange)', 0, 16, 1, 14, 1) + sliderHtml('paH2', 'h₂ (orange)', -5, 5, 1, -3, 1);
+  $('paBtns').innerHTML = presetBtns(PA_PRESETS, function (p) { return p.name; }, 'Autre paire');
+  function paRender() {
+    var m1 = M_LIST[clampI(rv('paM1'), 17)], h1 = F(Math.round(rv('paH1'))), m2 = M_LIST[clampI(rv('paM2'), 17)], h2 = F(Math.round(rv('paH2')));
+    $('paM1Out').textContent = fs(m1); $('paH1Out').textContent = fs(h1); $('paM2Out').textContent = fs(m2); $('paH2Out').textContent = fs(h2);
+    $('paE1').textContent = eqStr(m1, h1, 'f'); $('paE2').textContent = eqStr(m2, h2, 'g');
+    var I = intersect(m1, h1, m2, h2);
+    $('paG').innerHTML = plot(SQ('Droites de ' + eqStr(m1, h1, 'f') + ' et ' + eqStr(m2, h2, 'g')), function (P) {
+      return lineM(P, m2, h2, 'var(--two)', I.kind === 'same' ? 7 : 3.5, I.kind === 'same' ? ' stroke-opacity="0.55"' : '') + lineM(P, m1, h1, 'var(--acc)', 3.5, I.kind === 'same' ? ' stroke-dasharray="10 8"' : '');
+    }, function (P) { return I.kind === 'one' && inView([val(I.x), val(I.y)]) ? Dot(P, val(I.x), val(I.y), 'var(--red)', 8) : ''; });
+    var out = $('paOut');
+    if (I.kind === 'same') { out.className = 'fbk info'; out.innerHTML = '<strong>Confondues</strong><span>Même pente et même h : c’est deux fois la même droite. Tous leurs points sont communs.</span>'; }
+    else if (I.kind === 'none') { out.className = 'fbk info'; out.innerHTML = '<strong>Parallèles</strong><span>Même pente m = ' + esc(fs(m1)) + ', mais h différents : les droites restent toujours à la même distance verticale (' + esc(fs(absQ(sub(h1, h2)))) + ') et ne se coupent jamais.</span>'; }
+    else {
+      var perp = eq(mul(m1, m2), F(-1));
+      out.className = 'fbk ok';
+      out.innerHTML = '<strong>Sécantes</strong><span>Pentes différentes (' + esc(fs(m1)) + ' et ' + esc(fs(m2)) + ') : les droites se coupent en un seul point, I(' + esc(fs(I.x)) + ' ; ' + esc(fs(I.y)) + ')' + (inView([val(I.x), val(I.y)]) ? '' : ', en dehors du graphique') + '. Le calcul de ce point est expliqué à l’étape 8.</span>' + (perp ? '<span>Bonus : m₁ × m₂ = −1, les droites sont <strong>perpendiculaires</strong> (elles forment un angle droit, car les deux axes ont la même échelle).</span>' : '');
+    }
+    Array.prototype.forEach.call($('paBtns').querySelectorAll('[data-i]'), function (b) { var p = PA_PRESETS[+b.getAttribute('data-i')]; b.setAttribute('aria-pressed', eq(p.a[0], m1) && eq(p.a[1], h1) && eq(p.b[0], m2) && eq(p.b[1], h2) ? 'true' : 'false'); });
+  }
+  $('paParams').addEventListener('input', paRender);
+  $('paBtns').addEventListener('click', function (ev) {
+    var b = ev.target.closest('button'); if (!b) return;
+    if (b.hasAttribute('data-r')) { setRange($('paM1'), rint(0, 16), true); setRange($('paH1'), rint(-5, 5), true); setRange($('paM2'), rint(0, 16), true); setRange($('paH2'), rint(-5, 5), true); }
+    else { var p = PA_PRESETS[+b.getAttribute('data-i')]; setRange($('paM1'), mIdx(p.a[0]), true); setRange($('paH1'), p.a[1].n, true); setRange($('paM2'), mIdx(p.b[0]), true); setRange($('paH2'), p.b[1].n, true); }
+    paRender();
+  });
+  paRender();
+
+  /* ---------- Étape 8 : intersection pas à pas ---------- */
+  var inK = 0;
+  function inDraw(st) {
+    var f = INTER_PAIRS[inK][0], g = INTER_PAIRS[inK][1], s = st.show, I = intersect(f.m, f.h, g.m, g.h);
+    $('inG').innerHTML = plot(SQ('Droites de ' + eqStr(f.m, f.h, 'f') + ' et ' + eqStr(g.m, g.h, 'g')), function (P) {
+      var o = lineM(P, f.m, f.h, 'var(--acc)', 3.5) + lineM(P, g.m, g.h, 'var(--two)', 3.5);
+      if (s.vx && I.kind === 'one') o += Ln(P.X(val(I.x)), P.Y(-6), P.X(val(I.x)), P.Y(val(I.y)), 'var(--red)', 2, ' stroke-dasharray="5 4"');
+      return o;
+    }, function (P) {
+      if (!s.vx || I.kind !== 'one') return '';
+      var o = Dot(P, val(I.x), 0, 'var(--red)', 5);
+      if (s.I) o += Dot(P, val(I.x), val(I.y), 'var(--red)', 8) + Tx(P.X(val(I.x)) + 12, P.Y(val(I.y)) - 10, 'I', { fs: P.fs, st: halo('var(--red)') });
+      return o;
+    });
+  }
+  var inS = makeSteps({ pos: 'inPos', say: 'inSay', prev: 'inPrev', next: 'inNext', reset: 'inReset', draw: inDraw, doneTitle: 'Résultat' });
+  function inLoad() { var f = INTER_PAIRS[inK][0], g = INTER_PAIRS[inK][1]; $('inLabel').textContent = 'Paire ' + (inK + 1) + ' / ' + INTER_PAIRS.length; $('inE1').textContent = eqStr(f.m, f.h, 'f'); $('inE2').textContent = eqStr(g.m, g.h, 'g'); inS.load(interSteps(f, g)); }
+  $('inOther').addEventListener('click', function () { inK = (inK + 1) % INTER_PAIRS.length; inLoad(); });
+  inLoad();
+
+  /* ---------- Étape 9 : le comparateur ---------- */
+  var taKey = 'velo', taShowC = false, COLS = ['var(--acc)', 'var(--two)', 'var(--ok)'], CCLS = ['c-acc', 'c-two', 'c-ok'];
+  $('taBtns').innerHTML = Object.keys(TARIFS).map(function (k) { return '<button type="button" data-k="' + k + '">' + esc(TARIFS[k].name) + '</button>'; }).join('');
+  function taBuild() {
+    var T = TARIFS[taKey];
+    $('taParams').innerHTML = T.o.map(function (o, i) {
+      return '<div class="offer" id="taOf' + i + '"' + (i === 2 && !taShowC ? ' hidden' : '') + '><strong class="' + CCLS[i] + '">' + o.name + ' · ' + esc(o.label) + '</strong>' +
+        sliderHtml('taF' + i, 'Montant fixe ' + o.name, 0, 100, 1, o.fee, 1) + sliderHtml('taP' + i, 'Prix par ' + T.unit.one + ' ' + o.name, 0, 10, 0.5, o.price, 0.5) + '</div>';
+    }).join('');
+    $('taXp').innerHTML = sliderHtml('taX', 'Lire les prix pour x', 0, T.xMax, 0.5, Math.round(T.xMax / 3), 0.5);
+    Array.prototype.forEach.call($('taBtns').querySelectorAll('button'), function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-k') === taKey ? 'true' : 'false'); });
+    taRender();
+  }
+  function taRender() {
+    var T = TARIFS[taKey], U = T.unit, n = taShowC ? 3 : 2, xMax = T.xMax;
+    var offers = T.o.slice(0, n).map(function (o, i) { return { name: o.name, label: o.label, fee: rv('taF' + i), price: rv('taP' + i) }; });
+    offers.forEach(function (o, i) { $('taF' + i + 'Out').textContent = mon(F(cents(o.fee))); $('taP' + i + 'Out').textContent = mon(F(cents(o.price))); });
+    $('taOf2').hidden = !taShowC;
+    $('taC').setAttribute('aria-pressed', taShowC ? 'true' : 'false'); $('taC').textContent = taShowC ? 'Retirer l’offre C' : 'Ajouter l’offre C';
+    var x = rv('taX'), tx = F(Math.round(x * 2), 2);
+    $('taXOut').textContent = uStr(tx, U);
+    var maxC = 0; offers.forEach(function (o) { maxC = Math.max(maxC, o.fee + o.price * xMax, o.fee); });
+    var sy = [1, 2, 5, 10, 20, 25, 50, 100, 200].filter(function (s) { return Math.ceil(maxC / s) <= 6; })[0] || 200, yMax = Math.max(sy, Math.ceil(maxC / sy) * sy);
+    var lx = [1, 2, 5].filter(function (s) { return xMax / s <= 8; })[0] || 5;
+    var cross = [];
+    for (var i = 0; i < n; i++) for (var j = i + 1; j < n; j++) { var be = breakEven(offers[i], offers[j]); if (be.kind === 'cross' && val(be.t) <= xMax) cross.push({ t: be.t, c: be.cost, lab: offers[i].name + ' = ' + offers[j].name }); }
+    $('taLeg').innerHTML = offers.map(function (o, i) { return '<span><i style="background:' + COLS[i] + '"></i>' + esc(tarifEq(o, U)) + '</span>'; }).join('');
+    $('taG').innerHTML = plot({ w: 400, h: 300, L: 46, R: 10, T: 30, B: 50, x0: 0, x1: xMax, y0: 0, y1: yMax, sx: 1, sy: sy, lx: lx, ly: sy, fs: 15, xl: T.xl, yl: 'prix (fr.)', label: 'Prix des offres selon ' + T.xl }, function (P) {
+      var o = Ln(P.X(x), P.Y(0), P.X(x), P.Y(yMax), 'var(--ink-soft)', 1.5, ' stroke-dasharray="5 4"');
+      offers.forEach(function (of, k) { o += Ln(P.X(0), P.Y(of.fee), P.X(xMax), P.Y(of.fee + of.price * xMax), COLS[k], 3.5, ' stroke-linecap="round"'); });
+      offers.forEach(function (of, k) { o += Dot(P, x, of.fee + of.price * x, COLS[k], 5); });
+      return o;
+    }, function (P) {
+      var o = '';
+      cross.forEach(function (c, k) { var cx = val(c.t), cy = val(c.c) / 100; if (cy <= yMax) o += Dot(P, cx, cy, 'var(--red)', 7) + Tx(P.X(cx), P.Y(cy) - 12 - 16 * (k % 2), c.lab, { fs: 15, a: cx > xMax * 0.8 ? 'end' : 'middle', st: halo('var(--red)') }); });
+      return o;
+    });
+    var costs = offers.map(function (o, i) { return '<span class="' + CCLS[i] + '">' + o.name + ' : ' + esc(mon(costF(o, tx))) + '</span>'; }).join('');
+    var pairs = [];
+    for (i = 0; i < n; i++) for (j = i + 1; j < n; j++) pairs.push('<span>• ' + esc(pairText(offers[i], offers[j], U, xMax)) + '</span>');
+    var segs = segText(cheapest(offers, xMax), U).map(function (s) { return '<span>• ' + esc(s) + '</span>'; }).join('');
+    $('taOut').innerHTML = '<span><b>Pour ' + esc(uStr(tx, U)) + ' :</b></span>' + costs + '<span><b>Les points d’équilibre</b></span>' + pairs.join('') + (n > 2 ? '<span><b>La moins chère, sur le graphique (0 à ' + esc(uStr(xMax, U)) + ')</b></span>' + segs : '');
+  }
+  $('taParams').addEventListener('input', taRender);
+  $('taXp').addEventListener('input', taRender);
+  $('taBtns').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b) return; taKey = b.getAttribute('data-k'); taBuild(); });
+  $('taC').addEventListener('click', function () { taShowC = !taShowC; taRender(); });
+  taBuild();
+
+  /* ---------- Étape 10 ---------- */
+  makeSorter({ items: lifeCards, names: null, order: [], btns: 'lfBtns', card: 'lfCard', pos: 'lfPos', out: 'lfOut', score_: 'lfScore', prev: 'lfPrev', next: 'lfNext', reset: 'lfReset', word: 'Situation', score: scorer(lifeCards),
+    cardHtml: function (it) {
+      if (it.s) return '<span>' + esc(it.s) + '</span><span class="ask">Choisis la bonne fonction.</span>';
+      return '<span>Quelle situation ce graphique peut-il représenter ?</span><div class="graph mini">' + plot(it.g.c, function (P) { return lineM(P, it.g.m, it.g.h, 'var(--acc)', 3.5); }) + '</div>';
+    } });
+
+  /* ---------- Étape 11 : sens de variation et zéro ---------- */
+  var ZE_PRESETS = [[F(2), F(-4)], [F(-1, 2), F(3)], [F(3, 2), F(3)], [F(0), F(2)]];
+  $('zeParams').innerHTML = sliderHtml('zeM', 'Pente m', 0, 16, 1, 14, 1) + sliderHtml('zeH', 'Ordonnée à l’origine h', -5, 5, 1, -4, 1);
+  $('zeBtns').innerHTML = presetBtns(ZE_PRESETS, function (p) { return eqStr(p[0], p[1]); }, 'Autre droite');
+  function zeRender() {
+    var m = M_LIST[clampI(rv('zeM'), 17)], h = F(Math.round(rv('zeH'))), z = zeroOf(m, h);
+    $('zeMOut').textContent = fs(m); $('zeHOut').textContent = fs(h); $('zeEq').textContent = eqStr(m, h);
+    var zin = z.kind === 'one' && Math.abs(val(z.x)) <= 6;
+    $('zeG').innerHTML = plot(SQ('Droite de ' + eqStr(m, h) + ' et son zéro'), function (P) {
+      var o = '';
+      if (zin) { var zx = val(z.x); o += '<rect x="' + r1(Math.min(P.X(zx), P.X(m.n > 0 ? 6 : -6))) + '" y="' + r1(P.Y(6)) + '" width="' + r1(Math.abs(P.X(m.n > 0 ? 6 : -6) - P.X(zx))) + '" height="' + r1(P.Y(0) - P.Y(6)) + '" style="fill:var(--ok);fill-opacity:.12"/>'; }
+      return o + lineM(P, m, h, 'var(--acc)', 3.5);
+    }, function (P) { return zin ? Dot(P, val(z.x), 0, 'var(--red)', 8) + Tx(P.X(val(z.x)), P.Y(0) + 24, 'zéro', { fs: 14, a: 'middle', st: halo('var(--red)') }) : ''; });
+    var sens = m.n > 0 ? '<span class="c-ok">m = ' + esc(fs(m)) + ' &gt; 0 : f est croissante (quand x augmente, f(x) augmente).</span>' : m.n < 0 ? '<span class="c-two">m = ' + esc(fs(m)) + ' &lt; 0 : f est décroissante (quand x augmente, f(x) diminue).</span>' : '<span>m = 0 : f est constante.</span>';
+    var zt;
+    if (z.kind === 'all') zt = '<span>f(x) = 0 pour tous les x : la droite est l’axe horizontal lui-même.</span>';
+    else if (z.kind === 'none') zt = '<span>m = 0 et h ≠ 0 : la droite horizontale ne touche jamais l’axe horizontal. <b>Pas de zéro.</b></span>';
+    else zt = '<span>Zéro : ' + esc(rhs(m, h)) + ' = 0 ⟹ ' + esc(termX(m)) + ' = ' + esc(fs(neg(h))) + ' ⟹ x = ' + esc(fs(neg(h))) + ' : ' + esc(fp(m)) + ' = <b>' + esc(fs(z.x)) + '</b>' + (isInt(z.x) ? '' : ' (environ ' + esc(dec(val(z.x), 2)) + ')') + (zin ? '' : ', en dehors du graphique') + '.</span><span class="soft">Signe : f(x) &gt; 0 pour x ' + (m.n > 0 ? '&gt; ' : '&lt; ') + esc(fs(z.x)) + ' (zone verte au-dessus de l’axe), f(x) &lt; 0 pour x ' + (m.n > 0 ? '&lt; ' : '&gt; ') + esc(fs(z.x)) + '.</span>';
+    $('zeOut').innerHTML = sens + zt;
+    Array.prototype.forEach.call($('zeBtns').querySelectorAll('[data-i]'), function (b) { var p = ZE_PRESETS[+b.getAttribute('data-i')]; b.setAttribute('aria-pressed', eq(p[0], m) && eq(p[1], h) ? 'true' : 'false'); });
+  }
+  $('zeParams').addEventListener('input', zeRender);
+  $('zeBtns').addEventListener('click', function (ev) {
+    var b = ev.target.closest('button'); if (!b) return;
+    if (b.hasAttribute('data-r')) { setRange($('zeM'), rint(0, 16), true); setRange($('zeH'), rint(-5, 5), true); }
+    else { var p = ZE_PRESETS[+b.getAttribute('data-i')]; setRange($('zeM'), mIdx(p[0]), true); setRange($('zeH'), p[1].n, true); }
+    zeRender();
+  });
+  zeRender();
+
+  /* ---------- Étape 12 : morceaux ---------- */
+  var pcMode = 'morc';
+  $('pcParams').innerHTML = sliderHtml('pcT', 'Durée de stationnement', 0, 8, 0.5, 4.5, 0.5);
+  function pcRender() {
+    var t = rv('pcT'), c = pcMode === 'morc' ? parkCost(t) : stairCost(t), tq = F(Math.round(t * 2), 2), U = { one: 'heure', many: 'heures', time: true };
+    $('pcTOut').textContent = uStr(tq, U);
+    $('pcMorc').setAttribute('aria-pressed', pcMode === 'morc' ? 'true' : 'false'); $('pcEsc').setAttribute('aria-pressed', pcMode === 'esc' ? 'true' : 'false');
+    $('pcG').innerHTML = plot({ w: 400, h: 300, L: 46, R: 10, T: 30, B: 50, x0: 0, x1: 8, y0: 0, y1: 24, sx: 1, sy: 3, lx: 1, ly: 6, fs: 15, xl: 'durée (h)', yl: 'prix (fr.)', label: pcMode === 'morc' ? 'Tarif en deux morceaux de droites' : 'Tarif en escalier' }, function (P) {
+      var o = '';
+      if (pcMode === 'morc') { o += Ln(P.X(0), P.Y(0), P.X(3), P.Y(9), 'var(--acc)', 3.5, ' stroke-linecap="round"') + Ln(P.X(3), P.Y(9), P.X(8), P.Y(14), 'var(--two)', 3.5, ' stroke-linecap="round"'); }
+      else { for (var k = 1; k <= 8; k++) o += Ln(P.X(k - 1), P.Y(3 * k), P.X(k), P.Y(3 * k), 'var(--acc)', 3.5); }
+      o += Ln(P.X(t), P.Y(0), P.X(t), P.Y(c), 'var(--ink-soft)', 1.5, ' stroke-dasharray="5 4"');
+      return o;
+    }, function (P) {
+      var o = '';
+      if (pcMode === 'esc') for (var k = 1; k <= 8; k++) { o += '<circle cx="' + r1(P.X(k - 1)) + '" cy="' + r1(P.Y(3 * k)) + '" r="4" style="fill:var(--card);stroke:var(--acc);stroke-width:2"/>'; o += '<circle cx="' + r1(P.X(k)) + '" cy="' + r1(P.Y(3 * k)) + '" r="4" style="fill:var(--acc)"/>'; }
+      else o += Tx(P.X(1.5) - 6, P.Y(4.5) - 10, 'pente 3', { fs: 15, a: 'end', st: halo('var(--acc)') }) + Tx(P.X(5.5), P.Y(11.5) - 14, 'pente 1', { fs: 15, a: 'middle', st: halo('var(--two)') });
+      return o + Dot(P, t, c, 'var(--red)', 7);
+    });
+    var txt;
+    if (pcMode === 'morc') txt = t <= 3 ? '<span>Premier morceau (jusqu’à 3 h) : P(t) = 3t = 3 × ' + esc(dec(t)) + ' = <b>' + esc(dec(c)) + ' fr.</b></span><span class="soft">Pente 3 : chaque heure coûte 3 fr.</span>' : '<span>Deuxième morceau (après 3 h) : P(t) = 9 + 1 × (t − 3) = 9 + ' + esc(dec(t - 3)) + ' = <b>' + esc(dec(c)) + ' fr.</b></span><span class="soft">Les 3 premières heures coûtent 9 fr. ; ensuite la pente n’est plus que 1. On peut aussi écrire ce morceau P(t) = t + 6.</span>';
+    else txt = '<span>Chaque heure commencée coûte 3 fr. : ' + esc(uStr(tq, U)) + (t > 0 ? ', donc ' + Math.ceil(t - 1e-9) + ' heure' + (Math.ceil(t - 1e-9) > 1 ? 's' : '') + ' commencée' + (Math.ceil(t - 1e-9) > 1 ? 's' : '') : '') + ' → <b>' + esc(dec(c)) + ' fr.</b></span><span class="soft">Le prix fait des sauts : ce n’est plus une droite, mais des marches. Le point plein appartient à la marche, le point vide non.</span>';
+    $('pcOut').innerHTML = txt;
+  }
+  $('pcParams').addEventListener('input', pcRender);
+  $('pcMorc').addEventListener('click', function () { pcMode = 'morc'; pcRender(); });
+  $('pcEsc').addEventListener('click', function () { pcMode = 'esc'; pcRender(); });
+  pcRender();
+
+  /* ---------- Quiz ---------- */
+  var quiz = $('quiz'), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ''; done = [];
+    QZ.forEach(function (Q, k) {
+      var li = document.createElement('li');
+      li.innerHTML = '<span>' + esc(Q.q) + '</span><select id="qa' + k + '" aria-label="Ta réponse à la question ' + (k + 1) + '"><option value="">…</option>' + Q.o.map(function (o) { return '<option value="' + o[0] + '">' + esc(o[1]) + '</option>'; }).join('') + '</select><button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+      quiz.appendChild(li);
+      function check() {
+        var fb = $('qf' + k), v = $('qa' + k).value;
+        if (!v) { fb.className = 'fb'; fb.textContent = 'Choisis une réponse.'; return; }
+        if (v === Q.a) { fb.className = 'fb ok'; fb.innerHTML = 'Bravo, c’est juste !<span>' + esc(Q.how) + '</span>'; done[k] = true; }
+        else {
+          done[k] = false;
+          var good = Q.o.filter(function (o) { return o[0] === Q.a; })[0][1];
+          fb.className = 'fb no'; fb.innerHTML = 'Pas tout à fait : la bonne réponse est « ' + esc(good) + ' ».<span>' + esc(Q.how) + '</span>';
+        }
+        $('score').textContent = done.filter(Boolean).length + ' / 8';
+      }
+      $('qb' + k).addEventListener('click', check);
+      $('qa' + k).addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+    });
+    $('score').textContent = '0 / 8';
+  }
+  $('newQuiz').addEventListener('click', newQuiz);
+  newQuiz();
+
+  window.__aff = {
+    F: F, add: add, sub: sub, mul: mul, div: div, neg: neg, cmp: cmp, eq: eq, val: val, isInt: isInt, fs: fs, dec: dec,
+    eqStr: eqStr, rhs: rhs, evalStr: evalStr, M_LIST: M_LIST, slope: slope, lineFrom2: lineFrom2, intersect: intersect, zeroOf: zeroOf, latticePts: latticePts, fval: fval,
+    kindCards: kindCards, KIND_NAMES: KIND_NAMES, eqCards: eqCards, lifeCards: lifeCards,
+    SLOPE_LINES: SLOPE_LINES, TRACE_LINES: TRACE_LINES, TWO_PAIRS: TWO_PAIRS, INTER_PAIRS: INTER_PAIRS,
+    traceSteps: traceSteps, twoPtSteps: twoPtSteps, interSteps: interSteps, traceable: traceable,
+    TARIFS: TARIFS, breakEven: breakEven, cheapest: cheapest, pairText: pairText, segText: segText, uStr: uStr, mon: mon, tarifEq: tarifEq,
+    parkCost: parkCost, stairCost: stairCost, plot: plot, quiz: QZ
+  };
+})();
+</script>
+</body>
+</html>

@@ -20,6 +20,7 @@ La page d'accueil ([index.html](index.html)) ne montre que les matières. La pag
 | [Les opérations posées](les-operations-posees.html) | Additionner, soustraire, multiplier et diviser par écrit en colonnes, avec une machine qui montre chaque étape. |
 | [Les fractions](les-fractions.html) | Numérateur et dénominateur, fractions égales et simplification, comparer, les quatre opérations avec une calculatrice pas à pas, fractions, décimaux et pourcentages, un quiz en images et des exercices. |
 | [Les équations](les-equations.html) | Les équations du premier degré : une balance interactive, les règles, la méthode en 4 étapes, un solveur pas à pas (parenthèses, fractions, cas sans solution), un quiz, l'histoire et des problèmes à mettre en équation. |
+| [Les fonctions affines](les-fonctions-affines.html) | La pente et l'ordonnée à l'origine, tracer et trouver l'équation d'une droite, le point d'intersection et comparer deux tarifs. |
 | [Mettre en équation](mettre-en-equation.html) | Des problèmes aux équations : choisir l'inconnue, traduire les phrases, résoudre et vérifier que la réponse a du sens. |
 | [Les pourcentages](les-pourcentages.html) | Une part sur 100, prendre et trouver un pourcentage, hausses et soldes avec le coefficient multiplicateur, les pourcentages qui s'enchaînent (et ne s'additionnent pas), un quiz et des problèmes. |
 | [Fractions, décimaux et pourcentages](fractions-decimaux-et-pourcentages.html) | Trois façons d'écrire la même part : passer de l'une à l'autre, comparer, prendre une part, les offres en magasin et les diagrammes. |
