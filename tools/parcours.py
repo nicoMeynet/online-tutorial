@@ -21,7 +21,7 @@ TRACKS = [
         "les-priorites-de-calcul", "les-operations-posees", "les-nombres-decimaux", "les-nombres-relatifs", "les-fractions", "les-arrondis-et-ordres-de-grandeur",
         "la-proportionnalite", "les-conversions", "les-angles-et-triangles", "les-formes-geometriques"]),
     ("quatrieme", "maths", "Cap sur la 10H", "9H–10H", "Les lettres entrent en scène : puissances, calcul littéral, équations, Pythagore.", [
-        "les-puissances", "le-calcul-litteral", "les-equations", "les-pourcentages", "la-vitesse",
+        "les-puissances", "le-calcul-litteral", "les-equations", "les-pourcentages", "fractions-decimaux-et-pourcentages", "la-vitesse",
         "le-reperage", "le-theoreme-de-pythagore", "les-transformations", "les-droites-remarquables", "les-constructions-a-la-regle-et-au-compas", "les-projections-et-les-vues",
         "les-quadrilateres", "les-statistiques"]),
     ("brevet", "maths", "Objectif 11H", "11H", "Tout le programme de 11H, jusqu'au grand quiz de révision.", [
@@ -64,6 +64,7 @@ TRACKS = [
 
 # Ce qu'il vaut mieux connaître avant (seulement les liens importants).
 PRE = {
+    "fractions-decimaux-et-pourcentages": ["les-fractions", "les-pourcentages"],
     "les-triangles-isometriques-et-semblables": ["le-theoreme-de-thales"],
     "les-constructions-a-la-regle-et-au-compas": ["les-angles-et-triangles"],
     "les-projections-et-les-vues": ["le-reperage"],
