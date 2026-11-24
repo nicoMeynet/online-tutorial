@@ -16,6 +16,8 @@ ROOT = Path(__file__).resolve().parent.parent
 SUBJECTS = [
     ("maths.html", "maths", "Maths", "#2346b5", "#8fb0ff",
      "Nombres, algèbre, géométrie, proportions, statistiques… et des curiosités comme π ou les fractales."),
+    ("francais.html", "francais", "Français", "#0f5f8a", "#7cc4ec",
+     "D'où vient notre langue, les mots venus d'ailleurs, le français de Suisse romande et les pièges d'orthographe."),
     ("physique.html", "physique", "Physique-chimie", "#0e7490", "#67e8f9",
      "La matière, le mouvement, les forces, l'énergie, l'électricité, la lumière et le son, en simulations."),
     ("numerique.html", "numerique", "Numérique", "#b91c1c", "#fca5a5",
@@ -30,6 +32,7 @@ ICONS = {
     "maths": '<text x="32" y="49" text-anchor="middle" font-family="Bricolage Grotesque, Segoe UI, sans-serif" font-weight="800" font-size="50" fill="currentColor">π</text>',
     "physique": '<g fill="none" stroke="currentColor" stroke-width="3"><ellipse cx="32" cy="32" rx="25" ry="10"/><ellipse cx="32" cy="32" rx="25" ry="10" transform="rotate(60 32 32)"/><ellipse cx="32" cy="32" rx="25" ry="10" transform="rotate(-60 32 32)"/></g><circle cx="32" cy="32" r="4.5" fill="currentColor"/>',
     "numerique": '<g fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"><rect x="8" y="12" width="48" height="32" rx="4"/><path d="M24 54h16M32 44v10"/></g><path d="M24 23l-6 5 6 5M40 23l6 5-6 5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>',
+    "francais": '<g fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"><path d="M8 12h48v30H30l-12 10v-10H8z"/></g><text x="32" y="35" text-anchor="middle" font-family="Bricolage Grotesque, Segoe UI, sans-serif" font-weight="800" font-size="20" fill="currentColor">Aa</text>',
     "geographie": '<path d="M4 52 L22 22 L31 35 L40 16 L60 52 Z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><path d="M36 23 L40 16 L44 23" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>',
     "religions": '<g fill="none" stroke="currentColor" stroke-width="3"><circle cx="32" cy="32" r="23"/><ellipse cx="32" cy="32" rx="10" ry="23"/><path d="M9 32h46M13 20h38M13 44h38"/></g>',
 }
@@ -64,7 +67,7 @@ HEAD = """<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>__TITLE__</title>
-<meta name="description" content="Des tutoriels interactifs en français pour le secondaire I en Suisse romande : maths, physique-chimie, numérique, religions, histoire, géographie et citoyenneté.">
+<meta name="description" content="Des tutoriels interactifs en français pour le secondaire I en Suisse romande : maths, français, physique-chimie, numérique, religions, histoire, géographie et citoyenneté.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=JetBrains+Mono:wght@500;600&display=swap">
@@ -386,7 +389,7 @@ def main():
         cats, cards = read_landing(fname)
         lp = ROOT / fname
         lt = lp.read_text(encoding="utf-8")
-        lt2 = re.sub(r'(<p class="sub">)\d+( tutoriels)', lambda m: m.group(1) + str(len(cards)) + m.group(2), lt)
+        lt2 = re.sub(r'(<p class="sub">)\d+ tutoriels?( interactifs?)', lambda m: m.group(1) + str(len(cards)) + (" tutoriels interactifs" if len(cards) > 1 else " tutoriel interactif"), lt)
         if lt2 != lt:
             lp.write_text(lt2, encoding="utf-8", newline="\n")
         for c in cards:

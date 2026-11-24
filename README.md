@@ -4,7 +4,7 @@ Petits tutoriels interactifs en français, pour les élèves du secondaire I (Su
 
 Chaque tutoriel est une seule page HTML, sans installation. Il suffit de l'ouvrir dans un navigateur, sur ordinateur ou sur téléphone.
 
-La page d'accueil ([index.html](index.html)) ne montre que les matières. La page [À propos](a-propos.html) explique le site et comment ça marche, et regroupe la recherche dans tous les tutoriels, les outils (parcours, quiz de révision, glossaires) et la progression. Chaque tutoriel a son bouton « Imprimer la fiche » dans « À retenir ». Accueils des matières : [maths.html](maths.html), [physique.html](physique.html), [numerique.html](numerique.html), [religions.html](religions.html) et [geographie.html](geographie.html).
+La page d'accueil ([index.html](index.html)) ne montre que les matières. La page [À propos](a-propos.html) explique le site et comment ça marche, et regroupe la recherche dans tous les tutoriels, les outils (parcours, quiz de révision, glossaires) et la progression. Chaque tutoriel a son bouton « Imprimer la fiche » dans « À retenir ». Accueils des matières : [maths.html](maths.html), [physique.html](physique.html), [numerique.html](numerique.html), [religions.html](religions.html), [geographie.html](geographie.html) et [francais.html](francais.html).
 
 ## Tutoriels
 
@@ -61,6 +61,14 @@ La page d'accueil ([index.html](index.html)) ne montre que les matières. La pag
 | [Les jeux de stratégie](les-jeux-de-strategie.html) | Allumettes, course à 20, Nim et la somme de Nim, morpion contre l'ordinateur, raisonner à rebours, le dilemme du prisonnier, un quiz. |
 | [Les maths et la musique](les-maths-et-la-musique.html) | Fréquences et ondes, l'octave, la corde de Pythagore, les intervalles, la gamme tempérée et un mini-piano, les rythmes en fractions, un quiz. |
 
+## Français
+
+Accueil : [francais.html](francais.html).
+
+| Tutoriel | Contenu |
+|---|---|
+| [La langue française](la-langue-francaise.html) | Du latin au français d'aujourd'hui, les mots venus d'ailleurs, la francophonie, le français de Suisse romande et les pièges d'orthographe. |
+
 ## Physique-chimie
 
 Accueil de la physique : [physique.html](physique.html).
@@ -116,7 +124,7 @@ Accueil du numérique : [numerique.html](numerique.html).
 
 ## Religions
 
-Accueil des religions : [religions.html](religions.html) et [geographie.html](geographie.html). On apprend sur les religions (croyances, textes, fêtes, lieux), de façon neutre et respectueuse.
+Accueil des religions : [religions.html](religions.html), [geographie.html](geographie.html) et [francais.html](francais.html). On apprend sur les religions (croyances, textes, fêtes, lieux), de façon neutre et respectueuse.
 
 | Tutoriel | Contenu |
 |---|---|
@@ -160,5 +168,5 @@ La **progression** (tutoriels ouverts, meilleur score à chaque quiz) est enregi
 
 1. Ajouter un fichier `nom-du-tutoriel.html` à la racine.
 2. Ajouter une ligne dans le tableau ci-dessus.
-3. Ajouter une carte dans `maths.html` (maths), `physique.html` (physique-chimie) `numerique.html` (numérique) `religions.html` (religions) ou `geographie.html` (histoire, géographie et citoyenneté), dans la bonne catégorie.
+3. Ajouter une carte dans `maths.html` (maths), `physique.html` (physique-chimie) `numerique.html` (numérique) `religions.html` (religions) `geographie.html` (histoire, géographie et citoyenneté) ou `francais.html` (français), dans la bonne catégorie.
 4. Ajouter le tutoriel dans un parcours de `tools/parcours.py` (et ses prérequis), puis lancer `python tools/parcours.py`, `python tools/fiches.py`, `python tools/accueil.py` (l'accueil `index.html` et la page `a-propos.html`, avec la recherche dans toutes les matières) et `python tools/liens.py` : il ajoute le logo (icône d'onglet et d'écran d'accueil), le retour à l'accueil, les liens « précédent / suivant » (dans l'ordre de l'accueil de la matière) et transforme les mentions « le tutoriel sur … » en liens. Il ajoute aussi en bas de chaque page la date de dernière mise à jour et le copyright (`tools/maj.py`) : la date ne change que si le contenu de la page change (empreintes dans `tools/dates.json`). On peut le relancer sans risque.

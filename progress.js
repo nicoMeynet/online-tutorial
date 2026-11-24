@@ -80,7 +80,7 @@
     box.querySelector('.bar i').style.width = Math.round(100 * seen / cards.length) + '%';
   }
 
-  var LANDING = page === 'maths.html' || page === 'physique.html' || page === 'numerique.html' || page === 'religions.html' || page === 'geographie.html';
+  var LANDING = page === 'maths.html' || page === 'physique.html' || page === 'numerique.html' || page === 'religions.html' || page === 'geographie.html' || page === 'francais.html';
   window.__progress = { load: load, key: KEY, refresh: function () { if (LANDING) showOnLanding(); } };
 
   function start() {

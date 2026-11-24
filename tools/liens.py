@@ -22,6 +22,7 @@ DATES = maj.Dates()
 ROOT = Path(__file__).resolve().parent.parent
 
 TOPICS = [
+    ("la langue française", "la-langue-francaise.html"),
     ("l'histoire de la Suisse", "l-histoire-de-la-suisse.html"),
     ("l’histoire de la Suisse", "l-histoire-de-la-suisse.html"),
     ("la géographie de la Suisse", "la-geographie-de-la-suisse.html"),
@@ -221,9 +222,9 @@ CSS = CSS.replace("</style>", difficulte.BADGE_CSS + "</style>", 1)
 
 # Une page d'accueil par matière : chaque tutoriel renvoie vers la sienne,
 # et « précédent / suivant » reste dans la même matière.
-LANDINGS = [("maths.html", "Tous les tutoriels de maths"), ("physique.html", "Tous les tutoriels de physique"), ("numerique.html", "Tous les tutoriels numériques"), ("religions.html", "Tous les tutoriels de religions"), ("geographie.html", "Tous les tutoriels d'histoire-géo")]
+LANDINGS = [("maths.html", "Tous les tutoriels de maths"), ("physique.html", "Tous les tutoriels de physique"), ("numerique.html", "Tous les tutoriels numériques"), ("religions.html", "Tous les tutoriels de religions"), ("geographie.html", "Tous les tutoriels d'histoire-géo"), ("francais.html", "Tous les tutoriels de français")]
 # Pages de révision qui ne sont pas des cartes mais appartiennent à une matière.
-SHORT = {"index.html": "Accueil", "maths.html": "Maths", "physique.html": "Physique-chimie", "numerique.html": "Numérique", "religions.html": "Religions", "geographie.html": "Histoire-géo"}
+SHORT = {"index.html": "Accueil", "maths.html": "Maths", "physique.html": "Physique-chimie", "numerique.html": "Numérique", "religions.html": "Religions", "geographie.html": "Histoire-géo", "francais.html": "Français"}
 HOME_OF = {"maths.html": ("glossaire.html", "revisions-brevet.html"), "physique.html": ("glossaire-physique.html", "revisions-brevet-physique.html")}
 
 

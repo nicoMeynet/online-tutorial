@@ -116,7 +116,7 @@ def summary(path):
 def main():
     out = []
     count = 0
-    subjects = [("maths.html", "maths", "Maths"), ("physique.html", "physique", "Physique-chimie"), ("numerique.html", "numerique", "Numérique"), ("religions.html", "religions", "Religions"), ("geographie.html", "geographie", "Histoire, géographie et citoyenneté")]
+    subjects = [("maths.html", "maths", "Maths"), ("physique.html", "physique", "Physique-chimie"), ("numerique.html", "numerique", "Numérique"), ("religions.html", "religions", "Religions"), ("geographie.html", "geographie", "Histoire, géographie et citoyenneté"), ("francais.html", "francais", "Français")]
     for landing, sid, sname in subjects:
       if not (ROOT / landing).exists():
           continue
