@@ -26,7 +26,7 @@ TRACKS = [
         "les-quadrilateres", "les-statistiques"]),
     ("brevet", "maths", "Objectif 11H", "11H", "Tout le programme de 11H, jusqu'au grand quiz de révision.", [
         "les-identites-remarquables", "l-equation-produit-nul-et-les-systemes", "les-inequations", "les-fonctions",
-        "les-racines-carrees", "les-nombres-premiers", "le-theoreme-de-thales", "le-cercle-et-ses-angles", "la-trigonometrie",
+        "les-racines-carrees", "les-nombres-premiers", "le-theoreme-de-thales", "les-triangles-isometriques-et-semblables", "le-cercle-et-ses-angles", "la-trigonometrie",
         "les-echelles", "la-sphere-et-la-boule", "les-grandeurs-composees", "les-conversions-avancees", "les-probabilites",
         "l-algorithmique", "la-demonstration", "revisions-brevet"]),
     ("lycee", "maths", "Avant-goût du secondaire II", "11H → secondaire II", "Pour les curieux qui veulent prendre de l'avance.", [
@@ -64,6 +64,7 @@ TRACKS = [
 
 # Ce qu'il vaut mieux connaître avant (seulement les liens importants).
 PRE = {
+    "les-triangles-isometriques-et-semblables": ["le-theoreme-de-thales"],
     "les-constructions-a-la-regle-et-au-compas": ["les-angles-et-triangles"],
     "les-projections-et-les-vues": ["le-reperage"],
     "le-cercle-et-ses-angles": ["les-angles-et-triangles"],

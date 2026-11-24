@@ -1,0 +1,1394 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Les triangles isométriques et semblables</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels de géométrie, marge rouge. Encre violette (comme un feutre de tableau) pour le premier triangle, orange pour sa copie ; les marques d'égalité (traits et arcs) sont à l'encre noire. Page pensée d'abord pour le téléphone : tout se fait en touchant des boutons. */
+:root {
+  --paper: #f7f6fb;
+  --grid: #e6e2f2;
+  --card: #ffffff;
+  --ink: #1a1726;
+  --ink-soft: #57536a;
+  --acc: #6d28d9;
+  --acc-ink: #5b21b6;
+  --acc-soft: #ede4fd;
+  --two: #c2410c;
+  --two-soft: #fde7d9;
+  --four: #0f766e;
+  --four-soft: #d5efec;
+  --warn: #b45309;
+  --warn-soft: #fbecd6;
+  --warn-ink: #92400e;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #fff0a3;
+  --line: #dcd7ea;
+  --figgrid: #ebe8f4;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #120f1c; --grid: #1d1930; --card: #181428; --ink: #eeeaf8; --ink-soft: #b2abc8;
+    --acc: #c4a5ff; --acc-ink: #d8c7ff; --acc-soft: #2e2050; --two: #fb923c; --two-soft: #3d2212;
+    --four: #2dd4bf; --four-soft: #0f3330; --warn: #f5a524; --warn-soft: #3d2a0c; --warn-ink: #fbbf5a;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #322c48; --figgrid: #1f1a32;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #120f1c; --grid: #1d1930; --card: #181428; --ink: #eeeaf8; --ink-soft: #b2abc8;
+  --acc: #c4a5ff; --acc-ink: #d8c7ff; --acc-soft: #2e2050; --two: #fb923c; --two-soft: #3d2212;
+  --four: #2dd4bf; --four-soft: #0f3330; --warn: #f5a524; --warn-soft: #3d2a0c; --warn-ink: #fbbf5a;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b4318; --line: #322c48; --figgrid: #1f1a32;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+@media (max-width: 520px) { .page { padding-block: 28px 64px; gap: 44px; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--red); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 14px; }
+.hero-top { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+.hero-top svg { width: 150px; height: auto; flex: none; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.15rem; color: var(--ink-soft); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+@media (max-width: 520px) { .box { padding: 14px; } }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note.blue { border-left-color: var(--four); background: var(--four-soft); }
+.note.warn { border-left-color: var(--warn); background: var(--warn-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 8px 12px; min-height: 44px; min-width: 44px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button[aria-pressed="true"] { background: var(--acc-ink); color: var(--paper); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+button:disabled { opacity: .45; cursor: default; transform: none; box-shadow: 3px 3px 0 var(--ink); }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.btns .lbl { font-family: var(--f-mono); font-size: .8rem; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .08em; }
+.btns .val { font-family: var(--f-mono); font-weight: 600; color: var(--acc-ink); min-width: 3.5em; text-align: center; }
+input[type="text"] { font: inherit; font-family: var(--f-mono); font-size: 1.05rem; padding: 8px 10px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-height: 44px; }
+input[type="range"] { width: 100%; accent-color: var(--acc); min-height: 36px; }
+.param { display: flex; flex-direction: column; gap: 2px; }
+.param label { font-weight: 700; }
+
+/* Figures dessinées par le script */
+.fig { display: block; width: 100%; max-width: 560px; height: auto; margin: 0 auto; background-color: var(--paper); border: 1.5px solid var(--line); border-radius: 8px; overflow: hidden;
+  background-image: linear-gradient(var(--figgrid) 1px, transparent 1px), linear-gradient(90deg, var(--figgrid) 1px, transparent 1px); background-size: 20px 20px; }
+.fig.sm { max-width: 440px; }
+.fig .hit { cursor: pointer; }
+.hint { font-size: .9rem; color: var(--ink-soft); }
+
+.results { display: flex; flex-direction: column; gap: 8px; font-variant-numeric: tabular-nums; }
+.res { border: 1.5px solid var(--line); border-radius: 8px; padding: 8px 12px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; align-items: baseline; }
+.res-name { font-family: var(--f-display); font-weight: 700; }
+.res-val { font-family: var(--f-mono); font-weight: 600; color: var(--acc-ink); font-size: 1.05rem; white-space: nowrap; }
+.res-calc { grid-column: 1 / -1; font-family: var(--f-mono); font-size: .88rem; color: var(--ink-soft); overflow-wrap: anywhere; }
+.res.c2 .res-name, .res.c2 .res-val { color: var(--two); }
+.res.c4 .res-name, .res.c4 .res-val { color: var(--four); }
+.res.total { border-color: var(--ok); background: var(--ok-soft); }
+.res.total .res-val { color: var(--ok); }
+.verdict { border-radius: 8px; padding: 12px 14px; font-weight: 700; display: flex; flex-direction: column; gap: 4px; }
+.verdict:empty { display: none; }
+.verdict.yes { background: var(--ok-soft); color: var(--ok); }
+.verdict.no { background: var(--red-soft); color: var(--red); }
+.verdict.mid { background: var(--four-soft); color: var(--four); }
+.verdict span { font-weight: 400; color: var(--ink); }
+
+.steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; counter-reset: st; }
+.steps li { counter-increment: st; padding: 8px 12px 8px 44px; border: 1.5px solid var(--line); border-radius: 8px; position: relative; color: var(--ink-soft); }
+.steps li::before { content: counter(st); position: absolute; left: 10px; top: 8px; width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid currentColor; display: grid; place-items: center; font-family: var(--f-mono); font-size: .8rem; font-weight: 600; }
+.steps li.now { border-color: var(--acc); background: var(--acc-soft); color: var(--ink); font-weight: 700; }
+.steps li.past { color: var(--ink); }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; color: var(--acc-ink); }
+.tag.two { color: var(--two); }
+.tag.four { color: var(--four); }
+.tag.warn { color: var(--warn-ink); }
+.defbox { border: 1.5px solid var(--acc); background: var(--acc-soft); border-radius: 8px; padding: 10px 14px; display: flex; flex-direction: column; gap: 2px; }
+.defbox strong { font-family: var(--f-display); color: var(--acc-ink); font-size: 1.15rem; }
+.formula { font-family: var(--f-mono); font-size: 1.05rem; background: var(--paper); border: 1.5px dashed var(--line); border-radius: 8px; padding: 10px 14px; overflow-wrap: anywhere; }
+
+.tbl { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; font-size: .95rem; }
+th, td { border: 1.5px solid var(--line); padding: 6px 8px; text-align: left; }
+th { font-family: var(--f-display); background: var(--acc-soft); }
+td.n { font-family: var(--f-mono); text-align: right; white-space: nowrap; }
+td.k { font-family: var(--f-mono); text-align: right; white-space: nowrap; color: var(--ok); font-weight: 600; }
+@media (max-width: 520px) { table { font-size: .85rem; } th, td { padding: 4px 6px; } }
+
+/* Jeux « une carte à la fois » (moteur makeSorter) */
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc-ink); }
+.step-n { font-family: var(--f-mono); font-size: .85rem; color: var(--ink-soft); }
+.fbk { border-radius: 8px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; min-width: 0; overflow-wrap: anywhere; }
+.fbk:empty { display: none; }
+.fbk.ok { background: var(--ok-soft); }
+.fbk.no { background: var(--red-soft); }
+.fbk.warn { background: var(--warn-soft); }
+.fbk strong { font-family: var(--f-display); }
+.fbk.ok strong { color: var(--ok); }
+.fbk.no strong { color: var(--red); }
+.fbk.warn strong { color: var(--warn-ink); }
+button.right, button.right:disabled { background: var(--ok-soft); border-color: var(--ok); color: var(--ok); opacity: 1; }
+button.wrong, button.wrong:disabled { background: var(--red-soft); border-color: var(--red); color: var(--red); opacity: 1; }
+.choice button { flex: 1 1 120px; }
+.choice button:disabled:not(.right):not(.wrong) { opacity: .55; }
+.card-big { background: var(--paper); border: 1.5px dashed var(--line); border-radius: 10px; padding: 12px; font-family: var(--f-display); font-weight: 700; font-size: 1.1rem; overflow-wrap: anywhere; display: flex; flex-direction: column; gap: 8px; }
+.card-big svg { display: block; width: 100%; max-width: 360px; height: auto; margin: 0 auto; }
+.card-big .cq { text-align: center; }
+.card-big .cd { font-family: var(--f-body); font-weight: 400; font-size: 1rem; text-align: center; }
+.sorter-end { margin-top: .6rem; }
+.sorter-end strong { font-size: 1.05rem; }
+
+/* Idées reçues */
+.myth .btns button { flex: 1 1 100px; }
+.myth .stmt { font-family: var(--f-display); font-weight: 700; }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 110px auto; gap: 10px; align-items: center; }
+.quiz li > span:first-child { overflow-wrap: anywhere; min-width: 0; }
+.quiz input[type="text"] { font-size: 1rem; padding: 6px 8px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb:empty { display: none; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; min-height: 32px; }
+summary::marker { color: var(--red); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); overflow-wrap: anywhere; }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+</style>
+
+<!--ticons--><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Tutoriels"><script src="progress.js" defer></script><script src="share.js" defer></script><!--/ticons-->
+<style id="tnav-css">
+.tnav-top { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin: 0 0 4px; }
+.tnav-home { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font-weight: 700; font-size: .95rem; text-decoration: none; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tnav-home:hover, .tnav-home:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.tnav-bottom { margin-top: 8px; display: flex; flex-direction: column; gap: 12px; }
+.tnav-bottom h2 { margin: 0; }
+.tnav-pn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tnav-pn a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--ink, #222); border-radius: 10px;
+  background: var(--card, #fff); color: var(--ink, #222); text-decoration: none; box-shadow: 3px 3px 0 var(--ink, #222); min-width: 0; }
+.tnav-pn a span { font-size: .85rem; color: var(--ink-soft, #666); }
+.tnav-pn a strong { overflow-wrap: anywhere; }
+.tnav-pn a.next { text-align: right; grid-column: 2; }
+.tnav-bottom .tnav-home { align-self: center; }
+.tnav-top [data-share] { margin-left: auto; }
+.tnav-short { display: none; }
+.tprint-h { display: none; }
+@media (max-width: 600px) { header.hero { gap: 8px !important; } header.hero > .fig, header.hero > .box.fig, header.hero .hero-top .fig { display: none !important; }
+  header.hero p.lead { font-size: 1rem !important; line-height: 1.5 !important; } header.hero > p.soft { font-size: .88rem !important; line-height: 1.45 !important; }
+  header.hero h1 { font-size: clamp(1.7rem, 8vw, 2.2rem) !important; } }
+.tprint-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 14px 0 0; }
+.tprint-row span { font-size: .9rem; opacity: .8; }
+.tprint { display: inline-flex; align-items: center; gap: 8px; min-height: 42px; padding: 8px 16px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font: inherit; font-weight: 700; cursor: pointer; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tprint:hover, .tprint:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+@media print { [data-tp-hide] { display: none !important; } html.tp-on, html.tp-on body { background: #fff !important; color: #111 !important; padding: 0 !important; margin: 0 !important; }
+  html.tp-on [data-fiche] { color: #111; } html.tp-on [data-fiche] * { color: #111 !important; background: transparent !important; box-shadow: none !important; }
+  html.tp-on .tprint-h { display: block; font-size: 1.4rem; font-weight: 800; margin: 0 0 10px; } .tprint-row { display: none !important; } }
+@media (max-width: 520px) { .tnav-top .tnav-long { display: none; } .tnav-top .tnav-short { display: inline; } .tnav-top { flex-wrap: nowrap; } .tnav-top > * { flex: none; } }
+.tnav-end { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+@media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
+.diff { font: 700 .72rem/1.2 var(--f-mono, monospace); padding: 2px 8px; border-radius: 99px; border: 1.5px solid; white-space: nowrap; }
+.diff.d1 { color: #15803d; border-color: #15803d; background: #dcf3e3; }
+.diff.d2 { color: #a15c07; border-color: #b45309; background: #fbe7cf; }
+.diff.d3 { color: #b91c1c; border-color: #b91c1c; background: #fde2e2; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root:not([data-theme="light"]) .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root:not([data-theme="light"]) .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; } }
+:root[data-theme="dark"] .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root[data-theme="dark"] .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root[data-theme="dark"] .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; }
+</style>
+</head>
+<body>
+<main class="page">
+<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="maths.html">← <span class="tnav-long">Tous les tutoriels de maths</span><span class="tnav-short">Maths</span></a><span class="diff d2" title="Difficulté : moyen">Moyen</span><button type="button" data-share hidden>Partager</button></nav><!--/tnav-->
+
+
+  <header class="hero">
+    <div class="hero-top">
+      <svg id="heroSvg" viewBox="0 0 200 180" aria-hidden="true"></svg>
+      <div style="display:flex;flex-direction:column;gap:10px;min-width:0;flex:1 1 260px">
+        <span class="eyebrow">Tutoriel de maths · niveau 10H–11H</span>
+        <h1>Les triangles isométriques et semblables</h1>
+        <p class="lead">Deux triangles peuvent être de vrais jumeaux, ou avoir la même forme sans avoir la même taille. Apprends à le reconnaître, puis sers-t'en pour mesurer un sapin sans grimper dessus.</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · Même forme, même taille ?</span>
+    <h2>Jumeaux, cousins ou étrangers</h2>
+    <p>Décalque un triangle sur du papier calque. Si tu peux poser le calque <strong>exactement</strong> sur l'autre triangle, les deux sont <strong>isométriques</strong>. On dit aussi qu'ils sont <strong>égaux</strong> ou <strong>superposables</strong>.</p>
+    <p>Pour superposer, tu as le droit de faire glisser le calque, de le tourner, et même de le <strong>retourner</strong> (une symétrie). Un triangle retourné, comme dans un miroir, reste isométrique.</p>
+    <div class="cards">
+      <div class="box"><span class="tag">Isométriques</span><strong>Même forme, même taille</strong><span class="soft">Mêmes côtés, mêmes angles. On peut les superposer.</span></div>
+      <div class="box"><span class="tag two">Semblables</span><strong>Même forme, taille différente</strong><span class="soft">L'un est un agrandissement ou une réduction de l'autre, comme une photo zoomée.</span></div>
+      <div class="box"><span class="tag warn">Ni l'un ni l'autre</span><strong>Formes différentes</strong><span class="soft">Même avec un zoom, on ne pourrait pas les superposer.</span></div>
+    </div>
+    <div class="box">
+      <h3>Trie les paires de triangles</h3>
+      <div class="btns"><span class="score" id="s1Score">Question 1 / 9</span><span class="step-n" id="s1Pos"></span></div>
+      <div class="card-big" id="s1Card" aria-live="polite"></div>
+      <div class="btns choice" id="s1Btns" role="group" aria-label="Choisis ta réponse"></div>
+      <div class="fbk" id="s1Out" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="s1Prev">← Précédent</button><button type="button" id="s1Next">Suivant →</button><button type="button" id="s1Reset">Recommencer</button></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Des jumeaux sont aussi des cousins</span>
+      <span>Deux triangles isométriques ont la même forme : ils sont aussi semblables, avec un zoom de 1 (rien ne change). Dans le jeu, choisis la réponse la plus précise.</span>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · Les éléments homologues</span>
+    <h2>Qui correspond à qui ?</h2>
+    <p>Quand deux triangles sont isométriques, chaque sommet, chaque côté et chaque angle de l'un a son <strong>homologue</strong> dans l'autre : l'élément qui vient se poser dessus quand on superpose. Deux côtés homologues ont la même longueur, deux angles homologues la même mesure.</p>
+    <p>On écrit les sommets <strong>dans l'ordre</strong> des homologues : <span class="hl">ABC ≅ DEF veut dire A ↔ D, B ↔ E et C ↔ F</span>. Alors [AB] ↔ [DE], [BC] ↔ [EF] et [CA] ↔ [FD].</p>
+    <div class="box">
+      <h3>Touche un côté ou un angle</h3>
+      <svg class="fig" id="s2Svg" viewBox="0 0 480 270" role="img" aria-label="Le triangle ABC et un triangle isométrique, avec un élément et son homologue en couleur"></svg>
+      <div class="btns" id="s2Els" role="group" aria-label="Choisir un élément du triangle ABC"></div>
+      <div class="defbox" id="s2Def" aria-live="polite"></div>
+      <p class="hint">Tu peux aussi toucher directement un côté ou un sommet sur la figure, dans un triangle comme dans l'autre.</p>
+      <div class="btns"><button type="button" id="s2New">Autre position</button></div>
+      <h3>Quelle écriture respecte l'ordre ?</h3>
+      <div class="btns choice" id="s2Q" role="group" aria-label="Choisis la bonne écriture"></div>
+      <div class="fbk" id="s2QOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Les cas d'isométrie</span>
+    <h2>Trois informations suffisent</h2>
+    <p>Pour savoir si deux triangles sont isométriques, pas besoin de comparer les six éléments (3 côtés et 3 angles). Il suffit de trois informations bien choisies : ce sont les <strong>cas d'isométrie</strong>.</p>
+    <div class="cards">
+      <div class="box"><span class="tag">CCC</span><strong>Les 3 côtés</strong><span class="soft">Trois côtés égaux deux à deux.</span></div>
+      <div class="box"><span class="tag two">CAC</span><strong>2 côtés et l'angle compris</strong><span class="soft">L'angle doit être <strong>entre</strong> les deux côtés.</span></div>
+      <div class="box"><span class="tag four">ACA</span><strong>1 côté et ses 2 angles</strong><span class="soft">Les deux angles doivent être <strong>collés</strong> à ce côté.</span></div>
+    </div>
+    <p>Pourquoi ça marche ? Avec ces données, il n'y a <strong>qu'un seul triangle</strong> qu'on peut construire (à un retournement près). Construis-le toi-même. Pour les gestes du compas, revois le tutoriel sur <a class="tlink" href="les-constructions-a-la-regle-et-au-compas.html">les constructions à la règle et au compas</a>.</p>
+    <div class="box">
+      <h3>Construis-le</h3>
+      <div class="btns" role="group" aria-label="Choisir le cas">
+        <button type="button" id="coCCC" aria-pressed="true">CCC</button>
+        <button type="button" id="coCAC" aria-pressed="false">CAC</button>
+        <button type="button" id="coACA" aria-pressed="false">ACA</button>
+      </div>
+      <svg class="fig" id="coSvg" viewBox="0 0 480 300" role="img" aria-label="Construction pas à pas d'un triangle à partir de trois données"></svg>
+      <ol class="steps" id="coSteps"></ol>
+      <div class="btns">
+        <button type="button" id="coPrev">← Précédent</button>
+        <button type="button" id="coNext">Suivant →</button>
+        <button type="button" id="coReset">Recommencer</button>
+        <button type="button" id="coNew">Autre figure</button>
+      </div>
+      <div class="verdict" id="coOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · Les pièges</span>
+    <h2>Quand trois informations ne suffisent pas</h2>
+    <p>Attention aux faux amis. <strong>Deux côtés et un angle qui n'est pas entre eux</strong> (on dit parfois « CCA ») ne suffisent pas : il peut exister <strong>deux triangles différents</strong> avec ces données.</p>
+    <div class="box">
+      <h3>Le piège CCA</h3>
+      <p class="soft">On impose AB = 7 cm, un angle de 40° en A, et la longueur BC. Le point C doit être sur la demi-droite et à la distance BC de B : sur le cercle en pointillés.</p>
+      <svg class="fig" id="amSvg" viewBox="0 0 480 300" role="img" aria-label="La demi-droite issue de A, le cercle de centre B et les triangles possibles"></svg>
+      <div class="btns">
+        <span class="lbl">BC</span>
+        <button type="button" id="amM" aria-label="Raccourcir BC de 0,5 cm">−</button>
+        <span class="val" id="amV">5 cm</span>
+        <button type="button" id="amP" aria-label="Allonger BC de 0,5 cm">+</button>
+      </div>
+      <div class="btns" role="group" aria-label="Quel triangle montrer ?">
+        <button type="button" id="amS1" aria-pressed="false">Triangle 1</button>
+        <button type="button" id="amS2" aria-pressed="false">Triangle 2</button>
+        <button type="button" id="amSB" aria-pressed="true">Les deux</button>
+      </div>
+      <div class="results" id="amOut" aria-live="polite"></div>
+    </div>
+    <p>Autre piège : <strong>les trois angles</strong> (« AAA »). Deux triangles qui ont les mêmes angles ont la même forme… mais pas forcément la même taille. Ils sont <strong>semblables</strong>, pas forcément isométriques.</p>
+    <div class="box">
+      <svg class="fig sm" id="aaaSvg" viewBox="0 0 440 230" role="img" aria-label="Deux triangles avec les mêmes angles de 50, 60 et 70 degrés, l'un plus grand que l'autre"></svg>
+      <p class="soft">Les deux triangles ont des angles de 50°, 60° et 70°. Le grand est un agrandissement du petit : ses côtés sont 1,8 fois plus longs.</p>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Le jeu des cas</span>
+    <h2>Isométriques ? Quel cas ?</h2>
+    <p>Sur chaque carte, les marques indiquent ce qu'on sait : les côtés avec le même nombre de traits sont égaux, les angles avec le même nombre d'arcs aussi. Quel cas d'isométrie permet de conclure ? Ou bien ne peut-on pas savoir ?</p>
+    <div class="box">
+      <div class="btns"><span class="score" id="s5Score">Question 1 / 9</span><span class="step-n" id="s5Pos"></span></div>
+      <div class="card-big" id="s5Card" aria-live="polite"></div>
+      <div class="btns choice" id="s5Btns" role="group" aria-label="Choisis le cas"></div>
+      <div class="fbk" id="s5Out" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="s5Prev">← Précédent</button><button type="button" id="s5Next">Suivant →</button><button type="button" id="s5Reset">Recommencer</button></div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · Les triangles semblables</span>
+    <h2>Même forme, autre taille</h2>
+    <p>Deux triangles sont <strong>semblables</strong> quand l'un est un agrandissement ou une réduction de l'autre. Deux choses vont toujours ensemble : <span class="hl">les angles sont égaux deux à deux, et les côtés sont proportionnels</span>.</p>
+    <p>Le nombre par lequel on multiplie toutes les longueurs s'appelle le <strong>rapport de similitude</strong>, noté k. Si k &gt; 1, c'est un agrandissement ; si k &lt; 1, une réduction ; si k = 1, les triangles sont isométriques.</p>
+    <div class="box">
+      <svg class="fig" id="k6Svg" viewBox="0 0 480 300" role="img" aria-label="Le triangle ABC et sa copie A′B′C′ multipliée par k"></svg>
+      <div class="param">
+        <label for="k6">Rapport de similitude : k = <span class="mono" id="k6Out">2</span></label>
+        <input id="k6" type="range" min="0.5" max="3" step="0.1" value="2">
+      </div>
+      <div class="btns" id="k6Pre" role="group" aria-label="Rapports tout faits"></div>
+      <div class="tbl"><table><thead><tr><th>Élément</th><th>ABC</th><th>A′B′C′</th><th>Rapport</th></tr></thead><tbody id="k6Rows"></tbody></table></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Les angles ne grandissent pas</span>
+      <span>Quand on zoome sur une photo, tout grandit, sauf les angles : un angle droit reste droit. C'est pour ça que les angles de A′B′C′ ne bougent pas quand tu changes k.</span>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Reconnaître des triangles semblables</span>
+    <h2>Deux angles suffisent</h2>
+    <p>Bonne nouvelle : pour des triangles semblables, il suffit de <strong>deux angles égaux</strong> (« AA »). Pourquoi ? Dans tout triangle, la somme des angles vaut 180°. Si deux angles sont égaux, le troisième l'est forcément aussi.</p>
+    <p>Autre méthode : vérifier que <strong>les côtés sont proportionnels</strong>. Range les côtés de chaque triangle du plus petit au plus grand, puis divise : les trois rapports doivent être égaux.</p>
+    <div class="box">
+      <div class="btns"><span class="score" id="s7Score">Question 1 / 9</span><span class="step-n" id="s7Pos"></span></div>
+      <div class="card-big" id="s7Card" aria-live="polite"></div>
+      <div class="btns choice" id="s7Btns" role="group" aria-label="Sont-ils semblables ?"></div>
+      <div class="fbk" id="s7Out" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="s7Prev">← Précédent</button><button type="button" id="s7Next">Suivant →</button><button type="button" id="s7Reset">Recommencer</button></div>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Calculer une longueur</span>
+    <h2>Le produit en croix</h2>
+    <p>Si deux triangles sont semblables, on peut calculer une longueur inconnue : les côtés homologues sont proportionnels. On écrit l'égalité de deux rapports, puis on fait un <strong>produit en croix</strong>.</p>
+    <p>Tu connais peut-être déjà une configuration qui donne des triangles semblables, avec deux droites parallèles : le tutoriel sur <a class="tlink" href="le-theoreme-de-thales.html">le théorème de Thalès</a> la présente en détail. Le deuxième exercice ci-dessous en est un exemple.</p>
+    <div class="box">
+      <div class="btns" id="cxTabs" role="group" aria-label="Choisir l'exercice"></div>
+      <svg class="fig" id="cxSvg" viewBox="0 0 480 280" role="img" aria-label="Deux triangles semblables et une longueur inconnue"></svg>
+      <ol class="steps" id="cxSteps"></ol>
+      <div class="btns">
+        <button type="button" id="cxPrev">← Précédent</button>
+        <button type="button" id="cxNext">Suivant →</button>
+        <button type="button" id="cxReset">Recommencer</button>
+      </div>
+      <div class="verdict" id="cxOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Dans la vraie vie</span>
+    <h2>Mesurer un sapin avec un bâton</h2>
+    <p>Les rayons du soleil arrivent tous avec la même pente. Le bâton et son ombre forment un petit triangle rectangle ; le sapin et son ombre, un grand. Ces deux triangles ont un angle droit et le même angle du soleil : ils sont <strong>semblables</strong> (cas AA) !</p>
+    <p class="formula">hauteur ÷ ombre du sapin = bâton ÷ ombre du bâton</p>
+    <div class="box">
+      <svg class="fig" id="shSvg" viewBox="0 0 480 280" role="img" aria-label="Un bâton et son ombre, en zoom, puis un sapin et son ombre, avec les rayons du soleil"></svg>
+      <div class="param">
+        <label for="shB">Hauteur du bâton : <span class="mono" id="shBOut">1</span> m</label>
+        <input id="shB" type="range" min="0.5" max="2" step="0.1" value="1">
+      </div>
+      <div class="param">
+        <label for="shS">Ombre du bâton : <span class="mono" id="shSOut">1,5</span> m</label>
+        <input id="shS" type="range" min="0.3" max="4" step="0.1" value="1.5">
+      </div>
+      <div class="param">
+        <label for="shT">Ombre de l'objet : <span class="mono" id="shTOut">24</span> m</label>
+        <input id="shT" type="range" min="2" max="200" step="1" value="24">
+      </div>
+      <div class="btns" role="group" aria-label="Exemples">
+        <button type="button" id="shP1">Sapin à midi</button>
+        <button type="button" id="shP2">Le même sapin le soir</button>
+        <button type="button" id="shP3">Jet d'eau de Genève</button>
+      </div>
+      <div class="results" id="shOut" aria-live="polite"></div>
+    </div>
+    <div class="cards">
+      <div class="box"><span class="tag">Le pouce</span><strong>Estimer une distance</strong><span class="soft">Bras tendu (environ 60 cm), ton pouce (environ 2 cm de large) cache juste une personne de 1,80 m. Deux triangles semblables partent de ton œil : distance = 1,80 × 60 ÷ 2 = 54 m.</span></div>
+      <div class="box"><span class="tag two">Photo</span><strong>Agrandir sans déformer</strong><span class="soft">Une photo de 10 × 15 cm agrandie en 20 × 30 cm garde sa forme (k = 2). Mais 9 × 13 cm vers 13 × 18 cm, non : 13 ÷ 9 ≈ 1,44 et 18 ÷ 13 ≈ 1,38. Il faut couper un bord !</span></div>
+      <div class="box"><span class="tag four">Maquette</span><strong>Les trains miniatures</strong><span class="soft">À l'échelle H0, tout est divisé par 87 : une voiture CFF de 26 m devient longue d'environ 30 cm. La maquette est semblable au vrai train.</span></div>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · Aires et volumes</span>
+    <h2>×k pour les longueurs, ×k² pour les aires</h2>
+    <p>Si les longueurs sont multipliées par k, les <strong>aires</strong> sont multipliées par <strong>k × k = k²</strong>, et les <strong>volumes</strong> par <strong>k³</strong>. Le tutoriel sur <a class="tlink" href="les-echelles.html">les échelles</a> et les agrandissements l'explique en détail ; ici, regarde-le sur un triangle.</p>
+    <div class="box">
+      <svg class="fig" id="arSvg" viewBox="0 0 480 300" role="img" aria-label="Un petit triangle et sa copie agrandie, découpée en petits triangles"></svg>
+      <div class="param">
+        <label for="arK">Rapport de similitude : k = <span class="mono" id="arKOut">2</span></label>
+        <input id="arK" type="range" min="0.5" max="3" step="0.1" value="2">
+      </div>
+      <div class="btns" id="arPre" role="group" aria-label="Rapports tout faits"></div>
+      <div class="results" id="arOut" aria-live="polite"></div>
+    </div>
+    <div class="note blue">
+      <span class="note-title">Et les volumes ?</span>
+      <span>Double les arêtes d'un cube de 1 cm : il te faut 2 × 2 × 2 = 8 petits cubes pour le remplir. Volume × 2³ = × 8.</span>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · Pour aller plus loin</span>
+    <h2>Démontrer avec un cas d'isométrie</h2>
+    <p>Les cas d'isométrie servent à <strong>prouver</strong> des propriétés, sans mesurer. Une mesure au rapporteur est toujours un peu fausse ; une démonstration est vraie pour tous les triangles. Le tutoriel sur <a class="tlink" href="la-demonstration.html">la démonstration</a> t'apprend à rédiger ce genre de raisonnement.</p>
+    <p>À prouver : <span class="hl">dans un triangle isocèle, les deux angles à la base sont égaux</span>.</p>
+    <div class="box">
+      <svg class="fig" id="prSvg" viewBox="0 0 480 300" role="img" aria-label="Triangle isocèle ABC, sa médiane AI et les deux petits triangles ABI et ACI"></svg>
+      <ol class="steps" id="prSteps"></ol>
+      <div class="btns">
+        <button type="button" id="prPrev">← Précédent</button>
+        <button type="button" id="prNext">Suivant →</button>
+        <button type="button" id="prReset">Recommencer</button>
+        <button type="button" id="prNew">Autre triangle</button>
+      </div>
+      <div class="verdict" id="prOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Les idées reçues</span>
+    <h2>Vrai ou idée reçue ?</h2>
+    <p>Pour chaque phrase, choisis : <strong>vrai</strong> ou <strong>idée reçue</strong> ?</p>
+    <div class="btns"><span class="score" id="mythScore">0 / 8</span><button type="button" id="mythReset">Recommencer</button></div>
+    <div class="cards" id="myths"></div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Le savais-tu ?</span>
+    <h2>Quelques curiosités</h2>
+    <div class="cards">
+      <div class="box"><span class="tag">Histoire</span><strong>Euclide les connaissait déjà</strong><span class="soft">Vers 300 av. J.-C., le livre I des <em>Éléments</em> d'Euclide démontre les trois cas : CAC (proposition 4), CCC (proposition 8) et ACA (proposition 26).</span></div>
+      <div class="box"><span class="tag two">Papier</span><strong>A4 et A3</strong><span class="soft">Une feuille A3 est un agrandissement exact d'une A4, de rapport k ≈ 1,41 (c'est √2). Son aire est donc 1,41² ≈ 2 fois plus grande : deux A4 côte à côte font une A3.</span></div>
+      <div class="box"><span class="tag four">Mots</span><strong>Selon les pays</strong><span class="soft">En Suisse romande, on dit souvent « isométriques » ; en France, plutôt « triangles égaux » et « cas d'égalité ». En anglais : <em>congruent</em> et <em>similar</em>.</span></div>
+      <div class="box"><span class="tag warn">Rigidité</span><strong>Pourquoi des triangles partout ?</strong><span class="soft">Grâce au cas CCC, trois barres fixées forment un triangle qui ne peut pas se déformer. C'est pour ça que les grues, les pylônes et les ponts métalliques sont pleins de triangles.</span></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Écris un nombre (avec une virgule si besoin, par exemple 2,5).</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="quizReset" type="button">Recommencer</button>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À toi de jouer</span>
+    <h2>Six exercices</h2>
+    <div class="exos">
+      <details>
+        <summary>Quel cas ?<span class="q">AB = DE = 5 cm, AC = DF = 7 cm, et les angles en A et en D mesurent tous les deux 40°. Les triangles ABC et DEF sont-ils isométriques ?</span></summary>
+        <div><span>L'angle en A est entre [AB] et [AC], l'angle en D entre [DE] et [DF] : c'est l'angle compris.</span><span>Par le cas <strong>CAC</strong>, les triangles sont <strong>isométriques</strong>, avec ABC ≅ DEF. Donc aussi BC = EF.</span></div>
+      </details>
+      <details>
+        <summary>Le piège CCA<span class="q">On veut un triangle avec AB = 8 cm, BC = 6 cm et un angle de 40° en A. Combien de triangles différents peut-on construire ?</span></summary>
+        <div><span>L'angle en A n'est pas entre [AB] et [BC] : attention au piège. La distance de B à la demi-droite vaut environ 5,14 cm, moins que 6 cm, et 6 cm est moins que AB = 8 cm.</span><span>Le cercle de centre B et de rayon 6 cm coupe donc la demi-droite en <strong>deux points</strong> : deux triangles, avec AC ≈ 9,22 cm ou AC ≈ 3,04 cm.</span></div>
+      </details>
+      <details>
+        <summary>Les côtés manquants<span class="q">Le triangle ABC a des côtés de 3, 4 et 5 cm. Un triangle semblable DEF a pour plus grand côté 12,5 cm. Quels sont ses deux autres côtés ?</span></summary>
+        <div><span>Le plus grand côté correspond au plus grand : k = 12,5 ÷ 5 = 2,5.</span><span>Les autres côtés : 3 × 2,5 = <strong>7,5 cm</strong> et 4 × 2,5 = <strong>10 cm</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Le clocher<span class="q">Un bâton de 1,5 m fait une ombre de 2 m. Au même moment, l'ombre d'un clocher mesure 36 m. Quelle est la hauteur du clocher ?</span></summary>
+        <div><span>Triangles semblables : hauteur ÷ 36 = 1,5 ÷ 2.</span><span>Hauteur = 36 × 1,5 ÷ 2 = 54 ÷ 2 = <strong>27 m</strong>.</span></div>
+      </details>
+      <details>
+        <summary>Le pouce<span class="q">Bras tendu à 60 cm de ton œil, ton pouce de 2 cm cache exactement une vache de 1,5 m de haut, au loin dans un pré. À quelle distance est-elle ?</span></summary>
+        <div><span>Le petit triangle (œil–pouce) et le grand (œil–vache) sont semblables : distance ÷ 60 = 150 ÷ 2 (tout en cm).</span><span>Distance = 60 × 150 ÷ 2 = 4500 cm = <strong>45 m</strong>.</span></div>
+      </details>
+      <details>
+        <summary>L'aire du drapeau<span class="q">Un fanion triangulaire a une aire de 300 cm². On le reproduit en réduisant toutes ses longueurs de moitié. Quelle est l'aire de la copie ?</span></summary>
+        <div><span>Réduire de moitié : k = 0,5. L'aire est multipliée par k² = 0,5 × 0,5 = 0,25.</span><span>Aire de la copie : 300 × 0,25 = <strong>75 cm²</strong>. C'est le quart, pas la moitié !</span></div>
+      </details>
+    </div>
+  </section>
+
+  <section data-fiche><!--tprint--><p class="tprint-h">Fiche de révision · Les triangles isométriques et semblables</p><!--/tprint-->    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• Deux triangles <strong>isométriques</strong> (égaux, superposables) ont la même forme et la même taille, même si l'un est retourné.</span>
+      <span>• On écrit les sommets <strong>dans l'ordre des homologues</strong> : ABC ≅ DEF veut dire A ↔ D, B ↔ E, C ↔ F.</span>
+      <span>• Les trois <strong>cas d'isométrie</strong> : CCC (3 côtés), CAC (2 côtés et l'angle <strong>compris</strong>), ACA (1 côté et ses 2 angles <strong>adjacents</strong>).</span>
+      <span>• Pièges : 2 côtés et un angle non compris peuvent donner <strong>deux</strong> triangles ; 3 angles égaux donnent des triangles <strong>semblables</strong>, pas forcément isométriques.</span>
+      <span>• Deux triangles <strong>semblables</strong> ont leurs angles égaux deux à deux et leurs côtés proportionnels, de <strong>rapport de similitude</strong> k.</span>
+      <span>• Pour prouver qu'ils sont semblables : <strong>2 angles égaux</strong> suffisent (le 3ᵉ suit, car la somme fait 180°), ou bien des côtés proportionnels.</span>
+      <span>• Longueur inconnue : égalité de deux rapports, puis <strong>produit en croix</strong>.</span>
+      <span>• Longueurs × k → aires × <strong>k²</strong> → volumes × <strong>k³</strong>.</span>
+    </div>
+  <!--tprint--><p class="tprint-row"><button type="button" class="tprint" data-print><span aria-hidden="true">🖨</span> Imprimer la fiche</button><span>Seulement ce résumé, sur une page.</span></p><!--/tprint-->
+</section>
+
+  <!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"><a class="prev" href="les-constructions-a-la-regle-et-au-compas.html"><span>← Précédent</span><strong>Les constructions à la règle et au compas</strong></a><a class="next" href="les-statistiques.html"><span>Suivant →</span><strong>Les statistiques</strong></a></div><div class="tnav-end"><a class="tnav-home" href="maths.html">⌂ Tous les tutoriels de maths</a><button type="button" data-share hidden>Partager</button></div></nav><!--/tnav-->
+<footer>Fiche de révision · Les triangles isométriques et semblables<!--tmaj--><span class="tmaj" style="display:block;margin-top:6px;font-size:.85rem;opacity:.85">Dernière mise à jour : 24 novembre 2026 · © 2026 Nicolas Meynet</span><!--/tmaj--></footer>
+</main>
+
+<script>
+(function () {
+  /*
+   * Hooks de test : window.__sembl (unités : cm et degrés ; y vers le haut)
+   *   triSides(a, b, c)        -> [A, B, C] avec a = BC, b = CA, c = AB ; A = (0, 0), B = (c, 0) ; null si impossible
+   *   triCAC(b, c, A), triACA(c, A, B) -> [A, B, C] (cas CAC et ACA) ; info(T) -> { a, b, c, A, B, C, area }
+   *   ambiguous(c, A, a)       -> longueurs AC possibles (0, 1 ou 2) quand on impose AB = c, l’angle A et BC = a (piège CCA)
+   *   similarity(T1, T2)       -> rapport k si les triangles sont semblables (côtés rangés), sinon null
+   *   xform(T, { flip, k, rot }) -> image du triangle (retournement, zoom, rotation autour du centre de gravité)
+   *   shadowHeight(b, s, S)    -> hauteur = S × b ÷ s (étape 9)
+   *   pairs, cases, simCards   -> jeux des étapes 1, 5 et 7 ; checkCards() -> liste des incohérences (vide si tout est juste)
+   *   coData, coSteps(m, d)    -> constructions de l’étape 3 ; calc -> exercices de l’étape 8 ; checkCalc() -> incohérences
+   *   proofSteps, proofFigs    -> démonstration de l’étape 11
+   *   myths, checkMyth(k, c)   -> idées reçues ('vrai' | 'mythe')
+   *   quiz, checkQuiz(k, x)    -> les 8 questions ; checkQuiz renvoie true / false
+   *   sorterScore(items, ans)  -> { correct, answered, total }
+   */
+  function $(id) { return document.getElementById(id); }
+  function fmt(x, d) { var r = Math.round(x * 1e6) / 1e6; if (Object.is(r, -0)) r = 0; return r.toLocaleString('fr-FR', { maximumFractionDigits: d == null ? 2 : d }).replace('-', '−'); }
+  function num(s) { var t = String(s).replace(/\s/g, '').replace(/[−–]/g, '-').replace(',', '.'); if (t === '') return NaN; var x = Number(t); return isFinite(x) ? x : NaN; }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function clamp(i, n) { i = Math.floor(Number(i)); if (!isFinite(i)) i = 0; return Math.max(0, Math.min(n - 1, i)); }
+  function lim(v, a, b) { return Math.max(a, Math.min(b, v)); }
+  function each(list, fn) { Array.prototype.forEach.call(list, fn); }
+  function by(list, k) { return list.filter(function (x) { return x.k === k; })[0] || null; }
+
+  /* ---------- Géométrie ---------- */
+  function rad(a) { return a * Math.PI / 180; }
+  function n360(a) { a = a % 360; if (a < 0) a += 360; return a; }
+  function on(r, a, C) { C = C || [0, 0]; return [C[0] + r * Math.cos(rad(a)), C[1] + r * Math.sin(rad(a))]; }
+  function sub(P, Q) { return [P[0] - Q[0], P[1] - Q[1]]; }
+  function add(P, Q) { return [P[0] + Q[0], P[1] + Q[1]]; }
+  function mul(P, k) { return [P[0] * k, P[1] * k]; }
+  function dot(u, v) { return u[0] * v[0] + u[1] * v[1]; }
+  function cross(u, v) { return u[0] * v[1] - u[1] * v[0]; }
+  function len(u) { return Math.hypot(u[0], u[1]); }
+  function dist(P, Q) { return Math.hypot(P[0] - Q[0], P[1] - Q[1]); }
+  function mid(P, Q) { return [(P[0] + Q[0]) / 2, (P[1] + Q[1]) / 2]; }
+  function unit(u) { var n = len(u); return n ? [u[0] / n, u[1] / n] : [0, 0]; }
+  function perp(u) { return [-u[1], u[0]]; }
+  function dirDeg(P, Q) { return n360(Math.atan2(Q[1] - P[1], Q[0] - P[0]) * 180 / Math.PI); }
+  function angleAt(V, P, Q) {
+    var u = sub(P, V), w = sub(Q, V), nu = len(u), nw = len(w);
+    if (!nu || !nw) return NaN;
+    return Math.acos(lim(dot(u, w) / (nu * nw), -1, 1)) * 180 / Math.PI;
+  }
+  /* Triangle par ses trois côtés (loi des cosinus) : a = BC, b = CA, c = AB. */
+  function triSides(a, b, c) {
+    if (!(a > 0 && b > 0 && c > 0) || a + b <= c + 1e-12 || a + c <= b + 1e-12 || b + c <= a + 1e-12) return null;
+    var x = (b * b + c * c - a * a) / (2 * c), y = Math.sqrt(Math.max(0, b * b - x * x));
+    return [[0, 0], [c, 0], [x, y]];
+  }
+  function triCAC(b, c, A) { return [[0, 0], [c, 0], on(b, A)]; }
+  /* Cas ACA : AB = c, angles A et B ; AC par la loi des sinus. */
+  function triACA(c, A, B) { var C = 180 - A - B; if (C <= 0) return null; return [[0, 0], [c, 0], on(c * Math.sin(rad(B)) / Math.sin(rad(C)), A)]; }
+  function info(T) {
+    var A = T[0], B = T[1], C = T[2];
+    return { a: dist(B, C), b: dist(C, A), c: dist(A, B), A: angleAt(A, B, C), B: angleAt(B, C, A), C: angleAt(C, A, B), area: Math.abs(cross(sub(B, A), sub(C, A))) / 2 };
+  }
+  function sides(T) { var I = info(T); return [I.a, I.b, I.c].sort(function (x, y) { return x - y; }); }
+  function similarity(T1, T2) {
+    var s1 = sides(T1), s2 = sides(T2), k = s2[0] / s1[0];
+    for (var i = 0; i < 3; i++) if (Math.abs(s2[i] / s1[i] - k) > 1e-6) return null;
+    return k;
+  }
+  function isIso(T1, T2) { var k = similarity(T1, T2); return k !== null && Math.abs(k - 1) < 1e-6; }
+  /* Piège CCA : AB = c, angle A, BC = a -> longueurs AC possibles. */
+  function ambiguous(c, A, a) {
+    var h = c * Math.sin(rad(A)), p = c * Math.cos(rad(A)), D = a * a - h * h, out = [];
+    if (D < -1e-12) return out;
+    var r = Math.sqrt(Math.max(0, D));
+    [p + r, p - r].forEach(function (t) { if (t > 1e-9 && !out.some(function (u) { return Math.abs(u - t) < 1e-9; })) out.push(t); });
+    return out;
+  }
+  function centroid(T) { return [(T[0][0] + T[1][0] + T[2][0]) / 3, (T[0][1] + T[1][1] + T[2][1]) / 3]; }
+  function rot(P, a, C) { var c = Math.cos(rad(a)), s = Math.sin(rad(a)), x = P[0] - C[0], y = P[1] - C[1]; return [C[0] + c * x - s * y, C[1] + s * x + c * y]; }
+  function xform(T, o) {
+    o = o || {};
+    var G = centroid(T);
+    return T.map(function (P) {
+      var Q = [P[0], P[1]];
+      if (o.flip) Q = [2 * G[0] - Q[0], Q[1]];
+      if (o.k) Q = add(G, mul(sub(Q, G), o.k));
+      if (o.rot) Q = rot(Q, o.rot, G);
+      return Q;
+    });
+  }
+  function bbox(pts) {
+    var b = { x0: Infinity, y0: Infinity, x1: -Infinity, y1: -Infinity };
+    pts.forEach(function (p) { b.x0 = Math.min(b.x0, p[0]); b.y0 = Math.min(b.y0, p[1]); b.x1 = Math.max(b.x1, p[0]); b.y1 = Math.max(b.y1, p[1]); });
+    return b;
+  }
+  function shift(T, d) { return T.map(function (P) { return add(P, d); }); }
+  /* Place deux triangles côte à côte (centrés en hauteur). */
+  function pair(T1, T2, gap) {
+    var b1 = bbox(T1), b2 = bbox(T2);
+    if (gap == null) gap = 0.22 * ((b1.x1 - b1.x0) + (b2.x1 - b2.x0));
+    return [shift(T1, [-b1.x0, -(b1.y0 + b1.y1) / 2]), shift(T2, [b1.x1 - b1.x0 + gap - b2.x0, -(b2.y0 + b2.y1) / 2])];
+  }
+
+  /* ---------- Dessin SVG (chaînes) ; v = { s: px par cm, cx, cy } ---------- */
+  function r2(x) { return Math.round(x * 100) / 100; }
+  function View(s, cx, cy) { return { s: s, cx: cx, cy: cy }; }
+  function fitView(pts, W, H, pad, maxS) {
+    var b = bbox(pts), w = Math.max(b.x1 - b.x0, 1e-6), h = Math.max(b.y1 - b.y0, 1e-6), s = Math.min((W - 2 * pad) / w, (H - 2 * pad) / h);
+    if (maxS) s = Math.min(s, maxS);
+    return View(s, W / 2 - s * (b.x0 + b.x1) / 2, H / 2 + s * (b.y0 + b.y1) / 2);
+  }
+  function X(v, p) { return r2(v.cx + v.s * p[0]); }
+  function Y(v, p) { return r2(v.cy - v.s * p[1]); }
+  function sLine(v, P, Q, col, w, dash, op) { return '<line x1="' + X(v, P) + '" y1="' + Y(v, P) + '" x2="' + X(v, Q) + '" y2="' + Y(v, Q) + '" stroke="' + col + '" stroke-width="' + (w || 2) + '" stroke-linecap="round"' + (dash ? ' stroke-dasharray="' + dash + '"' : '') + (op ? ' stroke-opacity="' + op + '"' : '') + '/>'; }
+  function sCirc(v, C, r, col, w, fill, dash, fop) { return '<circle cx="' + X(v, C) + '" cy="' + Y(v, C) + '" r="' + r2(r * v.s) + '" fill="' + (fill || 'none') + '"' + (fop ? ' fill-opacity="' + fop + '"' : '') + ' stroke="' + col + '" stroke-width="' + (w || 2) + '"' + (dash ? ' stroke-dasharray="' + dash + '"' : '') + '/>'; }
+  function sDot(v, P, col, rr) { return '<circle cx="' + X(v, P) + '" cy="' + Y(v, P) + '" r="' + (rr || 5) + '" fill="' + col + '" stroke="var(--card)" stroke-width="2"/>'; }
+  function sText(v, P, txt, col, size, weight) { return '<text x="' + X(v, P) + '" y="' + Y(v, P) + '" text-anchor="middle" dominant-baseline="central" font-size="' + (size || 18) + '" font-weight="' + (weight || 700) + '" style="fill:' + (col || 'var(--ink)') + ';paint-order:stroke;stroke:var(--paper);stroke-width:4px;stroke-linejoin:round">' + esc(txt) + '</text>'; }
+  function pText(x, y, txt, col, size, anchor) { return '<text x="' + r2(x) + '" y="' + r2(y) + '" text-anchor="' + (anchor || 'middle') + '" dominant-baseline="central" font-size="' + (size || 18) + '" font-weight="700" style="fill:' + (col || 'var(--ink)') + ';paint-order:stroke;stroke:var(--paper);stroke-width:4px;stroke-linejoin:round">' + esc(txt) + '</text>'; }
+  function arcD(v, C, r, a0, span) {
+    var R = r2(r * v.s), p0 = on(r, a0, C), p1 = on(r, a0 + span, C);
+    return 'M' + X(v, p0) + ' ' + Y(v, p0) + ' A' + R + ' ' + R + ' 0 ' + (span > 180 ? 1 : 0) + ' 0 ' + X(v, p1) + ' ' + Y(v, p1);
+  }
+  function sArc(v, C, r, a0, span, col, w, op) { return '<path d="' + arcD(v, C, r, a0, span) + '" fill="none" stroke="' + col + '" stroke-width="' + (w || 3) + '" stroke-linecap="round"' + (op ? ' stroke-opacity="' + op + '"' : '') + '/>'; }
+  function sectorD(v, C, r, a0, span) {
+    var p0 = on(r, a0, C), p1 = on(r, a0 + span, C), R = r2(r * v.s);
+    return 'M' + X(v, C) + ' ' + Y(v, C) + ' L' + X(v, p0) + ' ' + Y(v, p0) + ' A' + R + ' ' + R + ' 0 ' + (span > 180 ? 1 : 0) + ' 0 ' + X(v, p1) + ' ' + Y(v, p1) + ' Z';
+  }
+  /* Le plus petit des deux angles en V entre les directions vers P et Q : { st, sp } */
+  function span(V, P, Q) { var a1 = dirDeg(V, P), a2 = dirDeg(V, Q), d = n360(a2 - a1); return d > 180 ? { st: a2, sp: 360 - d } : { st: a1, sp: d }; }
+  /* Marque d’angle : n arcs (rayon en pixels), et un secteur clair. */
+  function arcs(v, V, P, Q, px, n, col) {
+    var g = span(V, P, Q), h = '<path d="' + sectorD(v, V, px / v.s, g.st, g.sp) + '" fill="' + col + '" fill-opacity="0.16" stroke="none"/>';
+    for (var i = 0; i < n; i++) h += sArc(v, V, (px + i * 4.5) / v.s, g.st, g.sp, col, 2);
+    return h;
+  }
+  function rightMark(v, V, P, Q, px, col) {
+    var k = px / v.s, u = mul(unit(sub(P, V)), k), w = mul(unit(sub(Q, V)), k), p1 = add(V, u), p2 = add(p1, w), p3 = add(V, w);
+    return '<polyline points="' + X(v, p1) + ',' + Y(v, p1) + ' ' + X(v, p2) + ',' + Y(v, p2) + ' ' + X(v, p3) + ',' + Y(v, p3) + '" fill="' + col + '" fill-opacity="0.15" stroke="' + col + '" stroke-width="2"/>';
+  }
+  /* Texte d’un angle, posé sur la bissectrice, à px pixels du sommet (plus loin si l’angle est petit). */
+  function angText(v, V, P, Q, px, txt, col, size) { var g = span(V, P, Q); if (g.sp < 45) px += 12; if (g.sp < 30) px += 10; return sText(v, on(px / v.s, g.st + g.sp / 2, V), txt, col, size || 16); }
+  /* n traits sur un côté (marque d’égalité). */
+  function ticks(v, P, Q, n, col) {
+    var M = mid(P, Q), u = unit(sub(Q, P)), nn = unit(perp(u)), h = '', L = 7 / v.s, sp = 5 / v.s;
+    for (var i = 0; i < n; i++) { var C = add(M, mul(u, (i - (n - 1) / 2) * sp)); h += sLine(v, add(C, mul(nn, L)), sub(C, mul(nn, L)), col, 2.2); }
+    return h;
+  }
+  function sPoly(v, T, col, fill, fop, w) { return '<polygon points="' + T.map(function (p) { return X(v, p) + ',' + Y(v, p); }).join(' ') + '" fill="' + (fill || 'none') + '" fill-opacity="' + (fop == null ? 1 : fop) + '" stroke="' + col + '" stroke-width="' + (w || 2.5) + '" stroke-linejoin="round"/>'; }
+  /* Nom d’un sommet, à px pixels vers l’extérieur du triangle T. */
+  function vLab(v, T, i, name, col, size, px) { var G = centroid(T), d = unit(sub(T[i], G)); return sText(v, add(T[i], mul(d, (px || 15) / v.s)), name, col || 'var(--ink)', size || 18); }
+  /* Étiquette d’un côté [T[i] T[j]], à px pixels vers l’extérieur (px négatif : vers l’intérieur). */
+  function sideLab(v, T, i, j, txt, col, size, px) {
+    var G = centroid(T), M = mid(T[i], T[j]), n = unit(perp(sub(T[j], T[i])));
+    if (dot(n, sub(M, G)) < 0) n = mul(n, -1);
+    return sText(v, add(M, mul(n, (px == null ? 14 : px) / v.s)), txt, col || 'var(--ink)', size || 16);
+  }
+  function res(cls, name, val, calc) { return '<div class="res ' + (cls || '') + '"><span class="res-name">' + name + '</span><span class="res-val">' + val + '</span>' + (calc ? '<span class="res-calc">' + calc + '</span>' : '') + '</div>'; }
+  function verdict(cls, title, text) { return '<div class="verdict ' + cls + '">' + title + (text ? '<span>' + text + '</span>' : '') + '</div>'; }
+  function deg(x, d) { return fmt(x, d == null ? 1 : d) + '°'; }
+  function cm(x, d) { return fmt(x, d == null ? 2 : d) + ' cm'; }
+  function setPressed(ids, on_) { ids.forEach(function (id) { $(id).setAttribute('aria-pressed', id === on_ ? 'true' : 'false'); }); }
+
+  /* Trieur générique (cartes une par une), comme dans les autres tutoriels.
+     Si un item a sa propre liste o (options), elle remplace les boutons communs.
+     o.cardHtml(it, answered) renvoie le contenu HTML de la carte. */
+  function makeSorter(o) {
+    var idx = 0, ans = {};
+    function opts(it) { return it.o ? it.o : o.order; }
+    function name(c) { return o.names && o.names[c] ? o.names[c] : c; }
+    function render() {
+      var it = o.items[idx], a = ans[it.k];
+      if (o.cardHtml) $(o.card).innerHTML = o.cardHtml(it, !!a); else $(o.card).textContent = it.s;
+      $(o.pos).textContent = o.word + ' ' + (idx + 1) + ' / ' + o.items.length;
+      $(o.btns).innerHTML = opts(it).map(function (c) {
+        var cls = a ? (c === it.a ? 'right' : (c === a ? 'wrong' : '')) : '';
+        return '<button type="button" data-c="' + esc(c) + '"' + (cls ? ' class="' + cls + '"' : '') + (a ? ' disabled' : '') + '>' + esc(name(c)) + '</button>';
+      }).join('');
+      var out = $(o.out);
+      if (!a) { out.className = 'fbk'; out.innerHTML = ''; }
+      else {
+        var ok = a === it.a;
+        out.className = 'fbk ' + (ok ? 'ok' : 'no');
+        out.innerHTML = '<strong>' + (ok ? 'Bien vu !' : 'Pas tout à fait. Réponse : ' + esc(name(it.a)) + '.') + '</strong><span>' + esc(it.why) + '</span>';
+      }
+      var s = o.score(ans), last = idx === o.items.length - 1, left = s.total - s.answered;
+      $(o.score_).textContent = (o.word ? o.word + ' ' : '') + (idx + 1) + ' / ' + s.total;
+      $(o.pos).textContent = s.answered ? 'Bonnes réponses : ' + s.correct + ' sur ' + s.answered : '';
+      $(o.prev).disabled = idx === 0;
+      $(o.next).disabled = last;
+      $(o.next).style.display = last ? 'none' : '';
+      var end = $(o.out + 'End');
+      if (!end) { end = document.createElement('div'); end.id = o.out + 'End'; end.setAttribute('aria-live', 'polite'); $(o.out).insertAdjacentElement('afterend', end); }
+      if (!left) {
+        var r = s.correct / s.total;
+        end.className = 'fbk ok sorter-end';
+        end.innerHTML = '<strong>Terminé ! ' + s.correct + ' / ' + s.total + ' bonnes réponses</strong><span>' +
+          (r === 1 ? 'Parfait, tout est juste !' : r >= .7 ? 'Très bien !' : r >= .5 ? 'Pas mal ! Relis les explications des erreurs.' : 'Relis les explications, puis réessaie.') +
+          ' Touche « Recommencer » pour rejouer.</span>';
+      } else if (last && ans[it.k]) {
+        end.className = 'fbk warn sorter-end';
+        end.innerHTML = '<strong>C’était la dernière carte.</strong><span>Il te reste ' + left + ' réponse' + (left > 1 ? 's' : '') + ' à donner : reviens en arrière avec « ← Précédent ».</span>';
+      } else { end.className = ''; end.innerHTML = ''; }
+    }
+    $(o.btns).addEventListener('click', function (ev) {
+      var b = ev.target.closest('button'); if (!b || b.disabled) return;
+      var it = o.items[idx]; if (!ans[it.k]) ans[it.k] = b.getAttribute('data-c');
+      render();
+    });
+    $(o.prev).addEventListener('click', function () { idx = clamp(idx - 1, o.items.length); render(); });
+    $(o.next).addEventListener('click', function () { idx = clamp(idx + 1, o.items.length); render(); });
+    $(o.reset).addEventListener('click', function () { ans = {}; idx = 0; render(); });
+    render();
+  }
+  function scorer(items) {
+    return function (ans) { var correct = 0, answered = 0; items.forEach(function (x) { if (ans && ans[x.k]) { answered++; if (ans[x.k] === x.a) correct++; } }); return { correct: correct, answered: answered, total: items.length }; };
+  }
+
+  var COL1 = 'var(--acc)', COL2 = 'var(--two)';
+  /* Deux triangles côte à côte dans une carte 320 × 190 ; extra(v, P) ajoute des marques. */
+  function pairSvg(T1, T2, aria, extra, o) {
+    o = o || {};
+    var P = pair(T1, T2), v = fitView(P[0].concat(P[1]), o.W || 320, o.H || 190, o.pad || 22), h = '';
+    h += sPoly(v, P[0], COL1, 'var(--acc-soft)', 0.85, 2.5) + sPoly(v, P[1], COL2, 'var(--two-soft)', 0.85, 2.5);
+    if (extra) h += extra(v, P);
+    return '<svg viewBox="0 0 ' + (o.W || 320) + ' ' + (o.H || 190) + '" role="img" aria-label="' + esc(aria) + '">' + h + '</svg>';
+  }
+
+  /* ---------- Héros ---------- */
+  (function () {
+    var T1 = triSides(3.2, 2.6, 3.6), T2 = xform(T1, { k: 1.55 }), P = pair(T1, T2, 0.5), v = fitView(P[0].concat(P[1]), 200, 180, 14), h = '';
+    h += sPoly(v, P[0], COL1, 'var(--acc-soft)', 0.9, 3) + sPoly(v, P[1], COL2, 'var(--two-soft)', 0.9, 3);
+    [0, 1, 2].forEach(function (i) { P.forEach(function (T) { h += arcs(v, T[i], T[(i + 1) % 3], T[(i + 2) % 3], 10, i + 1, 'var(--ink)'); }); });
+    $('heroSvg').innerHTML = h;
+  })();
+
+  /* ---------- Étape 1 : isométriques, semblables ou ni l’un ni l’autre ---------- */
+  var S1 = [
+    { k: 'p1', t1: triSides(4, 3, 4.5), tr: { rot: 50 }, a: 'iso', why: 'Le deuxième triangle, c’est le premier qui a tourné. Mêmes côtés (4 ; 3 et 4,5 cm), mêmes angles : on peut les superposer.' },
+    { k: 'p3', t1: triSides(3.5, 3, 4), tr: { k: 1.5, rot: 25 }, a: 'sem', why: 'Même forme, mais le deuxième est 1,5 fois plus grand : 3 ; 3,5 et 4 cm deviennent 4,5 ; 5,25 et 6 cm. Les angles sont les mêmes.' },
+    { k: 'p6', t1: triSides(4, 3, 4.5), t2: xform(triSides(5.5, 2.5, 4.2), { rot: 10 }), a: 'ni', why: 'Les formes sont différentes : le deuxième a un angle obtus (plus de 90°), le premier n’a que des angles aigus. Aucun zoom ne les rendra superposables.' },
+    { k: 'p2', t1: triSides(4.5, 3.5, 5), tr: { flip: true, rot: -20 }, a: 'iso', why: 'Le deuxième est le premier retourné (comme dans un miroir), puis tourné. En retournant le calque, on les superpose : ils sont isométriques.' },
+    { k: 'p5', t1: triSides(3, 3, 3), tr: { k: 1.7, rot: 15 }, a: 'sem', why: 'Deux triangles équilatéraux ont toujours la même forme (trois angles de 60°). Ici le deuxième est 1,7 fois plus grand.' },
+    { k: 'p7', t1: triCAC(3, 4, 40), t2: xform(triCAC(3, 4, 100), { rot: -15 }), a: 'ni', why: 'Deux côtés ont les mêmes longueurs (4 cm et 3 cm), mais l’angle entre eux vaut 40° dans le premier et 100° dans le deuxième : formes différentes.' },
+    { k: 'p8', t1: triSides(5, 4, 3), tr: { flip: true, k: 1.4, rot: 70 }, a: 'sem', why: 'Retourné ET agrandi 1,4 fois : 3 ; 4 et 5 cm deviennent 4,2 ; 5,6 et 7 cm. Même forme (un angle droit), autre taille.' },
+    { k: 'p9', t1: triSides(4.5, 3.5, 4), tr: { rot: 180 }, a: 'iso', why: 'Le deuxième a fait un demi-tour : il a la tête en bas, mais il a exactement les mêmes côtés et les mêmes angles.' },
+    { k: 'p4', t1: triSides(4.5, 4, 5.5), tr: { k: 0.6, rot: -35 }, a: 'sem', why: 'Le deuxième est une réduction du premier : toutes les longueurs sont multipliées par 0,6 (4 ; 4,5 et 5,5 cm deviennent 2,4 ; 2,7 et 3,3 cm).' }
+  ];
+  S1.forEach(function (it) { if (!it.t2) it.t2 = xform(it.t1, it.tr); it.s = 'Ces deux triangles sont…'; });
+  var S1N = { iso: 'Isométriques', sem: 'Semblables, autre taille', ni: 'Ni l’un ni l’autre' };
+  makeSorter({ items: S1, names: S1N, order: ['iso', 'sem', 'ni'], btns: 's1Btns', card: 's1Card', pos: 's1Pos', out: 's1Out', score_: 's1Score', prev: 's1Prev', next: 's1Next', reset: 's1Reset', word: 'Question', score: scorer(S1),
+    cardHtml: function (it) { return pairSvg(it.t1, it.t2, 'Deux triangles, un violet et un orange') + '<span class="cq">' + esc(it.s) + '</span>'; } });
+
+  /* ---------- Étape 2 : éléments homologues ---------- */
+  var S2_T = triSides(6, 4, 5);
+  var S2_F = [
+    { tr: { rot: 130 }, n: ['D', 'E', 'F'] },
+    { tr: { flip: true, rot: 35 }, n: ['T', 'R', 'S'] },
+    { tr: { flip: true, rot: -150 }, n: ['M', 'N', 'L'] }
+  ];
+  var EL = { AB: [0, 1], BC: [1, 2], CA: [2, 0], A: [0], B: [1], C: [2] }, ELK = ['AB', 'BC', 'CA', 'A', 'B', 'C'];
+  var S2 = { f: 0, sel: 'AB', q: null };
+  function s2Opts(f) {
+    var n = S2_F[f].n, good = n.join(''), perms = [[0, 1, 2], [0, 2, 1], [1, 0, 2], [1, 2, 0], [2, 0, 1], [2, 1, 0]].map(function (p) { return p.map(function (i) { return n[i]; }).join(''); });
+    var sorted = n.slice().sort().join(''), wrong = perms.filter(function (w) { return w !== good; });
+    wrong.sort(function (x, y) { return (y === sorted) - (x === sorted); });
+    var list = [good, wrong[0], wrong[3]];
+    for (var i = 0; i < f + 1; i++) list.push(list.shift());
+    return { good: good, list: list };
+  }
+  function elName(names, el) { return EL[el].length === 2 ? '[' + names[EL[el][0]] + names[EL[el][1]] + ']' : 'l’angle en ' + names[EL[el][0]]; }
+  $('s2Els').innerHTML = ELK.map(function (k) { return '<button type="button" data-el="' + k + '" aria-pressed="false">' + (k.length === 2 ? '[' + k + ']' : 'Angle en ' + k) + '</button>'; }).join('');
+  function renderS2() {
+    var F = S2_F[S2.f], T2 = xform(S2_T, F.tr), P = pair(S2_T, T2, 1.6), v = fitView(P[0].concat(P[1]), 480, 270, 36), h = '', I = info(S2_T), names = [['A', 'B', 'C'], F.n];
+    var meas = { AB: I.c, BC: I.a, CA: I.b, A: I.A, B: I.B, C: I.C }, sel = S2.sel, ix = EL[sel];
+    h += sPoly(v, P[0], COL1, 'var(--acc-soft)', 0.8, 3) + sPoly(v, P[1], COL2, 'var(--two-soft)', 0.8, 3);
+    P.forEach(function (T, j) {
+      if (ix.length === 2) h += sLine(v, T[ix[0]], T[ix[1]], 'var(--four)', 8, null, 0.85);
+      else { var i = ix[0]; h += arcs(v, T[i], T[(i + 1) % 3], T[(i + 2) % 3], 22, 1, 'var(--four)') + angText(v, T[i], T[(i + 1) % 3], T[(i + 2) % 3], 44, deg(meas[sel]), 'var(--four)', 16); }
+      [[0, 1], [1, 2], [2, 0]].forEach(function (s) { h += sideLab(v, T, s[0], s[1], fmt(dist(T[s[0]], T[s[1]]), 1), 'var(--ink-soft)', 15, 13); });
+    });
+    P.forEach(function (T, j) {
+      [['AB', 0, 1], ['BC', 1, 2], ['CA', 2, 0]].forEach(function (s) { h += '<line class="hit" x1="' + X(v, T[s[1]]) + '" y1="' + Y(v, T[s[1]]) + '" x2="' + X(v, T[s[2]]) + '" y2="' + Y(v, T[s[2]]) + '" stroke="transparent" stroke-width="24" data-el="' + s[0] + '"/>'; });
+      T.forEach(function (p, i) { h += vLab(v, T, i, names[j][i], j ? 'var(--two)' : 'var(--acc-ink)', 19, 16); });
+      T.forEach(function (p, i) { var q = add(p, mul(unit(sub(centroid(T), p)), 14 / v.s)); h += '<circle class="hit" cx="' + X(v, q) + '" cy="' + Y(v, q) + '" r="20" fill="transparent" data-el="' + 'ABC'[i] + '"/>'; });
+    });
+    $('s2Svg').innerHTML = h;
+    each($('s2Els').querySelectorAll('button'), function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-el') === sel ? 'true' : 'false'); });
+    var a = elName(names[0], sel), b2 = elName(F.n, sel);
+    $('s2Def').innerHTML = '<strong>' + esc(a.charAt(0).toUpperCase() + a.slice(1)) + ' ↔ ' + esc(b2) + '</strong><span>' +
+      (ix.length === 2 ? 'Deux côtés homologues : ils mesurent tous les deux ' + cm(meas[sel], 1) + '.' : 'Deux angles homologues : ils mesurent tous les deux ' + deg(meas[sel]) + '.') + '</span>';
+    var Q = s2Opts(S2.f);
+    $('s2Q').innerHTML = Q.list.map(function (w) {
+      var cls = S2.q ? (w === Q.good ? 'right' : (w === S2.q ? 'wrong' : '')) : '';
+      return '<button type="button" data-w="' + w + '"' + (cls ? ' class="' + cls + '"' : '') + (S2.q ? ' disabled' : '') + '>ABC ≅ ' + w + '</button>';
+    }).join('');
+    var out = $('s2QOut');
+    if (!S2.q) { out.className = 'fbk'; out.innerHTML = ''; }
+    else {
+      var ok = S2.q === Q.good;
+      out.className = 'fbk ' + (ok ? 'ok' : 'no');
+      out.innerHTML = '<strong>' + (ok ? 'Bien vu !' : 'Pas tout à fait : c’est ABC ≅ ' + Q.good + '.') + '</strong><span>A ↔ ' + F.n[0] + ', B ↔ ' + F.n[1] + ' et C ↔ ' + F.n[2] + ' : regarde les côtés de même longueur. Par exemple [AB] et [' + F.n[0] + F.n[1] + '] mesurent tous les deux 5 cm.</span>';
+    }
+  }
+  $('s2Els').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b) return; S2.sel = b.getAttribute('data-el'); renderS2(); });
+  $('s2Svg').addEventListener('click', function (ev) { var t = ev.target; if (!t || !t.getAttribute) return; var e = t.getAttribute('data-el'); if (!e || !EL[e]) return; S2.sel = e; renderS2(); });
+  $('s2Q').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b || b.disabled || S2.q) return; S2.q = b.getAttribute('data-w'); renderS2(); });
+  $('s2New').addEventListener('click', function () { S2.f = (S2.f + 1) % S2_F.length; S2.q = null; renderS2(); });
+  renderS2();
+
+  /* ---------- Étape 3 : construire avec CCC, CAC, ACA ---------- */
+  var CO_DATA = {
+    ccc: [{ a: 5, b: 4, c: 6 }, { a: 4, b: 5, c: 7 }, { a: 6, b: 5, c: 5 }],
+    cac: [{ b: 4, c: 6, A: 50 }, { b: 6, c: 5, A: 110 }, { b: 3.5, c: 7, A: 35 }],
+    aca: [{ c: 6, A: 45, B: 60 }, { c: 7, A: 30, B: 100 }, { c: 5, A: 70, B: 70 }]
+  };
+  var CO = { m: 'ccc', f: 0, s: 0 };
+  function coTri(m, d) { return m === 'ccc' ? triSides(d.a, d.b, d.c) : m === 'cac' ? triCAC(d.b, d.c, d.A) : triACA(d.c, d.A, d.B); }
+  function coSteps(m, d) {
+    if (m === 'ccc') return [
+      'Les données : AB = ' + cm(d.c, 1) + ', AC = ' + cm(d.b, 1) + ' et BC = ' + cm(d.a, 1) + '.',
+      'Trace le segment [AB] de ' + cm(d.c, 1) + '.',
+      'Pointe le compas sur A, écarte-le de ' + cm(d.b, 1) + ' (la longueur AC) et trace un arc.',
+      'Pointe le compas sur B, écarte-le de ' + cm(d.a, 1) + ' (la longueur BC) et trace un arc.',
+      'Les deux arcs se coupent en un point : c’est C.',
+      'Trace [AC] et [BC] : le triangle est construit.'];
+    if (m === 'cac') return [
+      'Les données : AB = ' + cm(d.c, 1) + ', AC = ' + cm(d.b, 1) + ' et l’angle en A = ' + deg(d.A, 0) + ', compris entre ces deux côtés.',
+      'Trace le segment [AB] de ' + cm(d.c, 1) + '.',
+      'Avec le rapporteur, trace en A une demi-droite qui fait ' + deg(d.A, 0) + ' avec [AB].',
+      'Au compas, reporte ' + cm(d.b, 1) + ' sur cette demi-droite, depuis A : c’est C.',
+      'Trace [BC] : le triangle est construit.'];
+    return [
+      'Les données : AB = ' + cm(d.c, 1) + ', l’angle en A = ' + deg(d.A, 0) + ' et l’angle en B = ' + deg(d.B, 0) + ', les deux angles collés à [AB].',
+      'Trace le segment [AB] de ' + cm(d.c, 1) + '.',
+      'En A, trace avec le rapporteur une demi-droite à ' + deg(d.A, 0) + ' de [AB].',
+      'En B, trace une demi-droite à ' + deg(d.B, 0) + ' de [BA].',
+      'Les deux demi-droites se coupent en un point : c’est C.',
+      'Repasse les côtés : le triangle est construit.'];
+  }
+  function renderCo() {
+    var m = CO.m, d = CO_DATA[m][CO.f], T = coTri(m, d), A = T[0], B = T[1], C = T[2], I = info(T), st = coSteps(m, d), last = st.length - 1, s = Math.min(CO.s, last), h = '';
+    var aA = dirDeg(A, C), aB = dirDeg(B, C), rayA = add(A, mul(unit(sub(C, A)), I.b * 1.3)), rayB = add(B, mul(unit(sub(C, B)), I.a * 1.3));
+    var pts = [A, B, C, on(I.b, aA - 22, A), on(I.b, aA + 22, A), on(I.a, aB - 22, B), on(I.a, aB + 22, B), [A[0], -0.8]];
+    if (m !== 'ccc') pts.push(rayA);
+    if (m === 'aca') pts.push(rayB);
+    var v = fitView(pts, 480, 300, 30), done = s >= last;
+    if (done) h += sPoly(v, T, COL1, 'var(--acc-soft)', 0.75, 3);
+    if (m === 'ccc') {
+      if (s >= 2) h += sArc(v, A, I.b, aA - 22, 44, 'var(--two)', 2.4);
+      if (s === 2) h += sLine(v, A, on(I.b, aA + 14, A), 'var(--two)', 1.8, '5 5') + sText(v, on(I.b * 0.55, aA + 14 + 9, A), fmt(d.b, 1), 'var(--two)', 16);
+      if (s >= 3) h += sArc(v, B, I.a, aB - 22, 44, 'var(--four)', 2.4);
+      if (s === 3) h += sLine(v, B, on(I.a, aB - 14, B), 'var(--four)', 1.8, '5 5') + sText(v, on(I.a * 0.55, aB - 14 - 9, B), fmt(d.a, 1), 'var(--four)', 16);
+      if (s >= 5) h += sideLab(v, T, 0, 2, fmt(d.b, 1), 'var(--ink)', 16) + sideLab(v, T, 1, 2, fmt(d.a, 1), 'var(--ink)', 16);
+    }
+    if (m === 'cac') {
+      if (s >= 2) h += sLine(v, A, rayA, 'var(--four)', 2.2) + arcs(v, A, B, C, 26, 1, 'var(--four)') + angText(v, A, B, C, 46, deg(d.A, 0), 'var(--four)', 16);
+      if (s >= 3) h += sArc(v, A, I.b, aA - 12, 24, 'var(--two)', 2.4) + sideLab(v, T, 0, 2, fmt(d.b, 1), 'var(--two)', 16);
+      if (s >= 4) h += sideLab(v, T, 1, 2, '≈ ' + fmt(I.a, 1), 'var(--acc-ink)', 16);
+    }
+    if (m === 'aca') {
+      if (s >= 2) h += sLine(v, A, rayA, 'var(--four)', 2.2) + arcs(v, A, B, C, 26, 1, 'var(--four)') + angText(v, A, B, C, 46, deg(d.A, 0), 'var(--four)', 16);
+      if (s >= 3) h += sLine(v, B, rayB, 'var(--two)', 2.2) + arcs(v, B, A, C, 26, 2, 'var(--two)') + angText(v, B, A, C, 50, deg(d.B, 0), 'var(--two)', 16);
+      if (s >= 5) h += angText(v, C, A, B, 40, deg(I.C, 0), 'var(--acc-ink)', 16);
+    }
+    if (s >= 1) h += sLine(v, A, B, 'var(--ink)', 3.5) + sideLab(v, T, 0, 1, fmt(d.c, 1), 'var(--ink)', 16);
+    if (done) h += sLine(v, A, C, COL1, 3) + sLine(v, B, C, COL1, 3);
+    h += sDot(v, A, 'var(--ink)', 5) + vLab(v, T, 0, 'A') + sDot(v, B, 'var(--ink)', 5) + vLab(v, T, 1, 'B');
+    if ((m === 'ccc' && s >= 4) || (m === 'cac' && s >= 3) || (m === 'aca' && s >= 4)) h += sDot(v, C, 'var(--red)', 7) + vLab(v, T, 2, 'C', 'var(--red)');
+    $('coSvg').innerHTML = h;
+    $('coSteps').innerHTML = st.map(function (t, i) { return '<li class="' + (i === s ? 'now' : i < s ? 'past' : '') + '">' + esc(t) + '</li>'; }).join('');
+    $('coPrev').disabled = s === 0;
+    $('coNext').style.display = done ? 'none' : '';
+    var out = $('coOut');
+    if (!done) { out.className = 'verdict'; out.innerHTML = ''; return; }
+    out.className = 'verdict yes';
+    var angs = 'Angles mesurés : A ≈ ' + deg(I.A) + ', B ≈ ' + deg(I.B) + ', C ≈ ' + deg(I.C) + '.';
+    if (m === 'ccc') out.innerHTML = 'Construction terminée ✓<span>Au-dessus de [AB], les deux arcs ne se coupent qu’en un seul point : il n’y a qu’un triangle possible. (Sous [AB], le point symétrique donne le même triangle retourné, donc isométrique.) ' + angs + '</span>';
+    else if (m === 'cac') out.innerHTML = 'Construction terminée ✓<span>Tu n’as pas choisi la longueur BC : elle est imposée par les données, BC ≈ ' + cm(I.a) + '. Tout le monde obtient le même triangle. ' + angs + '</span>';
+    else out.innerHTML = 'Construction terminée ✓<span>Le troisième angle est imposé : C = 180 − ' + fmt(d.A) + ' − ' + fmt(d.B) + ' = ' + deg(I.C, 0) + '. Les longueurs aussi : AC ≈ ' + cm(I.b) + ' et BC ≈ ' + cm(I.a) + '. Un seul triangle possible.</span>';
+  }
+  function setCo(m) { CO.m = m; CO.f = 0; CO.s = 0; setPressed(['coCCC', 'coCAC', 'coACA'], 'co' + m.toUpperCase()); renderCo(); }
+  $('coCCC').addEventListener('click', function () { setCo('ccc'); });
+  $('coCAC').addEventListener('click', function () { setCo('cac'); });
+  $('coACA').addEventListener('click', function () { setCo('aca'); });
+  $('coPrev').addEventListener('click', function () { if (CO.s > 0) CO.s--; renderCo(); });
+  $('coNext').addEventListener('click', function () { if (CO.s < coSteps(CO.m, CO_DATA[CO.m][CO.f]).length - 1) CO.s++; renderCo(); });
+  $('coReset').addEventListener('click', function () { CO.s = 0; renderCo(); });
+  $('coNew').addEventListener('click', function () { CO.f = (CO.f + 1) % CO_DATA[CO.m].length; CO.s = 0; renderCo(); });
+  renderCo();
+
+  /* ---------- Étape 4 : le piège CCA ---------- */
+  var AM = { c: 7, A: 40, a: 5, sel: 'both' }, amV = View(30, 36, 262);
+  function renderAm() {
+    var v = amV, A = [0, 0], B = [AM.c, 0], sols = ambiguous(AM.c, AM.A, AM.a), Cs = sols.map(function (t) { return on(t, AM.A); }), h = '', sel = AM.sel;
+    if (sols.length < 2) sel = '1';
+    var show = [sel === '1' || sel === 'both', sel === '2' || sel === 'both'], cols = [COL1, COL2], soft = ['var(--acc-soft)', 'var(--two-soft)'];
+    var Hf = on(AM.c * Math.cos(rad(AM.A)), AM.A), hd = AM.c * Math.sin(rad(AM.A));
+    Cs.forEach(function (C, i) { if (show[i]) h += sPoly(v, [A, B, C], cols[i], soft[i], 0.55, 3); });
+    h += sCirc(v, B, AM.a, 'var(--four)', 2, null, '7 6');
+    h += sLine(v, A, on(12, AM.A), 'var(--ink-soft)', 2.2);
+    h += sLine(v, B, Hf, 'var(--ink-soft)', 1.6, '3 5');
+    h += sLine(v, A, B, 'var(--ink)', 3.5) + sText(v, [AM.c / 2, -0.55], fmt(AM.c) + ' cm', 'var(--ink)', 17);
+    h += arcs(v, A, B, on(1, AM.A), 34, 1, 'var(--ink)') + sText(v, on(70 / v.s, AM.A / 2), deg(AM.A, 0), 'var(--ink)', 17);
+    Cs.forEach(function (C, i) {
+      if (!show[i]) return;
+      h += sLine(v, B, C, cols[i], 3.5);
+      h += sDot(v, C, cols[i], 7) + sText(v, add(C, mul(unit(perp(on(1, AM.A))), 20 / v.s)), sols.length > 1 ? 'C' + (i ? '₂' : '₁') : 'C', cols[i], 18);
+    });
+    h += sDot(v, A, 'var(--ink)', 6) + sText(v, [-0.15, -0.6], 'A', 'var(--ink)', 18) + sDot(v, B, 'var(--ink)', 6) + sText(v, [AM.c + 0.3, -0.6], 'B', 'var(--ink)', 18);
+    $('amSvg').innerHTML = h;
+    $('amV').textContent = cm(AM.a, 1);
+    $('amM').disabled = AM.a <= 4; $('amP').disabled = AM.a >= 8;
+    $('amS2').disabled = sols.length < 2; $('amSB').disabled = sols.length < 2;
+    setPressed(['amS1', 'amS2', 'amSB'], sel === '1' ? 'amS1' : sel === '2' ? 'amS2' : 'amSB');
+    var out = '';
+    Cs.forEach(function (C, i) {
+      var Ii = info([A, B, C]);
+      out += res(i ? 'c2' : '', sols.length > 1 ? 'Triangle ' + (i + 1) : 'Le triangle', 'AC ≈ ' + cm(Ii.b), 'Angle en B ≈ ' + deg(Ii.B) + ' ; angle en C ≈ ' + deg(Ii.C) + '.');
+    });
+    if (!sols.length) out += verdict('no', 'Aucun triangle possible.', 'B est à environ ' + cm(hd) + ' de la demi-droite : un cercle de rayon ' + cm(AM.a, 1) + ' ne la touche pas.');
+    else if (sols.length === 2) out += verdict('mid', 'Deux triangles différents !', 'Les deux ont AB = 7 cm, BC = ' + cm(AM.a, 1) + ' et un angle de 40° en A… mais ils ne sont pas isométriques. L’angle n’est pas entre les deux côtés connus : c’est le piège CCA.');
+    else out += verdict('yes', 'Un seul triangle cette fois.', 'BC est au moins aussi long que AB : le cercle recoupe la droite en A ou derrière A, hors de la demi-droite. Mais on ne peut pas compter là-dessus en général.');
+    $('amOut').innerHTML = out;
+  }
+  $('amM').addEventListener('click', function () { AM.a = Math.max(4, AM.a - 0.5); renderAm(); });
+  $('amP').addEventListener('click', function () { AM.a = Math.min(8, AM.a + 0.5); renderAm(); });
+  $('amS1').addEventListener('click', function () { AM.sel = '1'; renderAm(); });
+  $('amS2').addEventListener('click', function () { AM.sel = '2'; renderAm(); });
+  $('amSB').addEventListener('click', function () { AM.sel = 'both'; renderAm(); });
+  renderAm();
+
+  (function () {
+    var T1 = triACA(3, 50, 60), T2 = xform(T1, { k: 1.8 }), P = pair(T1, T2, 1.4), v = fitView(P[0].concat(P[1]), 440, 230, 26), h = '';
+    h += sPoly(v, P[0], COL1, 'var(--acc-soft)', 0.8, 3) + sPoly(v, P[1], COL2, 'var(--two-soft)', 0.8, 3);
+    var A = [50, 60, 70];
+    P.forEach(function (T) { [0, 1, 2].forEach(function (i) { h += arcs(v, T[i], T[(i + 1) % 3], T[(i + 2) % 3], 15, i + 1, 'var(--ink)') + angText(v, T[i], T[(i + 1) % 3], T[(i + 2) % 3], 40, A[i] + '°', 'var(--ink)', 15); }); });
+    $('aaaSvg').innerHTML = h;
+  })();
+
+  /* ---------- Étape 5 : quel cas d’isométrie ? ---------- */
+  var AMB = ambiguous(5, 40, 3.6);
+  var CASES = [
+    { k: 'c1', t1: triSides(4, 3.2, 5), tr: { rot: 140 }, m: { s: [[0, 1, 1], [1, 2, 2], [2, 0, 3]] }, a: 'CCC', why: 'Les trois côtés sont marqués égaux deux à deux (1, 2 et 3 traits) : c’est le cas CCC.' },
+    { k: 'c2', t1: triSides(4.5, 3.5, 5), tr: { flip: true, rot: 30 }, m: { s: [[0, 1, 1], [0, 2, 2]], a: [[0, 1]] }, a: 'CAC', why: 'Deux côtés égaux, et l’angle marqué est juste entre eux, à leur point de rencontre : cas CAC. Le retournement ne change rien.' },
+    { k: 'c4', t1: triSides(4, 3.5, 4.5), tr: { k: 1.5, rot: 20 }, m: { a: [[0, 1], [1, 2], [2, 3]] }, a: 'nsp', why: 'Seuls les angles sont égaux : les triangles ont la même forme, mais pas forcément la même taille. Ici l’un est 1,5 fois plus grand. Semblables, pas isométriques.' },
+    { k: 'c3', t1: triSides(5, 4, 4.5), tr: { rot: -70 }, m: { s: [[0, 1, 1]], a: [[0, 1], [1, 2]] }, a: 'ACA', why: 'Un côté égal et les deux angles collés à ses extrémités : cas ACA.' },
+    { k: 'c5', t1: [[0, 0], [5, 0], on(AMB[0], 40)], t2: [[0, 0], [5, 0], on(AMB[1], 40)], m: { s: [[0, 1, 1], [1, 2, 2]], a: [[0, 1]] }, a: 'nsp', why: 'Deux côtés et un angle égaux… mais l’angle marqué n’est pas entre les deux côtés marqués. C’est le piège de l’étape 4 : ici, les deux triangles ne sont même pas isométriques !' },
+    { k: 'c6', t1: triSides(3.5, 4.5, 5), tr: { rot: 200 }, m: { s: [[0, 1, 1], [1, 2, 2]], a: [[1, 1]] }, a: 'CAC', why: 'Les deux côtés marqués se rencontrent au sommet où est l’arc : l’angle est compris entre eux. Cas CAC.' },
+    { k: 'c9', t1: triCAC(3, 4.5, 45), t2: xform(triCAC(3, 4.5, 100), { rot: 30 }), m: { s: [[0, 1, 1], [0, 2, 2]] }, a: 'nsp', why: 'Deux côtés égaux seulement : il manque une information. Ici l’angle entre ces côtés est différent, et le troisième côté aussi.' },
+    { k: 'c7', t1: triSides(4.6, 4, 3.4), tr: { flip: true, rot: 100 }, m: { s: [[1, 2, 1]], a: [[1, 1], [2, 2]] }, a: 'ACA', why: 'Le côté marqué a ses deux angles marqués aux extrémités : cas ACA.' },
+    { k: 'c8', t1: triSides(4.4, 3.6, 5.2), tr: { flip: true, rot: -10 }, m: { s: [[0, 1, 1], [1, 2, 2], [2, 0, 3]] }, a: 'CCC', why: 'Trois côtés égaux deux à deux : cas CCC, même si l’un des triangles est retourné.' }
+  ];
+  CASES.forEach(function (it) { if (!it.t2) it.t2 = xform(it.t1, it.tr); it.s = 'Peut-on dire qu’ils sont isométriques ? Avec quel cas ?'; });
+  var CASEN = { CCC: 'CCC', CAC: 'CAC', ACA: 'ACA', nsp: 'On ne peut pas savoir' };
+  function markTri(v, T, m) {
+    var h = '';
+    (m.s || []).forEach(function (s) { h += ticks(v, T[s[0]], T[s[1]], s[2], 'var(--ink)'); });
+    (m.a || []).forEach(function (a) { var i = a[0]; h += arcs(v, T[i], T[(i + 1) % 3], T[(i + 2) % 3], 14, a[1], 'var(--ink)'); });
+    return h;
+  }
+  makeSorter({ items: CASES, names: CASEN, order: ['CCC', 'CAC', 'ACA', 'nsp'], btns: 's5Btns', card: 's5Card', pos: 's5Pos', out: 's5Out', score_: 's5Score', prev: 's5Prev', next: 's5Next', reset: 's5Reset', word: 'Question', score: scorer(CASES),
+    cardHtml: function (it) { return pairSvg(it.t1, it.t2, 'Deux triangles avec des marques d’égalité', function (v, P) { return markTri(v, P[0], it.m) + markTri(v, P[1], it.m); }) + '<span class="cq">' + esc(it.s) + '</span>'; } });
+
+  /* ---------- Étape 6 : le rapport de similitude ---------- */
+  var K6_T = triSides(3.4, 2.8, 4), k6 = $('k6');
+  $('k6Pre').innerHTML = [0.5, 1, 1.5, 2, 3].map(function (k) { return '<button type="button" data-k="' + k + '">k = ' + fmt(k) + '</button>'; }).join('');
+  function renderK6() {
+    var k = parseFloat(k6.value); if (!isFinite(k)) k = 2;
+    var v = View(22, 16, 270), T1 = shift(K6_T, [0.4, 0]), T2 = shift(K6_T.map(function (P) { return mul(P, k); }), [0.4 + 4 + 1.4, 0]), h = '', I1 = info(T1), I2 = info(T2);
+    $('k6Out').textContent = fmt(k, 1);
+    h += sPoly(v, T1, COL1, 'var(--acc-soft)', 0.8, 3) + sPoly(v, T2, COL2, 'var(--two-soft)', 0.8, 3);
+    [T1, T2].forEach(function (T, j) {
+      [0, 1, 2].forEach(function (i) { h += arcs(v, T[i], T[(i + 1) % 3], T[(i + 2) % 3], 12, i + 1, 'var(--ink)'); });
+      [[0, 1], [1, 2], [2, 0]].forEach(function (s) { h += sideLab(v, T, s[0], s[1], fmt(dist(T[s[0]], T[s[1]]), 2), j ? 'var(--two)' : 'var(--acc-ink)', 15, 13); });
+      ['A', 'B', 'C'].forEach(function (n, i) { h += vLab(v, T, i, j ? n + '′' : n, 'var(--ink)', 17, 14); });
+    });
+    $('k6Svg').innerHTML = h;
+    var rows = [['[AB]', I1.c, I2.c], ['[BC]', I1.a, I2.a], ['[CA]', I1.b, I2.b]].map(function (r) { return '<tr><td>' + r[0] + '</td><td class="n">' + cm(r[1]) + '</td><td class="n">' + cm(r[2]) + '</td><td class="k">× ' + fmt(r[2] / r[1], 2) + '</td></tr>'; }).join('');
+    rows += [['Angle en A', I1.A, I2.A], ['Angle en B', I1.B, I2.B], ['Angle en C', I1.C, I2.C]].map(function (r) { return '<tr><td>' + r[0] + '</td><td class="n">' + deg(r[1]) + '</td><td class="n">' + deg(r[2]) + '</td><td class="k">égal</td></tr>'; }).join('');
+    rows += '<tr><td>Périmètre</td><td class="n">' + cm(I1.a + I1.b + I1.c) + '</td><td class="n">' + cm(I2.a + I2.b + I2.c) + '</td><td class="k">× ' + fmt(k, 2) + '</td></tr>';
+    $('k6Rows').innerHTML = rows;
+  }
+  k6.addEventListener('input', renderK6);
+  $('k6Pre').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b) return; k6.value = b.getAttribute('data-k'); renderK6(); });
+  renderK6();
+
+  /* ---------- Étape 7 : semblables ou pas ? ---------- */
+  function simTri(d) { return d.ang ? triACA(d.c, d.ang[0], d.ang[1]) : triSides(d.s[0], d.s[1], d.s[2]); }
+  var SIM = [
+    { k: 's1', s: 'Triangle 1 : angles de 40° et 75°. Triangle 2 : angles de 75° et 65°.', d1: { ang: [40, 75], c: 4, lab: ['40°', '75°'] }, d2: { ang: [75, 65], c: 5.2, lab: ['75°', '65°'] }, a: 'aa',
+      why: 'Le 3ᵉ angle du triangle 1 vaut 180 − 40 − 75 = 65°. Les deux triangles ont donc des angles de 40°, 75° et 65° : semblables.' },
+    { k: 's2', s: 'Triangle 1 : angles de 40° et 60°. Triangle 2 : angles de 40° et 70°.', d1: { ang: [40, 60], c: 4.5, lab: ['40°', '60°'] }, d2: { ang: [40, 70], c: 4.5, lab: ['40°', '70°'] }, a: 'non',
+      why: 'Les 3ᵉ angles valent 180 − 40 − 60 = 80° et 180 − 40 − 70 = 70°. Les angles sont 40, 60, 80 d’un côté et 40, 70, 70 de l’autre : pas semblables.' },
+    { k: 's3', s: 'Triangle 1 : côtés de 3 cm, 4 cm et 6 cm. Triangle 2 : côtés de 9 cm, 4,5 cm et 6 cm.', d1: { s: [4, 3, 6] }, d2: { s: [6, 4.5, 9] }, a: 'cp',
+      why: 'Dans l’ordre : 3 ; 4 ; 6 et 4,5 ; 6 ; 9. On a 4,5 ÷ 3 = 1,5 ; 6 ÷ 4 = 1,5 ; 9 ÷ 6 = 1,5. Tous les rapports sont égaux : semblables, k = 1,5.' },
+    { k: 's5', s: 'Triangle 1 : rectangle, avec un angle de 35°. Triangle 2 : rectangle, avec un angle de 55°.', d1: { ang: [90, 35], c: 3.4, lab: ['90°', '35°'] }, d2: { ang: [55, 90], c: 3.2, lab: ['55°', '90°'] }, a: 'aa',
+      why: 'Dans le triangle 1, le 3ᵉ angle vaut 180 − 90 − 35 = 55°. Les deux triangles ont des angles de 90°, 35° et 55° : semblables.' },
+    { k: 's4', s: 'Triangle 1 : côtés de 2 cm, 3 cm et 4 cm. Triangle 2 : côtés de 4 cm, 6 cm et 7 cm.', d1: { s: [3, 2, 4] }, d2: { s: [6, 4, 7] }, a: 'non',
+      why: '4 ÷ 2 = 2 et 6 ÷ 3 = 2, mais 7 ÷ 4 = 1,75. Un des rapports est différent : pas semblables.' },
+    { k: 's9', s: 'Triangle 1 : côtés de 2,5 cm, 4 cm et 5 cm. Triangle 2 : côtés de 10 cm, 5 cm et 8 cm.', d1: { s: [4, 2.5, 5] }, d2: { s: [8, 5, 10] }, a: 'cp',
+      why: 'Dans l’ordre : 2,5 ; 4 ; 5 et 5 ; 8 ; 10. On a 5 ÷ 2,5 = 2 ; 8 ÷ 4 = 2 ; 10 ÷ 5 = 2 : semblables, k = 2.' },
+    { k: 's6', s: 'Triangle 1 : isocèle, angle au sommet de 40°. Triangle 2 : isocèle, un angle à la base de 70°.', d1: { ang: [70, 70], c: 3, lab: [null, null, '40°'], iso: true }, d2: { ang: [70, 70], c: 4.4, lab: ['70°'], iso: true }, a: 'aa',
+      why: 'Dans le triangle 1, les deux angles à la base valent (180 − 40) ÷ 2 = 70°. Les deux triangles ont des angles de 40°, 70° et 70° : semblables.' },
+    { k: 's8', s: 'Triangle 1 : côtés de 3 cm, 4 cm et 5 cm. Triangle 2 : côtés de 6 cm, 8 cm et 11 cm.', d1: { s: [5, 4, 3] }, d2: { s: [11, 8, 6] }, a: 'non',
+      why: '6 ÷ 3 = 2 et 8 ÷ 4 = 2, mais 11 ÷ 5 = 2,2 : pas semblables. D’ailleurs le premier est rectangle, le deuxième non.' },
+    { k: 's7', s: 'Triangle 1 : côtés de 5 cm, 6 cm et 8 cm. Triangle 2 : côtés de 12 cm, 7,5 cm et 9 cm.', d1: { s: [6, 5, 8] }, d2: { s: [9, 7.5, 12] }, a: 'cp',
+      why: 'Dans l’ordre : 5 ; 6 ; 8 et 7,5 ; 9 ; 12. On a 7,5 ÷ 5 = 1,5 ; 9 ÷ 6 = 1,5 ; 12 ÷ 8 = 1,5 : semblables, k = 1,5.' }
+  ];
+  SIM.forEach(function (it) { it.t1 = simTri(it.d1); it.t2 = simTri(it.d2); });
+  var SIMN = { aa: 'Oui, par les angles', cp: 'Oui, côtés proportionnels', non: 'Non' };
+  function simMarks(v, T, d) {
+    var h = '';
+    if (d.ang) {
+      (d.lab || []).forEach(function (t, i) { if (t) h += arcs(v, T[i], T[(i + 1) % 3], T[(i + 2) % 3], 13, 1, 'var(--ink)') + angText(v, T[i], T[(i + 1) % 3], T[(i + 2) % 3], 32, t, 'var(--ink)', 14); });
+      if (d.iso) h += ticks(v, T[0], T[2], 1, 'var(--ink)') + ticks(v, T[1], T[2], 1, 'var(--ink)');
+    } else {
+      h += sideLab(v, T, 1, 2, fmt(d.s[0]), 'var(--ink)', 14, 12) + sideLab(v, T, 2, 0, fmt(d.s[1]), 'var(--ink)', 14, 12) + sideLab(v, T, 0, 1, fmt(d.s[2]), 'var(--ink)', 14, 12);
+    }
+    return h;
+  }
+  makeSorter({ items: SIM, names: SIMN, order: ['aa', 'cp', 'non'], btns: 's7Btns', card: 's7Card', pos: 's7Pos', out: 's7Out', score_: 's7Score', prev: 's7Prev', next: 's7Next', reset: 's7Reset', word: 'Question', score: scorer(SIM),
+    cardHtml: function (it) { return pairSvg(it.t1, it.t2, 'Triangle 1 en violet, triangle 2 en orange', function (v, P) { return simMarks(v, P[0], it.d1) + simMarks(v, P[1], it.d2); }, { pad: 26 }) + '<span class="cd">' + esc(it.s) + '</span><span class="cq">Sont-ils semblables ?</span>'; } });
+
+  /* ---------- Étape 8 : calculer une longueur ---------- */
+  function buildCalc() {
+    var list = [];
+    /* Exercice 1 : deux triangles séparés, k = 1,5 */
+    var T1 = triSides(5, 6, 4), P1 = pair(T1, xform(T1, { k: 1.5, rot: 160 }), 1.4);
+    list.push({ k: 'e1', name: 'Deux triangles', pts: { A: P1[0][0], B: P1[0][1], C: P1[0][2], D: P1[1][0], E: P1[1][1], F: P1[1][2] },
+      tris: [['A', 'B', 'C'], ['D', 'E', 'F']], arcs: [['A', 1], ['B', 2], ['C', 3], ['D', 1], ['E', 2], ['F', 3]],
+      labs: [['A', 'B', 0, '4'], ['B', 'C', 0, '5'], ['D', 'E', 1, '6'], ['E', 'F', 1, '?']], known: [['A', 'B'], ['D', 'E']], target: [['B', 'C'], ['E', 'F']], rk: 1.5, ans: 7.5,
+      steps: ['Les données : AB = 4 cm, BC = 5 cm et DE = 6 cm. On cherche EF.',
+        'Les angles sont égaux deux à deux (mêmes marques) : les triangles ABC et DEF sont semblables.',
+        'Les côtés homologues : [AB] ↔ [DE], [BC] ↔ [EF] et [CA] ↔ [FD].',
+        'Le rapport de similitude : k = DE ÷ AB = 6 ÷ 4 = 1,5.',
+        'Produit en croix : EF ÷ BC = DE ÷ AB, donc EF = BC × DE ÷ AB = 5 × 6 ÷ 4 = 7,5 cm.'] });
+    /* Exercice 2 : configuration de Thalès, (DE) // (BC) */
+    var b0 = triSides(8.75, 7.5, 10), B = b0[0], C = b0[1], A = b0[2], D = add(A, mul(sub(B, A), 0.4)), E = add(A, mul(sub(C, A), 0.4));
+    list.push({ k: 'e2', name: 'Des parallèles', pts: { A: A, B: B, C: C, D: D, E: E },
+      tris: [['A', 'D', 'E'], ['A', 'B', 'C']], arcs: [['A', 1], ['D', 2], ['B', 2], ['E', 3], ['C', 3]], par: [['D', 'E'], ['B', 'C']],
+      labs: [['A', 'D', 0, '3', -14], ['A', 'B', 1, '7,5'], ['D', 'E', 0, '4', -14], ['B', 'C', 1, '?']], known: [['A', 'D'], ['A', 'B']], target: [['D', 'E'], ['B', 'C']], rk: 2.5, ans: 10,
+      steps: ['Les données : (DE) est parallèle à (BC), AD = 3 cm, AB = 7,5 cm et DE = 4 cm. On cherche BC.',
+        'L’angle en A est commun aux deux triangles. Les parallèles donnent des angles égaux en D et en B (angles correspondants). Deux angles égaux : ADE et ABC sont semblables.',
+        'Les côtés homologues : [AD] ↔ [AB], [DE] ↔ [BC] et [AE] ↔ [AC].',
+        'Le rapport de similitude : k = AB ÷ AD = 7,5 ÷ 3 = 2,5.',
+        'Produit en croix : BC ÷ DE = AB ÷ AD, donc BC = DE × AB ÷ AD = 4 × 7,5 ÷ 3 = 10 cm.'] });
+    /* Exercice 3 : le papillon, (AB) // (CD) */
+    var o3 = triSides(2.4, 2.6, 3), Oo = [0, 0], A3 = rot([-3, 0], 15, Oo), B3 = rot(mul(o3[2], -1), 15, Oo), C3 = mul(A3, -1.5), D3 = mul(B3, -1.5);
+    list.push({ k: 'e3', name: 'Le papillon', pts: { O: Oo, A: A3, B: B3, C: C3, D: D3 },
+      tris: [['O', 'A', 'B'], ['O', 'C', 'D']], arcs: [['A', 2], ['C', 2], ['B', 3], ['D', 3]], vert: true, par: [['A', 'B'], ['C', 'D']],
+      labs: [['O', 'A', 0, '3'], ['O', 'C', 1, '4,5'], ['A', 'B', 0, '2,4'], ['C', 'D', 1, '?']], known: [['O', 'A'], ['O', 'C']], target: [['A', 'B'], ['C', 'D']], rk: 1.5, ans: 3.6,
+      steps: ['Les données : les droites (AC) et (BD) se coupent en O, (AB) est parallèle à (CD), OA = 3 cm, OC = 4,5 cm et AB = 2,4 cm. On cherche CD.',
+        'Les angles en O sont opposés par le sommet, donc égaux. Les parallèles donnent des angles égaux en A et en C (angles alternes-internes). Deux angles égaux : OAB et OCD sont semblables.',
+        'Les côtés homologues : [OA] ↔ [OC], [AB] ↔ [CD] et [OB] ↔ [OD].',
+        'Le rapport de similitude : k = OC ÷ OA = 4,5 ÷ 3 = 1,5.',
+        'Produit en croix : CD ÷ AB = OC ÷ OA, donc CD = AB × OC ÷ OA = 2,4 × 4,5 ÷ 3 = 3,6 cm.'] });
+    return list;
+  }
+  var CALC = buildCalc(), CX = { e: 0, s: 0 };
+  function checkCalc() {
+    var bad = [];
+    CALC.forEach(function (ex) {
+      var p = ex.pts, T1 = ex.tris[0].map(function (n) { return p[n]; }), T2 = ex.tris[1].map(function (n) { return p[n]; }), k = similarity(T1, T2);
+      if (k === null || Math.abs(k - ex.rk) > 1e-6) bad.push(ex.k + ' : rapport ' + k);
+      ex.labs.forEach(function (l) { if (l[3] === '?') return; var L = dist(p[l[0]], p[l[1]]); if (Math.abs(L - num(l[3])) > 1e-6) bad.push(ex.k + ' : ' + l[0] + l[1] + ' = ' + L); });
+      var t = ex.target[1], L2 = dist(p[t[0]], p[t[1]]); if (Math.abs(L2 - ex.ans) > 1e-6) bad.push(ex.k + ' : réponse ' + L2);
+    });
+    return bad;
+  }
+  $('cxTabs').innerHTML = CALC.map(function (ex, i) { return '<button type="button" data-i="' + i + '" aria-pressed="' + (i === 0 ? 'true' : 'false') + '">' + esc(ex.name) + '</button>'; }).join('');
+  function renderCx() {
+    var ex = CALC[CX.e], p = ex.pts, s = CX.s, last = ex.steps.length - 1, h = '', all = Object.keys(p).map(function (n) { return p[n]; });
+    var v = fitView(all, 480, 280, 36), Ts = ex.tris.map(function (t) { return t.map(function (n) { return p[n]; }); });
+    var big = Ts[0].concat(Ts[1]), G = centroid([big[0], big[1], big[2]]);
+    h += sPoly(v, Ts[1], COL2, 'var(--two-soft)', 0.7, 3) + sPoly(v, Ts[0], COL1, 'var(--acc-soft)', 0.75, 3);
+    if (s >= 1) {
+      ex.arcs.forEach(function (a) {
+        var ti = ex.tris[0].indexOf(a[0]) >= 0 ? 0 : 1, t = ex.tris[ti], i = t.indexOf(a[0]);
+        h += arcs(v, p[a[0]], p[t[(i + 1) % 3]], p[t[(i + 2) % 3]], 15, a[1], 'var(--ink)');
+      });
+      if (ex.vert) h += arcs(v, p.O, p.A, p.B, 15, 1, 'var(--ink)') + arcs(v, p.O, p.C, p.D, 15, 1, 'var(--ink)');    }
+    if (s >= 2) {
+      [ex.known, ex.target].forEach(function (pr, j) { pr.forEach(function (sg) { h += sLine(v, p[sg[0]], p[sg[1]], j ? 'var(--two)' : 'var(--four)', 7, null, 0.55); }); });
+    }
+    ex.labs.forEach(function (l) {
+      var T = Ts[l[2]], t = ex.tris[l[2]], txt = l[3] === '?' && s >= last ? fmt(ex.ans) : l[3];
+      h += sideLab(v, T, t.indexOf(l[0]), t.indexOf(l[1]), txt, l[3] === '?' ? 'var(--red)' : 'var(--ink)', 17, l[4] == null ? 15 : l[4]);
+    });
+    Object.keys(p).forEach(function (n) {
+      var ti = ex.tris[0].indexOf(n) >= 0 ? 0 : 1, T = Ts[ti], i = ex.tris[ti].indexOf(n);
+      if (ex.k === 'e2' && (n === 'D' || n === 'E')) { var dd = n === 'D' ? sub(p.D, p.E) : sub(p.E, p.D); h += sDot(v, p[n], 'var(--ink)', 4.5) + sText(v, add(p[n], mul(unit(dd), 16 / v.s)), n, 'var(--ink)', 18); return; }
+      if (n === 'O') { h += sDot(v, p.O, 'var(--ink)', 4.5) + sText(v, add(p.O, mul(unit(perp(sub(p.C, p.A))), 18 / v.s)), 'O', 'var(--ink)', 18); return; }
+      h += sDot(v, p[n], 'var(--ink)', 4.5) + vLab(v, T, i, n, 'var(--ink)', 18, 15);
+    });
+    $('cxSvg').innerHTML = h;
+    $('cxSteps').innerHTML = ex.steps.map(function (t, i) { return '<li class="' + (i === s ? 'now' : i < s ? 'past' : '') + '">' + esc(t) + '</li>'; }).join('');
+    each($('cxTabs').querySelectorAll('button'), function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-i') === String(CX.e) ? 'true' : 'false'); });
+    $('cxPrev').disabled = s === 0;
+    $('cxNext').style.display = s >= last ? 'none' : '';
+    var out = $('cxOut');
+    if (s >= last) { var t = ex.target[1]; out.className = 'verdict yes'; out.innerHTML = 'Calcul terminé ✓<span>' + t[0] + t[1] + ' = ' + cm(ex.ans) + '. Vérification : ' + fmt(ex.ans) + ' ÷ ' + ex.labs.filter(function (l) { return l[0] + l[1] === ex.target[0][0] + ex.target[0][1]; }).map(function (l) { return l[3]; })[0] + ' = ' + fmt(ex.rk) + ', le même rapport k.</span>'; }
+    else if (s >= 2) { out.className = 'verdict mid'; out.innerHTML = 'Les couleurs<span>En vert : les deux côtés homologues connus, qui donnent k. En orange : le côté connu et son homologue cherché.</span>'; }
+    else { out.className = 'verdict'; out.innerHTML = ''; }
+  }
+  $('cxTabs').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b) return; CX.e = clamp(b.getAttribute('data-i'), CALC.length); CX.s = 0; renderCx(); });
+  $('cxPrev').addEventListener('click', function () { if (CX.s > 0) CX.s--; renderCx(); });
+  $('cxNext').addEventListener('click', function () { if (CX.s < CALC[CX.e].steps.length - 1) CX.s++; renderCx(); });
+  $('cxReset').addEventListener('click', function () { CX.s = 0; renderCx(); });
+  renderCx();
+
+  /* ---------- Étape 9 : la hauteur du sapin ---------- */
+  var SH = { obj: 'sapin' }, shB = $('shB'), shS = $('shS'), shT = $('shT');
+  function shadowHeight(b, s, S) { return s > 0 ? S * b / s : NaN; }
+  function renderSh() {
+    var b = parseFloat(shB.value), s = parseFloat(shS.value), S = parseFloat(shT.value), H = shadowHeight(b, s, S), h = '', gy = 236;
+    $('shBOut').textContent = fmt(b, 1); $('shSOut').textContent = fmt(s, 1); $('shTOut').textContent = fmt(S, 0);
+    /* Zoom sur le bâton */
+    var x0 = 72, sl = Math.min(110 / s, 180 / b), top = [x0, gy - b * sl], tip = [x0 + s * sl, gy];
+    h += '<line x1="8" y1="' + gy + '" x2="196" y2="' + gy + '" stroke="var(--ink)" stroke-width="2.5"/>';
+    h += '<polygon points="' + x0 + ',' + gy + ' ' + r2(top[0]) + ',' + r2(top[1]) + ' ' + r2(tip[0]) + ',' + gy + '" fill="var(--acc-soft)" fill-opacity="0.8" stroke="none"/>';
+    var u = unit([top[0] - tip[0], top[1] - tip[1]]);
+    h += '<line x1="' + r2(tip[0]) + '" y1="' + gy + '" x2="' + r2(top[0] + u[0] * 40) + '" y2="' + r2(top[1] + u[1] * 40) + '" stroke="var(--warn)" stroke-width="2.5" stroke-dasharray="7 5"/>';
+    h += '<line x1="' + x0 + '" y1="' + gy + '" x2="' + x0 + '" y2="' + r2(top[1]) + '" stroke="var(--acc)" stroke-width="5" stroke-linecap="round"/>';
+    h += '<line x1="' + x0 + '" y1="' + (gy + 1) + '" x2="' + r2(tip[0]) + '" y2="' + (gy + 1) + '" stroke="var(--ink-soft)" stroke-width="7" stroke-opacity="0.6"/>';
+    h += pText(x0 - 8, (gy + top[1]) / 2, fmt(b, 1) + ' m', 'var(--acc-ink)', 17, 'end') + pText((x0 + tip[0]) / 2, gy + 20, fmt(s, 1) + ' m', 'var(--ink-soft)', 17);
+    h += pText(100, 18, 'bâton (zoom)', 'var(--ink-soft)', 16);
+    h += '<line x1="204" y1="10" x2="204" y2="268" stroke="var(--line)" stroke-width="2" stroke-dasharray="5 5"/>';
+    /* L’objet et son ombre */
+    var X0 = 262, st = Math.min(200 / S, 196 / H), Ht = gy - H * st, Tip = [X0 + S * st, gy], U = unit([X0 - Tip[0], Ht - Tip[1]]);
+    h += '<line x1="212" y1="' + gy + '" x2="476" y2="' + gy + '" stroke="var(--ink)" stroke-width="2.5"/>';
+    h += '<polygon points="' + X0 + ',' + gy + ' ' + X0 + ',' + r2(Ht) + ' ' + r2(Tip[0]) + ',' + gy + '" fill="var(--two-soft)" fill-opacity="0.8" stroke="none"/>';
+    h += '<line x1="' + X0 + '" y1="' + (gy + 1) + '" x2="' + r2(Tip[0]) + '" y2="' + (gy + 1) + '" stroke="var(--ink-soft)" stroke-width="7" stroke-opacity="0.6"/>';
+    var Hp = gy - Ht;
+    if (SH.obj === 'jet') {
+      h += '<line x1="' + X0 + '" y1="' + gy + '" x2="' + X0 + '" y2="' + r2(Ht) + '" stroke="var(--four)" stroke-width="6" stroke-linecap="round" stroke-opacity="0.85"/>';
+      h += '<path d="M' + X0 + ' ' + r2(Ht) + ' q 16 6 22 40 M' + X0 + ' ' + r2(Ht) + ' q -16 6 -22 40" fill="none" stroke="var(--four)" stroke-width="3" stroke-opacity="0.7"/>';
+    } else {
+      var w = Math.max(10, 0.2 * Hp);
+      h += '<rect x="' + r2(X0 - 3) + '" y="' + r2(gy - 0.12 * Hp) + '" width="6" height="' + r2(0.12 * Hp) + '" fill="var(--warn-ink)"/>';
+      [[0.12, 0.55, 1], [0.38, 0.8, 0.78], [0.62, 1, 0.55]].forEach(function (q) { h += '<polygon points="' + r2(X0 - w * q[2]) + ',' + r2(gy - q[0] * Hp) + ' ' + r2(X0 + w * q[2]) + ',' + r2(gy - q[0] * Hp) + ' ' + X0 + ',' + r2(gy - q[1] * Hp) + '" fill="var(--ok)" fill-opacity="0.85"/>'; });
+    }
+    h += '<line x1="' + r2(Tip[0]) + '" y1="' + gy + '" x2="' + r2(X0 + U[0] * 40) + '" y2="' + r2(Ht + U[1] * 40) + '" stroke="var(--warn)" stroke-width="2.5" stroke-dasharray="7 5"/>';
+    h += pText(X0 + 12, Math.max(16, Ht - 4), 'H ≈ ' + fmt(H, 1) + ' m', 'var(--two)', 18, 'start') + pText((X0 + Tip[0]) / 2, gy + 20, fmt(S, 0) + ' m', 'var(--ink-soft)', 17);
+    $('shSvg').innerHTML = h;
+    $('shOut').innerHTML = res('total', SH.obj === 'jet' ? 'Hauteur du jet d’eau' : 'Hauteur du sapin', '≈ ' + fmt(H, 1) + ' m', 'H ÷ ' + fmt(S, 0) + ' = ' + fmt(b, 1) + ' ÷ ' + fmt(s, 1) + ', donc H = ' + fmt(S, 0) + ' × ' + fmt(b, 1) + ' ÷ ' + fmt(s, 1) + ' ≈ ' + fmt(H, 2) + ' m') +
+      res('', 'Rapport de similitude', 'k ≈ ' + fmt(S / s, 2), 'Le grand triangle est ' + fmt(S / s, 2) + ' fois plus grand que le petit : ' + fmt(S, 0) + ' ÷ ' + fmt(s, 1) + '.');
+  }
+  function setSh(o, b, s, S) { SH.obj = o; shB.value = String(b); shS.value = String(s); shT.value = String(S); renderSh(); }
+  [shB, shS, shT].forEach(function (el) { el.addEventListener('input', renderSh); });
+  $('shP1').addEventListener('click', function () { setSh('sapin', 1, 1.5, 24); });
+  $('shP2').addEventListener('click', function () { setSh('sapin', 1, 3, 48); });
+  $('shP3').addEventListener('click', function () { setSh('jet', 1, 0.5, 70); });
+  renderSh();
+
+  /* ---------- Étape 10 : les aires ---------- */
+  var AR_T = [[0, 0], [4, 0], [1.5, 3]], arK = $('arK');
+  $('arPre').innerHTML = [0.5, 1, 2, 3].map(function (k) { return '<button type="button" data-k="' + k + '">k = ' + fmt(k) + '</button>'; }).join('');
+  function renderAr() {
+    var k = parseFloat(arK.value); if (!isFinite(k)) k = 2;
+    var v = View(20, 18, 282), T1 = shift(AR_T, [0.3, 0]), T2 = shift(AR_T.map(function (P) { return mul(P, k); }), [0.3 + 4 + 1.2, 0]), h = '', A1 = info(T1).area, A2 = info(T2).area, n = Math.round(k), integ = Math.abs(k - n) < 1e-9 && n >= 2;
+    $('arKOut').textContent = fmt(k, 1);
+    h += sPoly(v, T1, COL1, 'var(--acc-soft)', 0.85, 3) + sPoly(v, T2, COL2, 'var(--two-soft)', 0.85, 3);
+    if (integ) {
+      for (var i = 1; i < n; i++) {
+        var t = i / n;
+        [[0, 1, 2], [1, 2, 0], [2, 0, 1]].forEach(function (q) {
+          var V = T2[q[0]], P1 = add(V, mul(sub(T2[q[1]], V), t)), P2 = add(V, mul(sub(T2[q[2]], V), t));
+          h += sLine(v, P1, P2, 'var(--two)', 1.6, '5 4');
+        });
+      }
+    }
+    h += sText(v, centroid(T1), fmt(A1) + ' cm²', 'var(--acc-ink)', 15) + sText(v, [T2[2][0], T2[2][1] + 22 / v.s], fmt(A2) + ' cm²', 'var(--two)', 17);
+    $('arSvg').innerHTML = h;
+    $('arOut').innerHTML = res('', 'Longueurs', '× ' + fmt(k, 1), 'Base : 4 cm → ' + cm(4 * k) + ' ; hauteur : 3 cm → ' + cm(3 * k) + '.') +
+      res('total', 'Aire', '× ' + fmt(k * k, 2), 'Petit : 4 × 3 ÷ 2 = 6 cm². Grand : ' + fmt(4 * k) + ' × ' + fmt(3 * k) + ' ÷ 2 = ' + fmt(A2) + ' cm². Et ' + fmt(A2) + ' ÷ 6 = ' + fmt(k * k) + ' = ' + fmt(k, 1) + ' × ' + fmt(k, 1) + '.') +
+      (integ ? verdict('mid', n * n + ' petits triangles tiennent dans le grand.', 'Compte-les : ' + n + ' × ' + n + ' = ' + n * n + ' copies du petit triangle, dont certaines la tête en bas.') : '');
+  }
+  arK.addEventListener('input', renderAr);
+  $('arPre').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b) return; arK.value = b.getAttribute('data-k'); renderAr(); });
+  renderAr();
+
+  /* ---------- Étape 11 : la démonstration ---------- */
+  var PR_FIGS = [[2.5, 5], [3.5, 2.6], [2, 6.5]], PR = { f: 0, s: 0 };
+  var PR_STEPS = [
+    'On sait : ABC est isocèle en A, donc AB = AC. On veut montrer : l’angle en B est égal à l’angle en C.',
+    'Trace la médiane [AI] : I est le milieu de [BC], donc BI = CI.',
+    'Compare les triangles ABI et ACI : AB = AC (isocèle), BI = CI (milieu), et le côté [AI] est commun aux deux.',
+    'Trois côtés égaux deux à deux : par le cas CCC, les triangles ABI et ACI sont isométriques.',
+    'Dans des triangles isométriques, les angles homologues sont égaux. B ↔ C, donc l’angle en B est égal à l’angle en C.'
+  ];
+  function renderPr() {
+    var F = PR_FIGS[PR.f], B = [-F[0], 0], C = [F[0], 0], A = [0, F[1]], I = [0, 0], s = PR.s, last = PR_STEPS.length - 1, h = '';
+    var v = fitView([A, B, C, [0, -0.9]], 480, 300, 34), T = [A, B, C], aB = angleAt(B, A, C);
+    if (s >= 2) h += sPoly(v, [A, B, I], COL1, 'var(--acc-soft)', 0.85, 0.01) + sPoly(v, [A, C, I], COL2, 'var(--two-soft)', 0.85, 0.01);
+    else h += sPoly(v, T, 'var(--ink)', 'var(--acc-soft)', 0.4, 0.01);
+    h += sPoly(v, T, 'var(--ink)', null, 1, 3);
+    h += ticks(v, A, B, 2, 'var(--ink)') + ticks(v, A, C, 2, 'var(--ink)');
+    if (s >= 1) h += sLine(v, A, I, s >= 2 ? 'var(--four)' : 'var(--ink)', s >= 2 ? 4 : 2.5) + ticks(v, B, I, 1, 'var(--ink)') + ticks(v, I, C, 1, 'var(--ink)') + sDot(v, I, 'var(--ink)', 5) + sText(v, add(I, [0, -18 / v.s]), 'I', 'var(--ink)', 18);
+    if (s >= 3) h += sText(v, mid(mid(A, B), I), 'CCC', 'var(--ok)', 16);
+    if (s >= 4) h += arcs(v, B, A, C, 22, 1, 'var(--red)') + arcs(v, C, A, B, 22, 1, 'var(--red)') + angText(v, B, A, C, 46, deg(aB), 'var(--red)', 15) + angText(v, C, A, B, 46, deg(aB), 'var(--red)', 15);
+    h += vLab(v, T, 0, 'A') + vLab(v, T, 1, 'B') + vLab(v, T, 2, 'C');
+    $('prSvg').innerHTML = h;
+    $('prSteps').innerHTML = PR_STEPS.map(function (t, i) { return '<li class="' + (i === s ? 'now' : i < s ? 'past' : '') + '">' + esc(t) + '</li>'; }).join('');
+    $('prPrev').disabled = s === 0;
+    $('prNext').style.display = s >= last ? 'none' : '';
+    var out = $('prOut');
+    if (s >= last) { out.className = 'verdict yes'; out.innerHTML = 'Démonstration terminée ✓<span>C’est vrai pour tous les triangles isocèles, sans rien mesurer. Bonus : les angles AIB et AIC sont homologues aussi ; ils sont égaux et font 180° à eux deux, donc 90° chacun. La médiane [AI] est aussi une hauteur !</span>'; }
+    else { out.className = 'verdict'; out.innerHTML = ''; }
+  }
+  $('prPrev').addEventListener('click', function () { if (PR.s > 0) PR.s--; renderPr(); });
+  $('prNext').addEventListener('click', function () { if (PR.s < PR_STEPS.length - 1) PR.s++; renderPr(); });
+  $('prReset').addEventListener('click', function () { PR.s = 0; renderPr(); });
+  $('prNew').addEventListener('click', function () { PR.f = (PR.f + 1) % PR_FIGS.length; renderPr(); });
+  renderPr();
+
+  /* ---------- Vérification des jeux ---------- */
+  function checkCards() {
+    var bad = [];
+    S1.forEach(function (it) { var k = similarity(it.t1, it.t2), kind = k === null ? 'ni' : Math.abs(k - 1) < 1e-6 ? 'iso' : 'sem'; if (kind !== it.a) bad.push(it.k + ' : ' + kind); });
+    CASES.forEach(function (it) {
+      var I1 = info(it.t1), I2 = info(it.t2), L = function (I, s) { var k = [s[0], s[1]].sort().join(''); return k === '01' ? I.c : k === '12' ? I.a : I.b; }, An = ['A', 'B', 'C'];
+      (it.m.s || []).forEach(function (s) { if (Math.abs(L(I1, s) - L(I2, s)) > 1e-6) bad.push(it.k + ' : côté marqué différent'); });
+      (it.m.a || []).forEach(function (a) { if (Math.abs(I1[An[a[0]]] - I2[An[a[0]]]) > 1e-6) bad.push(it.k + ' : angle marqué différent'); });
+      if (isIso(it.t1, it.t2) !== (it.a !== 'nsp')) bad.push(it.k + ' : isométrie ' + isIso(it.t1, it.t2));
+    });
+    if (AMB.length !== 2) bad.push('c5 : pas deux solutions');
+    SIM.forEach(function (it) {
+      if (!it.t1 || !it.t2) { bad.push(it.k + ' : triangle impossible'); return; }
+      var k = similarity(it.t1, it.t2); if ((k !== null) !== (it.a !== 'non')) bad.push(it.k + ' : semblables ' + k);
+    });
+    return bad;
+  }
+
+  /* ---------- Idées reçues ---------- */
+  var MYTHS = [
+    { k: 'm1', s: '« Un triangle retourné, comme dans un miroir, n’est plus isométrique à l’original. »', a: 'mythe', why: 'On a le droit de retourner le calque : un triangle et son image dans un miroir ont les mêmes côtés et les mêmes angles. Ils sont isométriques.' },
+    { k: 'm2', s: '« Deux triangles qui ont les mêmes trois angles sont isométriques. »', a: 'mythe', why: 'Ils ont la même forme, mais pas forcément la même taille : ils sont semblables. L’un peut être un agrandissement de l’autre.' },
+    { k: 'm3', s: '« Deux triangles isométriques sont aussi semblables. »', a: 'vrai', why: 'Ils ont la même forme : ce sont des triangles semblables avec un rapport de similitude k = 1.' },
+    { k: 'm4', s: '« Si on double les côtés d’un triangle, ses angles doublent aussi. »', a: 'mythe', why: 'Un agrandissement ne change pas les angles. Sinon, un triangle aux angles doublés aurait une somme de 360° : impossible !' },
+    { k: 'm5', s: '« Si on double les côtés d’un triangle, son aire double. »', a: 'mythe', why: 'L’aire est multipliée par 2 × 2 = 4. Quatre copies du petit triangle remplissent le grand.' },
+    { k: 'm6', s: '« Deux côtés et un angle égaux, ça suffit toujours pour être isométriques. »', a: 'mythe', why: 'Seulement si l’angle est compris entre les deux côtés (CAC). Sinon, il peut y avoir deux triangles différents.' },
+    { k: 'm7', s: '« Deux triangles équilatéraux sont toujours semblables. »', a: 'vrai', why: 'Ils ont tous les deux trois angles de 60° : deux angles égaux suffisent.' },
+    { k: 'm8', s: '« Deux triangles rectangles sont toujours semblables. »', a: 'mythe', why: 'L’angle droit ne fait qu’un angle égal. Il en faut un deuxième : un triangle rectangle avec 30° et un autre avec 45° n’ont pas la même forme.' }
+  ];
+  function checkMyth(k, choice) { var m = by(MYTHS, k); if (!m || (choice !== 'vrai' && choice !== 'mythe')) return null; return { ok: m.a === choice, answer: m.a, why: m.why }; }
+  var mythAns = {};
+  $('myths').innerHTML = MYTHS.map(function (m) {
+    return '<div class="box myth" data-k="' + m.k + '"><span class="stmt">' + esc(m.s) + '</span><div class="btns"><button type="button" data-c="vrai">Vrai</button><button type="button" data-c="mythe">Idée reçue</button></div><div class="fbk" aria-live="polite"></div></div>';
+  }).join('');
+  function mythRender() {
+    var correct = 0;
+    each($('myths').querySelectorAll('.myth'), function (box) {
+      var k = box.getAttribute('data-k'), a = mythAns[k], m = by(MYTHS, k), out = box.querySelector('.fbk');
+      each(box.querySelectorAll('button'), function (b) { var c = b.getAttribute('data-c'); b.disabled = !!a; b.className = a ? (c === m.a ? 'right' : (c === a ? 'wrong' : '')) : ''; });
+      if (!a) { out.className = 'fbk'; out.innerHTML = ''; return; }
+      var ok = a === m.a; if (ok) correct++;
+      out.className = 'fbk ' + (ok ? 'ok' : 'no');
+      out.innerHTML = '<strong>' + (m.a === 'vrai' ? 'Vrai.' : 'Idée reçue.') + (ok ? ' Bien joué !' : '') + '</strong><span>' + esc(m.why) + '</span>';
+    });
+    $('mythScore').textContent = correct + ' / ' + MYTHS.length;
+  }
+  $('myths').addEventListener('click', function (ev) {
+    var b = ev.target.closest('button'); if (!b || b.disabled) return;
+    var k = b.closest('.myth').getAttribute('data-k');
+    if (!mythAns[k]) mythAns[k] = b.getAttribute('data-c');
+    mythRender();
+  });
+  $('mythReset').addEventListener('click', function () { mythAns = {}; mythRender(); });
+  mythRender();
+
+  /* ---------- Quiz ---------- */
+  var QZ = [
+    { q: 'Les triangles ABC et DEF sont isométriques, avec ABC ≅ DEF. AB = 7 cm. Combien mesure DE (en cm) ?', a: 7, how: '[AB] et [DE] sont homologues (1ʳᵉ et 2ᵉ lettres) : DE = AB = 7 cm' },
+    { q: 'ABC ≅ DEF et l’angle en B mesure 48°. Combien mesure l’angle en E (en degrés) ?', a: 48, how: 'B et E sont homologues (2ᵉ lettre) : 48°' },
+    { q: 'Un triangle a deux angles de 35° et 85°. Combien mesure son troisième angle, qui est aussi celui de tout triangle semblable (en degrés) ?', a: 60, how: '180 − 35 − 85 = 60°' },
+    { q: 'Un triangle a des côtés de 4, 6 et 7 cm. Un triangle semblable a des côtés de 10, 15 et 17,5 cm. Quel est le rapport de similitude k ?', a: 2.5, how: '10 ÷ 4 = 15 ÷ 6 = 17,5 ÷ 7 = 2,5' },
+    { q: 'ABC et DEF sont semblables, avec k = DE ÷ AB = 3. BC = 5 cm. Combien mesure EF (en cm) ?', a: 15, how: 'EF = BC × k = 5 × 3 = 15 cm' },
+    { q: 'ABC et DEF sont semblables (A ↔ D, B ↔ E, C ↔ F). AB = 6 cm, DE = 9 cm et AC = 8 cm. Combien mesure DF (en cm) ?', a: 12, how: 'DF ÷ AC = DE ÷ AB, donc DF = 8 × 9 ÷ 6 = 12 cm' },
+    { q: 'Un bâton de 1,2 m fait une ombre de 0,8 m. Au même moment, un sapin fait une ombre de 10 m. Quelle est sa hauteur (en m) ?', a: 15, how: 'H = 10 × 1,2 ÷ 0,8 = 12 ÷ 0,8 = 15 m' },
+    { q: 'Un triangle a une aire de 5 cm². On l’agrandit avec k = 3. Quelle est l’aire du grand triangle (en cm²) ?', a: 45, how: 'Aire × k² = 5 × 9 = 45 cm²' }
+  ];
+  function checkQuiz(k, x) { var Q = QZ[k]; if (!Q || isNaN(x)) return false; return Math.abs(x - Q.a) <= (Q.tol || 0.006); }
+  var quiz = $('quiz'), done = [];
+  function buildQuiz() {
+    quiz.innerHTML = ''; done = [];
+    QZ.forEach(function (Q, k) {
+      var li = document.createElement('li');
+      li.innerHTML = '<span>' + esc(Q.q) + '</span><input type="text" id="qa' + k + '" inputmode="decimal" autocomplete="off" aria-label="Ta réponse à la question ' + (k + 1) + '"><button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+      quiz.appendChild(li);
+      function check() {
+        var fb = $('qf' + k), x = num($('qa' + k).value);
+        if (isNaN(x)) { fb.className = 'fb'; fb.textContent = 'Écris un nombre.'; return; }
+        if (checkQuiz(k, x)) { fb.className = 'fb ok'; fb.textContent = 'Bravo, c’est juste !'; done[k] = true; }
+        else { done[k] = false; fb.className = 'fb no'; fb.innerHTML = 'Pas tout à fait : la réponse est ' + fmt(Q.a, 2) + '.<span>' + esc(Q.how) + '</span>'; }
+        $('score').textContent = done.filter(Boolean).length + ' / 8';
+      }
+      $('qb' + k).addEventListener('click', check);
+      $('qa' + k).addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+    });
+    $('score').textContent = '0 / 8';
+  }
+  $('quizReset').addEventListener('click', buildQuiz);
+  buildQuiz();
+
+  window.__sembl = {
+    triSides: triSides, triCAC: triCAC, triACA: triACA, info: info, ambiguous: ambiguous, similarity: similarity, xform: xform, shadowHeight: shadowHeight,
+    pairs: S1, cases: CASES, simCards: SIM, checkCards: checkCards, coData: CO_DATA, coSteps: coSteps, calc: CALC, checkCalc: checkCalc,
+    proofSteps: PR_STEPS, proofFigs: PR_FIGS, myths: MYTHS, checkMyth: checkMyth, quiz: QZ, checkQuiz: checkQuiz,
+    sorterScore: function (items, ans) { return scorer(items)(ans); }
+  };
+})();
+</script>
+</body>
+</html>

@@ -22,6 +22,8 @@ DATES = maj.Dates()
 ROOT = Path(__file__).resolve().parent.parent
 
 TOPICS = [
+    ("les triangles isométriques et semblables", "les-triangles-isometriques-et-semblables.html"),
+    ("les triangles semblables", "les-triangles-isometriques-et-semblables.html"),
     ("les opérations posées", "les-operations-posees.html"),
     ("les constructions à la règle et au compas", "les-constructions-a-la-regle-et-au-compas.html"),
     ("les constructions", "les-constructions-a-la-regle-et-au-compas.html"),
