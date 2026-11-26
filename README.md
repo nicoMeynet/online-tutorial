@@ -171,6 +171,7 @@ Accueil : [geographie.html](geographie.html). La Suisse et son histoire, le mond
 | [La retraite en Suisse : les trois piliers](la-retraite-en-suisse.html) | AVS, caisse de pension et 3e pilier : qui paie quoi, répartition ou capitalisation, un parcours de vie et les débats actuels. |
 | [Les impôts en Suisse](les-impots-en-suisse.html) | Commune, canton et Confédération, impôts directs et TVA, la progressivité, la déclaration d'impôt et où va l'argent. |
 | [L'assurance-maladie en Suisse](l-assurance-maladie-en-suisse.html) | La LAMal obligatoire, la prime, la franchise et la quote-part, les modèles, les subsides, les accidents et pourquoi les primes augmentent. |
+| [Le budget et l'argent de poche](le-budget-et-l-argent-de-poche.html) | Combien d'argent de poche, besoins et envies, faire un budget, épargner pour un projet, les pièges, le premier salaire et les dettes. |
 
 ## Pour réviser
 

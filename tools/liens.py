@@ -22,6 +22,9 @@ DATES = maj.Dates()
 ROOT = Path(__file__).resolve().parent.parent
 
 TOPICS = [
+    ("le budget et l'argent de poche", "le-budget-et-l-argent-de-poche.html"),
+    ("le budget et l’argent de poche", "le-budget-et-l-argent-de-poche.html"),
+    ("le budget", "le-budget-et-l-argent-de-poche.html"),
     ("l'assurance-maladie en Suisse", "l-assurance-maladie-en-suisse.html"),
     ("l’assurance-maladie en Suisse", "l-assurance-maladie-en-suisse.html"),
     ("l'assurance-maladie", "l-assurance-maladie-en-suisse.html"),
