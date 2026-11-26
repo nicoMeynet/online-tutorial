@@ -22,6 +22,13 @@ DATES = maj.Dates()
 ROOT = Path(__file__).resolve().parent.parent
 
 TOPICS = [
+    ("les hypothèques", "les-hypotheques.html"),
+    ("l'hypothèque", "les-hypotheques.html"),
+    ("l’hypothèque", "les-hypotheques.html"),
+    ("le logement et le loyer", "le-logement-et-le-loyer.html"),
+    ("le loyer", "le-logement-et-le-loyer.html"),
+    ("le permis de conduire en Suisse", "le-permis-de-conduire-en-suisse.html"),
+    ("le permis de conduire", "le-permis-de-conduire-en-suisse.html"),
     ("le budget et l'argent de poche", "le-budget-et-l-argent-de-poche.html"),
     ("le budget et l’argent de poche", "le-budget-et-l-argent-de-poche.html"),
     ("le budget", "le-budget-et-l-argent-de-poche.html"),

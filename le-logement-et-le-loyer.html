@@ -1,0 +1,1337 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Le logement et le loyer</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels de citoyenneté (copie de la page sur la LAMal), marge rouge, accent rouge suisse (#c8102e) avec une encre plus foncée (--acc-ink) pour le texte. Page éducative et neutre : aucun conseil juridique ni financier, aucun nom de régie, de banque, d'assureur ou d'association. Règles vérifiées : Code des obligations (art. 253 ss, version du 1.10.2026), OBLF (version du 1.10.2025), OFL (taux de référence, communiqué du 1.9.2026), OFS (logements vacants au 1.6.2026 ; logements en propriété 2024), règles et usages locatifs du canton de Vaud (document publié par l'OFL). Personnes, logements, prix, acomptes et règles de partage sont inventés. Couleurs : loyer net = --pa (bleu), charges = --pb (ambre), garantie / épargne = --pc (sarcelle), reste du budget = --pd (violet). */
+:root {
+  --paper: #faf7f7;
+  --grid: #efe3e4;
+  --card: #ffffff;
+  --ink: #221417;
+  --ink-soft: #5d4b4f;
+  --acc: #c8102e;
+  --acc-ink: #9b0c23;
+  --acc-soft: #fbe3e7;
+  --two: #1d4ed8;
+  --two-soft: #e0e8fb;
+  --warn: #b45309;
+  --warn-soft: #fbecd6;
+  --warn-ink: #92400e;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #ffe9a8;
+  --line: #e6d5d8;
+  --pa: #2563eb;
+  --pb: #d97706;
+  --pc: #0f766e;
+  --pd: #7c3aed;
+  --pa-soft: #dbe6fd;
+  --pb-soft: #fdebd3;
+  --pc-soft: #d5f0ec;
+  --pd-soft: #ece4fd;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #150d0f; --grid: #24171a; --card: #1d1316; --ink: #f6ecee; --ink-soft: #c4b0b4;
+    --acc: #f0475f; --acc-ink: #ff8fa0; --acc-soft: #3d1219; --two: #7aa2ff; --two-soft: #172446;
+    --warn: #f5a524; --warn-soft: #3d2a0c; --warn-ink: #fbbf5a;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b3a18; --line: #3a2a2e;
+    --pa: #7aa2ff; --pb: #f5a524; --pc: #5fd0c2; --pd: #b79bff;
+    --pa-soft: #172446; --pb-soft: #3d2a0c; --pc-soft: #12332f; --pd-soft: #261a44;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #150d0f; --grid: #24171a; --card: #1d1316; --ink: #f6ecee; --ink-soft: #c4b0b4;
+  --acc: #f0475f; --acc-ink: #ff8fa0; --acc-soft: #3d1219; --two: #7aa2ff; --two-soft: #172446;
+  --warn: #f5a524; --warn-soft: #3d2a0c; --warn-ink: #fbbf5a;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b3a18; --line: #3a2a2e;
+  --pa: #7aa2ff; --pb: #f5a524; --pc: #5fd0c2; --pd: #b79bff;
+  --pa-soft: #172446; --pb-soft: #3d2a0c; --pc-soft: #12332f; --pd-soft: #261a44;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--acc-ink); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+@media (max-width: 420px) { .box { padding: 14px; } }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note.warn { border-left-color: var(--warn); background: var(--warn-soft); }
+.note.ok { border-left-color: var(--ok); background: var(--ok-soft); }
+.note.two { border-left-color: var(--two); background: var(--two-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+.fig svg { width: 100%; height: auto; display: block; }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 8px 12px; min-height: 44px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button[aria-pressed="true"] { background: var(--acc-ink); color: var(--paper); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+button:disabled { cursor: default; }
+:focus-visible { outline: 3px solid var(--two); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+select { font: inherit; font-size: 1rem; padding: 8px 8px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; min-height: 44px; }
+input[type="range"] { width: 100%; accent-color: var(--acc); min-height: 40px; min-width: 0; }
+.param { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.param label, .param .lb { font-weight: 700; }
+.slider-row { display: grid; grid-template-columns: 46px minmax(0, 1fr) 46px; gap: 8px; align-items: center; }
+.slider-row button { padding: 0; min-width: 46px; font-size: 1.3rem; box-shadow: none; border-width: 1.5px; }
+.slider-row button:hover { box-shadow: none; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
+.tag.ok { color: var(--ok); }
+.tag.no { color: var(--red); }
+.tag.acc { color: var(--acc-ink); }
+.tag.two { color: var(--two); }
+.tag.warn { color: var(--warn-ink); }
+.tag.p1 { color: var(--pa); } .tag.p2 { color: var(--pb); } .tag.p3 { color: var(--pc); } .tag.p4 { color: var(--pd); }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc-ink); }
+.fbk { border-radius: 8px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; min-width: 0; overflow-wrap: anywhere; }
+.fbk:empty { display: none; }
+.fbk.ok { background: var(--ok-soft); }
+.fbk.no { background: var(--red-soft); }
+.fbk.info { background: var(--two-soft); }
+.fbk.warn { background: var(--warn-soft); }
+.fbk strong { font-family: var(--f-display); }
+.fbk.ok strong { color: var(--ok); }
+.fbk.no strong { color: var(--red); }
+.fbk.info strong { color: var(--two); }
+.fbk.warn strong { color: var(--warn-ink); }
+.step-n { font-family: var(--f-mono); font-size: .85rem; color: var(--ink-soft); }
+button.right, button.right:disabled { background: var(--ok-soft); border-color: var(--ok); color: var(--ok); }
+button.wrong, button.wrong:disabled { background: var(--red-soft); border-color: var(--red); color: var(--red); }
+.choice button { flex: 1 1 130px; }
+.choice button:disabled:not(.right):not(.wrong) { opacity: .55; }
+.card-big { background: var(--paper); border: 1.5px dashed var(--line); border-radius: 10px; padding: 14px; font-family: var(--f-display); font-weight: 700; font-size: 1.1rem; overflow-wrap: anywhere; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.card-big .ask { font-family: var(--f-body); font-weight: 400; font-size: 1rem; color: var(--ink-soft); }
+.part-btns button { flex: 1 1 120px; font-size: .95rem; box-shadow: none; border-width: 1.5px; }
+.part-btns button:hover { box-shadow: none; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+.stat { background: var(--paper); border: 1.5px solid var(--line); border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; min-width: 0; }
+.stat b { font-family: var(--f-display); font-size: 1.5rem; color: var(--acc-ink); line-height: 1.15; overflow-wrap: anywhere; }
+.stat span { font-size: .9rem; color: var(--ink-soft); }
+
+/* Héros : l'immeuble */
+.fig.house svg { max-width: 520px; margin: 0 auto; }
+.house .wall { fill: var(--pa-soft); stroke: var(--ink); stroke-width: 2; }
+.house .roof { fill: var(--acc-soft); stroke: var(--ink); stroke-width: 2; stroke-linejoin: round; }
+.house .win { fill: var(--card); stroke: var(--ink); stroke-width: 1.5; }
+.house .win.lit { fill: var(--hl); }
+.house .door { fill: var(--pc-soft); stroke: var(--ink); stroke-width: 1.5; }
+.house .sign { fill: var(--card); stroke: var(--acc); stroke-width: 2; }
+.house .key { fill: none; stroke: var(--pb); stroke-width: 4; stroke-linecap: round; }
+
+/* Cent logements */
+.grid100 { display: grid; grid-template-columns: repeat(20, minmax(0, 1fr)); gap: 3px; }
+.grid100 i { display: block; aspect-ratio: 1; border-radius: 3px; background: var(--line); border: 1px solid var(--ink-soft); }
+.grid100 i.loc { background: var(--pa); border-color: var(--pa); }
+.grid100 i.own { background: var(--pb); border-color: var(--pb); }
+.grid100 i.vac { background: var(--acc); border-color: var(--acc-ink); }
+@media (max-width: 420px) { .grid100 { grid-template-columns: repeat(10, minmax(0, 1fr)); } }
+
+/* Barres */
+.hbar { height: 26px; border-radius: 6px; background: var(--line); border: 1.5px solid var(--ink); overflow: hidden; position: relative; display: flex; }
+.hbar i { display: block; height: 100%; transition: width .3s; width: 0; }
+.hbar .b1 { background: var(--pa); } .hbar .b2 { background: var(--pb); } .hbar .b3 { background: var(--pc); } .hbar .b4 { background: var(--pd); } .hbar .bacc { background: var(--acc); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: .92rem; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.sw { width: 14px; height: 14px; border-radius: 50%; display: inline-block; flex: none; }
+
+/* Tableaux */
+.scroll { overflow-x: auto; padding-bottom: 4px; }
+.ptable { border-collapse: collapse; width: 100%; min-width: 520px; }
+.ptable th, .ptable td { border: 1.5px solid var(--line); padding: 8px 10px; text-align: left; vertical-align: top; }
+.ptable th { font-family: var(--f-display); background: var(--paper); }
+.ptable td:first-child { font-family: var(--f-display); font-weight: 700; color: var(--acc-ink); }
+@media (max-width: 520px) { .ptable { min-width: 440px; } .ptable th, .ptable td { padding: 5px 6px; font-size: .88rem; } }
+
+/* Ticket / décompte */
+.slip { font-family: var(--f-mono); font-size: .95rem; background: var(--paper); border: 1.5px dashed var(--ink-soft); border-radius: 8px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.slip .row { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.slip .row span:last-child { white-space: nowrap; }
+.slip .tot { border-top: 2px solid var(--ink); padding-top: 6px; margin-top: 4px; font-weight: 600; }
+.slip .hd { font-family: var(--f-display); font-weight: 700; font-size: 1.05rem; }
+.slip .sm { font-size: .85rem; color: var(--ink-soft); }
+@media (max-width: 420px) { .slip { font-size: .86rem; padding: 10px; } }
+.items { display: flex; flex-direction: column; gap: 8px; }
+.item { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 10px; align-items: center; border-bottom: 1px dashed var(--line); padding-bottom: 8px; }
+.item .nm { font-family: var(--f-display); font-weight: 700; overflow-wrap: anywhere; }
+.item .pr { font-family: var(--f-mono); font-size: .88rem; color: var(--ink-soft); }
+.qty { display: flex; align-items: center; gap: 6px; }
+.qty button { min-width: 44px; padding: 0; font-size: 1.25rem; box-shadow: none; border-width: 1.5px; }
+.qty button:hover { box-shadow: none; }
+.qty b { font-family: var(--f-mono); min-width: 2.6em; text-align: center; }
+
+/* Parcours pas à pas */
+.era { border-left: 5px solid var(--acc); background: var(--paper); border-radius: 0 10px 10px 0; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; min-width: 0; overflow-wrap: anywhere; }
+.era .when { font-family: var(--f-mono); font-weight: 600; color: var(--acc-ink); font-size: .95rem; }
+.era-bar { height: 8px; border-radius: 4px; background: var(--line); overflow: hidden; }
+.era-bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--acc), var(--warn)); width: 0; transition: width .3s; }
+
+/* Listes à barres */
+.bud { display: flex; flex-direction: column; gap: 6px; }
+.bud button, .bud .rowx { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; text-align: left; box-shadow: none; border-width: 1.5px; padding: 8px 10px; font-size: .95rem; }
+.bud .rowx { border: 1.5px solid var(--line); border-radius: 8px; background: var(--card); }
+.bud .rowx.best { border-color: var(--ok); background: var(--ok-soft); }
+.bud .rowx.over { border-color: var(--red); border-style: dashed; }
+.bud button:hover { box-shadow: none; }
+.bud .bn { overflow-wrap: anywhere; font-family: var(--f-display); font-weight: 700; }
+.bud .bd { grid-column: 1 / -1; font-size: .85rem; color: var(--ink-soft); font-family: var(--f-mono); overflow-wrap: anywhere; }
+.bud .bv { font-family: var(--f-mono); font-weight: 600; white-space: nowrap; }
+.bud .bt { grid-column: 1 / -1; height: 12px; border-radius: 4px; background: var(--line); overflow: hidden; display: flex; }
+.bud .bt i { display: block; height: 100%; background: var(--acc); }
+.bud .bt i.pa { background: var(--pa); } .bud .bt i.pb { background: var(--pb); } .bud .bt i.acc { background: var(--acc); } .bud .bt i.pc { background: var(--pc); } .bud .bt i.pd { background: var(--pd); }
+.bud button[aria-pressed="true"] .bt { background: rgba(255,255,255,.25); }
+.bud button[aria-pressed="true"] .bd { color: var(--paper); }
+
+/* Plan de l'appartement (état des lieux) */
+.fig.plan svg { max-width: 560px; margin: 0 auto; }
+.plan .room { fill: var(--paper); stroke: var(--ink); stroke-width: 2.5; }
+.plan .wet { fill: var(--pc-soft); }
+.plan .cook { fill: var(--pb-soft); }
+.plan .rl { font-size: 14px; font-weight: 600; fill: var(--ink-soft); }
+.plan .spot { cursor: pointer; }
+.plan .spot circle { fill: var(--card); stroke: var(--acc); stroke-width: 2.5; }
+.plan .spot text { font-size: 15px; font-weight: 600; fill: var(--acc-ink); pointer-events: none; }
+.plan .spot.on circle { fill: var(--acc); }
+.plan .spot.on text { fill: var(--paper); }
+.plan .spot.sel circle { stroke: var(--two); stroke-width: 4; }
+.plan .spot:focus-visible { outline: none; }
+.plan .spot:focus-visible circle { stroke: var(--two); stroke-width: 4; }
+.spots button { flex: 1 1 150px; font-size: .92rem; box-shadow: none; border-width: 1.5px; text-align: left; }
+.spots button:hover { box-shadow: none; }
+.spots button.on:not([aria-pressed="true"]) { border-style: dashed; background: var(--acc-soft); }
+
+/* Avis */
+.views { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.views .box { box-shadow: none; border-width: 1.5px; gap: 6px; }
+
+/* Idées reçues */
+.myth .btns button { flex: 1 1 100px; }
+.myth .stmt { font-family: var(--f-display); font-weight: 700; }
+
+/* Glossaire */
+.gloss { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px 18px; margin: 0; }
+.gloss div { border-bottom: 1px dashed var(--line); padding-bottom: 6px; }
+.gloss dt { font-family: var(--f-display); font-weight: 700; color: var(--acc-ink); }
+.gloss dd { margin: 0; font-size: .95rem; }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 220px auto; gap: 10px; align-items: center; }
+.quiz li > span:first-child { min-width: 0; overflow-wrap: anywhere; }
+.quiz select { font-size: .95rem; padding: 6px 6px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb:empty { display: none; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--acc-ink); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); overflow-wrap: anywhere; }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+/*sorter-end*/
+.sorter-end { margin-top: .6rem; }
+.sorter-end strong { font-size: 1.05rem; }
+</style>
+
+<!--ticons--><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Tutoriels"><script src="progress.js" defer></script><script src="share.js" defer></script><!--/ticons-->
+<style id="tnav-css">
+.tnav-top { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin: 0 0 4px; }
+.tnav-home { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font-weight: 700; font-size: .95rem; text-decoration: none; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tnav-home:hover, .tnav-home:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.tnav-bottom { margin-top: 8px; display: flex; flex-direction: column; gap: 12px; }
+.tnav-bottom h2 { margin: 0; }
+.tnav-pn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tnav-pn a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--ink, #222); border-radius: 10px;
+  background: var(--card, #fff); color: var(--ink, #222); text-decoration: none; box-shadow: 3px 3px 0 var(--ink, #222); min-width: 0; }
+.tnav-pn a span { font-size: .85rem; color: var(--ink-soft, #666); }
+.tnav-pn a strong { overflow-wrap: anywhere; }
+.tnav-pn a.next { text-align: right; grid-column: 2; }
+.tnav-bottom .tnav-home { align-self: center; }
+.tnav-top [data-share] { margin-left: auto; }
+.tnav-short { display: none; }
+.tprint-h { display: none; }
+@media (max-width: 600px) { header.hero { gap: 8px !important; } header.hero > .fig, header.hero > .box.fig, header.hero .hero-top .fig { display: none !important; }
+  header.hero p.lead { font-size: 1rem !important; line-height: 1.5 !important; } header.hero > p.soft { font-size: .88rem !important; line-height: 1.45 !important; }
+  header.hero h1 { font-size: clamp(1.7rem, 8vw, 2.2rem) !important; } }
+.tprint-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 14px 0 0; }
+.tprint-row span { font-size: .9rem; opacity: .8; }
+.tprint { display: inline-flex; align-items: center; gap: 8px; min-height: 42px; padding: 8px 16px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font: inherit; font-weight: 700; cursor: pointer; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tprint:hover, .tprint:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+@media print { [data-tp-hide] { display: none !important; } html.tp-on, html.tp-on body { background: #fff !important; color: #111 !important; padding: 0 !important; margin: 0 !important; }
+  html.tp-on [data-fiche] { color: #111; } html.tp-on [data-fiche] * { color: #111 !important; background: transparent !important; box-shadow: none !important; }
+  html.tp-on .tprint-h { display: block; font-size: 1.4rem; font-weight: 800; margin: 0 0 10px; } .tprint-row { display: none !important; } }
+@media (max-width: 520px) { .tnav-top .tnav-long { display: none; } .tnav-top .tnav-short { display: inline; } .tnav-top { flex-wrap: nowrap; } .tnav-top > * { flex: none; } }
+.tnav-end { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+@media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
+.diff { font: 700 .72rem/1.2 var(--f-mono, monospace); padding: 2px 8px; border-radius: 99px; border: 1.5px solid; white-space: nowrap; }
+.diff.d1 { color: #15803d; border-color: #15803d; background: #dcf3e3; }
+.diff.d2 { color: #a15c07; border-color: #b45309; background: #fbe7cf; }
+.diff.d3 { color: #b91c1c; border-color: #b91c1c; background: #fde2e2; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root:not([data-theme="light"]) .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root:not([data-theme="light"]) .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; } }
+:root[data-theme="dark"] .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root[data-theme="dark"] .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root[data-theme="dark"] .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; }
+</style>
+</head>
+<body>
+<main class="page">
+<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="geographie.html">← <span class="tnav-long">Tous les tutoriels d'histoire-géo</span><span class="tnav-short">Histoire-géo</span></a><span class="diff d2" title="Difficulté : moyen">Moyen</span><button type="button" data-share hidden>Partager</button></nav><!--/tnav-->
+
+
+  <header class="hero">
+    <span class="eyebrow">Tutoriel de citoyenneté · niveau 9H–11H</span>
+    <h1>Trouver, louer et payer son logement</h1>
+    <p class="lead">Un jour, tu chercheras peut-être ton premier appartement, une chambre en colocation ou un studio pour tes études. Que veut dire « 3,5 pièces » ? Qu'est-ce qu'une <strong>garantie de loyer</strong>, un <strong>état des lieux</strong>, un <strong>décompte de charges</strong> ? Le loyer peut-il augmenter ? Comment partir ? Découvre les règles du bail à loyer en Suisse avec des jeux et des simulateurs.</p>
+    <div class="box fig house">
+      <svg viewBox="0 0 360 160" role="img" aria-label="Un immeuble locatif avec des fenêtres allumées, un panneau « à louer » et une clé">
+        <polygon class="roof" points="40,48 140,12 240,48"/>
+        <rect class="wall" x="52" y="48" width="176" height="106"/>
+        <rect class="win lit" x="66" y="60" width="30" height="22"/><rect class="win" x="125" y="60" width="30" height="22"/><rect class="win lit" x="184" y="60" width="30" height="22"/>
+        <rect class="win" x="66" y="94" width="30" height="22"/><rect class="win lit" x="125" y="94" width="30" height="22"/><rect class="win" x="184" y="94" width="30" height="22"/>
+        <rect class="door" x="128" y="122" width="24" height="32"/>
+        <rect class="sign" x="252" y="58" width="96" height="40" rx="6"/>
+        <text x="300" y="83" text-anchor="middle" font-size="14" font-weight="600">À LOUER</text>
+        <line x1="300" y1="98" x2="300" y2="154" stroke="var(--ink)" stroke-width="2"/>
+        <circle class="key" cx="268" cy="128" r="9"/>
+        <path class="key" d="M277 128 H330 M318 128 V138 M328 128 V136"/>
+      </svg>
+    </div>
+    <div class="note warn">
+      <span class="note-title">À lire avant de commencer</span>
+      <span>Ce tutoriel <strong>explique</strong> les règles générales ; ce n'est <strong>pas un conseil juridique ni financier</strong>. Chaque situation dépend du <strong>contrat de bail</strong> et du <strong>canton</strong> (formulaires, usages locaux, aides). Les personnes, les appartements et les prix des jeux sont <strong>inventés</strong>. Les règles viennent du Code des obligations (art. 253 et suivants), de l'ordonnance sur le bail (OBLF), de l'Office fédéral du logement (OFL) et de l'Office fédéral de la statistique (OFS) ; l'année est indiquée à côté de chaque chiffre. Pour une vraie question, on peut s'adresser à l'autorité de conciliation en matière de bail de son canton, qui renseigne locataires et bailleurs.</span>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · Louer ou acheter ?</span>
+    <h2>La Suisse, un pays de locataires</h2>
+    <p>Quand on habite un logement, soit on en est <strong>propriétaire</strong> (on l'a acheté), soit on est <strong>locataire</strong> : on paie chaque mois un <strong>loyer</strong> au <strong>bailleur</strong> (le propriétaire, souvent représenté par une gérance). En Suisse, la plupart des gens louent : c'est plus rare dans les pays voisins. Acheter demande beaucoup d'argent de côté ; c'est expliqué dans le tutoriel sur <a class="tlink" href="les-hypotheques.html">les hypothèques</a>.</p>
+    <div class="box">
+      <h3>Cent logements suisses</h3>
+      <p class="soft">Chaque carré représente 1 logement sur 100. Touche une ligne pour colorer les carrés. Chiffres de l'OFS : logements occupés en 2024, logements vides au 1er juin 2026 (arrondis).</p>
+      <div class="bud" id="hoList" role="group" aria-label="Choisir une statistique"></div>
+      <div class="grid100" id="hoGrid" aria-hidden="true"></div>
+      <div class="fbk info" id="hoOut" aria-live="polite"></div>
+    </div>
+    <div class="note two">
+      <span class="note-title">Qui sont les bailleurs ?</span>
+      <span>Un logement peut appartenir à une personne privée, à une caisse de pension, à une assurance, à une commune ou à une <strong>coopérative d'habitation</strong> (les habitants en sont membres). Les règles du bail du Code des obligations s'appliquent dans tous les cas, avec parfois des règles en plus pour les logements subventionnés.</span>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · Lire une annonce</span>
+    <h2>Pièces, m², loyer net et charges</h2>
+    <div class="cards">
+      <div class="box"><span class="tag acc">Pièces</span><strong>« 3,5 pièces »</strong><span class="soft">En Suisse romande, on compte en général le séjour et les chambres. La <strong>demi-pièce</strong> désigne souvent un hall assez grand, un coin repas ou une petite pièce. La cuisine et la salle de bain ne comptent en général pas, sauf à <strong>Genève</strong>, où l'usage est de compter la cuisine comme une pièce : un « 4 pièces » genevois a donc souvent 3 pièces sans la cuisine.</span></div>
+      <div class="box"><span class="tag p3">Surface</span><strong>En mètres carrés (m²)</strong><span class="soft">La surface aide à comparer : deux « 3,5 pièces » peuvent mesurer 65 ou 95&nbsp;m². On peut calculer le loyer par m² : loyer ÷ surface.</span></div>
+      <div class="box"><span class="tag p1">Loyer net</span><strong>Le prix du logement</strong><span class="soft">C'est ce que l'on paie pour l'usage de l'appartement lui-même.</span></div>
+      <div class="box"><span class="tag p2">Charges</span><strong>Les frais accessoires</strong><span class="soft">Chauffage, eau chaude, conciergerie… Elles ne sont dues que si le bail le prévoit (CO 257a). <strong>Loyer net + charges = loyer brut</strong>, c'est-à-dire ce que l'on verse chaque mois.</span></div>
+    </div>
+    <div class="box">
+      <h3>Jeu : décoder les annonces</h3>
+      <p class="soft">Annonces et prix <strong>inventés</strong>.</p>
+      <div class="btns"><span class="score" id="s0Score">Question 1 / 8</span><span class="step-n" id="s0Pos"></span></div>
+      <div class="card-big" id="s0Card" aria-live="polite"></div>
+      <div class="btns choice" id="s0Btns" role="group" aria-label="Choisir une réponse"></div>
+      <div class="fbk" id="s0Out" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="s0Prev">← Précédent</button><button type="button" id="s0Next">Suivant →</button><button type="button" id="s0Reset">Recommencer</button></div>
+    </div>
+    <div class="note red">
+      <span class="note-title">Attention aux fausses annonces</span>
+      <span>Un appartement très beau et très bon marché, un « propriétaire à l'étranger » qui veut de l'argent avant toute visite : c'est souvent une arnaque. On ne verse jamais d'argent avant d'avoir visité le logement et signé un bail.</span>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · Combien je peux payer ?</span>
+    <h2>L'habitude du « tiers du revenu »</h2>
+    <p>Beaucoup de gérances et de conseillers en budget utilisent une <strong>habitude</strong> : le loyer (charges comprises) ne devrait pas dépasser <strong>environ un tiers du revenu</strong>. Ce n'est <strong>pas une loi</strong>, mais une façon de garder assez d'argent pour le reste : assurance-maladie, nourriture, transports, impôts, épargne… Le tutoriel sur <a class="tlink" href="le-budget-et-l-argent-de-poche.html">le budget et l'argent de poche</a> montre comment faire un budget complet.</p>
+    <div class="box">
+      <h3>Simulateur : quel loyer pour quel revenu ?</h3>
+      <p class="soft">Revenu <strong>net</strong> par mois (ce qui arrive sur le compte). Logements et prix <strong>inventés</strong>. Le résultat est une habitude, pas une règle : certaines gérances demandent plus de marge, d'autres moins.</p>
+      <div class="btns part-btns" id="buPre" role="group" aria-label="Revenus d'exemple"></div>
+      <div class="param">
+        <span class="lb" id="buLbl">Revenu net par mois : <span id="buVal" class="mono">4 500 fr.</span></span>
+        <div class="slider-row"><button type="button" id="buMinus" aria-label="Diminuer le revenu de 100 francs">−</button><input type="range" id="buRange" min="1000" max="12000" step="100" value="4500" aria-labelledby="buLbl"><button type="button" id="buPlus" aria-label="Augmenter le revenu de 100 francs">+</button></div>
+      </div>
+      <div class="hbar" aria-hidden="true"><i class="b1" id="buB1"></i><i class="b4" id="buB2"></i></div>
+      <div class="legend"><span><i class="sw" style="background:var(--pa)"></i>loyer maximal (un tiers)</span><span><i class="sw" style="background:var(--pd)"></i>le reste du budget (deux tiers)</span></div>
+      <div class="bud" id="buList" aria-live="polite"></div>
+      <div class="fbk info" id="buOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · Le dossier de candidature</span>
+    <h2>Visiter, postuler, convaincre</h2>
+    <p>Quand il y a peu de logements libres, il y a souvent beaucoup de candidats pour un même appartement. Le bailleur choisit en général sur la base d'un <strong>dossier</strong>. Suis Lina (inventée), 20 ans, qui vient de finir son apprentissage et cherche son premier studio.</p>
+    <div class="box">
+      <h3>Lina cherche un logement</h3>
+      <div class="era-bar" aria-hidden="true"><i id="liBar"></i></div>
+      <div class="era" id="liOut" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="liPrev">← Précédent</button><button type="button" id="liNext">Suivant →</button><button type="button" id="liReset">Recommencer</button></div>
+      <div class="fbk" id="liEnd" aria-live="polite"></div>
+    </div>
+    <div class="cards">
+      <div class="box"><span class="tag acc">Poursuites</span><strong>L'extrait du registre des poursuites</strong><span class="soft">Un document de l'office des poursuites qui montre si une personne a des dettes impayées réclamées officiellement. Les bailleurs le demandent très souvent, récent (de quelques mois au plus).</span></div>
+      <div class="box"><span class="tag p1">Revenus</span><strong>Fiches de salaire ou contrat</strong><span class="soft">Pour montrer qu'on peut payer le loyer. Une personne en formation peut présenter une bourse, le soutien des parents, ou un garant.</span></div>
+      <div class="box"><span class="tag p3">Identité</span><strong>Pièce d'identité ou permis</strong><span class="soft">Carte d'identité, passeport ou permis de séjour, avec un formulaire de candidature rempli.</span></div>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Le bail</span>
+    <h2>Le contrat qui lie locataire et bailleur</h2>
+    <p>Le <strong>bail à loyer</strong> est un contrat : le bailleur cède l'usage d'un logement au locataire, qui paie un loyer (CO 253). On le signe en général par écrit. On y trouve : les noms des parties, l'adresse et la description du logement, la date d'entrée, la <strong>durée</strong> (le plus souvent indéterminée, avec des délais pour résilier), le <strong>loyer net</strong>, les <strong>charges</strong>, les <strong>termes</strong> de résiliation, la <strong>garantie</strong>, et souvent un <strong>règlement de maison</strong>. Le loyer se paie chaque mois, à l'avance ou à la fin du mois selon le contrat ou l'usage du lieu (CO 257c).</p>
+    <div class="box">
+      <h3>Simulateur : la garantie de loyer</h3>
+      <p class="soft">Le bailleur peut demander une <strong>garantie</strong> (une caution) pour se protéger si le locataire ne paie pas ou laisse des dégâts. Pour un logement, elle ne peut pas dépasser <strong>3 mois de loyer</strong> (CO 257e) ; en Suisse romande, les règles et usages locatifs parlent de <strong>loyer net</strong> (sans les charges). Choisis un loyer net <strong>inventé</strong> et un nombre de mois.</p>
+      <div class="param">
+        <span class="lb" id="gaLbl">Loyer net par mois : <span id="gaVal" class="mono">1 400 fr.</span></span>
+        <div class="slider-row"><button type="button" id="gaMinus" aria-label="Diminuer le loyer de 50 francs">−</button><input type="range" id="gaRange" min="500" max="4000" step="50" value="1400" aria-labelledby="gaLbl"><button type="button" id="gaPlus" aria-label="Augmenter le loyer de 50 francs">+</button></div>
+      </div>
+      <div class="btns part-btns" id="gaMonths" role="group" aria-label="Nombre de mois de garantie demandés"></div>
+      <div class="stats">
+        <div class="stat"><b id="gaAmt">—</b><span>garantie demandée</span></div>
+        <div class="stat"><b id="gaMax">—</b><span>maximum légal (3 mois)</span></div>
+      </div>
+      <div class="fbk" id="gaOut" aria-live="polite"></div>
+    </div>
+    <div class="cards">
+      <div class="box"><span class="tag p3">Où va l'argent ?</span><strong>Sur un compte au nom du locataire</strong><span class="soft">Le bailleur doit déposer la garantie dans une banque, sur un compte d'épargne ou de dépôt <strong>au nom du locataire</strong> (CO 257e). Il ne peut pas la garder dans sa poche.</span></div>
+      <div class="box"><span class="tag ok">À la fin du bail</span><strong>La garantie est rendue</strong><span class="soft">La banque la rend avec l'accord des deux parties, ou sur décision officielle. Si, dans l'<strong>année</strong> qui suit la fin du bail, le bailleur n'a lancé aucune procédure (justice, poursuite), le locataire peut la récupérer seul (CO 257e).</span></div>
+      <div class="box"><span class="tag warn">Autre solution</span><strong>Une assurance de garantie</strong><span class="soft">Certaines sociétés proposent de remplacer le dépôt par un contrat : on paie une <strong>prime chaque année</strong>, qui n'est pas rendue, et la société paie le bailleur en cas de problème, puis se retourne en général contre le locataire. On compare avant de choisir.</span></div>
+    </div>
+    <div class="note two">
+      <span class="note-title">L'assurance RC ménage</span>
+      <span>Le bailleur demande <strong>souvent</strong> une assurance <strong>responsabilité civile (RC) privée</strong> : elle paie les dommages qu'on cause par accident à d'autres, par exemple une inondation chez le voisin du dessous. Dans le canton de Vaud, les règles et usages locatifs demandent au locataire et au bailleur d'avoir une telle assurance. On la combine souvent avec une assurance <strong>ménage</strong>, qui couvre ses propres affaires (vol, incendie, dégât d'eau).</span>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · L'état des lieux</span>
+    <h2>Tout noter à l'entrée, pour ne pas payer à la sortie</h2>
+    <p>À l'entrée, le locataire et le bailleur (ou la gérance) font le tour du logement et écrivent tous les défauts dans un <strong>état des lieux</strong> (procès-verbal), signé par les deux. À la sortie, on refait la même visite et on compare. Le nouveau locataire peut demander à voir le procès-verbal de sortie du locataire précédent, et connaître le loyer qu'il payait (CO 256a).</p>
+    <div class="box fig plan">
+      <h3>Visite d'entrée : trouve les 8 défauts</h3>
+      <p class="soft">Appartement <strong>inventé</strong>. Touche les cercles numérotés sur le plan (ou les boutons dessous) pour noter chaque défaut.</p>
+      <svg viewBox="0 0 360 250" id="plSvg" role="group" aria-label="Plan simplifié d'un appartement de 2,5 pièces avec 8 défauts numérotés">
+        <rect class="room" x="6" y="6" width="200" height="138"/>
+        <rect class="room" x="206" y="6" width="148" height="138"/>
+        <rect class="room cook" x="6" y="144" width="116" height="100"/>
+        <rect class="room" x="122" y="144" width="110" height="100"/>
+        <rect class="room wet" x="232" y="144" width="122" height="100"/>
+        <text class="rl" x="106" y="30" text-anchor="middle">séjour</text>
+        <text class="rl" x="280" y="30" text-anchor="middle">chambre</text>
+        <text class="rl" x="64" y="236" text-anchor="middle">cuisine</text>
+        <text class="rl" x="177" y="236" text-anchor="middle">hall</text>
+        <text class="rl" x="293" y="236" text-anchor="middle">bains</text>
+        <g id="plSpots"></g>
+      </svg>
+      <div class="btns spots" id="plBtns" role="group" aria-label="Les défauts à noter"></div>
+      <div class="fbk info" id="plOut" aria-live="polite"></div>
+      <div class="btns"><span class="step-n" id="plCount"></span><button type="button" id="plReset">Recommencer</button></div>
+    </div>
+    <p>À la sortie, le locataire paie les <strong>dégâts</strong> qu'il a causés, mais pas l'<strong>usure normale</strong> : un logement vieillit même si on en prend soin (CO 267). Souvent, on tient aussi compte de l'âge des objets : on ne paie pas une peinture neuve pour un mur déjà vieux de plusieurs années. Le bailleur doit vérifier l'état du logement à la restitution et signaler <strong>tout de suite</strong> les défauts dont il tient le locataire responsable (CO 267a).</p>
+    <div class="box">
+      <h3>Jeu : usure normale ou dégât ?</h3>
+      <p class="soft">Situations <strong>inventées</strong>, constatées à la sortie. Qui paie la remise en état ?</p>
+      <div class="btns"><span class="score" id="s1Score">Question 1 / 12</span><span class="step-n" id="s1Pos"></span></div>
+      <div class="card-big" id="s1Card" aria-live="polite"></div>
+      <div class="btns choice" id="s1Btns" role="group" aria-label="Usure normale ou dégât"></div>
+      <div class="fbk" id="s1Out" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="s1Prev">← Précédent</button><button type="button" id="s1Next">Suivant →</button><button type="button" id="s1Reset">Recommencer</button></div>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Les charges et le décompte</span>
+    <h2>Acompte ou forfait ?</h2>
+    <p>Les <strong>charges</strong> (frais accessoires) sont les dépenses réelles du bailleur liées à l'usage du logement : chauffage, eau chaude, conciergerie, électricité des parties communes… (CO 257b). Elles peuvent être payées de deux façons (OBLF, art. 4) :</p>
+    <div class="cards">
+      <div class="box"><span class="tag p2">Acompte</span><strong>Une avance, puis un décompte</strong><span class="soft">On verse chaque mois une avance. Au moins <strong>une fois par an</strong>, le bailleur fait un <strong>décompte</strong> des coûts réels : s'il a reçu trop, il rembourse ; s'il manque de l'argent, le locataire paie le solde. Le locataire peut demander à voir les justificatifs.</span></div>
+      <div class="box"><span class="tag p1">Forfait</span><strong>Un montant fixe</strong><span class="soft">On paie un montant fixe, sans décompte : pas de remboursement, pas de supplément. Le bailleur doit le calculer sur la <strong>moyenne de trois ans</strong> de coûts.</span></div>
+    </div>
+    <div class="box">
+      <h3>Simulateur : le décompte annuel</h3>
+      <p class="soft">Immeuble et montants <strong>inventés</strong> pour un 2,5 pièces. Acompte : 200&nbsp;fr. par mois. Choisis le mode, puis l'hiver.</p>
+      <div class="btns" id="chMode" role="group" aria-label="Acompte ou forfait">
+        <button type="button" data-m="acompte" aria-pressed="true">Acompte</button>
+        <button type="button" data-m="forfait" aria-pressed="false">Forfait</button>
+      </div>
+      <div class="btns part-btns" id="chPre" role="group" aria-label="Type d'hiver"></div>
+      <div class="param">
+        <span class="lb" id="chLbl">Frais de chauffage de l'année : <span id="chVal" class="mono">1 400 fr.</span></span>
+        <div class="slider-row"><button type="button" id="chMinus" aria-label="Diminuer le chauffage de 50 francs">−</button><input type="range" id="chRange" min="800" max="2200" step="50" value="1400" aria-labelledby="chLbl"><button type="button" id="chPlus" aria-label="Augmenter le chauffage de 50 francs">+</button></div>
+      </div>
+      <div class="slip" id="chSlip" aria-live="polite"></div>
+      <div class="fbk info" id="chOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Le loyer peut-il changer ?</span>
+    <h2>Le taux de référence et les autres raisons</h2>
+    <p>Pendant le bail, le loyer peut monter ou baisser, mais pas n'importe comment. Une hausse doit être annoncée sur une <strong>formule officielle</strong> agréée par le canton, avec les <strong>motifs</strong>, et parvenir au locataire au moins <strong>10 jours avant</strong> le début du délai de résiliation ; sinon elle est nulle (CO 269d). Le locataire peut la <strong>contester</strong> devant l'autorité de conciliation dans les <strong>30 jours</strong> (CO 270b). Raisons possibles :</p>
+    <div class="cards">
+      <div class="box"><span class="tag acc">Taux de référence</span><strong>Le coût des hypothèques</strong><span class="soft">Le taux hypothécaire de référence suit le taux moyen des hypothèques en Suisse, arrondi au quart de point. Il est publié chaque trimestre par la Confédération (OBLF 12a). Valeur : <strong>1,25&nbsp;%</strong>, valable depuis le 2 septembre 2025 et confirmée le 1er septembre 2026 ; prochaine publication le <strong>1er décembre 2026</strong> (OFL).</span></div>
+      <div class="box"><span class="tag p2">Renchérissement</span><strong>Les prix qui montent</strong><span class="soft">Le bailleur peut répercuter au plus <strong>40&nbsp;%</strong> de la hausse de l'indice suisse des prix à la consommation (IPC) (OBLF 16).</span></div>
+      <div class="box"><span class="tag p3">Coûts</span><strong>Entretien, travaux</strong><span class="soft">La hausse des frais d'entretien et d'exploitation, ou de vraies améliorations du logement, peuvent aussi compter.</span></div>
+    </div>
+    <div class="box">
+      <h3>Simulateur : si le taux de référence change</h3>
+      <p class="soft">Règle de l'OFL : quand le taux de référence monte de <strong>0,25 point</strong>, le loyer peut augmenter de <strong>3&nbsp;%</strong> au plus, en règle générale (pour des taux inférieurs à 5&nbsp;%, OBLF 13). Quand il baisse de 0,25 point, le locataire peut en principe demander une baisse d'environ <strong>2,91&nbsp;%</strong>. Ici, on suppose un loyer net <strong>inventé</strong> fixé avec le taux de 1,25&nbsp;%, et on oublie les autres raisons (IPC, coûts). Choisis une nouvelle valeur <strong>imaginaire</strong> du taux.</p>
+      <div class="param">
+        <span class="lb" id="rfLbl">Loyer net actuel : <span id="rfVal" class="mono">1 600 fr.</span></span>
+        <div class="slider-row"><button type="button" id="rfMinus" aria-label="Diminuer le loyer de 50 francs">−</button><input type="range" id="rfRange" min="800" max="3500" step="50" value="1600" aria-labelledby="rfLbl"><button type="button" id="rfPlus" aria-label="Augmenter le loyer de 50 francs">+</button></div>
+      </div>
+      <div class="btns part-btns" id="rfRates" role="group" aria-label="Nouvelle valeur du taux de référence"></div>
+      <div class="slip" id="rfSlip" aria-live="polite"></div>
+      <div class="fbk info" id="rfOut" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Une baisse se demande</span>
+      <span>Si le taux de référence baisse, le loyer ne baisse <strong>pas tout seul</strong>. Le locataire doit écrire au bailleur ; celui-ci a 30 jours pour répondre. S'il refuse ou ne répond pas, le locataire peut saisir l'autorité de conciliation dans les 30 jours (CO 270a). Le bail ou le dernier avis de hausse indique en général sur quel taux le loyer est basé (OFL, 2026). Pour revoir les calculs en %, le tutoriel sur <a class="tlink" href="les-pourcentages.html">les pourcentages</a> peut t'aider.</span>
+    </div>
+    <div class="note two">
+      <span class="note-title">Et le loyer de départ ?</span>
+      <span>Un locataire qui trouve son <strong>loyer initial</strong> abusif peut le contester devant l'autorité de conciliation dans les <strong>30 jours</strong> après avoir reçu le logement, à certaines conditions : par exemple s'il a dû signer à cause de la pénurie de logements, ou si le loyer a beaucoup augmenté par rapport au locataire précédent (CO 270). Dans plusieurs cantons où les logements manquent, dont Genève, Fribourg et Berne, et en partie Vaud et Neuchâtel, le bailleur doit indiquer le loyer précédent sur une formule officielle (OFL, 2026).</span>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Colocation et sous-location</span>
+    <h2>Partager un logement</h2>
+    <div class="cards">
+      <div class="box"><span class="tag p1">Colocation</span><strong>Plusieurs locataires, un seul bail</strong><span class="soft">Tous les colocataires signent le bail. Souvent, le bail prévoit qu'ils sont <strong>solidaires</strong> : le bailleur peut réclamer tout le loyer à n'importe lequel d'entre eux. Il est utile d'écrire entre colocataires une <strong>convention</strong> : qui paie quoi, comment on partage les charges, ce qui se passe si quelqu'un part.</span></div>
+      <div class="box"><span class="tag p4">Sous-location</span><strong>Avec l'accord du bailleur</strong><span class="soft">Le locataire peut sous-louer tout ou partie du logement avec le <strong>consentement du bailleur</strong>. Celui-ci ne peut refuser que si le locataire cache les conditions, si les conditions sont <strong>abusives</strong> (par exemple un loyer bien plus cher pour faire du profit), ou si la sous-location lui cause des inconvénients majeurs (CO 262).</span></div>
+      <div class="box"><span class="tag warn">Responsable</span><strong>Le locataire principal répond</strong><span class="soft">Le locataire principal garantit au bailleur que le sous-locataire utilise le logement comme le prévoit le bail (CO 262).</span></div>
+    </div>
+    <div class="box">
+      <h3>Simulateur : partager le loyer de la colocation</h3>
+      <p class="soft">Colocation <strong>inventée</strong> : loyer brut de 2&nbsp;550&nbsp;fr. par mois (2&nbsp;250&nbsp;fr. net + 300&nbsp;fr. de charges). Règle de partage choisie par les colocataires eux-mêmes : la loi ne l'impose pas. Change la taille des chambres avec + et −.</p>
+      <div class="btns part-btns" id="coRule" role="group" aria-label="Règle de partage"></div>
+      <div class="items" id="coItems"></div>
+      <div class="slip" id="coSlip" aria-live="polite"></div>
+      <div class="fbk info" id="coOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · Résilier et déménager</span>
+    <h2>Délais, termes et lettre recommandée</h2>
+    <p>Un bail de durée indéterminée se résilie en respectant un <strong>délai de congé</strong> et un <strong>terme</strong> (une date de fin possible). Pour une habitation, le délai légal est de <strong>3 mois</strong>, pour le terme fixé par l'usage local ou, à défaut, pour la fin d'un trimestre de bail ; le contrat peut prévoir un délai plus long ou d'autres termes (CO 266a et 266c). Le congé doit être donné <strong>par écrit</strong> (CO 266l). Le locataire n'a pas besoin de donner de motif ; on envoie la lettre en <strong>recommandé</strong> et c'est la date de <strong>réception</strong> qui compte (ch.ch). Pour le logement de la famille, un époux ne peut pas résilier sans l'accord exprès de son conjoint (CO 266m).</p>
+    <div class="box">
+      <h3>Calcul : quand le bail se termine-t-il ?</h3>
+      <p class="soft">Termes <strong>inventés</strong> : les vrais termes sont écrits dans ton bail ou fixés par l'usage local. Choisis les termes, puis le mois où la lettre arrive chez le bailleur (au plus tard le dernier jour de ce mois).</p>
+      <div class="btns" id="teTerms" role="group" aria-label="Termes du bail"></div>
+      <div class="btns part-btns" id="teMonth" role="group" aria-label="Mois de réception de la lettre"></div>
+      <div class="fbk info" id="teOut" aria-live="polite"></div>
+    </div>
+    <div class="box">
+      <h3>Noah déménage, pas à pas</h3>
+      <p class="soft">Noah (inventé) a trouvé un appartement plus près de son travail.</p>
+      <div class="era-bar" aria-hidden="true"><i id="noBar"></i></div>
+      <div class="era" id="noOut" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="noPrev">← Précédent</button><button type="button" id="noNext">Suivant →</button><button type="button" id="noReset">Recommencer</button></div>
+      <div class="fbk" id="noEnd" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Quand c'est le bailleur qui résilie</span>
+      <span>Le bailleur doit utiliser une <strong>formule officielle</strong> agréée par le canton, qui explique comment contester (CO 266l) ; sinon, le congé est nul (CO 266o). Le locataire peut demander le motif. Il peut contester un congé contraire à la bonne foi, ou demander une <strong>prolongation</strong> du bail si le départ a des conséquences pénibles, en saisissant l'autorité de conciliation dans les <strong>30 jours</strong> après réception du congé (CO 271, 272 et 273).</span>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · Droits et devoirs</span>
+    <h2>Qui fait quoi dans le logement ?</h2>
+    <div class="cards">
+      <div class="box"><span class="tag p4">Bailleur</span><strong>Un logement en bon état</strong><span class="soft">Il doit remettre le logement à la date prévue, en état d'être habité, et l'entretenir (CO 256). S'il y a un défaut que le locataire n'a pas causé, celui-ci peut demander la réparation ou une baisse de loyer proportionnelle (CO 259a). Avant de rénover, le bailleur doit prévenir à l'avance.</span></div>
+      <div class="box"><span class="tag p1">Locataire</span><strong>Soin, égards, petits travaux</strong><span class="soft">Il utilise le logement avec soin, respecte les voisins (CO 257f) et paie les <strong>menus travaux</strong> de nettoyage et de réparation selon l'usage local (CO 259). Il signale vite les défauts. Pour faire des travaux, il lui faut l'accord <strong>écrit</strong> du bailleur (CO 260a).</span></div>
+      <div class="box"><span class="tag acc">Voisinage</span><strong>Le règlement de maison</strong><span class="soft">Il précise les heures de calme, l'usage de la buanderie, des caves, du local à vélos… Dans le canton de Vaud, les règles et usages locatifs demandent par exemple de respecter le repos des voisins de 22&nbsp;h à 7&nbsp;h.</span></div>
+    </div>
+    <div class="box">
+      <h3>Jeu : locataire ou bailleur ?</h3>
+      <p class="soft">Situations <strong>inventées</strong>. Qui doit s'en occuper (ou payer) en règle générale ? Le bail ou l'usage local peut préciser.</p>
+      <div class="btns"><span class="score" id="s2Score">Question 1 / 12</span><span class="step-n" id="s2Pos"></span></div>
+      <div class="card-big" id="s2Card" aria-live="polite"></div>
+      <div class="btns choice" id="s2Btns" role="group" aria-label="Locataire ou bailleur"></div>
+      <div class="fbk" id="s2Out" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="s2Prev">← Précédent</button><button type="button" id="s2Next">Suivant →</button><button type="button" id="s2Reset">Recommencer</button></div>
+    </div>
+    <div class="note warn">
+      <span class="note-title">Et si on ne paie pas le loyer ?</span>
+      <span>Le bailleur peut fixer par écrit un délai d'au moins <strong>30 jours</strong> pour payer, en annonçant qu'il résiliera le bail. Si le loyer n'est toujours pas payé, il peut résilier avec un préavis d'au moins 30 jours pour la fin d'un mois (CO 257d). En cas de difficulté, il vaut mieux en parler tout de suite avec le bailleur ou un service social.</span>
+    </div>
+  </section>
+
+  <!-- 12 -->
+  <section>
+    <span class="eyebrow">Étape 12 · Et moi, maintenant ?</span>
+    <h2>Ton premier logement</h2>
+    <p>Beaucoup de jeunes habitent chez leurs parents pendant l'apprentissage ou les études. Quand on part, il existe plusieurs solutions.</p>
+    <div class="cards">
+      <div class="box"><span class="tag p1">Après l'apprentissage</span><strong>Un studio ou une colocation</strong><span class="soft">Avec un premier salaire, un studio est parfois possible ; une colocation coûte souvent moins cher par personne. Fais d'abord ton budget, avec tous les frais : loyer, charges, électricité, internet, assurances, meubles.</span></div>
+      <div class="box"><span class="tag p3">Pendant les études</span><strong>Logement étudiant</strong><span class="soft">Chambres dans des résidences pour étudiants (souvent liées aux hautes écoles ou à des fondations), chambres chez l'habitant, colocations. Les places partent vite : on s'inscrit tôt.</span></div>
+      <div class="box"><span class="tag p4">Aides</span><strong>Selon le canton et la commune</strong><span class="soft">Certains cantons et communes proposent des logements à loyer modéré ou subventionnés, parfois une aide individuelle au loyer, et soutiennent les coopératives. Les règles changent d'un canton à l'autre : l'office cantonal du logement renseigne. Ces aides sont financées en partie par les impôts : le tutoriel sur <a class="tlink" href="les-impots-en-suisse.html">les impôts en Suisse</a> explique d'où vient cet argent.</span></div>
+    </div>
+    <div class="box">
+      <h3>Le logement, un sujet de débat</h3>
+      <p class="soft">Les logements libres sont rares dans plusieurs régions. Les avis divergent sur les solutions ; voici des arguments entendus, sans parti pris.</p>
+      <div class="views">
+        <div class="box"><span class="tag two">Construire plus ?</span><span>Les uns veulent construire davantage et plus vite, en simplifiant les règles. D'autres craignent pour le paysage, les espaces verts ou le patrimoine.</span></div>
+        <div class="box"><span class="tag two">Protéger les locataires ?</span><span>Les uns veulent mieux contrôler les loyers et protéger les locataires. D'autres estiment que trop de règles découragent les propriétaires d'investir et de rénover.</span></div>
+        <div class="box"><span class="tag two">Des logements d'utilité publique ?</span><span>Les uns souhaitent plus de coopératives et de logements à but non lucratif, soutenus par l'État. D'autres préfèrent laisser jouer le marché et aider directement les personnes qui en ont besoin.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Les idées reçues</span>
+    <h2>Vrai ou idée reçue ?</h2>
+    <p>On entend beaucoup de choses sur le logement. Pour chaque phrase, choisis : <strong>vrai</strong> ou <strong>idée reçue</strong> ?</p>
+    <div class="btns"><span class="score" id="mythScore">0 / 8</span><button type="button" id="mythReset">Recommencer</button></div>
+    <div class="cards" id="myths"></div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Le savais-tu ?</span>
+    <h2>Quelques curiosités</h2>
+    <div class="cards">
+      <div class="box"><span class="tag two">0,93&nbsp;%</span><strong>Moins d'un logement vide sur cent</strong><span class="soft">Au 1er juin 2026, la Suisse comptait 45&nbsp;493 logements vacants, soit 0,93&nbsp;% du parc : c'est la première fois que le taux passe sous 1&nbsp;% (1,00&nbsp;% un an plus tôt). Les taux les plus bas : Zoug (0,20&nbsp;%), Genève (0,31&nbsp;%) et Obwald (0,38&nbsp;%) (OFS, 10 septembre 2026).</span></div>
+      <div class="box"><span class="tag two">2008</span><strong>Un seul taux pour toute la Suisse</strong><span class="soft">Depuis 2008, un taux hypothécaire de référence unique sert à adapter les loyers dans toute la Suisse. Il est publié chaque trimestre (OBLF 12a). Le taux moyen des hypothèques au 30 juin 2026 était de 1,31&nbsp;% (OFL).</span></div>
+      <div class="box"><span class="tag two">Genève</span><strong>La cuisine, une pièce ?</strong><span class="soft">À Genève, l'usage est de compter la cuisine comme une pièce. Pour comparer des annonces de cantons différents, regarde plutôt la surface en m².</span></div>
+      <div class="box"><span class="tag two">1 an</span><strong>La garantie bloquée</strong><span class="soft">Si le bailleur ne réclame rien en justice ou par une poursuite dans l'année qui suit la fin du bail, le locataire peut récupérer seul sa garantie à la banque (CO 257e).</span></div>
+    </div>
+    <div class="box">
+      <h3>Mots à connaître</h3>
+      <dl class="gloss">
+        <div><dt>Bail à loyer</dt><dd>contrat par lequel le bailleur cède l'usage d'un logement contre un loyer.</dd></div>
+        <div><dt>Bailleur</dt><dd>le propriétaire qui loue (ou la gérance qui le représente).</dd></div>
+        <div><dt>Loyer net / brut</dt><dd>net : le prix du logement seul ; brut : loyer net + charges.</dd></div>
+        <div><dt>Charges (frais accessoires)</dt><dd>chauffage, eau chaude, conciergerie… payés par acompte ou forfait.</dd></div>
+        <div><dt>Décompte</dt><dd>calcul annuel des charges réelles, comparé aux acomptes versés.</dd></div>
+        <div><dt>Garantie de loyer</dt><dd>caution du locataire, au plus 3 mois de loyer, sur un compte à son nom.</dd></div>
+        <div><dt>État des lieux</dt><dd>procès-verbal de l'état du logement à l'entrée et à la sortie.</dd></div>
+        <div><dt>Terme</dt><dd>date à laquelle un bail peut se terminer.</dd></div>
+        <div><dt>Taux de référence</dt><dd>taux hypothécaire moyen arrondi, publié chaque trimestre, qui sert à adapter les loyers.</dd></div>
+        <div><dt>Autorité de conciliation</dt><dd>service cantonal qui conseille et tente de mettre d'accord bailleur et locataire en cas de litige.</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Choisis ta réponse, puis vérifie. Les chiffres sont ceux de 2026, sauf indication contraire.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Recommencer</button>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À toi de jouer</span>
+    <h2>Six problèmes</h2>
+    <p>Réfléchis, écris ta réponse sur une feuille, puis ouvre la correction. Les personnes, les logements et les montants sont inventés.</p>
+    <div class="exos">
+      <details>
+        <summary>Le loyer d'une année<span class="q">Un 2,5 pièces coûte 1&nbsp;450&nbsp;fr. de loyer net et 210&nbsp;fr. de charges par mois. Quel est le loyer brut ? Combien paie-t-on en une année ?</span></summary>
+        <div>
+          <span>Loyer brut : 1&nbsp;450 + 210 = <strong>1&nbsp;660&nbsp;fr.</strong> par mois.</span>
+          <span>Par an : 12 × 1&nbsp;660 = <strong>19&nbsp;920&nbsp;fr.</strong></span>
+        </div>
+      </details>
+      <details>
+        <summary>L'habitude du tiers<span class="q">Maé gagne 4&nbsp;200&nbsp;fr. net par mois. Selon l'habitude du tiers, quel loyer brut maximal vise-t-elle ? Que lui reste-t-il pour le reste ?</span></summary>
+        <div>
+          <span>4&nbsp;200 ÷ 3 = <strong>1&nbsp;400&nbsp;fr.</strong> par mois au plus pour le loyer, charges comprises.</span>
+          <span>Il lui reste 4&nbsp;200 − 1&nbsp;400 = <strong>2&nbsp;800&nbsp;fr.</strong> pour tout le reste. Ce n'est pas une loi : c'est une habitude de prudence.</span>
+        </div>
+      </details>
+      <details>
+        <summary>La garantie<span class="q">Loyer net : 1&nbsp;720&nbsp;fr. ; charges : 190&nbsp;fr. Le bailleur demande la garantie maximale. Combien ?</span></summary>
+        <div>
+          <span>3 mois de loyer net : 3 × 1&nbsp;720 = <strong>5&nbsp;160&nbsp;fr.</strong> (les charges ne comptent pas, selon les usages romands).</span>
+          <span>L'argent est déposé sur un compte de garantie au nom du locataire.</span>
+        </div>
+      </details>
+      <details>
+        <summary>Le décompte de charges<span class="q">Acompte : 190&nbsp;fr. par mois. Le décompte de l'année indique 2&nbsp;435&nbsp;fr. de charges réelles. Le locataire reçoit-il de l'argent ou doit-il payer ? Combien ?</span></summary>
+        <div>
+          <span>Acomptes versés : 12 × 190 = 2&nbsp;280&nbsp;fr. Coûts réels : 2&nbsp;435&nbsp;fr.</span>
+          <span>Il manque 2&nbsp;435 − 2&nbsp;280 = <strong>155&nbsp;fr.</strong> : le locataire doit payer ce solde.</span>
+        </div>
+      </details>
+      <details>
+        <summary>Le taux de référence<span class="q">Un loyer net de 2&nbsp;000&nbsp;fr. est basé sur un taux de 1,25&nbsp;%. Le taux passerait à 1,50&nbsp;%. Quelle hausse maximale, en règle générale, sans autre raison ? Et dans l'autre sens, de 1,50&nbsp;% à 1,25&nbsp;% ?</span></summary>
+        <div>
+          <span>+0,25 point → au plus +3&nbsp;% : 2&nbsp;000 × 3&nbsp;% = 60&nbsp;fr. → <strong>2&nbsp;060&nbsp;fr.</strong></span>
+          <span>−0,25 point → baisse d'environ 2,91&nbsp;% : 2&nbsp;000 ÷ 1,03 ≈ <strong>1&nbsp;941,75&nbsp;fr.</strong> (environ 58,25&nbsp;fr. de moins). La baisse doit être demandée par écrit au bailleur.</span>
+        </div>
+      </details>
+      <details>
+        <summary>Partir à temps<span class="q">Le bail de Noah a pour termes fin mars, fin juin et fin septembre, avec 3 mois de délai. Sa lettre arrive chez le bailleur le 15 avril. Pour quelle date le bail se termine-t-il ?</span></summary>
+        <div>
+          <span>Pour fin juin, la lettre aurait dû arriver au plus tard le 31 mars. Le 15 avril, c'est trop tard pour ce terme.</span>
+          <span>Le bail se termine le <strong>30 septembre</strong>. Pour partir plus tôt, Noah peut présenter un locataire de remplacement solvable et prêt à reprendre le bail aux mêmes conditions (CO 264).</span>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section data-fiche><!--tprint--><p class="tprint-h">Fiche de révision · Trouver, louer et payer son logement</p><!--/tprint-->    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• En Suisse, la plupart des gens sont <strong>locataires</strong> : environ 36&nbsp;% seulement des logements occupés le sont par leur propriétaire (OFS, 2024). Les logements vides sont rares : <strong>0,93&nbsp;%</strong> au 1er juin 2026.</span>
+      <span>• <strong>Loyer net + charges = loyer brut.</strong> Les charges se paient par <strong>acompte</strong> (avec un décompte au moins une fois par an) ou par <strong>forfait</strong>. L'habitude : un loyer d'environ <strong>un tiers du revenu</strong> au plus (ce n'est pas une loi).</span>
+      <span>• La <strong>garantie</strong> ne dépasse pas <strong>3 mois de loyer</strong> et se trouve sur un compte bancaire <strong>au nom du locataire</strong>. Un <strong>état des lieux</strong> précis à l'entrée protège à la sortie : on paie les dégâts, pas l'usure normale.</span>
+      <span>• Le loyer peut changer avec le <strong>taux de référence</strong> (1,25&nbsp;% depuis septembre 2025 ; prochaine publication le 1er décembre 2026), le renchérissement (40&nbsp;% de l'IPC) et les coûts. Une hausse se fait sur <strong>formule officielle</strong> et se conteste dans les <strong>30 jours</strong>.</span>
+      <span>• Résilier un logement : par <strong>écrit</strong>, avec un délai d'au moins <strong>3 mois</strong> pour un terme ; le bailleur utilise une formule officielle. Sous-louer : avec l'<strong>accord du bailleur</strong>.</span>
+      <span>• Ce tutoriel n'est pas un conseil juridique : le bail et le canton comptent. En cas de doute, l'autorité de conciliation en matière de bail de ton canton renseigne.</span>
+      <div class="scroll"><table class="ptable" aria-label="Les délais à connaître">
+        <tr><th>Quoi</th><th>Délai ou limite</th><th>Règle</th></tr>
+        <tr><td>Garantie de loyer</td><td>Au plus 3 mois de loyer</td><td>CO 257e</td></tr>
+        <tr><td>Contester le loyer initial</td><td>30 jours après la remise du logement (à certaines conditions)</td><td>CO 270</td></tr>
+        <tr><td>Contester une hausse</td><td>30 jours après l'avis de majoration</td><td>CO 270b</td></tr>
+        <tr><td>Résilier une habitation</td><td>3 mois au moins, pour un terme</td><td>CO 266c</td></tr>
+        <tr><td>Contester un congé</td><td>30 jours après sa réception</td><td>CO 273</td></tr>
+        <tr><td>Décompte de charges</td><td>Au moins une fois par an</td><td>OBLF 4</td></tr>
+      </table></div>
+    </div>
+  <!--tprint--><p class="tprint-row"><button type="button" class="tprint" data-print><span aria-hidden="true">🖨</span> Imprimer la fiche</button><span>Seulement ce résumé, sur une page.</span></p><!--/tprint-->
+</section>
+
+  <!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"><a class="prev" href="le-permis-de-conduire-en-suisse.html"><span>← Précédent</span><strong>Le permis de conduire en Suisse</strong></a><a class="next" href="les-hypotheques.html"><span>Suivant →</span><strong>Les hypothèques</strong></a></div><div class="tnav-end"><a class="tnav-home" href="geographie.html">⌂ Tous les tutoriels d'histoire-géo</a><button type="button" data-share hidden>Partager</button></div></nav><!--/tnav-->
+<footer>Fiche de révision · Le logement et le loyer<!--tmaj--><span class="tmaj" style="display:block;margin-top:6px;font-size:.85rem;opacity:.85">Dernière mise à jour : 26 novembre 2026 · © 2026 Nicolas Meynet</span><!--/tmaj--></footer>
+</main>
+
+<script>
+(function () {
+  /*
+   * Hooks de test : window.__logement
+   *   F                         -> chiffres et règles vérifiés (OFS 2024 et 2026, OFL 1.9.2026, CO, OBLF), avec leur date
+   *   housing                   -> statistiques du graphique « cent logements » (parts en %)
+   *   sort0, sort0Score(ans)    -> jeu « décoder les annonces »
+   *   maxRent(revFr)            -> {rev, max, rest} en centimes (habitude du tiers, arrondi au centime inférieur)
+   *   flats, fits(revFr)        -> logements inventés et ceux qui respectent l’habitude du tiers
+   *   lina                      -> étapes du dossier de Lina
+   *   guarantee(netFr, months)  -> {amount, max, legal} en centimes ; legal = months <= 3
+   *   defects                   -> défauts de l’état des lieux
+   *   sort1, sort1Score(ans)    -> jeu « usure normale ou dégât ? »
+   *   charges(heatFr, mode)     -> {paid, cost, lines, balance} en centimes ; balance > 0 : rembourser au locataire, < 0 : à payer
+   *   refRent(netFr, newRate)   -> {steps, factor, pct, newRent, diff} en centimes ; base 1,25 %, 3 % par quart de point
+   *   split(totalC, sizes, rule)-> parts en centimes (somme exacte) ; rule = egal | surface | mixte
+   *   endOfLease(month, key)    -> {term, wait, nextYear} ; key = trim | mois
+   *   noah                      -> étapes du déménagement de Noah
+   *   sort2, sort2Score(ans)    -> jeu « locataire ou bailleur ? »
+   *   isOk(it, c)               -> bonne réponse (avec alt éventuelles)
+   *   myths, checkMyth(k, c), quiz
+   */
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function clamp(i, n) { i = Math.floor(Number(i)); if (!isFinite(i)) i = 0; return Math.max(0, Math.min(n - 1, i)); }
+  function lim(x, a, b) { x = Number(x); if (!isFinite(x)) x = a; return Math.max(a, Math.min(b, x)); }
+  function each(list, fn) { Array.prototype.forEach.call(list, fn); }
+  var NB = ' ';
+  /* Nombres à la française : espace insécable pour les milliers, virgule décimale. */
+  function fmt(x, d) {
+    if (!isFinite(x)) return '?';
+    d = d == null ? 0 : d;
+    var p = Math.pow(10, d), r = Math.round(x * p) / p; if (Object.is(r, -0)) r = 0;
+    var neg = r < 0, s = Math.abs(r).toFixed(d), parts = s.split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, NB);
+    return (neg ? '−' : '') + parts[0] + (parts[1] ? ',' + parts[1] : '');
+  }
+  function chf(x, d) { return fmt(x, d) + NB + 'fr.'; }
+  /* Centimes -> « 1 175,60 fr. » (ou sans décimales si le montant est rond) */
+  function cts(c) { c = Math.round(c); return chf(c / 100, c % 100 ? 2 : 0); }
+  function pctx(x, d) { return fmt(x, d == null ? 0 : d) + NB + '%'; }
+  function pressAll(box, attr, val) { each(box.querySelectorAll('button'), function (b) { b.setAttribute('aria-pressed', b.getAttribute(attr) === String(val) ? 'true' : 'false'); }); }
+  function row(a, b, cls) { return '<div class="row' + (cls ? ' ' + cls : '') + '"><span>' + a + '</span><span>' + b + '</span></div>'; }
+
+  /* ---------- Chiffres et règles vérifiés ----------
+     OFS : taux de logements en propriété 2024 (35,7 %) ; recensement des logements vacants au 1.6.2026 (communiqué du 10.9.2026).
+     OFL : communiqué du 1.9.2026 (taux de référence 1,25 %, taux moyen 1,31 % au 30.6.2026, prochaine publication 1.12.2026) ;
+           page « Taux de référence » (hausse 3 % / baisse 2,91 % par quart de point) ; aperçu 2026 des formules officielles (loyer initial).
+     CO (RS 220, état au 1.10.2026) : art. 253, 256, 256a, 257a–257f, 259, 259a, 260a, 262, 264, 266a, 266c, 266l–266o, 267, 267a, 269d, 270, 270a, 270b, 271–273.
+     OBLF (RS 221.213.11, état au 1.10.2025) : art. 4 (décompte annuel, forfait sur 3 ans), 12a, 13 (3 % sous 5 %), 16 (40 % de l’IPC).
+     Règles et usages locatifs du canton de Vaud (publiés par l’OFL) : garantie de 3 mois de loyer net, RC, repos 22 h – 7 h. */
+  var F = {
+    owners2024: 35.7, tenants2024: 64.3,
+    vacancy: { rate: 0.93, n: 45493, prev: 1.00, date: '1er juin 2026', published: '10 septembre 2026', low: [['Zoug', 0.20], ['Genève', 0.31], ['Obwald', 0.38]] },
+    ref: { rate: 1.25, since: '2 septembre 2025', confirmed: '1er septembre 2026', next: '1er décembre 2026', avg: 1.31, avgDate: '30 juin 2026', upPerStep: 3, downPerStep: 2.91, step: 0.25, ipcShare: 40 },
+    guaranteeMonths: 3, noticeMonths: 3, contestDays: 30, hikeNoticeDays: 10, paymentDelayDays: 30, guaranteeBlockYears: 1
+  };
+
+  /* ---------- 1. Cent logements ---------- */
+  var HOUSING = [
+    { k: 'loc', t: 'Logements loués', v: F.tenants2024, sq: 64, c: 'pa', x: 'Environ 64 logements occupés sur 100 sont loués (y compris les logements de coopératives). C’est le complément des 35,7 % de logements occupés par leur propriétaire en 2024 (OFS). Les personnes seules sont plus souvent locataires que les familles.' },
+    { k: 'own', t: 'Occupés par leur propriétaire', v: F.owners2024, sq: 36, c: 'pb', x: '35,7 % des logements occupés le sont par leur propriétaire en 2024 (OFS) : maisons individuelles ou appartements en propriété par étage (PPE). Le taux varie beaucoup selon les cantons : il est plus bas dans les grandes villes.' },
+    { k: 'vac', t: 'Logements vides (à louer ou à vendre)', v: F.vacancy.rate, sq: 1, c: 'acc', x: 'Au 1er juin 2026, 45 493 logements étaient vides, soit 0,93 % du parc : moins d’un sur cent (OFS, publié le 10 septembre 2026). Quand ce taux est bas, trouver un logement devient difficile et les candidats sont nombreux.' }
+  ];
+  var hoSel = 'loc';
+  $('hoGrid').innerHTML = Array.apply(null, Array(100)).map(function () { return '<i></i>'; }).join('');
+  function hoRender() {
+    $('hoList').innerHTML = HOUSING.map(function (h) {
+      return '<button type="button" data-k="' + h.k + '" aria-pressed="' + (hoSel === h.k ? 'true' : 'false') + '"><span class="bn">' + esc(h.t) + '</span><span class="bv">' + esc((h.k === 'vac' ? '' : 'environ ') + pctx(h.v, h.k === 'vac' ? 2 : 0)) + '</span><span class="bt" aria-hidden="true"><i class="' + h.c + '" style="width:' + Math.max(1, h.v).toFixed(1) + '%"></i></span></button>';
+    }).join('');
+    var h = HOUSING.filter(function (x) { return x.k === hoSel; })[0];
+    each($('hoGrid').querySelectorAll('i'), function (d, i) { d.className = i < h.sq ? (h.k === 'vac' ? 'vac' : h.k) : ''; });
+    $('hoOut').innerHTML = '<strong>' + esc(h.t) + ' : ' + esc(h.sq) + ' carré' + (h.sq > 1 ? 's' : '') + ' sur 100</strong><span>' + esc(h.x) + '</span>';
+  }
+  $('hoList').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b) return; hoSel = b.getAttribute('data-k'); hoRender(); });
+  hoRender();
+
+  /* ---------- Trieur générique (cartes une par une), comme dans les autres tutoriels.
+     Si un item a une liste alt, ces réponses sont aussi acceptées. Si un item a une liste o, elle remplace les options. ---------- */
+  function isOk(it, c) { return c === it.a || !!(it.alt && it.alt.indexOf(c) >= 0); }
+  function makeSorter(o) {
+    var idx = 0, ans = {};
+    function opts(it) { return it.o ? it.o : o.order; }
+    function name(c) { return o.names && o.names[c] ? o.names[c] : c; }
+    function render() {
+      var it = o.items[idx], a = ans[it.k];
+      if (o.cardHtml) $(o.card).innerHTML = o.cardHtml(it, !!a); else $(o.card).textContent = it.s;
+      $(o.btns).innerHTML = opts(it).map(function (c) {
+        var cls = a ? (c === it.a || (c === a && isOk(it, a)) ? 'right' : (c === a ? 'wrong' : '')) : '';
+        return '<button type="button" data-c="' + esc(c) + '"' + (cls ? ' class="' + cls + '"' : '') + (a ? ' disabled' : '') + '>' + esc(name(c)) + '</button>';
+      }).join('');
+      var out = $(o.out);
+      if (!a) { out.className = 'fbk'; out.innerHTML = ''; }
+      else {
+        var ok = isOk(it, a);
+        out.className = 'fbk ' + (ok ? 'ok' : 'no');
+        out.innerHTML = '<strong>' + (ok ? 'Bien vu !' : 'Pas tout à fait. Réponse : ' + esc(name(it.a)) + '.') + '</strong><span>' + esc(it.why) + '</span>';
+      }
+      var s = o.score(ans), last = idx === o.items.length - 1, left = s.total - s.answered;
+      $(o.score_).textContent = (o.word ? o.word + ' ' : '') + (idx + 1) + ' / ' + s.total;
+      $(o.pos).textContent = s.answered ? 'Bonnes réponses : ' + s.correct + ' sur ' + s.answered : '';
+      $(o.prev).disabled = idx === 0;
+      $(o.next).disabled = last;
+      $(o.next).style.display = last ? 'none' : '';
+      var end = $(o.out + 'End');
+      if (!end) { end = document.createElement('div'); end.id = o.out + 'End'; end.setAttribute('aria-live', 'polite'); $(o.out).insertAdjacentElement('afterend', end); }
+      if (!left) {
+        var r = s.correct / s.total;
+        end.className = 'fbk ok sorter-end';
+        end.innerHTML = '<strong>Terminé ! ' + s.correct + ' / ' + s.total + ' bonnes réponses</strong><span>' +
+          (r === 1 ? 'Parfait, tout est juste !' : r >= .7 ? 'Très bien !' : r >= .5 ? 'Pas mal ! Relis les explications des erreurs.' : 'Relis les explications, puis réessaie.') +
+          ' Touche « Recommencer » pour rejouer.</span>';
+      } else if (last && ans[it.k]) {
+        end.className = 'fbk warn sorter-end';
+        end.innerHTML = '<strong>C’était la dernière carte.</strong><span>Il te reste ' + left + ' réponse' + (left > 1 ? 's' : '') + ' à donner : reviens en arrière avec « ← Précédent ».</span>';
+      } else { end.className = ''; end.innerHTML = ''; }
+    }
+    $(o.btns).addEventListener('click', function (ev) {
+      var b = ev.target.closest('button'); if (!b || b.disabled) return;
+      var it = o.items[idx]; if (!ans[it.k]) ans[it.k] = b.getAttribute('data-c');
+      render();
+    });
+    $(o.prev).addEventListener('click', function () { idx = clamp(idx - 1, o.items.length); render(); });
+    $(o.next).addEventListener('click', function () { idx = clamp(idx + 1, o.items.length); render(); });
+    $(o.reset).addEventListener('click', function () { ans = {}; idx = 0; render(); });
+    render();
+  }
+  function scorer(items) {
+    return function (ans) { var correct = 0, answered = 0; items.forEach(function (x) { if (ans && ans[x.k]) { answered++; if (isOk(x, ans[x.k])) correct++; } }); return { correct: correct, answered: answered, total: items.length }; };
+  }
+
+  /* ---------- 2. Décoder les annonces (options propres à chaque carte) ---------- */
+  var SORT0 = [
+    { k: 'n1', s: 'Annonce : « 3,5 pièces, 82 m², loyer 1 600 fr. + charges 200 fr. »', q: 'Combien verses-tu chaque mois ?', o: ['1 600 fr.', '1 800 fr.', '1 400 fr.'], a: '1 800 fr.', why: 'Loyer net + charges = loyer brut : 1 600 + 200 = 1 800 fr. par mois.' },
+    { k: 'n2', s: 'Annonce : « 2,5 pièces » en Suisse romande (hors Genève).', q: 'Combien de chambres à coucher séparées, le plus souvent ?', o: ['1', '2', '3'], a: '1', why: 'En général : un séjour + une chambre (2 pièces), et une demi-pièce (hall, coin repas ou petite pièce). Il y a donc le plus souvent une seule chambre à coucher.' },
+    { k: 'n3', s: 'Annonce : « loyer brut 2 100 fr., dont 250 fr. de charges ».', q: 'Quel est le loyer net ?', o: ['1 850 fr.', '2 350 fr.', '2 100 fr.'], a: '1 850 fr.', why: 'Loyer net = loyer brut − charges = 2 100 − 250 = 1 850 fr.' },
+    { k: 'n4', s: 'Annonce : « charges : acompte de 180 fr. par mois ».', q: 'Que veut dire « acompte » ?', o: ['Un montant fixe, jamais recalculé', 'Une avance, recalculée au moins une fois par an', 'Une partie de la garantie'], a: 'Une avance, recalculée au moins une fois par an', why: 'Un acompte est une avance : le décompte annuel compare les acomptes aux coûts réels (OBLF 4). Le montant fixe, sans décompte, s’appelle un forfait.' },
+    { k: 'n5', s: 'Annonce : « 70 m², loyer net 1 750 fr. ».', q: 'Quel est le loyer net par m² et par mois ?', o: ['25 fr.', '35 fr.', '17,50 fr.'], a: '25 fr.', why: '1 750 ÷ 70 = 25 fr. par m² et par mois. Utile pour comparer des logements de tailles différentes.' },
+    { k: 'n6', s: 'Annonce : « libre dès le 1er avril ».', q: 'Ça veut dire…', o: ['On peut emménager dès cette date', 'Le loyer d’avril est gratuit', 'Il faut avoir quitté son ancien logement le 1er avril'], a: 'On peut emménager dès cette date', why: '« Libre dès » indique la date à partir de laquelle le logement peut être loué. Le loyer est dû dès le début du bail.' },
+    { k: 'n7', s: 'Annonce à Genève : « 4 pièces ».', q: 'Comme la cuisine compte en général comme une pièce à Genève, ce logement a souvent…', o: ['3 pièces sans la cuisine', '4 chambres à coucher', '5 pièces sans la cuisine'], a: '3 pièces sans la cuisine', why: 'À Genève, l’usage est de compter la cuisine. Un « 4 pièces » genevois a donc souvent 3 pièces sans la cuisine, par exemple un séjour et deux chambres. La surface en m² aide à comparer.' },
+    { k: 'n8', s: 'Annonce : « garantie : 3 mois de loyer net ». Loyer net 1 500 fr., charges 180 fr.', q: 'Quel est le montant de la garantie ?', o: ['4 500 fr.', '5 040 fr.', '1 500 fr.'], a: '4 500 fr.', why: '3 × 1 500 = 4 500 fr. Les charges ne comptent pas ici, puisque l’annonce parle du loyer net. Pour un logement, la loi limite la garantie à 3 mois de loyer (CO 257e).' }
+  ];
+  var sort0Score = scorer(SORT0);
+  makeSorter({ items: SORT0, order: [], btns: 's0Btns', card: 's0Card', pos: 's0Pos', out: 's0Out', score_: 's0Score', prev: 's0Prev', next: 's0Next', reset: 's0Reset', word: 'Question', score: sort0Score,
+    cardHtml: function (it) { return '<span>' + esc(it.s) + '</span><span class="ask">' + esc(it.q) + '</span>'; } });
+
+  /* ---------- 3. Habitude du tiers (centimes, arrondi vers le bas) ---------- */
+  function maxRent(revFr) {
+    var rev = Math.max(0, Math.round(Number(revFr) || 0)) * 100, max = Math.floor(rev / 3);
+    return { rev: rev, max: max, rest: rev - max };
+  }
+  var FLATS = [
+    { k: 'ch', t: 'Chambre en colocation, 14 m²', net: 640, ch: 50 },
+    { k: 'st', t: 'Studio, 26 m²', net: 980, ch: 90 },
+    { k: 'p25', t: '2,5 pièces, 55 m²', net: 1420, ch: 170 },
+    { k: 'p35', t: '3,5 pièces, 78 m²', net: 1890, ch: 240 },
+    { k: 'p45', t: '4,5 pièces, 105 m²', net: 2450, ch: 290 }
+  ];
+  function fits(revFr) { var M = maxRent(revFr); return FLATS.filter(function (f) { return (f.net + f.ch) * 100 <= M.max; }).map(function (f) { return f.k; }); }
+  var BU_PRE = [['Apprenti·e, 3e année : 1 200 fr.', 1200], ['Premier emploi : 4 300 fr.', 4300], ['Couple : 8 600 fr.', 8600]], buRev = 4500;
+  $('buPre').innerHTML = BU_PRE.map(function (p) { return '<button type="button" data-v="' + p[1] + '" aria-pressed="false">' + esc(p[0]) + '</button>'; }).join('');
+  function buRender() {
+    buRev = Math.round(lim(buRev, 1000, 12000) / 100) * 100;
+    $('buRange').value = buRev; $('buVal').textContent = chf(buRev);
+    pressAll($('buPre'), 'data-v', buRev);
+    var M = maxRent(buRev), ok = fits(buRev);
+    $('buB1').style.width = (M.max / M.rev * 100).toFixed(1) + '%';
+    $('buB2').style.width = (M.rest / M.rev * 100).toFixed(1) + '%';
+    var top = FLATS[FLATS.length - 1].net + FLATS[FLATS.length - 1].ch;
+    $('buList').innerHTML = FLATS.map(function (f) {
+      var brut = f.net + f.ch, good = ok.indexOf(f.k) >= 0, w = function (v) { return (v / top * 100).toFixed(1) + '%'; };
+      return '<div class="rowx' + (good ? ' best' : ' over') + '"><span class="bn">' + esc(f.t) + ' · ' + (good ? 'dans la règle du tiers' : 'au-dessus du tiers') + '</span><span class="bv">' + esc(chf(brut)) + '</span>' +
+        '<span class="bt" aria-hidden="true"><i class="pa" style="width:' + w(f.net) + '"></i><i class="pb" style="width:' + w(f.ch) + '"></i></span>' +
+        '<span class="bd">loyer net ' + esc(chf(f.net)) + ' + charges ' + esc(chf(f.ch)) + ' (logement inventé)</span></div>';
+    }).join('');
+    var txt = ok.length
+      ? 'Un tiers de ' + chf(buRev) + ' = ' + cts(M.max) + ' ; il reste ' + cts(M.rest) + ' pour tout le reste : assurance-maladie, nourriture, transports, impôts, téléphone, épargne… ' + ok.length + ' logement' + (ok.length > 1 ? 's' : '') + ' inventé' + (ok.length > 1 ? 's' : '') + ' sur ' + FLATS.length + ' respecte' + (ok.length > 1 ? 'nt' : '') + ' cette habitude.'
+      : 'Un tiers de ' + chf(buRev) + ' = ' + cts(M.max) + ' : aucun logement de la liste ne respecte l’habitude du tiers. Pendant un apprentissage, on habite souvent encore chez ses parents, ou on partage un logement.';
+    $('buOut').innerHTML = '<strong>Loyer brut maximal selon l’habitude : ' + esc(cts(M.max)) + ' par mois</strong><span>' + esc(txt) + '</span>';
+  }
+  $('buPre').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b) return; buRev = Number(b.getAttribute('data-v')); buRender(); });
+  $('buRange').addEventListener('input', function () { buRev = Number(this.value); buRender(); });
+  $('buMinus').addEventListener('click', function () { buRev -= 100; buRender(); });
+  $('buPlus').addEventListener('click', function () { buRev += 100; buRender(); });
+  buRender();
+
+  /* ---------- Pas à pas générique (Précédent / Suivant / Recommencer) ---------- */
+  function makeStepper(o) {
+    var idx = 0;
+    function render() {
+      var L = o.steps(), s; idx = clamp(idx, L.length); s = L[idx];
+      $(o.out).innerHTML = '<span class="when">' + esc(o.label) + ' · ' + (idx + 1) + ' / ' + L.length + (s.when ? ' · ' + esc(s.when) : '') + '</span><strong>' + esc(s.t) + '</strong><span>' + s.x + '</span>';
+      $(o.bar).style.width = Math.round((idx + 1) / L.length * 100) + '%';
+      var last = idx === L.length - 1;
+      $(o.prev).disabled = idx === 0;
+      $(o.next).disabled = last;
+      $(o.next).style.display = last ? 'none' : '';
+      var end = $(o.end);
+      if (last) { end.className = 'fbk ok'; end.innerHTML = '<strong>Terminé !</strong><span>' + esc(o.endText) + ' Touche « Recommencer » pour revoir depuis le début.</span>'; }
+      else { end.className = 'fbk'; end.innerHTML = ''; }
+    }
+    $(o.prev).addEventListener('click', function () { idx--; render(); });
+    $(o.next).addEventListener('click', function () { idx++; render(); });
+    $(o.reset).addEventListener('click', function () { idx = 0; render(); });
+    render();
+    return { go: function (i) { idx = i; render(); } };
+  }
+
+  /* ---------- 4. Le dossier de Lina (personne inventée) ---------- */
+  var LINA = [
+    { when: 'avant de chercher', t: 'Faire son budget', x: 'Lina gagne 4 300 fr. net par mois (montant inventé). Avec l’habitude du tiers, elle vise un loyer brut d’environ <strong>1 430 fr.</strong> au plus. Elle compte aussi l’électricité, internet, l’assurance-maladie, les transports et les meubles.' },
+    { when: 'chercher', t: 'Lire les annonces', x: 'Elle compare les annonces : loyer brut, surface, distance du travail, date d’entrée. Elle se méfie des annonces trop belles et ne verse jamais d’argent avant une visite.' },
+    { when: 'visiter', t: 'La visite', x: 'Elle regarde l’état du logement, l’orientation, le bruit, la buanderie, la cave. Elle pose des questions : que comprennent les charges ? acompte ou forfait ? quels sont les termes de résiliation ?' },
+    { when: 'postuler', t: 'Le dossier', x: 'Elle remplit le formulaire de candidature et ajoute : une copie de sa <strong>pièce d’identité</strong>, un <strong>extrait du registre des poursuites</strong> récent (commandé à l’office des poursuites), ses dernières <strong>fiches de salaire</strong> ou son contrat de travail, et parfois une attestation d’assurance RC. Elle rend un dossier complet et propre, vite.' },
+    { when: 'si besoin', t: 'Un garant ?', x: 'Comme son emploi est nouveau, la gérance demande un <strong>garant</strong> : une personne (souvent un parent) qui s’engage par écrit à payer si Lina ne paie pas. C’est un engagement sérieux, à bien lire avant de signer.' },
+    { when: 'la réponse', t: 'Refus… puis oui !', x: 'Pour les deux premiers studios, d’autres candidats ont été choisis : c’est fréquent quand les logements libres sont rares. Pour le troisième, la réponse est oui.' },
+    { when: 'signer', t: 'Lire et signer le bail', x: 'Lina lit le bail et le règlement de maison avant de signer : loyer net, charges, garantie (au plus 3 mois de loyer), termes, délai de congé. Elle verse la garantie sur un <strong>compte à son nom</strong>.' },
+    { when: 'emménager', t: 'L’état des lieux et les clés', x: 'Le jour de l’entrée, elle fait l’état des lieux avec la gérance, note chaque défaut, prend des photos datées, signe et garde un exemplaire. Puis elle reçoit les clés.' }
+  ];
+  makeStepper({ steps: function () { return LINA; }, label: 'Lina', out: 'liOut', bar: 'liBar', prev: 'liPrev', next: 'liNext', reset: 'liReset', end: 'liEnd',
+    endText: 'Lina a trouvé son studio : budget, dossier complet, bail lu, garantie sur un compte à son nom et état des lieux signé.' });
+
+  /* ---------- 5. Garantie de loyer (centimes) ---------- */
+  function guarantee(netFr, months) {
+    var net = Math.max(0, Math.round(Number(netFr) || 0)) * 100, m = Math.max(0, Math.round(Number(months) || 0));
+    return { net: net, months: m, amount: net * m, max: net * F.guaranteeMonths, legal: m <= F.guaranteeMonths };
+  }
+  var gaNet = 1400, gaM = 3;
+  $('gaMonths').innerHTML = [1, 2, 3, 4, 6].map(function (m) { return '<button type="button" data-m="' + m + '" aria-pressed="false">' + m + ' mois</button>'; }).join('');
+  function gaRender() {
+    gaNet = Math.round(lim(gaNet, 500, 4000) / 50) * 50;
+    $('gaRange').value = gaNet; $('gaVal').textContent = chf(gaNet);
+    pressAll($('gaMonths'), 'data-m', gaM);
+    var G = guarantee(gaNet, gaM), out = $('gaOut');
+    $('gaAmt').textContent = cts(G.amount); $('gaMax').textContent = cts(G.max);
+    if (G.legal) {
+      out.className = 'fbk ok';
+      out.innerHTML = '<strong>Autorisé : ' + esc(cts(G.amount)) + '</strong><span>' + esc(gaM + ' × ' + chf(gaNet) + ' = ' + cts(G.amount) + '. C’est au plus 3 mois de loyer : le bailleur peut le demander. L’argent est déposé dans une banque sur un compte au nom du locataire, et rendu à la fin du bail s’il n’y a pas de dette ni de dégât.') + '</span>';
+    } else {
+      out.className = 'fbk no';
+      out.innerHTML = '<strong>Interdit pour un logement !</strong><span>' + esc(gaM + ' mois = ' + cts(G.amount) + ', c’est plus que 3 mois de loyer (' + cts(G.max) + '). Pour une habitation, le bailleur ne peut pas exiger davantage (CO 257e).') + '</span>';
+    }
+  }
+  $('gaMonths').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b) return; gaM = Number(b.getAttribute('data-m')); gaRender(); });
+  $('gaRange').addEventListener('input', function () { gaNet = Number(this.value); gaRender(); });
+  $('gaMinus').addEventListener('click', function () { gaNet -= 50; gaRender(); });
+  $('gaPlus').addEventListener('click', function () { gaNet += 50; gaRender(); });
+  gaRender();
+
+  /* ---------- 6. État des lieux : défauts à noter (appartement inventé) ---------- */
+  var DEFECTS = [
+    { k: 'd1', x: 66, y: 66, t: 'Trous au mur du séjour', w: 'À noter : « 4 trous de chevilles au mur à côté de la fenêtre, environ 6 mm ». Sinon, on pourrait croire que c’est toi qui les as faits.' },
+    { k: 'd2', x: 150, y: 108, t: 'Parquet rayé', w: 'À noter : « rayures sur le parquet du séjour, près de la porte, sur 1 m environ ». Une photo datée aide beaucoup.' },
+    { k: 'd3', x: 248, y: 70, t: 'Store qui ne descend plus', w: 'À noter, et à faire réparer : un défaut qui empêche d’utiliser le logement normalement doit être signalé au bailleur, qui doit l’entretenir (CO 256).' },
+    { k: 'd4', x: 316, y: 108, t: 'Vitre fêlée dans la chambre', w: 'À noter : « fêlure de 10 cm en bas à droite de la fenêtre de la chambre ». Sinon, la vitre pourrait t’être facturée à la sortie.' },
+    { k: 'd5', x: 40, y: 178, t: 'Plaque de cuisson rayée', w: 'À noter : « rayures sur la plaque de cuisson, zone avant gauche ». Les appareils de la cuisine font partie du logement loué.' },
+    { k: 'd6', x: 92, y: 206, t: 'Porte d’armoire qui ferme mal', w: 'À noter : « porte de l’armoire haute de la cuisine désaxée ». Les petits défauts comptent aussi.' },
+    { k: 'd7', x: 268, y: 178, t: 'Joint de douche noirci', w: 'À noter : « joint en silicone de la douche noirci par endroits ». Bien aérer ensuite aide à éviter la moisissure.' },
+    { k: 'd8', x: 160, y: 186, t: 'Interrupteur cassé dans le hall', w: 'À noter : « cache de l’interrupteur du hall fendu ». Tout ce qui est cassé à l’entrée doit apparaître sur le procès-verbal.' }
+  ];
+  var plOn = {}, plSel = null, NS = 'http://www.w3.org/2000/svg';
+  (function () {
+    var g = $('plSpots');
+    DEFECTS.forEach(function (d, i) {
+      var s = document.createElementNS(NS, 'g');
+      s.setAttribute('class', 'spot'); s.setAttribute('data-k', d.k); s.setAttribute('tabindex', '0'); s.setAttribute('role', 'button');
+      s.setAttribute('aria-label', 'Défaut ' + (i + 1) + ' : ' + d.t);
+      var c = document.createElementNS(NS, 'circle'); c.setAttribute('cx', d.x); c.setAttribute('cy', d.y); c.setAttribute('r', 17);
+      var t = document.createElementNS(NS, 'text'); t.setAttribute('x', d.x); t.setAttribute('y', d.y + 5); t.setAttribute('text-anchor', 'middle'); t.textContent = String(i + 1);
+      s.appendChild(c); s.appendChild(t); g.appendChild(s);
+    });
+    $('plBtns').innerHTML = DEFECTS.map(function (d, i) { return '<button type="button" data-k="' + d.k + '" aria-pressed="false">' + (i + 1) + '. ' + esc(d.t) + '</button>'; }).join('');
+  })();
+  function plRender() {
+    each($('plSpots').querySelectorAll('.spot'), function (s) { var k = s.getAttribute('data-k'); s.setAttribute('class', 'spot' + (plOn[k] ? ' on' : '') + (plSel === k ? ' sel' : '')); });
+    pressAll($('plBtns'), 'data-k', plSel || '');
+    each($('plBtns').querySelectorAll('button'), function (b) { b.classList.toggle('on', !!plOn[b.getAttribute('data-k')]); });
+    var n = Object.keys(plOn).length, d = DEFECTS.filter(function (x) { return x.k === plSel; })[0], out = $('plOut');
+    $('plCount').textContent = 'Défauts notés : ' + n + ' sur ' + DEFECTS.length;
+    if (!d) { out.className = 'fbk info'; out.innerHTML = '<strong>Fais le tour du logement</strong><span>Touche un numéro pour noter le défaut dans l’état des lieux d’entrée.</span>'; return; }
+    var done = n === DEFECTS.length ? '<span><strong>Terminé !</strong> Les 8 défauts sont notés. Chacun signe l’état des lieux et en garde un exemplaire. Si tu découvres un autre défaut dans les jours suivants, signale-le rapidement par écrit, dans le délai prévu par le bail ou les usages du canton.</span>' : '';
+    out.className = 'fbk ' + (n === DEFECTS.length ? 'ok' : 'info');
+    out.innerHTML = '<strong>' + esc((DEFECTS.indexOf(d) + 1) + '. ' + d.t) + '</strong><span>' + esc(d.w) + '</span>' + done;
+  }
+  function plPick(k) { if (!k) return; plSel = k; plOn[k] = true; plRender(); }
+  $('plSpots').addEventListener('click', function (ev) { var s = ev.target.closest('.spot'); if (s) plPick(s.getAttribute('data-k')); });
+  $('plSpots').addEventListener('keydown', function (ev) { if (ev.key !== 'Enter' && ev.key !== ' ') return; var s = ev.target.closest('.spot'); if (s) { ev.preventDefault(); plPick(s.getAttribute('data-k')); } });
+  $('plBtns').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (b) plPick(b.getAttribute('data-k')); });
+  $('plReset').addEventListener('click', function () { plOn = {}; plSel = null; plRender(); });
+  plRender();
+
+  /* ---------- 6 bis. Usure normale ou dégât ? ---------- */
+  var N1 = { usure: 'Usure normale (bailleur)', degat: 'Dégât (locataire)' };
+  var SORT1 = [
+    { k: 'u1', s: 'Après 10 ans, la peinture des murs a jauni.', a: 'usure', why: 'Une peinture vieillit, même si on fait attention : c’est l’usure normale. Le locataire ne paie pas une peinture neuve.' },
+    { k: 'u2', s: 'Une brûlure de cigarette sur le parquet du séjour.', a: 'degat', why: 'C’est un dégât causé par un manque de soin : le locataire paie la réparation (en tenant souvent compte de l’âge du parquet).' },
+    { k: 'u3', s: 'La moquette est usée dans les passages, après 12 ans.', a: 'usure', why: 'Marcher sur une moquette l’use : usure normale après tant d’années.' },
+    { k: 'u4', s: 'Une vitre cassée par un ballon lancé dans l’appartement.', a: 'degat', why: 'Un accident causé par le locataire : il paie. Une assurance RC ou ménage peut parfois aider, selon le contrat.' },
+    { k: 'u5', s: 'Des dessins au feutre des enfants sur le mur de la chambre.', a: 'degat', why: 'Ce n’est pas un usage normal du mur : le locataire paie la remise en état.' },
+    { k: 'u6', s: 'Le parquet a pâli au soleil près de la fenêtre.', a: 'usure', why: 'Le soleil décolore les sols : personne n’y peut rien, c’est l’usure normale.' },
+    { k: 'u7', s: 'De légères traces de meubles sur le sol.', a: 'usure', why: 'Habiter un logement, c’est y mettre des meubles : de légères traces sont de l’usure normale.' },
+    { k: 'u8', s: 'La porte d’entrée griffée profondément par le chien.', a: 'degat', why: 'Les dégâts causés par un animal du locataire sont à sa charge.' },
+    { k: 'u9', s: 'Une tache de vin rouge sur une moquette posée il y a un an.', a: 'degat', why: 'Une tache qui ne part pas est un dégât. Comme la moquette est presque neuve, le locataire paie une grande partie.' },
+    { k: 'u10', s: 'Après 15 ans, le joint de la baignoire est jauni.', a: 'usure', why: 'Les joints vieillissent avec le temps : c’est l’usure normale. En revanche, un nettoyage régulier fait partie du soin attendu.' },
+    { k: 'u11', s: 'La plaque vitrocéramique est fêlée : une casserole est tombée dessus.', a: 'degat', why: 'C’est un accident causé par le locataire : il en répond.' },
+    { k: 'u12', s: 'Quelques petits trous de punaises pour des affiches, rebouchés proprement.', a: 'usure', alt: ['degat'], why: 'Quelques petits trous sont souvent considérés comme un usage normal, surtout s’ils sont bien rebouchés ; beaucoup de grands trous, non. Les deux réponses sont acceptées : cela dépend du nombre et de la taille.' }
+  ];
+  var sort1Score = scorer(SORT1);
+  makeSorter({ items: SORT1, names: N1, order: ['usure', 'degat'], btns: 's1Btns', card: 's1Card', pos: 's1Pos', out: 's1Out', score_: 's1Score', prev: 's1Prev', next: 's1Next', reset: 's1Reset', word: 'Question', score: sort1Score,
+    cardHtml: function (it) { return '<span>' + esc(it.s) + '</span><span class="ask">Usure normale ou dégât ?</span>'; } });
+
+  /* ---------- 7. Décompte de charges (montants inventés, centimes) ---------- */
+  var CH_ACOMPTE = 200, CH_FIXED = [['Eau chaude', 360], ['Conciergerie et nettoyage', 310], ['Électricité des parties communes', 95], ['Frais d’administration du décompte', 85]];
+  function charges(heatFr, mode) {
+    var heat = Math.max(0, Math.round(Number(heatFr) || 0)) * 100;
+    var lines = [['Chauffage', heat]].concat(CH_FIXED.map(function (l) { return [l[0], l[1] * 100]; }));
+    var cost = lines.reduce(function (s, l) { return s + l[1]; }, 0), paid = CH_ACOMPTE * 12 * 100;
+    return { mode: mode === 'forfait' ? 'forfait' : 'acompte', paid: paid, cost: cost, lines: lines, balance: mode === 'forfait' ? 0 : paid - cost };
+  }
+  var CH_PRE = [['Hiver doux', 1150], ['Hiver normal', 1400], ['Hiver froid', 1750]], chHeat = 1400, chMode = 'acompte';
+  $('chPre').innerHTML = CH_PRE.map(function (p) { return '<button type="button" data-v="' + p[1] + '" aria-pressed="false">' + esc(p[0]) + '</button>'; }).join('');
+  function chRender() {
+    chHeat = Math.round(lim(chHeat, 800, 2200) / 50) * 50;
+    $('chRange').value = chHeat; $('chVal').textContent = chf(chHeat);
+    pressAll($('chPre'), 'data-v', chHeat); pressAll($('chMode'), 'data-m', chMode);
+    var C = charges(chHeat, chMode), h;
+    if (C.mode === 'acompte') {
+      h = '<div class="hd">Décompte de charges · année inventée</div>';
+      C.lines.forEach(function (l) { h += row(esc(l[0]), esc(cts(l[1]))); });
+      h += row('Coûts réels de l’année', esc(cts(C.cost)), 'tot') + row('Acomptes versés : 12 × ' + esc(chf(CH_ACOMPTE)), esc(cts(C.paid))) +
+        row(C.balance >= 0 ? 'Solde en faveur du locataire' : 'Solde à payer par le locataire', esc(cts(Math.abs(C.balance))), 'tot');
+      $('chSlip').innerHTML = h;
+      $('chOut').innerHTML = C.balance > 0
+        ? '<strong>Le bailleur rembourse ' + esc(cts(C.balance)) + '</strong><span>' + esc('Les acomptes (' + cts(C.paid) + ') dépassent les coûts réels (' + cts(C.cost) + '). Le trop-perçu revient au locataire.') + '</span>'
+        : C.balance < 0
+          ? '<strong>Le locataire doit payer ' + esc(cts(-C.balance)) + '</strong><span>' + esc('Les coûts réels (' + cts(C.cost) + ') dépassent les acomptes (' + cts(C.paid) + '). On peut demander à voir les justificatifs avant de payer (CO 257b). Avec des hivers froids, prévoir un peu d’argent pour le décompte est prudent.') + '</span>'
+          : '<strong>Pile juste : rien à payer ni à rembourser</strong><span>Les acomptes couvrent exactement les coûts réels.</span>';
+    } else {
+      h = '<div class="hd">Forfait · année inventée</div>' + row('Forfait : 12 × ' + esc(chf(CH_ACOMPTE)), esc(cts(C.paid)), 'tot') + '<div class="sm">Coûts réels de l’année (pour information) : ' + esc(cts(C.cost)) + '</div>';
+      $('chSlip').innerHTML = h;
+      $('chOut').innerHTML = '<strong>Forfait : pas de décompte</strong><span>' + esc('Le locataire paie ' + cts(C.paid) + ' quoi qu’il arrive, que l’hiver soit doux ou froid. Le bailleur doit fixer le forfait d’après la moyenne de trois ans de coûts (OBLF 4).') + '</span>';
+    }
+  }
+  $('chMode').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b) return; chMode = b.getAttribute('data-m'); chRender(); });
+  $('chPre').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b) return; chHeat = Number(b.getAttribute('data-v')); chRender(); });
+  $('chRange').addEventListener('input', function () { chHeat = Number(this.value); chRender(); });
+  $('chMinus').addEventListener('click', function () { chHeat -= 50; chRender(); });
+  $('chPlus').addEventListener('click', function () { chHeat += 50; chRender(); });
+  chRender();
+
+  /* ---------- 8. Taux de référence : 3 % par quart de point à la hausse, ÷ 1,03 à la baisse (≈ −2,91 %) ---------- */
+  var RF_RATES = [0.50, 0.75, 1.00, 1.25, 1.50, 1.75, 2.00, 2.25, 2.50];
+  function refRent(netFr, newRate) {
+    var net = Math.max(0, Math.round(Number(netFr) || 0)) * 100;
+    var steps = Math.round((Number(newRate) - F.ref.rate) / F.ref.step);
+    if (!isFinite(steps)) steps = 0;
+    var factor = Math.pow(1 + F.ref.upPerStep / 100, steps), nr = Math.round(net * factor);
+    return { net: net, steps: steps, factor: factor, pct: (factor - 1) * 100, newRent: nr, diff: nr - net };
+  }
+  var rfNet = 1600, rfRate = 1.50;
+  $('rfRates').innerHTML = RF_RATES.map(function (r) { return '<button type="button" data-r="' + r.toFixed(2) + '" aria-pressed="false">' + esc(pctx(r, 2)) + '</button>'; }).join('');
+  function rfRender() {
+    rfNet = Math.round(lim(rfNet, 800, 3500) / 50) * 50;
+    $('rfRange').value = rfNet; $('rfVal').textContent = chf(rfNet);
+    pressAll($('rfRates'), 'data-r', rfRate.toFixed(2));
+    var R = refRent(rfNet, rfRate), sgn = R.steps > 0 ? '+' : '';
+    $('rfSlip').innerHTML = '<div class="hd">Calcul simplifié</div>' +
+      row('Taux de départ → nouveau taux', esc(pctx(F.ref.rate, 2) + ' → ' + pctx(rfRate, 2))) +
+      row('Écart', esc(sgn + fmt(R.steps * F.ref.step, 2) + ' point (' + sgn + R.steps + ' quart' + (Math.abs(R.steps) > 1 ? 's' : '') + ' de point)')) +
+      row('Facteur : 1,03 puissance ' + R.steps, esc(fmt(R.factor, 4))) +
+      row('Loyer net actuel', esc(cts(R.net))) +
+      row(R.steps > 0 ? 'Loyer net maximal' : R.steps < 0 ? 'Loyer net après la baisse demandée' : 'Loyer net', esc(cts(R.newRent)), 'tot');
+    var out = $('rfOut');
+    if (!R.steps) { out.innerHTML = '<strong>Pas de changement</strong><span>Le taux reste à 1,25 % : il ne donne aucune raison de modifier le loyer. D’autres raisons (IPC, coûts) restent possibles.</span>'; return; }
+    if (R.steps > 0) out.innerHTML = '<strong>Hausse de ' + esc(cts(R.diff)) + ' au plus (' + esc('+' + pctx(R.pct, 2)) + ')</strong><span>' + esc('En règle générale, le bailleur pourrait augmenter le loyer net d’au plus ' + pctx(R.pct, 2) + ', sur formule officielle, pour le prochain terme de résiliation. Le locataire peut contester dans les 30 jours.') + '</span>';
+    else out.innerHTML = '<strong>Baisse d’environ ' + esc(cts(-R.diff)) + ' (' + esc(pctx(R.pct, 2)) + ')</strong><span>' + esc('Le locataire peut en principe demander par écrit une baisse d’environ ' + pctx(-R.pct, 2) + '. Le bailleur peut opposer d’autres hausses de coûts ou le renchérissement. La baisse n’est pas automatique.') + '</span>';
+  }
+  $('rfRates').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b) return; rfRate = Number(b.getAttribute('data-r')); rfRender(); });
+  $('rfRange').addEventListener('input', function () { rfNet = Number(this.value); rfRender(); });
+  $('rfMinus').addEventListener('click', function () { rfNet -= 50; rfRender(); });
+  $('rfPlus').addEventListener('click', function () { rfNet += 50; rfRender(); });
+  rfRender();
+
+  /* ---------- 9. Partage du loyer en colocation (règles inventées, centimes, somme exacte) ---------- */
+  function allocate(totalC, weights) {
+    var sum = weights.reduce(function (s, w) { return s + w; }, 0);
+    if (!sum) return weights.map(function () { return 0; });
+    var raw = weights.map(function (w) { return totalC * w / sum; }), base = raw.map(Math.floor), left = totalC - base.reduce(function (s, x) { return s + x; }, 0);
+    var order = raw.map(function (r, i) { return [r - Math.floor(r), i]; }).sort(function (a, b) { return b[0] - a[0] || a[1] - b[1]; });
+    for (var j = 0; j < left; j++) base[order[j % order.length][1]]++;
+    return base;
+  }
+  function split(totalC, sizes, rule) {
+    var n = sizes.length, S = sizes.reduce(function (s, x) { return s + x; }, 0), w;
+    if (rule === 'surface') w = sizes.slice();
+    else if (rule === 'mixte') w = sizes.map(function (s) { return S + n * s; });
+    else w = sizes.map(function () { return 1; });
+    return allocate(Math.round(totalC), w);
+  }
+  var CO_TOTAL = 255000, CO_NAMES = ['Léo', 'Inès', 'Sam'], coSizes = [16, 12, 9], coRule = 'mixte';
+  var CO_RULES = [['egal', 'À parts égales'], ['surface', 'Selon la taille des chambres'], ['mixte', 'Moitié égale, moitié selon la taille']];
+  $('coRule').innerHTML = CO_RULES.map(function (r) { return '<button type="button" data-r="' + r[0] + '" aria-pressed="false">' + esc(r[1]) + '</button>'; }).join('');
+  function coRender() {
+    pressAll($('coRule'), 'data-r', coRule);
+    $('coItems').innerHTML = CO_NAMES.map(function (nm, i) {
+      return '<div class="item" data-i="' + i + '"><span><span class="nm">Chambre de ' + esc(nm) + '</span><br><span class="pr">surface privée</span></span><span class="qty"><button type="button" data-d="-1" aria-label="Chambre de ' + esc(nm) + ' : 1 m² de moins">−</button><b>' + coSizes[i] + NB + 'm²</b><button type="button" data-d="1" aria-label="Chambre de ' + esc(nm) + ' : 1 m² de plus">+</button></span></div>';
+    }).join('');
+    var P = split(CO_TOTAL, coSizes, coRule), h = '<div class="hd">Loyer brut : ' + esc(cts(CO_TOTAL)) + ' par mois</div>';
+    CO_NAMES.forEach(function (nm, i) { h += row(esc(nm + ' (' + coSizes[i] + ' m²)'), esc(cts(P[i]))); });
+    var sum = P.reduce(function (s, x) { return s + x; }, 0);
+    h += row('Total', esc(cts(sum)), 'tot');
+    $('coSlip').innerHTML = h;
+    var hi = Math.max.apply(null, P), lo = Math.min.apply(null, P);
+    var txt = coRule === 'egal' ? 'Chacun paie le même montant, quelle que soit sa chambre. Simple, mais celui qui a la petite chambre paie autant que celui qui a la grande.'
+      : coRule === 'surface' ? 'Chacun paie selon la surface de sa chambre. Mais la cuisine, le séjour et la salle de bain sont partagés à égalité : cette règle peut sembler dure pour la plus grande chambre.'
+      : 'La moitié du loyer correspond aux pièces communes, partagée à égalité ; l’autre moitié suit la taille des chambres. Un compromis souvent jugé équitable.';
+    $('coOut').innerHTML = '<strong>Écart entre la part la plus haute et la plus basse : ' + esc(cts(hi - lo)) + '</strong><span>' + esc(txt + ' Les colocataires choisissent ensemble et l’écrivent dans leur convention de colocation. Pour le bailleur, c’est souvent le loyer total qui compte.') + '</span>';
+  }
+  $('coRule').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b) return; coRule = b.getAttribute('data-r'); coRender(); });
+  $('coItems').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b) return; var i = Number(b.closest('.item').getAttribute('data-i')); coSizes[i] = Math.max(6, Math.min(30, coSizes[i] + Number(b.getAttribute('data-d')))); coRender(); });
+  coRender();
+
+  /* ---------- 10. Fin du bail : délai de 3 mois, termes inventés ---------- */
+  var MONTHS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+  var LASTDAY = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  var TERMS = { trim: { t: 'Fin mars, juin et septembre', m: [3, 6, 9] }, mois: { t: 'Chaque fin de mois, sauf décembre', m: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] } };
+  function endOfLease(month, key) {
+    var m = clamp(Number(month) - 1, 12) + 1, T = (TERMS[key] || TERMS.trim).m;
+    for (var k = F.noticeMonths; k <= F.noticeMonths + 12; k++) {
+      var t = ((m - 1 + k) % 12) + 1;
+      if (T.indexOf(t) >= 0) return { received: m, term: t, wait: k, nextYear: m - 1 + k >= 12 };
+    }
+    return null;
+  }
+  function dayOf(m) { return LASTDAY[m - 1] + ' ' + MONTHS[m - 1]; }
+  var teKey = 'trim', teM = 1;
+  $('teTerms').innerHTML = Object.keys(TERMS).map(function (k) { return '<button type="button" data-k="' + k + '" aria-pressed="false">' + esc(TERMS[k].t) + '</button>'; }).join('');
+  $('teMonth').innerHTML = MONTHS.map(function (n, i) { return '<button type="button" data-m="' + (i + 1) + '" aria-pressed="false">' + esc(n) + '</button>'; }).join('');
+  function teRender() {
+    pressAll($('teTerms'), 'data-k', teKey); pressAll($('teMonth'), 'data-m', teM);
+    var E = endOfLease(teM, teKey);
+    var txt = 'Il faut que le délai de 3 mois soit entier avant un terme. Lettre reçue au plus tard le ' + dayOf(E.received) + (E.received === 2 ? ' (29 les années bissextiles)' : '') + ' : le premier terme possible est le ' + dayOf(E.term) + (E.term === 2 ? ' (ou le 29)' : '') + (E.nextYear ? ' de l’année suivante' : '') + ', soit ' + E.wait + ' mois plus tard.';
+    if (E.wait > F.noticeMonths) txt += ' Comme ' + MONTHS[((E.received - 1 + F.noticeMonths) % 12)] + ' n’est pas un terme, il faut attendre le suivant.';
+    $('teOut').innerHTML = '<strong>Fin du bail : ' + esc(dayOf(E.term)) + (E.nextYear ? ' (année suivante)' : '') + '</strong><span>' + esc(txt) + ' Si le délai ou le terme n’est pas respecté, la résiliation vaut pour le terme suivant (CO 266a).</span>';
+  }
+  $('teTerms').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b) return; teKey = b.getAttribute('data-k'); teRender(); });
+  $('teMonth').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b) return; teM = Number(b.getAttribute('data-m')); teRender(); });
+  teRender();
+
+  var NOAH = [
+    { when: 'lire le bail', t: 'Délai et termes', x: 'Noah relit son bail : délai de congé de <strong>3 mois</strong>, termes fin mars, fin juin et fin septembre (exemple inventé). Il veut partir fin juin.' },
+    { when: 'écrire', t: 'La lettre de résiliation', x: 'Il écrit une lettre <strong>signée</strong> : son nom, l’adresse du logement, la date de fin souhaitée. Pas besoin de motif. Si plusieurs personnes ont signé le bail, toutes signent la lettre ; pour le logement de la famille, le conjoint doit être d’accord.' },
+    { when: 'envoyer', t: 'En recommandé, à temps', x: 'Il l’envoie en <strong>recommandé</strong>, assez tôt pour qu’elle <strong>arrive</strong> au plus tard le 31 mars : c’est la date de réception qui compte.' },
+    { when: 'si on part plus tôt', t: 'Le locataire de remplacement', x: 'Si Noah voulait partir avant le terme, il pourrait proposer un <strong>locataire de remplacement</strong> solvable, que le bailleur ne peut pas raisonnablement refuser, et prêt à reprendre le bail aux mêmes conditions. Sinon, il doit payer le loyer jusqu’au terme (CO 264).' },
+    { when: 'avant de rendre les clés', t: 'Nettoyer et réparer', x: 'Il nettoie tout le logement (fours, stores, filtres, radiateurs…) et répare les petits dégâts qu’il a causés. L’usure normale n’est pas à sa charge.' },
+    { when: 'le dernier jour', t: 'L’état des lieux de sortie', x: 'Avec la gérance, il compare l’état du logement avec l’état des lieux d’entrée. Il ne signe que ce qui est juste et garde un exemplaire. Le bailleur doit signaler tout de suite les défauts qu’il lui reproche (CO 267a).' },
+    { when: 'après', t: 'La garantie rendue', x: 'Si tout est en ordre, la garantie est libérée avec l’accord des deux. Noah annonce aussi son départ à la commune et son changement d’adresse.' }
+  ];
+  makeStepper({ steps: function () { return NOAH; }, label: 'Noah', out: 'noOut', bar: 'noBar', prev: 'noPrev', next: 'noNext', reset: 'noReset', end: 'noEnd',
+    endText: 'Noah a quitté son logement dans les règles : lettre écrite et reçue à temps, logement rendu propre, état des lieux signé, garantie récupérée.' });
+
+  /* ---------- 11. Locataire ou bailleur ? ---------- */
+  var N2 = { loc: 'Locataire', bai: 'Bailleur' };
+  var SORT2 = [
+    { k: 'r1', s: 'Remplacer une ampoule grillée dans la cuisine.', a: 'loc', why: 'C’est un menu travail d’entretien : à la charge du locataire selon l’usage (CO 259).' },
+    { k: 'r2', s: 'Le chauffage central de l’immeuble tombe en panne en janvier.', a: 'bai', why: 'Le bailleur doit entretenir le logement en état d’être habité (CO 256). Le locataire le prévient tout de suite.' },
+    { k: 'r3', s: 'Le toit fuit et l’eau coule dans la chambre.', a: 'bai', why: 'Une grosse réparation : c’est au bailleur. Le locataire doit signaler le défaut sans attendre.' },
+    { k: 'r4', s: 'Déboucher le siphon du lavabo, bouché par des cheveux.', a: 'loc', why: 'Petit entretien courant : les règles et usages locatifs vaudois, par exemple, le mettent à la charge du locataire.' },
+    { k: 'r5', s: 'Changer la sangle usée d’un store à rouleau.', a: 'loc', why: 'Les règles et usages locatifs vaudois citent ce petit travail parmi ceux du locataire. Le bail peut préciser.' },
+    { k: 'r6', s: 'Le vieux frigo fourni avec l’appartement ne marche plus après 20 ans.', a: 'bai', why: 'Un appareil qui fait partie du logement et qui s’use avec le temps est remplacé par le bailleur.' },
+    { k: 'r7', s: 'Respecter le calme la nuit et les règles de la buanderie.', a: 'loc', why: 'Le locataire doit avoir des égards pour les voisins (CO 257f) et respecter le règlement de maison.' },
+    { k: 'r8', s: 'Signaler un dégât d’eau découvert sous l’évier.', a: 'loc', why: 'Le locataire doit aviser le bailleur des défauts qu’il ne doit pas réparer lui-même ; sinon, il peut répondre du dommage aggravé.' },
+    { k: 'r9', s: 'Prévenir à l’avance avant de rénover la salle de bain.', a: 'bai', why: 'Le bailleur qui rénove doit annoncer les travaux assez tôt et tenir compte des intérêts du locataire.' },
+    { k: 'r10', s: 'Demander l’accord écrit avant de repeindre les murs en noir.', a: 'loc', why: 'Pour modifier le logement, le locataire a besoin de l’accord écrit du bailleur (CO 260a).' },
+    { k: 'r11', s: 'Déposer la garantie sur un compte au nom du locataire.', a: 'bai', why: 'C’est une obligation du bailleur (CO 257e).' },
+    { k: 'r12', s: 'Payer le loyer et les charges à temps chaque mois.', a: 'loc', why: 'C’est l’obligation principale du locataire (CO 257c). En cas de retard, le bailleur peut fixer un délai de 30 jours avant de résilier (CO 257d).' }
+  ];
+  var sort2Score = scorer(SORT2);
+  makeSorter({ items: SORT2, names: N2, order: ['loc', 'bai'], btns: 's2Btns', card: 's2Card', pos: 's2Pos', out: 's2Out', score_: 's2Score', prev: 's2Prev', next: 's2Next', reset: 's2Reset', word: 'Question', score: sort2Score,
+    cardHtml: function (it) { return '<span>' + esc(it.s) + '</span><span class="ask">Qui s’en occupe, en règle générale ?</span>'; } });
+
+  /* ---------- Idées reçues ---------- */
+  var MYTHS = [
+    { k: 'gar', s: '« Le bailleur peut demander 6 mois de loyer comme garantie. »', a: 'mythe', why: 'Pour un logement, la garantie ne peut pas dépasser 3 mois de loyer (CO 257e).' },
+    { k: 'auto', s: '« Si le taux de référence baisse, mon loyer baisse tout seul. »', a: 'mythe', why: 'Il faut demander la baisse par écrit au bailleur. S’il refuse ou ne répond pas dans les 30 jours, on peut saisir l’autorité de conciliation (CO 270a).' },
+    { k: 'mois', s: '« On peut quitter son appartement quand on veut, avec un mois de préavis. »', a: 'mythe', why: 'Pour une habitation, le délai légal est d’au moins 3 mois, pour un terme. Pour partir plus tôt, on peut présenter un locataire de remplacement (CO 264).' },
+    { k: 'motif', s: '« Le locataire doit expliquer pourquoi il résilie son bail. »', a: 'mythe', why: 'Le locataire n’a pas besoin de donner un motif. Il écrit et envoie sa lettre en recommandé, à temps.' },
+    { k: 'init', s: '« On peut parfois contester le loyer de départ. »', a: 'vrai', why: 'Vrai, dans les 30 jours après la remise du logement, à certaines conditions (pénurie, forte hausse par rapport au locataire précédent…) (CO 270).' },
+    { k: 'peint', s: '« Après 15 ans d’usage normal, le locataire doit payer la peinture neuve. »', a: 'mythe', why: 'La peinture qui vieillit avec le temps, c’est l’usure normale : le locataire ne la paie pas. Il paie seulement les dégâts qu’il a causés.' },
+    { k: 'sous', s: '« Pour sous-louer une chambre, il faut l’accord du bailleur. »', a: 'vrai', why: 'Vrai (CO 262). Le bailleur ne peut refuser que pour certaines raisons, par exemple des conditions abusives.' },
+    { k: 'acpt', s: '« L’acompte de charges est un montant définitif. »', a: 'mythe', why: 'Un acompte est une avance : au moins une fois par an, un décompte compare les acomptes aux coûts réels (OBLF 4). C’est le forfait qui est fixe.' }
+  ];
+  function mythBy(k) { return MYTHS.filter(function (m) { return m.k === k; })[0] || null; }
+  function checkMyth(k, choice) { var m = mythBy(k); if (!m || (choice !== 'vrai' && choice !== 'mythe')) return null; return { ok: m.a === choice, answer: m.a, why: m.why }; }
+  var mythAns = {};
+  $('myths').innerHTML = MYTHS.map(function (m) {
+    return '<div class="box myth" data-k="' + m.k + '"><span class="stmt">' + esc(m.s) + '</span><div class="btns"><button type="button" data-c="vrai">Vrai</button><button type="button" data-c="mythe">Idée reçue</button></div><div class="fbk" aria-live="polite"></div></div>';
+  }).join('');
+  function mythRender() {
+    var correct = 0;
+    each($('myths').querySelectorAll('.myth'), function (box) {
+      var k = box.getAttribute('data-k'), a = mythAns[k], m = mythBy(k), out = box.querySelector('.fbk');
+      each(box.querySelectorAll('button'), function (b) { var c = b.getAttribute('data-c'); b.disabled = !!a; b.className = a ? (c === m.a ? 'right' : (c === a ? 'wrong' : '')) : ''; });
+      if (!a) { out.className = 'fbk'; out.innerHTML = ''; return; }
+      var ok = a === m.a; if (ok) correct++;
+      out.className = 'fbk ' + (ok ? 'ok' : 'no');
+      out.innerHTML = '<strong>' + (m.a === 'vrai' ? 'Vrai.' : 'Idée reçue.') + (ok ? ' Bien joué !' : '') + '</strong><span>' + esc(m.why) + '</span>';
+    });
+    $('mythScore').textContent = correct + ' / ' + MYTHS.length;
+  }
+  $('myths').addEventListener('click', function (ev) {
+    var b = ev.target.closest('button'); if (!b || b.disabled) return;
+    var k = b.closest('.myth').getAttribute('data-k');
+    if (!mythAns[k]) mythAns[k] = b.getAttribute('data-c');
+    mythRender();
+  });
+  $('mythReset').addEventListener('click', function () { mythAns = {}; mythRender(); });
+  mythRender();
+
+  /* ---------- Quiz ---------- */
+  var QZ = [
+    { q: 'En 2024, environ quelle part des logements occupés l’étaient par leur propriétaire en Suisse ?', o: [['a', 'environ 36 %'], ['b', 'environ 64 %'], ['c', 'environ 90 %']], a: 'a', how: '35,7 % (OFS, 2024). Environ 64 % des logements occupés sont donc loués : la Suisse est un pays de locataires.' },
+    { q: 'Pour un logement, la garantie de loyer peut être au plus de…', o: [['a', '1 mois de loyer'], ['b', '3 mois de loyer'], ['c', '6 mois de loyer']], a: 'b', how: '3 mois de loyer (CO 257e), déposés sur un compte au nom du locataire.' },
+    { q: 'Quel est le délai légal minimum pour résilier le bail d’une habitation ?', o: [['a', '1 mois'], ['b', '3 mois'], ['c', '6 mois']], a: 'b', how: '3 mois, pour un terme fixé par l’usage local ou, à défaut, la fin d’un trimestre de bail (CO 266c). Le bail peut prévoir plus long.' },
+    { q: 'Dans quel délai peut-on contester un loyer initial jugé abusif ?', o: [['a', '10 jours'], ['b', '30 jours'], ['c', '1 an']], a: 'b', how: '30 jours après la remise du logement, devant l’autorité de conciliation, à certaines conditions (CO 270).' },
+    { q: 'Quelle est la valeur du taux hypothécaire de référence publiée le 1er septembre 2026 ?', o: [['a', '0,50 %'], ['b', '1,25 %'], ['c', '2,50 %']], a: 'b', how: '1,25 %, inchangé depuis le 2 septembre 2025. Prochaine publication : 1er décembre 2026 (OFL).' },
+    { q: 'Le taux de référence monte de 0,25 point. En règle générale, de combien le loyer peut-il augmenter au plus ?', o: [['a', '1 %'], ['b', '3 %'], ['c', '10 %']], a: 'b', how: '3 % au plus (OBLF 13, pour des taux inférieurs à 5 %). À la baisse, environ 2,91 %, sur demande du locataire.' },
+    { q: 'Loyer net 1 500 fr. et charges 200 fr. : quel est le loyer brut ?', o: [['a', '1 300 fr.'], ['b', '1 500 fr.'], ['c', '1 700 fr.']], a: 'c', how: 'Loyer brut = loyer net + charges = 1 500 + 200 = 1 700 fr.' },
+    { q: 'Comment le bailleur doit-il résilier le bail d’un logement ?', o: [['a', 'Par un message sur le téléphone'], ['b', 'Avec une formule officielle agréée par le canton'], ['c', 'Oralement, lors d’une visite']], a: 'b', how: 'Par écrit, avec une formule officielle qui explique comment contester ; sinon, le congé est nul (CO 266l et 266o).' }
+  ];
+  var quiz = $('quiz'), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ''; done = [];
+    QZ.forEach(function (Q, k) {
+      var li = document.createElement('li');
+      li.innerHTML = '<span>' + esc(Q.q) + '</span><select id="qa' + k + '" aria-label="Ta réponse à la question ' + (k + 1) + '"><option value="">…</option>' + Q.o.map(function (o) { return '<option value="' + o[0] + '">' + esc(o[1]) + '</option>'; }).join('') + '</select><button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+      quiz.appendChild(li);
+      function check() {
+        var fb = $('qf' + k), v = $('qa' + k).value;
+        if (!v) { fb.className = 'fb'; fb.textContent = 'Choisis une réponse.'; return; }
+        if (v === Q.a) { fb.className = 'fb ok'; fb.innerHTML = 'Bravo, c’est juste !<span>' + esc(Q.how) + '</span>'; done[k] = true; }
+        else {
+          done[k] = false;
+          var good = Q.o.filter(function (o) { return o[0] === Q.a; })[0][1];
+          fb.className = 'fb no'; fb.innerHTML = 'Pas tout à fait : la bonne réponse est « ' + esc(good) + ' ».<span>' + esc(Q.how) + '</span>';
+        }
+        $('score').textContent = done.filter(Boolean).length + ' / 8';
+      }
+      $('qb' + k).addEventListener('click', check);
+      $('qa' + k).addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+    });
+    $('score').textContent = '0 / 8';
+  }
+  $('newQuiz').addEventListener('click', newQuiz);
+  newQuiz();
+
+  window.__logement = {
+    F: F, housing: HOUSING,
+    sort0: SORT0, sort0Score: sort0Score,
+    maxRent: maxRent, flats: FLATS, fits: fits, lina: LINA,
+    guarantee: guarantee, defects: DEFECTS,
+    sort1: SORT1, sort1Score: sort1Score,
+    charges: charges, refRent: refRent, allocate: allocate, split: split,
+    endOfLease: endOfLease, terms: TERMS, noah: NOAH,
+    sort2: SORT2, sort2Score: sort2Score, isOk: isOk,
+    myths: MYTHS, checkMyth: checkMyth, quiz: QZ
+  };
+})();
+</script>
+</body>
+</html>

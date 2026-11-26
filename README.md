@@ -172,6 +172,9 @@ Accueil : [geographie.html](geographie.html). La Suisse et son histoire, le mond
 | [Les impôts en Suisse](les-impots-en-suisse.html) | Commune, canton et Confédération, impôts directs et TVA, la progressivité, la déclaration d'impôt et où va l'argent. |
 | [L'assurance-maladie en Suisse](l-assurance-maladie-en-suisse.html) | La LAMal obligatoire, la prime, la franchise et la quote-part, les modèles, les subsides, les accidents et pourquoi les primes augmentent. |
 | [Le budget et l'argent de poche](le-budget-et-l-argent-de-poche.html) | Combien d'argent de poche, besoins et envies, faire un budget, épargner pour un projet, les pièges, le premier salaire et les dettes. |
+| [Le permis de conduire en Suisse](le-permis-de-conduire-en-suisse.html) | Du vélo au permis B : les âges et les catégories, les étapes, les panneaux, la distance d'arrêt, l'alcool, le permis à l'essai et le coût. |
+| [Le logement et le loyer](le-logement-et-le-loyer.html) | Lire une annonce, combien payer, le dossier, le bail, la garantie, l'état des lieux, les charges, le taux de référence et déménager. |
+| [Les hypothèques](les-hypotheques.html) | Acheter un logement à crédit : fonds propres, intérêts et amortissement, capacité financière, fixe ou SARON, 2e pilier et valeur locative. |
 
 ## Pour réviser
 
