@@ -54,8 +54,8 @@ TRACKS = [
     ("religions1", "religions", "Découvrir les religions du monde", "9H–11H", "Les grandes religions et sagesses, leurs croyances, leurs textes et leurs fêtes.", [
         "les-religions-du-monde", "le-judaisme", "le-christianisme", "l-islam", "l-hindouisme", "le-bouddhisme", "le-sikhisme",
         "les-sagesses-de-chine-et-du-japon", "les-religions-traditionnelles", "les-mythologies-antiques", "les-fetes-et-calendriers"]),
-    ("geo1", "geographie", "Découvrir la Suisse et le monde", "9H–11H", "Le relief et les cantons de la Suisse, son histoire, les pays du monde, la démocratie suisse et la retraite.", [
-        "la-geographie-de-la-suisse", "l-histoire-de-la-suisse", "la-geographie-du-monde", "la-politique-suisse", "la-retraite-en-suisse"]),
+    ("geo1", "geographie", "Découvrir la Suisse et le monde", "9H–11H", "Le relief et les cantons de la Suisse, son histoire, les pays du monde, la démocratie suisse, la retraite et les impôts.", [
+        "la-geographie-de-la-suisse", "l-histoire-de-la-suisse", "la-geographie-du-monde", "la-politique-suisse", "la-retraite-en-suisse", "les-impots-en-suisse"]),
     ("fr1", "francais", "Découvrir la langue française", "9H–11H", "D'où vient le français, comment se construit une phrase, comment on l'écrit et comment on conjugue.", [
         "la-langue-francaise", "la-grammaire", "l-orthographe", "la-ponctuation", "la-conjugaison"]),
     ("pcurio", "physique", "Physique et curiosités", "tous niveaux", "La physique du ciel, du sport et du climat.", [
@@ -64,6 +64,7 @@ TRACKS = [
 
 # Ce qu'il vaut mieux connaître avant (seulement les liens importants).
 PRE = {
+    "les-impots-en-suisse": ["la-politique-suisse"],
     "la-retraite-en-suisse": ["la-politique-suisse"],
     "calculer-avec-les-racines": ["les-racines-carrees"],
     "les-regles-de-calcul-des-puissances": ["les-puissances"],

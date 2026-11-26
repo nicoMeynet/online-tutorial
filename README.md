@@ -169,6 +169,7 @@ Accueil : [geographie.html](geographie.html). La Suisse et son histoire, le mond
 | [La géographie du monde](la-geographie-du-monde.html) | Continents et océans, pays et capitales en jeu, fuseaux horaires, records de la planète et cartes qui déforment. |
 | [La politique suisse](la-politique-suisse.html) | Commune, canton et Confédération, Parlement et Conseil fédéral, élections, votations, référendum et initiative. |
 | [La retraite en Suisse : les trois piliers](la-retraite-en-suisse.html) | AVS, caisse de pension et 3e pilier : qui paie quoi, répartition ou capitalisation, un parcours de vie et les débats actuels. |
+| [Les impôts en Suisse](les-impots-en-suisse.html) | Commune, canton et Confédération, impôts directs et TVA, la progressivité, la déclaration d'impôt et où va l'argent. |
 
 ## Pour réviser
 

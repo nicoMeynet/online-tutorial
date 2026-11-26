@@ -25,7 +25,7 @@ SUBJECTS = [
     ("religions.html", "religions", "Religions", "#6d28d9", "#c4b5fd",
      "Les religions et les sagesses du monde : croyances, textes, fêtes et lieux, pour mieux comprendre les autres."),
     ("geographie.html", "geographie", "Histoire, géographie et citoyenneté", "#15803d", "#4ade80",
-     "Le relief, l'histoire et les cantons de la Suisse, les pays et capitales du monde, comment fonctionne la démocratie suisse et la retraite."),
+     "Le relief, l'histoire et les cantons de la Suisse, les pays et capitales du monde, comment fonctionne la démocratie suisse, la retraite et les impôts."),
 ]
 
 ICONS = {
