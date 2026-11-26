@@ -1,0 +1,1289 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>L'assurance-maladie en Suisse</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout : même cahier à grands carreaux que les autres tutoriels de citoyenneté, marge rouge, accent rouge suisse (#c8102e) avec une encre plus foncée (--acc-ink) pour le texte. Page éducative et neutre : aucun conseil d'assurance, aucun nom d'assureur ni de parti. Chiffres officiels vérifiés (OFSP : communiqués des primes 2026 et 2027, fiches d'information, « Primes-Conseil » 2027 ; OFS : coûts de la santé 2024 ; Chancellerie fédérale : votations) ; toutes les personnes, les primes des simulateurs et la règle de subside sont inventées. Couleurs : franchise = --pb (ambre), quote-part = --acc (rouge), assureur = --pa (bleu), subside / canton = --pc (sarcelle), complémentaire = --pd (violet). */
+:root {
+  --paper: #faf7f7;
+  --grid: #efe3e4;
+  --card: #ffffff;
+  --ink: #221417;
+  --ink-soft: #5d4b4f;
+  --acc: #c8102e;
+  --acc-ink: #9b0c23;
+  --acc-soft: #fbe3e7;
+  --two: #1d4ed8;
+  --two-soft: #e0e8fb;
+  --warn: #b45309;
+  --warn-soft: #fbecd6;
+  --warn-ink: #92400e;
+  --ok: #1f7a4d;
+  --ok-soft: #dcf1e5;
+  --red: #cf3a52;
+  --red-soft: #fbe1e6;
+  --hl: #ffe9a8;
+  --line: #e6d5d8;
+  --pa: #2563eb;
+  --pb: #d97706;
+  --pc: #0f766e;
+  --pd: #7c3aed;
+  --pa-soft: #dbe6fd;
+  --pb-soft: #fdebd3;
+  --pc-soft: #d5f0ec;
+  --pd-soft: #ece4fd;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #150d0f; --grid: #24171a; --card: #1d1316; --ink: #f6ecee; --ink-soft: #c4b0b4;
+    --acc: #f0475f; --acc-ink: #ff8fa0; --acc-soft: #3d1219; --two: #7aa2ff; --two-soft: #172446;
+    --warn: #f5a524; --warn-soft: #3d2a0c; --warn-ink: #fbbf5a;
+    --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b3a18; --line: #3a2a2e;
+    --pa: #7aa2ff; --pb: #f5a524; --pc: #5fd0c2; --pd: #b79bff;
+    --pa-soft: #172446; --pb-soft: #3d2a0c; --pc-soft: #12332f; --pd-soft: #261a44;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #150d0f; --grid: #24171a; --card: #1d1316; --ink: #f6ecee; --ink-soft: #c4b0b4;
+  --acc: #f0475f; --acc-ink: #ff8fa0; --acc-soft: #3d1219; --two: #7aa2ff; --two-soft: #172446;
+  --warn: #f5a524; --warn-soft: #3d2a0c; --warn-ink: #fbbf5a;
+  --ok: #6fd39f; --ok-soft: #173a29; --red: #ff7d92; --red-soft: #3a1c27; --hl: #4b3a18; --line: #3a2a2e;
+  --pa: #7aa2ff; --pb: #f5a524; --pc: #5fd0c2; --pd: #b79bff;
+  --pa-soft: #172446; --pb-soft: #3d2a0c; --pc-soft: #12332f; --pd-soft: #261a44;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 760px; margin: 0 auto; padding-block: 40px 80px; position: relative; display: flex; flex-direction: column; gap: 56px; }
+@media (min-width: 900px) { .page::before { content: ""; position: absolute; top: 0; bottom: 0; left: -36px; width: 2px; background: var(--red); opacity: .55; } }
+
+h1, h2, h3 { font-family: var(--f-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); font-weight: 800; }
+h3 { font-size: 1.2rem; font-weight: 700; }
+p { margin: 0; max-width: 65ch; }
+.hl { background: linear-gradient(transparent 45%, var(--hl) 45%); padding: 0 2px; }
+.mono { font-family: var(--f-mono); }
+.soft { color: var(--ink-soft); }
+section { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.eyebrow { font-family: var(--f-mono); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--acc-ink); font-weight: 600; }
+
+.hero { display: flex; flex-direction: column; gap: 16px; }
+.hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; }
+.hero .lead { font-size: 1.2rem; color: var(--ink-soft); }
+
+.box { background: var(--card); border: 2px solid var(--ink); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 4px 4px 0 var(--ink); min-width: 0; }
+@media (max-width: 420px) { .box { padding: 14px; } }
+.note { border-left: 4px solid var(--acc); background: var(--acc-soft); padding: 14px 16px; border-radius: 0 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.note.red { border-left-color: var(--red); background: var(--red-soft); }
+.note.warn { border-left-color: var(--warn); background: var(--warn-soft); }
+.note.ok { border-left-color: var(--ok); background: var(--ok-soft); }
+.note.two { border-left-color: var(--two); background: var(--two-soft); }
+.note-title { font-family: var(--f-display); font-weight: 700; }
+svg text { font-family: var(--f-mono); fill: var(--ink); }
+.fig svg { width: 100%; height: auto; display: block; }
+
+button { font: inherit; font-family: var(--f-display); font-weight: 700; background: var(--card); color: var(--ink); border: 2px solid var(--ink); border-radius: 8px; padding: 8px 12px; min-height: 44px; cursor: pointer; box-shadow: 3px 3px 0 var(--ink); }
+button[aria-pressed="true"] { background: var(--acc-ink); color: var(--paper); }
+button:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+button:disabled { cursor: default; }
+:focus-visible { outline: 3px solid var(--two); outline-offset: 3px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+select { font: inherit; font-size: 1rem; padding: 8px 8px; border: 2px solid var(--ink); border-radius: 8px; background: var(--paper); color: var(--ink); width: 100%; min-width: 0; min-height: 44px; }
+input[type="range"] { width: 100%; accent-color: var(--acc); min-height: 40px; min-width: 0; }
+.param { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.param label, .param .lb { font-weight: 700; }
+.slider-row { display: grid; grid-template-columns: 46px minmax(0, 1fr) 46px; gap: 8px; align-items: center; }
+.slider-row button { padding: 0; min-width: 46px; font-size: 1.3rem; box-shadow: none; border-width: 1.5px; }
+.slider-row button:hover { box-shadow: none; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
+.cards .box { box-shadow: none; border-width: 1.5px; gap: 8px; }
+.tag { font-family: var(--f-mono); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; align-self: flex-start; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
+.tag.ok { color: var(--ok); }
+.tag.no { color: var(--red); }
+.tag.acc { color: var(--acc-ink); }
+.tag.two { color: var(--two); }
+.tag.warn { color: var(--warn-ink); }
+.tag.p1 { color: var(--pa); } .tag.p2 { color: var(--pb); } .tag.p3 { color: var(--pc); } .tag.p4 { color: var(--pd); }
+.score { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; color: var(--acc-ink); }
+.fbk { border-radius: 8px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; min-width: 0; overflow-wrap: anywhere; }
+.fbk:empty { display: none; }
+.fbk.ok { background: var(--ok-soft); }
+.fbk.no { background: var(--red-soft); }
+.fbk.info { background: var(--two-soft); }
+.fbk.warn { background: var(--warn-soft); }
+.fbk strong { font-family: var(--f-display); }
+.fbk.ok strong { color: var(--ok); }
+.fbk.no strong { color: var(--red); }
+.fbk.info strong { color: var(--two); }
+.fbk.warn strong { color: var(--warn-ink); }
+.step-n { font-family: var(--f-mono); font-size: .85rem; color: var(--ink-soft); }
+button.right, button.right:disabled { background: var(--ok-soft); border-color: var(--ok); color: var(--ok); }
+button.wrong, button.wrong:disabled { background: var(--red-soft); border-color: var(--red); color: var(--red); }
+.choice button { flex: 1 1 130px; }
+.choice button:disabled:not(.right):not(.wrong) { opacity: .55; }
+.card-big { background: var(--paper); border: 1.5px dashed var(--line); border-radius: 10px; padding: 14px; font-family: var(--f-display); font-weight: 700; font-size: 1.1rem; overflow-wrap: anywhere; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.card-big .ask { font-family: var(--f-body); font-weight: 400; font-size: 1rem; color: var(--ink-soft); }
+.part-btns button { flex: 1 1 120px; font-size: .95rem; box-shadow: none; border-width: 1.5px; }
+.part-btns button:hover { box-shadow: none; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+.stat { background: var(--paper); border: 1.5px solid var(--line); border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; min-width: 0; }
+.stat b { font-family: var(--f-display); font-size: 1.5rem; color: var(--acc-ink); line-height: 1.15; overflow-wrap: anywhere; }
+.stat span { font-size: .9rem; color: var(--ink-soft); }
+
+/* Héros : la caisse commune */
+.fig.pot svg { max-width: 520px; margin: 0 auto; }
+.pot .person { fill: var(--pa-soft); stroke: var(--ink); stroke-width: 1.5; }
+.pot .coin { fill: var(--hl); stroke: var(--ink); stroke-width: 1.2; }
+.pot .jar { fill: var(--pc-soft); stroke: var(--ink); stroke-width: 2; }
+.pot .bed { fill: var(--acc-soft); stroke: var(--ink); stroke-width: 1.5; }
+.pot .arrow { fill: none; stroke: var(--ink-soft); stroke-width: 2; stroke-linecap: round; }
+
+/* Mutuelle de la classe */
+.evts { display: flex; flex-direction: column; gap: 4px; font-size: .95rem; }
+.evts span { border-bottom: 1px dashed var(--line); padding-bottom: 4px; overflow-wrap: anywhere; }
+.pupils { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 4px; }
+.pupils i { display: block; aspect-ratio: 1; border-radius: 50%; background: var(--pa-soft); border: 1.5px solid var(--ink-soft); }
+.pupils i.sick { background: var(--acc); border-color: var(--acc-ink); }
+.pupils i.big { background: var(--warn); border-color: var(--warn-ink); }
+@media (max-width: 420px) { .pupils { grid-template-columns: repeat(8, minmax(0, 1fr)); } }
+
+/* Barres */
+.hbar { height: 26px; border-radius: 6px; background: var(--line); border: 1.5px solid var(--ink); overflow: hidden; position: relative; display: flex; }
+.hbar i { display: block; height: 100%; transition: width .3s; width: 0; }
+.hbar .b1 { background: var(--pa); } .hbar .b2 { background: var(--pb); } .hbar .b3 { background: var(--pc); } .hbar .b4 { background: var(--pd); } .hbar .bacc { background: var(--acc); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: .92rem; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.sw { width: 14px; height: 14px; border-radius: 50%; display: inline-block; flex: none; }
+
+/* Tableaux */
+.scroll { overflow-x: auto; padding-bottom: 4px; }
+.ptable { border-collapse: collapse; width: 100%; min-width: 520px; }
+.ptable th, .ptable td { border: 1.5px solid var(--line); padding: 8px 10px; text-align: left; vertical-align: top; }
+.ptable th { font-family: var(--f-display); background: var(--paper); }
+.ptable td:first-child { font-family: var(--f-display); font-weight: 700; color: var(--acc-ink); }
+@media (max-width: 520px) { .ptable { min-width: 440px; } .ptable th, .ptable td { padding: 5px 6px; font-size: .88rem; } }
+
+/* Ticket */
+.slip { font-family: var(--f-mono); font-size: .95rem; background: var(--paper); border: 1.5px dashed var(--ink-soft); border-radius: 8px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.slip .row { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.slip .row span:last-child { white-space: nowrap; }
+.slip .tot { border-top: 2px solid var(--ink); padding-top: 6px; margin-top: 4px; font-weight: 600; }
+.slip .hd { font-family: var(--f-display); font-weight: 700; font-size: 1.05rem; }
+.slip .sm { font-size: .85rem; color: var(--ink-soft); }
+@media (max-width: 420px) { .slip { font-size: .86rem; padding: 10px; } }
+.items { display: flex; flex-direction: column; gap: 8px; }
+.item { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 10px; align-items: center; border-bottom: 1px dashed var(--line); padding-bottom: 8px; }
+.item .nm { font-family: var(--f-display); font-weight: 700; overflow-wrap: anywhere; }
+.item .pr { font-family: var(--f-mono); font-size: .88rem; color: var(--ink-soft); }
+.qty { display: flex; align-items: center; gap: 6px; }
+.qty button { min-width: 44px; padding: 0; font-size: 1.25rem; box-shadow: none; border-width: 1.5px; }
+.qty button:hover { box-shadow: none; }
+.qty b { font-family: var(--f-mono); min-width: 1.6em; text-align: center; }
+
+/* Parcours pas à pas */
+.era { border-left: 5px solid var(--acc); background: var(--paper); border-radius: 0 10px 10px 0; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; min-width: 0; overflow-wrap: anywhere; }
+.era .when { font-family: var(--f-mono); font-weight: 600; color: var(--acc-ink); font-size: .95rem; }
+.era-bar { height: 8px; border-radius: 4px; background: var(--line); overflow: hidden; }
+.era-bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--acc), var(--warn)); width: 0; transition: width .3s; }
+.era .amt { font-family: var(--f-mono); font-weight: 600; }
+
+/* Listes à barres (franchises, financement) */
+.bud { display: flex; flex-direction: column; gap: 6px; }
+.bud button, .bud .rowx { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; text-align: left; box-shadow: none; border-width: 1.5px; padding: 8px 10px; font-size: .95rem; }
+.bud .rowx { border: 1.5px solid var(--line); border-radius: 8px; background: var(--card); }
+.bud .rowx.best { border-color: var(--ok); background: var(--ok-soft); }
+.bud button:hover { box-shadow: none; }
+.bud .bn { overflow-wrap: anywhere; font-family: var(--f-display); font-weight: 700; }
+.bud .bd { grid-column: 1 / -1; font-size: .85rem; color: var(--ink-soft); font-family: var(--f-mono); overflow-wrap: anywhere; }
+.bud .bv { font-family: var(--f-mono); font-weight: 600; white-space: nowrap; }
+.bud .bt { grid-column: 1 / -1; height: 12px; border-radius: 4px; background: var(--line); overflow: hidden; display: flex; }
+.bud .bt i { display: block; height: 100%; background: var(--acc); }
+.bud .bt i.pa { background: var(--pa); } .bud .bt i.pb { background: var(--pb); } .bud .bt i.acc { background: var(--acc); } .bud .bt i.pc { background: var(--pc); } .bud .bt i.pd { background: var(--pd); }
+.bud button[aria-pressed="true"] .bt { background: rgba(255,255,255,.25); }
+.bud button[aria-pressed="true"] .bd { color: var(--paper); }
+
+/* Modèles */
+.models { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
+.models button { text-align: left; font-size: .95rem; box-shadow: none; border-width: 1.5px; display: flex; flex-direction: column; gap: 0; }
+.models button:hover { box-shadow: none; }
+.models .code { font-family: var(--f-mono); font-size: .8rem; font-weight: 600; opacity: .85; }
+.models button.seen:not([aria-pressed="true"]) { border-style: dashed; }
+
+/* Avis */
+.views { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.views .box { box-shadow: none; border-width: 1.5px; gap: 6px; }
+
+/* Idées reçues */
+.myth .btns button { flex: 1 1 100px; }
+.myth .stmt { font-family: var(--f-display); font-weight: 700; }
+
+/* Glossaire */
+.gloss { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px 18px; margin: 0; }
+.gloss div { border-bottom: 1px dashed var(--line); padding-bottom: 6px; }
+.gloss dt { font-family: var(--f-display); font-weight: 700; color: var(--acc-ink); }
+.gloss dd { margin: 0; font-size: .95rem; }
+
+.quiz { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.quiz li { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr 220px auto; gap: 10px; align-items: center; }
+.quiz li > span:first-child { min-width: 0; overflow-wrap: anywhere; }
+.quiz select { font-size: .95rem; padding: 6px 6px; }
+.quiz .fb { grid-column: 1 / -1; font-size: .95rem; }
+.quiz .fb:empty { display: none; }
+.quiz .fb.ok { color: var(--ok); font-weight: 700; }
+.quiz .fb.no { color: var(--red); font-weight: 700; }
+.quiz .fb span { color: var(--ink-soft); font-weight: 400; font-family: var(--f-mono); font-size: .88rem; display: block; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .quiz li { grid-template-columns: 1fr auto; } .quiz li > span:first-child { grid-column: 1 / -1; } }
+
+.exos { display: flex; flex-direction: column; gap: 14px; }
+details { background: var(--card); border: 1.5px solid var(--ink); border-radius: 10px; padding: 14px 18px; }
+summary { cursor: pointer; font-weight: 700; }
+summary::marker { color: var(--acc-ink); }
+details > div { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; color: var(--ink-soft); overflow-wrap: anywhere; }
+details .q { color: var(--ink); font-weight: 400; display: block; margin-top: 4px; }
+footer { color: var(--ink-soft); font-size: .9rem; border-top: 2px solid var(--ink); padding-top: 14px; }
+/*sorter-end*/
+.sorter-end { margin-top: .6rem; }
+.sorter-end strong { font-size: 1.05rem; }
+</style>
+
+<!--ticons--><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Tutoriels"><script src="progress.js" defer></script><script src="share.js" defer></script><!--/ticons-->
+<style id="tnav-css">
+.tnav-top { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin: 0 0 4px; }
+.tnav-home { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font-weight: 700; font-size: .95rem; text-decoration: none; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tnav-home:hover, .tnav-home:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+a.tlink { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.tnav-bottom { margin-top: 8px; display: flex; flex-direction: column; gap: 12px; }
+.tnav-bottom h2 { margin: 0; }
+.tnav-pn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tnav-pn a { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 2px solid var(--ink, #222); border-radius: 10px;
+  background: var(--card, #fff); color: var(--ink, #222); text-decoration: none; box-shadow: 3px 3px 0 var(--ink, #222); min-width: 0; }
+.tnav-pn a span { font-size: .85rem; color: var(--ink-soft, #666); }
+.tnav-pn a strong { overflow-wrap: anywhere; }
+.tnav-pn a.next { text-align: right; grid-column: 2; }
+.tnav-bottom .tnav-home { align-self: center; }
+.tnav-top [data-share] { margin-left: auto; }
+.tnav-short { display: none; }
+.tprint-h { display: none; }
+@media (max-width: 600px) { header.hero { gap: 8px !important; } header.hero > .fig, header.hero > .box.fig, header.hero .hero-top .fig { display: none !important; }
+  header.hero p.lead { font-size: 1rem !important; line-height: 1.5 !important; } header.hero > p.soft { font-size: .88rem !important; line-height: 1.45 !important; }
+  header.hero h1 { font-size: clamp(1.7rem, 8vw, 2.2rem) !important; } }
+.tprint-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 14px 0 0; }
+.tprint-row span { font-size: .9rem; opacity: .8; }
+.tprint { display: inline-flex; align-items: center; gap: 8px; min-height: 42px; padding: 8px 16px; border: 2px solid var(--ink, #222); border-radius: 999px;
+  background: var(--card, #fff); color: var(--ink, #222); font: inherit; font-weight: 700; cursor: pointer; box-shadow: 2px 2px 0 var(--ink, #222); }
+.tprint:hover, .tprint:focus-visible { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink, #222); }
+@media print { [data-tp-hide] { display: none !important; } html.tp-on, html.tp-on body { background: #fff !important; color: #111 !important; padding: 0 !important; margin: 0 !important; }
+  html.tp-on [data-fiche] { color: #111; } html.tp-on [data-fiche] * { color: #111 !important; background: transparent !important; box-shadow: none !important; }
+  html.tp-on .tprint-h { display: block; font-size: 1.4rem; font-weight: 800; margin: 0 0 10px; } .tprint-row { display: none !important; } }
+@media (max-width: 520px) { .tnav-top .tnav-long { display: none; } .tnav-top .tnav-short { display: inline; } .tnav-top { flex-wrap: nowrap; } .tnav-top > * { flex: none; } }
+.tnav-end { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+@media (max-width: 520px) { .tnav-pn { grid-template-columns: 1fr; } .tnav-pn a.next { grid-column: 1; } }
+.diff { font: 700 .72rem/1.2 var(--f-mono, monospace); padding: 2px 8px; border-radius: 99px; border: 1.5px solid; white-space: nowrap; }
+.diff.d1 { color: #15803d; border-color: #15803d; background: #dcf3e3; }
+.diff.d2 { color: #a15c07; border-color: #b45309; background: #fbe7cf; }
+.diff.d3 { color: #b91c1c; border-color: #b91c1c; background: #fde2e2; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root:not([data-theme="light"]) .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root:not([data-theme="light"]) .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; } }
+:root[data-theme="dark"] .diff.d1 { color: #86efac; background: #14301f; border-color: #4ade80; } :root[data-theme="dark"] .diff.d2 { color: #fcd34d; background: #3d2e08; border-color: #f5a35c; } :root[data-theme="dark"] .diff.d3 { color: #fca5a5; background: #431a1a; border-color: #f87171; }
+</style>
+</head>
+<body>
+<main class="page">
+<!--tnav--><nav class="tnav-top" aria-label="Navigation"><a class="tnav-home" href="geographie.html">← <span class="tnav-long">Tous les tutoriels d'histoire-géo</span><span class="tnav-short">Histoire-géo</span></a><span class="diff d2" title="Difficulté : moyen">Moyen</span><button type="button" data-share hidden>Partager</button></nav><!--/tnav-->
+
+
+  <header class="hero">
+    <span class="eyebrow">Tutoriel de citoyenneté · niveau 9H–11H</span>
+    <h1>Qui paie quand on est malade ?</h1>
+    <p class="lead">Une visite chez le médecin, un plâtre, quelques jours à l'hôpital… Tout cela coûte cher. En Suisse, chaque habitant doit avoir une <strong>assurance-maladie</strong>. Comment fonctionne-t-elle ? Que veulent dire <strong>prime</strong>, <strong>franchise</strong> et <strong>quote-part</strong> ? Et pourquoi en parle-t-on autant chaque automne ? Découvre-le avec des simulateurs à essayer toi-même.</p>
+    <div class="box fig pot">
+      <svg viewBox="0 0 360 150" role="img" aria-label="Des personnes versent chacune une pièce dans une caisse commune, qui paie les soins d'une personne malade">
+        <circle class="person" cx="30" cy="30" r="12"/><circle class="person" cx="30" cy="75" r="12"/><circle class="person" cx="30" cy="120" r="12"/>
+        <circle class="coin" cx="62" cy="30" r="6"/><circle class="coin" cx="62" cy="75" r="6"/><circle class="coin" cx="62" cy="120" r="6"/>
+        <path class="arrow" d="M72 32 C100 40 110 60 128 68"/>
+        <path class="arrow" d="M72 75 H128"/>
+        <path class="arrow" d="M72 118 C100 110 110 90 128 82"/>
+        <rect class="jar" x="134" y="44" width="84" height="66" rx="12"/>
+        <text x="176" y="73" text-anchor="middle" font-size="13" font-weight="600">caisse</text>
+        <text x="176" y="91" text-anchor="middle" font-size="13" font-weight="600">commune</text>
+        <path class="arrow" d="M222 77 H262"/>
+        <rect class="bed" x="268" y="70" width="80" height="26" rx="5"/>
+        <circle class="person" cx="286" cy="62" r="11"/>
+        <text x="308" y="124" text-anchor="middle" font-size="13">soins payés</text>
+      </svg>
+    </div>
+    <div class="note warn">
+      <span class="note-title">À lire avant de commencer</span>
+      <span>Ce tutoriel <strong>explique</strong> comment fonctionne l'assurance-maladie ; ce n'est <strong>pas un conseil</strong>. Le choix d'une franchise, d'un modèle ou d'un assureur dépend de la santé et du budget de chacun : on en parle avec un adulte de confiance. Les personnes, les primes des simulateurs et la règle de subside sont <strong>inventées</strong>. Les chiffres officiels viennent de l'Office fédéral de la santé publique (OFSP), de l'Office fédéral de la statistique (OFS) et de la Chancellerie fédérale ; l'année est indiquée à côté de chaque chiffre. Pour comparer les vraies primes, il existe le comparateur officiel des primes de la Confédération (priminfo.admin.ch).</span>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section>
+    <span class="eyebrow">Étape 1 · Pourquoi une assurance ?</span>
+    <h2>Partager le risque, c'est la solidarité</h2>
+    <p>Personne ne sait à l'avance s'il sera malade cette année. La plupart des gens dépensent peu, mais quelques-uns ont de très gros frais : une opération, une longue maladie. Une <strong>assurance</strong>, c'est une <strong>caisse commune</strong> : tout le monde verse un petit montant régulier, et la caisse paie les soins de ceux qui en ont besoin. Les personnes en bonne santé paient pour les malades… et un jour, ce sera peut-être l'inverse.</p>
+    <div class="box">
+      <h3>La mutuelle de la classe</h3>
+      <p class="soft">Jeu <strong>inventé</strong> : les 24 élèves d'une classe versent chacun une petite somme par mois dans une caisse. Chaque mois, le hasard décide qui a un « pépin » (petit : 20 à 60&nbsp;fr. ; gros : 150 à 300&nbsp;fr.). La caisse paie, tant qu'il y a assez d'argent. Choisis la cotisation, puis avance mois par mois.</p>
+      <div class="btns part-btns" id="muC" role="group" aria-label="Cotisation par élève et par mois"></div>
+      <div class="pupils" id="muPupils" aria-hidden="true"></div>
+      <div class="legend"><span><i class="sw" style="background:var(--pa-soft);border:1.5px solid var(--ink-soft)"></i>en forme</span><span><i class="sw" style="background:var(--acc)"></i>petit pépin</span><span><i class="sw" style="background:var(--warn)"></i>gros pépin</span></div>
+      <div class="era-bar" aria-hidden="true"><i id="muBar"></i></div>
+      <div class="era" id="muOut" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="muPrev">← Précédent</button><button type="button" id="muNext">Mois suivant →</button><button type="button" id="muReset">Recommencer</button><button type="button" id="muNew">Nouveau tirage</button></div>
+      <div class="fbk" id="muEnd" aria-live="polite"></div>
+    </div>
+    <div class="note two">
+      <span class="note-title">Une assurance parmi d'autres</span>
+      <span>L'assurance-maladie est une <strong>assurance sociale</strong>, comme l'AVS (vieillesse) ou l'AI (invalidité, quand une maladie ou un accident empêche durablement de travailler). L'AVS et l'AI sont expliquées dans le tutoriel sur <a class="tlink" href="la-retraite-en-suisse.html">la retraite en Suisse</a>.</span>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <span class="eyebrow">Étape 2 · L'assurance de base (LAMal)</span>
+    <h2>Obligatoire, et la même pour tous</h2>
+    <p>La <strong>loi fédérale sur l'assurance-maladie</strong> (LAMal) a été acceptée en votation le 4 décembre 1994 et elle est en vigueur depuis le <strong>1er janvier 1996</strong>. Elle a créé l'<strong>assurance obligatoire des soins</strong>, qu'on appelle souvent « l'assurance de base » ou « la LAMal ».</p>
+    <div class="cards">
+      <div class="box"><span class="tag acc">Obligatoire</span><strong>Pour toute personne qui habite en Suisse</strong><span class="soft">On doit s'assurer dans les <strong>3 mois</strong> qui suivent son arrivée en Suisse ou sa naissance. Si on le fait dans ce délai, l'assurance compte depuis le premier jour. Les parents s'en occupent pour leur bébé (OFSP, 2026).</span></div>
+      <div class="box"><span class="tag ok">Même couverture</span><strong>Chez tous les assureurs</strong><span class="soft">Les prestations de l'assurance de base sont <strong>les mêmes</strong> chez tous les assureurs. Ce qui change d'un assureur à l'autre, c'est surtout le <strong>prix</strong> (la prime) et le service.</span></div>
+      <div class="box"><span class="tag two">Tout le monde accepté</span><strong>Sans questionnaire de santé</strong><span class="soft">Pour l'assurance de base, un assureur doit accepter toute personne de sa région, quels que soient son âge et son état de santé, sans réserve ni délai d'attente (OFSP, 2026).</span></div>
+      <div class="box"><span class="tag p3">Carte d'assuré</span><strong>À montrer chez le médecin</strong><span class="soft">Chaque personne assurée reçoit une <strong>carte d'assuré</strong> à son nom, qu'on présente chez le médecin, à la pharmacie ou à l'hôpital. Au dos, on trouve en général la carte européenne d'assurance-maladie, utile en voyage en Europe.</span></div>
+    </div>
+    <div class="box">
+      <h3>Jeu : qui contacter ?</h3>
+      <p class="soft">Situations <strong>inventées</strong>. Ce n'est pas un avis médical : en cas de doute, un adulte demande conseil. En cas de danger pour la vie, on appelle tout de suite le <strong>144</strong>, le numéro des ambulances (urgences sanitaires).</p>
+      <div class="btns"><span class="score" id="s0Score">Situation 1 / 6</span><span class="step-n" id="s0Pos"></span></div>
+      <div class="card-big" id="s0Card" aria-live="polite"></div>
+      <div class="btns choice" id="s0Btns" role="group" aria-label="Qui contacter"></div>
+      <div class="fbk" id="s0Out" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="s0Prev">← Précédent</button><button type="button" id="s0Next">Suivant →</button><button type="button" id="s0Reset">Recommencer</button></div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <span class="eyebrow">Étape 3 · La prime</span>
+    <h2>Chaque mois, chaque personne</h2>
+    <p>La <strong>prime</strong> est le prix de l'assurance. On la paie <strong>chaque mois</strong>, et <strong>chaque personne</strong> en a une, même les bébés. Elle ne dépend <strong>pas du revenu</strong> ni de l'état de santé. Elle dépend :</p>
+    <div class="cards">
+      <div class="box"><span class="tag p1">Âge</span><strong>Trois catégories</strong><span class="soft">Enfants (jusqu'à 18 ans), jeunes adultes (19 à 25 ans), adultes (dès 26 ans). Dans une même catégorie, la prime ne change pas avec l'âge (OFSP, 2025).</span></div>
+      <div class="box"><span class="tag p2">Lieu</span><strong>Canton et région</strong><span class="soft">Les primes varient selon le canton, et certains cantons sont partagés en plusieurs <strong>régions de primes</strong> (par exemple ville et campagne).</span></div>
+      <div class="box"><span class="tag p3">Choix</span><strong>Assureur, modèle, franchise</strong><span class="soft">Chaque assureur a ses prix. Une franchise plus haute ou un modèle avec choix limité (étapes 5 et 6) font baisser la prime. En 2026, il existe plus de <strong>245&nbsp;000 primes différentes</strong> en Suisse (OFSP).</span></div>
+    </div>
+    <div class="box">
+      <h3>Les primes moyennes en Suisse</h3>
+      <p class="soft">Primes <strong>moyennes</strong> par mois pour toute la Suisse, toutes franchises et tous modèles confondus (OFSP). Ta vraie prime peut être bien plus haute ou plus basse. Choisis l'année, puis compose une famille avec + et −.</p>
+      <div class="btns part-btns" id="prYear" role="group" aria-label="Choisir l'année"></div>
+      <div class="btns part-btns" id="prPreset" role="group" aria-label="Exemples de ménages inventés"></div>
+      <div class="items" id="prItems"></div>
+      <div class="slip" id="prSlip" aria-live="polite"></div>
+      <div class="fbk info" id="prOut" aria-live="polite"></div>
+    </div>
+    <div class="note">
+      <span class="note-title">Chaque automne, les nouvelles primes</span>
+      <span>Les assureurs fixent leurs primes ; l'OFSP les contrôle et les approuve. Fin septembre, il annonce la hausse moyenne. Pour <strong>2026</strong> : prime moyenne de <strong>393,30&nbsp;fr.</strong> par mois, soit <strong>+4,4&nbsp;%</strong>. Pour <strong>2027</strong> (annonce du 29 septembre 2026) : <strong>412&nbsp;fr.</strong>, soit <strong>+5,0&nbsp;%</strong>. Les assureurs doivent informer chaque personne de sa nouvelle prime avant le 31 octobre (OFSP). L'OFSP recalcule ses moyennes chaque année avec les choix réels des assurés : les hausses annoncées ne se déduisent donc pas exactement des chiffres de l'année précédente.</span>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <span class="eyebrow">Étape 4 · Franchise et quote-part</span>
+    <h2>Qui paie ma facture ?</h2>
+    <p>Payer la prime ne suffit pas : quand on se soigne, on paie aussi une partie des frais. C'est la <strong>participation aux coûts</strong>. Elle a deux étages (OFSP, 2026) :</p>
+    <div class="cards">
+      <div class="box"><span class="tag p2">1. Franchise</span><strong>Les premiers francs de l'année</strong><span class="soft">Chaque année civile, tu paies toi-même tes frais jusqu'au montant de ta franchise. Adultes : <strong>300&nbsp;fr.</strong> (franchise ordinaire), ou au choix 500, 1&nbsp;000, 1&nbsp;500, 2&nbsp;000 ou 2&nbsp;500&nbsp;fr. Enfants : <strong>0&nbsp;fr.</strong>, ou au choix 100, 200, 300, 400, 500 ou 600&nbsp;fr.</span></div>
+      <div class="box"><span class="tag acc">2. Quote-part</span><strong>10&nbsp;% du reste, avec un plafond</strong><span class="soft">Au-delà de la franchise, tu paies <strong>10&nbsp;%</strong> des frais, mais au plus <strong>700&nbsp;fr.</strong> par an pour un adulte et <strong>350&nbsp;fr.</strong> pour un enfant. Pour certains médicaments originaux qui ont un générique moins cher, la quote-part est de 40&nbsp;%.</span></div>
+      <div class="box"><span class="tag p1">Le reste</span><strong>L'assureur paie</strong><span class="soft">Tout ce qui dépasse est payé par l'assurance (pour les soins remboursés par l'assurance de base). Les coûts d'une très grosse maladie sont donc couverts presque entièrement.</span></div>
+    </div>
+    <div class="box">
+      <h3>Simulateur : qui paie ma facture ?</h3>
+      <p class="soft">Règles réelles 2026. Choisis adulte ou enfant, une franchise, puis les frais médicaux de toute l'année (consultations, médicaments, analyses…). Pour revoir les calculs avec 10&nbsp;%, le tutoriel sur <a class="tlink" href="les-pourcentages.html">les pourcentages</a> peut t'aider.</p>
+      <div class="btns" id="fqWho" role="group" aria-label="Adulte ou enfant">
+        <button type="button" data-w="a" aria-pressed="true">Adulte</button>
+        <button type="button" data-w="e" aria-pressed="false">Enfant</button>
+      </div>
+      <div class="btns part-btns" id="fqFr" role="group" aria-label="Choisir la franchise"></div>
+      <div class="btns part-btns" id="fqPre" role="group" aria-label="Frais d'exemple"></div>
+      <div class="param">
+        <span class="lb" id="fqLbl">Frais de l'année : <span id="fqVal" class="mono">1 000 fr.</span></span>
+        <div class="slider-row"><button type="button" id="fqMinus" aria-label="Diminuer les frais de 100 francs">−</button><input type="range" id="fqRange" min="0" max="60000" step="100" value="1000" aria-labelledby="fqLbl"><button type="button" id="fqPlus" aria-label="Augmenter les frais de 100 francs">+</button></div>
+      </div>
+      <div class="hbar" aria-hidden="true"><i class="b2" id="fqB1"></i><i class="bacc" id="fqB2"></i><i class="b1" id="fqB3"></i></div>
+      <div class="legend"><span><i class="sw" style="background:var(--pb)"></i>franchise (toi)</span><span><i class="sw" style="background:var(--acc)"></i>quote-part (toi)</span><span><i class="sw" style="background:var(--pa)"></i>assureur</span></div>
+      <div class="slip" id="fqSlip" aria-live="polite"></div>
+      <div class="fbk info" id="fqOut" aria-live="polite"></div>
+    </div>
+    <div class="note two">
+      <span class="note-title">À l'hôpital : 15&nbsp;fr. par jour</span>
+      <span>En plus, lors d'un séjour à l'hôpital, un adulte paie une <strong>contribution aux frais de séjour</strong> de <strong>15&nbsp;fr. par jour</strong>, sans le jour de sortie. En sont exemptés : les enfants jusqu'à 18 ans, les jeunes adultes jusqu'à 25 ans encore <strong>en formation</strong>, et les femmes pour les prestations de <strong>maternité</strong>. De la 13e semaine de grossesse jusqu'à 8 semaines après l'accouchement, une femme ne paie ni franchise ni quote-part, même pour d'autres soins (OFSP, 2026).</span>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section>
+    <span class="eyebrow">Étape 5 · Choisir sa franchise</span>
+    <h2>Une prime plus basse, mais plus de risque</h2>
+    <p>Avec une franchise plus haute, la prime baisse : on accepte de payer soi-même davantage si on est malade. La loi limite ce rabais : il ne peut pas dépasser 70&nbsp;% du risque supplémentaire pris (OFSP, 2026). Quelle franchise revient le moins cher sur une année ? Cela dépend des frais… que personne ne connaît à l'avance.</p>
+    <div class="box">
+      <h3>Simulateur : le coût total d'une année</h3>
+      <p class="soft"><strong>Primes inventées</strong> pour un adulte (pas celles d'un vrai assureur), qui respectent la règle des 70&nbsp;%. Total = 12 primes + franchise + quote-part. Ce n'est <strong>pas un conseil</strong> : le choix dépend de la santé et du budget de chacun, et se discute avec un adulte.</p>
+      <div class="btns part-btns" id="chPre" role="group" aria-label="Frais d'exemple"></div>
+      <div class="param">
+        <span class="lb" id="chLbl">Frais de l'année : <span id="chVal" class="mono">500 fr.</span></span>
+        <div class="slider-row"><button type="button" id="chMinus" aria-label="Diminuer les frais de 100 francs">−</button><input type="range" id="chRange" min="0" max="20000" step="100" value="500" aria-labelledby="chLbl"><button type="button" id="chPlus" aria-label="Augmenter les frais de 100 francs">+</button></div>
+      </div>
+      <div class="bud" id="chList" aria-live="polite"></div>
+      <div class="legend"><span><i class="sw" style="background:var(--pa)"></i>primes de l'année</span><span><i class="sw" style="background:var(--pb)"></i>franchise payée</span><span><i class="sw" style="background:var(--acc)"></i>quote-part</span></div>
+      <div class="fbk info" id="chOut" aria-live="polite"></div>
+    </div>
+    <div class="views">
+      <div class="box"><span class="tag ok">Si on est rarement malade…</span><span>… une franchise haute fait souvent payer moins sur l'année, grâce à la prime plus basse. Mais il faut pouvoir payer d'un coup jusqu'à 2&nbsp;500&nbsp;fr. de frais (plus la quote-part) si un problème arrive.</span></div>
+      <div class="box"><span class="tag warn">Si on a des frais réguliers…</span><span>… (traitement, médicaments chaque mois) une franchise basse coûte souvent moins cher au total. L'OFSP rappelle aussi qu'il ne faut jamais renoncer à aller chez le médecin juste pour économiser.</span></div>
+    </div>
+    <p class="soft">On peut changer de franchise seulement pour le 1er janvier : vers une franchise plus basse, en l'annonçant avant le 30 novembre ; vers une franchise plus haute, avant le 31 décembre (OFSP, 2026).</p>
+  </section>
+
+  <!-- 6 -->
+  <section>
+    <span class="eyebrow">Étape 6 · Les modèles d'assurance</span>
+    <h2>Libre choix ou premier contact imposé</h2>
+    <p>Dans le modèle <strong>standard</strong>, on choisit librement son médecin. Les assureurs proposent aussi des modèles « avec choix limité » : on promet de passer d'abord par un premier point de contact. En échange, la prime est souvent moins chère. L'OFSP range ces modèles en quatre catégories (2026). Plus de 80&nbsp;% des assurés ont choisi une franchise plus haute, un modèle avec choix limité, ou les deux (OFSP, 2025).</p>
+    <div class="box">
+      <h3>Touche un modèle</h3>
+      <div class="models" id="moBtns" role="group" aria-label="Choisir un modèle d'assurance"></div>
+      <div class="fbk info" id="moOut" aria-live="polite"></div>
+      <div class="btns"><span class="step-n" id="moCount"></span><button type="button" id="moReset">Recommencer</button></div>
+    </div>
+    <p class="soft">En général, on peut toujours consulter directement un ou une gynécologue et un ou une ophtalmologue ; il faut quand même lire les conditions du modèle choisi. Les urgences restent toujours possibles.</p>
+  </section>
+
+  <!-- 7 -->
+  <section>
+    <span class="eyebrow">Étape 7 · Les subsides</span>
+    <h2>Une aide pour payer les primes</h2>
+    <p>Comme la prime est la même quel que soit le revenu, elle pèse lourd pour les familles aux revenus modestes. La LAMal prévoit donc une <strong>réduction des primes</strong>, qu'on appelle souvent « subside ». C'est le <strong>canton</strong> qui décide qui y a droit et combien, avec sa propre règle ; il verse l'argent <strong>directement à l'assureur</strong>. Pour les revenus bas et moyens, les cantons doivent réduire d'au moins <strong>80&nbsp;%</strong> les primes des enfants et d'au moins <strong>50&nbsp;%</strong> celles des jeunes adultes en formation (OFSP, 2025).</p>
+    <div class="stats">
+      <div class="stat"><b>6,6 mrd</b><span>de francs de réduction des primes en 2024, en tout (OFSP)</span></div>
+      <div class="stat"><b>50,6&nbsp;%</b><span>payés par la Confédération en 2024 (3,3 milliards), le reste par les cantons</span></div>
+      <div class="stat"><b>7,5&nbsp;%</b><span>des coûts bruts de l'assurance de base : la part fédérale, fixée depuis 2008</span></div>
+    </div>
+    <p>Cet argent vient des <strong>impôts</strong> de la Confédération et des cantons : le tutoriel sur <a class="tlink" href="les-impots-en-suisse.html">les impôts en Suisse</a> montre d'où il vient. Depuis le <strong>1er janvier 2026</strong>, chaque canton doit consacrer aux subsides un <strong>montant minimal</strong>, qui dépend du poids des primes sur le revenu de ses habitants (OFSP, 2025).</p>
+    <div class="box">
+      <h3>Simulateur : la famille Rossi (inventée)</h3>
+      <p class="soft">2 adultes et 2 enfants, primes moyennes suisses 2026 de l'étape 3, soit 14&nbsp;107,20&nbsp;fr. par an. <strong>Règle inventée</strong> d'un canton imaginaire : « le canton paie la part des primes qui dépasse 12&nbsp;% du revenu ». Les vraies règles cantonales sont différentes et plus compliquées ; pour une vraie question, il faut s'adresser à l'office cantonal qui gère les subsides.</p>
+      <div class="btns part-btns" id="suPre" role="group" aria-label="Revenus d'exemple"></div>
+      <div class="param">
+        <span class="lb" id="suLbl">Revenu de la famille (inventé) : <span id="suVal" class="mono">60 000 fr.</span></span>
+        <div class="slider-row"><button type="button" id="suMinus" aria-label="Diminuer le revenu de 5000 francs">−</button><input type="range" id="suRange" min="20000" max="160000" step="5000" value="60000" aria-labelledby="suLbl"><button type="button" id="suPlus" aria-label="Augmenter le revenu de 5000 francs">+</button></div>
+      </div>
+      <div class="hbar" aria-hidden="true"><i class="b1" id="suB1"></i><i class="b3" id="suB2"></i></div>
+      <div class="legend"><span><i class="sw" style="background:var(--pa)"></i>payé par la famille</span><span><i class="sw" style="background:var(--pc)"></i>subside du canton (règle inventée)</span></div>
+      <div class="stats">
+        <div class="stat"><b id="suPrem">—</b><span>primes de l'année</span></div>
+        <div class="stat"><b id="suSub">—</b><span>subside (règle inventée)</span></div>
+        <div class="stat"><b id="suPay">—</b><span>reste à payer par la famille</span></div>
+      </div>
+      <div class="fbk info" id="suOut" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section>
+    <span class="eyebrow">Étape 8 · Les accidents</span>
+    <h2>Accident : quelle assurance paie ?</h2>
+    <div class="cards">
+      <div class="box"><span class="tag p4">LAA</span><strong>Par l'employeur</strong><span class="soft">Toute personne qui travaille en Suisse est assurée par son employeur selon la <strong>loi sur l'assurance-accidents</strong> (LAA) contre les accidents de travail. Si elle travaille <strong>au moins 8 heures par semaine</strong> chez le même employeur, elle est aussi assurée pour les accidents <strong>hors du travail</strong> (loisirs, sport). Les <strong>apprentis</strong> sont aussi assurés (OFSP).</span></div>
+      <div class="box"><span class="tag p1">LAMal</span><strong>Pour les autres</strong><span class="soft">Les enfants, les élèves, les étudiants, les retraités ou les personnes sans emploi sont couverts pour les accidents par leur <strong>assurance-maladie</strong>, aux mêmes conditions qu'une maladie (franchise, quote-part). Elle ne paie que si aucune assurance-accidents ne couvre déjà l'accident.</span></div>
+      <div class="box"><span class="tag ok">Économie</span><strong>Supprimer la couverture accidents</strong><span class="soft">Quelqu'un qui est assuré par la LAA (au moins 8 heures par semaine) peut demander à son assureur-maladie d'exclure la couverture accidents, avec une attestation de l'employeur : sa prime baisse dès le mois suivant (OFSP, 2026).</span></div>
+    </div>
+    <div class="box">
+      <h3>Jeu : qui paie ?</h3>
+      <p class="soft">Situations <strong>inventées</strong>, en Suisse. Choisis qui paie <strong>la plus grande partie</strong> des frais. « Moi » veut dire : la personne elle-même (ou ses parents).</p>
+      <div class="btns"><span class="score" id="s1Score">Question 1 / 12</span><span class="step-n" id="s1Pos"></span></div>
+      <div class="card-big" id="s1Card" aria-live="polite"></div>
+      <div class="btns choice" id="s1Btns" role="group" aria-label="Qui paie"></div>
+      <div class="fbk" id="s1Out" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="s1Prev">← Précédent</button><button type="button" id="s1Next">Suivant →</button><button type="button" id="s1Reset">Recommencer</button></div>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section>
+    <span class="eyebrow">Étape 9 · Ce que l'assurance de base paie</span>
+    <h2>Remboursé… ou pas ?</h2>
+    <p>L'assurance de base paie les soins <strong>nécessaires</strong> figurant dans les listes officielles : consultations chez le médecin, traitements prescrits par lui (physiothérapie, par exemple), médicaments de la <strong>liste des spécialités</strong>, séjours en <strong>division commune</strong> d'un hôpital de la liste du canton, accouchement, certaines mesures de prévention… Elle ne paie <strong>pas</strong> le confort (chambre privée) ni, en général, le dentiste (OFSP, Primes-Conseil 2027). Toujours après la franchise et la quote-part.</p>
+    <div class="box">
+      <h3>Jeu : remboursé par l'assurance de base ?</h3>
+      <p class="soft">Situations <strong>inventées</strong>, soins faits en Suisse.</p>
+      <div class="btns"><span class="score" id="s2Score">Question 1 / 12</span><span class="step-n" id="s2Pos"></span></div>
+      <div class="card-big" id="s2Card" aria-live="polite"></div>
+      <div class="btns choice" id="s2Btns" role="group" aria-label="Remboursé ou non"></div>
+      <div class="fbk" id="s2Out" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="s2Prev">← Précédent</button><button type="button" id="s2Next">Suivant →</button><button type="button" id="s2Reset">Recommencer</button></div>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section>
+    <span class="eyebrow">Étape 10 · Les assurances complémentaires</span>
+    <h2>En plus de la base, si on le veut</h2>
+    <p>Les <strong>assurances complémentaires</strong> paient ce que l'assurance de base ne prend pas en charge : chambre privée ou mi-privée à l'hôpital, libre choix du médecin à l'hôpital, une partie des soins dentaires et de l'orthodontie, des médecines alternatives, des lunettes, une assurance voyage… Elles dépendent d'une autre loi, la <strong>loi sur le contrat d'assurance</strong> (LCA), et les règles sont très différentes (OFSP, 2026).</p>
+    <div class="scroll"><table class="ptable" aria-label="Assurance de base et assurances complémentaires">
+      <tr><th></th><th>Assurance de base (LAMal)</th><th>Complémentaire (LCA)</th></tr>
+      <tr><td>Obligatoire ?</td><td>Oui, pour toute personne qui habite en Suisse</td><td>Non, facultative</td></tr>
+      <tr><td>L'assureur peut refuser ?</td><td>Non, il doit accepter tout le monde</td><td>Oui, ou accepter avec des <strong>réserves</strong> (maladies exclues)</td></tr>
+      <tr><td>Questionnaire de santé</td><td>Interdit</td><td>Oui ; une réponse incomplète peut faire refuser des remboursements</td></tr>
+      <tr><td>Prestations</td><td>Les mêmes chez tous les assureurs</td><td>Différentes d'une offre à l'autre</td></tr>
+      <tr><td>Résiliation</td><td>Chaque année, avant le 30 novembre</td><td>Selon le contrat (parfois une durée de plusieurs années)</td></tr>
+    </table></div>
+    <div class="note two">
+      <span class="note-title">Pourquoi y penser tôt ?</span>
+      <span>Avec l'âge ou après une maladie, un assureur peut refuser une complémentaire ou mettre des réserves ; l'OFSP signale qu'elles sont souvent refusées à partir de 55 à 65 ans. C'est pourquoi certains parents en concluent une pour leurs enfants, par exemple pour l'orthodontie (appareil dentaire), que l'assurance de base ne paie pas. D'autres trouvent que c'est trop cher pour leur budget. Une complémentaire peut rester chez un autre assureur que l'assurance de base.</span>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section>
+    <span class="eyebrow">Étape 11 · Pourquoi les primes augmentent ?</span>
+    <h2>Des coûts de la santé en hausse</h2>
+    <p>Les primes suivent les <strong>coûts</strong> : si on dépense plus pour se soigner, les assureurs doivent encaisser plus. Les coûts de l'assurance de base ont augmenté de <strong>5,3&nbsp;%</strong> en 2025 (OFSP, 2026). Raisons souvent citées : la population vieillit, il y a de nouveaux traitements et médicaments (parfois très chers), on consulte plus souvent, et les progrès de la médecine permettent de soigner plus de maladies.</p>
+    <div class="stats">
+      <div class="stat"><b>97 mrd</b><span>coûts du système de santé en 2024 (OFS), +4,1&nbsp;% en un an</span></div>
+      <div class="stat"><b>10&nbsp;792&nbsp;fr.</b><span>par habitant et par an (2024, OFS)</span></div>
+      <div class="stat"><b>11,4&nbsp;%</b><span>du produit intérieur brut (PIB) en 2024 (OFS)</span></div>
+    </div>
+    <div class="box">
+      <h3>Qui finance la santé ? (2024)</h3>
+      <p class="soft">Touche une ligne. Parts du financement du système de santé en 2024, d'après l'OFS (publication du 24 avril 2026).</p>
+      <div class="bud" id="fiList" role="group" aria-label="Parts du financement"></div>
+      <div class="fbk info" id="fiOut" aria-live="polite"></div>
+    </div>
+    <div class="box">
+      <h3>Des solutions discutées : deux façons de voir</h3>
+      <p class="soft">La santé est un sujet de votations fréquent. Les avis divergent ; voici des arguments entendus, sans parti pris.</p>
+      <div class="views">
+        <div class="box"><span class="tag two">Primes selon le revenu ?</span><span>Les uns veulent que personne ne paie plus qu'une certaine part de son revenu pour les primes. D'autres craignent le coût pour les impôts. Le 9 juin 2024, l'initiative « Maximum 10&nbsp;% du revenu pour les primes » a été rejetée par 55,47&nbsp;% de non ; un contre-projet (le montant minimal des cantons) s'applique depuis 2026.</span></div>
+        <div class="box"><span class="tag two">Une caisse unique ?</span><span>Les uns pensent qu'une seule caisse publique coûterait moins en frais et en publicité. D'autres estiment que la concurrence entre assureurs pousse à mieux gérer. Le 28 septembre 2014, l'initiative « Pour une caisse publique d'assurance-maladie » a été rejetée par 61,8&nbsp;% de non ; il y avait alors 61 caisses-maladie.</span></div>
+        <div class="box"><span class="tag two">Freiner les coûts ?</span><span>Les uns veulent obliger les autorités à agir quand les coûts montent plus vite que les salaires. D'autres craignent un rationnement des soins. Le 9 juin 2024, l'initiative « pour un frein aux coûts » a été rejetée par 62,77&nbsp;% de non.</span></div>
+        <div class="box"><span class="tag two">Qui paie l'hôpital ?</span><span>Le 24 novembre 2024, le peuple a accepté par 53,31&nbsp;% une modification de la LAMal : les soins seront financés de la même façon par les assureurs et les cantons, qu'ils soient faits à l'hôpital ou en cabinet (« financement uniforme »). Elle entre en vigueur par étapes.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 12 -->
+  <section>
+    <span class="eyebrow">Étape 12 · Et moi, maintenant ?</span>
+    <h2>Ton parcours d'assuré, pas à pas</h2>
+    <p>Aujourd'hui, ce sont en général tes parents qui paient ta prime et reçoivent les factures. Mais tout change entre 18 et 26 ans. Avance pas à pas.</p>
+    <div class="box">
+      <h3>De la naissance à 26 ans (et après)</h3>
+      <div class="era-bar" aria-hidden="true"><i id="pcBar"></i></div>
+      <div class="era" id="pcOut" aria-live="polite"></div>
+      <div class="btns"><button type="button" id="pcPrev">← Précédent</button><button type="button" id="pcNext">Suivant →</button><button type="button" id="pcReset">Recommencer</button></div>
+      <div class="fbk" id="pcEnd" aria-live="polite"></div>
+    </div>
+    <div class="cards">
+      <div class="box"><span class="tag acc">144</span><strong>Ambulance</strong><span class="soft">Urgence sanitaire : quelqu'un est gravement blessé, inconscient, a du mal à respirer.</span></div>
+      <div class="box"><span class="tag p1">117 · 118</span><strong>Police · pompiers</strong><span class="soft">117 pour la police, 118 pour le feu.</span></div>
+      <div class="box"><span class="tag two">112</span><strong>Numéro d'urgence européen</strong><span class="soft">Il fonctionne aussi en Suisse et relie à la centrale de la police, même avec une carte SIM étrangère (ch.ch).</span></div>
+      <div class="box"><span class="tag p3">Médecin de garde</span><strong>Le soir et le week-end</strong><span class="soft">Pour un problème qui ne peut pas attendre mais n'est pas une urgence vitale. Le numéro dépend du canton : note-le avec tes parents.</span></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Les idées reçues</span>
+    <h2>Vrai ou idée reçue ?</h2>
+    <p>On entend beaucoup de choses sur l'assurance-maladie. Pour chaque phrase, choisis : <strong>vrai</strong> ou <strong>idée reçue</strong> ?</p>
+    <div class="btns"><span class="score" id="mythScore">0 / 8</span><button type="button" id="mythReset">Recommencer</button></div>
+    <div class="cards" id="myths"></div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Le savais-tu ?</span>
+    <h2>Quelques curiosités</h2>
+    <div class="cards">
+      <div class="box"><span class="tag two">1996</span><strong>Obligatoire depuis 30 ans</strong><span class="soft">Avant la LAMal, en vigueur depuis le 1er janvier 1996, l'assurance-maladie n'était pas obligatoire pour toute la Suisse ; la loi a été acceptée en votation le 4 décembre 1994.</span></div>
+      <div class="box"><span class="tag two">245&nbsp;000</span><strong>Primes différentes</strong><span class="soft">Avec les cantons, les régions, les âges, les franchises, les modèles et la couverture accidents, il existe plus de 245&nbsp;000 primes différentes pour 2026 (OFSP).</span></div>
+      <div class="box"><span class="tag two">180,67&nbsp;fr.</span><strong>Pour les lunettes des enfants</strong><span class="soft">L'assurance de base verse une contribution de 180,67&nbsp;fr. par an pour les verres de lunettes ou les lentilles prescrits aux enfants jusqu'à 18 ans (OFSP, 2026).</span></div>
+      <div class="box"><span class="tag two">10&nbsp;792&nbsp;fr.</span><strong>Par personne et par an</strong><span class="soft">C'est ce qu'a coûté en moyenne le système de santé par habitant en 2024, soit environ 900&nbsp;fr. par mois (OFS). Tout n'est pas payé par l'assurance de base.</span></div>
+    </div>
+    <div class="box">
+      <h3>Mots à connaître</h3>
+      <dl class="gloss">
+        <div><dt>LAMal</dt><dd>loi fédérale sur l'assurance-maladie ; désigne aussi l'assurance de base obligatoire.</dd></div>
+        <div><dt>Prime</dt><dd>le prix de l'assurance, payé chaque mois par chaque personne.</dd></div>
+        <div><dt>Franchise</dt><dd>la part des frais de l'année que l'on paie soi-même avant que l'assurance participe.</dd></div>
+        <div><dt>Quote-part</dt><dd>10&nbsp;% des frais au-delà de la franchise, plafonnés (700&nbsp;fr. adulte, 350&nbsp;fr. enfant).</dd></div>
+        <div><dt>Participation aux coûts</dt><dd>franchise + quote-part (+ contribution hospitalière).</dd></div>
+        <div><dt>Subside</dt><dd>réduction de prime accordée par le canton aux personnes de condition modeste.</dd></div>
+        <div><dt>Modèle d'assurance</dt><dd>règle sur le premier contact (cabinet, téléphone, pharmacie…) en échange d'une prime plus basse.</dd></div>
+        <div><dt>Complémentaire</dt><dd>assurance facultative en plus de la base, régie par la LCA.</dd></div>
+        <div><dt>LAA</dt><dd>loi sur l'assurance-accidents : assurance des personnes qui travaillent, payée via l'employeur.</dd></div>
+        <div><dt>Réserve</dt><dd>dans une complémentaire, une maladie exclue de la couverture.</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">Quiz</span>
+    <h2>Huit questions pour t'entraîner</h2>
+    <p>Choisis ta réponse, puis vérifie. Les chiffres sont ceux de 2026, sauf indication contraire.</p>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="btns">
+      <span class="score" id="score">0 / 8</span>
+      <button id="newQuiz" type="button">Recommencer</button>
+    </div>
+  </section>
+
+  <section>
+    <span class="eyebrow">À toi de jouer</span>
+    <h2>Six problèmes</h2>
+    <p>Réfléchis, écris ta réponse sur une feuille, puis ouvre la correction. Les personnes et les primes sont inventées ; la franchise, la quote-part et la contribution hospitalière suivent les règles de 2026.</p>
+    <div class="exos">
+      <details>
+        <summary>Une facture de 1&nbsp;200&nbsp;fr.<span class="q">Nora, 30 ans, a une franchise de 300&nbsp;fr. Ses frais de l'année font 1&nbsp;200&nbsp;fr. Combien paie-t-elle ? Combien paie l'assureur ?</span></summary>
+        <div>
+          <span>Franchise : 300&nbsp;fr. Il reste 1&nbsp;200 − 300 = 900&nbsp;fr. Quote-part : 10&nbsp;% de 900 = 90&nbsp;fr. (moins que 700&nbsp;fr.).</span>
+          <span>Nora paie <strong>300 + 90 = 390&nbsp;fr.</strong> L'assureur paie <strong>1&nbsp;200 − 390 = 810&nbsp;fr.</strong></span>
+        </div>
+      </details>
+      <details>
+        <summary>Une grosse année<span class="q">Même franchise de 300&nbsp;fr., mais 12&nbsp;000&nbsp;fr. de frais dans l'année. Combien paie Nora ?</span></summary>
+        <div>
+          <span>Franchise : 300&nbsp;fr. Reste : 11&nbsp;700&nbsp;fr. ; 10&nbsp;% = 1&nbsp;170&nbsp;fr., mais le plafond est de 700&nbsp;fr.</span>
+          <span>Nora paie <strong>300 + 700 = 1&nbsp;000&nbsp;fr.</strong> au maximum ; l'assureur paie <strong>11&nbsp;000&nbsp;fr.</strong></span>
+        </div>
+      </details>
+      <details>
+        <summary>La franchise haute<span class="q">Yanis a une franchise de 2&nbsp;500&nbsp;fr. Ses frais de l'année : 800&nbsp;fr. Combien paie l'assureur ?</span></summary>
+        <div>
+          <span>Les 800&nbsp;fr. sont sous la franchise : Yanis les paie <strong>en entier</strong>. L'assureur paie <strong>0&nbsp;fr.</strong> cette année-là.</span>
+          <span>Yanis a quand même payé ses primes : c'est le principe de l'assurance.</span>
+        </div>
+      </details>
+      <details>
+        <summary>Un enfant<span class="q">Mia, 10 ans, a la franchise ordinaire des enfants. Ses frais de l'année : 5&nbsp;000&nbsp;fr. Combien paient ses parents ?</span></summary>
+        <div>
+          <span>Franchise des enfants : 0&nbsp;fr. Quote-part : 10&nbsp;% de 5&nbsp;000 = 500&nbsp;fr., mais le plafond des enfants est de 350&nbsp;fr.</span>
+          <span>Les parents paient <strong>350&nbsp;fr.</strong> ; l'assureur paie <strong>4&nbsp;650&nbsp;fr.</strong></span>
+        </div>
+      </details>
+      <details>
+        <summary>Quatre nuits à l'hôpital<span class="q">Luc, 40 ans, entre à l'hôpital un lundi et sort le vendredi. Combien de contribution aux frais de séjour paie-t-il ?</span></summary>
+        <div>
+          <span>On compte lundi, mardi, mercredi et jeudi, sans le jour de sortie : 4 jours × 15&nbsp;fr. = <strong>60&nbsp;fr.</strong></span>
+          <span>Cela s'ajoute à sa franchise et à sa quote-part. Une jeune femme de 22 ans encore en formation ne paierait pas ces 60&nbsp;fr.</span>
+        </div>
+      </details>
+      <details>
+        <summary>Quelle franchise aurait coûté le moins ?<span class="q">Avec les primes inventées de l'étape 5 (480&nbsp;fr. par mois avec 300&nbsp;fr. de franchise, 360&nbsp;fr. avec 2&nbsp;500&nbsp;fr.), compare le total d'une année avec 1&nbsp;500&nbsp;fr. de frais.</span></summary>
+        <div>
+          <span>Franchise 300 : 12 × 480 = 5&nbsp;760&nbsp;fr. de primes + 300 + 10&nbsp;% de 1&nbsp;200 (120) = <strong>6&nbsp;180&nbsp;fr.</strong></span>
+          <span>Franchise 2&nbsp;500 : 12 × 360 = 4&nbsp;320&nbsp;fr. + 1&nbsp;500 = <strong>5&nbsp;820&nbsp;fr.</strong> Cette année-là, la franchise haute coûte 360&nbsp;fr. de moins. Avec 3&nbsp;000&nbsp;fr. de frais, ce serait l'inverse (6&nbsp;330 contre 6&nbsp;870&nbsp;fr.).</span>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section data-fiche><!--tprint--><p class="tprint-h">Fiche de révision · Qui paie quand on est malade ?</p><!--/tprint-->    <span class="eyebrow">À retenir</span>
+    <div class="box">
+      <span>• L'assurance-maladie de base (<strong>LAMal</strong>, depuis 1996) est <strong>obligatoire</strong> pour toute personne qui habite en Suisse : s'assurer dans les <strong>3 mois</strong> après l'arrivée ou la naissance.</span>
+      <span>• Elle couvre <strong>la même chose</strong> chez tous les assureurs, qui doivent accepter tout le monde. Les <strong>complémentaires</strong> sont facultatives et peuvent refuser.</span>
+      <span>• La <strong>prime</strong> se paie chaque mois par personne ; elle dépend de l'âge, du lieu, de l'assureur, du modèle et de la franchise. Prime moyenne 2026 : <strong>393,30&nbsp;fr.</strong> ; adultes 465,30&nbsp;fr. ; jeunes adultes 326,30&nbsp;fr. ; enfants 122,50&nbsp;fr. (OFSP).</span>
+      <span>• Quand on se soigne : <strong>franchise</strong> (300 à 2&nbsp;500&nbsp;fr. pour un adulte, 0 à 600&nbsp;fr. pour un enfant), puis <strong>10&nbsp;%</strong> de quote-part, au plus 700&nbsp;fr. (adulte) ou 350&nbsp;fr. (enfant).</span>
+      <span>• Les <strong>subsides</strong> du canton aident les revenus modestes ; ils sont payés par la Confédération et les cantons, avec les impôts. Accidents : <strong>LAA</strong> via l'employeur dès 8 heures par semaine, sinon la LAMal.</span>
+      <span>• Pour changer d'assureur de base au 1er janvier, la lettre de résiliation doit <strong>arriver</strong> au plus tard le <strong>30 novembre</strong>. Ce tutoriel n'est pas un conseil : on choisit avec un adulte.</span>
+      <div class="scroll"><table class="ptable" aria-label="Qui paie quoi">
+        <tr><th>Quoi</th><th>Qui paie ?</th><th>Combien (règles 2026)</th></tr>
+        <tr><td>Prime</td><td>Chaque assuré (les parents pour les enfants), parfois aidé par un subside du canton</td><td>Chaque mois, selon l'âge, le lieu, l'assureur, le modèle et la franchise</td></tr>
+        <tr><td>Franchise</td><td>Moi, sur les premiers frais de l'année</td><td>Adultes 300 à 2&nbsp;500&nbsp;fr. ; enfants 0 à 600&nbsp;fr.</td></tr>
+        <tr><td>Quote-part</td><td>Moi, sur les frais au-delà de la franchise</td><td>10&nbsp;% (40&nbsp;% pour certains originaux), au plus 700&nbsp;fr. adulte, 350&nbsp;fr. enfant</td></tr>
+        <tr><td>Contribution hospitalière</td><td>Moi (adulte), sauf enfants, jeunes en formation jusqu'à 25 ans, maternité</td><td>15&nbsp;fr. par jour d'hôpital, sans le jour de sortie</td></tr>
+        <tr><td>Le reste</td><td>L'assureur (et le canton pour une partie des séjours à l'hôpital)</td><td>Tout ce qui dépasse, pour les soins de l'assurance de base</td></tr>
+      </table></div>
+    </div>
+  <!--tprint--><p class="tprint-row"><button type="button" class="tprint" data-print><span aria-hidden="true">🖨</span> Imprimer la fiche</button><span>Seulement ce résumé, sur une page.</span></p><!--/tprint-->
+</section>
+
+  <!--tnav--><nav class="tnav-bottom" aria-label="Autres tutoriels"><h2>Continuer</h2><div class="tnav-pn"><a class="prev" href="les-impots-en-suisse.html"><span>← Précédent</span><strong>Les impôts en Suisse</strong></a></div><div class="tnav-end"><a class="tnav-home" href="geographie.html">⌂ Tous les tutoriels d'histoire-géo</a><button type="button" data-share hidden>Partager</button></div></nav><!--/tnav-->
+<footer>Fiche de révision · L'assurance-maladie en Suisse<!--tmaj--><span class="tmaj" style="display:block;margin-top:6px;font-size:.85rem;opacity:.85">Dernière mise à jour : 26 novembre 2026 · © 2026 Nicolas Meynet</span><!--/tmaj--></footer>
+</main>
+
+<script>
+(function () {
+  /*
+   * Hooks de test : window.__lamal
+   *   F                           -> chiffres officiels vérifiés (primes moyennes 2026 et 2027, franchises, quote-part, contribution hospitalière, subsides, coûts OFS 2024, votations), avec leur année
+   *   rng(seed), classYear(seed, cotis) -> mutuelle de la classe : 12 mois {month, events:[{p, cost, big}], need, paid, missing, pot} en francs entiers
+   *   sort0, sort0Score(ans)      -> jeu « qui contacter ? »
+   *   prem(year, n)               -> primes en centimes : {month, year} pour n = {a, j, e} ; year = 2026 | 2027
+   *   participation(costC, fr, cap) -> {fr, qp, ins, me} en centimes (franchise, quote-part, assureur, total à ma charge)
+   *   invented, yearTotal(fr, costC), compare(costC), crossover(frA, frB) -> simulateur des franchises (primes inventées, en centimes)
+   *   models                      -> les modèles d’assurance (standard, PRAXIS, TEL_DIG, PHARM, FLEX, bonus)
+   *   subsidy(incomeFr)           -> {prem, threshold, sub, pay} en centimes ; règle inventée : part des primes au-dessus de 12 % du revenu
+   *   sort1, sort1Score(ans)      -> jeu « qui paie ? » (LAMal / LAA / complémentaire / moi)
+   *   sort2, sort2Score(ans)      -> jeu « remboursé par l’assurance de base ? »
+   *   isOk(it, c)                 -> bonne réponse (avec alt éventuelles)
+   *   financing                   -> parts du financement de la santé 2024 (OFS)
+   *   path                        -> étapes du parcours d’assuré
+   *   myths, checkMyth(k, c), quiz
+   */
+  var NS = 'http://www.w3.org/2000/svg';
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function clamp(i, n) { i = Math.floor(Number(i)); if (!isFinite(i)) i = 0; return Math.max(0, Math.min(n - 1, i)); }
+  function lim(x, a, b) { x = Number(x); if (!isFinite(x)) x = a; return Math.max(a, Math.min(b, x)); }
+  function each(list, fn) { Array.prototype.forEach.call(list, fn); }
+  var NB = ' ';
+  /* Nombres à la française : espace insécable pour les milliers, virgule décimale. */
+  function fmt(x, d) {
+    if (!isFinite(x)) return '?';
+    d = d == null ? 0 : d;
+    var p = Math.pow(10, d), r = Math.round(x * p) / p; if (Object.is(r, -0)) r = 0;
+    var neg = r < 0, s = Math.abs(r).toFixed(d), parts = s.split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, NB);
+    return (neg ? '−' : '') + parts[0] + (parts[1] ? ',' + parts[1] : '');
+  }
+  function chf(x, d) { return fmt(x, d) + NB + 'fr.'; }
+  /* Centimes -> « 1 175,60 fr. » (ou sans décimales si le montant est rond) */
+  function cts(c) { c = Math.round(c); return chf(c / 100, c % 100 ? 2 : 0); }
+  function cts2(c) { return chf(Math.round(c) / 100, 2); }
+  function pct(x, d) { return fmt(x * 100, d == null ? 0 : d) + NB + '%'; }
+  function pressAll(box, attr, val) { each(box.querySelectorAll('button'), function (b) { b.setAttribute('aria-pressed', b.getAttribute(attr) === String(val) ? 'true' : 'false'); }); }
+
+  /* ---------- Chiffres officiels vérifiés ----------
+     OFSP, communiqué du 23.9.2025 (primes 2026) et du 29.9.2026 (primes 2027) ; fiche « Prime moyenne » (23.9.2025) ;
+     OFSP « Primes-Conseil » (septembre 2026) ; fiche « Réduction des primes » (23.9.2025) ; fiche « Changement de caisse-maladie » (29.9.2026) ;
+     OFS, communiqué du 24.4.2026 (coûts 2024) ; Chancellerie fédérale et OFSP (votations). */
+  var F = {
+    lamal: { vote: '4 décembre 1994', since: 1996, delayMonths: 3 },
+    premiums: {
+      2026: { all: 39330, a: 46530, j: 32630, e: 12250, rise: 4.4, label: '2026' },
+      2027: { all: 41200, a: 48760, j: 33880, e: 12810, rise: 5.0, label: '2027 (annoncé)' }
+    },
+    ages: { e: '0 à 18 ans', j: '19 à 25 ans', a: 'dès 26 ans' },
+    franchises: { adult: [300, 500, 1000, 1500, 2000, 2500], child: [0, 100, 200, 300, 400, 500, 600] },
+    quote: { rate: 0.10, capAdult: 700, capChild: 350, generic: 0.40 },
+    hospital: { perDay: 15, exempt: 'enfants jusqu’à 18 ans, jeunes en formation jusqu’à 25 ans, maternité' },
+    maternity: { fromWeek: 13, weeksAfter: 8 },
+    discountMax: 0.70,
+    deadlines: { info: '31 octobre', cancel: '30 novembre', higherFranchise: '31 décembre', midYearLetter: '31 mars', midYearEnd: '30 juin' },
+    subsidies: { total2024: 6.6, conf2024: 3.3, confShare2024: 0.506, confRate: 0.075, since: 2008, children: 0.80, youngInTraining: 0.50, cantonMin: 2026 },
+    laaHours: 8,
+    glassesChild: 180.67,
+    costs2024: { total: 97, rise: 4.1, perHead: 10792, gdp: 11.4, aosRise2025: 5.3 },
+    votes: { relief2024No: 55.47, brake2024No: 62.77, single2014No: 61.8, insurers2014: 61, efas2024Yes: 53.31 },
+    premiumsCount2026: 245000
+  };
+
+  /* ---------- 1. Mutuelle de la classe (tirage pseudo-aléatoire reproductible) ---------- */
+  function rng(seed) {
+    var a = seed >>> 0;
+    return function () { a = (a + 0x6D2B79F5) >>> 0; var t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+  }
+  var PUPILS = 24;
+  function classYear(seed, cotis) {
+    var r = rng(seed), pot = 0, months = [];
+    cotis = Math.max(0, Math.round(Number(cotis) || 0));
+    for (var m = 1; m <= 12; m++) {
+      var events = [];
+      for (var p = 1; p <= PUPILS; p++) {
+        var u = r();
+        if (u < 0.008) events.push({ p: p, big: true, cost: 150 + Math.floor(r() * 16) * 10 });
+        else if (u < 0.068) events.push({ p: p, big: false, cost: 20 + Math.floor(r() * 9) * 5 });
+      }
+      var income = cotis * PUPILS, need = events.reduce(function (s, e) { return s + e.cost; }, 0);
+      pot += income;
+      var paid = Math.min(pot, need);
+      pot -= paid;
+      months.push({ month: m, events: events, income: income, need: need, paid: paid, missing: need - paid, pot: pot });
+    }
+    return months;
+  }
+  var MU_C = [2, 4, 6, 8], muC = 6, muSeed = 2026, muIdx = 0, MU = classYear(muSeed, muC);
+  var MONTHS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+  $('muC').innerHTML = MU_C.map(function (c) { return '<button type="button" data-c="' + c + '" aria-pressed="false">' + esc(chf(c)) + ' par mois</button>'; }).join('');
+  $('muPupils').innerHTML = Array.apply(null, Array(PUPILS)).map(function () { return '<i></i>'; }).join('');
+  function muRender() {
+    pressAll($('muC'), 'data-c', muC);
+    muIdx = clamp(muIdx, 12);
+    var M = MU[muIdx], dots = $('muPupils').querySelectorAll('i');
+    each(dots, function (d, i) { var e = M.events.filter(function (x) { return x.p === i + 1; })[0]; d.className = e ? (e.big ? 'big' : 'sick') : ''; });
+    var list = M.events.length ? M.events.map(function (e) { return '<span>Élève n°' + e.p + ' : ' + (e.big ? 'gros pépin' : 'petit pépin') + ', ' + esc(chf(e.cost)) + '</span>'; }).join('') : '<span>Personne n’a eu besoin de soins ce mois-ci.</span>';
+    var lines = '<span class="amt">Cotisations : ' + PUPILS + ' × ' + esc(chf(muC)) + ' = ' + esc(chf(M.income)) + ' · Frais : ' + esc(chf(M.need)) + ' · Payé par la caisse : ' + esc(chf(M.paid)) + '</span>' +
+      (M.missing ? '<span><strong>La caisse est vide :</strong> il manque ' + esc(chf(M.missing)) + ', que les familles doivent payer elles-mêmes. La cotisation est trop basse !</span>' : '') +
+      '<span class="amt">Dans la caisse à la fin du mois : ' + esc(chf(M.pot)) + '</span>';
+    $('muOut').innerHTML = '<span class="when">Mois ' + (muIdx + 1) + ' / 12 · ' + MONTHS[muIdx] + '</span><strong>' + M.events.length + ' élève' + (M.events.length > 1 ? 's' : '') + ' avec un pépin</strong><div class="evts">' + list + '</div>' + lines;
+    $('muBar').style.width = Math.round((muIdx + 1) / 12 * 100) + '%';
+    var last = muIdx === 11;
+    $('muPrev').disabled = muIdx === 0;
+    $('muNext').disabled = last;
+    $('muNext').style.display = last ? 'none' : '';
+    var end = $('muEnd');
+    if (last) {
+      var tot = MU.reduce(function (s, x) { return s + x.need; }, 0), miss = MU.reduce(function (s, x) { return s + x.missing; }, 0);
+      var biggest = 0; MU.forEach(function (x) { x.events.forEach(function (e) { if (e.cost > biggest) biggest = e.cost; }); });
+      end.className = 'fbk ' + (miss ? 'warn' : 'ok');
+      end.innerHTML = '<strong>Terminé ! Bilan de l’année</strong><span>Chaque élève a versé ' + esc(chf(12 * muC)) + '. Frais de toute la classe : ' + esc(chf(tot)) + (miss ? ', dont ' + esc(chf(miss)) + ' que la caisse n’a pas pu payer.' : ', tous payés par la caisse.') + (biggest ? ' Le plus gros pépin a coûté ' + esc(chf(biggest)) + ' : sans la caisse, une seule famille aurait dû le payer.' : '') + ' Touche « Recommencer » pour revoir, ou « Nouveau tirage » pour une autre année.</span>';
+    } else { end.className = 'fbk'; end.innerHTML = ''; }
+  }
+  $('muC').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b) return; muC = Number(b.getAttribute('data-c')); MU = classYear(muSeed, muC); muIdx = 0; muRender(); });
+  $('muPrev').addEventListener('click', function () { muIdx--; muRender(); });
+  $('muNext').addEventListener('click', function () { muIdx++; muRender(); });
+  $('muReset').addEventListener('click', function () { muIdx = 0; muRender(); });
+  $('muNew').addEventListener('click', function () { muSeed = (muSeed * 7919 + 17) % 1000003; MU = classYear(muSeed, muC); muIdx = 0; muRender(); });
+  muRender();
+
+  /* ---------- Trieur générique (cartes une par une), comme dans les autres tutoriels.
+     Si un item a une liste alt, ces réponses sont aussi acceptées. ---------- */
+  function isOk(it, c) { return c === it.a || !!(it.alt && it.alt.indexOf(c) >= 0); }
+  function makeSorter(o) {
+    var idx = 0, ans = {};
+    function opts(it) { return it.o ? it.o : o.order; }
+    function name(c) { return o.names && o.names[c] ? o.names[c] : c; }
+    function render() {
+      var it = o.items[idx], a = ans[it.k];
+      if (o.cardHtml) $(o.card).innerHTML = o.cardHtml(it, !!a); else $(o.card).textContent = it.s;
+      $(o.btns).innerHTML = opts(it).map(function (c) {
+        var cls = a ? (c === it.a || (c === a && isOk(it, a)) ? 'right' : (c === a ? 'wrong' : '')) : '';
+        return '<button type="button" data-c="' + esc(c) + '"' + (cls ? ' class="' + cls + '"' : '') + (a ? ' disabled' : '') + '>' + esc(name(c)) + '</button>';
+      }).join('');
+      var out = $(o.out);
+      if (!a) { out.className = 'fbk'; out.innerHTML = ''; }
+      else {
+        var ok = isOk(it, a);
+        out.className = 'fbk ' + (ok ? 'ok' : 'no');
+        out.innerHTML = '<strong>' + (ok ? 'Bien vu !' : 'Pas tout à fait. Réponse : ' + esc(name(it.a)) + '.') + '</strong><span>' + esc(it.why) + '</span>';
+      }
+      var s = o.score(ans), last = idx === o.items.length - 1, left = s.total - s.answered;
+      $(o.score_).textContent = (o.word ? o.word + ' ' : '') + (idx + 1) + ' / ' + s.total;
+      $(o.pos).textContent = s.answered ? 'Bonnes réponses : ' + s.correct + ' sur ' + s.answered : '';
+      $(o.prev).disabled = idx === 0;
+      $(o.next).disabled = last;
+      $(o.next).style.display = last ? 'none' : '';
+      var end = $(o.out + 'End');
+      if (!end) { end = document.createElement('div'); end.id = o.out + 'End'; end.setAttribute('aria-live', 'polite'); $(o.out).insertAdjacentElement('afterend', end); }
+      if (!left) {
+        var r = s.correct / s.total;
+        end.className = 'fbk ok sorter-end';
+        end.innerHTML = '<strong>Terminé ! ' + s.correct + ' / ' + s.total + ' bonnes réponses</strong><span>' +
+          (r === 1 ? 'Parfait, tout est juste !' : r >= .7 ? 'Très bien !' : r >= .5 ? 'Pas mal ! Relis les explications des erreurs.' : 'Relis les explications, puis réessaie.') +
+          ' Touche « Recommencer » pour rejouer.</span>';
+      } else if (last && ans[it.k]) {
+        end.className = 'fbk warn sorter-end';
+        end.innerHTML = '<strong>C’était la dernière carte.</strong><span>Il te reste ' + left + ' réponse' + (left > 1 ? 's' : '') + ' à donner : reviens en arrière avec « ← Précédent ».</span>';
+      } else { end.className = ''; end.innerHTML = ''; }
+    }
+    $(o.btns).addEventListener('click', function (ev) {
+      var b = ev.target.closest('button'); if (!b || b.disabled) return;
+      var it = o.items[idx]; if (!ans[it.k]) ans[it.k] = b.getAttribute('data-c');
+      render();
+    });
+    $(o.prev).addEventListener('click', function () { idx = clamp(idx - 1, o.items.length); render(); });
+    $(o.next).addEventListener('click', function () { idx = clamp(idx + 1, o.items.length); render(); });
+    $(o.reset).addEventListener('click', function () { ans = {}; idx = 0; render(); });
+    render();
+  }
+  function scorer(items) {
+    return function (ans) { var correct = 0, answered = 0; items.forEach(function (x) { if (ans && ans[x.k]) { answered++; if (isOk(x, ans[x.k])) correct++; } }); return { correct: correct, answered: answered, total: items.length }; };
+  }
+
+  /* ---------- 2. Qui contacter ? ---------- */
+  var N0 = { pharm: 'Pharmacie', med: 'Médecin (ou de garde)', urg: '144 (ambulance)' };
+  var SORT0 = [
+    { k: 'c1', s: 'Tu as un petit rhume depuis hier, sans fièvre.', a: 'pharm', alt: ['med'], why: 'Pour un petit souci, un ou une pharmacienne peut conseiller. Si ça ne passe pas ou si ça s’aggrave, on va chez le médecin. Les deux réponses sont acceptées.' },
+    { k: 'c2', s: 'Ta sœur a de la fièvre depuis trois jours et tousse beaucoup.', a: 'med', why: 'Une fièvre qui dure doit être vue par un médecin. Avec certains modèles d’assurance, on appelle d’abord le cabinet, la ligne de télémédecine ou la pharmacie prévus.' },
+    { k: 'c3', s: 'Un passant s’effondre dans la rue et ne répond plus.', a: 'urg', why: 'Danger pour la vie : on appelle tout de suite le 144 (ambulance). On peut aussi composer le 112.' },
+    { k: 'c4', s: 'Tu t’es tordu la cheville au sport : tu peux marcher, mais elle gonfle.', a: 'med', why: 'Il faut faire examiner la cheville (peut-être une radio). Ce n’est pas une urgence vitale.' },
+    { k: 'c5', s: 'Dimanche soir, ton petit frère a très mal à l’oreille et le cabinet est fermé.', a: 'med', why: 'Le soir et le week-end, il y a un médecin de garde. Son numéro dépend du canton : c’est utile de le connaître.' },
+    { k: 'c6', s: 'Quelqu’un a beaucoup de peine à respirer et ses lèvres deviennent bleues.', a: 'urg', why: 'C’est une urgence vitale : 144 sans attendre.' }
+  ];
+  var sort0Score = scorer(SORT0);
+  makeSorter({ items: SORT0, names: N0, order: ['pharm', 'med', 'urg'], btns: 's0Btns', card: 's0Card', pos: 's0Pos', out: 's0Out', score_: 's0Score', prev: 's0Prev', next: 's0Next', reset: 's0Reset', word: 'Situation', score: sort0Score,
+    cardHtml: function (it) { return '<span>' + esc(it.s) + '</span><span class="ask">Qui contacter en premier ?</span>'; } });
+
+  /* ---------- 3. Primes moyennes ---------- */
+  function prem(year, n) {
+    var P = F.premiums[year] || F.premiums[2026];
+    n = n || {};
+    var a = Math.max(0, Math.round(Number(n.a) || 0)), j = Math.max(0, Math.round(Number(n.j) || 0)), e = Math.max(0, Math.round(Number(n.e) || 0));
+    var month = a * P.a + j * P.j + e * P.e;
+    return { month: month, year: month * 12, a: a, j: j, e: e };
+  }
+  var PR_ROWS = [['a', 'Adulte (dès 26 ans)'], ['j', 'Jeune adulte (19 à 25 ans)'], ['e', 'Enfant (jusqu’à 18 ans)']];
+  var PR_PRESETS = [['rossi', 'Famille Rossi : 2 adultes + 2 enfants', { a: 2, j: 0, e: 2 }], ['moi', 'Toi seul·e (enfant)', { a: 0, j: 0, e: 1 }], ['etu', 'Étudiante de 20 ans', { a: 0, j: 1, e: 0 }]];
+  var prY = 2026, prN = { a: 2, j: 0, e: 2 };
+  $('prYear').innerHTML = [2026, 2027].map(function (y) { return '<button type="button" data-y="' + y + '" aria-pressed="false">' + esc(F.premiums[y].label) + '</button>'; }).join('');
+  $('prPreset').innerHTML = PR_PRESETS.map(function (p) { return '<button type="button" data-p="' + p[0] + '" aria-pressed="false">' + esc(p[1]) + '</button>'; }).join('');
+  function prRender() {
+    var P = F.premiums[prY];
+    pressAll($('prYear'), 'data-y', prY);
+    var match = PR_PRESETS.filter(function (p) { return p[2].a === prN.a && p[2].j === prN.j && p[2].e === prN.e; })[0];
+    pressAll($('prPreset'), 'data-p', match ? match[0] : '');
+    $('prItems').innerHTML = PR_ROWS.map(function (r) {
+      return '<div class="item" data-k="' + r[0] + '"><span><span class="nm">' + esc(r[1]) + '</span><br><span class="pr">' + esc(cts2(P[r[0]])) + ' par mois en moyenne</span></span><span class="qty"><button type="button" data-d="-1" aria-label="Une personne de moins : ' + esc(r[1]) + '">−</button><b>' + prN[r[0]] + '</b><button type="button" data-d="1" aria-label="Une personne de plus : ' + esc(r[1]) + '">+</button></span></div>';
+    }).join('');
+    var R = prem(prY, prN), row = function (a, b, cls) { return '<div class="row' + (cls ? ' ' + cls : '') + '"><span>' + a + '</span><span>' + b + '</span></div>'; };
+    var h = '<div class="hd">Primes moyennes · ' + esc(P.label) + '</div>';
+    PR_ROWS.forEach(function (r) { if (prN[r[0]]) h += row(esc(prN[r[0]] + ' × ' + r[1].split(' (')[0].toLowerCase()), esc(cts2(prN[r[0]] * P[r[0]]))); });
+    if (!R.month) h += '<div class="sm">Personne : ajoute quelqu’un avec +.</div>';
+    h += row('Par mois', esc(cts2(R.month)), 'tot') + row('Par an (× 12)', esc(cts2(R.year)), 'tot');
+    $('prSlip').innerHTML = h;
+    var people = R.a + R.j + R.e;
+    $('prOut').innerHTML = '<strong>' + (people ? esc(cts2(R.year)) + ' par an pour ' + people + ' personne' + (people > 1 ? 's' : '') : 'Aucune personne') + '</strong><span>Prime moyenne de toute la population en ' + esc(P.label) + ' : ' + esc(cts2(P.all)) + ' par mois, soit +' + esc(fmt(P.rise, 1)) + NB + '% par rapport à l’année précédente (OFSP). C’est une moyenne nationale : selon le canton, la région, la franchise et le modèle, une vraie prime peut être très différente.</span>';
+  }
+  $('prYear').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b) return; prY = Number(b.getAttribute('data-y')); prRender(); });
+  $('prPreset').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b) return; var p = PR_PRESETS.filter(function (x) { return x[0] === b.getAttribute('data-p'); })[0]; if (p) prN = { a: p[2].a, j: p[2].j, e: p[2].e }; prRender(); });
+  $('prItems').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b) return; var k = b.closest('.item').getAttribute('data-k'); prN[k] = Math.max(0, Math.min(k === 'e' ? 6 : 4, prN[k] + Number(b.getAttribute('data-d')))); prRender(); });
+  prRender();
+
+  /* ---------- 4. Franchise et quote-part (calculs en centimes) ---------- */
+  function participation(costC, frFr, capFr) {
+    costC = Math.max(0, Math.round(Number(costC) || 0));
+    var frC = Math.max(0, Math.round(Number(frFr) || 0)) * 100, capC = Math.max(0, Math.round(Number(capFr) || 0)) * 100;
+    var fr = Math.min(costC, frC);
+    var qp = Math.min(capC, Math.round((costC - fr) * F.quote.rate));
+    return { cost: costC, fr: fr, qp: qp, me: fr + qp, ins: costC - fr - qp };
+  }
+  var FQ_PRE = [0, 200, 1000, 3000, 10000, 50000];
+  var fqW = 'a', fqF = 300, fqCost = 1000;
+  $('fqPre').innerHTML = FQ_PRE.map(function (v) { return '<button type="button" data-v="' + v + '" aria-pressed="false">' + esc(chf(v)) + '</button>'; }).join('');
+  function fqFrBtns() {
+    var L = fqW === 'a' ? F.franchises.adult : F.franchises.child;
+    $('fqFr').innerHTML = L.map(function (f) { return '<button type="button" data-f="' + f + '" aria-pressed="false">Franchise ' + esc(chf(f)) + '</button>'; }).join('');
+  }
+  function fqRender() {
+    fqCost = Math.round(lim(fqCost, 0, 60000) / 100) * 100;
+    $('fqRange').value = fqCost; $('fqVal').textContent = chf(fqCost);
+    pressAll($('fqWho'), 'data-w', fqW); pressAll($('fqFr'), 'data-f', fqF); pressAll($('fqPre'), 'data-v', fqCost);
+    var cap = fqW === 'a' ? F.quote.capAdult : F.quote.capChild, R = participation(fqCost * 100, fqF, cap);
+    var w = function (v) { return R.cost ? (v / R.cost * 100).toFixed(1) + '%' : '0%'; };
+    $('fqB1').style.width = w(R.fr); $('fqB2').style.width = w(R.qp); $('fqB3').style.width = w(R.ins);
+    var row = function (a, b, cls) { return '<div class="row' + (cls ? ' ' + cls : '') + '"><span>' + a + '</span><span>' + b + '</span></div>'; };
+    var rest = R.cost - R.fr, raw = Math.round(rest * F.quote.rate);
+    $('fqSlip').innerHTML = '<div class="hd">Décompte de l’année · ' + (fqW === 'a' ? 'adulte' : 'enfant') + '</div>' +
+      row('Frais de l’année', esc(cts(R.cost))) +
+      row('Franchise (jusqu’à ' + esc(chf(fqF)) + ')', esc(cts(R.fr))) +
+      row('Reste : ' + esc(cts(rest)) + ' × 10' + NB + '% = ' + esc(cts(raw)) + (raw > cap * 100 ? ' → plafond' : ''), esc(cts(R.qp))) +
+      row('Total payé par moi', esc(cts(R.me)), 'tot') +
+      row('Payé par l’assureur', esc(cts(R.ins)), 'tot') +
+      '<div class="sm">Sans compter les primes de l’année ni l’éventuelle contribution hospitalière.</div>';
+    var txt;
+    if (!R.cost) txt = 'Aucun frais : tu ne paies rien de plus que tes primes, et l’assureur ne paie rien.';
+    else if (R.cost <= fqF * 100) txt = 'Les frais restent sous la franchise : tu les paies entièrement toi-même. L’assurance ne paie rien cette année-là.';
+    else if (R.qp >= cap * 100) txt = 'Tu as atteint le maximum : franchise + ' + chf(cap) + ' de quote-part. Tout ce qui dépasse est payé par l’assureur, même s’il y a beaucoup plus de frais.';
+    else txt = 'Après la franchise, tu paies 10 % du reste. L’assureur paie ' + pct(R.ins / R.cost, 1) + ' des frais.';
+    $('fqOut').innerHTML = '<strong>Je paie ' + esc(cts(R.me)) + ', l’assureur ' + esc(cts(R.ins)) + '</strong><span>' + esc(txt) + ' Maximum possible avec cette franchise : ' + esc(chf(fqF + cap)) + ' par an.</span>';
+  }
+  $('fqWho').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b) return; fqW = b.getAttribute('data-w'); fqF = fqW === 'a' ? 300 : 0; fqFrBtns(); fqRender(); });
+  $('fqFr').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b) return; fqF = Number(b.getAttribute('data-f')); fqRender(); });
+  $('fqPre').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b) return; fqCost = Number(b.getAttribute('data-v')); fqRender(); });
+  $('fqRange').addEventListener('input', function () { fqCost = Number(this.value); fqRender(); });
+  $('fqMinus').addEventListener('click', function () { fqCost -= 100; fqRender(); });
+  $('fqPlus').addEventListener('click', function () { fqCost += 100; fqRender(); });
+  fqFrBtns(); fqRender();
+
+  /* ---------- 5. Choisir sa franchise : primes INVENTÉES (francs par mois, adulte) ----------
+     Contrôle de la règle des 70 % : rabais annuel <= 0,7 × (franchise − 300). Ex. 2 500 : 12 × 120 = 1 440 <= 1 540. */
+  var INVENTED = [[300, 480], [500, 469], [1000, 440], [1500, 411], [2000, 384], [2500, 360]];
+  function yearTotal(fr, costC) {
+    var p = INVENTED.filter(function (x) { return x[0] === fr; })[0]; if (!p) return null;
+    var P = participation(costC, fr, F.quote.capAdult), premC = p[1] * 1200;
+    return { fr: fr, prem: premC, part: P, total: premC + P.me };
+  }
+  function compare(costC) {
+    var L = INVENTED.map(function (x) { return yearTotal(x[0], costC); }), best = L[0];
+    L.forEach(function (x) { if (x.total < best.total) best = x; });
+    return { list: L, best: best.fr };
+  }
+  /* Plus petits frais (pas de 10 fr.) à partir desquels la franchise A devient moins chère que B */
+  function crossover(frA, frB) {
+    for (var c = 0; c <= 2000000; c += 1000) { var A = yearTotal(frA, c), B = yearTotal(frB, c); if (A.total < B.total) return c; }
+    return null;
+  }
+  var CH_PRE = [0, 500, 1500, 3000, 8000], chCost = 500;
+  $('chPre').innerHTML = CH_PRE.map(function (v) { return '<button type="button" data-v="' + v + '" aria-pressed="false">' + esc(chf(v)) + '</button>'; }).join('');
+  function chRender() {
+    chCost = Math.round(lim(chCost, 0, 20000) / 100) * 100;
+    $('chRange').value = chCost; $('chVal').textContent = chf(chCost);
+    pressAll($('chPre'), 'data-v', chCost);
+    var C = compare(chCost * 100), max = C.list.reduce(function (m, x) { return Math.max(m, x.total); }, 0);
+    $('chList').innerHTML = C.list.map(function (x) {
+      var w = function (v) { return (v / max * 100).toFixed(1) + '%'; };
+      return '<div class="rowx' + (x.fr === C.best ? ' best' : '') + '"><span class="bn">Franchise ' + esc(chf(x.fr)) + (x.fr === C.best ? ' · la moins chère' : '') + '</span><span class="bv">' + esc(cts(x.total)) + '</span>' +
+        '<span class="bt" aria-hidden="true"><i class="pa" style="width:' + w(x.prem) + '"></i><i class="pb" style="width:' + w(x.part.fr) + '"></i><i class="acc" style="width:' + w(x.part.qp) + '"></i></span>' +
+        '<span class="bd">primes ' + esc(cts(x.prem)) + ' (' + esc(chf(INVENTED.filter(function (p) { return p[0] === x.fr; })[0][1])) + ' × 12) + franchise ' + esc(cts(x.part.fr)) + ' + quote-part ' + esc(cts(x.part.qp)) + '</span></div>';
+    }).join('');
+    var lo = yearTotal(300, chCost * 100), hi = yearTotal(2500, chCost * 100), diff = Math.abs(lo.total - hi.total);
+    var cross = crossover(300, 2500);
+    var txt = (hi.total < lo.total ? 'Ici, la franchise de 2 500 fr. coûte ' + cts(diff) + ' de moins que celle de 300 fr.' : hi.total > lo.total ? 'Ici, la franchise de 300 fr. coûte ' + cts(diff) + ' de moins que celle de 2 500 fr.' : 'Ici, les franchises de 300 fr. et de 2 500 fr. coûtent autant.') +
+      ' Avec ces primes inventées, la franchise de 300 fr. devient la moins chère des deux à partir d’environ ' + chf(cross / 100) + ' de frais. Mais personne ne sait à l’avance combien il dépensera.';
+    $('chOut').innerHTML = '<strong>Avec ' + esc(chf(chCost)) + ' de frais : la moins chère est la franchise de ' + esc(chf(C.best)) + '</strong><span>' + esc(txt) + '</span>';
+  }
+  $('chPre').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b) return; chCost = Number(b.getAttribute('data-v')); chRender(); });
+  $('chRange').addEventListener('input', function () { chCost = Number(this.value); chRender(); });
+  $('chMinus').addEventListener('click', function () { chCost -= 100; chRender(); });
+  $('chPlus').addEventListener('click', function () { chCost += 100; chRender(); });
+  chRender();
+
+  /* ---------- 6. Les modèles d’assurance (catégories OFSP 2026) ---------- */
+  var MODELS = [
+    { k: 'std', code: 'standard', t: 'Libre choix', x: 'Tu vas chez le médecin que tu veux, aussi directement chez un spécialiste. C’est le modèle le plus libre, et en général le plus cher. On peut le quitter pour un modèle avec choix limité à tout moment de l’année.' },
+    { k: 'praxis', code: 'PRAXIS', t: 'Cabinet médical', x: 'Pour une question de santé, tu vas toujours d’abord dans un cabinet choisi (médecin de famille, centre médical, parfois appelé « réseau de soins » ou « HMO »). Si nécessaire, ce cabinet t’envoie chez un spécialiste. La prime est souvent moins chère.' },
+    { k: 'tel', code: 'TEL_DIG', t: 'Téléphone ou en ligne', x: 'Le premier contact se fait toujours par téléphone ou en ligne, par exemple avec un centre de télémédecine ou une application. On te dit ensuite où aller. La prime est souvent moins chère.' },
+    { k: 'pharm', code: 'PHARM', t: 'Pharmacie', x: 'Le premier contact est une pharmacie partenaire de l’assureur, qui conseille et oriente vers un médecin si nécessaire. La prime est souvent moins chère.' },
+    { k: 'flex', code: 'FLEX', t: 'Flexible', x: 'Tu peux choisir entre plusieurs premiers points de contact, par exemple un cabinet de médecin de famille ou un centre de télémédecine.' },
+    { k: 'bonus', code: 'bonus', t: 'Assurance avec bonus', x: 'La prime baisse pour chaque année sans remboursement. Attention : elle commence 10 % plus haut que la prime ordinaire, et la franchise ne peut pas être augmentée. En cinq ans, elle peut descendre jusqu’à 55 % de la prime de départ (OFSP).' }
+  ];
+  var moSeen = {}, moSel = null;
+  $('moBtns').innerHTML = MODELS.map(function (m) { return '<button type="button" data-k="' + m.k + '" aria-pressed="false"><span class="code">' + esc(m.code) + '</span>' + esc(m.t) + '</button>'; }).join('');
+  function moRender() {
+    pressAll($('moBtns'), 'data-k', moSel || '');
+    each($('moBtns').querySelectorAll('button'), function (b) { b.classList.toggle('seen', !!moSeen[b.getAttribute('data-k')]); });
+    var n = Object.keys(moSeen).length, m = MODELS.filter(function (x) { return x.k === moSel; })[0];
+    $('moCount').textContent = 'Modèles découverts : ' + n + ' sur ' + MODELS.length;
+    var out = $('moOut');
+    if (!m) { out.className = 'fbk info'; out.innerHTML = '<strong>Six façons de s’assurer</strong><span>Touche un modèle pour savoir comment il fonctionne.</span>'; return; }
+    var done = n === MODELS.length ? '<span><strong>Terminé !</strong> Tu connais les ' + MODELS.length + ' modèles. Les soins remboursés sont les mêmes partout : seul change le chemin pour y arriver (et le prix). Un changement de modèle se fait surtout pour le 1er janvier ; on annonce par écrit avant le 30 novembre qu’on quitte un modèle avec choix limité.</span>' : '';
+    out.className = 'fbk ' + (n === MODELS.length ? 'ok' : 'info');
+    out.innerHTML = '<strong>' + esc(m.code + ' · ' + m.t) + '</strong><span>' + esc(m.x) + '</span>' + done;
+  }
+  $('moBtns').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b) return; moSel = b.getAttribute('data-k'); moSeen[moSel] = true; moRender(); });
+  $('moReset').addEventListener('click', function () { moSeen = {}; moSel = null; moRender(); });
+  moRender();
+
+  /* ---------- 7. Subsides : règle INVENTÉE (part des primes au-dessus de 12 % du revenu) ---------- */
+  var SU_RATE = 0.12, SU_FAMILY = { a: 2, j: 0, e: 2 };
+  function subsidy(incomeFr) {
+    var inc = Math.max(0, Math.round(Number(incomeFr) || 0));
+    var premC = prem(2026, SU_FAMILY).year, thr = Math.round(inc * 100 * SU_RATE);
+    var sub = Math.max(0, premC - thr);
+    return { income: inc, prem: premC, threshold: thr, sub: sub, pay: premC - sub };
+  }
+  var SU_PRE = [30000, 60000, 90000, 120000], suInc = 60000;
+  $('suPre').innerHTML = SU_PRE.map(function (v) { return '<button type="button" data-v="' + v + '" aria-pressed="false">' + esc(chf(v)) + '</button>'; }).join('');
+  function suRender() {
+    suInc = Math.round(lim(suInc, 20000, 160000) / 5000) * 5000;
+    $('suRange').value = suInc; $('suVal').textContent = chf(suInc);
+    pressAll($('suPre'), 'data-v', suInc);
+    var R = subsidy(suInc);
+    $('suB1').style.width = (R.pay / R.prem * 100).toFixed(1) + '%';
+    $('suB2').style.width = (R.sub / R.prem * 100).toFixed(1) + '%';
+    $('suPrem').textContent = cts2(R.prem); $('suSub').textContent = cts2(R.sub); $('suPay').textContent = cts2(R.pay);
+    var txt = R.sub
+      ? '12 % de ' + chf(suInc) + ' = ' + cts2(R.threshold) + '. Les primes dépassent ce montant de ' + cts2(R.sub) + ' : avec la règle inventée, le canton verse ce subside directement à l’assureur. La famille paie ' + cts2(R.pay) + ', soit ' + pct(R.pay / (suInc * 100), 1) + ' de son revenu.'
+      : '12 % de ' + chf(suInc) + ' = ' + cts2(R.threshold) + ', plus que les primes : avec la règle inventée, pas de subside. Les primes représentent ' + pct(R.prem / (suInc * 100), 1) + ' du revenu de la famille.';
+    $('suOut').innerHTML = '<strong>' + (R.sub ? 'Subside (règle inventée) : ' + esc(cts2(R.sub)) + ' par an' : 'Pas de subside (règle inventée)') + '</strong><span>' + esc(txt) + '</span>';
+  }
+  $('suPre').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b) return; suInc = Number(b.getAttribute('data-v')); suRender(); });
+  $('suRange').addEventListener('input', function () { suInc = Number(this.value); suRender(); });
+  $('suMinus').addEventListener('click', function () { suInc -= 5000; suRender(); });
+  $('suPlus').addEventListener('click', function () { suInc += 5000; suRender(); });
+  suRender();
+
+  /* ---------- 8. Qui paie ? ---------- */
+  var N1 = { lamal: 'LAMal', laa: 'LAA (employeur)', comp: 'Complémentaire', moi: 'Moi' };
+  var SORT1 = [
+    { k: 'a1', s: 'Léa, 14 ans, élève, se casse le poignet au ski.', a: 'lamal', why: 'Léa ne travaille pas : son assurance-maladie couvre aussi les accidents. Comme c’est une enfant, elle n’a pas de franchise ordinaire (0 fr.) et une quote-part de 350 fr. au plus.' },
+    { k: 'a2', s: 'Marco, apprenti, se blesse au genou au football un samedi.', a: 'laa', why: 'Les apprentis sont assurés par la LAA, via leur employeur, aussi pour les accidents de loisirs (s’ils travaillent au moins 8 heures par semaine chez lui).' },
+    { k: 'a3', s: 'Un ouvrier se coupe la main sur le chantier.', a: 'laa', why: 'C’est un accident professionnel : l’assurance-accidents de l’employeur paie, quel que soit le nombre d’heures.' },
+    { k: 'a4', s: 'Une employée à plein temps tombe dans l’escalier chez elle.', a: 'laa', why: 'Elle travaille plus de 8 heures par semaine : la LAA couvre aussi les accidents non professionnels.' },
+    { k: 'a5', s: 'Un lycéen qui travaille 4 heures par semaine au marché tombe à vélo un dimanche.', a: 'lamal', why: 'Avec moins de 8 heures par semaine, la LAA ne couvre pas les accidents de loisirs : c’est son assurance-maladie qui paie (avec franchise et quote-part).' },
+    { k: 'a6', s: 'Un enfant de 8 ans a une angine et va chez le médecin.', a: 'lamal', why: 'Une maladie : c’est l’assurance de base qui paie. Les parents paient au plus la quote-part.' },
+    { k: 'a7', s: 'Le supplément pour une chambre privée à l’hôpital.', a: 'comp', alt: ['moi'], why: 'L’assurance de base paie la division commune. La chambre privée est payée par une complémentaire, si on en a une ; sinon on la paie soi-même.' },
+    { k: 'a8', s: 'Le plombage d’une carie chez le dentiste.', a: 'moi', alt: ['comp'], why: 'L’assurance de base ne paie pas les plombages habituels. On paie soi-même, sauf si on a une complémentaire dentaire.' },
+    { k: 'a9', s: 'Un appareil dentaire (orthodontie) pour une fille de 12 ans.', a: 'comp', alt: ['moi'], why: 'L’assurance de base ne paie pas l’orthodontie, sauf cas graves rares. Une complémentaire peut en payer une partie ; sinon, ce sont les parents.' },
+    { k: 'a10', s: 'Une crème solaire achetée à la pharmacie, sans ordonnance.', a: 'moi', why: 'Ce n’est pas un médicament prescrit de la liste : on le paie soi-même.' },
+    { k: 'a11', s: 'Les 300 premiers francs de frais médicaux d’un adulte qui a une franchise de 300 fr.', a: 'moi', why: 'C’est la franchise : on la paie soi-même chaque année avant que l’assurance participe.' },
+    { k: 'a12', s: 'Un médicament prescrit, figurant sur la liste des spécialités, pour une adulte qui a déjà dépassé sa franchise.', a: 'lamal', why: 'L’assurance de base le rembourse ; l’assurée paie encore 10 % de quote-part (jusqu’au plafond de 700 fr.).' }
+  ];
+  var sort1Score = scorer(SORT1);
+  makeSorter({ items: SORT1, names: N1, order: ['lamal', 'laa', 'comp', 'moi'], btns: 's1Btns', card: 's1Card', pos: 's1Pos', out: 's1Out', score_: 's1Score', prev: 's1Prev', next: 's1Next', reset: 's1Reset', word: 'Question', score: sort1Score,
+    cardHtml: function (it) { return '<span>' + esc(it.s) + '</span><span class="ask">Qui paie la plus grande partie ?</span>'; } });
+
+  /* ---------- 9. Remboursé par l’assurance de base ? (OFSP, Primes-Conseil 2027) ---------- */
+  var N2 = { oui: 'Oui', part: 'En partie', non: 'Non' };
+  var SORT2 = [
+    { k: 'b1', s: 'Une consultation chez le médecin de famille pour une bronchite.', a: 'oui', why: 'Oui, après la franchise et avec la quote-part de 10 %.' },
+    { k: 'b2', s: 'Une opération et un séjour en division commune d’un hôpital de la liste du canton.', a: 'oui', why: 'Oui. Une partie est payée par l’assureur, l’autre par le canton (au moins 55 % des coûts d’un séjour à l’hôpital). Le patient adulte paie aussi 15 fr. par jour.' },
+    { k: 'b3', s: 'Des séances de physiothérapie prescrites par le médecin.', a: 'oui', why: 'Oui : les soins faits sur ordonnance médicale par certains professionnels (physiothérapeutes, ergothérapeutes…) sont pris en charge.' },
+    { k: 'b4', s: 'Un médicament prescrit qui figure sur la liste des spécialités.', a: 'oui', why: 'Oui, c’est la liste officielle des médicaments remboursés. Pour un original qui a un générique moins cher, la quote-part peut monter à 40 %.' },
+    { k: 'b5', s: 'Le plombage d’une carie.', a: 'non', why: 'Non : les soins dentaires habituels ne sont pas payés. L’assurance de base paie le dentiste seulement dans des cas précis (maladie grave, accident non couvert par la LAA).' },
+    { k: 'b6', s: 'Un appareil dentaire pour corriger la position des dents d’un enfant.', a: 'non', why: 'Non : l’orthodontie n’est pas remboursée par l’assurance de base, sauf cas graves rares.' },
+    { k: 'b7', s: 'Des lunettes prescrites par l’ophtalmologue pour un enfant de 12 ans.', a: 'part', why: 'En partie : une contribution de 180,67 fr. par an pour les verres ou les lentilles des enfants jusqu’à 18 ans (2026).' },
+    { k: 'b8', s: 'Une chambre privée à l’hôpital, pour plus de confort.', a: 'non', why: 'Non : seule la division commune est couverte. Le confort relève d’une assurance complémentaire.' },
+    { k: 'b9', s: 'Un transport en ambulance médicalement nécessaire.', a: 'part', why: 'En partie : 50 % des frais de transport, au plus 500 fr. par année (et 50 % des frais de sauvetage, au plus 5 000 fr.).' },
+    { k: 'b10', s: 'L’accouchement à l’hôpital.', a: 'oui', why: 'Oui, et sans franchise ni quote-part pour les prestations de maternité. Les contrôles de grossesse sont aussi couverts.' },
+    { k: 'b11', s: 'Des vitamines achetées sans ordonnance.', a: 'non', why: 'Non : seuls les médicaments prescrits et figurant sur les listes officielles sont remboursés.' },
+    { k: 'b12', s: 'Une cure thermale prescrite par le médecin, dans un établissement admis.', a: 'part', why: 'En partie : une contribution de 10 fr. par jour, pendant 21 jours au plus par an.' }
+  ];
+  var sort2Score = scorer(SORT2);
+  makeSorter({ items: SORT2, names: N2, order: ['oui', 'part', 'non'], btns: 's2Btns', card: 's2Card', pos: 's2Pos', out: 's2Out', score_: 's2Score', prev: 's2Prev', next: 's2Next', reset: 's2Reset', word: 'Question', score: sort2Score,
+    cardHtml: function (it) { return '<span>' + esc(it.s) + '</span><span class="ask">Remboursé par l’assurance de base ?</span>'; } });
+
+  /* ---------- 11. Financement de la santé 2024 (OFS, 24.4.2026) ---------- */
+  var FIN = [
+    ['ind', 'Ménages : primes et autres contributions', 40.7, 'pa', 'Surtout les primes d’assurance-maladie payées par les ménages. C’est la plus grande part.'],
+    ['pub', 'Pouvoirs publics (surtout les cantons)', 31.3, 'pc', 'Les cantons paient une grande partie des séjours à l’hôpital, des subsides, et d’autres prestations ; la Confédération participe aussi, par exemple aux subsides.'],
+    ['dir', 'Ménages : paiements directs', 21.3, 'pb', 'Ce que les gens paient de leur poche : franchises, quote-parts, dentiste, soins non remboursés…'],
+    ['aut', 'Autres (employeurs, autres sources)', 6.7, 'pd', 'Le reste (100 % moins les trois parts précédentes) : par exemple les contributions des employeurs aux assurances sociales.']
+  ];
+  var fiSel = null;
+  function fiRender() {
+    $('fiList').innerHTML = FIN.map(function (r) {
+      return '<button type="button" data-k="' + r[0] + '" aria-pressed="' + (fiSel === r[0] ? 'true' : 'false') + '"><span class="bn">' + esc(r[1]) + '</span><span class="bv">' + esc(fmt(r[2], 1)) + NB + '%</span><span class="bt" aria-hidden="true"><i class="' + r[3] + '" style="width:' + (r[2] / 45 * 100).toFixed(1) + '%"></i></span></button>';
+    }).join('');
+    var r = FIN.filter(function (x) { return x[0] === fiSel; })[0];
+    $('fiOut').innerHTML = r
+      ? '<strong>' + esc(r[1]) + ' : ' + esc(fmt(r[2], 1)) + NB + '% · environ ' + esc(fmt(F.costs2024.total * r[2] / 100, 0)) + ' milliards</strong><span>' + esc(r[4]) + '</span>'
+      : '<strong>97 milliards de francs en 2024</strong><span>Les ménages financent près des deux tiers (21,3 % + 40,7 % = 62 %). Touche une ligne pour en savoir plus.</span>';
+  }
+  $('fiList').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b) return; fiSel = b.getAttribute('data-k'); fiRender(); });
+  fiRender();
+
+  /* ---------- Pas à pas générique (Précédent / Suivant / Recommencer) ---------- */
+  function makeStepper(o) {
+    var idx = 0;
+    function render() {
+      var L = o.steps(), s; idx = clamp(idx, L.length); s = L[idx];
+      $(o.out).innerHTML = '<span class="when">' + esc(o.label) + ' · ' + (idx + 1) + ' / ' + L.length + (s.when ? ' · ' + esc(s.when) : '') + '</span><strong>' + esc(s.t) + '</strong><span>' + s.x + '</span>';
+      $(o.bar).style.width = Math.round((idx + 1) / L.length * 100) + '%';
+      var last = idx === L.length - 1;
+      $(o.prev).disabled = idx === 0;
+      $(o.next).disabled = last;
+      $(o.next).style.display = last ? 'none' : '';
+      var end = $(o.end);
+      if (last) { end.className = 'fbk ok'; end.innerHTML = '<strong>Terminé !</strong><span>' + esc(o.endText) + ' Touche « Recommencer » pour revoir depuis le début.</span>'; }
+      else { end.className = 'fbk'; end.innerHTML = ''; }
+    }
+    $(o.prev).addEventListener('click', function () { idx--; render(); });
+    $(o.next).addEventListener('click', function () { idx++; render(); });
+    $(o.reset).addEventListener('click', function () { idx = 0; render(); });
+    render();
+    return { go: function (i) { idx = i; render(); } };
+  }
+
+  /* ---------- 12. Le parcours d’assuré ---------- */
+  var PATH = [
+    { when: 'naissance', t: 'S’assurer dans les 3 mois', x: 'Les parents doivent assurer leur bébé dans les <strong>3 mois</strong> après la naissance. Dans ce délai, l’assurance compte depuis le premier jour. Il reçoit sa propre <strong>carte d’assuré</strong>.' },
+    { when: '0 à 18 ans', t: 'La prime d’enfant', x: 'Tes parents paient ta prime d’enfant (en moyenne ' + esc(cts2(F.premiums[2026].e)) + ' par mois en 2026). Franchise ordinaire : <strong>0 fr.</strong> ; quote-part : au plus <strong>350 fr.</strong> par an. À l’hôpital, pas de contribution de 15 fr. par jour.' },
+    { when: 'dès 19 ans', t: 'Jeune adulte', x: 'Tu passes dans la catégorie des <strong>jeunes adultes</strong> (19 à 25 ans) : prime moyenne de ' + esc(cts2(F.premiums[2026].j)) + ' par mois en 2026. Comme un adulte, tu as une franchise d’au moins <strong>300 fr.</strong> et une quote-part jusqu’à <strong>700 fr.</strong> C’est le bon moment de regarder avec tes parents quelle franchise et quel modèle te conviennent.' },
+    { when: 'apprentissage ou emploi', t: 'L’assurance-accidents de l’employeur', x: 'Si tu travailles au moins <strong>8 heures par semaine</strong> chez le même employeur (ou si tu es apprenti·e), la <strong>LAA</strong> te couvre aussi pour les accidents de loisirs. Tu peux alors faire exclure la couverture accidents de ta LAMal, avec une attestation, et ta prime baisse.' },
+    { when: 'jusqu’à 25 ans', t: 'En formation', x: 'Si tu es encore en formation (études, apprentissage), tu ne paies pas la contribution de 15 fr. par jour à l’hôpital. Pour les revenus bas et moyens, le canton doit aussi réduire ta prime d’au moins 50 % (subside).' },
+    { when: 'dès 26 ans', t: 'Adulte', x: 'Tu paies la prime d’adulte (en moyenne ' + esc(cts2(F.premiums[2026].a)) + ' par mois en 2026, ' + esc(cts2(F.premiums[2027].a)) + ' annoncés pour 2027). Une fois que tu as tes propres revenus, c’est en général toi qui la paies.' },
+    { when: 'chaque année', t: 'Le calendrier de l’automne', x: 'Avant le <strong>31 octobre</strong>, l’assureur annonce la prime de l’année suivante. Pour changer d’assureur de base au 1er janvier, la lettre de résiliation doit <strong>arriver</strong> au plus tard le <strong>30 novembre</strong> (c’est la date de réception qui compte, pas celle de la poste ; l’OFSP conseille un envoi recommandé vers la mi-novembre). Avec la franchise ordinaire et sans modèle particulier, on peut aussi changer pour le 30 juin, avec une lettre reçue avant le 31 mars. On ne peut pas changer si on a des primes impayées.' }
+  ];
+  makeStepper({ steps: function () { return PATH; }, label: 'Parcours', out: 'pcOut', bar: 'pcBar', prev: 'pcPrev', next: 'pcNext', reset: 'pcReset', end: 'pcEnd',
+    endText: 'Tu as suivi le parcours d’un assuré, de la naissance à l’âge adulte. Garde ta carte d’assuré sur toi.' });
+
+  /* ---------- Idées reçues ---------- */
+  var MYTHS = [
+    { k: 'diff', s: '« L’assurance de base n’est pas la même selon l’assureur. »', a: 'mythe', why: 'Les prestations de l’assurance de base sont les mêmes chez tous les assureurs. Seuls le prix, le service et les modèles proposés changent.' },
+    { k: 'haute', s: '« Avec la franchise la plus haute, on économise toujours. »', a: 'mythe', why: 'La prime est plus basse, mais si on a beaucoup de frais, on paie jusqu’à 2 500 fr. de franchise plus 700 fr. de quote-part. Avec des frais réguliers, une franchise basse revient souvent moins cher.' },
+    { k: 'enfants', s: '« Les enfants ne paient pas de prime. »', a: 'mythe', why: 'Chaque enfant a sa propre prime, payée par ses parents : en moyenne 122,50 fr. par mois en 2026 (OFSP). Ils n’ont simplement pas de franchise ordinaire.' },
+    { k: 'dentiste', s: '« Le dentiste est remboursé par l’assurance de base. »', a: 'mythe', why: 'En général non : plombages et orthodontie ne sont pas remboursés. L’assurance de base paie seulement dans des cas précis (maladie grave, accident non couvert par la LAA).' },
+    { k: 'refus', s: '« Un assureur peut refuser une personne malade pour l’assurance de base. »', a: 'mythe', why: 'Non : il doit accepter tout le monde dans l’assurance de base, sans questionnaire de santé. Pour une complémentaire, en revanche, il peut refuser.' },
+    { k: 'change', s: '« On peut changer d’assureur de base chaque année. »', a: 'vrai', why: 'Vrai : la lettre de résiliation doit arriver avant le 30 novembre pour un changement au 1er janvier, même si on est malade ou âgé.' },
+    { k: 'tout', s: '« Quand on est assuré, on ne paie plus rien chez le médecin. »', a: 'mythe', why: 'On paie la franchise puis 10 % de quote-part (jusqu’à 700 fr. pour un adulte), et parfois 15 fr. par jour à l’hôpital.' },
+    { k: 'revenu', s: '« La prime de base dépend du salaire. »', a: 'mythe', why: 'La prime est la même quel que soit le revenu. C’est pour cela que les cantons versent des subsides aux personnes de condition modeste.' }
+  ];
+  function mythBy(k) { return MYTHS.filter(function (m) { return m.k === k; })[0] || null; }
+  function checkMyth(k, choice) { var m = mythBy(k); if (!m || (choice !== 'vrai' && choice !== 'mythe')) return null; return { ok: m.a === choice, answer: m.a, why: m.why }; }
+  var mythAns = {};
+  $('myths').innerHTML = MYTHS.map(function (m) {
+    return '<div class="box myth" data-k="' + m.k + '"><span class="stmt">' + esc(m.s) + '</span><div class="btns"><button type="button" data-c="vrai">Vrai</button><button type="button" data-c="mythe">Idée reçue</button></div><div class="fbk" aria-live="polite"></div></div>';
+  }).join('');
+  function mythRender() {
+    var correct = 0;
+    each($('myths').querySelectorAll('.myth'), function (box) {
+      var k = box.getAttribute('data-k'), a = mythAns[k], m = mythBy(k), out = box.querySelector('.fbk');
+      each(box.querySelectorAll('button'), function (b) { var c = b.getAttribute('data-c'); b.disabled = !!a; b.className = a ? (c === m.a ? 'right' : (c === a ? 'wrong' : '')) : ''; });
+      if (!a) { out.className = 'fbk'; out.innerHTML = ''; return; }
+      var ok = a === m.a; if (ok) correct++;
+      out.className = 'fbk ' + (ok ? 'ok' : 'no');
+      out.innerHTML = '<strong>' + (m.a === 'vrai' ? 'Vrai.' : 'Idée reçue.') + (ok ? ' Bien joué !' : '') + '</strong><span>' + esc(m.why) + '</span>';
+    });
+    $('mythScore').textContent = correct + ' / ' + MYTHS.length;
+  }
+  $('myths').addEventListener('click', function (ev) {
+    var b = ev.target.closest('button'); if (!b || b.disabled) return;
+    var k = b.closest('.myth').getAttribute('data-k');
+    if (!mythAns[k]) mythAns[k] = b.getAttribute('data-c');
+    mythRender();
+  });
+  $('mythReset').addEventListener('click', function () { mythAns = {}; mythRender(); });
+  mythRender();
+
+  /* ---------- Quiz ---------- */
+  var QZ = [
+    { q: 'Depuis quand l’assurance-maladie de base est-elle obligatoire en Suisse ?', o: [['a', '1948'], ['b', '1996'], ['c', '2008']], a: 'b', how: 'Depuis le 1er janvier 1996, avec la LAMal, acceptée en votation en 1994.' },
+    { q: 'Dans quel délai faut-il s’assurer après son arrivée en Suisse ou sa naissance ?', o: [['a', '3 mois'], ['b', '1 an'], ['c', '30 jours']], a: 'a', how: '3 mois. Dans ce délai, l’assurance compte depuis le premier jour.' },
+    { q: 'Quelle est la franchise ordinaire d’un adulte ?', o: [['a', '0 fr.'], ['b', '300 fr.'], ['c', '2 500 fr.']], a: 'b', how: '300 fr. On peut choisir plus haut (jusqu’à 2 500 fr.) pour une prime plus basse. 0 fr. est la franchise ordinaire des enfants.' },
+    { q: 'Quel est le plafond annuel de la quote-part pour un adulte ?', o: [['a', '350 fr.'], ['b', '700 fr.'], ['c', '1 000 fr.']], a: 'b', how: '700 fr. pour un adulte, 350 fr. pour un enfant. 1 000 fr. est le maximum total avec une franchise de 300 fr. (300 + 700).' },
+    { q: 'Ta franchise est de 300 fr. et tes frais de l’année de 800 fr. Combien paies-tu ?', o: [['a', '350 fr.'], ['b', '380 fr.'], ['c', '800 fr.']], a: 'a', how: '300 fr. de franchise + 10 % de 500 fr. (50 fr.) = 350 fr.' },
+    { q: 'Qui décide si une famille a droit à une réduction de primes (subside) ?', o: [['a', 'l’assureur'], ['b', 'le canton'], ['c', 'la commune']], a: 'b', how: 'Le canton fixe les règles et verse le subside à l’assureur ; la Confédération en paie une partie.' },
+    { q: 'Une personne travaille 12 heures par semaine chez le même employeur et se blesse au sport le week-end. Qui paie en priorité ?', o: [['a', 'l’assurance-maladie'], ['b', 'l’assurance-accidents de l’employeur (LAA)'], ['c', 'personne']], a: 'b', how: 'Dès 8 heures par semaine chez le même employeur, la LAA couvre aussi les accidents non professionnels.' },
+    { q: 'Pour changer d’assureur de base au 1er janvier, quand la lettre de résiliation doit-elle arriver au plus tard ?', o: [['a', 'le 31 octobre'], ['b', 'le 30 novembre'], ['c', 'le 31 décembre']], a: 'b', how: 'Le 30 novembre (date de réception). Le 31 octobre est la date limite pour annoncer les nouvelles primes.' }
+  ];
+  var quiz = $('quiz'), done = [];
+  function newQuiz() {
+    quiz.innerHTML = ''; done = [];
+    QZ.forEach(function (Q, k) {
+      var li = document.createElement('li');
+      li.innerHTML = '<span>' + esc(Q.q) + '</span><select id="qa' + k + '" aria-label="Ta réponse à la question ' + (k + 1) + '"><option value="">…</option>' + Q.o.map(function (o) { return '<option value="' + o[0] + '">' + esc(o[1]) + '</option>'; }).join('') + '</select><button type="button" id="qb' + k + '">Vérifier</button><span class="fb" id="qf' + k + '" aria-live="polite"></span>';
+      quiz.appendChild(li);
+      function check() {
+        var fb = $('qf' + k), v = $('qa' + k).value;
+        if (!v) { fb.className = 'fb'; fb.textContent = 'Choisis une réponse.'; return; }
+        if (v === Q.a) { fb.className = 'fb ok'; fb.innerHTML = 'Bravo, c’est juste !<span>' + esc(Q.how) + '</span>'; done[k] = true; }
+        else {
+          done[k] = false;
+          var good = Q.o.filter(function (o) { return o[0] === Q.a; })[0][1];
+          fb.className = 'fb no'; fb.innerHTML = 'Pas tout à fait : la bonne réponse est « ' + esc(good) + ' ».<span>' + esc(Q.how) + '</span>';
+        }
+        $('score').textContent = done.filter(Boolean).length + ' / 8';
+      }
+      $('qb' + k).addEventListener('click', check);
+      $('qa' + k).addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+    });
+    $('score').textContent = '0 / 8';
+  }
+  $('newQuiz').addEventListener('click', newQuiz);
+  newQuiz();
+
+  window.__lamal = {
+    F: F, rng: rng, classYear: classYear,
+    sort0: SORT0, sort0Score: sort0Score,
+    prem: prem, participation: participation,
+    invented: INVENTED, yearTotal: yearTotal, compare: compare, crossover: crossover,
+    models: MODELS, subsidy: subsidy,
+    sort1: SORT1, sort1Score: sort1Score, sort2: SORT2, sort2Score: sort2Score, isOk: isOk,
+    financing: FIN, path: PATH,
+    myths: MYTHS, checkMyth: checkMyth, quiz: QZ
+  };
+})();
+</script>
+</body>
+</html>

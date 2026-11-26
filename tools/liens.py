@@ -22,6 +22,10 @@ DATES = maj.Dates()
 ROOT = Path(__file__).resolve().parent.parent
 
 TOPICS = [
+    ("l'assurance-maladie en Suisse", "l-assurance-maladie-en-suisse.html"),
+    ("l’assurance-maladie en Suisse", "l-assurance-maladie-en-suisse.html"),
+    ("l'assurance-maladie", "l-assurance-maladie-en-suisse.html"),
+    ("l’assurance-maladie", "l-assurance-maladie-en-suisse.html"),
     ("les impôts en Suisse", "les-impots-en-suisse.html"),
     ("les impôts", "les-impots-en-suisse.html"),
     ("la retraite en Suisse", "la-retraite-en-suisse.html"),
