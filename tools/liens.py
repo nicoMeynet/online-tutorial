@@ -22,6 +22,8 @@ DATES = maj.Dates()
 ROOT = Path(__file__).resolve().parent.parent
 
 TOPICS = [
+    ("la retraite en Suisse", "la-retraite-en-suisse.html"),
+    ("les trois piliers", "la-retraite-en-suisse.html"),
     ("calculer avec les racines", "calculer-avec-les-racines.html"),
     ("les règles de calcul des puissances", "les-regles-de-calcul-des-puissances.html"),
     ("les règles des puissances", "les-regles-de-calcul-des-puissances.html"),
